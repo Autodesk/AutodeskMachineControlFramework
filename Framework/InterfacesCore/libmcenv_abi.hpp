@@ -2455,7 +2455,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmillise
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmicroseconds(LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMicroseconds);
 
 /**
-* Adds binary data to store with the build.
+* Adds binary data to store with the build execution.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
@@ -2471,17 +2471,51 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmicrose
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+* Attaches a temp stream to the build execution.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
-* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+* @param[in] pName - Name of the attached data
+* @param[in] pStreamWriterInstance - Stream to attach to the build.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads stream of the build execution by identifier.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pIdentifier - Unique name of the attachment. Fails if name does not exist.
+* @param[in] pStreamReaderInstance - Reader class to access the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_StreamReader pStreamReaderInstance);
+
+/**
+* Loads stream of the build by attachment UUID.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
+* @param[in] pStreamReaderInstance - Reader class to access the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_StreamReader pStreamReaderInstance);
+
+/**
+* Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 * @param[out] pFieldDataInstance - Loaded field instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
-* Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+* Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2491,11 +2525,11 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyid
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
-* Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
+* Stores a discrete field in the build execution. MIME Type will be application/amcf-discretefield2d.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
-* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pIdentifier - Unique name of the attachment. Fails if identifier already exists or is invalid.
+* @param[in] pName - Human Readable name of the attachment.
 * @param[in] pFieldDataInstance - Field instance to store.
 * @param[in] pStoreOptions - Field Data Store Options.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
@@ -2503,23 +2537,58 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyuu
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+* Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
-* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pDataTableInstance - Loaded data table instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddatatablebyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
+* Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pDataTableInstance - Loaded data table instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddatatablebyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
+* Stores a data table in the build execution. MIME Type will be application/amcf-datatable.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pIdentifier - Unique name of the attachment. Fails if identifier already exists or is invalid.
+* @param[in] pName - Human Readable name of the attachment.
+* @param[in] pFieldDataInstance - Field instance to store.
+* @param[in] pStoreOptions - Data Table Write Options.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pFieldDataInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 * @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 * @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 * @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 * @param[out] pImageDataInstance - Image data instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+* Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2532,11 +2601,11 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyidentifie
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* Stores a discrete field in the build job. MIME Type will be image/png
+* Stores a PNG image in the build job. MIME Type will be image/png
 *
 * @param[in] pBuildExecution - BuildExecution instance.
-* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pName - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 * @param[in] pImageDataInstance - Image data instance.
 * @param[in] pStoreOptions - PNG Store Options.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
@@ -2544,7 +2613,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyuuid(LibM
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBuildExecution, const char * pContextIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
@@ -2727,14 +2796,48 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+* Attaches a temp stream to the build.
 *
 * @param[in] pBuild - Build instance.
-* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+* @param[in] pName - Name of the attached data
+* @param[in] pStreamWriterInstance - Stream to attach to the build.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_attachtempstream(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads stream of the build by identifier.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pIdentifier - Unique name of the build attachment. Fails if name does not exist.
+* @param[in] pStreamReaderInstance - Reader class to access the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadstreambyidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, LibMCEnv_StreamReader pStreamReaderInstance);
+
+/**
+* Loads stream of the build by attachment UUID.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
+* @param[in] pStreamReaderInstance - Reader class to access the stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadstreambyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_StreamReader pStreamReaderInstance);
+
+/**
+* Loads a discrete field by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 * @param[out] pFieldDataInstance - Loaded field instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddiscretefield2dbyidentifier(LibMCEnv_Build pBuild, const char * pContextIdentifier, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddiscretefield2dbyidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
 * Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
@@ -2750,8 +2853,8 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddiscretefield2dbyuuid(LibMCE
 * Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
 *
 * @param[in] pBuild - Build instance.
-* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pIdentifier - Unique name of the build attachment. Fails if identifier already exists or is invalid.
+* @param[in] pName - Unique name of the build attachment.
 * @param[in] pFieldDataInstance - Field instance to store.
 * @param[in] pStoreOptions - Field Data Store Options.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
@@ -2759,23 +2862,58 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddiscretefield2dbyuuid(LibMCE
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const char * pContextIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
+* Loads a data table by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-datatable.
 *
 * @param[in] pBuild - Build instance.
-* @param[in] pContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pDataTableInstance - Data Table instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddatatablebyidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
+* Loads a data table by uuid which previously stored in the build job. MIME Type MUST be application/amcf-datatable.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+* @param[out] pDataTableInstance - Data Table instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddatatablebyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_DataTable * pDataTableInstance);
+
+/**
+* Stores a data table in the build job. MIME Type will be application/amcf-datatable.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pIdentifier - Unique name of the build attachment. Fails if identifier already exists or is invalid.
+* @param[in] pName - Unique name of the build attachment.
+* @param[in] pDataTableInstance - Data Table instance to store.
+* @param[in] pStoreOptions - Data Table Write Options.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storedatatable(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pDataTableInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/**
+* Loads a PNG image by identifier which was previously stored in the build job. MIME Type MUST be image/png.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 * @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 * @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 * @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 * @param[out] pImageDataInstance - Image data instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyidentifier(LibMCEnv_Build pBuild, const char * pContextIdentifier, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+* Loads a PNG image by uuid which was previously stored in the build job. MIME Type MUST be image/png.
 *
 * @param[in] pBuild - Build instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2788,11 +2926,11 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyidentifier(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* Stores a discrete field in the build job. MIME Type will be image/png
+* Stores a PNG Image in the build job. MIME Type will be image/png
 *
 * @param[in] pBuild - Build instance.
-* @param[in] pContextIdentifier - Unique name of the attachment. Fails if name does already exist or has invalid Mime type.
-* @param[in] pName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+* @param[in] pIdentifier - Unique name of the attachment. Fails if identifier does already exist or is invalid.
+* @param[in] pName - Unique name of the build attachment.
 * @param[in] pImageDataInstance - Image data instance.
 * @param[in] pStoreOptions - PNG Store Options.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
@@ -2800,7 +2938,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyuuid(LibMCEnv_Buil
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * pContextIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Starts a build execution. This function does not work in a UIEnvironment context!
@@ -4763,6 +4901,40 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getbuildjob(LibMCEnv
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createcryptocontext(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_CryptoContext * pContext);
 
+/**
+* Returns the current time as DateTime object instance.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getcurrentdatetime(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_DateTime * pDateTime);
+
+/**
+* Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nYear - Year. Must be larger or equal than 1970.
+* @param[in] nMonth - Month. Must be between 1 and 12.
+* @param[in] nDay - Day. Must be between 1 and 31.
+* @param[in] nHour - Hour. Must be between 0 and 23.
+* @param[in] nMinute - Minute. Must be between 0 and 59.
+* @param[in] nSecond - Second. Must be between 0 and 59.
+* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getcustomdatetime(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nYear, LibMCEnv_uint32 nMonth, LibMCEnv_uint32 nDay, LibMCEnv_uint32 nHour, LibMCEnv_uint32 nMinute, LibMCEnv_uint32 nSecond, LibMCEnv_uint32 nMicrosecond, LibMCEnv_DateTime * pDateTime);
+
+/**
+* Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getstartdatetime(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_DateTime * pDateTime);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
@@ -5081,50 +5253,71 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setintegerresult(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setboolresult(LibMCEnv_SignalHandler pSignalHandler, const char * pName, bool bValue);
 
 /*************************************************************************************************************************
- Class definition for TempStreamWriter
+ Class definition for BaseTempStreamWriter
 **************************************************************************************************************************/
 
 /**
 * Returns the UUID of the stream.
 *
-* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
 * @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pUUIDBuffer -  buffer of Returns stream uuid., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getuuid(LibMCEnv_TempStreamWriter pTempStreamWriter, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_getuuid(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * Returns the name of the stream.
 *
-* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
 * @param[in] nNameBufferSize - size of the buffer (including trailing 0)
 * @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pNameBuffer -  buffer of Returns stream name., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getname(LibMCEnv_TempStreamWriter pTempStreamWriter, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_getname(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
 * Returns the MIME type of the stream.
 *
-* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
 * @param[in] nMIMETypeBufferSize - size of the buffer (including trailing 0)
 * @param[out] pMIMETypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pMIMETypeBuffer -  buffer of Returns stream MIME Type., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getmimetype(LibMCEnv_TempStreamWriter pTempStreamWriter, const LibMCEnv_uint32 nMIMETypeBufferSize, LibMCEnv_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_getmimetype(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, const LibMCEnv_uint32 nMIMETypeBufferSize, LibMCEnv_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer);
 
 /**
 * Returns the current size of the stream.
 *
-* @param[in] pTempStreamWriter - TempStreamWriter instance.
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
 * @param[out] pSize - Current size of the stream.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getsize(LibMCEnv_TempStreamWriter pTempStreamWriter, LibMCEnv_uint64 * pSize);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_getsize(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, LibMCEnv_uint64 * pSize);
+
+/**
+* Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
+*
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_finish(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter);
+
+/**
+* Returns if the stream writing has already been finished.
+*
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
+* @param[out] pFinished - If true, writing into the stream is not possible anymore.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_isfinished(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, bool * pFinished);
+
+/*************************************************************************************************************************
+ Class definition for TempStreamWriter
+**************************************************************************************************************************/
 
 /**
 * Returns the current write position of the stream.
@@ -5143,15 +5336,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_getwriteposition(LibM
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_seek(LibMCEnv_TempStreamWriter pTempStreamWriter, LibMCEnv_uint64 nWritePosition);
-
-/**
-* Returns if the stream writing has been finished.
-*
-* @param[in] pTempStreamWriter - TempStreamWriter instance.
-* @param[out] pWritingIsFinished - Returns true if writing is finished.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_isfinished(LibMCEnv_TempStreamWriter pTempStreamWriter, bool * pWritingIsFinished);
 
 /**
 * Writes a data array into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
@@ -5182,14 +5366,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_writestring(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_writeline(LibMCEnv_TempStreamWriter pTempStreamWriter, const char * pLine);
 
 /**
-* Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
-*
-* @param[in] pTempStreamWriter - TempStreamWriter instance.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_finish(LibMCEnv_TempStreamWriter pTempStreamWriter);
-
-/**
 * Copies the full content of a StreamReader Instance.
 *
 * @param[in] pTempStreamWriter - TempStreamWriter instance.
@@ -5213,63 +5389,14 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tempstreamwriter_copyfrom(LibMCEnv_Tem
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_createzipentry(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const char * pFileName, LibMCEnv_TempStreamWriter * pTempStream);
 
 /**
-* Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
+* Adds the full content of a StreamReader Instance.
 *
 * @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_finish(LibMCEnv_ZIPStreamWriter pZIPStreamWriter);
-
-/**
-* Copies the full content of a StreamReader Instance.
-*
-* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
+* @param[in] pFileName - File Name for the new entry in the ZIP file. Entry MUST not exist yet.
 * @param[in] pStreamReader - Stream to read from.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_copyfrom(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, LibMCEnv_StreamReader pStreamReader);
-
-/**
-* Returns the UUID of the stream.
-*
-* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
-* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUUIDBuffer -  buffer of Returns stream uuid., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_getuuid(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
-
-/**
-* Returns the name of the stream.
-*
-* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
-* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pNameBuffer -  buffer of Returns stream name., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_getname(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
-
-/**
-* Returns the MIME type of the stream.
-*
-* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
-* @param[in] nMIMETypeBufferSize - size of the buffer (including trailing 0)
-* @param[out] pMIMETypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pMIMETypeBuffer -  buffer of Returns stream MIME Type., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_getmimetype(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const LibMCEnv_uint32 nMIMETypeBufferSize, LibMCEnv_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer);
-
-/**
-* Returns the current size of the stream.
-*
-* @param[in] pZIPStreamWriter - ZIPStreamWriter instance.
-* @param[out] pSize - Current size of the stream.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_getsize(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, LibMCEnv_uint64 * pSize);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_zipstreamwriter_createzipentryfromstream(LibMCEnv_ZIPStreamWriter pZIPStreamWriter, const char * pFileName, LibMCEnv_StreamReader pStreamReader);
 
 /*************************************************************************************************************************
  Class definition for StreamReader
@@ -6484,7 +6611,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmilli
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
-* Returns the global start time of the current state in milliseconds.
+* Returns the global start timer of the current state in milliseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[out] pTimerValue - Timer value in Milliseconds
@@ -6493,7 +6620,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmicro
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getstarttimeofstateinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
-* Returns the global start time of the current state in microseconds.
+* Returns the global start timer of the current state in microseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[out] pTimerValue - Timer value in Milliseconds
@@ -6502,7 +6629,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getstarttimeofstatein
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getstarttimeofstateinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
-* Returns the global finish time of the previous state in microseconds.
+* Returns the global finish timer of the previous state in microseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[out] pTimerValue - Timer value in Microseconds
@@ -6511,7 +6638,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getstarttimeofstatein
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getendtimeofpreviousstateinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
-* Returns the global finish time of the previous state in milliseconds.
+* Returns the global finish timer of the previous state in milliseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[out] pTimerValue - Timer value in Milliseconds
@@ -6520,7 +6647,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getendtimeofpreviouss
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getendtimeofpreviousstateinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
-* Returns the global finish time of the previous state in milliseconds.
+* Returns the global finish timer of the previous state in milliseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[out] pTimerValue - Timer value in Milliseconds
@@ -6529,13 +6656,47 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getendtimeofpreviouss
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getelapsedtimeinstateinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /**
-* Returns the global finish time of the previous state in microseconds.
+* Returns the global finish timer of the previous state in microseconds.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[out] pTimerValue - Timer value in Microseconds
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getelapsedtimeinstateinmicroseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
+* Returns the current time as DateTime object instance.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getcurrentdatetime(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_DateTime * pDateTime);
+
+/**
+* Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] nYear - Year. Must be larger or equal than 1970.
+* @param[in] nMonth - Month. Must be between 1 and 12.
+* @param[in] nDay - Day. Must be between 1 and 31.
+* @param[in] nHour - Hour. Must be between 0 and 23.
+* @param[in] nMinute - Minute. Must be between 0 and 59.
+* @param[in] nSecond - Second. Must be between 0 and 59.
+* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getcustomdatetime(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nYear, LibMCEnv_uint32 nMonth, LibMCEnv_uint32 nDay, LibMCEnv_uint32 nHour, LibMCEnv_uint32 nMinute, LibMCEnv_uint32 nSecond, LibMCEnv_uint32 nMicrosecond, LibMCEnv_DateTime * pDateTime);
+
+/**
+* Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getstartdatetime(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_DateTime * pDateTime);
 
 /**
 * Returns a test environment instance.
@@ -7587,6 +7748,40 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createzipstream(LibMCEnv
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findstream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
+
+/**
+* Returns the current time as DateTime object instance.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcurrentdatetime(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_DateTime * pDateTime);
+
+/**
+* Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nYear - Year. Must be larger or equal than 1970.
+* @param[in] nMonth - Month. Must be between 1 and 12.
+* @param[in] nDay - Day. Must be between 1 and 31.
+* @param[in] nHour - Hour. Must be between 0 and 23.
+* @param[in] nMinute - Minute. Must be between 0 and 59.
+* @param[in] nSecond - Second. Must be between 0 and 59.
+* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcustomdatetime(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nYear, LibMCEnv_uint32 nMonth, LibMCEnv_uint32 nDay, LibMCEnv_uint32 nHour, LibMCEnv_uint32 nMinute, LibMCEnv_uint32 nSecond, LibMCEnv_uint32 nMicrosecond, LibMCEnv_DateTime * pDateTime);
+
+/**
+* Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pDateTime - Date Time Instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getstartdatetime(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_DateTime * pDateTime);
 
 /*************************************************************************************************************************
  Global functions

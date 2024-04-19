@@ -96,6 +96,18 @@ public:
 
 	std::string AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer) override;
 
+	std::string AttachTempStream(const std::string& sIdentifier, const std::string& sName, IBaseTempStreamWriter* pStreamWriterInstance) override;
+
+	void LoadStreamByIdentifier(const std::string& sIdentifier, IStreamReader* pStreamReaderInstance) override;
+
+	void LoadStreamByUUID(const std::string& sDataUUID, IStreamReader* pStreamReaderInstance) override;
+
+	IDataTable* LoadDataTableByIdentifier(const std::string& sIdentifier) override;
+
+	IDataTable* LoadDataTableByUUID(const std::string& sDataUUID) override;
+
+	std::string StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions) override;
+
 	IDiscreteFieldData2D* LoadDiscreteField2DByIdentifier(const std::string& sContextIdentifier) override;
 
 	IDiscreteFieldData2D* LoadDiscreteField2DByUUID(const std::string& sDataUUID) override;

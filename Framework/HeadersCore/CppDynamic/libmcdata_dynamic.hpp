@@ -1283,12 +1283,12 @@ public:
 	
 	inline bool StreamIsReady(const std::string & sUUID);
 	inline PStorageStream RetrieveStream(const std::string & sUUID);
-	inline void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
-	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
 	inline void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2);
-	inline void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline void StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline LibMCData_uint64 GetRandomWriteStreamSize(const std::string & sUUID);
 	inline void FinishRandomWriteStream(const std::string & sUUID);
@@ -5385,33 +5385,29 @@ public:
 	/**
 	* CStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
-	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] ContentBuffer - Data of stream
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	void CStorage::StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreNewStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data(), sUserID.c_str(), nAbsoluteTimeStamp));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreNewStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data(), sUserID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
 	* CStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserID.c_str(), nAbsoluteTimeStamp));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -5448,16 +5444,14 @@ public:
 	/**
 	* CStorage::BeginRandomWriteStream - starts storing a stream with random write access. Checksums are not required.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	void CStorage::BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginRandomWriteStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sContextIdentifier.c_str(), sName.c_str(), sMimeType.c_str(), sUserID.c_str(), nAbsoluteTimeStamp));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginRandomWriteStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), sUserID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**

@@ -334,6 +334,7 @@ namespace AMC {
 		
 		std::string getStartTimeAsUTC();
 
+		uint64_t getStartTimeAsMicrosecondsSince1970();
 	};
 
 
@@ -637,6 +638,11 @@ namespace AMC {
 		return m_pGlobalChrono->convertToISO8601TimeUTC (m_nAbsoluteStartTimeInMicroseconds);
 	}
 
+	uint64_t CStateJournalImpl::getStartTimeAsMicrosecondsSince1970()
+	{
+		return m_nAbsoluteStartTimeInMicroseconds;
+	}
+
 	uint64_t CStateJournalImpl::retrieveTimeStamp_MicroSecond()
 	{
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
@@ -853,6 +859,12 @@ namespace AMC {
 	{
 		return m_pImpl->getStartTimeAsUTC();
 	}
+
+	uint64_t CStateJournal::getStartTimeAsMicrosecondsSince1970()
+	{
+		return m_pImpl->getStartTimeAsMicrosecondsSince1970();
+	}
+
 
 }
 

@@ -237,7 +237,7 @@ std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, cons
 	auto sDataUUID = AMCCommon::CUtils::createUUID();
 	auto sSystemUserID = m_sSystemUserID;
 
-	pStorage->StoreNewStream(sDataUUID, m_pExecution->GetExecutionUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 
 	auto nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
@@ -245,6 +245,21 @@ std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, cons
 	m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID, nAbsoluteTimeStamp);
 
 	return sDataUUID;
+}
+
+std::string CBuildExecution::AttachTempStream(const std::string& sIdentifier, const std::string& sName, IBaseTempStreamWriter* pStreamWriterInstance)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+void CBuildExecution::LoadStreamByIdentifier(const std::string& sIdentifier, IStreamReader* pStreamReaderInstance)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+void CBuildExecution::LoadStreamByUUID(const std::string& sDataUUID, IStreamReader* pStreamReaderInstance)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
 IDiscreteFieldData2D * CBuildExecution::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)

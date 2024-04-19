@@ -732,8 +732,6 @@ public:
 	/**
 	* IStorage::StoreNewStream - stores a new stream.
 	* @param[in] sUUID - UUID of storage stream. Must be unique and newly generated.
-	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nContentBufferSize - Number of elements in buffer
@@ -741,20 +739,18 @@ public:
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual void StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::BeginPartialStream - starts storing a stream with partial uploads.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::StorePartialStream - stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -782,14 +778,12 @@ public:
 	/**
 	* IStorage::BeginRandomWriteStream - starts storing a stream with random write access. Checksums are not required.
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
-	* @param[in] sContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-	* @param[in] sContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void BeginRandomWriteStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sContextIdentifier, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual void BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::StoreRandomWriteStream - stores data in a stream with random write access. Writing may be in arbitrary order.

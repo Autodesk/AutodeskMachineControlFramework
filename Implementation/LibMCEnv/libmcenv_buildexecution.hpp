@@ -121,11 +121,23 @@ public:
 
 	std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) override;
 
+	std::string AttachTempStream(const std::string& sIdentifier, const std::string& sName, IBaseTempStreamWriter* pStreamWriterInstance) override;
+
+	void LoadStreamByIdentifier(const std::string& sIdentifier, IStreamReader* pStreamReaderInstance) override;
+
+	virtual void LoadStreamByUUID(const std::string& sDataUUID, IStreamReader* pStreamReaderInstance) override;
+
 	IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier) override;
 
 	IDiscreteFieldData2D * LoadDiscreteField2DByUUID(const std::string & sDataUUID) override;
 
 	std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) override;
+
+	IDataTable* LoadDataTableByIdentifier(const std::string& sIdentifier) override;
+
+	IDataTable* LoadDataTableByUUID(const std::string& sDataUUID) override;
+
+	std::string StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions) override;
 
 	IImageData * LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 

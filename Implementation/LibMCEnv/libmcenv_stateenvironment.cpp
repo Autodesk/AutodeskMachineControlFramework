@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_dataseries.hpp"
+#include "libmcenv_datetime.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_journalvariable.hpp"
 #include "libmcenv_testenvironment.hpp"
@@ -48,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_zipstreamwriter.hpp"
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
 
@@ -846,7 +848,11 @@ ITempStreamWriter* CStateEnvironment::CreateTemporaryStream(const std::string& s
 
 IZIPStreamWriter* CStateEnvironment::CreateZIPStream(const std::string& sName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (sName.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
+
+	std::string sUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	return new CZIPStreamWriter(m_pSystemState->getDataModelInstance(), sName, sUserUUID, m_pSystemState->getGlobalChronoInstance());
 }
 
 
@@ -871,3 +877,23 @@ IStreamReader* CStateEnvironment::FindStream(const std::string& sUUID, const boo
 	return nullptr;
 
 }
+
+
+IDateTime* CStateEnvironment::GetCurrentDateTime()
+{
+	auto pChrono = m_pSystemState->getGlobalChronoInstance();
+	return new CDateTime(pChrono->getUTCTimeStampInMicrosecondsSince1970());
+		
+}
+
+IDateTime* CStateEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)
+{
+	return new CDateTime(AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond));
+}
+
+IDateTime* CStateEnvironment::GetStartDateTime()
+{
+	auto pJournalInstance = m_pSystemState->getStateJournalInstance();
+	return new CDateTime(pJournalInstance->getStartTimeAsMicrosecondsSince1970 ());
+}
+

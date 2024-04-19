@@ -612,8 +612,6 @@ typedef LibMCDataResult (*PLibMCDataStorage_RetrieveStreamPtr) (LibMCData_Storag
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. Must be unique and newly generated.
-* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-* @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name Description of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] nContentBufferSize - Number of elements in buffer
@@ -622,15 +620,13 @@ typedef LibMCDataResult (*PLibMCDataStorage_RetrieveStreamPtr) (LibMCData_Storag
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataStorage_StoreNewStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataStorage_StoreNewStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * starts storing a stream with partial uploads.
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST be unique and newly generated.
-* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-* @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] nSize - Final size of the stream. MUST NOT be 0.
@@ -638,7 +634,7 @@ typedef LibMCDataResult (*PLibMCDataStorage_StoreNewStreamPtr) (LibMCData_Storag
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataStorage_BeginPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataStorage_BeginPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -677,15 +673,13 @@ typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Pt
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST be unique and newly generated.
-* @param[in] pContextUUID - DEPRECIATED and not used anymore. Streams MUST create ownership references manually!
-* @param[in] pContextIdentifier - Identifier of the stream. MUST be unique within the given context.
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] pUserID - Currently authenticated user
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataStorage_BeginRandomWriteStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataStorage_BeginRandomWriteStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pName, const char * pMimeType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
 
 /**
 * stores data in a stream with random write access. Writing may be in arbitrary order.

@@ -38,6 +38,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_journalhandler.hpp"
 #include "libmcenv_dataseries.hpp"
+#include "libmcenv_datetime.hpp"
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_alert.hpp"
 #include "libmcenv_alertiterator.hpp"
@@ -845,4 +846,24 @@ IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool b
     }
 
     return nullptr;
+}
+
+
+
+IDateTime* CUIEnvironment::GetCurrentDateTime()
+{
+    auto pChrono = m_pUISystemState->getGlobalChronoInstance();
+    return new CDateTime(pChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+}
+
+IDateTime* CUIEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)
+{
+    return new CDateTime(AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond));
+}
+
+IDateTime* CUIEnvironment::GetStartDateTime()
+{
+    auto pJournalInstance = m_pUISystemState->getStateJournal();
+    return new CDateTime(pJournalInstance->getStartTimeAsMicrosecondsSince1970());
 }

@@ -98,6 +98,7 @@ class CDriverStatusUpdateSession;
 class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
+class CBaseTempStreamWriter;
 class CTempStreamWriter;
 class CZIPStreamWriter;
 class CStreamReader;
@@ -155,6 +156,7 @@ typedef CDriverStatusUpdateSession CLibMCEnvDriverStatusUpdateSession;
 typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
+typedef CBaseTempStreamWriter CLibMCEnvBaseTempStreamWriter;
 typedef CTempStreamWriter CLibMCEnvTempStreamWriter;
 typedef CZIPStreamWriter CLibMCEnvZIPStreamWriter;
 typedef CStreamReader CLibMCEnvStreamReader;
@@ -212,6 +214,7 @@ typedef std::shared_ptr<CDriverStatusUpdateSession> PDriverStatusUpdateSession;
 typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
+typedef std::shared_ptr<CBaseTempStreamWriter> PBaseTempStreamWriter;
 typedef std::shared_ptr<CTempStreamWriter> PTempStreamWriter;
 typedef std::shared_ptr<CZIPStreamWriter> PZIPStreamWriter;
 typedef std::shared_ptr<CStreamReader> PStreamReader;
@@ -269,6 +272,7 @@ typedef PDriverStatusUpdateSession PLibMCEnvDriverStatusUpdateSession;
 typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
+typedef PBaseTempStreamWriter PLibMCEnvBaseTempStreamWriter;
 typedef PTempStreamWriter PLibMCEnvTempStreamWriter;
 typedef PZIPStreamWriter PLibMCEnvZIPStreamWriter;
 typedef PStreamReader PLibMCEnvStreamReader;
@@ -876,6 +880,7 @@ private:
 	friend class CDriverEnvironment;
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
+	friend class CBaseTempStreamWriter;
 	friend class CTempStreamWriter;
 	friend class CZIPStreamWriter;
 	friend class CStreamReader;
@@ -1480,12 +1485,18 @@ public:
 	inline LibMCEnv_uint64 GetElapsedTimeInMilliseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInMicroseconds();
 	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
-	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier);
+	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
+	inline void LoadStreamByIdentifier(const std::string & sIdentifier, classParam<CStreamReader> pStreamReaderInstance);
+	inline void LoadStreamByUUID(const std::string & sDataUUID, classParam<CStreamReader> pStreamReaderInstance);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sIdentifier);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
-	inline std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
-	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline PDataTable LoadDataTableByIdentifier(const std::string & sIdentifier);
+	inline PDataTable LoadDataTableByUUID(const std::string & sDataUUID);
+	inline std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pFieldDataInstance, classParam<CDataTableWriteOptions> pStoreOptions);
+	inline PImageData LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
 	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
@@ -1535,12 +1546,18 @@ public:
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
 	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
-	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier);
+	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
+	inline void LoadStreamByIdentifier(const std::string & sIdentifier, classParam<CStreamReader> pStreamReaderInstance);
+	inline void LoadStreamByUUID(const std::string & sDataUUID, classParam<CStreamReader> pStreamReaderInstance);
+	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sIdentifier);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
-	inline std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
-	inline PImageData LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline PDataTable LoadDataTableByIdentifier(const std::string & sIdentifier);
+	inline PDataTable LoadDataTableByUUID(const std::string & sDataUUID);
+	inline std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pDataTableInstance, classParam<CDataTableWriteOptions> pStoreOptions);
+	inline PImageData LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
 	inline PBuildExecution StartExecution(const std::string & sDescription, const std::string & sUserUUID);
 	inline bool HasExecution(const std::string & sExecutionUUID);
 	inline PBuildExecution FindExecution(const std::string & sExecutionUUID);
@@ -1964,6 +1981,9 @@ public:
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline PCryptoContext CreateCryptoContext();
+	inline PDateTime GetCurrentDateTime();
+	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
+	inline PDateTime GetStartDateTime();
 };
 	
 /*************************************************************************************************************************
@@ -2029,54 +2049,65 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CBaseTempStreamWriter 
+**************************************************************************************************************************/
+class CBaseTempStreamWriter : public CBase {
+public:
+	
+	/**
+	* CBaseTempStreamWriter::CBaseTempStreamWriter - Constructor for BaseTempStreamWriter class.
+	*/
+	CBaseTempStreamWriter(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetUUID();
+	inline std::string GetName();
+	inline std::string GetMIMEType();
+	inline LibMCEnv_uint64 GetSize();
+	inline void Finish();
+	inline bool IsFinished();
+};
+	
+/*************************************************************************************************************************
  Class CTempStreamWriter 
 **************************************************************************************************************************/
-class CTempStreamWriter : public CBase {
+class CTempStreamWriter : public CBaseTempStreamWriter {
 public:
 	
 	/**
 	* CTempStreamWriter::CTempStreamWriter - Constructor for TempStreamWriter class.
 	*/
 	CTempStreamWriter(CWrapper* pWrapper, LibMCEnvHandle pHandle)
-		: CBase(pWrapper, pHandle)
+		: CBaseTempStreamWriter(pWrapper, pHandle)
 	{
 	}
 	
-	inline std::string GetUUID();
-	inline std::string GetName();
-	inline std::string GetMIMEType();
-	inline LibMCEnv_uint64 GetSize();
 	inline LibMCEnv_uint64 GetWritePosition();
 	inline void Seek(const LibMCEnv_uint64 nWritePosition);
-	inline bool IsFinished();
 	inline void WriteData(const CInputVector<LibMCEnv_uint8> & DataBuffer);
 	inline void WriteString(const std::string & sData);
 	inline void WriteLine(const std::string & sLine);
-	inline void Finish();
 	inline void CopyFrom(classParam<CStreamReader> pStreamReader);
 };
 	
 /*************************************************************************************************************************
  Class CZIPStreamWriter 
 **************************************************************************************************************************/
-class CZIPStreamWriter : public CBase {
+class CZIPStreamWriter : public CBaseTempStreamWriter {
 public:
 	
 	/**
 	* CZIPStreamWriter::CZIPStreamWriter - Constructor for ZIPStreamWriter class.
 	*/
 	CZIPStreamWriter(CWrapper* pWrapper, LibMCEnvHandle pHandle)
-		: CBase(pWrapper, pHandle)
+		: CBaseTempStreamWriter(pWrapper, pHandle)
 	{
 	}
 	
 	inline PTempStreamWriter CreateZIPEntry(const std::string & sFileName);
-	inline void Finish();
-	inline void CopyFrom(classParam<CStreamReader> pStreamReader);
-	inline std::string GetUUID();
-	inline std::string GetName();
-	inline std::string GetMIMEType();
-	inline LibMCEnv_uint64 GetSize();
+	inline void CreateZIPEntryFromStream(const std::string & sFileName, classParam<CStreamReader> pStreamReader);
 };
 	
 /*************************************************************************************************************************
@@ -2333,6 +2364,9 @@ public:
 	inline LibMCEnv_uint64 GetEndTimeOfPreviousStateInMilliseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInStateInMilliseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInStateInMicroseconds();
+	inline PDateTime GetCurrentDateTime();
+	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
+	inline PDateTime GetStartDateTime();
 	inline PTestEnvironment GetTestEnvironment();
 	inline PXMLDocument CreateXMLDocument(const std::string & sRootNodeName, const std::string & sDefaultNamespace);
 	inline PXMLDocument ParseXMLString(const std::string & sXMLString);
@@ -2463,6 +2497,9 @@ public:
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
 	inline PZIPStreamWriter CreateZIPStream(const std::string & sName);
 	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
+	inline PDateTime GetCurrentDateTime();
+	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
+	inline PDateTime GetStartDateTime();
 };
 	
 	/**
@@ -2775,9 +2812,15 @@ public:
 		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = nullptr;
 		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = nullptr;
 		pWrapperTable->m_BuildExecution_AddBinaryData = nullptr;
+		pWrapperTable->m_BuildExecution_AttachTempStream = nullptr;
+		pWrapperTable->m_BuildExecution_LoadStreamByIdentifier = nullptr;
+		pWrapperTable->m_BuildExecution_LoadStreamByUUID = nullptr;
 		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = nullptr;
 		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByUUID = nullptr;
 		pWrapperTable->m_BuildExecution_StoreDiscreteField2D = nullptr;
+		pWrapperTable->m_BuildExecution_LoadDataTableByIdentifier = nullptr;
+		pWrapperTable->m_BuildExecution_LoadDataTableByUUID = nullptr;
+		pWrapperTable->m_BuildExecution_StoreDataTable = nullptr;
 		pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier = nullptr;
 		pWrapperTable->m_BuildExecution_LoadPNGImageByUUID = nullptr;
 		pWrapperTable->m_BuildExecution_StorePNGImage = nullptr;
@@ -2798,9 +2841,15 @@ public:
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_Build_AddBinaryData = nullptr;
+		pWrapperTable->m_Build_AttachTempStream = nullptr;
+		pWrapperTable->m_Build_LoadStreamByIdentifier = nullptr;
+		pWrapperTable->m_Build_LoadStreamByUUID = nullptr;
 		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = nullptr;
 		pWrapperTable->m_Build_LoadDiscreteField2DByUUID = nullptr;
 		pWrapperTable->m_Build_StoreDiscreteField2D = nullptr;
+		pWrapperTable->m_Build_LoadDataTableByIdentifier = nullptr;
+		pWrapperTable->m_Build_LoadDataTableByUUID = nullptr;
+		pWrapperTable->m_Build_StoreDataTable = nullptr;
 		pWrapperTable->m_Build_LoadPNGImageByIdentifier = nullptr;
 		pWrapperTable->m_Build_LoadPNGImageByUUID = nullptr;
 		pWrapperTable->m_Build_StorePNGImage = nullptr;
@@ -2987,6 +3036,9 @@ public:
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateCryptoContext = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetCurrentDateTime = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetCustomDateTime = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetStartDateTime = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -3017,25 +3069,20 @@ public:
 		pWrapperTable->m_SignalHandler_SetDoubleResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetIntegerResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetBoolResult = nullptr;
-		pWrapperTable->m_TempStreamWriter_GetUUID = nullptr;
-		pWrapperTable->m_TempStreamWriter_GetName = nullptr;
-		pWrapperTable->m_TempStreamWriter_GetMIMEType = nullptr;
-		pWrapperTable->m_TempStreamWriter_GetSize = nullptr;
+		pWrapperTable->m_BaseTempStreamWriter_GetUUID = nullptr;
+		pWrapperTable->m_BaseTempStreamWriter_GetName = nullptr;
+		pWrapperTable->m_BaseTempStreamWriter_GetMIMEType = nullptr;
+		pWrapperTable->m_BaseTempStreamWriter_GetSize = nullptr;
+		pWrapperTable->m_BaseTempStreamWriter_Finish = nullptr;
+		pWrapperTable->m_BaseTempStreamWriter_IsFinished = nullptr;
 		pWrapperTable->m_TempStreamWriter_GetWritePosition = nullptr;
 		pWrapperTable->m_TempStreamWriter_Seek = nullptr;
-		pWrapperTable->m_TempStreamWriter_IsFinished = nullptr;
 		pWrapperTable->m_TempStreamWriter_WriteData = nullptr;
 		pWrapperTable->m_TempStreamWriter_WriteString = nullptr;
 		pWrapperTable->m_TempStreamWriter_WriteLine = nullptr;
-		pWrapperTable->m_TempStreamWriter_Finish = nullptr;
 		pWrapperTable->m_TempStreamWriter_CopyFrom = nullptr;
 		pWrapperTable->m_ZIPStreamWriter_CreateZIPEntry = nullptr;
-		pWrapperTable->m_ZIPStreamWriter_Finish = nullptr;
-		pWrapperTable->m_ZIPStreamWriter_CopyFrom = nullptr;
-		pWrapperTable->m_ZIPStreamWriter_GetUUID = nullptr;
-		pWrapperTable->m_ZIPStreamWriter_GetName = nullptr;
-		pWrapperTable->m_ZIPStreamWriter_GetMIMEType = nullptr;
-		pWrapperTable->m_ZIPStreamWriter_GetSize = nullptr;
+		pWrapperTable->m_ZIPStreamWriter_CreateZIPEntryFromStream = nullptr;
 		pWrapperTable->m_StreamReader_GetUUID = nullptr;
 		pWrapperTable->m_StreamReader_GetName = nullptr;
 		pWrapperTable->m_StreamReader_GetMIMEType = nullptr;
@@ -3148,6 +3195,9 @@ public:
 		pWrapperTable->m_StateEnvironment_GetEndTimeOfPreviousStateInMilliseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMilliseconds = nullptr;
 		pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMicroseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetCurrentDateTime = nullptr;
+		pWrapperTable->m_StateEnvironment_GetCustomDateTime = nullptr;
+		pWrapperTable->m_StateEnvironment_GetStartDateTime = nullptr;
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateXMLDocument = nullptr;
 		pWrapperTable->m_StateEnvironment_ParseXMLString = nullptr;
@@ -3246,6 +3296,9 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateTemporaryStream = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateZIPStream = nullptr;
 		pWrapperTable->m_UIEnvironment_FindStream = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCurrentDateTime = nullptr;
+		pWrapperTable->m_UIEnvironment_GetCustomDateTime = nullptr;
+		pWrapperTable->m_UIEnvironment_GetStartDateTime = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -5363,6 +5416,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_AttachTempStream = (PLibMCEnvBuildExecution_AttachTempStreamPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_attachtempstream");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_AttachTempStream = (PLibMCEnvBuildExecution_AttachTempStreamPtr) dlsym(hLibrary, "libmcenv_buildexecution_attachtempstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_AttachTempStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadStreamByIdentifier = (PLibMCEnvBuildExecution_LoadStreamByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loadstreambyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadStreamByIdentifier = (PLibMCEnvBuildExecution_LoadStreamByIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_loadstreambyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadStreamByIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadStreamByUUID = (PLibMCEnvBuildExecution_LoadStreamByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loadstreambyuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadStreamByUUID = (PLibMCEnvBuildExecution_LoadStreamByUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_loadstreambyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadStreamByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyidentifier");
 		#else // _WIN32
 		pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_loaddiscretefield2dbyidentifier");
@@ -5387,6 +5467,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildExecution_StoreDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadDataTableByIdentifier = (PLibMCEnvBuildExecution_LoadDataTableByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loaddatatablebyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadDataTableByIdentifier = (PLibMCEnvBuildExecution_LoadDataTableByIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_loaddatatablebyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadDataTableByIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_LoadDataTableByUUID = (PLibMCEnvBuildExecution_LoadDataTableByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_loaddatatablebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_LoadDataTableByUUID = (PLibMCEnvBuildExecution_LoadDataTableByUUIDPtr) dlsym(hLibrary, "libmcenv_buildexecution_loaddatatablebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_LoadDataTableByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_StoreDataTable = (PLibMCEnvBuildExecution_StoreDataTablePtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_storedatatable");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_StoreDataTable = (PLibMCEnvBuildExecution_StoreDataTablePtr) dlsym(hLibrary, "libmcenv_buildexecution_storedatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_StoreDataTable == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5570,6 +5677,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Build_AttachTempStream = (PLibMCEnvBuild_AttachTempStreamPtr) GetProcAddress(hLibrary, "libmcenv_build_attachtempstream");
+		#else // _WIN32
+		pWrapperTable->m_Build_AttachTempStream = (PLibMCEnvBuild_AttachTempStreamPtr) dlsym(hLibrary, "libmcenv_build_attachtempstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_AttachTempStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadStreamByIdentifier = (PLibMCEnvBuild_LoadStreamByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_loadstreambyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadStreamByIdentifier = (PLibMCEnvBuild_LoadStreamByIdentifierPtr) dlsym(hLibrary, "libmcenv_build_loadstreambyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadStreamByIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadStreamByUUID = (PLibMCEnvBuild_LoadStreamByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_build_loadstreambyuuid");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadStreamByUUID = (PLibMCEnvBuild_LoadStreamByUUIDPtr) dlsym(hLibrary, "libmcenv_build_loadstreambyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadStreamByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuild_LoadDiscreteField2DByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_loaddiscretefield2dbyidentifier");
 		#else // _WIN32
 		pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier = (PLibMCEnvBuild_LoadDiscreteField2DByIdentifierPtr) dlsym(hLibrary, "libmcenv_build_loaddiscretefield2dbyidentifier");
@@ -5594,6 +5728,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_StoreDiscreteField2D == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadDataTableByIdentifier = (PLibMCEnvBuild_LoadDataTableByIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_loaddatatablebyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadDataTableByIdentifier = (PLibMCEnvBuild_LoadDataTableByIdentifierPtr) dlsym(hLibrary, "libmcenv_build_loaddatatablebyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadDataTableByIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadDataTableByUUID = (PLibMCEnvBuild_LoadDataTableByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_build_loaddatatablebyuuid");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadDataTableByUUID = (PLibMCEnvBuild_LoadDataTableByUUIDPtr) dlsym(hLibrary, "libmcenv_build_loaddatatablebyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadDataTableByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_StoreDataTable = (PLibMCEnvBuild_StoreDataTablePtr) GetProcAddress(hLibrary, "libmcenv_build_storedatatable");
+		#else // _WIN32
+		pWrapperTable->m_Build_StoreDataTable = (PLibMCEnvBuild_StoreDataTablePtr) dlsym(hLibrary, "libmcenv_build_storedatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_StoreDataTable == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7271,6 +7432,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetCurrentDateTime = (PLibMCEnvDriverEnvironment_GetCurrentDateTimePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getcurrentdatetime");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetCurrentDateTime = (PLibMCEnvDriverEnvironment_GetCurrentDateTimePtr) dlsym(hLibrary, "libmcenv_driverenvironment_getcurrentdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetCurrentDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetCustomDateTime = (PLibMCEnvDriverEnvironment_GetCustomDateTimePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getcustomdatetime");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetCustomDateTime = (PLibMCEnvDriverEnvironment_GetCustomDateTimePtr) dlsym(hLibrary, "libmcenv_driverenvironment_getcustomdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetCustomDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetStartDateTime = (PLibMCEnvDriverEnvironment_GetStartDateTimePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getstartdatetime");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetStartDateTime = (PLibMCEnvDriverEnvironment_GetStartDateTimePtr) dlsym(hLibrary, "libmcenv_driverenvironment_getstartdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetStartDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) GetProcAddress(hLibrary, "libmcenv_signaltrigger_cantrigger");
 		#else // _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) dlsym(hLibrary, "libmcenv_signaltrigger_cantrigger");
@@ -7541,39 +7729,57 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_TempStreamWriter_GetUUID = (PLibMCEnvTempStreamWriter_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getuuid");
+		pWrapperTable->m_BaseTempStreamWriter_GetUUID = (PLibMCEnvBaseTempStreamWriter_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_basetempstreamwriter_getuuid");
 		#else // _WIN32
-		pWrapperTable->m_TempStreamWriter_GetUUID = (PLibMCEnvTempStreamWriter_GetUUIDPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getuuid");
+		pWrapperTable->m_BaseTempStreamWriter_GetUUID = (PLibMCEnvBaseTempStreamWriter_GetUUIDPtr) dlsym(hLibrary, "libmcenv_basetempstreamwriter_getuuid");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_TempStreamWriter_GetUUID == nullptr)
+		if (pWrapperTable->m_BaseTempStreamWriter_GetUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_TempStreamWriter_GetName = (PLibMCEnvTempStreamWriter_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getname");
+		pWrapperTable->m_BaseTempStreamWriter_GetName = (PLibMCEnvBaseTempStreamWriter_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_basetempstreamwriter_getname");
 		#else // _WIN32
-		pWrapperTable->m_TempStreamWriter_GetName = (PLibMCEnvTempStreamWriter_GetNamePtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getname");
+		pWrapperTable->m_BaseTempStreamWriter_GetName = (PLibMCEnvBaseTempStreamWriter_GetNamePtr) dlsym(hLibrary, "libmcenv_basetempstreamwriter_getname");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_TempStreamWriter_GetName == nullptr)
+		if (pWrapperTable->m_BaseTempStreamWriter_GetName == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_TempStreamWriter_GetMIMEType = (PLibMCEnvTempStreamWriter_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getmimetype");
+		pWrapperTable->m_BaseTempStreamWriter_GetMIMEType = (PLibMCEnvBaseTempStreamWriter_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcenv_basetempstreamwriter_getmimetype");
 		#else // _WIN32
-		pWrapperTable->m_TempStreamWriter_GetMIMEType = (PLibMCEnvTempStreamWriter_GetMIMETypePtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getmimetype");
+		pWrapperTable->m_BaseTempStreamWriter_GetMIMEType = (PLibMCEnvBaseTempStreamWriter_GetMIMETypePtr) dlsym(hLibrary, "libmcenv_basetempstreamwriter_getmimetype");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_TempStreamWriter_GetMIMEType == nullptr)
+		if (pWrapperTable->m_BaseTempStreamWriter_GetMIMEType == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_TempStreamWriter_GetSize = (PLibMCEnvTempStreamWriter_GetSizePtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getsize");
+		pWrapperTable->m_BaseTempStreamWriter_GetSize = (PLibMCEnvBaseTempStreamWriter_GetSizePtr) GetProcAddress(hLibrary, "libmcenv_basetempstreamwriter_getsize");
 		#else // _WIN32
-		pWrapperTable->m_TempStreamWriter_GetSize = (PLibMCEnvTempStreamWriter_GetSizePtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getsize");
+		pWrapperTable->m_BaseTempStreamWriter_GetSize = (PLibMCEnvBaseTempStreamWriter_GetSizePtr) dlsym(hLibrary, "libmcenv_basetempstreamwriter_getsize");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_TempStreamWriter_GetSize == nullptr)
+		if (pWrapperTable->m_BaseTempStreamWriter_GetSize == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BaseTempStreamWriter_Finish = (PLibMCEnvBaseTempStreamWriter_FinishPtr) GetProcAddress(hLibrary, "libmcenv_basetempstreamwriter_finish");
+		#else // _WIN32
+		pWrapperTable->m_BaseTempStreamWriter_Finish = (PLibMCEnvBaseTempStreamWriter_FinishPtr) dlsym(hLibrary, "libmcenv_basetempstreamwriter_finish");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BaseTempStreamWriter_Finish == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BaseTempStreamWriter_IsFinished = (PLibMCEnvBaseTempStreamWriter_IsFinishedPtr) GetProcAddress(hLibrary, "libmcenv_basetempstreamwriter_isfinished");
+		#else // _WIN32
+		pWrapperTable->m_BaseTempStreamWriter_IsFinished = (PLibMCEnvBaseTempStreamWriter_IsFinishedPtr) dlsym(hLibrary, "libmcenv_basetempstreamwriter_isfinished");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BaseTempStreamWriter_IsFinished == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7592,15 +7798,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_TempStreamWriter_Seek == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_TempStreamWriter_IsFinished = (PLibMCEnvTempStreamWriter_IsFinishedPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_isfinished");
-		#else // _WIN32
-		pWrapperTable->m_TempStreamWriter_IsFinished = (PLibMCEnvTempStreamWriter_IsFinishedPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_isfinished");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_TempStreamWriter_IsFinished == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7631,15 +7828,6 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_TempStreamWriter_Finish = (PLibMCEnvTempStreamWriter_FinishPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_finish");
-		#else // _WIN32
-		pWrapperTable->m_TempStreamWriter_Finish = (PLibMCEnvTempStreamWriter_FinishPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_finish");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_TempStreamWriter_Finish == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_TempStreamWriter_CopyFrom = (PLibMCEnvTempStreamWriter_CopyFromPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_copyfrom");
 		#else // _WIN32
 		pWrapperTable->m_TempStreamWriter_CopyFrom = (PLibMCEnvTempStreamWriter_CopyFromPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_copyfrom");
@@ -7658,57 +7846,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ZIPStreamWriter_Finish = (PLibMCEnvZIPStreamWriter_FinishPtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_finish");
+		pWrapperTable->m_ZIPStreamWriter_CreateZIPEntryFromStream = (PLibMCEnvZIPStreamWriter_CreateZIPEntryFromStreamPtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_createzipentryfromstream");
 		#else // _WIN32
-		pWrapperTable->m_ZIPStreamWriter_Finish = (PLibMCEnvZIPStreamWriter_FinishPtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_finish");
+		pWrapperTable->m_ZIPStreamWriter_CreateZIPEntryFromStream = (PLibMCEnvZIPStreamWriter_CreateZIPEntryFromStreamPtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_createzipentryfromstream");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ZIPStreamWriter_Finish == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ZIPStreamWriter_CopyFrom = (PLibMCEnvZIPStreamWriter_CopyFromPtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_copyfrom");
-		#else // _WIN32
-		pWrapperTable->m_ZIPStreamWriter_CopyFrom = (PLibMCEnvZIPStreamWriter_CopyFromPtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_copyfrom");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ZIPStreamWriter_CopyFrom == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ZIPStreamWriter_GetUUID = (PLibMCEnvZIPStreamWriter_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_getuuid");
-		#else // _WIN32
-		pWrapperTable->m_ZIPStreamWriter_GetUUID = (PLibMCEnvZIPStreamWriter_GetUUIDPtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_getuuid");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ZIPStreamWriter_GetUUID == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ZIPStreamWriter_GetName = (PLibMCEnvZIPStreamWriter_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_getname");
-		#else // _WIN32
-		pWrapperTable->m_ZIPStreamWriter_GetName = (PLibMCEnvZIPStreamWriter_GetNamePtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_getname");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ZIPStreamWriter_GetName == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ZIPStreamWriter_GetMIMEType = (PLibMCEnvZIPStreamWriter_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_getmimetype");
-		#else // _WIN32
-		pWrapperTable->m_ZIPStreamWriter_GetMIMEType = (PLibMCEnvZIPStreamWriter_GetMIMETypePtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_getmimetype");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ZIPStreamWriter_GetMIMEType == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ZIPStreamWriter_GetSize = (PLibMCEnvZIPStreamWriter_GetSizePtr) GetProcAddress(hLibrary, "libmcenv_zipstreamwriter_getsize");
-		#else // _WIN32
-		pWrapperTable->m_ZIPStreamWriter_GetSize = (PLibMCEnvZIPStreamWriter_GetSizePtr) dlsym(hLibrary, "libmcenv_zipstreamwriter_getsize");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ZIPStreamWriter_GetSize == nullptr)
+		if (pWrapperTable->m_ZIPStreamWriter_CreateZIPEntryFromStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8720,6 +8863,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetCurrentDateTime = (PLibMCEnvStateEnvironment_GetCurrentDateTimePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getcurrentdatetime");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetCurrentDateTime = (PLibMCEnvStateEnvironment_GetCurrentDateTimePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getcurrentdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetCurrentDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetCustomDateTime = (PLibMCEnvStateEnvironment_GetCustomDateTimePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getcustomdatetime");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetCustomDateTime = (PLibMCEnvStateEnvironment_GetCustomDateTimePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getcustomdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetCustomDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetStartDateTime = (PLibMCEnvStateEnvironment_GetStartDateTimePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getstartdatetime");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetStartDateTime = (PLibMCEnvStateEnvironment_GetStartDateTimePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getstartdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetStartDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = (PLibMCEnvStateEnvironment_GetTestEnvironmentPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_gettestenvironment");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetTestEnvironment = (PLibMCEnvStateEnvironment_GetTestEnvironmentPtr) dlsym(hLibrary, "libmcenv_stateenvironment_gettestenvironment");
@@ -9599,6 +9769,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_FindStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentDateTime = (PLibMCEnvUIEnvironment_GetCurrentDateTimePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcurrentdatetime");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCurrentDateTime = (PLibMCEnvUIEnvironment_GetCurrentDateTimePtr) dlsym(hLibrary, "libmcenv_uienvironment_getcurrentdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCurrentDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetCustomDateTime = (PLibMCEnvUIEnvironment_GetCustomDateTimePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getcustomdatetime");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetCustomDateTime = (PLibMCEnvUIEnvironment_GetCustomDateTimePtr) dlsym(hLibrary, "libmcenv_uienvironment_getcustomdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetCustomDateTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetStartDateTime = (PLibMCEnvUIEnvironment_GetStartDateTimePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getstartdatetime");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetStartDateTime = (PLibMCEnvUIEnvironment_GetStartDateTimePtr) dlsym(hLibrary, "libmcenv_uienvironment_getstartdatetime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetStartDateTime == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10578,6 +10775,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AddBinaryData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_attachtempstream", (void**)&(pWrapperTable->m_BuildExecution_AttachTempStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AttachTempStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loadstreambyidentifier", (void**)&(pWrapperTable->m_BuildExecution_LoadStreamByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadStreamByIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loadstreambyuuid", (void**)&(pWrapperTable->m_BuildExecution_LoadStreamByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadStreamByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_loaddiscretefield2dbyidentifier", (void**)&(pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadDiscreteField2DByIdentifier == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10588,6 +10797,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_storediscretefield2d", (void**)&(pWrapperTable->m_BuildExecution_StoreDiscreteField2D));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_StoreDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loaddatatablebyidentifier", (void**)&(pWrapperTable->m_BuildExecution_LoadDataTableByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadDataTableByIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_loaddatatablebyuuid", (void**)&(pWrapperTable->m_BuildExecution_LoadDataTableByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_LoadDataTableByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_storedatatable", (void**)&(pWrapperTable->m_BuildExecution_StoreDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_StoreDataTable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_loadpngimagebyidentifier", (void**)&(pWrapperTable->m_BuildExecution_LoadPNGImageByIdentifier));
@@ -10670,6 +10891,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddBinaryData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_build_attachtempstream", (void**)&(pWrapperTable->m_Build_AttachTempStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AttachTempStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loadstreambyidentifier", (void**)&(pWrapperTable->m_Build_LoadStreamByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadStreamByIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loadstreambyuuid", (void**)&(pWrapperTable->m_Build_LoadStreamByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadStreamByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_build_loaddiscretefield2dbyidentifier", (void**)&(pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDiscreteField2DByIdentifier == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10680,6 +10913,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_storediscretefield2d", (void**)&(pWrapperTable->m_Build_StoreDiscreteField2D));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StoreDiscreteField2D == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loaddatatablebyidentifier", (void**)&(pWrapperTable->m_Build_LoadDataTableByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDataTableByIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loaddatatablebyuuid", (void**)&(pWrapperTable->m_Build_LoadDataTableByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadDataTableByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_storedatatable", (void**)&(pWrapperTable->m_Build_StoreDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_StoreDataTable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_loadpngimagebyidentifier", (void**)&(pWrapperTable->m_Build_LoadPNGImageByIdentifier));
@@ -11426,6 +11671,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateCryptoContext == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getcurrentdatetime", (void**)&(pWrapperTable->m_DriverEnvironment_GetCurrentDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetCurrentDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getcustomdatetime", (void**)&(pWrapperTable->m_DriverEnvironment_GetCustomDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetCustomDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getstartdatetime", (void**)&(pWrapperTable->m_DriverEnvironment_GetStartDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetStartDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalTrigger_CanTrigger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -11546,20 +11803,28 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_SetBoolResult == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getuuid", (void**)&(pWrapperTable->m_TempStreamWriter_GetUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetUUID == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_getuuid", (void**)&(pWrapperTable->m_BaseTempStreamWriter_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_GetUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getname", (void**)&(pWrapperTable->m_TempStreamWriter_GetName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetName == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_getname", (void**)&(pWrapperTable->m_BaseTempStreamWriter_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getmimetype", (void**)&(pWrapperTable->m_TempStreamWriter_GetMIMEType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetMIMEType == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_getmimetype", (void**)&(pWrapperTable->m_BaseTempStreamWriter_GetMIMEType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_GetMIMEType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getsize", (void**)&(pWrapperTable->m_TempStreamWriter_GetSize));
-		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetSize == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_getsize", (void**)&(pWrapperTable->m_BaseTempStreamWriter_GetSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_GetSize == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_finish", (void**)&(pWrapperTable->m_BaseTempStreamWriter_Finish));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_Finish == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_isfinished", (void**)&(pWrapperTable->m_BaseTempStreamWriter_IsFinished));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_IsFinished == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getwriteposition", (void**)&(pWrapperTable->m_TempStreamWriter_GetWritePosition));
@@ -11568,10 +11833,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_seek", (void**)&(pWrapperTable->m_TempStreamWriter_Seek));
 		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_Seek == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_isfinished", (void**)&(pWrapperTable->m_TempStreamWriter_IsFinished));
-		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_IsFinished == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_writedata", (void**)&(pWrapperTable->m_TempStreamWriter_WriteData));
@@ -11586,10 +11847,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_WriteLine == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_finish", (void**)&(pWrapperTable->m_TempStreamWriter_Finish));
-		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_Finish == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_copyfrom", (void**)&(pWrapperTable->m_TempStreamWriter_CopyFrom));
 		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_CopyFrom == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -11598,28 +11855,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_CreateZIPEntry == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_finish", (void**)&(pWrapperTable->m_ZIPStreamWriter_Finish));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_Finish == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_copyfrom", (void**)&(pWrapperTable->m_ZIPStreamWriter_CopyFrom));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_CopyFrom == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_getuuid", (void**)&(pWrapperTable->m_ZIPStreamWriter_GetUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_GetUUID == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_getname", (void**)&(pWrapperTable->m_ZIPStreamWriter_GetName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_GetName == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_getmimetype", (void**)&(pWrapperTable->m_ZIPStreamWriter_GetMIMEType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_GetMIMEType == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_getsize", (void**)&(pWrapperTable->m_ZIPStreamWriter_GetSize));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_GetSize == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_zipstreamwriter_createzipentryfromstream", (void**)&(pWrapperTable->m_ZIPStreamWriter_CreateZIPEntryFromStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ZIPStreamWriter_CreateZIPEntryFromStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_streamreader_getuuid", (void**)&(pWrapperTable->m_StreamReader_GetUUID));
@@ -12070,6 +12307,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetElapsedTimeInStateInMicroseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getcurrentdatetime", (void**)&(pWrapperTable->m_StateEnvironment_GetCurrentDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetCurrentDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getcustomdatetime", (void**)&(pWrapperTable->m_StateEnvironment_GetCustomDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetCustomDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getstartdatetime", (void**)&(pWrapperTable->m_StateEnvironment_GetStartDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetStartDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_gettestenvironment", (void**)&(pWrapperTable->m_StateEnvironment_GetTestEnvironment));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetTestEnvironment == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12460,6 +12709,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_findstream", (void**)&(pWrapperTable->m_UIEnvironment_FindStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentdatetime", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getcustomdatetime", (void**)&(pWrapperTable->m_UIEnvironment_GetCustomDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCustomDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getstartdatetime", (void**)&(pWrapperTable->m_UIEnvironment_GetStartDateTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetStartDateTime == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -15378,7 +15639,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::AddBinaryData - Adds binary data to store with the build.
+	* CBuildExecution::AddBinaryData - Adds binary data to store with the build execution.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
@@ -15397,14 +15658,55 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuildExecution::AttachTempStream - Attaches a temp stream to the build execution.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attached data
+	* @param[in] pStreamWriterInstance - Stream to attach to the build.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuildExecution::AttachTempStream(const std::string & sIdentifier, const std::string & sName, classParam<CBaseTempStreamWriter> pStreamWriterInstance)
+	{
+		LibMCEnvHandle hStreamWriterInstance = pStreamWriterInstance.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStreamWriterInstance, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStreamWriterInstance, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by identifier.
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist.
+	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	*/
+	void CBuildExecution::LoadStreamByIdentifier(const std::string & sIdentifier, classParam<CStreamReader> pStreamReaderInstance)
+	{
+		LibMCEnvHandle hStreamReaderInstance = pStreamReaderInstance.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadStreamByIdentifier(m_pHandle, sIdentifier.c_str(), hStreamReaderInstance));
+	}
+	
+	/**
+	* CBuildExecution::LoadStreamByUUID - Loads stream of the build by attachment UUID.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
+	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	*/
+	void CBuildExecution::LoadStreamByUUID(const std::string & sDataUUID, classParam<CStreamReader> pStreamReaderInstance)
+	{
+		LibMCEnvHandle hStreamReaderInstance = pStreamReaderInstance.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadStreamByUUID(m_pHandle, sDataUUID.c_str(), hStreamReaderInstance));
+	}
+	
+	/**
+	* CBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
-	PDiscreteFieldData2D CBuildExecution::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)
+	PDiscreteFieldData2D CBuildExecution::LoadDiscreteField2DByIdentifier(const std::string & sIdentifier)
 	{
 		LibMCEnvHandle hFieldDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadDiscreteField2DByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hFieldDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadDiscreteField2DByIdentifier(m_pHandle, sIdentifier.c_str(), &hFieldDataInstance));
 		
 		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15413,7 +15715,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* CBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
@@ -15429,38 +15731,91 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuildExecution::StoreDiscreteField2D - Stores a discrete field in the build execution. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if identifier already exists or is invalid.
+	* @param[in] sName - Human Readable name of the attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	std::string CBuildExecution::StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
 	{
 		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
-	* CBuildExecution::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuildExecution::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded data table instance.
+	*/
+	PDataTable CBuildExecution::LoadDataTableByIdentifier(const std::string & sIdentifier)
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadDataTableByIdentifier(m_pHandle, sIdentifier.c_str(), &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
+	}
+	
+	/**
+	* CBuildExecution::LoadDataTableByUUID - Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded data table instance.
+	*/
+	PDataTable CBuildExecution::LoadDataTableByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadDataTableByUUID(m_pHandle, sDataUUID.c_str(), &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
+	}
+	
+	/**
+	* CBuildExecution::StoreDataTable - Stores a data table in the build execution. MIME Type will be application/amcf-datatable.
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if identifier already exists or is invalid.
+	* @param[in] sName - Human Readable name of the attachment.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Data Table Write Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuildExecution::StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pFieldDataInstance, classParam<CDataTableWriteOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	PImageData CBuildExecution::LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	PImageData CBuildExecution::LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadPNGImageByIdentifier(m_pHandle, sIdentifier.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15469,7 +15824,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* CBuildExecution::LoadPNGImageByUUID - Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -15488,22 +15843,22 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuildExecution::StorePNGImage - Stores a PNG image in the build job. MIME Type will be image/png
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	std::string CBuildExecution::StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
 	{
 		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -15745,14 +16100,55 @@ public:
 	}
 	
 	/**
-	* CBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuild::AttachTempStream - Attaches a temp stream to the build.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attached data
+	* @param[in] pStreamWriterInstance - Stream to attach to the build.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuild::AttachTempStream(const std::string & sIdentifier, const std::string & sName, classParam<CBaseTempStreamWriter> pStreamWriterInstance)
+	{
+		LibMCEnvHandle hStreamWriterInstance = pStreamWriterInstance.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStreamWriterInstance, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStreamWriterInstance, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuild::LoadStreamByIdentifier - Loads stream of the build by identifier.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist.
+	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	*/
+	void CBuild::LoadStreamByIdentifier(const std::string & sIdentifier, classParam<CStreamReader> pStreamReaderInstance)
+	{
+		LibMCEnvHandle hStreamReaderInstance = pStreamReaderInstance.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadStreamByIdentifier(m_pHandle, sIdentifier.c_str(), hStreamReaderInstance));
+	}
+	
+	/**
+	* CBuild::LoadStreamByUUID - Loads stream of the build by attachment UUID.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
+	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	*/
+	void CBuild::LoadStreamByUUID(const std::string & sDataUUID, classParam<CStreamReader> pStreamReaderInstance)
+	{
+		LibMCEnvHandle hStreamReaderInstance = pStreamReaderInstance.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadStreamByUUID(m_pHandle, sDataUUID.c_str(), hStreamReaderInstance));
+	}
+	
+	/**
+	* CBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
-	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)
+	PDiscreteFieldData2D CBuild::LoadDiscreteField2DByIdentifier(const std::string & sIdentifier)
 	{
 		LibMCEnvHandle hFieldDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByIdentifier(m_pHandle, sContextIdentifier.c_str(), &hFieldDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDiscreteField2DByIdentifier(m_pHandle, sIdentifier.c_str(), &hFieldDataInstance));
 		
 		if (!hFieldDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15778,37 +16174,90 @@ public:
 	
 	/**
 	* CBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if identifier already exists or is invalid.
+	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	std::string CBuild::StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
 	{
 		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
-	* CBuild::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuild::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-datatable.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Data Table instance.
+	*/
+	PDataTable CBuild::LoadDataTableByIdentifier(const std::string & sIdentifier)
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDataTableByIdentifier(m_pHandle, sIdentifier.c_str(), &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
+	}
+	
+	/**
+	* CBuild::LoadDataTableByUUID - Loads a data table by uuid which previously stored in the build job. MIME Type MUST be application/amcf-datatable.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Data Table instance.
+	*/
+	PDataTable CBuild::LoadDataTableByUUID(const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hDataTableInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadDataTableByUUID(m_pHandle, sDataUUID.c_str(), &hDataTableInstance));
+		
+		if (!hDataTableInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTable>(m_pWrapper, hDataTableInstance);
+	}
+	
+	/**
+	* CBuild::StoreDataTable - Stores a data table in the build job. MIME Type will be application/amcf-datatable.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if identifier already exists or is invalid.
+	* @param[in] sName - Unique name of the build attachment.
+	* @param[in] pDataTableInstance - Data Table instance to store.
+	* @param[in] pStoreOptions - Data Table Write Options.
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuild::StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pDataTableInstance, classParam<CDataTableWriteOptions> pStoreOptions)
+	{
+		LibMCEnvHandle hDataTableInstance = pDataTableInstance.GetHandle();
+		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hDataTableInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hDataTableInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	* CBuild::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
 	* @return Image data instance.
 	*/
-	PImageData CBuild::LoadPNGImageByIdentifier(const std::string & sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	PImageData CBuild::LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByIdentifier(m_pHandle, sContextIdentifier.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadPNGImageByIdentifier(m_pHandle, sIdentifier.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -15817,7 +16266,7 @@ public:
 	}
 	
 	/**
-	* CBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* CBuild::LoadPNGImageByUUID - Loads a PNG image by uuid which was previously stored in the build job. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -15836,22 +16285,22 @@ public:
 	}
 	
 	/**
-	* CBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
-	* @param[in] sContextIdentifier - Unique name of the attachment. Fails if name does already exist or has invalid Mime type.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* CBuild::StorePNGImage - Stores a PNG Image in the build job. MIME Type will be image/png
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if identifier does already exist or is invalid.
+	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	std::string CBuild::StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
 	{
 		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sContextIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -18370,6 +18819,58 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::GetCurrentDateTime - Returns the current time as DateTime object instance.
+	* @return Date Time Instance.
+	*/
+	PDateTime CDriverEnvironment::GetCurrentDateTime()
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetCurrentDateTime(m_pHandle, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
+	}
+	
+	/**
+	* CDriverEnvironment::GetCustomDateTime - Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+	* @param[in] nYear - Year. Must be larger or equal than 1970.
+	* @param[in] nMonth - Month. Must be between 1 and 12.
+	* @param[in] nDay - Day. Must be between 1 and 31.
+	* @param[in] nHour - Hour. Must be between 0 and 23.
+	* @param[in] nMinute - Minute. Must be between 0 and 59.
+	* @param[in] nSecond - Second. Must be between 0 and 59.
+	* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+	* @return Date Time Instance.
+	*/
+	PDateTime CDriverEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetCustomDateTime(m_pHandle, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
+	}
+	
+	/**
+	* CDriverEnvironment::GetStartDateTime - Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+	* @return Date Time Instance.
+	*/
+	PDateTime CDriverEnvironment::GetStartDateTime()
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetStartDateTime(m_pHandle, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
+	}
+	
+	/**
 	 * Method definitions for class CSignalTrigger
 	 */
 	
@@ -18751,65 +19252,89 @@ public:
 	}
 	
 	/**
-	 * Method definitions for class CTempStreamWriter
+	 * Method definitions for class CBaseTempStreamWriter
 	 */
 	
 	/**
-	* CTempStreamWriter::GetUUID - Returns the UUID of the stream.
+	* CBaseTempStreamWriter::GetUUID - Returns the UUID of the stream.
 	* @return Returns stream uuid.
 	*/
-	std::string CTempStreamWriter::GetUUID()
+	std::string CBaseTempStreamWriter::GetUUID()
 	{
 		LibMCEnv_uint32 bytesNeededUUID = 0;
 		LibMCEnv_uint32 bytesWrittenUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
 		std::vector<char> bufferUUID(bytesNeededUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
 		
 		return std::string(&bufferUUID[0]);
 	}
 	
 	/**
-	* CTempStreamWriter::GetName - Returns the name of the stream.
+	* CBaseTempStreamWriter::GetName - Returns the name of the stream.
 	* @return Returns stream name.
 	*/
-	std::string CTempStreamWriter::GetName()
+	std::string CBaseTempStreamWriter::GetName()
 	{
 		LibMCEnv_uint32 bytesNeededName = 0;
 		LibMCEnv_uint32 bytesWrittenName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
 		std::vector<char> bufferName(bytesNeededName);
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
 		
 		return std::string(&bufferName[0]);
 	}
 	
 	/**
-	* CTempStreamWriter::GetMIMEType - Returns the MIME type of the stream.
+	* CBaseTempStreamWriter::GetMIMEType - Returns the MIME type of the stream.
 	* @return Returns stream MIME Type.
 	*/
-	std::string CTempStreamWriter::GetMIMEType()
+	std::string CBaseTempStreamWriter::GetMIMEType()
 	{
 		LibMCEnv_uint32 bytesNeededMIMEType = 0;
 		LibMCEnv_uint32 bytesWrittenMIMEType = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetMIMEType(m_pHandle, 0, &bytesNeededMIMEType, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetMIMEType(m_pHandle, 0, &bytesNeededMIMEType, nullptr));
 		std::vector<char> bufferMIMEType(bytesNeededMIMEType);
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetMIMEType(m_pHandle, bytesNeededMIMEType, &bytesWrittenMIMEType, &bufferMIMEType[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetMIMEType(m_pHandle, bytesNeededMIMEType, &bytesWrittenMIMEType, &bufferMIMEType[0]));
 		
 		return std::string(&bufferMIMEType[0]);
 	}
 	
 	/**
-	* CTempStreamWriter::GetSize - Returns the current size of the stream.
+	* CBaseTempStreamWriter::GetSize - Returns the current size of the stream.
 	* @return Current size of the stream.
 	*/
-	LibMCEnv_uint64 CTempStreamWriter::GetSize()
+	LibMCEnv_uint64 CBaseTempStreamWriter::GetSize()
 	{
 		LibMCEnv_uint64 resultSize = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_GetSize(m_pHandle, &resultSize));
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetSize(m_pHandle, &resultSize));
 		
 		return resultSize;
 	}
+	
+	/**
+	* CBaseTempStreamWriter::Finish - Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
+	*/
+	void CBaseTempStreamWriter::Finish()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_Finish(m_pHandle));
+	}
+	
+	/**
+	* CBaseTempStreamWriter::IsFinished - Returns if the stream writing has already been finished.
+	* @return If true, writing into the stream is not possible anymore.
+	*/
+	bool CBaseTempStreamWriter::IsFinished()
+	{
+		bool resultFinished = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_IsFinished(m_pHandle, &resultFinished));
+		
+		return resultFinished;
+	}
+	
+	/**
+	 * Method definitions for class CTempStreamWriter
+	 */
 	
 	/**
 	* CTempStreamWriter::GetWritePosition - Returns the current write position of the stream.
@@ -18830,18 +19355,6 @@ public:
 	void CTempStreamWriter::Seek(const LibMCEnv_uint64 nWritePosition)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_Seek(m_pHandle, nWritePosition));
-	}
-	
-	/**
-	* CTempStreamWriter::IsFinished - Returns if the stream writing has been finished.
-	* @return Returns true if writing is finished.
-	*/
-	bool CTempStreamWriter::IsFinished()
-	{
-		bool resultWritingIsFinished = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_IsFinished(m_pHandle, &resultWritingIsFinished));
-		
-		return resultWritingIsFinished;
 	}
 	
 	/**
@@ -18869,14 +19382,6 @@ public:
 	void CTempStreamWriter::WriteLine(const std::string & sLine)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_WriteLine(m_pHandle, sLine.c_str()));
-	}
-	
-	/**
-	* CTempStreamWriter::Finish - Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
-	*/
-	void CTempStreamWriter::Finish()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_TempStreamWriter_Finish(m_pHandle));
 	}
 	
 	/**
@@ -18910,78 +19415,14 @@ public:
 	}
 	
 	/**
-	* CZIPStreamWriter::Finish - Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
-	*/
-	void CZIPStreamWriter::Finish()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_Finish(m_pHandle));
-	}
-	
-	/**
-	* CZIPStreamWriter::CopyFrom - Copies the full content of a StreamReader Instance.
+	* CZIPStreamWriter::CreateZIPEntryFromStream - Adds the full content of a StreamReader Instance.
+	* @param[in] sFileName - File Name for the new entry in the ZIP file. Entry MUST not exist yet.
 	* @param[in] pStreamReader - Stream to read from.
 	*/
-	void CZIPStreamWriter::CopyFrom(classParam<CStreamReader> pStreamReader)
+	void CZIPStreamWriter::CreateZIPEntryFromStream(const std::string & sFileName, classParam<CStreamReader> pStreamReader)
 	{
 		LibMCEnvHandle hStreamReader = pStreamReader.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_CopyFrom(m_pHandle, hStreamReader));
-	}
-	
-	/**
-	* CZIPStreamWriter::GetUUID - Returns the UUID of the stream.
-	* @return Returns stream uuid.
-	*/
-	std::string CZIPStreamWriter::GetUUID()
-	{
-		LibMCEnv_uint32 bytesNeededUUID = 0;
-		LibMCEnv_uint32 bytesWrittenUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
-		std::vector<char> bufferUUID(bytesNeededUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
-		
-		return std::string(&bufferUUID[0]);
-	}
-	
-	/**
-	* CZIPStreamWriter::GetName - Returns the name of the stream.
-	* @return Returns stream name.
-	*/
-	std::string CZIPStreamWriter::GetName()
-	{
-		LibMCEnv_uint32 bytesNeededName = 0;
-		LibMCEnv_uint32 bytesWrittenName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
-		std::vector<char> bufferName(bytesNeededName);
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
-		
-		return std::string(&bufferName[0]);
-	}
-	
-	/**
-	* CZIPStreamWriter::GetMIMEType - Returns the MIME type of the stream.
-	* @return Returns stream MIME Type.
-	*/
-	std::string CZIPStreamWriter::GetMIMEType()
-	{
-		LibMCEnv_uint32 bytesNeededMIMEType = 0;
-		LibMCEnv_uint32 bytesWrittenMIMEType = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetMIMEType(m_pHandle, 0, &bytesNeededMIMEType, nullptr));
-		std::vector<char> bufferMIMEType(bytesNeededMIMEType);
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetMIMEType(m_pHandle, bytesNeededMIMEType, &bytesWrittenMIMEType, &bufferMIMEType[0]));
-		
-		return std::string(&bufferMIMEType[0]);
-	}
-	
-	/**
-	* CZIPStreamWriter::GetSize - Returns the current size of the stream.
-	* @return Current size of the stream.
-	*/
-	LibMCEnv_uint64 CZIPStreamWriter::GetSize()
-	{
-		LibMCEnv_uint64 resultSize = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_GetSize(m_pHandle, &resultSize));
-		
-		return resultSize;
+		CheckError(m_pWrapper->m_WrapperTable.m_ZIPStreamWriter_CreateZIPEntryFromStream(m_pHandle, sFileName.c_str(), hStreamReader));
 	}
 	
 	/**
@@ -20540,7 +20981,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetStartTimeOfStateInMilliseconds - Returns the global start time of the current state in milliseconds.
+	* CStateEnvironment::GetStartTimeOfStateInMilliseconds - Returns the global start timer of the current state in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
 	LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMilliseconds()
@@ -20552,7 +20993,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetStartTimeOfStateInMicroseconds - Returns the global start time of the current state in microseconds.
+	* CStateEnvironment::GetStartTimeOfStateInMicroseconds - Returns the global start timer of the current state in microseconds.
 	* @return Timer value in Milliseconds
 	*/
 	LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMicroseconds()
@@ -20564,7 +21005,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds - Returns the global finish time of the previous state in microseconds.
+	* CStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds - Returns the global finish timer of the previous state in microseconds.
 	* @return Timer value in Microseconds
 	*/
 	LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds()
@@ -20576,7 +21017,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds - Returns the global finish time of the previous state in milliseconds.
+	* CStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds - Returns the global finish timer of the previous state in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
 	LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds()
@@ -20588,7 +21029,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetElapsedTimeInStateInMilliseconds - Returns the global finish time of the previous state in milliseconds.
+	* CStateEnvironment::GetElapsedTimeInStateInMilliseconds - Returns the global finish timer of the previous state in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
 	LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMilliseconds()
@@ -20600,7 +21041,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetElapsedTimeInStateInMicroseconds - Returns the global finish time of the previous state in microseconds.
+	* CStateEnvironment::GetElapsedTimeInStateInMicroseconds - Returns the global finish timer of the previous state in microseconds.
 	* @return Timer value in Microseconds
 	*/
 	LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMicroseconds()
@@ -20609,6 +21050,58 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetElapsedTimeInStateInMicroseconds(m_pHandle, &resultTimerValue));
 		
 		return resultTimerValue;
+	}
+	
+	/**
+	* CStateEnvironment::GetCurrentDateTime - Returns the current time as DateTime object instance.
+	* @return Date Time Instance.
+	*/
+	PDateTime CStateEnvironment::GetCurrentDateTime()
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetCurrentDateTime(m_pHandle, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
+	}
+	
+	/**
+	* CStateEnvironment::GetCustomDateTime - Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+	* @param[in] nYear - Year. Must be larger or equal than 1970.
+	* @param[in] nMonth - Month. Must be between 1 and 12.
+	* @param[in] nDay - Day. Must be between 1 and 31.
+	* @param[in] nHour - Hour. Must be between 0 and 23.
+	* @param[in] nMinute - Minute. Must be between 0 and 59.
+	* @param[in] nSecond - Second. Must be between 0 and 59.
+	* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+	* @return Date Time Instance.
+	*/
+	PDateTime CStateEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetCustomDateTime(m_pHandle, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
+	}
+	
+	/**
+	* CStateEnvironment::GetStartDateTime - Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+	* @return Date Time Instance.
+	*/
+	PDateTime CStateEnvironment::GetStartDateTime()
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetStartDateTime(m_pHandle, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
 	}
 	
 	/**
@@ -22049,6 +22542,58 @@ public:
 		} else {
 			return nullptr;
 		}
+	}
+	
+	/**
+	* CUIEnvironment::GetCurrentDateTime - Returns the current time as DateTime object instance.
+	* @return Date Time Instance.
+	*/
+	PDateTime CUIEnvironment::GetCurrentDateTime()
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCurrentDateTime(m_pHandle, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
+	}
+	
+	/**
+	* CUIEnvironment::GetCustomDateTime - Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+	* @param[in] nYear - Year. Must be larger or equal than 1970.
+	* @param[in] nMonth - Month. Must be between 1 and 12.
+	* @param[in] nDay - Day. Must be between 1 and 31.
+	* @param[in] nHour - Hour. Must be between 0 and 23.
+	* @param[in] nMinute - Minute. Must be between 0 and 59.
+	* @param[in] nSecond - Second. Must be between 0 and 59.
+	* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+	* @return Date Time Instance.
+	*/
+	PDateTime CUIEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetCustomDateTime(m_pHandle, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
+	}
+	
+	/**
+	* CUIEnvironment::GetStartDateTime - Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+	* @return Date Time Instance.
+	*/
+	PDateTime CUIEnvironment::GetStartDateTime()
+	{
+		LibMCEnvHandle hDateTime = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetStartDateTime(m_pHandle, &hDateTime));
+		
+		if (!hDateTime) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
 	}
 
 } // namespace LibMCEnv

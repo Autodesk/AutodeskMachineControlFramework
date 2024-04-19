@@ -1906,16 +1906,12 @@ LibMCDataResult libmcdata_storage_retrievestream(LibMCData_Storage pStorage, con
 	}
 }
 
-LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
+LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, const char * pUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
 	try {
 		if (pUUID == nullptr)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if (pContextUUID == nullptr)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if (pContextIdentifier == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
@@ -1926,8 +1922,6 @@ LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, con
 		if (pUserID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sUUID(pUUID);
-		std::string sContextUUID(pContextUUID);
-		std::string sContextIdentifier(pContextIdentifier);
 		std::string sName(pName);
 		std::string sMimeType(pMimeType);
 		std::string sUserID(pUserID);
@@ -1935,7 +1929,7 @@ LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, con
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->StoreNewStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nContentBufferSize, pContentBuffer, sUserID, nAbsoluteTimeStamp);
+		pIStorage->StoreNewStream(sUUID, sName, sMimeType, nContentBufferSize, pContentBuffer, sUserID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -1950,16 +1944,12 @@ LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, con
 	}
 }
 
-LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
+LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
 	try {
 		if (pUUID == nullptr)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if (pContextUUID == nullptr)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if (pContextIdentifier == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
@@ -1968,8 +1958,6 @@ LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage,
 		if (pUserID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sUUID(pUUID);
-		std::string sContextUUID(pContextUUID);
-		std::string sContextIdentifier(pContextIdentifier);
 		std::string sName(pName);
 		std::string sMimeType(pMimeType);
 		std::string sUserID(pUserID);
@@ -1977,7 +1965,7 @@ LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage,
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->BeginPartialStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nSize, sUserID, nAbsoluteTimeStamp);
+		pIStorage->BeginPartialStream(sUUID, sName, sMimeType, nSize, sUserID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -2081,16 +2069,12 @@ LibMCDataResult libmcdata_storage_finishpartialstreamblockwisesha256(LibMCData_S
 	}
 }
 
-LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pContextIdentifier, const char * pName, const char * pMimeType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
+LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStorage, const char * pUUID, const char * pName, const char * pMimeType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
 	try {
 		if (pUUID == nullptr)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if (pContextUUID == nullptr)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if (pContextIdentifier == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
@@ -2099,8 +2083,6 @@ LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStor
 		if (pUserID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sUUID(pUUID);
-		std::string sContextUUID(pContextUUID);
-		std::string sContextIdentifier(pContextIdentifier);
 		std::string sName(pName);
 		std::string sMimeType(pMimeType);
 		std::string sUserID(pUserID);
@@ -2108,7 +2090,7 @@ LibMCDataResult libmcdata_storage_beginrandomwritestream(LibMCData_Storage pStor
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->BeginRandomWriteStream(sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, sUserID, nAbsoluteTimeStamp);
+		pIStorage->BeginRandomWriteStream(sUUID, sName, sMimeType, sUserID, nAbsoluteTimeStamp);
 
 		return LIBMCDATA_SUCCESS;
 	}

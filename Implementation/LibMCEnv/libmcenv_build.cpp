@@ -195,7 +195,7 @@ std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::str
 	auto sSystemUserID = m_sSystemUserID;
 	uint64_t nTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
-	pStorage->StoreNewStream(sDataUUID, pBuildJob->GetUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID, nTimeStamp);
+	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID, nTimeStamp);
 
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
 	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID, nTimeStamp);
@@ -203,6 +203,37 @@ std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::str
 	return sDataUUID;
 
 }
+
+std::string CBuild::AttachTempStream(const std::string& sIdentifier, const std::string& sName, IBaseTempStreamWriter* pStreamWriterInstance)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+void CBuild::LoadStreamByIdentifier(const std::string& sIdentifier, IStreamReader* pStreamReaderInstance)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+void CBuild::LoadStreamByUUID(const std::string& sDataUUID, IStreamReader* pStreamReaderInstance)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IDataTable* CBuild::LoadDataTableByIdentifier(const std::string& sIdentifier)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IDataTable* CBuild::LoadDataTableByUUID(const std::string& sDataUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
 
 IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByIdentifier(const std::string& sContextIdentifier)
 {

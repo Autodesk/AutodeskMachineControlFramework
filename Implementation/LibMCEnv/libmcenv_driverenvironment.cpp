@@ -42,11 +42,13 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_datetime.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_datatable.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 #include "amc_xmldocument.hpp"
 #include "amc_xmldocumentnode.hpp"
 #include "amc_constants.hpp"
@@ -427,5 +429,20 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 ICryptoContext* CDriverEnvironment::CreateCryptoContext()
 {
     return new CCryptoContext();
+}
+
+IDateTime* CDriverEnvironment::GetCurrentDateTime()
+{
+    return new CDateTime(m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+}
+
+IDateTime* CDriverEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)
+{
+    return new CDateTime(AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond));
+}
+
+IDateTime* CDriverEnvironment::GetStartDateTime()
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 

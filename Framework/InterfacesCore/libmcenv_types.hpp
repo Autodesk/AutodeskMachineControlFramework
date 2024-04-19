@@ -503,6 +503,7 @@ typedef LibMCEnvHandle LibMCEnv_DriverStatusUpdateSession;
 typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
+typedef LibMCEnvHandle LibMCEnv_BaseTempStreamWriter;
 typedef LibMCEnvHandle LibMCEnv_TempStreamWriter;
 typedef LibMCEnvHandle LibMCEnv_ZIPStreamWriter;
 typedef LibMCEnvHandle LibMCEnv_StreamReader;
