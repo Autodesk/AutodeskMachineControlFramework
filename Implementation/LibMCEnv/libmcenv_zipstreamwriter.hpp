@@ -64,11 +64,11 @@ namespace Impl {
 	private:
 
 		std::string m_sEntryUUID;
-		PZIPWriterInstance m_pInstance;
+		
 
 	public:
 
-		CZIPEntryStreamWriter(PZIPWriterInstance m_pInstance, const std::string & sEntryUUID, const std::string & sName);
+		CZIPEntryStreamWriter(const std::string & sEntryUUID, const std::string & sName);
 
 		virtual ~CZIPEntryStreamWriter();
 
