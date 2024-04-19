@@ -68,7 +68,7 @@ private:
     AMCData::PStorageState m_pStorageState;
     AMCData::PSQLHandler m_pSQLHandler;
 
-    void insertDBEntry(const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID, uint64_t nAbsoluteTimeStamp);
+    void insertDBEntry(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID, uint64_t nAbsoluteTimeStamp);
 
 protected:
 
@@ -82,9 +82,9 @@ public:
 
     IStorageStream* RetrieveStream(const std::string& sUUID) override;
     
-    void StoreNewStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+    void StoreNewStream(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
-    void BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+    void BeginPartialStream(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer) override;
 
@@ -92,7 +92,7 @@ public:
 
     void FinishPartialStreamBlockwiseSHA256(const std::string& sUUID, const std::string& sBlockwiseSHA2) override;
 
-	void BeginRandomWriteStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+	void BeginRandomWriteStream(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	void StoreRandomWriteStream(const std::string& sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer) override;
 
