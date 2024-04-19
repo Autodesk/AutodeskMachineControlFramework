@@ -229,7 +229,7 @@ IDataTable* CBuild::LoadDataTableByUUID(const std::string& sDataUUID)
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-std::string StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions)
+std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }

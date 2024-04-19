@@ -310,6 +310,21 @@ std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextId
 
 }
 
+IDataTable* CBuildExecution::LoadDataTableByIdentifier(const std::string& sIdentifier)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IDataTable* CBuildExecution::LoadDataTableByUUID(const std::string& sDataUUID)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CBuildExecution::StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
 IImageData* CBuildExecution::LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
 {
 	std::vector<uint8_t> Buffer;
