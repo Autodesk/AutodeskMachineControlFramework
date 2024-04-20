@@ -650,6 +650,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storagezipwriter_writedata(LibMCDat
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storagezipwriter_getentrysize(LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint32 nEntryID, LibMCData_uint64 * pEntrySize);
 
 /**
+* Returns the current size of the stream.
+*
+* @param[in] pStorageZIPWriter - StorageZIPWriter instance.
+* @param[out] pSize - Current size of the stream.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storagezipwriter_getzipstreamsize(LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint64 * pSize);
+
+/**
 * Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.
 *
 * @param[in] pStorageZIPWriter - StorageZIPWriter instance.

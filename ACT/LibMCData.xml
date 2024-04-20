@@ -384,6 +384,11 @@
 		<error name="EMPTYJOBDATAIDENTIFIER" code="384" description="Empty job data identifier." />								
 		<error name="BUILDJOBEXECUTIONDATANOTFOUND" code="385" description="Build job execution data not found." />								
 		<error name="EMPTYJOBEXECUTIONDATAIDENTIFIER" code="386" description="Empty job execution data identifier." />								
+		<error name="ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE" code="387" description="ZIP Streams to not support async chunk write." />								
+		<error name="ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES" code="388" description="ZIP Stream exceeds maximum number of entries." />								
+		<error name="ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY" code="389" description="Attempted to write to finished ZIP stream entry." />								
+		<error name="INVALIDZIPSTREAMENTRYID" code="390" description="Invalid ZIP Stream entry ID." />								
+		<error name="ZIPSTREAMENTRYIDNOTFOUND" code="391" description="ZIP Stream entry ID not found." />	
 		
 		
 		
@@ -773,7 +778,11 @@
 			<param name="EntryID" type="uint32" pass="in" description="Entry ID to check." />
 			<param name="EntrySize" type="uint64" pass="return" description="Returns the current entry size of the ZIP entry in bytes." />
 		</method>
-		
+
+		<method name="GetZIPStreamSize" description="Returns the current size of the stream.">
+			<param name="Size" type="uint64" pass="return" description="Current size of the stream." />
+		</method>		
+
 		<method name="Finish" description="Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.">
 		</method>
 

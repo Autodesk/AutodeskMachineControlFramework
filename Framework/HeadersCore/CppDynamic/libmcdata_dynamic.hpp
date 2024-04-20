@@ -572,6 +572,11 @@ public:
 			case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "EMPTYJOBDATAIDENTIFIER";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND: return "BUILDJOBEXECUTIONDATANOTFOUND";
 			case LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER: return "EMPTYJOBEXECUTIONDATAIDENTIFIER";
+			case LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE: return "ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE";
+			case LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES: return "ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES";
+			case LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY: return "ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY";
+			case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "INVALIDZIPSTREAMENTRYID";
+			case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIPSTREAMENTRYIDNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -895,6 +900,11 @@ public:
 			case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "Empty job data identifier.";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND: return "Build job execution data not found.";
 			case LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER: return "Empty job execution data identifier.";
+			case LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE: return "ZIP Streams to not support async chunk write.";
+			case LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES: return "ZIP Stream exceeds maximum number of entries.";
+			case LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY: return "Attempted to write to finished ZIP stream entry.";
+			case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "Invalid ZIP Stream entry ID.";
+			case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIP Stream entry ID not found.";
 		}
 		return "unknown error";
 	}
@@ -1291,6 +1301,7 @@ public:
 	inline LibMCData_uint32 GetOpenEntryID();
 	inline void WriteData(const LibMCData_uint32 nEntryID, const CInputVector<LibMCData_uint8> & DataBuffer);
 	inline LibMCData_uint64 GetEntrySize(const LibMCData_uint32 nEntryID);
+	inline LibMCData_uint64 GetZIPStreamSize();
 	inline void Finish();
 	inline bool IsFinished();
 };
@@ -1847,6 +1858,7 @@ public:
 		pWrapperTable->m_StorageZIPWriter_GetOpenEntryID = nullptr;
 		pWrapperTable->m_StorageZIPWriter_WriteData = nullptr;
 		pWrapperTable->m_StorageZIPWriter_GetEntrySize = nullptr;
+		pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize = nullptr;
 		pWrapperTable->m_StorageZIPWriter_Finish = nullptr;
 		pWrapperTable->m_StorageZIPWriter_IsFinished = nullptr;
 		pWrapperTable->m_Storage_StreamIsReady = nullptr;
@@ -2511,6 +2523,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StorageZIPWriter_GetEntrySize == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize = (PLibMCDataStorageZIPWriter_GetZIPStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_getzipstreamsize");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize = (PLibMCDataStorageZIPWriter_GetZIPStreamSizePtr) dlsym(hLibrary, "libmcdata_storagezipwriter_getzipstreamsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4146,6 +4167,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_GetEntrySize == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_getzipstreamsize", (void**)&(pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_storagezipwriter_finish", (void**)&(pWrapperTable->m_StorageZIPWriter_Finish));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_Finish == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5549,6 +5574,18 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_GetEntrySize(m_pHandle, nEntryID, &resultEntrySize));
 		
 		return resultEntrySize;
+	}
+	
+	/**
+	* CStorageZIPWriter::GetZIPStreamSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	LibMCData_uint64 CStorageZIPWriter::GetZIPStreamSize()
+	{
+		LibMCData_uint64 resultSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_GetZIPStreamSize(m_pHandle, &resultSize));
+		
+		return resultSize;
 	}
 	
 	/**

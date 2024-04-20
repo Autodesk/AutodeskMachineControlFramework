@@ -47,7 +47,7 @@ CStorageZIPWriter::CStorageZIPWriter(AMCData::PStorageWriter_ZIPStream pStorageW
 	: m_pStorageWriter (pStorageWriter)
 {
 	if (pStorageWriter.get () == nullptr)
-		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
 }
 
@@ -83,10 +83,18 @@ LibMCData_uint64 CStorageZIPWriter::GetEntrySize(const LibMCData_uint32 nEntryID
 
 void CStorageZIPWriter::Finish()
 {
+	std::string sSHA256;
+	std::string sBlockwiseSHA256;
+	
+	m_pStorageWriter->finalize (sSHA256, sBlockwiseSHA256);
 }
 
 bool CStorageZIPWriter::IsFinished()
 {
-	return false;
+	return m_pStorageWriter->isFinalized ();
 }
 
+LibMCData_uint64 CStorageZIPWriter::GetZIPStreamSize()
+{
+	return m_pStorageWriter->getZIPStreamSize();
+}

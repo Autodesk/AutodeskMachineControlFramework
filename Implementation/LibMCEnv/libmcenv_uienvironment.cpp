@@ -384,12 +384,19 @@ IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSiz
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
+    return GetGlobalTimerInMicroseconds () / 1000ULL;
 }
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMicroseconds()
 {
-    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+    uint64_t nStartTime = pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+    uint64_t nCurrentTime = pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+    
+    if (nCurrentTime < nStartTime)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+    return nCurrentTime - nStartTime;
 }
 
 void CUIEnvironment::LogOut()
@@ -864,6 +871,6 @@ IDateTime* CUIEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const 
 
 IDateTime* CUIEnvironment::GetStartDateTime()
 {
-    auto pJournalInstance = m_pUISystemState->getStateJournal();
-    return new CDateTime(pJournalInstance->getStartTimeAsMicrosecondsSince1970());
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+    return new CDateTime(pGlobalChrono->getStartTimeStampInMicrosecondsSince1970());
 }

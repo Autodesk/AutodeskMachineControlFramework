@@ -411,6 +411,11 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER 384 /** Empty job data identifier. */
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND 385 /** Build job execution data not found. */
 #define LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER 386 /** Empty job execution data identifier. */
+#define LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE 387 /** ZIP Streams to not support async chunk write. */
+#define LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES 388 /** ZIP Stream exceeds maximum number of entries. */
+#define LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY 389 /** Attempted to write to finished ZIP stream entry. */
+#define LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID 390 /** Invalid ZIP Stream entry ID. */
+#define LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND 391 /** ZIP Stream entry ID not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -734,6 +739,11 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "Empty job data identifier.";
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND: return "Build job execution data not found.";
     case LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER: return "Empty job execution data identifier.";
+    case LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE: return "ZIP Streams to not support async chunk write.";
+    case LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES: return "ZIP Stream exceeds maximum number of entries.";
+    case LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY: return "Attempted to write to finished ZIP stream entry.";
+    case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "Invalid ZIP Stream entry ID.";
+    case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIP Stream entry ID not found.";
     default: return "unknown error";
   }
 }

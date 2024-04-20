@@ -43,8 +43,106 @@ using namespace LibMCEnv::Impl;
  Class definition of CZIPStreamWriter 
 **************************************************************************************************************************/
 
-CZIPStreamWriter::CZIPStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sCurrentUserID, AMCCommon::PChrono pGlobalChrono)
+
+CZIPEntryStreamWriter::CZIPEntryStreamWriter(LibMCData::PStorageZIPWriter pZIPWriter, uint32_t nEntryID, const std::string& sUUID, const std::string& sName)
+    : m_pZIPWriter (pZIPWriter), m_nEntryID (nEntryID), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sName (sName)
 {
+    if (pZIPWriter.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "zip writer is null object");
+}
+
+CZIPEntryStreamWriter::~CZIPEntryStreamWriter()
+{
+
+}
+
+std::string CZIPEntryStreamWriter::GetUUID()
+{
+    return m_sUUID;
+}
+
+std::string CZIPEntryStreamWriter::GetName()
+{
+    return m_sName;
+}
+
+std::string CZIPEntryStreamWriter::GetMIMEType()
+{
+    return "application/zip";
+}
+
+LibMCEnv_uint64 CZIPEntryStreamWriter::GetSize()
+{
+    return m_pZIPWriter->GetEntrySize(m_nEntryID);
+}
+
+LibMCEnv_uint64 CZIPEntryStreamWriter::GetWritePosition()
+{
+    return m_pZIPWriter->GetEntrySize(m_nEntryID);
+}
+
+void CZIPEntryStreamWriter::Seek(const LibMCEnv_uint64 nWritePosition)
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM);
+}
+
+bool CZIPEntryStreamWriter::IsFinished()
+{
+    return m_pZIPWriter->IsFinished();
+}
+
+void CZIPEntryStreamWriter::WriteData(const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8* pDataBuffer)
+{
+    m_pZIPWriter->WriteData(m_nEntryID, LibMCData::CInputVector<uint8_t>(pDataBuffer, nDataBufferSize));
+}
+
+void CZIPEntryStreamWriter::WriteString(const std::string& sData)
+{
+    if (!sData.empty()) {
+        WriteData(sData.length(), (const uint8_t*)sData.c_str());
+    }
+}
+
+void CZIPEntryStreamWriter::WriteLine(const std::string& sLine)
+{
+    WriteString(sLine + "\n");
+}
+
+void CZIPEntryStreamWriter::Finish()
+{
+    m_pZIPWriter->Finish();
+}
+
+void CZIPEntryStreamWriter::CopyFrom(IStreamReader* pStreamReader)
+{
+    if (pStreamReader == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "streamreader is null object");
+
+    size_t nSize = pStreamReader->GetSize();
+    if (nSize > 0) {
+        std::vector<uint8_t> Buffer;
+        Buffer.resize(nSize);
+
+        uint64_t dataNeeded;
+        pStreamReader->ReadAllData(Buffer.size(), &dataNeeded, Buffer.data());
+    }
+}
+
+
+CZIPStreamWriter::CZIPStreamWriter(LibMCData::PDataModel pDataModel, LibMCData::PStorageZIPWriter pZIPWriter, const std::string& sUUID, const std::string& sName, AMCCommon::PChrono pGlobalChrono)
+    : m_pDataModel(pDataModel),
+    m_pZIPWriter(pZIPWriter),
+    m_sName(sName),
+    m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)),
+    m_pGlobalChrono (pGlobalChrono)
+
+{
+    if (pDataModel.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pZIPWriter.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pGlobalChrono.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
 
@@ -56,40 +154,52 @@ CZIPStreamWriter::~CZIPStreamWriter()
 
 ITempStreamWriter * CZIPStreamWriter::CreateZIPEntry(const std::string & sFileName)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    uint32_t nCurrentEntryID = m_pZIPWriter->StartNewEntry(sFileName, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+    return new CZIPEntryStreamWriter(m_pZIPWriter, nCurrentEntryID, m_sUUID, sFileName);
 }
 
 void CZIPStreamWriter::Finish()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    m_pZIPWriter->FinishCurrentEntry();
+    m_pZIPWriter->Finish();
 }
 
 void CZIPStreamWriter::CreateZIPEntryFromStream(const std::string& sFileName, IStreamReader* pStreamReader) 
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    m_pZIPWriter->FinishCurrentEntry();
+
+    if (pStreamReader == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    uint32_t nCurrentEntryID = m_pZIPWriter->StartNewEntry(sFileName, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+    auto pWriter = std::make_unique<CZIPEntryStreamWriter>(m_pZIPWriter, nCurrentEntryID, m_sUUID, sFileName);
+    pWriter->CopyFrom(pStreamReader);
 }
 
 std::string CZIPStreamWriter::GetUUID()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_sUUID;
 }
 
 std::string CZIPStreamWriter::GetName()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_sName;
 }
 
 std::string CZIPStreamWriter::GetMIMEType()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return "application/zip";
 }
 
 LibMCEnv_uint64 CZIPStreamWriter::GetSize()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_pZIPWriter->GetZIPStreamSize();
 }
 
 bool CZIPStreamWriter::IsFinished()
 {
-    return false;
+    return m_pZIPWriter->IsFinished();
 }
+

@@ -1977,6 +1977,32 @@ LibMCDataResult libmcdata_storagezipwriter_getentrysize(LibMCData_StorageZIPWrit
 	}
 }
 
+LibMCDataResult libmcdata_storagezipwriter_getzipstreamsize(LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint64 * pSize)
+{
+	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
+
+	try {
+		if (pSize == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IStorageZIPWriter* pIStorageZIPWriter = dynamic_cast<IStorageZIPWriter*>(pIBaseClass);
+		if (!pIStorageZIPWriter)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pSize = pIStorageZIPWriter->GetZIPStreamSize();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_storagezipwriter_finish(LibMCData_StorageZIPWriter pStorageZIPWriter)
 {
 	IBase* pIBaseClass = (IBase *)pStorageZIPWriter;
@@ -7664,6 +7690,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storagezipwriter_writedata;
 	if (sProcName == "libmcdata_storagezipwriter_getentrysize") 
 		*ppProcAddress = (void*) &libmcdata_storagezipwriter_getentrysize;
+	if (sProcName == "libmcdata_storagezipwriter_getzipstreamsize") 
+		*ppProcAddress = (void*) &libmcdata_storagezipwriter_getzipstreamsize;
 	if (sProcName == "libmcdata_storagezipwriter_finish") 
 		*ppProcAddress = (void*) &libmcdata_storagezipwriter_finish;
 	if (sProcName == "libmcdata_storagezipwriter_isfinished") 

@@ -34,8 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <memory>
+#include <map>
 #include <mutex>
 #include "common_exportstream.hpp"
+#include "common_exportstream_zip.h"
+#include "common_portablezipwriter.hpp"
 
 namespace AMCData {
 
@@ -112,6 +115,15 @@ private:
     std::string m_sUUID;
     std::string m_sPath;
     AMCCommon::PExportStream m_pExportStream;
+    AMCCommon::PExportStream m_pCurrentEntryExportStream;
+    AMCCommon::PPortableZIPWriter m_pPortableZIPWriter;
+
+    uint32_t m_nEntryIDCounter;
+    uint32_t m_nCurrentEntryID;
+    uint64_t m_nCurrentEntryDataSize;
+    uint64_t m_nZIPSize;
+
+    std::map <uint32_t, uint64_t> m_nEntryDataSizes;
 
     std::mutex m_WriteMutex;
 
@@ -136,6 +148,10 @@ public:
     void finalize(std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256);
 
     uint64_t getEntrySize(uint32_t nEntryID);
+    
+    bool isFinalized();
+
+    uint64_t getZIPStreamSize();
 
 };
 

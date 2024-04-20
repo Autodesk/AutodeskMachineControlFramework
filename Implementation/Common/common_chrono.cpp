@@ -148,6 +148,11 @@ namespace AMCCommon {
 			return m_nStartTimeStampUTC + getElapsedMicroseconds();
 		}
 
+		uint64_t getStartTimeMicroseconds()
+		{
+			return m_nStartTimeStampUTC;
+		}
+		
 
 	};
 
@@ -160,20 +165,16 @@ namespace AMCCommon {
 	{
 	}
 
-	uint64_t CChrono::getExistenceTimeInMilliseconds()
-	{
-		return getExistenceTimeInMicroseconds() / 1000ULL;
-	}
-
-	uint64_t CChrono::getExistenceTimeInMicroseconds()
-	{
-		return m_pChronoImpl->getElapsedMicroseconds();
-	}
-
 	uint64_t CChrono::getUTCTimeStampInMicrosecondsSince1970()
 	{
 		return m_pChronoImpl->getAbsoluteMicroseconds();
 	}
+
+	uint64_t CChrono::getStartTimeStampInMicrosecondsSince1970()
+	{
+		return m_pChronoImpl->getStartTimeMicroseconds();
+	}
+
 
 	std::string CChrono::getUTCTimeInISO8601()
 	{

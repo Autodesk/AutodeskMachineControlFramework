@@ -751,6 +751,12 @@ public:
 	virtual LibMCData_uint64 GetEntrySize(const LibMCData_uint32 nEntryID) = 0;
 
 	/**
+	* IStorageZIPWriter::GetZIPStreamSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	virtual LibMCData_uint64 GetZIPStreamSize() = 0;
+
+	/**
 	* IStorageZIPWriter::Finish - Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.
 	*/
 	virtual void Finish() = 0;

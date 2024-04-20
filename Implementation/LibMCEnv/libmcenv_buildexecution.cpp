@@ -139,7 +139,7 @@ void CBuildExecution::SetStatusToFinished()
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION, "can not change status of build execution" + m_sExecutionUUID);
 
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	m_pExecution->ChangeStatus (LibMCData::eBuildJobExecutionStatus::Finished, m_pGlobalChrono->getExistenceTimeInMicroseconds ());
+	m_pExecution->ChangeStatus (LibMCData::eBuildJobExecutionStatus::Finished, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 }
 
 void CBuildExecution::SetStatusToFailed()
@@ -148,7 +148,7 @@ void CBuildExecution::SetStatusToFailed()
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION, "can not change status of build execution" + m_sExecutionUUID);
 
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	m_pExecution->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, m_pGlobalChrono->getExistenceTimeInMicroseconds());
+	m_pExecution->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 }
 
 std::string CBuildExecution::GetDescription()
@@ -227,7 +227,7 @@ LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMilliseconds()
 LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
 {
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getExistenceTimeInMicroseconds ());
+	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 }
 
 std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer)

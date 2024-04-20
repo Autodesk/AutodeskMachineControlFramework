@@ -80,6 +80,8 @@ public:
 
 	bool IsFinished() override;
 
+	LibMCData_uint64 GetZIPStreamSize() override;
+
 };
 
 } // namespace Impl

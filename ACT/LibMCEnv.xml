@@ -215,6 +215,9 @@
 		<error name="DATETIMEISINVALID" code="10175" description="Date Time is invalid" />		
 		<error name="DATETIMEOUTOFBOUNDS" code="10176" description="Date Time out of bounds" />		
 		<error name="EMPTYPNGBUFFER" code="10177" description="Empty PNG buffer" />						
+		<error name="CANNOTSEEKZIPSTREAM" code="10178" description="Cannot seek ZIP stream" />
+		<error name="GLOBALTIMERNOTCONTINUOUS" code="10179" description="Global Timer is not continuous." />	
+		
 		
 	</errors>
 
@@ -2976,7 +2979,7 @@
 	</class>
 	
 	<class name="ZIPStreamWriter" parent="BaseTempStreamWriter" description="A writer that allows to create a ZIP file storage stream.">
-
+	
 		<method name="CreateZIPEntry" description="Creates a new ZIP entry in the ZIP file. All currently open ZIP Entry streams will be finished and closed.">
 			<param name="FileName" type="string" pass="in" description="File Name for the new entry in the ZIP file. Entry MUST not exist yet." />
 			<param name="TempStream" type="class" class="TempStreamWriter" pass="return" description="Returns temp stream to write into." />

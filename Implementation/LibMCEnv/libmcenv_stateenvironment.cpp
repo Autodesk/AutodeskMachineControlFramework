@@ -77,16 +77,16 @@ using namespace LibMCEnv::Impl;
  Class definition of CStateEnvironment 
 **************************************************************************************************************************/
 
-CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string& sPreviousStateName)
+CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nAbsoluteEndTimeOfPreviousStateInMicroseconds, const std::string& sPreviousStateName)
 	: m_pSystemState (pSystemState), m_pParameterHandler (pParameterHandler), m_sInstanceName(sInstanceName),
-	  m_nEndTimeOfPreviousStateInMicroseconds (nEndTimeOfPreviousStateInMicroseconds), m_sPreviousStateName (sPreviousStateName)
+	  m_nAbsoluteEndTimeOfPreviousStateInMicroseconds (nAbsoluteEndTimeOfPreviousStateInMicroseconds), m_sPreviousStateName (sPreviousStateName)
 {
 	if (pSystemState.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pParameterHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	m_nStartTimeOfStateInMicroseconds = pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+	m_nAbsoluteStartTimeOfStateInMicroseconds = m_pSystemState->globalChrono()->getUTCTimeStampInMicrosecondsSince1970 ();
 }
 
 
@@ -461,45 +461,65 @@ IImageData* CStateEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBuffer
 
 LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
 {
-	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
+	return GetGlobalTimerInMicroseconds () / 1000ULL;
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMicroseconds()
 {
-	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+	auto pGlobalChrono = m_pSystemState->getGlobalChronoInstance();
+	uint64_t nStartTime = pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+	uint64_t nCurrentTime = pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+	if (nCurrentTime < nStartTime)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+	return nCurrentTime - nStartTime;
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMilliseconds()
 {
-	return m_nStartTimeOfStateInMicroseconds / 1000;
+	return GetStartTimeOfStateInMicroseconds() / 1000ULL;
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetStartTimeOfStateInMicroseconds()
 {
-	return m_nStartTimeOfStateInMicroseconds;
+	auto pGlobalChrono = m_pSystemState->getGlobalChronoInstance();
+	uint64_t nGlobalStartTime = pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+	if (m_nAbsoluteStartTimeOfStateInMicroseconds < nGlobalStartTime)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+	return m_nAbsoluteStartTimeOfStateInMicroseconds - nGlobalStartTime;
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds()
 {
-	return m_nEndTimeOfPreviousStateInMicroseconds / 1000;
+	return GetEndTimeOfPreviousStateInMicroseconds () / 1000ULL;
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds()
 {
-	return m_nEndTimeOfPreviousStateInMicroseconds;
+	auto pGlobalChrono = m_pSystemState->getGlobalChronoInstance();
+	uint64_t nGlobalStartTime = pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+	if (m_nAbsoluteEndTimeOfPreviousStateInMicroseconds < nGlobalStartTime)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+	return m_nAbsoluteEndTimeOfPreviousStateInMicroseconds - nGlobalStartTime;
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMilliseconds()
 {
-	uint64_t nElapsedTimeInMicroseconds = GetGlobalTimerInMicroseconds() - m_nStartTimeOfStateInMicroseconds;
-	return nElapsedTimeInMicroseconds / 1000;
+	return GetElapsedTimeInStateInMicroseconds() / 1000ULL;
 }
 
 
 LibMCEnv_uint64 CStateEnvironment::GetElapsedTimeInStateInMicroseconds()
 {
-	uint64_t nElapsedTimeInMicroseconds = GetGlobalTimerInMicroseconds() - m_nStartTimeOfStateInMicroseconds;
-	return nElapsedTimeInMicroseconds;
+	auto pGlobalChrono = m_pSystemState->getGlobalChronoInstance();
+	uint64_t nCurrentTime = pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+	if (nCurrentTime < m_nAbsoluteStartTimeOfStateInMicroseconds)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+	return nCurrentTime - m_nAbsoluteStartTimeOfStateInMicroseconds;
 }
 
 
@@ -851,8 +871,16 @@ IZIPStreamWriter* CStateEnvironment::CreateZIPStream(const std::string& sName)
 	if (sName.empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
 
+	auto pChrono = m_pSystemState->getGlobalChronoInstance();
+
 	std::string sUserUUID = AMCCommon::CUtils::createEmptyUUID();
-	return new CZIPStreamWriter(m_pSystemState->getDataModelInstance(), sName, sUserUUID, m_pSystemState->getGlobalChronoInstance());
+	std::string sStreamUUID = AMCCommon::CUtils::createUUID();
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pStorage = pDataModel->CreateStorage();
+	auto pZIPWriter = pStorage->CreateZIPStream(sStreamUUID, sName, sUserUUID, pChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+	return new CZIPStreamWriter (pDataModel, pZIPWriter, sStreamUUID, sName, pChrono);
 }
 
 
@@ -893,7 +921,7 @@ IDateTime* CStateEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, con
 
 IDateTime* CStateEnvironment::GetStartDateTime()
 {
-	auto pJournalInstance = m_pSystemState->getStateJournalInstance();
-	return new CDateTime(pJournalInstance->getStartTimeAsMicrosecondsSince1970 ());
+	auto pGlobalChrono = m_pSystemState->getGlobalChronoInstance();
+	return new CDateTime(pGlobalChrono->getStartTimeStampInMicrosecondsSince1970 ());
 }
 

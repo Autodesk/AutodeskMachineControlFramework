@@ -291,12 +291,18 @@ void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_pGlobalChrono->getExistenceTimeInMilliseconds();
+    return GetGlobalTimerInMicroseconds() / 1000ULL;
 }
 
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMicroseconds()
 {
-    return m_pGlobalChrono->getExistenceTimeInMicroseconds();
+    uint64_t nStartTime = m_pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+    uint64_t nCurrentTime = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+    if (nCurrentTime < nStartTime)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+    return nCurrentTime - nStartTime;
 }
 
 void CDriverEnvironment::LogMessage(const std::string& sLogString)
@@ -443,6 +449,6 @@ IDateTime* CDriverEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, co
 
 IDateTime* CDriverEnvironment::GetStartDateTime()
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return new CDateTime(m_pGlobalChrono->getStartTimeStampInMicrosecondsSince1970());
 }
 

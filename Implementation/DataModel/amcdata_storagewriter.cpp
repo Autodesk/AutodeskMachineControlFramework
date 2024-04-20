@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PicoSHA2/picosha2.h"
 
+#define STORAGE_ZIPSTREAM_MAXENTRIES (1024*1024*1024)
+
 namespace AMCData {
 
 	CStorageWriter::CStorageWriter()
@@ -222,13 +224,22 @@ namespace AMCData {
 
 
 	CStorageWriter_ZIPStream::CStorageWriter_ZIPStream(const std::string& sUUID, const std::string& sPath)
-		: CStorageWriter(), m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)), m_sPath(sPath)
+		: CStorageWriter(), m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID)), 
+		  m_sPath(sPath), 
+		  m_nZIPSize (0),
+		  m_nEntryIDCounter (1),
+		  m_nCurrentEntryID (0),
+		  m_nCurrentEntryDataSize (0)
+
 	{
 		m_pExportStream = std::make_shared<AMCCommon::CExportStream_Native>(sPath);
+		m_pPortableZIPWriter = std::make_shared<AMCCommon::CPortableZIPWriter>(m_pExportStream, true);
 	}
 
 	CStorageWriter_ZIPStream::~CStorageWriter_ZIPStream()
 	{
+		m_pPortableZIPWriter = nullptr;
+
 		if (m_pExportStream.get() != nullptr) {
 			m_pExportStream = nullptr;
 			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
@@ -243,36 +254,122 @@ namespace AMCData {
 
 	void CStorageWriter_ZIPStream::writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset)
 	{
-		//throw ELibMCDataInterfaceException();
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE);
 	}
 
 
 	uint32_t CStorageWriter_ZIPStream::startNewEntry(const std::string& sFileName, uint64_t nAbsoluteTimeStamp)
 	{
-		return 0;
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
+		if (m_pExportStream.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+		if (m_pPortableZIPWriter.get () == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+
+		finishCurrentEntry();
+
+		if (m_nEntryIDCounter > STORAGE_ZIPSTREAM_MAXENTRIES)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES);
+
+		m_pExportStream->seekFromEnd (0, true);
+		m_nZIPSize = m_pExportStream->getPosition();
+
+		m_nCurrentEntryID = m_nEntryIDCounter;
+		m_nEntryIDCounter++;
+
+		// Absolute Time stamp is microseconds since 1970, Unix Time Stamp is seconds since 1970.
+		uint64_t nUnixTimeStamp = (nAbsoluteTimeStamp / 1000000ULL);
+		std::string sNameInZIP = AMCCommon::CUtils::removeLeadingPathDelimiter(sFileName);
+		
+		m_pCurrentEntryExportStream = m_pPortableZIPWriter->createEntry(sNameInZIP, nUnixTimeStamp);
+		m_nCurrentEntryDataSize = 0;
+
+		return m_nCurrentEntryID;
 	}
 
 	void CStorageWriter_ZIPStream::finishCurrentEntry()
 	{
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
 
+		if (m_pExportStream.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+		if (m_pPortableZIPWriter.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+
+		if (m_nCurrentEntryID != 0) {
+			m_nEntryDataSizes.insert(std::make_pair (m_nCurrentEntryID, m_nCurrentEntryDataSize));
+		}
+
+		m_pCurrentEntryExportStream = nullptr;
+		m_pPortableZIPWriter->closeEntry();
+
+		m_pExportStream->seekFromEnd(0, true);
+		m_nZIPSize = m_pExportStream->getPosition();
+
+		m_nCurrentEntryID = 0;
 	}
 
 	uint32_t CStorageWriter_ZIPStream::getOpenEntryID()
 	{
-		return 0;
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+		return m_nCurrentEntryID;
 	}
 
 	void CStorageWriter_ZIPStream::writeToCurrentEntry(uint32_t nEntryID, const uint8_t* pChunkData, const uint64_t nChunkSize)
 	{
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
 
+		if (m_pExportStream.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+
+		if ((m_nCurrentEntryID != nEntryID) || (nEntryID == 0))
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY);
+
+		if (m_pCurrentEntryExportStream == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY);
+
+		if (nChunkSize > 0) {
+			if (pChunkData == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+			m_pCurrentEntryExportStream->writeBuffer(pChunkData, nChunkSize);
+			m_nCurrentEntryDataSize += nChunkSize;
+		}
 	}
 
 	uint64_t CStorageWriter_ZIPStream::getEntrySize(uint32_t nEntryID)
 	{
-		return 0;
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+
+		if (nEntryID == 0)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID);
+
+		if (m_nCurrentEntryID == nEntryID) {
+			return m_nCurrentEntryDataSize;
+		}
+		else {
+			auto iIter = m_nEntryDataSizes.find(nEntryID);
+			if (iIter == m_nEntryDataSizes.end ())
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND);
+
+			return iIter->second;
+		}
 
 	}
 
+	bool CStorageWriter_ZIPStream::isFinalized()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+		return (m_pExportStream == nullptr);
+	}
+
+	uint64_t CStorageWriter_ZIPStream::getZIPStreamSize()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
+		return m_nZIPSize;
+	}
+	
 	void CStorageWriter_ZIPStream::finalize(std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
@@ -282,8 +379,12 @@ namespace AMCData {
 
 		try {
 
+			finishCurrentEntry();
+
+			m_pPortableZIPWriter = nullptr;
+
 			m_pExportStream->seekFromEnd(0, true);
-			auto nSize = m_pExportStream->getPosition();
+			m_nZIPSize = m_pExportStream->getPosition();
 
 			// Free ExportStream and close file
 			m_pExportStream = nullptr;

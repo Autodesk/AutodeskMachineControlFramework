@@ -46,7 +46,7 @@ namespace AMC {
 
 	CStateMachineInstance::CStateMachineInstance(const std::string& sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState, AMC::PStateJournal pStateJournal)
 		: m_sName(sName), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState), m_pStateJournal (pStateJournal),
-		m_nEndTimeOfPreviousStateInMicroseconds (0)
+		m_nAbsoluteEndTimeOfPreviousStateInMicroseconds(0)
 	{
 		LibMCAssertNotNull(pEnvironmentWrapper.get());
 		LibMCAssertNotNull(pSystemState.get());
@@ -230,7 +230,7 @@ namespace AMC {
 			m_sPreviousState = sCurrentState;
 
 			std::string sNextState;
-			m_pCurrentState->execute(sNextState, m_pSystemState, m_ParameterHandler, m_nEndTimeOfPreviousStateInMicroseconds, sPreviousState);
+			m_pCurrentState->execute(sNextState, m_pSystemState, m_ParameterHandler, m_nAbsoluteEndTimeOfPreviousStateInMicroseconds, sPreviousState);
 
 			if (sNextState.empty())
 				throw ELibMCCustomException(LIBMC_ERROR_NOOUTSTATEGIVEN, m_sName + ": " + sCurrentState);
@@ -243,7 +243,7 @@ namespace AMC {
 
 			setCurrentStateInternal (findStateInternal (sNextState, true));
 
-			m_nEndTimeOfPreviousStateInMicroseconds = m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+			m_nAbsoluteEndTimeOfPreviousStateInMicroseconds = m_pSystemState->getGlobalChronoInstance()->getUTCTimeStampInMicrosecondsSince1970();
 
 		}
 		catch (std::exception & E) {

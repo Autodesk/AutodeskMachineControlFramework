@@ -372,7 +372,7 @@ IBuildExecution* CBuild::StartExecution(const std::string& sDescription, const s
 		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 	}
 
-	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID, m_pGlobalChrono->getExistenceTimeInMicroseconds ());
+	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
 

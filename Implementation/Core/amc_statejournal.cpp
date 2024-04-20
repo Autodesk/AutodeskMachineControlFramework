@@ -334,7 +334,6 @@ namespace AMC {
 		
 		std::string getStartTimeAsUTC();
 
-		uint64_t getStartTimeAsMicrosecondsSince1970();
 	};
 
 
@@ -481,11 +480,11 @@ namespace AMC {
 				throw;
 			}
 
-			uint64_t nIntervalTimeInMilliseconds = (uint64_t) m_nChunkWriteIntervalInSeconds * 1000;
+			AMCCommon::CChrono chrono;
+			uint64_t nTimeOutTimeStamp = chrono.getUTCTimeStampInMicrosecondsSince1970 () +  (uint64_t) m_nChunkWriteIntervalInSeconds * 1000000ULL;
 			uint32_t nThreadSleepTimeInMilliseconds = 1;
 
-			AMCCommon::CChrono chrono;
-			while ((!m_ThreadStopFlag) && (chrono.getExistenceTimeInMilliseconds () < nIntervalTimeInMilliseconds)) {
+			while ((!m_ThreadStopFlag) && (chrono.getUTCTimeStampInMicrosecondsSince1970() < nTimeOutTimeStamp)) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(nThreadSleepTimeInMilliseconds));
 			}
 		}
@@ -636,11 +635,6 @@ namespace AMC {
 	std::string CStateJournalImpl::getStartTimeAsUTC()
 	{
 		return m_pGlobalChrono->convertToISO8601TimeUTC (m_nAbsoluteStartTimeInMicroseconds);
-	}
-
-	uint64_t CStateJournalImpl::getStartTimeAsMicrosecondsSince1970()
-	{
-		return m_nAbsoluteStartTimeInMicroseconds;
 	}
 
 	uint64_t CStateJournalImpl::retrieveTimeStamp_MicroSecond()

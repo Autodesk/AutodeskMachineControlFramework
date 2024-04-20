@@ -637,6 +637,15 @@ typedef LibMCDataResult (*PLibMCDataStorageZIPWriter_WriteDataPtr) (LibMCData_St
 typedef LibMCDataResult (*PLibMCDataStorageZIPWriter_GetEntrySizePtr) (LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint32 nEntryID, LibMCData_uint64 * pEntrySize);
 
 /**
+* Returns the current size of the stream.
+*
+* @param[in] pStorageZIPWriter - StorageZIPWriter instance.
+* @param[out] pSize - Current size of the stream.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataStorageZIPWriter_GetZIPStreamSizePtr) (LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint64 * pSize);
+
+/**
 * Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.
 *
 * @param[in] pStorageZIPWriter - StorageZIPWriter instance.
@@ -2454,6 +2463,7 @@ typedef struct {
 	PLibMCDataStorageZIPWriter_GetOpenEntryIDPtr m_StorageZIPWriter_GetOpenEntryID;
 	PLibMCDataStorageZIPWriter_WriteDataPtr m_StorageZIPWriter_WriteData;
 	PLibMCDataStorageZIPWriter_GetEntrySizePtr m_StorageZIPWriter_GetEntrySize;
+	PLibMCDataStorageZIPWriter_GetZIPStreamSizePtr m_StorageZIPWriter_GetZIPStreamSize;
 	PLibMCDataStorageZIPWriter_FinishPtr m_StorageZIPWriter_Finish;
 	PLibMCDataStorageZIPWriter_IsFinishedPtr m_StorageZIPWriter_IsFinished;
 	PLibMCDataStorage_StreamIsReadyPtr m_Storage_StreamIsReady;
