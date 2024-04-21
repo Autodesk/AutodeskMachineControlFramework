@@ -38,7 +38,7 @@ NMR_PortableZIPWriter.cpp implements a portable and fast writer of ZIP files
 
 namespace AMCCommon {
 
-	CPortableZIPWriter::CPortableZIPWriter(_In_ PExportStream pExportStream, _In_ bool bWriteZIP64)
+	CPortableZIPWriter::CPortableZIPWriter(PExportStream pExportStream, bool bWriteZIP64)
 	{
 		if (pExportStream.get() == nullptr)
 			throw std::runtime_error("invalid export stream param");
@@ -70,7 +70,7 @@ namespace AMCCommon {
 			writeDirectory();
 	}
 
-	PExportStream CPortableZIPWriter::createEntry(_In_ const std::string sName, _In_ uint64_t nUnixTimeStamp)
+	PExportStream CPortableZIPWriter::createEntry(const std::string sName, uint64_t nUnixTimeStamp)
 	{
 		if (m_bIsFinished)
 			throw std::runtime_error("zip already finished");
@@ -199,7 +199,7 @@ namespace AMCCommon {
 		m_nCurrentEntryKey = 0;
 	}
 
-	void CPortableZIPWriter::calculateChecksum(_In_ uint32_t nEntryKey, _In_ const void * pBuffer, _In_ uint32_t cbUncompressedBytes)
+	void CPortableZIPWriter::calculateChecksum(uint32_t nEntryKey, const void * pBuffer, uint32_t cbUncompressedBytes)
 	{
 		if (m_pCurrentEntry.get() == nullptr)
 			throw std::runtime_error("invalid zip entry");
@@ -217,7 +217,7 @@ namespace AMCCommon {
 	}
 
 
-	void CPortableZIPWriter::writeDeflatedBuffer(_In_ uint32_t nEntryKey, _In_ const void * pBuffer, _In_ uint32_t cbCompressedBytes)
+	void CPortableZIPWriter::writeDeflatedBuffer(uint32_t nEntryKey, const void * pBuffer, uint32_t cbCompressedBytes)
 	{
 		if (m_pCurrentEntry.get() == nullptr)
 			throw std::runtime_error("invalid zip entry");
@@ -234,7 +234,7 @@ namespace AMCCommon {
 		}
 	}
 
-	uint64_t CPortableZIPWriter::getCurrentSize(_In_ uint32_t nEntryKey)
+	uint64_t CPortableZIPWriter::getCurrentSize(uint32_t nEntryKey)
 	{
 		if (m_pCurrentEntry.get() == nullptr)
 			throw std::runtime_error("invalid zip entry");
