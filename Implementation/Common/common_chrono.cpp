@@ -484,8 +484,8 @@ namespace AMCCommon {
 
 		return getMicrosecondsSince1970FromDateTime(utcTime.wYear, utcTime.wMonth, utcTime.wDay, utcTime.wHour, utcTime.wMinute, utcTime.wSecond, ((uint32_t)utcTime.wMilliseconds) * 1000);
 #else
-		std::time_t t = std::time(nullptr);
-		utc_time = *std::localtime(&t);
+		//std::time_t t = std::time(nullptr);
+		//utc_time = *std::localtime(&t);
 		throw std::runtime_error("date time support not implemented");
 
 #endif
