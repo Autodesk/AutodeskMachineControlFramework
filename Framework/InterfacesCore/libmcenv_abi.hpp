@@ -6941,7 +6941,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createtemporarystream
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createzipstream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_ZIPStreamWriter * pZIPStreamInstance);
 
 /**
-* Finds a stream in the storage system.
+* Loads a stream in the storage system.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pUUID - UUID of the storage stream.
@@ -6949,7 +6949,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createzipstream(LibMC
 * @param[out] pStreamInstance - Stream Instance. Will return null if not found and MustExists is false.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findstream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadstream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
 
 /*************************************************************************************************************************
  Class definition for UIItem
@@ -7739,7 +7739,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createtemporarystream(Li
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createzipstream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pName, LibMCEnv_ZIPStreamWriter * pZIPStreamInstance);
 
 /**
-* Finds a stream in the storage system.
+* Loads a stream in the storage system.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pUUID - UUID of the storage stream.
@@ -7747,7 +7747,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createzipstream(LibMCEnv
 * @param[out] pStreamInstance - Stream Instance. Will return null if not found and MustExists is false.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findstream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_loadstream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
 
 /**
 * Returns the current time as DateTime object instance.

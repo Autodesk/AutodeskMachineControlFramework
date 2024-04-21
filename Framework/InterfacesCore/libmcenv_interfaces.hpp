@@ -5378,12 +5378,12 @@ public:
 	virtual IZIPStreamWriter * CreateZIPStream(const std::string & sName) = 0;
 
 	/**
-	* IStateEnvironment::FindStream - Finds a stream in the storage system.
+	* IStateEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	virtual IStreamReader * FindStream(const std::string & sUUID, const bool bMustExist) = 0;
+	virtual IStreamReader * LoadStream(const std::string & sUUID, const bool bMustExist) = 0;
 
 };
 
@@ -5937,12 +5937,12 @@ public:
 	virtual IZIPStreamWriter * CreateZIPStream(const std::string & sName) = 0;
 
 	/**
-	* IUIEnvironment::FindStream - Finds a stream in the storage system.
+	* IUIEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	virtual IStreamReader * FindStream(const std::string & sUUID, const bool bMustExist) = 0;
+	virtual IStreamReader * LoadStream(const std::string & sUUID, const bool bMustExist) = 0;
 
 	/**
 	* IUIEnvironment::GetCurrentDateTime - Returns the current time as DateTime object instance.

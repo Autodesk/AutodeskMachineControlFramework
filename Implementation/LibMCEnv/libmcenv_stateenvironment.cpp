@@ -884,7 +884,7 @@ IZIPStreamWriter* CStateEnvironment::CreateZIPStream(const std::string& sName)
 }
 
 
-IStreamReader* CStateEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
+IStreamReader* CStateEnvironment::LoadStream(const std::string& sUUID, const bool bMustExist)
 {
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pStorage = pDataModel->CreateStorage();

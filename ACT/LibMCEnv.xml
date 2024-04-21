@@ -3745,7 +3745,7 @@
 			<param name="ZIPStreamInstance" type="class" class="ZIPStreamWriter" pass="return" description="ZIP stream writer instance" />
 		</method>
 
-		<method name="FindStream" description="Finds a stream in the storage system.">
+		<method name="LoadStream" description="Loads a stream in the storage system.">
 			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
 			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />
@@ -4148,7 +4148,7 @@
 			<param name="ZIPStreamInstance" type="class" class="ZIPStreamWriter" pass="return" description="ZIP stream writer instance" />
 		</method>
 
-		<method name="FindStream" description="Finds a stream in the storage system.">
+		<method name="LoadStream" description="Loads a stream in the storage system.">
 			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
 			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />

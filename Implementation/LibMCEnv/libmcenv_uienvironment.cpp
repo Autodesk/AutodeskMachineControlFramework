@@ -847,7 +847,7 @@ IZIPStreamWriter* CUIEnvironment::CreateZIPStream(const std::string& sName)
 }
 
 
-IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
+IStreamReader* CUIEnvironment::LoadStream(const std::string& sUUID, const bool bMustExist)
 {
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pStorage = pDataModel->CreateStorage();

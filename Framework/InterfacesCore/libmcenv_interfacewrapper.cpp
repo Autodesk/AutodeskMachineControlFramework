@@ -20892,7 +20892,7 @@ LibMCEnvResult libmcenv_stateenvironment_createzipstream(LibMCEnv_StateEnvironme
 	}
 }
 
-LibMCEnvResult libmcenv_stateenvironment_findstream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance)
+LibMCEnvResult libmcenv_stateenvironment_loadstream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
 
@@ -20907,7 +20907,7 @@ LibMCEnvResult libmcenv_stateenvironment_findstream(LibMCEnv_StateEnvironment pS
 		if (!pIStateEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseStreamInstance = pIStateEnvironment->FindStream(sUUID, bMustExist);
+		pBaseStreamInstance = pIStateEnvironment->LoadStream(sUUID, bMustExist);
 
 		*pStreamInstance = (IBase*)(pBaseStreamInstance);
 		return LIBMCENV_SUCCESS;
@@ -23431,7 +23431,7 @@ LibMCEnvResult libmcenv_uienvironment_createzipstream(LibMCEnv_UIEnvironment pUI
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_findstream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance)
+LibMCEnvResult libmcenv_uienvironment_loadstream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
@@ -23446,7 +23446,7 @@ LibMCEnvResult libmcenv_uienvironment_findstream(LibMCEnv_UIEnvironment pUIEnvir
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseStreamInstance = pIUIEnvironment->FindStream(sUUID, bMustExist);
+		pBaseStreamInstance = pIUIEnvironment->LoadStream(sUUID, bMustExist);
 
 		*pStreamInstance = (IBase*)(pBaseStreamInstance);
 		return LIBMCENV_SUCCESS;
@@ -24839,8 +24839,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createtemporarystream;
 	if (sProcName == "libmcenv_stateenvironment_createzipstream") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createzipstream;
-	if (sProcName == "libmcenv_stateenvironment_findstream") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_findstream;
+	if (sProcName == "libmcenv_stateenvironment_loadstream") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadstream;
 	if (sProcName == "libmcenv_uiitem_getname") 
 		*ppProcAddress = (void*) &libmcenv_uiitem_getname;
 	if (sProcName == "libmcenv_uiitem_getpath") 
@@ -24985,8 +24985,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_createtemporarystream;
 	if (sProcName == "libmcenv_uienvironment_createzipstream") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_createzipstream;
-	if (sProcName == "libmcenv_uienvironment_findstream") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_findstream;
+	if (sProcName == "libmcenv_uienvironment_loadstream") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_loadstream;
 	if (sProcName == "libmcenv_uienvironment_getcurrentdatetime") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getcurrentdatetime;
 	if (sProcName == "libmcenv_uienvironment_getcustomdatetime") 

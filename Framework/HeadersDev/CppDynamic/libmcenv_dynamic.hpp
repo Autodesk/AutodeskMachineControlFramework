@@ -2395,7 +2395,7 @@ public:
 	inline PCryptoContext CreateCryptoContext();
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
 	inline PZIPStreamWriter CreateZIPStream(const std::string & sName);
-	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
+	inline PStreamReader LoadStream(const std::string & sUUID, const bool bMustExist);
 };
 	
 /*************************************************************************************************************************
@@ -2500,7 +2500,7 @@ public:
 	inline PCryptoContext CreateCryptoContext();
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
 	inline PZIPStreamWriter CreateZIPStream(const std::string & sName);
-	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
+	inline PStreamReader LoadStream(const std::string & sUUID, const bool bMustExist);
 	inline PDateTime GetCurrentDateTime();
 	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
 	inline PDateTime GetStartDateTime();
@@ -3226,7 +3226,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateTemporaryStream = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateZIPStream = nullptr;
-		pWrapperTable->m_StateEnvironment_FindStream = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadStream = nullptr;
 		pWrapperTable->m_UIItem_GetName = nullptr;
 		pWrapperTable->m_UIItem_GetPath = nullptr;
 		pWrapperTable->m_UIItem_GetUUID = nullptr;
@@ -3299,7 +3299,7 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateTemporaryStream = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateZIPStream = nullptr;
-		pWrapperTable->m_UIEnvironment_FindStream = nullptr;
+		pWrapperTable->m_UIEnvironment_LoadStream = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCurrentDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCustomDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_GetStartDateTime = nullptr;
@@ -9110,12 +9110,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_FindStream = (PLibMCEnvStateEnvironment_FindStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findstream");
+		pWrapperTable->m_StateEnvironment_LoadStream = (PLibMCEnvStateEnvironment_LoadStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadstream");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_FindStream = (PLibMCEnvStateEnvironment_FindStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findstream");
+		pWrapperTable->m_StateEnvironment_LoadStream = (PLibMCEnvStateEnvironment_LoadStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadstream");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_FindStream == nullptr)
+		if (pWrapperTable->m_StateEnvironment_LoadStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9767,12 +9767,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_FindStream = (PLibMCEnvUIEnvironment_FindStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findstream");
+		pWrapperTable->m_UIEnvironment_LoadStream = (PLibMCEnvUIEnvironment_LoadStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadstream");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_FindStream = (PLibMCEnvUIEnvironment_FindStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_findstream");
+		pWrapperTable->m_UIEnvironment_LoadStream = (PLibMCEnvUIEnvironment_LoadStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_loadstream");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_FindStream == nullptr)
+		if (pWrapperTable->m_UIEnvironment_LoadStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12419,8 +12419,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateZIPStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_findstream", (void**)&(pWrapperTable->m_StateEnvironment_FindStream));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindStream == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadstream", (void**)&(pWrapperTable->m_StateEnvironment_LoadStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uiitem_getname", (void**)&(pWrapperTable->m_UIItem_GetName));
@@ -12711,8 +12711,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateZIPStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_findstream", (void**)&(pWrapperTable->m_UIEnvironment_FindStream));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindStream == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loadstream", (void**)&(pWrapperTable->m_UIEnvironment_LoadStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentdatetime", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentDateTime));
@@ -21473,15 +21473,15 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::FindStream - Finds a stream in the storage system.
+	* CStateEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	PStreamReader CStateEnvironment::FindStream(const std::string & sUUID, const bool bMustExist)
+	PStreamReader CStateEnvironment::LoadStream(const std::string & sUUID, const bool bMustExist)
 	{
 		LibMCEnvHandle hStreamInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
 		
 		if (hStreamInstance) {
 			return std::make_shared<CStreamReader>(m_pWrapper, hStreamInstance);
@@ -22531,15 +22531,15 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::FindStream - Finds a stream in the storage system.
+	* CUIEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	PStreamReader CUIEnvironment::FindStream(const std::string & sUUID, const bool bMustExist)
+	PStreamReader CUIEnvironment::LoadStream(const std::string & sUUID, const bool bMustExist)
 	{
 		LibMCEnvHandle hStreamInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
 		
 		if (hStreamInstance) {
 			return std::make_shared<CStreamReader>(m_pWrapper, hStreamInstance);

@@ -233,7 +233,7 @@ public:
 
 	IZIPStreamWriter* CreateZIPStream(const std::string& sName) override;
 
-	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
+	IStreamReader* LoadStream(const std::string& sUUID, const bool bMustExist) override;
 
 	IDateTime* GetCurrentDateTime()  override;
 

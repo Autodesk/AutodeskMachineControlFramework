@@ -6928,7 +6928,7 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateTemporaryStreamPtr) (Li
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateZIPStreamPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_ZIPStreamWriter * pZIPStreamInstance);
 
 /**
-* Finds a stream in the storage system.
+* Loads a stream in the storage system.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pUUID - UUID of the storage stream.
@@ -6936,7 +6936,7 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateZIPStreamPtr) (LibMCEnv
 * @param[out] pStreamInstance - Stream Instance. Will return null if not found and MustExists is false.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_FindStreamPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadStreamPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
 
 /*************************************************************************************************************************
  Class definition for UIItem
@@ -7726,7 +7726,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateTemporaryStreamPtr) (LibMC
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateZIPStreamPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pName, LibMCEnv_ZIPStreamWriter * pZIPStreamInstance);
 
 /**
-* Finds a stream in the storage system.
+* Loads a stream in the storage system.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pUUID - UUID of the storage stream.
@@ -7734,7 +7734,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateZIPStreamPtr) (LibMCEnv_UI
 * @param[out] pStreamInstance - Stream Instance. Will return null if not found and MustExists is false.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_FindStreamPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LoadStreamPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_StreamReader * pStreamInstance);
 
 /**
 * Returns the current time as DateTime object instance.
@@ -8465,7 +8465,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateCryptoContextPtr m_StateEnvironment_CreateCryptoContext;
 	PLibMCEnvStateEnvironment_CreateTemporaryStreamPtr m_StateEnvironment_CreateTemporaryStream;
 	PLibMCEnvStateEnvironment_CreateZIPStreamPtr m_StateEnvironment_CreateZIPStream;
-	PLibMCEnvStateEnvironment_FindStreamPtr m_StateEnvironment_FindStream;
+	PLibMCEnvStateEnvironment_LoadStreamPtr m_StateEnvironment_LoadStream;
 	PLibMCEnvUIItem_GetNamePtr m_UIItem_GetName;
 	PLibMCEnvUIItem_GetPathPtr m_UIItem_GetPath;
 	PLibMCEnvUIItem_GetUUIDPtr m_UIItem_GetUUID;
@@ -8538,7 +8538,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_CreateCryptoContextPtr m_UIEnvironment_CreateCryptoContext;
 	PLibMCEnvUIEnvironment_CreateTemporaryStreamPtr m_UIEnvironment_CreateTemporaryStream;
 	PLibMCEnvUIEnvironment_CreateZIPStreamPtr m_UIEnvironment_CreateZIPStream;
-	PLibMCEnvUIEnvironment_FindStreamPtr m_UIEnvironment_FindStream;
+	PLibMCEnvUIEnvironment_LoadStreamPtr m_UIEnvironment_LoadStream;
 	PLibMCEnvUIEnvironment_GetCurrentDateTimePtr m_UIEnvironment_GetCurrentDateTime;
 	PLibMCEnvUIEnvironment_GetCustomDateTimePtr m_UIEnvironment_GetCustomDateTime;
 	PLibMCEnvUIEnvironment_GetStartDateTimePtr m_UIEnvironment_GetStartDateTime;
