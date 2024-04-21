@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_portablezipwriterentry.hpp"
 #include "common_utils.hpp"
-#include "zlib.h"
+#include "Libraries/zlib/zlib.h"
 
 namespace AMCCommon {
 
