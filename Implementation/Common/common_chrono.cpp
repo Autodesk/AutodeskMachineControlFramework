@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <thread>
 #include <exception>
+#include <algorithm>
 #include <stdexcept>
 #include <sstream>
 #include <iomanip>
