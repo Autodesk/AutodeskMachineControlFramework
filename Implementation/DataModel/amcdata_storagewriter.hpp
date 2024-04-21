@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <mutex>
 #include "common_exportstream.hpp"
-#include "common_exportstream_zip.h"
 #include "common_portablezipwriter.hpp"
 
 namespace AMCData {
