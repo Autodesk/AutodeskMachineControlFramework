@@ -389,6 +389,7 @@
 		<error name="ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY" code="389" description="Attempted to write to finished ZIP stream entry." />								
 		<error name="INVALIDZIPSTREAMENTRYID" code="390" description="Invalid ZIP Stream entry ID." />								
 		<error name="ZIPSTREAMENTRYIDNOTFOUND" code="391" description="ZIP Stream entry ID not found." />	
+		<error name="ZIPWRITINGALREADYFINISHED" code="392" description="ZIP Writing already finished." />	
 		
 		
 		

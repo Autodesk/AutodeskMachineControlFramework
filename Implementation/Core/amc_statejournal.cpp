@@ -854,11 +854,6 @@ namespace AMC {
 		return m_pImpl->getStartTimeAsUTC();
 	}
 
-	uint64_t CStateJournal::getStartTimeAsMicrosecondsSince1970()
-	{
-		return m_pImpl->getStartTimeAsMicrosecondsSince1970();
-	}
-
 
 }
 

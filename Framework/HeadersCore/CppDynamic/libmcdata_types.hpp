@@ -416,6 +416,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY 389 /** Attempted to write to finished ZIP stream entry. */
 #define LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID 390 /** Invalid ZIP Stream entry ID. */
 #define LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND 391 /** ZIP Stream entry ID not found. */
+#define LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED 392 /** ZIP Writing already finished. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -744,6 +745,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY: return "Attempted to write to finished ZIP stream entry.";
     case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "Invalid ZIP Stream entry ID.";
     case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIP Stream entry ID not found.";
+    case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIP Writing already finished.";
     default: return "unknown error";
   }
 }

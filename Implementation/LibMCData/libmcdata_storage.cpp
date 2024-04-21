@@ -294,7 +294,7 @@ IStorageZIPWriter* CStorage::CreateZIPStream(const std::string& sUUID, const std
         auto pWriter = std::make_shared<AMCData::CStorageWriter_ZIPStream>(sParsedUUID, m_pStorageState->getStreamPath(sUUID));
         m_pStorageState->addPartialWriter(pWriter);
 
-        return new CStorageZIPWriter(pWriter);
+        return new CStorageZIPWriter(pWriter, m_pSQLHandler);
     }
 
 }

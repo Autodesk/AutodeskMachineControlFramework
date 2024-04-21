@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CStorageZIPWriter
 
 // Include custom headers here.
 #include "amcdata_storagewriter.hpp"
+#include "amcdata_sqlhandler.hpp"
 
 namespace LibMCData {
 namespace Impl {
@@ -59,10 +60,11 @@ class CStorageZIPWriter : public virtual IStorageZIPWriter, public virtual CBase
 private:
 
 	AMCData::PStorageWriter_ZIPStream m_pStorageWriter;
+	AMCData::PSQLHandler m_pSQLHandler;
 
 public:
 
-	CStorageZIPWriter(AMCData::PStorageWriter_ZIPStream pStorageWriter);
+	CStorageZIPWriter(AMCData::PStorageWriter_ZIPStream pStorageWriter, AMCData::PSQLHandler pSQLHandler);
 
 	virtual ~CStorageZIPWriter();
 

@@ -44,6 +44,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_zipstreamwriter.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -830,7 +831,19 @@ ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sNam
 
 IZIPStreamWriter* CUIEnvironment::CreateZIPStream(const std::string& sName)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    if (sName.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
+
+    auto pChrono = m_pUISystemState->getGlobalChronoInstance();
+
+    std::string sUserUUID = AMCCommon::CUtils::createEmptyUUID();
+    std::string sStreamUUID = AMCCommon::CUtils::createUUID();
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pStorage = pDataModel->CreateStorage();
+    auto pZIPWriter = pStorage->CreateZIPStream(sStreamUUID, sName, sUserUUID, pChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+    return new CZIPStreamWriter(pDataModel, pZIPWriter, sStreamUUID, sName, pChrono);
 }
 
 

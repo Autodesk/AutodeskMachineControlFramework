@@ -260,14 +260,14 @@ namespace AMCData {
 
 	uint32_t CStorageWriter_ZIPStream::startNewEntry(const std::string& sFileName, uint64_t nAbsoluteTimeStamp)
 	{
+		finishCurrentEntry();
+
 		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
 
 		if (m_pExportStream.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED);
 		if (m_pPortableZIPWriter.get () == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
-
-		finishCurrentEntry();
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED);
 
 		if (m_nEntryIDCounter > STORAGE_ZIPSTREAM_MAXENTRIES)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES);
@@ -293,9 +293,9 @@ namespace AMCData {
 		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
 
 		if (m_pExportStream.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED);
 		if (m_pPortableZIPWriter.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED);
 
 		if (m_nCurrentEntryID != 0) {
 			m_nEntryDataSizes.insert(std::make_pair (m_nCurrentEntryID, m_nCurrentEntryDataSize));
@@ -321,7 +321,7 @@ namespace AMCData {
 		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
 
 		if (m_pExportStream.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED);
 
 		if ((m_nCurrentEntryID != nEntryID) || (nEntryID == 0))
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY);
@@ -372,14 +372,14 @@ namespace AMCData {
 	
 	void CStorageWriter_ZIPStream::finalize(std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256)
 	{
+		finishCurrentEntry();
+
 		std::lock_guard<std::mutex> lockGuard(m_WriteMutex);
 
 		if (m_pExportStream.get() == nullptr)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED);
 
 		try {
-
-			finishCurrentEntry();
 
 			m_pPortableZIPWriter = nullptr;
 
