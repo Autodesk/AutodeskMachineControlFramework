@@ -60,11 +60,12 @@ namespace AMCCommon {
 		LARGE_INTEGER m_HighResFrequency;
 		uint64_t m_LowResStartingMilliseconds;
 
-		uint64_t m_nStartTimeStampUTC;
-
 #else		
 		timespec startTime;
 #endif
+
+		uint64_t m_nStartTimeStampUTC;
+
 	public:
 
 		CChrono_Impl(bool bHighResolution, uint64_t nStartTimeStampUTC)
