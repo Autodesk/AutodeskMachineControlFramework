@@ -53,18 +53,18 @@ namespace AMCCommon {
 
 		bool m_bIsInitialized;
 
-		uint32_t writeChunk(_In_ const uint8_t * pData, uint32_t cbCount);
+		uint32_t writeChunk(const uint8_t * pData, uint32_t cbCount);
 		void finishDeflate();
 	public:
 		CExportStream_ZIP() = delete;
-		CExportStream_ZIP(_In_ CPortableZIPWriter * pZIPWriter, uint32_t nEntryKey);
+		CExportStream_ZIP(CPortableZIPWriter * pZIPWriter, uint32_t nEntryKey);
 		~CExportStream_ZIP();
 
-		virtual bool seekPosition(_In_ uint64_t position, _In_ bool bHasToSucceed);
-		virtual bool seekForward(_In_ uint64_t bytes, _In_ bool bHasToSucceed);
-		virtual bool seekFromEnd(_In_ uint64_t bytes, _In_ bool bHasToSucceed);
+		virtual bool seekPosition(uint64_t position, bool bHasToSucceed);
+		virtual bool seekForward(uint64_t bytes, bool bHasToSucceed);
+		virtual bool seekFromEnd(uint64_t bytes, bool bHasToSucceed);
 		virtual uint64_t getPosition();
-		virtual uint64_t writeBuffer(_In_ const void * pBuffer, _In_ uint64_t cbTotalBytesToWrite);
+		virtual uint64_t writeBuffer(const void * pBuffer, uint64_t cbTotalBytesToWrite);
 
 		void flushZIPStream();
 

@@ -33,7 +33,7 @@ NMR_PortableZIPWriter.cpp implements a portable and fast writer of ZIP files
 #include "common_portablezipwriter.hpp"
 #include "common_utils.hpp"
 #include "common_portablezipwritertypes.hpp"
-#include "common_exportstream_zip.h"
+#include "common_exportstream_zip.hpp"
 #include <stdexcept>
 
 namespace AMCCommon {
