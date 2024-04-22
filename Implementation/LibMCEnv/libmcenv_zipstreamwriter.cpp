@@ -43,6 +43,7 @@ using namespace LibMCEnv::Impl;
  Class definition of CZIPStreamWriter 
 **************************************************************************************************************************/
 
+#define ZIPSTREAMCOPY_CHUNKSIZE (1024ULL * 1024ULL)
 
 CZIPEntryStreamWriter::CZIPEntryStreamWriter(LibMCData::PStorageZIPWriter pZIPWriter, uint32_t nEntryID, const std::string& sUUID, const std::string& sName)
     : m_pZIPWriter (pZIPWriter), m_nEntryID (nEntryID), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sName (sName)
@@ -118,13 +119,24 @@ void CZIPEntryStreamWriter::CopyFrom(IStreamReader* pStreamReader)
     if (pStreamReader == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "streamreader is null object");
 
+    pStreamReader->Seek(0);
     size_t nSize = pStreamReader->GetSize();
     if (nSize > 0) {
         std::vector<uint8_t> Buffer;
-        Buffer.resize(nSize);
+        Buffer.resize(ZIPSTREAMCOPY_CHUNKSIZE);
 
-        uint64_t dataNeeded;
-        pStreamReader->ReadAllData(Buffer.size(), &dataNeeded, Buffer.data());
+        while (nSize > 0) {
+            size_t nChunkSize = ZIPSTREAMCOPY_CHUNKSIZE;
+            if (nChunkSize > nSize)
+                nChunkSize = nSize;
+
+            uint64_t dataNeeded = 0;
+            pStreamReader->ReadData(nChunkSize, nChunkSize, &dataNeeded, Buffer.data());
+            WriteData(nChunkSize, Buffer.data());
+
+            nSize -= nChunkSize;
+        }
+
     }
 }
 
@@ -175,6 +187,7 @@ void CZIPStreamWriter::CreateZIPEntryFromStream(const std::string& sFileName, IS
     uint32_t nCurrentEntryID = m_pZIPWriter->StartNewEntry(sFileName, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 
     auto pWriter = std::make_unique<CZIPEntryStreamWriter>(m_pZIPWriter, nCurrentEntryID, m_sUUID, sFileName);
+    pStreamReader->Seek(0);
     pWriter->CopyFrom(pStreamReader);
 }
 
