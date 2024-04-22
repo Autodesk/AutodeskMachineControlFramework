@@ -2131,5 +2131,5 @@ LibMCDriver_ScanLab_int32 CRTCContext::ReadMultiMCBSP(const LibMCDriver_ScanLab_
 
 IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate)
 {
-	return new CUARTConnection(m_pScanLabSDK, nDesiredBaudRate, m_CardNo);
+	return new CUARTConnection(m_pScanLabSDK, nDesiredBaudRate, m_CardNo, m_pDriverEnvironment);
 }

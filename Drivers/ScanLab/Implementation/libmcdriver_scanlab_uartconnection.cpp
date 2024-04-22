@@ -43,10 +43,12 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CUARTConnection 
 **************************************************************************************************************************/
 
-CUARTConnection::CUARTConnection(PScanLabSDK pScanlabSDK, uint32_t nDesiredBaudRate, uint32_t nCardNo)
-	: m_pScanlabSDK (pScanlabSDK), m_nDesiredBaudRate (nDesiredBaudRate), m_nCardNo (nCardNo)
+CUARTConnection::CUARTConnection(PScanLabSDK pScanlabSDK, uint32_t nDesiredBaudRate, uint32_t nCardNo, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_pScanlabSDK (pScanlabSDK), m_nDesiredBaudRate (nDesiredBaudRate), m_nCardNo (nCardNo), m_pDriverEnvironment (pDriverEnvironment)
 {
 	if (pScanlabSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+	if (pDriverEnvironment.get () == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
 	m_pScanlabSDK->checkGlobalErrorOfCard(m_nCardNo);
@@ -135,7 +137,7 @@ void CUARTConnection::ReadData(const LibMCDriver_ScanLab_uint32 nByteCount, cons
 				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT);
 
 			if (m_ReceiveBuffer.size() < nByteCount)
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+				m_pDriverEnvironment->Sleep(1);
 		}
 
 		std::vector<uint8_t> newBuffer;
