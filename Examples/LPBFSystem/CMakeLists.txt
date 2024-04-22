@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.5)
 
-project("Autodesk_LBPF_Example")
+project("Autodesk_LPBF_Example")
 
 add_subdirectory(Main)
 add_subdirectory(PLC)

@@ -41,10 +41,12 @@ message(STATUS "Including Drivers in build")
 add_subdirectory(Drivers)
 endif()
 
+set(CMAKE_AMCF_PLUGINNAME Examples/LPBFSystem)
+
 set(CMAKE_AMCF_PROJECTDIR ${PROJECT_BINARY_DIR})
 
-add_subdirectory(Examples/LPBFSystem)
-set(CMAKE_CURRENT_PLUGINS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Examples/LPBFSystem)
+add_subdirectory(${CMAKE_AMCF_PLUGINNAME})
+set(CMAKE_CURRENT_PLUGINS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_AMCF_PLUGINNAME})
 
 if(INCLUDE_TESTS)
 message(STATUS "Including Tests in build")
