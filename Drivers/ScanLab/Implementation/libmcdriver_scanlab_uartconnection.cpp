@@ -198,7 +198,7 @@ std::string CUARTConnection::ReadLine(const std::string& sSeparator, const LibMC
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT);
 
 		if (!bIsFinished)
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			m_pDriverEnvironment->Sleep(1);
 
 	}
 
