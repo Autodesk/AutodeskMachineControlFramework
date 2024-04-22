@@ -269,7 +269,7 @@ LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibM
 	}
 }
 
-void CBuildJobExecution::AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
+std::string CBuildJobExecution::AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	if (pStream == nullptr)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -280,6 +280,8 @@ void CBuildJobExecution::AddJobExecutionData(const std::string& sIdentifier, con
 
 	auto sTimeStamp = AMCCommon::CChrono::convertToISO8601TimeUTC(nAbsoluteTimeStamp);
 	std::unique_ptr<CBuildJobExecutionData> buildJobData(CBuildJobExecutionData::createInDatabase(sIdentifier, sName, m_sExecutionUUID, eDataType, sTimeStamp, sStreamUUID, sUserUUID, sStreamSHA2, nStreamSize, m_pSQLHandler, m_pStorageState));
+
+	return buildJobData->GetDataUUID();
 }
 
 CBuildJobExecutionData* CBuildJobExecution::makeJobExecutionDataEx(AMCData::CSQLStatement* pStatement)

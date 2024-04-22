@@ -88,10 +88,9 @@ namespace AMC {
 		AMCCommon::PChrono m_pGlobalChronoInstance;
 
 		std::string m_sTestOutputPath;
-		std::string m_sSystemUserID;
 
 	public:
-		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel);
+		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel);
 
 		virtual ~CUISystemState();
 
@@ -112,7 +111,6 @@ namespace AMC {
 		AMCCommon::PChrono getGlobalChronoInstance();
 
 		std::string getTestOutputPath();
-		std::string getSystemUserID();
 
 		uint64_t getAbsoluteTimeStamp();
 	};

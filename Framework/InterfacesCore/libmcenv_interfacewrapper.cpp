@@ -7050,7 +7050,7 @@ LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmicroseconds(LibMCEnv_Bui
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pMIMEType, const char * pUserUUID, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
@@ -7061,6 +7061,8 @@ LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBu
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pMIMEType == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pContentBuffer) && (nContentBufferSize>0))
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
@@ -7068,6 +7070,7 @@ LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBu
 		std::string sIdentifier(pIdentifier);
 		std::string sName(pName);
 		std::string sMIMEType(pMIMEType);
+		std::string sUserUUID(pUserUUID);
 		std::string sDataUUID("");
 		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
 		if (!pIBuildExecution)
@@ -7075,7 +7078,7 @@ LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBu
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuildExecution->AddBinaryData(sIdentifier, sName, sMIMEType, nContentBufferSize, pContentBuffer);
+			sDataUUID = pIBuildExecution->AddBinaryData(sIdentifier, sName, sMIMEType, sUserUUID, nContentBufferSize, pContentBuffer);
 
 			pIBuildExecution->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -7109,7 +7112,7 @@ LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBu
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pUserUUID, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
@@ -7118,10 +7121,13 @@ LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution 
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
 		std::string sName(pName);
+		std::string sUserUUID(pUserUUID);
 		IBase* pIBaseClassStreamWriterInstance = (IBase *)pStreamWriterInstance;
 		IBaseTempStreamWriter* pIStreamWriterInstance = dynamic_cast<IBaseTempStreamWriter*>(pIBaseClassStreamWriterInstance);
 		if (!pIStreamWriterInstance)
@@ -7134,7 +7140,7 @@ LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution 
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuildExecution->AttachTempStream(sIdentifier, sName, pIStreamWriterInstance);
+			sDataUUID = pIBuildExecution->AttachTempStream(sIdentifier, sName, sUserUUID, pIStreamWriterInstance);
 
 			pIBuildExecution->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -7168,25 +7174,24 @@ LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution 
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_loadstreambyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_StreamReader pStreamReaderInstance)
+LibMCEnvResult libmcenv_buildexecution_loadstreambyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_StreamReader * pStreamReaderInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
 	try {
 		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pStreamReaderInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
-		IBase* pIBaseClassStreamReaderInstance = (IBase *)pStreamReaderInstance;
-		IStreamReader* pIStreamReaderInstance = dynamic_cast<IStreamReader*>(pIBaseClassStreamReaderInstance);
-		if (!pIStreamReaderInstance)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
-		
+		IBase* pBaseStreamReaderInstance(nullptr);
 		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
 		if (!pIBuildExecution)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIBuildExecution->LoadStreamByIdentifier(sIdentifier, pIStreamReaderInstance);
+		pBaseStreamReaderInstance = pIBuildExecution->LoadStreamByIdentifier(sIdentifier);
 
+		*pStreamReaderInstance = (IBase*)(pBaseStreamReaderInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -7200,25 +7205,24 @@ LibMCEnvResult libmcenv_buildexecution_loadstreambyidentifier(LibMCEnv_BuildExec
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_loadstreambyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_StreamReader pStreamReaderInstance)
+LibMCEnvResult libmcenv_buildexecution_loadstreambyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_StreamReader * pStreamReaderInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
 	try {
 		if (pDataUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pStreamReaderInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sDataUUID(pDataUUID);
-		IBase* pIBaseClassStreamReaderInstance = (IBase *)pStreamReaderInstance;
-		IStreamReader* pIStreamReaderInstance = dynamic_cast<IStreamReader*>(pIBaseClassStreamReaderInstance);
-		if (!pIStreamReaderInstance)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
-		
+		IBase* pBaseStreamReaderInstance(nullptr);
 		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
 		if (!pIBuildExecution)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIBuildExecution->LoadStreamByUUID(sDataUUID, pIStreamReaderInstance);
+		pBaseStreamReaderInstance = pIBuildExecution->LoadStreamByUUID(sDataUUID);
 
+		*pStreamReaderInstance = (IBase*)(pBaseStreamReaderInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -7294,7 +7298,7 @@ LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyuuid(LibMCEnv_BuildE
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
@@ -7302,6 +7306,8 @@ LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecut
 		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
@@ -7314,6 +7320,7 @@ LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecut
 		
 		IBase* pIBaseClassStoreOptions = (IBase *)pStoreOptions;
 		IDiscreteFieldData2DStoreOptions* pIStoreOptions = dynamic_cast<IDiscreteFieldData2DStoreOptions*>(pIBaseClassStoreOptions);
+		std::string sUserUUID(pUserUUID);
 		std::string sDataUUID("");
 		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
 		if (!pIBuildExecution)
@@ -7321,7 +7328,7 @@ LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecut
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuildExecution->StoreDiscreteField2D(sIdentifier, sName, pIFieldDataInstance, pIStoreOptions);
+			sDataUUID = pIBuildExecution->StoreDiscreteField2D(sIdentifier, sName, pIFieldDataInstance, pIStoreOptions, sUserUUID);
 
 			pIBuildExecution->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -7417,7 +7424,7 @@ LibMCEnvResult libmcenv_buildexecution_loaddatatablebyuuid(LibMCEnv_BuildExecuti
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pFieldDataInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pFieldDataInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
@@ -7425,6 +7432,8 @@ LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pB
 		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
@@ -7437,6 +7446,7 @@ LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pB
 		
 		IBase* pIBaseClassStoreOptions = (IBase *)pStoreOptions;
 		IDataTableWriteOptions* pIStoreOptions = dynamic_cast<IDataTableWriteOptions*>(pIBaseClassStoreOptions);
+		std::string sUserUUID(pUserUUID);
 		std::string sDataUUID("");
 		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
 		if (!pIBuildExecution)
@@ -7444,7 +7454,7 @@ LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pB
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuildExecution->StoreDataTable(sIdentifier, sName, pIFieldDataInstance, pIStoreOptions);
+			sDataUUID = pIBuildExecution->StoreDataTable(sIdentifier, sName, pIFieldDataInstance, pIStoreOptions, sUserUUID);
 
 			pIBuildExecution->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -7540,7 +7550,7 @@ LibMCEnvResult libmcenv_buildexecution_loadpngimagebyuuid(LibMCEnv_BuildExecutio
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
@@ -7548,6 +7558,8 @@ LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBu
 		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
@@ -7560,6 +7572,7 @@ LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBu
 		
 		IBase* pIBaseClassStoreOptions = (IBase *)pStoreOptions;
 		IPNGImageStoreOptions* pIStoreOptions = dynamic_cast<IPNGImageStoreOptions*>(pIBaseClassStoreOptions);
+		std::string sUserUUID(pUserUUID);
 		std::string sDataUUID("");
 		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
 		if (!pIBuildExecution)
@@ -7567,7 +7580,7 @@ LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBu
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuildExecution->StorePNGImage(sIdentifier, sName, pIImageDataInstance, pIStoreOptions);
+			sDataUUID = pIBuildExecution->StorePNGImage(sIdentifier, sName, pIImageDataInstance, pIStoreOptions, sUserUUID);
 
 			pIBuildExecution->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -8147,7 +8160,7 @@ LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_Build pBuild, LibM
 	}
 }
 
-LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, const char * pMIMEType, const char * pUserUUID, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuild;
 
@@ -8158,6 +8171,8 @@ LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * 
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pMIMEType == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pContentBuffer) && (nContentBufferSize>0))
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
@@ -8165,6 +8180,7 @@ LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * 
 		std::string sIdentifier(pIdentifier);
 		std::string sName(pName);
 		std::string sMIMEType(pMIMEType);
+		std::string sUserUUID(pUserUUID);
 		std::string sDataUUID("");
 		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
 		if (!pIBuild)
@@ -8172,7 +8188,7 @@ LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * 
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuild->AddBinaryData(sIdentifier, sName, sMIMEType, nContentBufferSize, pContentBuffer);
+			sDataUUID = pIBuild->AddBinaryData(sIdentifier, sName, sMIMEType, sUserUUID, nContentBufferSize, pContentBuffer);
 
 			pIBuild->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -8206,7 +8222,7 @@ LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * 
 	}
 }
 
-LibMCEnvResult libmcenv_build_attachtempstream(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_build_attachtempstream(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, const char * pUserUUID, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuild;
 
@@ -8215,10 +8231,13 @@ LibMCEnvResult libmcenv_build_attachtempstream(LibMCEnv_Build pBuild, const char
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
 		std::string sName(pName);
+		std::string sUserUUID(pUserUUID);
 		IBase* pIBaseClassStreamWriterInstance = (IBase *)pStreamWriterInstance;
 		IBaseTempStreamWriter* pIStreamWriterInstance = dynamic_cast<IBaseTempStreamWriter*>(pIBaseClassStreamWriterInstance);
 		if (!pIStreamWriterInstance)
@@ -8231,7 +8250,7 @@ LibMCEnvResult libmcenv_build_attachtempstream(LibMCEnv_Build pBuild, const char
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuild->AttachTempStream(sIdentifier, sName, pIStreamWriterInstance);
+			sDataUUID = pIBuild->AttachTempStream(sIdentifier, sName, sUserUUID, pIStreamWriterInstance);
 
 			pIBuild->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -8265,25 +8284,24 @@ LibMCEnvResult libmcenv_build_attachtempstream(LibMCEnv_Build pBuild, const char
 	}
 }
 
-LibMCEnvResult libmcenv_build_loadstreambyidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, LibMCEnv_StreamReader pStreamReaderInstance)
+LibMCEnvResult libmcenv_build_loadstreambyidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, LibMCEnv_StreamReader * pStreamReaderInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuild;
 
 	try {
 		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pStreamReaderInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
-		IBase* pIBaseClassStreamReaderInstance = (IBase *)pStreamReaderInstance;
-		IStreamReader* pIStreamReaderInstance = dynamic_cast<IStreamReader*>(pIBaseClassStreamReaderInstance);
-		if (!pIStreamReaderInstance)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
-		
+		IBase* pBaseStreamReaderInstance(nullptr);
 		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
 		if (!pIBuild)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIBuild->LoadStreamByIdentifier(sIdentifier, pIStreamReaderInstance);
+		pBaseStreamReaderInstance = pIBuild->LoadStreamByIdentifier(sIdentifier);
 
+		*pStreamReaderInstance = (IBase*)(pBaseStreamReaderInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -8297,25 +8315,24 @@ LibMCEnvResult libmcenv_build_loadstreambyidentifier(LibMCEnv_Build pBuild, cons
 	}
 }
 
-LibMCEnvResult libmcenv_build_loadstreambyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_StreamReader pStreamReaderInstance)
+LibMCEnvResult libmcenv_build_loadstreambyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_StreamReader * pStreamReaderInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuild;
 
 	try {
 		if (pDataUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pStreamReaderInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		std::string sDataUUID(pDataUUID);
-		IBase* pIBaseClassStreamReaderInstance = (IBase *)pStreamReaderInstance;
-		IStreamReader* pIStreamReaderInstance = dynamic_cast<IStreamReader*>(pIBaseClassStreamReaderInstance);
-		if (!pIStreamReaderInstance)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
-		
+		IBase* pBaseStreamReaderInstance(nullptr);
 		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
 		if (!pIBuild)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIBuild->LoadStreamByUUID(sDataUUID, pIStreamReaderInstance);
+		pBaseStreamReaderInstance = pIBuild->LoadStreamByUUID(sDataUUID);
 
+		*pStreamReaderInstance = (IBase*)(pBaseStreamReaderInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -8391,7 +8408,7 @@ LibMCEnvResult libmcenv_build_loaddiscretefield2dbyuuid(LibMCEnv_Build pBuild, c
 	}
 }
 
-LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuild;
 
@@ -8399,6 +8416,8 @@ LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const 
 		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
@@ -8411,6 +8430,7 @@ LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const 
 		
 		IBase* pIBaseClassStoreOptions = (IBase *)pStoreOptions;
 		IDiscreteFieldData2DStoreOptions* pIStoreOptions = dynamic_cast<IDiscreteFieldData2DStoreOptions*>(pIBaseClassStoreOptions);
+		std::string sUserUUID(pUserUUID);
 		std::string sDataUUID("");
 		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
 		if (!pIBuild)
@@ -8418,7 +8438,7 @@ LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const 
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuild->StoreDiscreteField2D(sIdentifier, sName, pIFieldDataInstance, pIStoreOptions);
+			sDataUUID = pIBuild->StoreDiscreteField2D(sIdentifier, sName, pIFieldDataInstance, pIStoreOptions, sUserUUID);
 
 			pIBuild->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -8514,7 +8534,7 @@ LibMCEnvResult libmcenv_build_loaddatatablebyuuid(LibMCEnv_Build pBuild, const c
 	}
 }
 
-LibMCEnvResult libmcenv_build_storedatatable(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pDataTableInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_build_storedatatable(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pDataTableInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuild;
 
@@ -8522,6 +8542,8 @@ LibMCEnvResult libmcenv_build_storedatatable(LibMCEnv_Build pBuild, const char *
 		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
@@ -8534,6 +8556,7 @@ LibMCEnvResult libmcenv_build_storedatatable(LibMCEnv_Build pBuild, const char *
 		
 		IBase* pIBaseClassStoreOptions = (IBase *)pStoreOptions;
 		IDataTableWriteOptions* pIStoreOptions = dynamic_cast<IDataTableWriteOptions*>(pIBaseClassStoreOptions);
+		std::string sUserUUID(pUserUUID);
 		std::string sDataUUID("");
 		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
 		if (!pIBuild)
@@ -8541,7 +8564,7 @@ LibMCEnvResult libmcenv_build_storedatatable(LibMCEnv_Build pBuild, const char *
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuild->StoreDataTable(sIdentifier, sName, pIDataTableInstance, pIStoreOptions);
+			sDataUUID = pIBuild->StoreDataTable(sIdentifier, sName, pIDataTableInstance, pIStoreOptions, sUserUUID);
 
 			pIBuild->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}
@@ -8637,7 +8660,7 @@ LibMCEnvResult libmcenv_build_loadpngimagebyuuid(LibMCEnv_Build pBuild, const ch
 	}
 }
 
-LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
+LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuild;
 
@@ -8645,6 +8668,8 @@ LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * 
 		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pDataUUIDBuffer) && !(pDataUUIDNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
@@ -8657,6 +8682,7 @@ LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * 
 		
 		IBase* pIBaseClassStoreOptions = (IBase *)pStoreOptions;
 		IPNGImageStoreOptions* pIStoreOptions = dynamic_cast<IPNGImageStoreOptions*>(pIBaseClassStoreOptions);
+		std::string sUserUUID(pUserUUID);
 		std::string sDataUUID("");
 		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
 		if (!pIBuild)
@@ -8664,7 +8690,7 @@ LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * 
 		
 		bool isCacheCall = (pDataUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sDataUUID = pIBuild->StorePNGImage(sIdentifier, sName, pIImageDataInstance, pIStoreOptions);
+			sDataUUID = pIBuild->StorePNGImage(sIdentifier, sName, pIImageDataInstance, pIStoreOptions, sUserUUID);
 
 			pIBuild->_setCache (new ParameterCache_1<std::string> (sDataUUID));
 		}

@@ -77,14 +77,13 @@ protected:
 	AMC::PResourcePackage m_pMachineResourcePackage;
 	AMC::PToolpathHandler m_pToolpathHandler;
 	LibMCData::PDataModel m_pDataModel;
-	std::string m_sSystemUserID;
 	AMC::PLogger m_pLogger;
 
 	AMCCommon::PChrono m_pGlobalChrono;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName);
 
 	virtual ~CDriverEnvironment();
 

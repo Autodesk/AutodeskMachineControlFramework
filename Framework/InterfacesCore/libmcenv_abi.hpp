@@ -2461,6 +2461,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmicrose
 * @param[in] pIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 * @param[in] pName - Name of the attache data
 * @param[in] pMIMEType - Mime type of the data.
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] nContentBufferSize - Number of elements in buffer
 * @param[in] pContentBuffer - uint8 buffer of Stream content to store
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
@@ -2468,7 +2469,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmicrose
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pMIMEType, const char * pUserUUID, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Attaches a temp stream to the build execution.
@@ -2476,33 +2477,34 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 * @param[in] pName - Name of the attached data
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] pStreamWriterInstance - Stream to attach to the build.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pUserUUID, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Loads stream of the build execution by identifier.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the attachment. Fails if name does not exist.
-* @param[in] pStreamReaderInstance - Reader class to access the stream.
+* @param[out] pStreamReaderInstance - Reader class to access the stream.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_StreamReader pStreamReaderInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_StreamReader * pStreamReaderInstance);
 
 /**
 * Loads stream of the build by attachment UUID.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
-* @param[in] pStreamReaderInstance - Reader class to access the stream.
+* @param[out] pStreamReaderInstance - Reader class to access the stream.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_StreamReader pStreamReaderInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_StreamReader * pStreamReaderInstance);
 
 /**
 * Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
@@ -2532,12 +2534,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyuu
 * @param[in] pName - Human Readable name of the attachment.
 * @param[in] pFieldDataInstance - Field instance to store.
 * @param[in] pStoreOptions - Field Data Store Options.
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
@@ -2567,12 +2570,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddatatablebyuuid(Lib
 * @param[in] pName - Human Readable name of the attachment.
 * @param[in] pFieldDataInstance - Field instance to store.
 * @param[in] pStoreOptions - Data Table Write Options.
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pFieldDataInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pFieldDataInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
@@ -2608,12 +2612,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyuuid(LibM
 * @param[in] pName - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 * @param[in] pImageDataInstance - Image data instance.
 * @param[in] pStoreOptions - PNG Store Options.
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storepngimage(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
@@ -2786,6 +2791,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_
 * @param[in] pIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 * @param[in] pName - Name of the attache data
 * @param[in] pMIMEType - Mime type of the data.
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] nContentBufferSize - Number of elements in buffer
 * @param[in] pContentBuffer - uint8 buffer of Stream content to store
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
@@ -2793,7 +2799,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, const char * pMIMEType, const char * pUserUUID, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Attaches a temp stream to the build.
@@ -2801,33 +2807,34 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBu
 * @param[in] pBuild - Build instance.
 * @param[in] pIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 * @param[in] pName - Name of the attached data
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] pStreamWriterInstance - Stream to attach to the build.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_attachtempstream(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_attachtempstream(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, const char * pUserUUID, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Loads stream of the build by identifier.
 *
 * @param[in] pBuild - Build instance.
 * @param[in] pIdentifier - Unique name of the build attachment. Fails if name does not exist.
-* @param[in] pStreamReaderInstance - Reader class to access the stream.
+* @param[out] pStreamReaderInstance - Reader class to access the stream.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadstreambyidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, LibMCEnv_StreamReader pStreamReaderInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadstreambyidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, LibMCEnv_StreamReader * pStreamReaderInstance);
 
 /**
 * Loads stream of the build by attachment UUID.
 *
 * @param[in] pBuild - Build instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
-* @param[in] pStreamReaderInstance - Reader class to access the stream.
+* @param[out] pStreamReaderInstance - Reader class to access the stream.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadstreambyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_StreamReader pStreamReaderInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadstreambyuuid(LibMCEnv_Build pBuild, const char * pDataUUID, LibMCEnv_StreamReader * pStreamReaderInstance);
 
 /**
 * Loads a discrete field by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
@@ -2857,12 +2864,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddiscretefield2dbyuuid(LibMCE
 * @param[in] pName - Unique name of the build attachment.
 * @param[in] pFieldDataInstance - Field instance to store.
 * @param[in] pStoreOptions - Field Data Store Options.
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storediscretefield2d(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Loads a data table by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-datatable.
@@ -2892,12 +2900,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loaddatatablebyuuid(LibMCEnv_Bui
 * @param[in] pName - Unique name of the build attachment.
 * @param[in] pDataTableInstance - Data Table instance to store.
 * @param[in] pStoreOptions - Data Table Write Options.
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storedatatable(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pDataTableInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storedatatable(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pDataTableInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Loads a PNG image by identifier which was previously stored in the build job. MIME Type MUST be image/png.
@@ -2933,12 +2942,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadpngimagebyuuid(LibMCEnv_Buil
 * @param[in] pName - Unique name of the build attachment.
 * @param[in] pImageDataInstance - Image data instance.
 * @param[in] pStoreOptions - PNG Store Options.
+* @param[in] pUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 * @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_storepngimage(LibMCEnv_Build pBuild, const char * pIdentifier, const char * pName, LibMCEnv_ImageData pImageDataInstance, LibMCEnv_PNGImageStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Starts a build execution. This function does not work in a UIEnvironment context!

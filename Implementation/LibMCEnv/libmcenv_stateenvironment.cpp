@@ -190,7 +190,7 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getSystemUserID (), m_pSystemState->getGlobalChronoInstance ());
+	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getGlobalChronoInstance ());
 }
 
 

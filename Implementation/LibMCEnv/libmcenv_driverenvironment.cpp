@@ -62,7 +62,7 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName)
     : m_bIsInitializing(false), 
     m_pParameterGroup(pParameterGroup), 
     m_pDriverResourcePackage (pDriverResourcePackage), 
@@ -72,7 +72,6 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
     m_pLogger (pLogger), 
     m_sDriverName (sDriverName), 
     m_pDataModel (pDataModel), 
-    m_sSystemUserID (sSystemUserID), 
     m_pGlobalChrono (pGlobalChrono)
 {
     if (pParameterGroup.get() == nullptr)
@@ -429,7 +428,7 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_pGlobalChrono);
 }
 
 ICryptoContext* CDriverEnvironment::CreateCryptoContext()

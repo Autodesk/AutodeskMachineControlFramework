@@ -104,7 +104,7 @@ public:
 
 	LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) override;
 
-	void AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+	std::string AddJobExecutionData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	IBuildJobExecutionDataIterator* ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType) override;
 

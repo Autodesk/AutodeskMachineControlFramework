@@ -79,7 +79,7 @@ namespace AMC {
 		m_pStringResourceHandler = std::make_shared<CStringResourceHandler> ();
 
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pDataModel);
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger, m_pDataModel, m_pGlobalChrono, getSystemUserID (), m_pStateJournal);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger, m_pDataModel, m_pGlobalChrono, m_pStateJournal);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
@@ -88,7 +88,7 @@ namespace AMC {
 		m_pDataSeriesHandler = std::make_shared<CDataSeriesHandler>();
 		m_pAlertHandler = std::make_shared<CAlertHandler>();
 
-		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), getSystemUserID(), m_pAccessControl, m_pLanguageHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono, m_pAlertHandler, m_pDataModel);
+		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), m_pAccessControl, m_pLanguageHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono, m_pAlertHandler, m_pDataModel);
 		m_pUIHandler = std::make_shared<CUIHandler>(pEnvWrapper, pUISystemState);
 
 		auto pSystemParameterHandler = std::make_shared<CParameterHandler>("System", m_pGlobalChrono);
@@ -266,12 +266,6 @@ namespace AMC {
 
 		return iIter->second.second;
 
-	}
-
-	std::string CSystemState::getSystemUserID()
-	{
-		// TODO: Retrieve a unique User ID for the current running session
-		return "amc";
 	}
 
 

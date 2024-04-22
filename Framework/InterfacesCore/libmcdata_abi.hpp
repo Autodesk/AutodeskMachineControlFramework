@@ -1204,9 +1204,12 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_computeelapsedtim
 * @param[in] eDataType - Datatype of Job Execution data
 * @param[in] pUserUUID - UUID of Currently authenticated user
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID, may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addjobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobexecution_addjobexecutiondata(LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp, const LibMCData_uint32 nDataUUIDBufferSize, LibMCData_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Retrieves a list of build job execution data objects, filtered by type.
@@ -1448,9 +1451,12 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_jobcanbearchived(LibMCData
 * @param[in] eDataType - Datatype of Job data
 * @param[in] pUserID - Currently authenticated user
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID, may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp, const LibMCData_uint32 nDataUUIDBufferSize, LibMCData_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Retrieves a list of build job data objects, filtered by type.

@@ -1191,9 +1191,12 @@ typedef LibMCDataResult (*PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicros
 * @param[in] eDataType - Datatype of Job Execution data
 * @param[in] pUserUUID - UUID of Currently authenticated user
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJobExecution_AddJobExecutionDataPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_AddJobExecutionDataPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp, const LibMCData_uint32 nDataUUIDBufferSize, LibMCData_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Retrieves a list of build job execution data objects, filtered by type.
@@ -1435,9 +1438,12 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_JobCanBeArchivedPtr) (LibMCData_Bui
 * @param[in] eDataType - Datatype of Job data
 * @param[in] pUserID - Currently authenticated user
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJob_AddJobDataPtr) (LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataBuildJob_AddJobDataPtr) (LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp, const LibMCData_uint32 nDataUUIDBufferSize, LibMCData_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Retrieves a list of build job data objects, filtered by type.

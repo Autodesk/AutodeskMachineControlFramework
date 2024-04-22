@@ -1463,7 +1463,7 @@ public:
 	inline LibMCData_uint64 GetStartTimeStampInMicroseconds();
 	inline LibMCData_uint64 GetEndTimeStampInMicroseconds();
 	inline LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds);
-	inline void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline std::string AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJobExecutionDataIterator ListJobExecutionDataByType(const eCustomDataType eDataType);
 	inline PBuildJobExecutionDataIterator ListJobExecutionData();
 	inline PBuildJobExecutionData RetrieveJobExecutionData(const std::string & sDataUUID);
@@ -1519,7 +1519,7 @@ public:
 	inline void UnArchiveJob();
 	inline void DeleteJob();
 	inline bool JobCanBeArchived();
-	inline void AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline std::string AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJobDataIterator ListJobDataByType(const eCustomDataType eDataType);
 	inline PBuildJobDataIterator ListJobData();
 	inline PBuildJobData RetrieveJobData(const std::string & sDataUUID);
@@ -6270,11 +6270,18 @@ public:
 	* @param[in] eDataType - Datatype of Job Execution data
 	* @param[in] sUserUUID - UUID of Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	* @return Data UUID
 	*/
-	void CBuildJobExecution::AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	std::string CBuildJobExecution::AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp));
+		LibMCData_uint32 bytesNeededDataUUID = 0;
+		LibMCData_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
@@ -6589,11 +6596,18 @@ public:
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
+	* @return Data UUID
 	*/
-	void CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	std::string CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp));
+		LibMCData_uint32 bytesNeededDataUUID = 0;
+		LibMCData_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**

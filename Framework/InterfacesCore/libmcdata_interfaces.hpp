@@ -1168,8 +1168,9 @@ public:
 	* @param[in] eDataType - Datatype of Job Execution data
 	* @param[in] sUserUUID - UUID of Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	* @return Data UUID
 	*/
-	virtual void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual std::string AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJobExecution::ListJobExecutionDataByType - Retrieves a list of build job execution data objects, filtered by type.
@@ -1344,8 +1345,9 @@ public:
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
+	* @return Data UUID
 	*/
-	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual std::string AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.
