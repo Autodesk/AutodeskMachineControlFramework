@@ -41,6 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <timeapi.h>
 #endif
 
+#ifdef _WIN32
+//#define USE_ALTERNATIVE_WINAPI_CODE
+#endif
 
 #include <thread>
 #include <exception>
@@ -369,7 +372,8 @@ namespace AMCCommon {
 
 	uint64_t CChrono::getMicrosecondsSince1970FromDay(uint32_t nYear, uint32_t nMonth, uint32_t nDay)
 	{
-#ifdef _WIN32
+
+#ifdef USE_ALTERNATIVE_WINAPI_CODE
 		SYSTEMTIME st;
 
 		st.wYear = nYear;
@@ -404,14 +408,42 @@ namespace AMCCommon {
 
 
 #else
-		throw std::runtime_error("date time support not implemented");
-#endif
+		if (nYear < 1970)
+			throw std::runtime_error("invalid time stamp year: " + std::to_string (nYear));
+		if ((nMonth < 1) || (nMonth > 12))
+			throw std::runtime_error("invalid time stamp month: " + std::to_string(nMonth));
+		if ((nDay < 1) || (nDay > 31))
+			throw std::runtime_error("invalid time stamp day: " + std::to_string(nDay));
+
+		std::tm tm = {};
+		tm.tm_year = nYear - 1900;  // Year since 1900
+		tm.tm_mon = nMonth - 1;     // Month, where 0 = January
+		tm.tm_mday = nDay;          // Day of the month
+		tm.tm_hour = 0;            // Hour (midnight)
+		tm.tm_min = 0;             // Minute
+		tm.tm_sec = 0;             // Second
+		tm.tm_isdst = -1;          // No daylight saving time flag
+
+		// Convert tm to time_t
+		auto time_c = std::mktime(&tm);
+		if (time_c == -1) {
+			throw std::runtime_error("Failed to convert time: " + std::to_string (nYear) + "/" + std::to_string (nMonth) + "/" + std::to_string (nDay));
+		}
+
+		// Convert time_t to a time_point
+		auto timePoint = std::chrono::system_clock::from_time_t(time_c);
+
+		return std::chrono::duration_cast<std::chrono::microseconds>(timePoint.time_since_epoch()).count();
+
+#endif //USE_ALTERNATIVE_WINAPI_CODE
+
 	}
 
 
 	void CChrono::parseDateFromMicrosecondsSince1970WithWeekday(const uint64_t nMicrosecondsSince1970, uint32_t& nYear, uint32_t& nMonth, uint32_t& nDay, uint32_t& nDayOfTheWeek)
 	{
-#ifdef _WIN32
+
+#ifdef USE_ALTERNATIVE_WINAPI_CODE
 		// Calculate the offset in 100-nanosecond intervals since FILETIME epoch (1601) to Unix epoch (1970)
 		int64_t unixTimeStartInFileTime = 116444736000000000LL; // 1970 - 1601
 
@@ -438,9 +470,30 @@ namespace AMCCommon {
 		// Handle Sunday as special case
 		if (nDayOfTheWeek == 0)
 			nDayOfTheWeek = 7;
+
 #else
-		throw std::runtime_error("date time support not implemented");
+		auto timePoint = std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> (std::chrono::microseconds(nMicrosecondsSince1970));
+
+		// Convert the time_point to time_t
+		std::time_t timeT = std::chrono::system_clock::to_time_t(timePoint);
+
+		std::tm gmt;
+
+#ifdef _WIN32
+		gmtime_s(&gmt, &timeT);
+#else
+		gmtime_r(&timeT, &gmt);
 #endif
+
+		// Extract the year, month, day, and day of the week
+		nYear = gmt.tm_year + 1900;  
+		nMonth = gmt.tm_mon + 1;     
+		nDay = gmt.tm_mday;          
+		nDayOfTheWeek = gmt.tm_wday;
+		if (nDayOfTheWeek == 0)
+			nDayOfTheWeek = 7;
+#endif // USE_ALTERNATIVE_WINAPI_CODE
+
 	}
 
 
@@ -476,21 +529,21 @@ namespace AMCCommon {
 
 	uint64_t CChrono::getCurrentUTCTimeInternal() {
 
-#ifdef _WIN32
+#ifdef USE_ALTERNATIVE_WINAPI_CODE
 		SYSTEMTIME utcTime;
 
 		// Retrieve the current UTC system time
 		GetSystemTime(&utcTime);
 
 		return getMicrosecondsSince1970FromDateTime(utcTime.wYear, utcTime.wMonth, utcTime.wDay, utcTime.wHour, utcTime.wMinute, utcTime.wSecond, ((uint32_t)utcTime.wMilliseconds) * 1000);
+
 #else
-		//std::time_t t = std::time(nullptr);
-		//utc_time = *std::localtime(&t);
-		throw std::runtime_error("date time support not implemented");
+
+		auto now = std::chrono::system_clock::now();
+		return std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
 
 #endif
-
-
+			
 	}
 
 
