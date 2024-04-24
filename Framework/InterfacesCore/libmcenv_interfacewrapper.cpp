@@ -15838,6 +15838,34 @@ LibMCEnvResult libmcenv_basetempstreamwriter_isfinished(LibMCEnv_BaseTempStreamW
 	}
 }
 
+LibMCEnvResult libmcenv_basetempstreamwriter_getstreamreader(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, LibMCEnv_StreamReader * pStreamReader)
+{
+	IBase* pIBaseClass = (IBase *)pBaseTempStreamWriter;
+
+	try {
+		if (pStreamReader == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseStreamReader(nullptr);
+		IBaseTempStreamWriter* pIBaseTempStreamWriter = dynamic_cast<IBaseTempStreamWriter*>(pIBaseClass);
+		if (!pIBaseTempStreamWriter)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseStreamReader = pIBaseTempStreamWriter->GetStreamReader();
+
+		*pStreamReader = (IBase*)(pBaseStreamReader);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for TempStreamWriter
@@ -24571,6 +24599,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_basetempstreamwriter_finish;
 	if (sProcName == "libmcenv_basetempstreamwriter_isfinished") 
 		*ppProcAddress = (void*) &libmcenv_basetempstreamwriter_isfinished;
+	if (sProcName == "libmcenv_basetempstreamwriter_getstreamreader") 
+		*ppProcAddress = (void*) &libmcenv_basetempstreamwriter_getstreamreader;
 	if (sProcName == "libmcenv_tempstreamwriter_getwriteposition") 
 		*ppProcAddress = (void*) &libmcenv_tempstreamwriter_getwriteposition;
 	if (sProcName == "libmcenv_tempstreamwriter_seek") 

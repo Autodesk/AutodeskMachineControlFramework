@@ -218,6 +218,8 @@
 		<error name="CANNOTSEEKZIPSTREAM" code="10178" description="Cannot seek ZIP stream" />
 		<error name="GLOBALTIMERNOTCONTINUOUS" code="10179" description="Global Timer is not continuous." />	
 		<error name="STREAMWRITERISNOTFINISHED" code="10180" description="Stream writer is not finished" />
+		<error name="CANNOTREADFROMZIPSTREAM" code="10181" description="Cannot read from ZIP stream" />
+		
 		
 	</errors>
 
@@ -2956,6 +2958,10 @@
 
 		<method name="IsFinished" description="Returns if the stream writing has already been finished.">
 			<param name="Finished" type="bool" pass="return" description="If true, writing into the stream is not possible anymore." />
+		</method>
+
+		<method name="GetStreamReader" description="Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.">
+			<param name="StreamReader" type="class" class="StreamReader" pass="return" description="Stream reader instance." />
 		</method>
 		
 	</class>

@@ -544,6 +544,7 @@ public:
 			case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "CANNOTSEEKZIPSTREAM";
 			case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "GLOBALTIMERNOTCONTINUOUS";
 			case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "STREAMWRITERISNOTFINISHED";
+			case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "CANNOTREADFROMZIPSTREAM";
 		}
 		return "UNKNOWN";
 	}
@@ -731,6 +732,7 @@ public:
 			case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "Cannot seek ZIP stream";
 			case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "Global Timer is not continuous.";
 			case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "Stream writer is not finished";
+			case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "Cannot read from ZIP stream";
 		}
 		return "unknown error";
 	}
@@ -2074,6 +2076,7 @@ public:
 	inline LibMCEnv_uint64 GetSize();
 	inline void Finish();
 	inline bool IsFinished();
+	inline PStreamReader GetStreamReader();
 };
 	
 /*************************************************************************************************************************
@@ -3081,6 +3084,7 @@ public:
 		pWrapperTable->m_BaseTempStreamWriter_GetSize = nullptr;
 		pWrapperTable->m_BaseTempStreamWriter_Finish = nullptr;
 		pWrapperTable->m_BaseTempStreamWriter_IsFinished = nullptr;
+		pWrapperTable->m_BaseTempStreamWriter_GetStreamReader = nullptr;
 		pWrapperTable->m_TempStreamWriter_GetWritePosition = nullptr;
 		pWrapperTable->m_TempStreamWriter_Seek = nullptr;
 		pWrapperTable->m_TempStreamWriter_WriteData = nullptr;
@@ -7789,6 +7793,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BaseTempStreamWriter_GetStreamReader = (PLibMCEnvBaseTempStreamWriter_GetStreamReaderPtr) GetProcAddress(hLibrary, "libmcenv_basetempstreamwriter_getstreamreader");
+		#else // _WIN32
+		pWrapperTable->m_BaseTempStreamWriter_GetStreamReader = (PLibMCEnvBaseTempStreamWriter_GetStreamReaderPtr) dlsym(hLibrary, "libmcenv_basetempstreamwriter_getstreamreader");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BaseTempStreamWriter_GetStreamReader == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_TempStreamWriter_GetWritePosition = (PLibMCEnvTempStreamWriter_GetWritePositionPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getwriteposition");
 		#else // _WIN32
 		pWrapperTable->m_TempStreamWriter_GetWritePosition = (PLibMCEnvTempStreamWriter_GetWritePositionPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getwriteposition");
@@ -11831,6 +11844,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_isfinished", (void**)&(pWrapperTable->m_BaseTempStreamWriter_IsFinished));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_IsFinished == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_getstreamreader", (void**)&(pWrapperTable->m_BaseTempStreamWriter_GetStreamReader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_GetStreamReader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getwriteposition", (void**)&(pWrapperTable->m_TempStreamWriter_GetWritePosition));
@@ -19366,6 +19383,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_IsFinished(m_pHandle, &resultFinished));
 		
 		return resultFinished;
+	}
+	
+	/**
+	* CBaseTempStreamWriter::GetStreamReader - Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.
+	* @return Stream reader instance.
+	*/
+	PStreamReader CBaseTempStreamWriter::GetStreamReader()
+	{
+		LibMCEnvHandle hStreamReader = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetStreamReader(m_pHandle, &hStreamReader));
+		
+		if (!hStreamReader) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStreamReader>(m_pWrapper, hStreamReader);
 	}
 	
 	/**

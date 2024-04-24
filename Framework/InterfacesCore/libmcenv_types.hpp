@@ -275,6 +275,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM 10178 /** Cannot seek ZIP stream */
 #define LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS 10179 /** Global Timer is not continuous. */
 #define LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED 10180 /** Stream writer is not finished */
+#define LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM 10181 /** Cannot read from ZIP stream */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -462,6 +463,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "Cannot seek ZIP stream";
     case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "Global Timer is not continuous.";
     case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "Stream writer is not finished";
+    case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "Cannot read from ZIP stream";
     default: return "unknown error";
   }
 }

@@ -5325,6 +5325,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_finish(LibMCEnv_B
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_isfinished(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, bool * pFinished);
 
+/**
+* Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.
+*
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
+* @param[out] pStreamReader - Stream reader instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_basetempstreamwriter_getstreamreader(LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, LibMCEnv_StreamReader * pStreamReader);
+
 /*************************************************************************************************************************
  Class definition for TempStreamWriter
 **************************************************************************************************************************/

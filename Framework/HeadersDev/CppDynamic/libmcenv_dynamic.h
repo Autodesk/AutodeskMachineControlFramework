@@ -5312,6 +5312,15 @@ typedef LibMCEnvResult (*PLibMCEnvBaseTempStreamWriter_FinishPtr) (LibMCEnv_Base
 */
 typedef LibMCEnvResult (*PLibMCEnvBaseTempStreamWriter_IsFinishedPtr) (LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, bool * pFinished);
 
+/**
+* Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.
+*
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
+* @param[out] pStreamReader - Stream reader instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBaseTempStreamWriter_GetStreamReaderPtr) (LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, LibMCEnv_StreamReader * pStreamReader);
+
 /*************************************************************************************************************************
  Class definition for TempStreamWriter
 **************************************************************************************************************************/
@@ -8328,6 +8337,7 @@ typedef struct {
 	PLibMCEnvBaseTempStreamWriter_GetSizePtr m_BaseTempStreamWriter_GetSize;
 	PLibMCEnvBaseTempStreamWriter_FinishPtr m_BaseTempStreamWriter_Finish;
 	PLibMCEnvBaseTempStreamWriter_IsFinishedPtr m_BaseTempStreamWriter_IsFinished;
+	PLibMCEnvBaseTempStreamWriter_GetStreamReaderPtr m_BaseTempStreamWriter_GetStreamReader;
 	PLibMCEnvTempStreamWriter_GetWritePositionPtr m_TempStreamWriter_GetWritePosition;
 	PLibMCEnvTempStreamWriter_SeekPtr m_TempStreamWriter_Seek;
 	PLibMCEnvTempStreamWriter_WriteDataPtr m_TempStreamWriter_WriteData;

@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CZIPStreamWriter
 
 #include "libmcenv_zipstreamwriter.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_streamreader.hpp"
 
 // Include custom headers here.
 
@@ -140,6 +141,11 @@ void CZIPEntryStreamWriter::CopyFrom(IStreamReader* pStreamReader)
     }
 }
 
+IStreamReader* CZIPEntryStreamWriter::GetStreamReader()
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM);
+}
+
 
 CZIPStreamWriter::CZIPStreamWriter(LibMCData::PDataModel pDataModel, LibMCData::PStorageZIPWriter pZIPWriter, const std::string& sUUID, const std::string& sName, AMCCommon::PChrono pGlobalChrono)
     : m_pDataModel(pDataModel),
@@ -216,3 +222,14 @@ bool CZIPStreamWriter::IsFinished()
     return m_pZIPWriter->IsFinished();
 }
 
+
+IStreamReader* CZIPStreamWriter::GetStreamReader()
+{
+    m_pZIPWriter->Finish();
+
+    auto pStorage = m_pDataModel->CreateStorage();
+    auto pStream = pStorage->RetrieveStream (m_sUUID);
+
+    return new CStreamReader(pStorage, pStream);
+
+}

@@ -4214,6 +4214,12 @@ public:
 	*/
 	virtual bool IsFinished() = 0;
 
+	/**
+	* IBaseTempStreamWriter::GetStreamReader - Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.
+	* @return Stream reader instance.
+	*/
+	virtual IStreamReader * GetStreamReader() = 0;
+
 };
 
 typedef IBaseSharedPtr<IBaseTempStreamWriter> PIBaseTempStreamWriter;
