@@ -123,7 +123,7 @@ public:
     
     bool JobCanBeArchived() override;
     
-    void AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+    std::string AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
     
     IBuildJobDataIterator* ListJobDataByType(const LibMCData::eCustomDataType eDataType) override;
 

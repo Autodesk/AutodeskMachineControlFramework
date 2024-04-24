@@ -53,15 +53,15 @@ namespace AMCCommon {
 		PExportStream m_pCurrentStream;
 	public:
 		CPortableZIPWriter() = delete;
-		CPortableZIPWriter(_In_ PExportStream pExportStream, _In_ bool bWriteZIP64);
+		CPortableZIPWriter(PExportStream pExportStream, bool bWriteZIP64);
 		~CPortableZIPWriter();
 
-		PExportStream createEntry(_In_ const std::string sName, _In_ uint64_t nUnixTimeStamp);
+		PExportStream createEntry(const std::string sName, uint64_t nUnixTimeStamp);
 		void closeEntry();
 
-		void writeDeflatedBuffer(_In_ uint32_t nEntryKey, _In_ const void * pBuffer, _In_ uint32_t cbCompressedBytes);
-		void calculateChecksum(_In_ uint32_t nEntryKey, _In_ const void * pBuffer, _In_ uint32_t cbUncompressedBytes);
-		uint64_t getCurrentSize(_In_ uint32_t nEntryKey);
+		void writeDeflatedBuffer(uint32_t nEntryKey, const void * pBuffer, uint32_t cbCompressedBytes);
+		void calculateChecksum(uint32_t nEntryKey, const void * pBuffer, uint32_t cbUncompressedBytes);
+		uint64_t getCurrentSize(uint32_t nEntryKey);
 
 		void writeDirectory();
 	};

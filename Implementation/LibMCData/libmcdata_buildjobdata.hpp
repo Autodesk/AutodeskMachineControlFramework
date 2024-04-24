@@ -72,20 +72,20 @@ private:
 
 protected:
 
-    CBuildJobData(const std::string& sDataUUID, const std::string& sIdentifier, const std::string & sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, std::string & sTimeStamp, std::string & sStorageStreamUUID, std::string & sUserID, std::string & sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    CBuildJobData(const std::string& sDataUUID, const std::string& sIdentifier, const std::string & sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserID, const std::string & sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
 public:
 
     ~CBuildJobData();
 
-    static CBuildJobData* make(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static CBuildJobData* make(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static CBuildJobData* makeFrom(CBuildJobData* pBuildJobData);
 
-    static PBuildJobData makeShared(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static PBuildJobData makeShared(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static PBuildJobData makeSharedFrom(CBuildJobData* pBuildJobData);    
 
-    static CBuildJobData* createInDatabase(const std::string& sIdentifier, const std::string sName, const std::string & sJobUUID, LibMCData::eCustomDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
-    static PBuildJobData createSharedInDatabase(const std::string& sIdentifier, const std::string sName,  const std::string & sJobUUID, LibMCData::eCustomDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static CBuildJobData* createInDatabase(const std::string& sIdentifier, const std::string sName, const std::string & sJobUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static PBuildJobData createSharedInDatabase(const std::string& sIdentifier, const std::string & sName,  const std::string & sJobUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
 	IStorageStream * GetStorageStream() override;
 

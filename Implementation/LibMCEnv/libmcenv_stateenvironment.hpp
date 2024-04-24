@@ -63,8 +63,8 @@ private:
 	AMC::PSystemState m_pSystemState;
 	AMC::PParameterHandler m_pParameterHandler;
 
-	uint64_t m_nStartTimeOfStateInMicroseconds;
-	uint64_t m_nEndTimeOfPreviousStateInMicroseconds;
+	uint64_t m_nAbsoluteStartTimeOfStateInMicroseconds;
+	uint64_t m_nAbsoluteEndTimeOfPreviousStateInMicroseconds;
 
 	std::string m_sPreviousStateName;
 
@@ -73,7 +73,7 @@ protected:
 
 public:
 
-	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string & sPreviousStateName);
+	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nAbsoluteEndTimeOfPreviousStateInMicroseconds, const std::string & sPreviousStateName);
 
 	std::string GetMachineState(const std::string& sMachineInstance);
 
@@ -213,7 +213,7 @@ public:
 
 	IZIPStreamWriter* CreateZIPStream(const std::string& sName) override;
 
-	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
+	IStreamReader* LoadStream(const std::string& sUUID, const bool bMustExist) override;
 
 	IDateTime* GetCurrentDateTime() override;
 

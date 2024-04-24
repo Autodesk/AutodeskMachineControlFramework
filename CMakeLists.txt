@@ -41,7 +41,12 @@ message(STATUS "Including Drivers in build")
 add_subdirectory(Drivers)
 endif()
 
-add_subdirectory(Plugins)
+set(CMAKE_AMCF_PLUGINNAME Examples/LPBFSystem)
+
+set(CMAKE_AMCF_PROJECTDIR ${PROJECT_BINARY_DIR})
+
+add_subdirectory(${CMAKE_AMCF_PLUGINNAME})
+set(CMAKE_CURRENT_PLUGINS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_AMCF_PLUGINNAME})
 
 if(INCLUDE_TESTS)
 message(STATUS "Including Tests in build")
@@ -417,9 +422,9 @@ set_target_properties(libmcdata
 ]]
 
 
-add_custom_target(configuration_xml ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml)
+add_custom_target(configuration_xml ALL DEPENDS ${CMAKE_CURRENT_PLUGINS_DIR}/config.xml)
 
-set_property(TARGET configuration_xml APPEND PROPERTY SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml)
+set_property(TARGET configuration_xml APPEND PROPERTY SOURCES ${CMAKE_CURRENT_PLUGINS_DIR}/config.xml)
 
 add_custom_command(
 	TARGET configuration_xml PRE_BUILD
@@ -438,7 +443,7 @@ add_custom_command(
 add_custom_command(
 	TARGET configuration_xml PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml
+			${CMAKE_CURRENT_PLUGINS_DIR}/config.xml
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
 
 #[[++
@@ -495,7 +500,7 @@ add_custom_command(
 add_custom_command(
 	TARGET create_core_resources POST_BUILD
 	COMMAND ${BUILDRESOURCES_EXECUTABLE}
-			${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Resources/
+			${CMAKE_CURRENT_PLUGINS_DIR}/Resources/
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core.data)
 
 #[[++

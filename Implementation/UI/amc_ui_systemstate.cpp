@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, const std::string& sSystemUserID, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel)
+CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel)
     : m_pStateMachineData(pStateMachineData),
     m_pSignalHandler(pSignalHandler),
     m_pDataModel(pDataModel),
@@ -43,7 +43,6 @@ CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpa
     m_pStateJournal(pStateJournal),
     m_sTestOutputPath(sTestOutputPath),
     m_pLogger(pLogger),
-    m_sSystemUserID(sSystemUserID),
     m_pAccessControl(pAccessControl),
     m_pLanguageHandler(pLanguageHandler),
     m_pMeshHandler(pMeshHandler),
@@ -113,11 +112,6 @@ PAlertHandler CUISystemState::getAlertHandler()
 std::string CUISystemState::getTestOutputPath()
 {
     return m_sTestOutputPath;
-}
-
-std::string CUISystemState::getSystemUserID()
-{
-    return m_sSystemUserID;
 }
 
 PAccessControl CUISystemState::getAccessControl()

@@ -43,7 +43,7 @@ using namespace LibMCData::Impl;
  Class definition of CCustomDataStream 
 **************************************************************************************************************************/
 
-CCustomDataStream::CCustomDataStream(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, LibMCData::eCustomDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize)
+CCustomDataStream::CCustomDataStream(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserID, const std::string& sSHA2, uint64_t nStreamSize)
 	: m_sIdentifier(sIdentifier),
     m_sName(sName),
     m_eDataType(eDataType),

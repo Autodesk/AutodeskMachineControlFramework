@@ -62,7 +62,7 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName)
     : m_bIsInitializing(false), 
     m_pParameterGroup(pParameterGroup), 
     m_pDriverResourcePackage (pDriverResourcePackage), 
@@ -72,7 +72,6 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
     m_pLogger (pLogger), 
     m_sDriverName (sDriverName), 
     m_pDataModel (pDataModel), 
-    m_sSystemUserID (sSystemUserID), 
     m_pGlobalChrono (pGlobalChrono)
 {
     if (pParameterGroup.get() == nullptr)
@@ -291,12 +290,18 @@ void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_pGlobalChrono->getExistenceTimeInMilliseconds();
+    return GetGlobalTimerInMicroseconds() / 1000ULL;
 }
 
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMicroseconds()
 {
-    return m_pGlobalChrono->getExistenceTimeInMicroseconds();
+    uint64_t nStartTime = m_pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+    uint64_t nCurrentTime = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+    if (nCurrentTime < nStartTime)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+    return nCurrentTime - nStartTime;
 }
 
 void CDriverEnvironment::LogMessage(const std::string& sLogString)
@@ -423,7 +428,7 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_pGlobalChrono);
 }
 
 ICryptoContext* CDriverEnvironment::CreateCryptoContext()
@@ -443,6 +448,6 @@ IDateTime* CDriverEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, co
 
 IDateTime* CDriverEnvironment::GetStartDateTime()
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return new CDateTime(m_pGlobalChrono->getStartTimeStampInMicrosecondsSince1970());
 }
 

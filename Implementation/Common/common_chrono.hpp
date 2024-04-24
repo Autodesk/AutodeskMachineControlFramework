@@ -59,17 +59,11 @@ namespace AMCCommon {
 			CChrono ();
 			~CChrono ();
 		
-
-			// Returns Duration in milliseconds since instance creation
-			// Subsequent calls of this method will never decrease.
-			uint64_t getExistenceTimeInMilliseconds ();
-
-			// Returns Duration in microseconds since instance creation
-			// Subsequent calls of this method will never decrease.
-			uint64_t getExistenceTimeInMicroseconds ();
-
 			// Returns Absolute UTC Time Stamp microseconds since 1970
 			uint64_t getUTCTimeStampInMicrosecondsSince1970();
+
+			// Returns Instance Creation UTC Time in microseconds since 1970
+			uint64_t getStartTimeStampInMicrosecondsSince1970();
 
 			// Returns Absolute UTC Time Stamp in ISO8601 formatting
 			std::string getUTCTimeInISO8601();

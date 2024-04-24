@@ -272,6 +272,9 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_DATETIMEISINVALID 10175 /** Date Time is invalid */
 #define LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS 10176 /** Date Time out of bounds */
 #define LIBMCENV_ERROR_EMPTYPNGBUFFER 10177 /** Empty PNG buffer */
+#define LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM 10178 /** Cannot seek ZIP stream */
+#define LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS 10179 /** Global Timer is not continuous. */
+#define LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED 10180 /** Stream writer is not finished */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -456,6 +459,9 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
     case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
     case LIBMCENV_ERROR_EMPTYPNGBUFFER: return "Empty PNG buffer";
+    case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "Cannot seek ZIP stream";
+    case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "Global Timer is not continuous.";
+    case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "Stream writer is not finished";
     default: return "unknown error";
   }
 }

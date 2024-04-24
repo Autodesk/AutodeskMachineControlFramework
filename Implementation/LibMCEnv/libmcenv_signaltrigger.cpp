@@ -74,10 +74,12 @@ void CSignalTrigger::Trigger()
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTTRIGGERSIGNAL);
 }
 
-bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOut)
+bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOutInMilliseconds)
 {
 
 	AMCCommon::CChrono chrono;
+
+	uint64_t nTimeOutTimeStamp = chrono.getUTCTimeStampInMicrosecondsSince1970() + (nTimeOutInMilliseconds * 1000ULL);
 
 	if (m_sTriggeredUUID.length() == 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED);
@@ -92,7 +94,7 @@ bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOut)
 			return true;
 		}
 
-		bIsTimeOut = chrono.getExistenceTimeInMilliseconds () > nTimeOut;
+		bIsTimeOut = chrono.getUTCTimeStampInMicrosecondsSince1970() > nTimeOutTimeStamp;
 
 		if (!bIsTimeOut) {
 			// TODO

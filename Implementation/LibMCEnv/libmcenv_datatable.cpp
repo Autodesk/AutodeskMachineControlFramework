@@ -37,6 +37,8 @@ Abstract: This is a stub class definition of CDataTable
 // Include custom headers here.
 #include "common_utils.hpp"
 #include <vector>
+#include <algorithm>
+#include <cstring>
 #include <sstream>
 
 #include "amc_constants.hpp"

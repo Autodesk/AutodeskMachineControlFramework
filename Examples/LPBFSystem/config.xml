@@ -125,7 +125,7 @@
     </parametergroup>
 
 		<parametergroup name="configuration" description="Machine Configuration">
-			<parameter name="simulatelaser" description="Simulate laser control" default="0" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a" />
+			<parameter name="simulatelaser" description="Simulate laser control" default="1" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a" />
 			<parameter name="simulateplc" description="Simulate PLC behaviour" default="1" type="bool" persistent="d1e8e7d2-8d77-4206-b390-b999300ca8a9" />
 		</parametergroup>
 
@@ -201,7 +201,104 @@
 	</statemachine>
 
 
+	<statemachine name="laser" description="Laser System" initstate="init" failedstate="fatalerror" library="plugin_laser">
 
+		<parametergroup name="cardconfig" description="Scanner Card Config">
+			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlab" type="string"/>
+			<parameter name="serial" description="Serial" default="341731" type="int"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.0.1" type="string"/>
+			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string"/>
+			<parameter name="port" description="Port" default="49374" type="int"/>
+			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
+			<parameter name="maxlaserpower" description="Max. laser power (W)" default="1000" type="double"/>
+			<parameter name="laserondelay" description="Laser On Delay in microseconds" default="100" type="double"/>
+			<parameter name="laseroffdelay" description="Laser Off Delay in microseconds" default="100" type="double"/>
+			<parameter name="markdelay" description="Mark Delay in microseconds" default="570" type="double"/>
+			<parameter name="jumpdelay" description="Jump Delay in microseconds" default="1400" type="double"/>
+			<parameter name="polygondelay" description="Polygon Delay in microseconds" default="280" type="double"/>
+			<derivedparameter name="simulatelaser" statemachine="main" group="configuration" parameter="simulatelaser"/>
+		</parametergroup>
+
+		<parametergroup name="correction" description="Scanlab Correction Data">
+			<parameter name="resourcename" description="Correction resource name" default="d2_1238" type="string"/>
+			<parameter name="tableindex" description="Correction table index" default="1" type="int"/>
+			<parameter name="dimension" description="Correction file dimension" default="3" type="int"/>
+			<parameter name="tablenumbera" description="Table number head A" default="1" type="int"/>
+			<parameter name="tablenumberb" description="Table number head B" default="0" type="int"/>
+		</parametergroup>
+
+		<driverparametergroup name="sdkstate" description="Scanlab SDK State" driver="scanlab"/>
+
+		<signaldefinition name="signal_exposure">
+			<parameter name="jobuuid" type="string"/>
+			<parameter name="layerindex" type="int"/>
+			<parameter name="timeout" type="int"/>
+			<result name="success" type="bool"/>
+		</signaldefinition>
+
+		<state name="init" repeatdelay="100">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="idle" repeatdelay="50">
+			<outstate target="idle"/>
+			<outstate target="exposure"/>
+		</state>
+
+		<state name="exposure" repeatdelay="50">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="5000">
+			<outstate target="init"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+
+
+
+	<statemachine name="plc" description="PLC System" initstate="init" failedstate="fatalerror" library="plugin_plc">
+
+		<parametergroup name="plcconfig" description="PLC Config">
+			<parameter name="ipaddress" description="PLC Ethernet Address" default="127.0.0.1" type="string"/>
+			<parameter name="port" description="PLC Port" default="12200" type="int"/>
+			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
+			<derivedparameter name="simulateplc" statemachine="main" group="configuration" parameter="simulateplc"/>
+		</parametergroup>
+
+		<driverparametergroup name="plcstate" description="BuR State" driver="bur"/>
+
+		<signaldefinition name="signal_recoatlayer">
+			<result name="success" type="bool"/>
+		</signaldefinition>
+
+		<signaldefinition name="signal_laserpointer">
+			<parameter name="laseron" type="bool"/>
+			<result name="success" type="bool"/>
+		</signaldefinition>
+
+
+		<state name="init" repeatdelay="100">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="idle" repeatdelay="10">
+			<outstate target="idle"/>
+			<outstate target="recoating"/>
+		</state>
+
+		<state name="recoating" repeatdelay="50">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="5000">
+			<outstate target="init"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
 
 
 	<userinterface appname="Autodesk Machine Control Framework" copyright="2022 Autodesk Inc." mainpage="main" library="plugin_userinterface">
@@ -273,6 +370,8 @@
 
           <form name="machinestateinforform">
 						<edit name="mainstatename" caption="Main System" readonly="1" sync:value="main.$state"/>
+						<edit name="scannerstatename" caption="Scanner System" readonly="1" sync:value="laser.$state"/>
+						<edit name="plcstatename" caption="PLC System" readonly="1" sync:value="plc.$state"/>
             <edit name="test" caption="Test" sync:value="main.jobinfo.countertest" validation="double" minvalue="10" maxvalue="20" validationmessage="Invalid value!"/>
           </form>
 
@@ -404,8 +503,23 @@
 					</form>
 				</content>
 
+				<content name="buildlaserstate" columnstart="2" rowstart="2" columnend="2" rowend="2" rowposition="centered">
+					<form name="stateform2">
+						<edit name="laserstate"
+						caption="Laser System"
+						sync:value="laser.$state"
+						readonly="1"/>
+					</form>
+				</content>
+
 
 				<content name="buildplcstate" columnstart="3" rowstart="2" columnend="3" rowend="2" rowposition="centered">
+					<form name="stateform3">
+						<edit name="plcstate"
+						caption="PLC System"
+						sync:value="plc.$state"
+						readonly="1"/>
+					</form>
 				</content>
 
 
@@ -433,6 +547,10 @@
 
 						<parameterlist loadingtext="Loading parameters">
 							<entry statemachine="main" group="jobinfo"/>
+							<entry statemachine="plc" group="plcstate"/>
+							<entry statemachine="laser" group="cardconfig"/>
+							<entry statemachine="laser" group="sdkstate"/>
+							<entry statemachine="laser" group="correction"/>
 
 						</parameterlist>
 
@@ -471,6 +589,10 @@
           <parameterlist loadingtext="Loading parameters">
             <entry statemachine="main" group="jobinfo"/>
             <entry statemachine="main" group="ui"/>
+            <entry statemachine="plc" group="plcconfig"/>
+            <entry statemachine="plc" group="plcstate"/>
+
+            <entry statemachine="laser" group="sdkstate"/>
 
           </parameterlist>
 
@@ -501,7 +623,38 @@
 
     <page name="modelview">
 
-     
+      <glscene name="glscene1">
+
+        <models>
+          <model name="platform" resource="bptest" />
+        </models>
+
+        <lights>
+          <spotlight name="spotlight">
+
+          </spotlight>
+        </lights>
+
+
+        <fog>
+          
+        </fog>
+
+
+        <scene>
+          
+          <instance name="platform_view" model="platform" visible="1">
+            <color red="0.8" green="0.9" blue="0.5" shininess="50" specular_red="0.1" specular_green="0.1" specular_blue="0.1" />
+            
+            <position x="100" y="20" z="30" />
+            <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
+            
+          </instance>
+
+
+        </scene>
+
+      </glscene>
 
     </page>
 

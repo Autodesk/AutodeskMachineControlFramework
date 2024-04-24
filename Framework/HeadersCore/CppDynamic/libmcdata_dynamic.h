@@ -637,6 +637,15 @@ typedef LibMCDataResult (*PLibMCDataStorageZIPWriter_WriteDataPtr) (LibMCData_St
 typedef LibMCDataResult (*PLibMCDataStorageZIPWriter_GetEntrySizePtr) (LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint32 nEntryID, LibMCData_uint64 * pEntrySize);
 
 /**
+* Returns the current size of the stream.
+*
+* @param[in] pStorageZIPWriter - StorageZIPWriter instance.
+* @param[out] pSize - Current size of the stream.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataStorageZIPWriter_GetZIPStreamSizePtr) (LibMCData_StorageZIPWriter pStorageZIPWriter, LibMCData_uint64 * pSize);
+
+/**
 * Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.
 *
 * @param[in] pStorageZIPWriter - StorageZIPWriter instance.
@@ -1182,9 +1191,12 @@ typedef LibMCDataResult (*PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicros
 * @param[in] eDataType - Datatype of Job Execution data
 * @param[in] pUserUUID - UUID of Currently authenticated user
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJobExecution_AddJobExecutionDataPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_AddJobExecutionDataPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserUUID, LibMCData_uint64 nAbsoluteTimeStamp, const LibMCData_uint32 nDataUUIDBufferSize, LibMCData_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Retrieves a list of build job execution data objects, filtered by type.
@@ -1426,9 +1438,12 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_JobCanBeArchivedPtr) (LibMCData_Bui
 * @param[in] eDataType - Datatype of Job data
 * @param[in] pUserID - Currently authenticated user
 * @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJob_AddJobDataPtr) (LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp);
+typedef LibMCDataResult (*PLibMCDataBuildJob_AddJobDataPtr) (LibMCData_BuildJob pBuildJob, const char * pIdentifier, const char * pName, LibMCData_StorageStream pStream, LibMCData::eCustomDataType eDataType, const char * pUserID, LibMCData_uint64 nAbsoluteTimeStamp, const LibMCData_uint32 nDataUUIDBufferSize, LibMCData_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
 * Retrieves a list of build job data objects, filtered by type.
@@ -2454,6 +2469,7 @@ typedef struct {
 	PLibMCDataStorageZIPWriter_GetOpenEntryIDPtr m_StorageZIPWriter_GetOpenEntryID;
 	PLibMCDataStorageZIPWriter_WriteDataPtr m_StorageZIPWriter_WriteData;
 	PLibMCDataStorageZIPWriter_GetEntrySizePtr m_StorageZIPWriter_GetEntrySize;
+	PLibMCDataStorageZIPWriter_GetZIPStreamSizePtr m_StorageZIPWriter_GetZIPStreamSize;
 	PLibMCDataStorageZIPWriter_FinishPtr m_StorageZIPWriter_Finish;
 	PLibMCDataStorageZIPWriter_IsFinishedPtr m_StorageZIPWriter_IsFinished;
 	PLibMCDataStorage_StreamIsReadyPtr m_Storage_StreamIsReady;

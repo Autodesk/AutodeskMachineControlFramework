@@ -25,13 +25,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --*/
 
-#include "common_exportstream_zip.h"
+#include "common_exportstream_zip.hpp"
 #include <stdexcept> 
 #include <vector>
 
 namespace AMCCommon {
 
-	CExportStream_ZIP::CExportStream_ZIP(_In_ CPortableZIPWriter * pZIPWriter, uint32_t nEntryKey)
+	CExportStream_ZIP::CExportStream_ZIP(CPortableZIPWriter * pZIPWriter, uint32_t nEntryKey)
 	{
 		m_bIsInitialized = false;
 
@@ -76,21 +76,21 @@ namespace AMCCommon {
 		}
 	}
 
-	bool CExportStream_ZIP::seekPosition(_In_ uint64_t position, _In_ bool bHasToSucceed)
+	bool CExportStream_ZIP::seekPosition(uint64_t position, bool bHasToSucceed)
 	{
 		if (bHasToSucceed)
 			throw std::runtime_error("zip stream cannot seek");
 		return false;
 	}
 
-	bool CExportStream_ZIP::seekForward(_In_ uint64_t bytes, _In_ bool bHasToSucceed)
+	bool CExportStream_ZIP::seekForward(uint64_t bytes, bool bHasToSucceed)
 	{
 		if (bHasToSucceed)
 			throw std::runtime_error("zip stream cannot seek");
 		return false;
 	}
 
-	bool CExportStream_ZIP::seekFromEnd(_In_ uint64_t bytes, _In_ bool bHasToSucceed)
+	bool CExportStream_ZIP::seekFromEnd(uint64_t bytes, bool bHasToSucceed)
 	{
 		if (bHasToSucceed)
 			throw std::runtime_error("zip stream cannot seek");
@@ -102,7 +102,7 @@ namespace AMCCommon {
 		return m_pZIPWriter->getCurrentSize(m_nEntryKey);
 	}
 
-	uint64_t CExportStream_ZIP::writeBuffer(_In_ const void * pBuffer, _In_ uint64_t cbTotalBytesToWrite)
+	uint64_t CExportStream_ZIP::writeBuffer(const void * pBuffer, uint64_t cbTotalBytesToWrite)
 	{
 		if (!m_bIsInitialized)
 			throw std::runtime_error("zip stream already finished");
@@ -126,7 +126,7 @@ namespace AMCCommon {
 		return cbTotalBytesToWrite;
 	}
 
-	uint32_t CExportStream_ZIP::writeChunk(_In_ const uint8_t * pData, uint32_t cbCount)
+	uint32_t CExportStream_ZIP::writeChunk(const uint8_t * pData, uint32_t cbCount)
 	{
 		if ((pData == nullptr) || (cbCount == 0) || (cbCount > ZIPEXPORTWRITECHUNKSIZE))
 			throw std::runtime_error("invalid param");

@@ -215,6 +215,9 @@
 		<error name="DATETIMEISINVALID" code="10175" description="Date Time is invalid" />		
 		<error name="DATETIMEOUTOFBOUNDS" code="10176" description="Date Time out of bounds" />		
 		<error name="EMPTYPNGBUFFER" code="10177" description="Empty PNG buffer" />						
+		<error name="CANNOTSEEKZIPSTREAM" code="10178" description="Cannot seek ZIP stream" />
+		<error name="GLOBALTIMERNOTCONTINUOUS" code="10179" description="Global Timer is not continuous." />	
+		<error name="STREAMWRITERISNOTFINISHED" code="10180" description="Stream writer is not finished" />
 		
 	</errors>
 
@@ -1507,6 +1510,7 @@
 			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
 			<param name="Name" type="string" pass="in" description="Name of the attache data" />
 			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
@@ -1514,18 +1518,19 @@
 		<method name="AttachTempStream" description="Attaches a temp stream to the build execution.">
 			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
 			<param name="Name" type="string" pass="in" description="Name of the attached data" />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="StreamWriterInstance" type="class" class="BaseTempStreamWriter" pass="in" description="Stream to attach to the build." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
 		
 		<method name="LoadStreamByIdentifier" description="Loads stream of the build execution by identifier.">
 			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does not exist." />
-			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="in" description="Reader class to access the stream." />
+			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
 		</method>
 
 		<method name="LoadStreamByUUID" description="Loads stream of the build by attachment UUID.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if uuid does not exist." />
-			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="in" description="Reader class to access the stream." />
+			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
 		</method>
 		
 		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.">
@@ -1543,6 +1548,7 @@
 			<param name="Name" type="string" pass="in" description="Human Readable name of the attachment." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
 			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
@@ -1561,6 +1567,7 @@
 			<param name="Name" type="string" pass="in" description="Human Readable name of the attachment." />
 			<param name="FieldDataInstance" type="class" class="DataTable" pass="in" description="Field instance to store." />
 			<param name="StoreOptions" type="optionalclass" class="DataTableWriteOptions" pass="in" description="Data Table Write Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
@@ -1585,6 +1592,7 @@
 			<param name="Name" type="string" pass="in" description="Unique name of the attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
 			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>			
 
@@ -1667,6 +1675,7 @@
 			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
 			<param name="Name" type="string" pass="in" description="Name of the attache data" />
 			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
@@ -1674,18 +1683,19 @@
 		<method name="AttachTempStream" description="Attaches a temp stream to the build.">
 			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
 			<param name="Name" type="string" pass="in" description="Name of the attached data" />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="StreamWriterInstance" type="class" class="BaseTempStreamWriter" pass="in" description="Stream to attach to the build." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
 		
 		<method name="LoadStreamByIdentifier" description="Loads stream of the build by identifier.">
 			<param name="Identifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist." />
-			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="in" description="Reader class to access the stream." />
+			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
 		</method>
 
 		<method name="LoadStreamByUUID" description="Loads stream of the build by attachment UUID.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if uuid does not exist." />
-			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="in" description="Reader class to access the stream." />
+			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
 		</method>
 
 		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
@@ -1703,6 +1713,7 @@
 			<param name="Name" type="string" pass="in" description="Unique name of the build attachment." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
 			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
@@ -1721,6 +1732,7 @@
 			<param name="Name" type="string" pass="in" description="Unique name of the build attachment." />
 			<param name="DataTableInstance" type="class" class="DataTable" pass="in" description="Data Table instance to store." />
 			<param name="StoreOptions" type="optionalclass" class="DataTableWriteOptions" pass="in" description="Data Table Write Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
@@ -1746,6 +1758,7 @@
 			<param name="Name" type="string" pass="in" description="Unique name of the build attachment." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
 			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
@@ -2976,7 +2989,7 @@
 	</class>
 	
 	<class name="ZIPStreamWriter" parent="BaseTempStreamWriter" description="A writer that allows to create a ZIP file storage stream.">
-
+	
 		<method name="CreateZIPEntry" description="Creates a new ZIP entry in the ZIP file. All currently open ZIP Entry streams will be finished and closed.">
 			<param name="FileName" type="string" pass="in" description="File Name for the new entry in the ZIP file. Entry MUST not exist yet." />
 			<param name="TempStream" type="class" class="TempStreamWriter" pass="return" description="Returns temp stream to write into." />
@@ -3742,7 +3755,7 @@
 			<param name="ZIPStreamInstance" type="class" class="ZIPStreamWriter" pass="return" description="ZIP stream writer instance" />
 		</method>
 
-		<method name="FindStream" description="Finds a stream in the storage system.">
+		<method name="LoadStream" description="Loads a stream in the storage system.">
 			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
 			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />
@@ -4145,7 +4158,7 @@
 			<param name="ZIPStreamInstance" type="class" class="ZIPStreamWriter" pass="return" description="ZIP stream writer instance" />
 		</method>
 
-		<method name="FindStream" description="Finds a stream in the storage system.">
+		<method name="LoadStream" description="Loads a stream in the storage system.">
 			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
 			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />

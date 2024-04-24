@@ -269,7 +269,7 @@ bool CBuildJob::JobCanBeArchived()
 
 }
 
-void CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+std::string CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string& sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
     if (pStream == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -280,6 +280,8 @@ void CBuildJob::AddJobData(const std::string& sIdentifier, const std::string& sN
 
     auto sTimeStamp = AMCCommon::CChrono::convertToISO8601TimeUTC (nAbsoluteTimeStamp);
     std::unique_ptr<CBuildJobData> buildJobData (CBuildJobData::createInDatabase (sIdentifier, sName, m_sUUID, eDataType, sTimeStamp, sStreamUUID, sUserID, sStreamSHA2, nStreamSize, m_pSQLHandler, m_pStorageState));
+
+    return buildJobData->GetDataUUID ();
 }
 
 

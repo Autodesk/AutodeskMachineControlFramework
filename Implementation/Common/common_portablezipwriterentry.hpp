@@ -47,7 +47,7 @@ namespace AMCCommon {
 		uint64_t m_nExtInfoPosition;
 		uint64_t m_nDataPosition;
 	public:
-		CPortableZIPWriterEntry(_In_ const std::string sUTF8Name, _In_ uint16_t nLastModTime, _In_ uint16_t nLastModDate, _In_ uint64_t nFilePosition, _In_ uint64_t nExtInfoPosition, _In_ uint64_t nDataPosition);
+		CPortableZIPWriterEntry(const std::string sUTF8Name, uint16_t nLastModTime, uint16_t nLastModDate, uint64_t nFilePosition, uint64_t nExtInfoPosition, uint64_t nDataPosition);
 		std::string getUTF8Name();
 		uint32_t getCRC32();
 		uint64_t getCompressedSize();
@@ -57,9 +57,9 @@ namespace AMCCommon {
 		uint64_t getFilePosition();
 		uint64_t getExtInfoPosition();
 		uint64_t getDataPosition();
-		void increaseCompressedSize(_In_ uint32_t nCompressedSize);
-		void increaseUncompressedSize(_In_ uint32_t nUncompressedSize);
-		void calculateChecksum(_In_ const void * pBuffer, _In_ uint32_t cbCount);
+		void increaseCompressedSize(uint32_t nCompressedSize);
+		void increaseUncompressedSize(uint32_t nUncompressedSize);
+		void calculateChecksum(const void * pBuffer, uint32_t cbCount);
 
 	};
 

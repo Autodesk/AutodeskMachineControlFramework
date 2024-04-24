@@ -63,12 +63,11 @@ private:
 	AMC::PToolpathHandler m_pToolpathHandler;
 	LibMCData::PDataModel m_pDataModel;
 	std::string m_sBuildJobUUID;
-	std::string m_sSystemUserID;
 
 
 public:
 
-	CBuild(LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID, AMCCommon::PChrono pGlobalChrono);
+	CBuild(LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CBuild();
 
@@ -94,31 +93,31 @@ public:
 
 	IToolpathAccessor* CreateToolpathAccessor() override;
 
-	std::string AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer) override;
+	std::string AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const std::string& sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer) override;
 
-	std::string AttachTempStream(const std::string& sIdentifier, const std::string& sName, IBaseTempStreamWriter* pStreamWriterInstance) override;
+	std::string AttachTempStream(const std::string& sIdentifier, const std::string& sName, const std::string& sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance) override;
 
-	void LoadStreamByIdentifier(const std::string& sIdentifier, IStreamReader* pStreamReaderInstance) override;
+	IStreamReader* LoadStreamByIdentifier(const std::string& sIdentifier) override;
 
-	void LoadStreamByUUID(const std::string& sDataUUID, IStreamReader* pStreamReaderInstance) override;
+	IStreamReader* LoadStreamByUUID(const std::string& sDataUUID) override;
 
 	IDataTable* LoadDataTableByIdentifier(const std::string& sIdentifier) override;
 
 	IDataTable* LoadDataTableByUUID(const std::string& sDataUUID) override;
 
-	std::string StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions) override;
+	std::string StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string& sUserUUID) override;
 
 	IDiscreteFieldData2D* LoadDiscreteField2DByIdentifier(const std::string& sContextIdentifier) override;
 
 	IDiscreteFieldData2D* LoadDiscreteField2DByUUID(const std::string& sDataUUID) override;
 
-	std::string StoreDiscreteField2D(const std::string& sContextIdentifier, const std::string& sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) override;
+	std::string StoreDiscreteField2D(const std::string& sContextIdentifier, const std::string& sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string& sUserUUID) override;
 
 	IImageData* LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
 	IImageData* LoadPNGImageByUUID(const std::string& sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
-	std::string StorePNGImage(const std::string& sContextIdentifier, const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) override;
+	std::string StorePNGImage(const std::string& sContextIdentifier, const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions, const std::string& sUserUUID) override;
 
 	IBuildExecution* StartExecution(const std::string& sDescription, const std::string& sUserUUID) override;
 

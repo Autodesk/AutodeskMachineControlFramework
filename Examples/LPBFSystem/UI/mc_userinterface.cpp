@@ -57,6 +57,27 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
+		/*auto pBuildJob = pUIEnvironment->GetBuildJob("12345");
+
+		auto pBuildFile = pUIEnvironment->FindStream (pBuildJob->GetStorageUUID());
+
+		auto pZIPStream = pUIEnvironment->CreateZIPStream();
+
+		auto pBuildFileStream = pZIPStream->CreateZIPEntry("build.3mf");
+		pBuildFileStream->
+
+		for (uint32_t nLayerIndex = 1; nLayerIndex < nLayerCount; nLayerIndex++) {
+			auto pDataTable = pBuildJobExecution->LoadDataTable("recording_layer_" + std::to_string(nLayerIndex));
+			auto pLayerCSV = pZIPStream->CreateZIPEntry("layer" + std::to_string (nLayerIndex) + ".csv");
+			pDataTable->WriteCSV(pLayerCSV);
+		}
+
+		pZIPStream->Finish();
+
+
+		pUIEnvironment->StartStreamDownload(pZIPStream->GetUUID()); */
+
+
 		pUIEnvironment->LogMessage("Clicked on Logout: " + pUIEnvironment->GetCurrentUserLogin ());
 		pUIEnvironment->LogMessage("User Role: " + pUIEnvironment->GetCurrentUserRole());
 		pUIEnvironment->LogMessage("User Language: " + pUIEnvironment->GetCurrentUserLanguage());
@@ -161,6 +182,18 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 		pUIEnvironment->LogMessage("Clicked on Test Journal Button");
+
+		auto pZIPStream = pUIEnvironment->CreateZIPStream("test_zip");
+		auto pEntry1 = pZIPStream->CreateZIPEntry("file1.txt");
+		pEntry1->WriteLine("LineA");
+
+		auto pEntry2 = pZIPStream->CreateZIPEntry("file2.txt");
+		pEntry2->WriteLine("LineB");
+		pEntry2->WriteLine("LineC");
+
+		pZIPStream->Finish();
+
+		pUIEnvironment->StartStreamDownload(pZIPStream->GetUUID(), "download.zip");
 
 		/*auto pUserManagement = pUIEnvironment->CreateUserManagement();
 		auto activeUsers = pUserManagement->GetActiveUsers();

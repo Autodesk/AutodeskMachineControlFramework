@@ -572,6 +572,12 @@ public:
 			case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "EMPTYJOBDATAIDENTIFIER";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND: return "BUILDJOBEXECUTIONDATANOTFOUND";
 			case LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER: return "EMPTYJOBEXECUTIONDATAIDENTIFIER";
+			case LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE: return "ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE";
+			case LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES: return "ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES";
+			case LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY: return "ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY";
+			case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "INVALIDZIPSTREAMENTRYID";
+			case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIPSTREAMENTRYIDNOTFOUND";
+			case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIPWRITINGALREADYFINISHED";
 		}
 		return "UNKNOWN";
 	}
@@ -895,6 +901,12 @@ public:
 			case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "Empty job data identifier.";
 			case LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND: return "Build job execution data not found.";
 			case LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER: return "Empty job execution data identifier.";
+			case LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE: return "ZIP Streams to not support async chunk write.";
+			case LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES: return "ZIP Stream exceeds maximum number of entries.";
+			case LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY: return "Attempted to write to finished ZIP stream entry.";
+			case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "Invalid ZIP Stream entry ID.";
+			case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIP Stream entry ID not found.";
+			case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIP Writing already finished.";
 		}
 		return "unknown error";
 	}
@@ -1291,6 +1303,7 @@ public:
 	inline LibMCData_uint32 GetOpenEntryID();
 	inline void WriteData(const LibMCData_uint32 nEntryID, const CInputVector<LibMCData_uint8> & DataBuffer);
 	inline LibMCData_uint64 GetEntrySize(const LibMCData_uint32 nEntryID);
+	inline LibMCData_uint64 GetZIPStreamSize();
 	inline void Finish();
 	inline bool IsFinished();
 };
@@ -1450,7 +1463,7 @@ public:
 	inline LibMCData_uint64 GetStartTimeStampInMicroseconds();
 	inline LibMCData_uint64 GetEndTimeStampInMicroseconds();
 	inline LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds);
-	inline void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline std::string AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJobExecutionDataIterator ListJobExecutionDataByType(const eCustomDataType eDataType);
 	inline PBuildJobExecutionDataIterator ListJobExecutionData();
 	inline PBuildJobExecutionData RetrieveJobExecutionData(const std::string & sDataUUID);
@@ -1506,7 +1519,7 @@ public:
 	inline void UnArchiveJob();
 	inline void DeleteJob();
 	inline bool JobCanBeArchived();
-	inline void AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline std::string AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJobDataIterator ListJobDataByType(const eCustomDataType eDataType);
 	inline PBuildJobDataIterator ListJobData();
 	inline PBuildJobData RetrieveJobData(const std::string & sDataUUID);
@@ -1847,6 +1860,7 @@ public:
 		pWrapperTable->m_StorageZIPWriter_GetOpenEntryID = nullptr;
 		pWrapperTable->m_StorageZIPWriter_WriteData = nullptr;
 		pWrapperTable->m_StorageZIPWriter_GetEntrySize = nullptr;
+		pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize = nullptr;
 		pWrapperTable->m_StorageZIPWriter_Finish = nullptr;
 		pWrapperTable->m_StorageZIPWriter_IsFinished = nullptr;
 		pWrapperTable->m_Storage_StreamIsReady = nullptr;
@@ -2511,6 +2525,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StorageZIPWriter_GetEntrySize == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize = (PLibMCDataStorageZIPWriter_GetZIPStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_storagezipwriter_getzipstreamsize");
+		#else // _WIN32
+		pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize = (PLibMCDataStorageZIPWriter_GetZIPStreamSizePtr) dlsym(hLibrary, "libmcdata_storagezipwriter_getzipstreamsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4146,6 +4169,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_GetEntrySize == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_storagezipwriter_getzipstreamsize", (void**)&(pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_GetZIPStreamSize == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_storagezipwriter_finish", (void**)&(pWrapperTable->m_StorageZIPWriter_Finish));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageZIPWriter_Finish == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5552,6 +5579,18 @@ public:
 	}
 	
 	/**
+	* CStorageZIPWriter::GetZIPStreamSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	LibMCData_uint64 CStorageZIPWriter::GetZIPStreamSize()
+	{
+		LibMCData_uint64 resultSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StorageZIPWriter_GetZIPStreamSize(m_pHandle, &resultSize));
+		
+		return resultSize;
+	}
+	
+	/**
 	* CStorageZIPWriter::Finish - Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.
 	*/
 	void CStorageZIPWriter::Finish()
@@ -6231,11 +6270,18 @@ public:
 	* @param[in] eDataType - Datatype of Job Execution data
 	* @param[in] sUserUUID - UUID of Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	* @return Data UUID
 	*/
-	void CBuildJobExecution::AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	std::string CBuildJobExecution::AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp));
+		LibMCData_uint32 bytesNeededDataUUID = 0;
+		LibMCData_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_AddJobExecutionData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
@@ -6550,11 +6596,18 @@ public:
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
+	* @return Data UUID
 	*/
-	void CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	std::string CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp));
+		LibMCData_uint32 bytesNeededDataUUID = 0;
+		LibMCData_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**

@@ -1,6 +1,6 @@
-#[[++
+/*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2024 Autodesk Inc.
 
 All rights reserved.
 
@@ -26,14 +26,56 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-]]
+*/
 
-cmake_minimum_required(VERSION 3.5)
+#include "libmcui_interfaceexception.hpp"
+#include "libmcui_eventhandler.hpp"
+#include "libmcui_event.hpp"
 
-project("Autodesk_LBPF_Example")
+#include <cmath>
 
-add_subdirectory(Main)
-add_subdirectory(PLC)
-add_subdirectory(Laser)
-add_subdirectory(UI)
+using namespace LibMCUI::Impl;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4250)
+#endif
+
+/*************************************************************************************************************************
+ Class declaration of CEvent_Logout
+**************************************************************************************************************************/
+
+class CEvent_Logout : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "logout";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogOut();
+
+	}
+
+};
+
+
+IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
+{
+	IEvent* pEventInstance = nullptr;
+	if (createEventInstanceByName<CEvent_Logout>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);
+}
+
+
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

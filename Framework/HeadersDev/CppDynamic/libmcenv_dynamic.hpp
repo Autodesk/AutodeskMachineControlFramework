@@ -541,6 +541,9 @@ public:
 			case LIBMCENV_ERROR_DATETIMEISINVALID: return "DATETIMEISINVALID";
 			case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "DATETIMEOUTOFBOUNDS";
 			case LIBMCENV_ERROR_EMPTYPNGBUFFER: return "EMPTYPNGBUFFER";
+			case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "CANNOTSEEKZIPSTREAM";
+			case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "GLOBALTIMERNOTCONTINUOUS";
+			case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "STREAMWRITERISNOTFINISHED";
 		}
 		return "UNKNOWN";
 	}
@@ -725,6 +728,9 @@ public:
 			case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
 			case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
 			case LIBMCENV_ERROR_EMPTYPNGBUFFER: return "Empty PNG buffer";
+			case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "Cannot seek ZIP stream";
+			case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "Global Timer is not continuous.";
+			case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "Stream writer is not finished";
 		}
 		return "unknown error";
 	}
@@ -1484,19 +1490,19 @@ public:
 	inline LibMCEnv_uint64 GetEndTimeStampInMicroseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInMilliseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInMicroseconds();
-	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
-	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
-	inline void LoadStreamByIdentifier(const std::string & sIdentifier, classParam<CStreamReader> pStreamReaderInstance);
-	inline void LoadStreamByUUID(const std::string & sDataUUID, classParam<CStreamReader> pStreamReaderInstance);
+	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
+	inline PStreamReader LoadStreamByIdentifier(const std::string & sIdentifier);
+	inline PStreamReader LoadStreamByUUID(const std::string & sDataUUID);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sIdentifier);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
-	inline std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions, const std::string & sUserUUID);
 	inline PDataTable LoadDataTableByIdentifier(const std::string & sIdentifier);
 	inline PDataTable LoadDataTableByUUID(const std::string & sDataUUID);
-	inline std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pFieldDataInstance, classParam<CDataTableWriteOptions> pStoreOptions);
+	inline std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pFieldDataInstance, classParam<CDataTableWriteOptions> pStoreOptions, const std::string & sUserUUID);
 	inline PImageData LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions, const std::string & sUserUUID);
 	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
@@ -1545,19 +1551,19 @@ public:
 	inline void UnloadToolpath();
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
-	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
-	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
-	inline void LoadStreamByIdentifier(const std::string & sIdentifier, classParam<CStreamReader> pStreamReaderInstance);
-	inline void LoadStreamByUUID(const std::string & sDataUUID, classParam<CStreamReader> pStreamReaderInstance);
+	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
+	inline PStreamReader LoadStreamByIdentifier(const std::string & sIdentifier);
+	inline PStreamReader LoadStreamByUUID(const std::string & sDataUUID);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByIdentifier(const std::string & sIdentifier);
 	inline PDiscreteFieldData2D LoadDiscreteField2DByUUID(const std::string & sDataUUID);
-	inline std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions);
+	inline std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions, const std::string & sUserUUID);
 	inline PDataTable LoadDataTableByIdentifier(const std::string & sIdentifier);
 	inline PDataTable LoadDataTableByUUID(const std::string & sDataUUID);
-	inline std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pDataTableInstance, classParam<CDataTableWriteOptions> pStoreOptions);
+	inline std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pDataTableInstance, classParam<CDataTableWriteOptions> pStoreOptions, const std::string & sUserUUID);
 	inline PImageData LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions);
+	inline std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions, const std::string & sUserUUID);
 	inline PBuildExecution StartExecution(const std::string & sDescription, const std::string & sUserUUID);
 	inline bool HasExecution(const std::string & sExecutionUUID);
 	inline PBuildExecution FindExecution(const std::string & sExecutionUUID);
@@ -2391,7 +2397,7 @@ public:
 	inline PCryptoContext CreateCryptoContext();
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
 	inline PZIPStreamWriter CreateZIPStream(const std::string & sName);
-	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
+	inline PStreamReader LoadStream(const std::string & sUUID, const bool bMustExist);
 };
 	
 /*************************************************************************************************************************
@@ -2496,7 +2502,7 @@ public:
 	inline PCryptoContext CreateCryptoContext();
 	inline PTempStreamWriter CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType);
 	inline PZIPStreamWriter CreateZIPStream(const std::string & sName);
-	inline PStreamReader FindStream(const std::string & sUUID, const bool bMustExist);
+	inline PStreamReader LoadStream(const std::string & sUUID, const bool bMustExist);
 	inline PDateTime GetCurrentDateTime();
 	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
 	inline PDateTime GetStartDateTime();
@@ -3222,7 +3228,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateTemporaryStream = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateZIPStream = nullptr;
-		pWrapperTable->m_StateEnvironment_FindStream = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadStream = nullptr;
 		pWrapperTable->m_UIItem_GetName = nullptr;
 		pWrapperTable->m_UIItem_GetPath = nullptr;
 		pWrapperTable->m_UIItem_GetUUID = nullptr;
@@ -3295,7 +3301,7 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateTemporaryStream = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateZIPStream = nullptr;
-		pWrapperTable->m_UIEnvironment_FindStream = nullptr;
+		pWrapperTable->m_UIEnvironment_LoadStream = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCurrentDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCustomDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_GetStartDateTime = nullptr;
@@ -9106,12 +9112,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_FindStream = (PLibMCEnvStateEnvironment_FindStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findstream");
+		pWrapperTable->m_StateEnvironment_LoadStream = (PLibMCEnvStateEnvironment_LoadStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadstream");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_FindStream = (PLibMCEnvStateEnvironment_FindStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findstream");
+		pWrapperTable->m_StateEnvironment_LoadStream = (PLibMCEnvStateEnvironment_LoadStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadstream");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_FindStream == nullptr)
+		if (pWrapperTable->m_StateEnvironment_LoadStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9763,12 +9769,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_FindStream = (PLibMCEnvUIEnvironment_FindStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findstream");
+		pWrapperTable->m_UIEnvironment_LoadStream = (PLibMCEnvUIEnvironment_LoadStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadstream");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_FindStream = (PLibMCEnvUIEnvironment_FindStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_findstream");
+		pWrapperTable->m_UIEnvironment_LoadStream = (PLibMCEnvUIEnvironment_LoadStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_loadstream");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_FindStream == nullptr)
+		if (pWrapperTable->m_UIEnvironment_LoadStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12415,8 +12421,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateZIPStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_findstream", (void**)&(pWrapperTable->m_StateEnvironment_FindStream));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindStream == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadstream", (void**)&(pWrapperTable->m_StateEnvironment_LoadStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uiitem_getname", (void**)&(pWrapperTable->m_UIItem_GetName));
@@ -12707,8 +12713,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateZIPStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_findstream", (void**)&(pWrapperTable->m_UIEnvironment_FindStream));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindStream == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loadstream", (void**)&(pWrapperTable->m_UIEnvironment_LoadStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getcurrentdatetime", (void**)&(pWrapperTable->m_UIEnvironment_GetCurrentDateTime));
@@ -15643,16 +15649,17 @@ public:
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] ContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
+	std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
 	{
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), sUserUUID.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), sUserUUID.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -15661,17 +15668,18 @@ public:
 	* CBuildExecution::AttachTempStream - Attaches a temp stream to the build execution.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attached data
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] pStreamWriterInstance - Stream to attach to the build.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuildExecution::AttachTempStream(const std::string & sIdentifier, const std::string & sName, classParam<CBaseTempStreamWriter> pStreamWriterInstance)
+	std::string CBuildExecution::AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, classParam<CBaseTempStreamWriter> pStreamWriterInstance)
 	{
 		LibMCEnvHandle hStreamWriterInstance = pStreamWriterInstance.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStreamWriterInstance, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), sUserUUID.c_str(), hStreamWriterInstance, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStreamWriterInstance, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), sUserUUID.c_str(), hStreamWriterInstance, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -15679,23 +15687,33 @@ public:
 	/**
 	* CBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by identifier.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist.
-	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	* @return Reader class to access the stream.
 	*/
-	void CBuildExecution::LoadStreamByIdentifier(const std::string & sIdentifier, classParam<CStreamReader> pStreamReaderInstance)
+	PStreamReader CBuildExecution::LoadStreamByIdentifier(const std::string & sIdentifier)
 	{
-		LibMCEnvHandle hStreamReaderInstance = pStreamReaderInstance.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadStreamByIdentifier(m_pHandle, sIdentifier.c_str(), hStreamReaderInstance));
+		LibMCEnvHandle hStreamReaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadStreamByIdentifier(m_pHandle, sIdentifier.c_str(), &hStreamReaderInstance));
+		
+		if (!hStreamReaderInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStreamReader>(m_pWrapper, hStreamReaderInstance);
 	}
 	
 	/**
 	* CBuildExecution::LoadStreamByUUID - Loads stream of the build by attachment UUID.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
-	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	* @return Reader class to access the stream.
 	*/
-	void CBuildExecution::LoadStreamByUUID(const std::string & sDataUUID, classParam<CStreamReader> pStreamReaderInstance)
+	PStreamReader CBuildExecution::LoadStreamByUUID(const std::string & sDataUUID)
 	{
-		LibMCEnvHandle hStreamReaderInstance = pStreamReaderInstance.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadStreamByUUID(m_pHandle, sDataUUID.c_str(), hStreamReaderInstance));
+		LibMCEnvHandle hStreamReaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadStreamByUUID(m_pHandle, sDataUUID.c_str(), &hStreamReaderInstance));
+		
+		if (!hStreamReaderInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStreamReader>(m_pWrapper, hStreamReaderInstance);
 	}
 	
 	/**
@@ -15736,17 +15754,18 @@ public:
 	* @param[in] sName - Human Readable name of the attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuildExecution::StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	std::string CBuildExecution::StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions, const std::string & sUserUUID)
 	{
 		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, sUserUUID.c_str(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, sUserUUID.c_str(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -15789,17 +15808,18 @@ public:
 	* @param[in] sName - Human Readable name of the attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Data Table Write Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuildExecution::StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pFieldDataInstance, classParam<CDataTableWriteOptions> pStoreOptions)
+	std::string CBuildExecution::StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pFieldDataInstance, classParam<CDataTableWriteOptions> pStoreOptions, const std::string & sUserUUID)
 	{
 		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, sUserUUID.c_str(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, sUserUUID.c_str(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -15848,17 +15868,18 @@ public:
 	* @param[in] sName - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuildExecution::StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	std::string CBuildExecution::StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions, const std::string & sUserUUID)
 	{
 		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, sUserUUID.c_str(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, sUserUUID.c_str(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -16085,16 +16106,17 @@ public:
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] ContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
+	std::string CBuild::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
 	{
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), sUserUUID.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sIdentifier.c_str(), sName.c_str(), sMIMEType.c_str(), sUserUUID.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -16103,17 +16125,18 @@ public:
 	* CBuild::AttachTempStream - Attaches a temp stream to the build.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attached data
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] pStreamWriterInstance - Stream to attach to the build.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::AttachTempStream(const std::string & sIdentifier, const std::string & sName, classParam<CBaseTempStreamWriter> pStreamWriterInstance)
+	std::string CBuild::AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, classParam<CBaseTempStreamWriter> pStreamWriterInstance)
 	{
 		LibMCEnvHandle hStreamWriterInstance = pStreamWriterInstance.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStreamWriterInstance, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), sUserUUID.c_str(), hStreamWriterInstance, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStreamWriterInstance, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AttachTempStream(m_pHandle, sIdentifier.c_str(), sName.c_str(), sUserUUID.c_str(), hStreamWriterInstance, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -16121,23 +16144,33 @@ public:
 	/**
 	* CBuild::LoadStreamByIdentifier - Loads stream of the build by identifier.
 	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist.
-	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	* @return Reader class to access the stream.
 	*/
-	void CBuild::LoadStreamByIdentifier(const std::string & sIdentifier, classParam<CStreamReader> pStreamReaderInstance)
+	PStreamReader CBuild::LoadStreamByIdentifier(const std::string & sIdentifier)
 	{
-		LibMCEnvHandle hStreamReaderInstance = pStreamReaderInstance.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadStreamByIdentifier(m_pHandle, sIdentifier.c_str(), hStreamReaderInstance));
+		LibMCEnvHandle hStreamReaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadStreamByIdentifier(m_pHandle, sIdentifier.c_str(), &hStreamReaderInstance));
+		
+		if (!hStreamReaderInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStreamReader>(m_pWrapper, hStreamReaderInstance);
 	}
 	
 	/**
 	* CBuild::LoadStreamByUUID - Loads stream of the build by attachment UUID.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
-	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	* @return Reader class to access the stream.
 	*/
-	void CBuild::LoadStreamByUUID(const std::string & sDataUUID, classParam<CStreamReader> pStreamReaderInstance)
+	PStreamReader CBuild::LoadStreamByUUID(const std::string & sDataUUID)
 	{
-		LibMCEnvHandle hStreamReaderInstance = pStreamReaderInstance.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadStreamByUUID(m_pHandle, sDataUUID.c_str(), hStreamReaderInstance));
+		LibMCEnvHandle hStreamReaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadStreamByUUID(m_pHandle, sDataUUID.c_str(), &hStreamReaderInstance));
+		
+		if (!hStreamReaderInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStreamReader>(m_pWrapper, hStreamReaderInstance);
 	}
 	
 	/**
@@ -16178,17 +16211,18 @@ public:
 	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions)
+	std::string CBuild::StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, classParam<CDiscreteFieldData2D> pFieldDataInstance, classParam<CDiscreteFieldData2DStoreOptions> pStoreOptions, const std::string & sUserUUID)
 	{
 		LibMCEnvHandle hFieldDataInstance = pFieldDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, sUserUUID.c_str(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDiscreteField2D(m_pHandle, sIdentifier.c_str(), sName.c_str(), hFieldDataInstance, hStoreOptions, sUserUUID.c_str(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -16231,17 +16265,18 @@ public:
 	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pDataTableInstance - Data Table instance to store.
 	* @param[in] pStoreOptions - Data Table Write Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pDataTableInstance, classParam<CDataTableWriteOptions> pStoreOptions)
+	std::string CBuild::StoreDataTable(const std::string & sIdentifier, const std::string & sName, classParam<CDataTable> pDataTableInstance, classParam<CDataTableWriteOptions> pStoreOptions, const std::string & sUserUUID)
 	{
 		LibMCEnvHandle hDataTableInstance = pDataTableInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hDataTableInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hDataTableInstance, hStoreOptions, sUserUUID.c_str(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hDataTableInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StoreDataTable(m_pHandle, sIdentifier.c_str(), sName.c_str(), hDataTableInstance, hStoreOptions, sUserUUID.c_str(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -16290,17 +16325,18 @@ public:
 	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	std::string CBuild::StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions)
+	std::string CBuild::StorePNGImage(const std::string & sIdentifier, const std::string & sName, classParam<CImageData> pImageDataInstance, classParam<CPNGImageStoreOptions> pStoreOptions, const std::string & sUserUUID)
 	{
 		LibMCEnvHandle hImageDataInstance = pImageDataInstance.GetHandle();
 		LibMCEnvHandle hStoreOptions = pStoreOptions.GetHandle();
 		LibMCEnv_uint32 bytesNeededDataUUID = 0;
 		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, sUserUUID.c_str(), 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_StorePNGImage(m_pHandle, sIdentifier.c_str(), sName.c_str(), hImageDataInstance, hStoreOptions, sUserUUID.c_str(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -21469,15 +21505,15 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::FindStream - Finds a stream in the storage system.
+	* CStateEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	PStreamReader CStateEnvironment::FindStream(const std::string & sUUID, const bool bMustExist)
+	PStreamReader CStateEnvironment::LoadStream(const std::string & sUUID, const bool bMustExist)
 	{
 		LibMCEnvHandle hStreamInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
 		
 		if (hStreamInstance) {
 			return std::make_shared<CStreamReader>(m_pWrapper, hStreamInstance);
@@ -22527,15 +22563,15 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::FindStream - Finds a stream in the storage system.
+	* CUIEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	PStreamReader CUIEnvironment::FindStream(const std::string & sUUID, const bool bMustExist)
+	PStreamReader CUIEnvironment::LoadStream(const std::string & sUUID, const bool bMustExist)
 	{
 		LibMCEnvHandle hStreamInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadStream(m_pHandle, sUUID.c_str(), bMustExist, &hStreamInstance));
 		
 		if (hStreamInstance) {
 			return std::make_shared<CStreamReader>(m_pWrapper, hStreamInstance);

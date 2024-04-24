@@ -63,12 +63,14 @@ namespace Impl {
 	class CZIPEntryStreamWriter : public virtual ITempStreamWriter, public virtual CBase {
 	private:
 
-		std::string m_sEntryUUID;
-		
+		LibMCData::PStorageZIPWriter m_pZIPWriter;
+		uint32_t m_nEntryID;
+		std::string m_sUUID;
+		std::string m_sName;
 
 	public:
 
-		CZIPEntryStreamWriter(const std::string & sEntryUUID, const std::string & sName);
+		CZIPEntryStreamWriter(LibMCData::PStorageZIPWriter pZIPWriter, uint32_t nEntryID, const std::string & sUUID, const std::string & sName);
 
 		virtual ~CZIPEntryStreamWriter();
 
@@ -102,10 +104,15 @@ namespace Impl {
 class CZIPStreamWriter : public virtual IZIPStreamWriter, public virtual CBase {
 protected:
     LibMCData::PDataModel m_pDataModel;
+	LibMCData::PStorageZIPWriter m_pZIPWriter;
+
+	std::string m_sUUID;
+	std::string m_sName;
+	AMCCommon::PChrono m_pGlobalChrono;
 
 public:
 
-    CZIPStreamWriter (LibMCData::PDataModel pDataModel, const std::string& sName,  const std::string& sCurrentUserID, AMCCommon::PChrono pGlobalChrono);
+    CZIPStreamWriter (LibMCData::PDataModel pDataModel, LibMCData::PStorageZIPWriter pZIPWriter, const std::string & sUUID, const std::string& sName, AMCCommon::PChrono pGlobalChrono);
 
     virtual ~CZIPStreamWriter();
 

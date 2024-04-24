@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CStorageZIPWriter
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "amcdata_storagestate.hpp"
 
 using namespace LibMCData::Impl;
 
@@ -43,11 +44,13 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 
-CStorageZIPWriter::CStorageZIPWriter(AMCData::PStorageWriter_ZIPStream pStorageWriter)
-	: m_pStorageWriter (pStorageWriter)
+CStorageZIPWriter::CStorageZIPWriter(AMCData::PStorageWriter_ZIPStream pStorageWriter, AMCData::PSQLHandler pSQLHandler)
+	: m_pStorageWriter (pStorageWriter), m_pSQLHandler (pSQLHandler)
 {
 	if (pStorageWriter.get () == nullptr)
-		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+	if (pSQLHandler.get() == nullptr)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);	
 
 }
 
@@ -83,10 +86,31 @@ LibMCData_uint64 CStorageZIPWriter::GetEntrySize(const LibMCData_uint32 nEntryID
 
 void CStorageZIPWriter::Finish()
 {
+	std::string sCalculatedSHA256;
+	std::string sCalculatedBlockSHA256;
+	
+	m_pStorageWriter->finalize (sCalculatedSHA256, sCalculatedBlockSHA256);
+
+	uint64_t nSize = m_pStorageWriter->getZIPStreamSize();
+
+	std::string sUpdateQuery = "UPDATE storage_streams SET size=?, status=?, sha2=?, sha256_block64k=? WHERE uuid=? AND status=?";
+	auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
+	pUpdateStatement->setString(1, std::to_string(nSize));
+	pUpdateStatement->setString(2, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
+	pUpdateStatement->setString(3, sCalculatedSHA256);
+	pUpdateStatement->setString(4, sCalculatedBlockSHA256);
+	pUpdateStatement->setString(5, m_pStorageWriter->getUUID ());
+	pUpdateStatement->setString(6, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
+	pUpdateStatement->execute();
+
 }
 
 bool CStorageZIPWriter::IsFinished()
 {
-	return false;
+	return m_pStorageWriter->isFinalized ();
 }
 
+LibMCData_uint64 CStorageZIPWriter::GetZIPStreamSize()
+{
+	return m_pStorageWriter->getZIPStreamSize();
+}

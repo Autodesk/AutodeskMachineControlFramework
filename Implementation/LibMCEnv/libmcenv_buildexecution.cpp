@@ -47,11 +47,10 @@ using namespace LibMCEnv::Impl;
 /*************************************************************************************************************************
  Class definition of CBuildExecution 
 **************************************************************************************************************************/
-CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID, AMCCommon::PChrono pGlobalChrono)
+CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMCCommon::PChrono pGlobalChrono)
 	: m_pExecution (pExecution), 
 	m_pDataModel (pDataModel), 
 	m_pToolpathHandler (pToolpathHandler), 
-	m_sSystemUserID (sSystemUserID),
 	m_pGlobalChrono (pGlobalChrono)
 {
 	if (pExecution.get() == nullptr)
@@ -77,7 +76,7 @@ CBuildExecution* CBuildExecution::makeFrom(CBuildExecution* pBuildExecution)
 	if (pBuildExecution == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	return new CBuildExecution(pBuildExecution->m_pExecution, pBuildExecution->m_pDataModel, pBuildExecution->m_pToolpathHandler, pBuildExecution->m_sSystemUserID, pBuildExecution->m_pGlobalChrono);
+	return new CBuildExecution(pBuildExecution->m_pExecution, pBuildExecution->m_pDataModel, pBuildExecution->m_pToolpathHandler, pBuildExecution->m_pGlobalChrono);
 }
 
 std::shared_ptr<CBuildExecution> CBuildExecution::makeSharedFrom(CBuildExecution* pBuildExecution)
@@ -101,7 +100,7 @@ std::string CBuildExecution::GetBuildUUID()
 IBuild * CBuildExecution::GetBuild()
 {
 	std::string sBuildUUID = GetBuildUUID();
-	return new CBuild(m_pDataModel, sBuildUUID, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+	return new CBuild(m_pDataModel, sBuildUUID, m_pToolpathHandler, m_pGlobalChrono);
 }
 
 LibMCEnv::eBuildExecutionStatus CBuildExecution::GetExecutionStatus()
@@ -139,7 +138,7 @@ void CBuildExecution::SetStatusToFinished()
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION, "can not change status of build execution" + m_sExecutionUUID);
 
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	m_pExecution->ChangeStatus (LibMCData::eBuildJobExecutionStatus::Finished, m_pGlobalChrono->getExistenceTimeInMicroseconds ());
+	m_pExecution->ChangeStatus (LibMCData::eBuildJobExecutionStatus::Finished, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 }
 
 void CBuildExecution::SetStatusToFailed()
@@ -148,7 +147,7 @@ void CBuildExecution::SetStatusToFailed()
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_CANNOTCHANGESTATUSOFBUILDEXECUTION, "can not change status of build execution" + m_sExecutionUUID);
 
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	m_pExecution->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, m_pGlobalChrono->getExistenceTimeInMicroseconds());
+	m_pExecution->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 }
 
 std::string CBuildExecution::GetDescription()
@@ -227,37 +226,66 @@ LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMilliseconds()
 LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
 {
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getExistenceTimeInMicroseconds ());
+	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 }
 
-std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer)
+std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string& sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer)
 {
 	auto pStorage = m_pDataModel->CreateStorage();
 
 	auto sDataUUID = AMCCommon::CUtils::createUUID();
-	auto sSystemUserID = m_sSystemUserID;
 
-	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+	std::string sNormalizedUUID;
+	if (sUserUUID.empty()) {
+		sNormalizedUUID = AMCCommon::CUtils::createEmptyUUID();
+	}
+	else {
+		sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+	}
+
+	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sNormalizedUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 
 	auto nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
-	m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID, nAbsoluteTimeStamp);
+	m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sNormalizedUUID, nAbsoluteTimeStamp);
 
 	return sDataUUID;
 }
 
-std::string CBuildExecution::AttachTempStream(const std::string& sIdentifier, const std::string& sName, IBaseTempStreamWriter* pStreamWriterInstance)
+std::string CBuildExecution::AttachTempStream(const std::string& sIdentifier, const std::string& sName, const std::string& sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance)
+{
+	if (pStreamWriterInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	if (!pStreamWriterInstance->IsFinished ())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED);
+
+	std::string sStreamUUID = pStreamWriterInstance->GetUUID();
+
+	std::string sNormalizedUUID;
+	if (sUserUUID.empty()) {
+		sNormalizedUUID = AMCCommon::CUtils::createEmptyUUID();
+	}
+	else {
+		sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+	}
+
+
+	auto nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pStorageStream = pStorage->RetrieveStream(sStreamUUID);
+
+	return m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sNormalizedUUID, nAbsoluteTimeStamp);
+}
+
+IStreamReader* CBuildExecution::LoadStreamByIdentifier(const std::string& sIdentifier)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-void CBuildExecution::LoadStreamByIdentifier(const std::string& sIdentifier, IStreamReader* pStreamReaderInstance)
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
-
-void CBuildExecution::LoadStreamByUUID(const std::string& sDataUUID, IStreamReader* pStreamReaderInstance)
+IStreamReader* CBuildExecution::LoadStreamByUUID(const std::string& sDataUUID)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
@@ -288,7 +316,7 @@ IDiscreteFieldData2D * CBuildExecution::LoadDiscreteField2DByUUID(const std::str
 
 }
 
-std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions)
+std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string& sUserUUID)
 {
 
 	if (pFieldDataInstance == nullptr)
@@ -306,7 +334,7 @@ std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextId
 	if (Buffer.size() == 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA);
 
-	return AddBinaryData(sContextIdentifier, sName, "application/amcf-discretefield2d", Buffer.size(), Buffer.data());
+	return AddBinaryData(sContextIdentifier, sName, "application/amcf-discretefield2d", sUserUUID, Buffer.size(), Buffer.data());
 
 }
 
@@ -320,7 +348,7 @@ IDataTable* CBuildExecution::LoadDataTableByUUID(const std::string& sDataUUID)
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-std::string CBuildExecution::StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions)
+std::string CBuildExecution::StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string& sUserUUID)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
@@ -354,7 +382,7 @@ IImageData* CBuildExecution::LoadPNGImageByUUID(const std::string& sDataUUID, co
 	return CImageData::createFromPNG(Buffer.data(), Buffer.size(), dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions)
+std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions, const std::string& sUserUUID)
 {
 	if (pImageDataInstance == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -375,7 +403,7 @@ std::string CBuildExecution::StorePNGImage(const std::string & sContextIdentifie
 	if (nWrittenCount != pngBuffer.size())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM);
 
-	return AddBinaryData(sContextIdentifier, sName, "image/png", pngBuffer.size(), pngBuffer.data());
+	return AddBinaryData(sContextIdentifier, sName, "image/png", sUserUUID, pngBuffer.size(), pngBuffer.data());
 
 }
 

@@ -44,6 +44,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_zipstreamwriter.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -384,12 +385,19 @@ IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSiz
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
+    return GetGlobalTimerInMicroseconds () / 1000ULL;
 }
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMicroseconds()
 {
-    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+    uint64_t nStartTime = pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+    uint64_t nCurrentTime = pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+    
+    if (nCurrentTime < nStartTime)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+    return nCurrentTime - nStartTime;
 }
 
 void CUIEnvironment::LogOut()
@@ -526,7 +534,7 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getSystemUserID(), m_pUISystemState->getGlobalChronoInstance ());
+    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getGlobalChronoInstance ());
 }
 
 
@@ -823,11 +831,23 @@ ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sNam
 
 IZIPStreamWriter* CUIEnvironment::CreateZIPStream(const std::string& sName)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    if (sName.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
+
+    auto pChrono = m_pUISystemState->getGlobalChronoInstance();
+
+    std::string sUserUUID = AMCCommon::CUtils::createEmptyUUID();
+    std::string sStreamUUID = AMCCommon::CUtils::createUUID();
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pStorage = pDataModel->CreateStorage();
+    auto pZIPWriter = pStorage->CreateZIPStream(sStreamUUID, sName, sUserUUID, pChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+    return new CZIPStreamWriter(pDataModel, pZIPWriter, sStreamUUID, sName, pChrono);
 }
 
 
-IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
+IStreamReader* CUIEnvironment::LoadStream(const std::string& sUUID, const bool bMustExist)
 {
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pStorage = pDataModel->CreateStorage();
@@ -864,6 +884,6 @@ IDateTime* CUIEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const 
 
 IDateTime* CUIEnvironment::GetStartDateTime()
 {
-    auto pJournalInstance = m_pUISystemState->getStateJournal();
-    return new CDateTime(pJournalInstance->getStartTimeAsMicrosecondsSince1970());
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+    return new CDateTime(pGlobalChrono->getStartTimeStampInMicrosecondsSince1970());
 }

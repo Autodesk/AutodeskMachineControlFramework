@@ -2102,34 +2102,36 @@ public:
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
 
 	/**
 	* IBuildExecution::AttachTempStream - Attaches a temp stream to the build execution.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attached data
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] pStreamWriterInstance - Stream to attach to the build.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, IBaseTempStreamWriter* pStreamWriterInstance) = 0;
+	virtual std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance) = 0;
 
 	/**
 	* IBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by identifier.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist.
-	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	* @return Reader class to access the stream.
 	*/
-	virtual void LoadStreamByIdentifier(const std::string & sIdentifier, IStreamReader* pStreamReaderInstance) = 0;
+	virtual IStreamReader * LoadStreamByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
 	* IBuildExecution::LoadStreamByUUID - Loads stream of the build by attachment UUID.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
-	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	* @return Reader class to access the stream.
 	*/
-	virtual void LoadStreamByUUID(const std::string & sDataUUID, IStreamReader* pStreamReaderInstance) = 0;
+	virtual IStreamReader * LoadStreamByUUID(const std::string & sDataUUID) = 0;
 
 	/**
 	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
@@ -2151,9 +2153,10 @@ public:
 	* @param[in] sName - Human Readable name of the attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+	virtual std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
 	* IBuildExecution::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
@@ -2175,9 +2178,10 @@ public:
 	* @param[in] sName - Human Readable name of the attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Data Table Write Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions) = 0;
+	virtual std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
 	* IBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
@@ -2205,9 +2209,10 @@ public:
 	* @param[in] sName - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+	virtual std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
 	* IBuildExecution::StoreMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
@@ -2334,34 +2339,36 @@ public:
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
 
 	/**
 	* IBuild::AttachTempStream - Attaches a temp stream to the build.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attached data
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] pStreamWriterInstance - Stream to attach to the build.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, IBaseTempStreamWriter* pStreamWriterInstance) = 0;
+	virtual std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance) = 0;
 
 	/**
 	* IBuild::LoadStreamByIdentifier - Loads stream of the build by identifier.
 	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist.
-	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	* @return Reader class to access the stream.
 	*/
-	virtual void LoadStreamByIdentifier(const std::string & sIdentifier, IStreamReader* pStreamReaderInstance) = 0;
+	virtual IStreamReader * LoadStreamByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
 	* IBuild::LoadStreamByUUID - Loads stream of the build by attachment UUID.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
-	* @param[in] pStreamReaderInstance - Reader class to access the stream.
+	* @return Reader class to access the stream.
 	*/
-	virtual void LoadStreamByUUID(const std::string & sDataUUID, IStreamReader* pStreamReaderInstance) = 0;
+	virtual IStreamReader * LoadStreamByUUID(const std::string & sDataUUID) = 0;
 
 	/**
 	* IBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
@@ -2383,9 +2390,10 @@ public:
 	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+	virtual std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
 	* IBuild::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-datatable.
@@ -2407,9 +2415,10 @@ public:
 	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pDataTableInstance - Data Table instance to store.
 	* @param[in] pStoreOptions - Data Table Write Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, IDataTable* pDataTableInstance, IDataTableWriteOptions* pStoreOptions) = 0;
+	virtual std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, IDataTable* pDataTableInstance, IDataTableWriteOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
 	* IBuild::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build job. MIME Type MUST be image/png.
@@ -2437,9 +2446,10 @@ public:
 	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+	virtual std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
 	* IBuild::StartExecution - Starts a build execution. This function does not work in a UIEnvironment context!
@@ -5378,12 +5388,12 @@ public:
 	virtual IZIPStreamWriter * CreateZIPStream(const std::string & sName) = 0;
 
 	/**
-	* IStateEnvironment::FindStream - Finds a stream in the storage system.
+	* IStateEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	virtual IStreamReader * FindStream(const std::string & sUUID, const bool bMustExist) = 0;
+	virtual IStreamReader * LoadStream(const std::string & sUUID, const bool bMustExist) = 0;
 
 };
 
@@ -5937,12 +5947,12 @@ public:
 	virtual IZIPStreamWriter * CreateZIPStream(const std::string & sName) = 0;
 
 	/**
-	* IUIEnvironment::FindStream - Finds a stream in the storage system.
+	* IUIEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	virtual IStreamReader * FindStream(const std::string & sUUID, const bool bMustExist) = 0;
+	virtual IStreamReader * LoadStream(const std::string & sUUID, const bool bMustExist) = 0;
 
 	/**
 	* IUIEnvironment::GetCurrentDateTime - Returns the current time as DateTime object instance.

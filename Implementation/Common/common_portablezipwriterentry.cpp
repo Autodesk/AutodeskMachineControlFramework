@@ -28,11 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_portablezipwriterentry.hpp"
 #include "common_utils.hpp"
-#include "zlib.h"
+#include "Libraries/zlib/zlib.h"
 
 namespace AMCCommon {
 
-	CPortableZIPWriterEntry::CPortableZIPWriterEntry(_In_ const std::string sUTF8Name, _In_ uint16_t nLastModTime, _In_ uint16_t nLastModDate, _In_ uint64_t nFilePosition, _In_ uint64_t nExtInfoPosition, _In_ uint64_t nDataPosition)
+	CPortableZIPWriterEntry::CPortableZIPWriterEntry(const std::string sUTF8Name, uint16_t nLastModTime, uint16_t nLastModDate, uint64_t nFilePosition, uint64_t nExtInfoPosition, uint64_t nDataPosition)
 	{
 		m_sUTF8Name = sUTF8Name;
 		m_nCRC32 = 0;
@@ -90,17 +90,17 @@ namespace AMCCommon {
 		return m_nDataPosition;
 	}
 
-	void CPortableZIPWriterEntry::increaseCompressedSize(_In_ uint32_t nCompressedSize)
+	void CPortableZIPWriterEntry::increaseCompressedSize(uint32_t nCompressedSize)
 	{
 		m_nCompressedSize += nCompressedSize;
 	}
 
-	void CPortableZIPWriterEntry::increaseUncompressedSize(_In_ uint32_t nUncompressedSize)
+	void CPortableZIPWriterEntry::increaseUncompressedSize(uint32_t nUncompressedSize)
 	{
 		m_nUncompressedSize += nUncompressedSize;
 	}
 
-	void CPortableZIPWriterEntry::calculateChecksum(_In_ const void * pBuffer, _In_ uint32_t cbCount)
+	void CPortableZIPWriterEntry::calculateChecksum(const void * pBuffer, uint32_t cbCount)
 	{
 		m_nCRC32 = crc32(m_nCRC32, (Bytef*) pBuffer, cbCount);
 	}

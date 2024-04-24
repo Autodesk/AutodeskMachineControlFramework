@@ -73,8 +73,8 @@ __DECLARESTATE(init)
 
 	auto pPLCCommandList = pDriver->CreateCommandList();
 
-	auto pPLCCommand_TurnOn = pDriver->CreateCommand("turnon");
-	pPLCCommandList->AddCommand(pPLCCommand_TurnOn);
+	//auto pPLCCommand_TurnOn = pDriver->CreateCommand("turnon");
+	//pPLCCommandList->AddCommand(pPLCCommand_TurnOn);
 
 	auto pPLCCommand_Home = pDriver->CreateCommand("home");
 	pPLCCommandList->AddCommand(pPLCCommand_Home);  

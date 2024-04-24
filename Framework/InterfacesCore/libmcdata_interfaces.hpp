@@ -751,6 +751,12 @@ public:
 	virtual LibMCData_uint64 GetEntrySize(const LibMCData_uint32 nEntryID) = 0;
 
 	/**
+	* IStorageZIPWriter::GetZIPStreamSize - Returns the current size of the stream.
+	* @return Current size of the stream.
+	*/
+	virtual LibMCData_uint64 GetZIPStreamSize() = 0;
+
+	/**
 	* IStorageZIPWriter::Finish - Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.
 	*/
 	virtual void Finish() = 0;
@@ -1162,8 +1168,9 @@ public:
 	* @param[in] eDataType - Datatype of Job Execution data
 	* @param[in] sUserUUID - UUID of Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	* @return Data UUID
 	*/
-	virtual void AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual std::string AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJobExecution::ListJobExecutionDataByType - Retrieves a list of build job execution data objects, filtered by type.
@@ -1338,8 +1345,9 @@ public:
 	* @param[in] eDataType - Datatype of Job data
 	* @param[in] sUserID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
+	* @return Data UUID
 	*/
-	virtual void AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual std::string AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.

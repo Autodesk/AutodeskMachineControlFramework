@@ -64,6 +64,7 @@ private:
 	uint32_t m_nActualBaudRate;
 
 	PScanLabSDK m_pScanlabSDK;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 	std::vector<uint8_t> m_ReceiveBuffer;
 
@@ -71,7 +72,7 @@ private:
 
 public:
 
-	CUARTConnection(PScanLabSDK pScanlabSDK, uint32_t nDesiredBaudRate, uint32_t nCardNo);
+	CUARTConnection(PScanLabSDK pScanlabSDK, uint32_t nDesiredBaudRate, uint32_t nCardNo, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	virtual ~CUARTConnection();
 
