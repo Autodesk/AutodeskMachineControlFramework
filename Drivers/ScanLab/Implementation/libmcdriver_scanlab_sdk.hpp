@@ -162,7 +162,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_laser_shifts) (uint32_t nCardNo, int32_t nDLasOn, int32_t nDLasOff);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_line_params) (uint32_t nCardNo, uint32_t nCornerScale, uint32_t nEndScale, uint32_t nAccScale);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_line_params_ex) (uint32_t nCardNo, uint32_t nCornerScale, uint32_t nEndScale, uint32_t nAccScale, uint32_t nJumpScale);
-		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_params) (uint32_t nCardNo, uint32_t nMode, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_params) (uint32_t nCardNo, uint32_t nMode, uint32_t nHeadNo, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_speed_control) (uint32_t nCardNo, uint32_t nMode);
 
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_micro_vector_abs_3d) (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nZ, int32_t nLasOn, int32_t nLasOff);
@@ -497,7 +497,7 @@ namespace LibMCDriver_ScanLab {
 			void n_set_scanahead_laser_shifts (uint32_t nCardNo, int32_t nDLasOn, int32_t nDLasOff);
 			void n_set_scanahead_line_params (uint32_t nCardNo, uint32_t nCornerScale, uint32_t nEndScale, uint32_t nAccScale);
 			void n_set_scanahead_line_params_ex (uint32_t nCardNo, uint32_t nCornerScale, uint32_t nEndScale, uint32_t nAccScale, uint32_t nJumpScale);
-			uint32_t n_set_scanahead_params (uint32_t nCardNo, uint32_t nMode, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax);
+			uint32_t n_set_scanahead_params (uint32_t nCardNo, uint32_t nMode, uint32_t nHeadNo, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax);
 			void n_set_scanahead_speed_control (uint32_t nCardNo, uint32_t nMode);
 
 			/*void n_micro_vector_abs_3d (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nZ, int32_t nLasOn, int32_t nLasOff);

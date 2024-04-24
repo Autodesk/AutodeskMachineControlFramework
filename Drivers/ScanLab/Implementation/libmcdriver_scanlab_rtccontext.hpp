@@ -367,6 +367,22 @@ public:
 
 	IUARTConnection* CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) override;
 
+	void EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo) override;
+
+	void DisableScanAhead() override;
+
+	void ActivateScanAheadAutoDelays() override;
+
+	void DeactivateScanAheadAutoDelays() override;
+
+	bool ScanAheadAutoDelaysAreActivated() override;
+
+	void SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds) override;
+
+	void SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift) override;
+
+	void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale) override;
+
 };
 
 

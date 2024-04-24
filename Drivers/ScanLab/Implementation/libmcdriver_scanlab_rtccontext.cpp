@@ -2133,3 +2133,119 @@ IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uin
 {
 	return new CUARTConnection(m_pScanLabSDK, nDesiredBaudRate, m_CardNo, m_pDriverEnvironment);
 }
+
+
+void CRTCContext::EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	uint32_t nErrorCode = m_pScanLabSDK->n_set_scanahead_params(m_CardNo, 1, nHeadNo, nTableNo, 0, 0, 0.0);
+	if (nErrorCode) {
+
+		// See RTC documentation for detailed information about the error codes
+		if (nErrorCode == 1)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION);
+		if (nErrorCode == 3)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN);
+		if (nErrorCode == 5)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE);
+		if (nErrorCode == 6)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR);
+		if (nErrorCode == 7)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR);
+		if (nErrorCode == 8)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE);
+		if (nErrorCode == 11)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR);
+
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR, "Scanahead unknown error: " + std::to_string(nErrorCode));
+	}
+
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+
+}
+
+void CRTCContext::DisableScanAhead()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	uint32_t nErrorCode = m_pScanLabSDK->n_set_scanahead_params(m_CardNo, 0, 0, 0, 0, 0, 0.0);
+	if (nErrorCode) {
+
+		// See RTC documentation for detailed information about the error codes
+		if (nErrorCode == 1)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION);
+		if (nErrorCode == 3)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN);
+		if (nErrorCode == 5)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE);
+		if (nErrorCode == 6)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR);
+		if (nErrorCode == 7)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR);
+		if (nErrorCode == 8)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE);
+		if (nErrorCode == 11)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR);
+
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR, "Scanahead unknown error: " + std::to_string(nErrorCode));
+	}
+
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::ActivateScanAheadAutoDelays()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_activate_scanahead_autodelays(m_CardNo, 1);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+void CRTCContext::DeactivateScanAheadAutoDelays()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_activate_scanahead_autodelays(m_CardNo, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+bool CRTCContext::ScanAheadAutoDelaysAreActivated()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	int32_t nAutoDelayMode = m_pScanLabSDK->n_activate_scanahead_autodelays(m_CardNo, -1);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	return (nAutoDelayMode == 1);
+
+}
+
+void CRTCContext::SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds)
+{
+	SetScanAheadLaserShiftsInUnits((int32_t)round(dLaserOnShiftInMicroSeconds * 64.0), (int32_t)round(dLaserOffShiftInMicroSeconds * 64.0));
+}
+
+void CRTCContext::SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_scanahead_laser_shifts (m_CardNo, nLaserOnShift, nLaserOffShift);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale)
+{
+	uint32_t nCappedCornerScale = nCornerScale;
+	if (nCappedCornerScale > 100)
+		nCappedCornerScale = 100;
+	uint32_t nCappedEndScale = nEndScale;
+	if (nCappedEndScale > 100)
+		nCappedEndScale = 100;
+	uint32_t nCappedAccScale = nAccelerationScale;
+	if (nCappedAccScale > 100)
+		nCappedAccScale = 100;
+
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_scanahead_line_params(m_CardNo, nCappedCornerScale, nCappedEndScale, nCappedAccScale);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}

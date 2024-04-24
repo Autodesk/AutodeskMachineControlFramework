@@ -1287,12 +1287,12 @@ void CScanLabSDK::n_set_scanahead_line_params_ex(uint32_t nCardNo, uint32_t nCor
 	ptr_n_set_scanahead_line_params_ex(nCardNo, nCornerScale, nEndScale, nAccScale, nJumpScale);
 }
 
-uint32_t CScanLabSDK::n_set_scanahead_params(uint32_t nCardNo, uint32_t nMode, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax)
+uint32_t CScanLabSDK::n_set_scanahead_params(uint32_t nCardNo, uint32_t nMode, uint32_t nHeadNo, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax)
 {
 	if (m_pLogJournal.get() != nullptr)
-		m_pLogJournal->logCall("n_set_scanahead_params", std::to_string(nCardNo) + ", " + std::to_string(nMode) + ", " + std::to_string(nTableNo) + ", " + std::to_string(nPreviewTime) + ", " + std::to_string(nVMax) + ", " + std::to_string(dAmax));
+		m_pLogJournal->logCall("n_set_scanahead_params", std::to_string(nCardNo) + ", " + std::to_string(nMode) + ", " + std::to_string(nHeadNo) + ", " + std::to_string(nTableNo) + ", " + std::to_string(nPreviewTime) + ", " + std::to_string(nVMax) + ", " + std::to_string(dAmax));
 
-	return ptr_n_set_scanahead_params(nCardNo, nMode, nTableNo, nPreviewTime, nVMax, dAmax);
+	return ptr_n_set_scanahead_params(nCardNo, nMode, nHeadNo, nTableNo, nPreviewTime, nVMax, dAmax);
 }
 
 void CScanLabSDK::n_set_scanahead_speed_control(uint32_t nCardNo, uint32_t nMode)
