@@ -1249,6 +1249,80 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_createuartconnection(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDesiredBaudRate, LibMCDriver_ScanLab_UARTConnection * pConnection);
 
+/**
+* Enables the Scanahead mode of the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nHeadNo - Head Number
+* @param[in] nTableNo - Table Number
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablescanahead(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nHeadNo, LibMCDriver_ScanLab_uint32 nTableNo);
+
+/**
+* Disables the Scanahead mode of the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablescanahead(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Activates the ScanAhead Auto Delays.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_activatescanaheadautodelays(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Deactivates the ScanAhead Auto Delays.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_deactivatescanaheadautodelays(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns if ScanAhead Auto Delays are activated.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pActivated - Returns true if Auto Delays are activated.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_scanaheadautodelaysareactivated(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pActivated);
+
+/**
+* Enables the Scanahead mode of the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dLaserOnShiftInMicroSeconds - Laser on shift in Microseconds. Will be rounded to 64th microseconds.
+* @param[in] dLaserOffShiftInMicroSeconds - Laser off shift in Microseconds. Will be rounded to 64th microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinmicroseconds(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds);
+
+/**
+* Enables the Scanahead mode of the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nLaserOnShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+* @param[in] nLaserOffShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinunits(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nLaserOnShift, LibMCDriver_ScanLab_int32 nLaserOffShift);
+
+/**
+* Controls the Scanahead Line parameters.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCornerScale - Corner sharpness scale in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+* @param[in] nEndScale - Line end sharpness scale in Percent.. 100 percent means straight line ends. Values above 100 will be clipped to 100.
+* @param[in] nAccelerationScale - Fraction of active laser time (not path lenght) during acceleration in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setscanaheadlineparameters(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nCornerScale, LibMCDriver_ScanLab_uint32 nEndScale, LibMCDriver_ScanLab_uint32 nAccelerationScale);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/

@@ -1240,6 +1240,56 @@ public:
 	*/
 	virtual IUARTConnection * CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) = 0;
 
+	/**
+	* IRTCContext::EnableScanAhead - Enables the Scanahead mode of the RTC card.
+	* @param[in] nHeadNo - Head Number
+	* @param[in] nTableNo - Table Number
+	*/
+	virtual void EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo) = 0;
+
+	/**
+	* IRTCContext::DisableScanAhead - Disables the Scanahead mode of the RTC card.
+	*/
+	virtual void DisableScanAhead() = 0;
+
+	/**
+	* IRTCContext::ActivateScanAheadAutoDelays - Activates the ScanAhead Auto Delays.
+	*/
+	virtual void ActivateScanAheadAutoDelays() = 0;
+
+	/**
+	* IRTCContext::DeactivateScanAheadAutoDelays - Deactivates the ScanAhead Auto Delays.
+	*/
+	virtual void DeactivateScanAheadAutoDelays() = 0;
+
+	/**
+	* IRTCContext::ScanAheadAutoDelaysAreActivated - Returns if ScanAhead Auto Delays are activated.
+	* @return Returns true if Auto Delays are activated.
+	*/
+	virtual bool ScanAheadAutoDelaysAreActivated() = 0;
+
+	/**
+	* IRTCContext::SetScanAheadLaserShiftsInMicroseconds - Enables the Scanahead mode of the RTC card.
+	* @param[in] dLaserOnShiftInMicroSeconds - Laser on shift in Microseconds. Will be rounded to 64th microseconds.
+	* @param[in] dLaserOffShiftInMicroSeconds - Laser off shift in Microseconds. Will be rounded to 64th microseconds.
+	*/
+	virtual void SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds) = 0;
+
+	/**
+	* IRTCContext::SetScanAheadLaserShiftsInUnits - Enables the Scanahead mode of the RTC card.
+	* @param[in] nLaserOnShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+	* @param[in] nLaserOffShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+	*/
+	virtual void SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift) = 0;
+
+	/**
+	* IRTCContext::SetScanAheadLineParameters - Controls the Scanahead Line parameters.
+	* @param[in] nCornerScale - Corner sharpness scale in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+	* @param[in] nEndScale - Line end sharpness scale in Percent.. 100 percent means straight line ends. Values above 100 will be clipped to 100.
+	* @param[in] nAccelerationScale - Fraction of active laser time (not path lenght) during acceleration in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+	*/
+	virtual void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale) = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCContext> PIRTCContext;

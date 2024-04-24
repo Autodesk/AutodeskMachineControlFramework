@@ -121,6 +121,15 @@
 		<error name="RS232READTIMEOUT" code="1069" description="RS232 read timeout." />		
 		<error name="RS232READLINEOVERRUN" code="1070" description="RS232 read line overrun." />		
 		<error name="RS232RINGBUFFEROVERRUN" code="1071" description="RS232 ring buffer overrun." />		
+		<error name="NOSCANAHEADOPTION" code="1072" description="No Scanahead option." />		
+		<error name="NOEXCELLISCAN" code="1073" description="No Excelli Scan." />		
+		<error name="SCANAHEADLISTISACTIVE" code="1074" description="Scanahead - list is active." />		
+		<error name="SCANAHEADPARAMETERERROR" code="1075" description="Scanahead parameter error." />		
+		<error name="SCANAHEADSCALINGERROR" code="1076" description="Scanahead scaling error." />		
+		<error name="SCANAHEADMISSINGRTCRESPONSE" code="1077" description="Scanahead missing rtc response." />		
+		<error name="SCANAHEADPCIERROR" code="1078" description="Scanahead PCI error." />		
+		<error name="SCANAHEADUNKNOWNERROR" code="1079" description="Scanahead unknown error." />		
+		
 						
 	</errors>
 
@@ -787,6 +796,40 @@ Custom implementation
 		<method name="CreateUARTConnection" description="Creates a new UART Connection. Closes any other one that might be active.">
 			<param name="DesiredBaudRate" type="uint32" pass="in" description="Desired baud rate. 160 Bd…12.8 MBd.  The other RS-232 interface parameters cannot be altered (data bits: 8, start bits: 1, stop bits: 1, parity: none)." />
 			<param name="Connection" type="class" class="UARTConnection" pass="return" description="UART Connection instance." />
+		</method>
+
+		<method name="EnableScanAhead" description="Enables the Scanahead mode of the RTC card.">
+			<param name="HeadNo" type="uint32" pass="in" description="Head Number" />
+			<param name="TableNo" type="uint32" pass="in" description="Table Number" />		
+		</method>
+		
+		<method name="DisableScanAhead" description="Disables the Scanahead mode of the RTC card.">
+		</method>
+
+		<method name="ActivateScanAheadAutoDelays" description="Activates the ScanAhead Auto Delays.">
+		</method>
+
+		<method name="DeactivateScanAheadAutoDelays" description="Deactivates the ScanAhead Auto Delays.">
+		</method>
+
+		<method name="ScanAheadAutoDelaysAreActivated" description="Returns if ScanAhead Auto Delays are activated.">
+			<param name="Activated" type="bool" pass="return" description="Returns true if Auto Delays are activated." />
+		</method>
+
+		<method name="SetScanAheadLaserShiftsInMicroseconds" description="Enables the Scanahead mode of the RTC card.">
+			<param name="LaserOnShiftInMicroSeconds" type="double" pass="in" description="Laser on shift in Microseconds. Will be rounded to 64th microseconds." />
+			<param name="LaserOffShiftInMicroSeconds" type="double" pass="in" description="Laser off shift in Microseconds. Will be rounded to 64th microseconds." />
+		</method>
+
+		<method name="SetScanAheadLaserShiftsInUnits" description="Enables the Scanahead mode of the RTC card.">
+			<param name="LaserOnShift" type="int32" pass="in" description="Laser on shift in Units, which are 1/64th of a Microsecond." />
+			<param name="LaserOffShift" type="int32" pass="in" description="Laser on shift in Units, which are 1/64th of a Microsecond." />
+		</method>
+		
+		<method name="SetScanAheadLineParameters" description="Controls the Scanahead Line parameters.">
+			<param name="CornerScale" type="uint32" pass="in" description="Corner sharpness scale in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100." />
+			<param name="EndScale" type="uint32" pass="in" description="Line end sharpness scale in Percent.. 100 percent means straight line ends. Values above 100 will be clipped to 100." />
+			<param name="AccelerationScale" type="uint32" pass="in" description="Fraction of active laser time (not path lenght) during acceleration in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100." />
 		</method>
 		
 	</class>
