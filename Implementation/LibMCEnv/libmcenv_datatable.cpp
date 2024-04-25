@@ -76,17 +76,55 @@ struct sLibMCDataTableColumnHeader {
 #pragma pack(pop)
 
 
+void CDataTableColumn::writeUint64ToBufferFixedDigits(uint64_t nValue, uint32_t nFixedDigits, std::vector<char>& buffer, size_t& nBufferPosition)
+{
+	if (nFixedDigits > 0) {
+
+		uint64_t nDigitValue = nValue;
+
+		for (int32_t nIndex = nFixedDigits - 1; nIndex >= 0; nIndex--) {
+			uint8_t nDigit = (uint8_t)(nDigitValue % 10);
+			nDigitValue /= 10;
+			buffer.at(nBufferPosition + nIndex) = nDigit + '0';
+		}
+
+		nBufferPosition += nFixedDigits;
+	}
+}
+
+void CDataTableColumn::writeUint64ToBuffer(uint64_t nValue, std::vector<char>& buffer, size_t& nBufferPosition)
+{
+	uint64_t nDigitValue = nValue;
+	int32_t nDigits = 1;
+	while (nDigitValue >= 10) {
+		nDigits++;
+		nDigitValue /= 10;
+	}
+
+	writeUint64ToBufferFixedDigits (nValue, nDigits, buffer, nBufferPosition);
+
+}
+
+
 class CDataTableColumn_Double : public CDataTableColumn 
 {
 private:
 
 	std::vector <double> m_Rows;
+	uint64_t m_nCSVQuantizationFactor;
+	uint32_t m_nCSVQuantizationDigits;
+
 
 public:
 
 	CDataTableColumn_Double (const std::string& sIdentifier, const std::string& sDescription)
 		: CDataTableColumn (sIdentifier, sDescription)
 	{
+		m_nCSVQuantizationDigits = 3;
+		m_nCSVQuantizationFactor = 1ULL;
+		for (uint32_t nIndex = 0; nIndex < m_nCSVQuantizationDigits; nIndex++)
+			m_nCSVQuantizationFactor *= 10;
+
 
 	}
 
@@ -142,12 +180,28 @@ public:
 	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
-			std::string sValue = std::to_string(m_Rows[nRowIndex]);
-			for (auto ch : sValue) {
-				buffer.at(nBufferPosition) = ch;
-				nBufferPosition++;
 
-			}
+			double dValue = m_Rows[nRowIndex];
+			uint64_t nQuantizedValue;
+
+
+			if (dValue >= 0.0) {
+				nQuantizedValue = (uint64_t)round(dValue * (double)m_nCSVQuantizationFactor);
+
+			} else {
+				nQuantizedValue = (uint64_t)round((-dValue) * (double)m_nCSVQuantizationFactor);
+
+				buffer.at(nBufferPosition) = '-';
+				nBufferPosition++;
+			} 
+
+			uint64_t nIntegerValue = nQuantizedValue / m_nCSVQuantizationFactor;
+			uint64_t nFracValue = nQuantizedValue % m_nCSVQuantizationFactor;
+
+			writeUint64ToBuffer(nIntegerValue, buffer, nBufferPosition);
+			buffer.at(nBufferPosition) = '.';
+			nBufferPosition++;
+			writeUint64ToBufferFixedDigits(nFracValue, m_nCSVQuantizationDigits, buffer, nBufferPosition);
 
 		} else {
 			buffer.at(nBufferPosition) = '0';
@@ -239,12 +293,16 @@ public:
 	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
-			std::string sValue = std::to_string(m_Rows[nRowIndex]);
+
+			uint32_t nValue = m_Rows[nRowIndex];
+			writeUint64ToBuffer(nValue, buffer, nBufferPosition);
+
+			/*std::string sValue = std::to_string(m_Rows[nRowIndex]);
 			for (auto ch : sValue) {
 				buffer.at(nBufferPosition) = ch;
 				nBufferPosition++;
 
-			}
+			} */
 
 		}
 		else {
@@ -336,12 +394,8 @@ public:
 	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
-			std::string sValue = std::to_string(m_Rows[nRowIndex]);
-			for (auto ch : sValue) {
-				buffer.at(nBufferPosition) = ch;
-				nBufferPosition++;
-
-			}
+			uint64_t nValue = m_Rows[nRowIndex];
+			writeUint64ToBuffer(nValue, buffer, nBufferPosition);
 
 		}
 		else {
@@ -432,11 +486,15 @@ public:
 	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
-			std::string sValue = std::to_string(m_Rows[nRowIndex]);
-			for (auto ch : sValue) {
-				buffer.at(nBufferPosition) = ch;
+			int32_t nValue = m_Rows[nRowIndex];
+			if (nValue >= 0) {
+				writeUint64ToBuffer((uint64_t) nValue, buffer, nBufferPosition);
+			}
+			else {
+				buffer.at(nBufferPosition) = '-';
 				nBufferPosition++;
 
+				writeUint64ToBuffer((uint64_t)(- nValue), buffer, nBufferPosition);
 			}
 
 		}
@@ -529,11 +587,15 @@ public:
 	void writeCSVValue(size_t nRowIndex, std::vector<char>& buffer, size_t& nBufferPosition) override
 	{
 		if (nRowIndex < m_Rows.size()) {
-			std::string sValue = std::to_string(m_Rows[nRowIndex]);
-			for (auto ch : sValue) {
-				buffer.at(nBufferPosition) = ch;
+			int64_t nValue = m_Rows[nRowIndex];
+			if (nValue >= 0) {
+				writeUint64ToBuffer((uint64_t)nValue, buffer, nBufferPosition);
+			}
+			else {
+				buffer.at(nBufferPosition) = '-';
 				nBufferPosition++;
 
+				writeUint64ToBuffer((uint64_t)(-nValue), buffer, nBufferPosition);
 			}
 
 		}

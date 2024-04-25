@@ -62,6 +62,11 @@ private:
 	std::string m_sIdentifier;
 	std::string m_sDescription;
 
+protected:
+
+	void writeUint64ToBufferFixedDigits(uint64_t nValue, uint32_t nFixedDigits, std::vector<char>& buffer, size_t& nBufferPosition);
+	void writeUint64ToBuffer(uint64_t nValue, std::vector<char>& buffer, size_t& nBufferPosition);
+
 public:
 
 	CDataTableColumn(const std::string& sIdentifier, const std::string & sDescription);
