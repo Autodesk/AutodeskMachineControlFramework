@@ -38,6 +38,7 @@ Abstract: This is a stub class definition of CBuildExecution
 #include "libmcenv_build.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_streamreader.hpp"
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
@@ -282,12 +283,23 @@ std::string CBuildExecution::AttachTempStream(const std::string& sIdentifier, co
 
 IStreamReader* CBuildExecution::LoadStreamByIdentifier(const std::string& sIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pJobExecutionData = m_pExecution->RetrieveJobExecutionDataByIdentifier(sIdentifier);
+	auto pStorageStream = pJobExecutionData->GetStorageStream();
+
+	auto pStorage = m_pDataModel->CreateStorage();
+
+	return new CStreamReader(pStorage, pStorageStream);
 }
 
 IStreamReader* CBuildExecution::LoadStreamByUUID(const std::string& sDataUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+	auto pJobExecutionData = m_pExecution->RetrieveJobExecutionData(sNormalizedUUID);
+	auto pStorageStream = pJobExecutionData->GetStorageStream();
+
+	auto pStorage = m_pDataModel->CreateStorage();
+
+	return new CStreamReader(pStorage, pStorageStream);
 }
 
 IDiscreteFieldData2D * CBuildExecution::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)

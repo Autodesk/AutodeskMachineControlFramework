@@ -38,6 +38,7 @@ Abstract: This is a stub class definition of CBuild
 #include "libmcenv_buildexecution.hpp"
 #include "libmcenv_buildexecutioniterator.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_streamreader.hpp"
 
 // Include custom headers here.
 #include "amc_systemstate.hpp"
@@ -241,12 +242,28 @@ std::string CBuild::AttachTempStream(const std::string& sIdentifier, const std::
 
 IStreamReader* CBuild::LoadStreamByIdentifier(const std::string& sIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pJobData = pBuildJob->RetrieveJobDataByIdentifier(sIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	return new CStreamReader(pStorage, pStorageStream);
 }
 
 IStreamReader* CBuild::LoadStreamByUUID(const std::string& sDataUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+	auto pJobData = pBuildJob->RetrieveJobData(sNormalizedUUID);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	return new CStreamReader(pStorage, pStorageStream);
 }
 
 IDataTable* CBuild::LoadDataTableByIdentifier(const std::string& sIdentifier)
