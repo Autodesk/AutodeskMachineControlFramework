@@ -421,30 +421,36 @@ set_target_properties(libmcdata
 
 ]]
 
+file(GLOB CONFIGURATION_SRC_XML
+	${CMAKE_CURRENT_PLUGINS_DIR}/*.xml
+)
 
-add_custom_target(configuration_xml ALL DEPENDS ${CMAKE_CURRENT_PLUGINS_DIR}/config.xml)
+add_custom_target(build_configuration_xml ALL DEPENDS ${CONFIGURATION_SRC_XML})
 
-set_property(TARGET configuration_xml APPEND PROPERTY SOURCES ${CMAKE_CURRENT_PLUGINS_DIR}/config.xml)
+set_property(TARGET build_configuration_xml APPEND PROPERTY SOURCES ${CONFIGURATION_SRC_XML})
+
 
 add_custom_command(
-	TARGET configuration_xml PRE_BUILD
+	TARGET build_configuration_xml PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E echo "creating output directory")
 
 add_custom_command(
-	TARGET configuration_xml PRE_BUILD
+	TARGET build_configuration_xml PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E make_directory			
 			${CMAKE_CURRENT_BINARY_DIR}/Output)
 
 add_custom_command(
-	TARGET configuration_xml PRE_BUILD
+	TARGET build_configuration_xml PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E echo "copying config.xml...")
 
 
 add_custom_command(
-	TARGET configuration_xml PRE_BUILD
+	TARGET build_configuration_xml PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_CURRENT_PLUGINS_DIR}/config.xml
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
+
+
 
 #[[++
 
