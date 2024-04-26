@@ -7050,6 +7050,64 @@ LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmicroseconds(LibMCEnv_Bui
 	}
 }
 
+LibMCEnvResult libmcenv_buildexecution_hasattachment(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, bool * pDataExists)
+{
+	IBase* pIBaseClass = (IBase *)pBuildExecution;
+
+	try {
+		if (pDataUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDataExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sDataUUID(pDataUUID);
+		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
+		if (!pIBuildExecution)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDataExists = pIBuildExecution->HasAttachment(sDataUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_buildexecution_hasattachmentidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, bool * pDataExists)
+{
+	IBase* pIBaseClass = (IBase *)pBuildExecution;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDataExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IBuildExecution* pIBuildExecution = dynamic_cast<IBuildExecution*>(pIBaseClass);
+		if (!pIBuildExecution)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDataExists = pIBuildExecution->HasAttachmentIdentifier(sIdentifier);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pMIMEType, const char * pUserUUID, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
@@ -8147,6 +8205,64 @@ LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_Build pBuild, LibM
 		pBaseToolpathInstance = pIBuild->CreateToolpathAccessor();
 
 		*pToolpathInstance = (IBase*)(pBaseToolpathInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_hasattachment(LibMCEnv_Build pBuild, const char * pDataUUID, bool * pDataExists)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pDataUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDataExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sDataUUID(pDataUUID);
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDataExists = pIBuild->HasAttachment(sDataUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_hasattachmentidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, bool * pDataExists)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDataExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDataExists = pIBuild->HasAttachmentIdentifier(sIdentifier);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -24071,6 +24187,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_getelapsedtimeinmilliseconds;
 	if (sProcName == "libmcenv_buildexecution_getelapsedtimeinmicroseconds") 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_getelapsedtimeinmicroseconds;
+	if (sProcName == "libmcenv_buildexecution_hasattachment") 
+		*ppProcAddress = (void*) &libmcenv_buildexecution_hasattachment;
+	if (sProcName == "libmcenv_buildexecution_hasattachmentidentifier") 
+		*ppProcAddress = (void*) &libmcenv_buildexecution_hasattachmentidentifier;
 	if (sProcName == "libmcenv_buildexecution_addbinarydata") 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_addbinarydata;
 	if (sProcName == "libmcenv_buildexecution_attachtempstream") 
@@ -24129,6 +24249,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_build_toolpathisloaded;
 	if (sProcName == "libmcenv_build_createtoolpathaccessor") 
 		*ppProcAddress = (void*) &libmcenv_build_createtoolpathaccessor;
+	if (sProcName == "libmcenv_build_hasattachment") 
+		*ppProcAddress = (void*) &libmcenv_build_hasattachment;
+	if (sProcName == "libmcenv_build_hasattachmentidentifier") 
+		*ppProcAddress = (void*) &libmcenv_build_hasattachmentidentifier;
 	if (sProcName == "libmcenv_build_addbinarydata") 
 		*ppProcAddress = (void*) &libmcenv_build_addbinarydata;
 	if (sProcName == "libmcenv_build_attachtempstream") 

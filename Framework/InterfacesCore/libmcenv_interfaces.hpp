@@ -2098,6 +2098,20 @@ public:
 	virtual LibMCEnv_uint64 GetElapsedTimeInMicroseconds() = 0;
 
 	/**
+	* IBuildExecution::HasAttachment - Returns if the Execution has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachment(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildExecution::HasAttachmentIdentifier - Returns if the Execution has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachmentIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
 	* IBuildExecution::AddBinaryData - Adds binary data to store with the build execution.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
@@ -2120,7 +2134,7 @@ public:
 	virtual std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance) = 0;
 
 	/**
-	* IBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by identifier.
+	* IBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by attachment identifier.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist.
 	* @return Reader class to access the stream.
 	*/
@@ -2134,14 +2148,14 @@ public:
 	virtual IStreamReader * LoadStreamByUUID(const std::string & sDataUUID) = 0;
 
 	/**
-	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
 	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* IBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
@@ -2159,14 +2173,14 @@ public:
 	virtual std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
-	* IBuildExecution::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* IBuildExecution::LoadDataTableByIdentifier - Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded data table instance.
 	*/
 	virtual IDataTable * LoadDataTableByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuildExecution::LoadDataTableByUUID - Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* IBuildExecution::LoadDataTableByUUID - Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded data table instance.
 	*/
@@ -2184,7 +2198,7 @@ public:
 	virtual std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
-	* IBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+	* IBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -2194,7 +2208,7 @@ public:
 	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
-	* IBuildExecution::LoadPNGImageByUUID - Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.
+	* IBuildExecution::LoadPNGImageByUUID - Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -2333,6 +2347,20 @@ public:
 	* @return Toolpath instance.
 	*/
 	virtual IToolpathAccessor * CreateToolpathAccessor() = 0;
+
+	/**
+	* IBuild::HasAttachment - Returns if the Build has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachment(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuild::HasAttachmentIdentifier - Returns if the Build has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachmentIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
 	* IBuild::AddBinaryData - Adds binary data to store with the build.

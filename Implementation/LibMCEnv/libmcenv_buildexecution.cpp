@@ -230,6 +230,19 @@ LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
 	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 }
 
+bool CBuildExecution::HasAttachment(const std::string& sDataUUID)
+{
+	std::lock_guard <std::mutex> lockGuard(m_Mutex);
+	return m_pExecution->HasJobExecutionDataUUID(sDataUUID);
+}
+
+bool CBuildExecution::HasAttachmentIdentifier(const std::string& sIdentifier)
+{
+	std::lock_guard <std::mutex> lockGuard(m_Mutex);
+	return m_pExecution->HasJobExecutionDataIdentifier(sIdentifier);
+}
+
+
 std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string& sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer)
 {
 	auto pStorage = m_pDataModel->CreateStorage();

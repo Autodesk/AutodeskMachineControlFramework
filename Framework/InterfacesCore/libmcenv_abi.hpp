@@ -2455,6 +2455,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmillise
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_getelapsedtimeinmicroseconds(LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMicroseconds);
 
 /**
+* Returns if the Execution has an attached data with a certain UUID
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pDataUUID - Data UUID of the attachment to query. 
+* @param[out] pDataExists - Returns true if the data exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_hasattachment(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, bool * pDataExists);
+
+/**
+* Returns if the Execution has an attached data with a certain identifier
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pIdentifier - Identifier of the attachment to query.
+* @param[out] pDataExists - Returns true if the data exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_hasattachmentidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, bool * pDataExists);
+
+/**
 * Adds binary data to store with the build execution.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
@@ -2487,7 +2507,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_addbinarydata(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_attachtempstream(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pUserUUID, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads stream of the build execution by identifier.
+* Loads stream of the build execution by attachment identifier.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the attachment. Fails if name does not exist.
@@ -2507,7 +2527,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyidentifier(
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyuuid(LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_StreamReader * pStreamReaderInstance);
 
 /**
-* Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+* Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
@@ -2517,7 +2537,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadstreambyuuid(LibMCE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
-* Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+* Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2543,7 +2563,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddiscretefield2dbyuu
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+* Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
@@ -2553,7 +2573,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storediscretefield2d(Li
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddatatablebyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_DataTable * pDataTableInstance);
 
 /**
-* Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+* Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2579,7 +2599,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loaddatatablebyuuid(Lib
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pFieldDataInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+* Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2592,7 +2612,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_storedatatable(LibMCEnv
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadpngimagebyidentifier(LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.
+* Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2783,6 +2803,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_toolpathisloaded(LibMCEnv_Build 
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_Build pBuild, LibMCEnv_ToolpathAccessor * pToolpathInstance);
+
+/**
+* Returns if the Build has an attached data with a certain UUID
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDataUUID - Data UUID of the attachment to query. 
+* @param[out] pDataExists - Returns true if the data exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_hasattachment(LibMCEnv_Build pBuild, const char * pDataUUID, bool * pDataExists);
+
+/**
+* Returns if the Build has an attached data with a certain identifier
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pIdentifier - Identifier of the attachment to query.
+* @param[out] pDataExists - Returns true if the data exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_hasattachmentidentifier(LibMCEnv_Build pBuild, const char * pIdentifier, bool * pDataExists);
 
 /**
 * Adds binary data to store with the build.

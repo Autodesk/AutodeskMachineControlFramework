@@ -1492,6 +1492,8 @@ public:
 	inline LibMCEnv_uint64 GetEndTimeStampInMicroseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInMilliseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInMicroseconds();
+	inline bool HasAttachment(const std::string & sDataUUID);
+	inline bool HasAttachmentIdentifier(const std::string & sIdentifier);
 	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
 	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
 	inline PStreamReader LoadStreamByIdentifier(const std::string & sIdentifier);
@@ -1553,6 +1555,8 @@ public:
 	inline void UnloadToolpath();
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
+	inline bool HasAttachment(const std::string & sDataUUID);
+	inline bool HasAttachmentIdentifier(const std::string & sIdentifier);
 	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
 	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
 	inline PStreamReader LoadStreamByIdentifier(const std::string & sIdentifier);
@@ -2820,6 +2824,8 @@ public:
 		pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds = nullptr;
 		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = nullptr;
 		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = nullptr;
+		pWrapperTable->m_BuildExecution_HasAttachment = nullptr;
+		pWrapperTable->m_BuildExecution_HasAttachmentIdentifier = nullptr;
 		pWrapperTable->m_BuildExecution_AddBinaryData = nullptr;
 		pWrapperTable->m_BuildExecution_AttachTempStream = nullptr;
 		pWrapperTable->m_BuildExecution_LoadStreamByIdentifier = nullptr;
@@ -2849,6 +2855,8 @@ public:
 		pWrapperTable->m_Build_UnloadToolpath = nullptr;
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
+		pWrapperTable->m_Build_HasAttachment = nullptr;
+		pWrapperTable->m_Build_HasAttachmentIdentifier = nullptr;
 		pWrapperTable->m_Build_AddBinaryData = nullptr;
 		pWrapperTable->m_Build_AttachTempStream = nullptr;
 		pWrapperTable->m_Build_LoadStreamByIdentifier = nullptr;
@@ -5417,6 +5425,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachment = (PLibMCEnvBuildExecution_HasAttachmentPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_hasattachment");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachment = (PLibMCEnvBuildExecution_HasAttachmentPtr) dlsym(hLibrary, "libmcenv_buildexecution_hasattachment");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_HasAttachment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachmentIdentifier = (PLibMCEnvBuildExecution_HasAttachmentIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_hasattachmentidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachmentIdentifier = (PLibMCEnvBuildExecution_HasAttachmentIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_hasattachmentidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_HasAttachmentIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildExecution_AddBinaryData = (PLibMCEnvBuildExecution_AddBinaryDataPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_addbinarydata");
 		#else // _WIN32
 		pWrapperTable->m_BuildExecution_AddBinaryData = (PLibMCEnvBuildExecution_AddBinaryDataPtr) dlsym(hLibrary, "libmcenv_buildexecution_addbinarydata");
@@ -5675,6 +5701,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_CreateToolpathAccessor == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_HasAttachment = (PLibMCEnvBuild_HasAttachmentPtr) GetProcAddress(hLibrary, "libmcenv_build_hasattachment");
+		#else // _WIN32
+		pWrapperTable->m_Build_HasAttachment = (PLibMCEnvBuild_HasAttachmentPtr) dlsym(hLibrary, "libmcenv_build_hasattachment");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_HasAttachment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_HasAttachmentIdentifier = (PLibMCEnvBuild_HasAttachmentIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_hasattachmentidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Build_HasAttachmentIdentifier = (PLibMCEnvBuild_HasAttachmentIdentifierPtr) dlsym(hLibrary, "libmcenv_build_hasattachmentidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_HasAttachmentIdentifier == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10790,6 +10834,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_hasattachment", (void**)&(pWrapperTable->m_BuildExecution_HasAttachment));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_HasAttachment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_hasattachmentidentifier", (void**)&(pWrapperTable->m_BuildExecution_HasAttachmentIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_HasAttachmentIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_addbinarydata", (void**)&(pWrapperTable->m_BuildExecution_AddBinaryData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AddBinaryData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10904,6 +10956,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_createtoolpathaccessor", (void**)&(pWrapperTable->m_Build_CreateToolpathAccessor));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_CreateToolpathAccessor == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_hasattachment", (void**)&(pWrapperTable->m_Build_HasAttachment));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_HasAttachment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_hasattachmentidentifier", (void**)&(pWrapperTable->m_Build_HasAttachmentIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_HasAttachmentIdentifier == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_addbinarydata", (void**)&(pWrapperTable->m_Build_AddBinaryData));
@@ -15662,6 +15722,32 @@ public:
 	}
 	
 	/**
+	* CBuildExecution::HasAttachment - Returns if the Execution has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	bool CBuildExecution::HasAttachment(const std::string & sDataUUID)
+	{
+		bool resultDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_HasAttachment(m_pHandle, sDataUUID.c_str(), &resultDataExists));
+		
+		return resultDataExists;
+	}
+	
+	/**
+	* CBuildExecution::HasAttachmentIdentifier - Returns if the Execution has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	bool CBuildExecution::HasAttachmentIdentifier(const std::string & sIdentifier)
+	{
+		bool resultDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_HasAttachmentIdentifier(m_pHandle, sIdentifier.c_str(), &resultDataExists));
+		
+		return resultDataExists;
+	}
+	
+	/**
 	* CBuildExecution::AddBinaryData - Adds binary data to store with the build execution.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
@@ -15702,7 +15788,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by identifier.
+	* CBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by attachment identifier.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist.
 	* @return Reader class to access the stream.
 	*/
@@ -15734,7 +15820,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* CBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
@@ -15750,7 +15836,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* CBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
@@ -15788,7 +15874,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* CBuildExecution::LoadDataTableByIdentifier - Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded data table instance.
 	*/
@@ -15804,7 +15890,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDataTableByUUID - Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* CBuildExecution::LoadDataTableByUUID - Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded data table instance.
 	*/
@@ -15842,7 +15928,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+	* CBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -15861,7 +15947,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadPNGImageByUUID - Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.
+	* CBuildExecution::LoadPNGImageByUUID - Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -16116,6 +16202,32 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CToolpathAccessor>(m_pWrapper, hToolpathInstance);
+	}
+	
+	/**
+	* CBuild::HasAttachment - Returns if the Build has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	bool CBuild::HasAttachment(const std::string & sDataUUID)
+	{
+		bool resultDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_HasAttachment(m_pHandle, sDataUUID.c_str(), &resultDataExists));
+		
+		return resultDataExists;
+	}
+	
+	/**
+	* CBuild::HasAttachmentIdentifier - Returns if the Build has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	bool CBuild::HasAttachmentIdentifier(const std::string & sIdentifier)
+	{
+		bool resultDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_HasAttachmentIdentifier(m_pHandle, sIdentifier.c_str(), &resultDataExists));
+		
+		return resultDataExists;
 	}
 	
 	/**

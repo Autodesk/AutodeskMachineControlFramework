@@ -185,6 +185,22 @@ bool CBuild::ToolpathIsLoaded()
 	return (m_pToolpathHandler->findToolpathEntity(sStreamUUID, false) != nullptr);
 }
 
+bool CBuild::HasAttachment(const std::string& sDataUUID)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->HasJobDataUUID(sDataUUID);
+}
+
+bool CBuild::HasAttachmentIdentifier(const std::string& sIdentifier)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->HasJobDataIdentifier(sIdentifier);
+}
+
+
+
 std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const std::string& sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer)
 {
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();

@@ -1507,6 +1507,16 @@
 		<method name="GetElapsedTimeInMicroseconds" description="Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.">
 			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
 		</method>
+
+		<method name="HasAttachment" description="Returns if the Execution has an attached data with a certain UUID">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment to query. " />
+			<param name="DataExists" type="bool" pass="return" description="Returns true if the data exists." />
+		</method>
+
+		<method name="HasAttachmentIdentifier" description="Returns if the Execution has an attached data with a certain identifier">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the attachment to query." />
+			<param name="DataExists" type="bool" pass="return" description="Returns true if the data exists." />
+		</method>
 		
 		<method name="AddBinaryData" description="Adds binary data to store with the build execution.">
 			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
@@ -1525,7 +1535,7 @@
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
 		
-		<method name="LoadStreamByIdentifier" description="Loads stream of the build execution by identifier.">
+		<method name="LoadStreamByIdentifier" description="Loads stream of the build execution by attachment identifier.">
 			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does not exist." />
 			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
 		</method>
@@ -1535,12 +1545,12 @@
 			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
 		</method>
 		
-		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.">
+		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.">
 			<param name="Identifier" type="string" pass="in" description="Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
 		</method>	
 		
-		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.">
+		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
 		</method>	
@@ -1554,12 +1564,12 @@
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
-		<method name="LoadDataTableByIdentifier" description="Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.">
+		<method name="LoadDataTableByIdentifier" description="Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.">
 			<param name="Identifier" type="string" pass="in" description="Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Loaded data table instance." />
 		</method>	
 		
-		<method name="LoadDataTableByUUID" description="Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.">
+		<method name="LoadDataTableByUUID" description="Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Loaded data table instance." />
 		</method>	
@@ -1573,7 +1583,7 @@
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
-		<method name="LoadPNGImageByIdentifier" description="Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.">
+		<method name="LoadPNGImageByIdentifier" description="Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.">
 			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
@@ -1581,7 +1591,7 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 		
-		<method name="LoadPNGImageByUUID" description="Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.">
+		<method name="LoadPNGImageByUUID" description="Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
@@ -1673,6 +1683,16 @@
 			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
 		</method>
 
+		<method name="HasAttachment" description="Returns if the Build has an attached data with a certain UUID">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment to query. " />
+			<param name="DataExists" type="bool" pass="return" description="Returns true if the data exists." />
+		</method>
+
+		<method name="HasAttachmentIdentifier" description="Returns if the Build has an attached data with a certain identifier">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the attachment to query." />
+			<param name="DataExists" type="bool" pass="return" description="Returns true if the data exists." />
+		</method>
+		
 		<method name="AddBinaryData" description="Adds binary data to store with the build.">
 			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
 			<param name="Name" type="string" pass="in" description="Name of the attache data" />
