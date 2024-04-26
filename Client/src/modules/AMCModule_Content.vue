@@ -51,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 																
 					<ContentItem_BuildList :key="moduleitem.uuid" v-if="(moduleitem.type=='buildlist')" :moduleitem="moduleitem" :Application="Application" />										
 
+					<ContentItem_ExecutionList :key="moduleitem.uuid" v-if="(moduleitem.type=='executionlist')" :moduleitem="moduleitem" :Application="Application" />										
+
 					<ContentItem_AlertList :key="moduleitem.uuid" v-if="(moduleitem.type=='alertlist')" :moduleitem="moduleitem" :Application="Application" />										
 																																			
 					<ContentItem_ParameterList :key="moduleitem.uuid" v-if="(moduleitem.type=='parameterlist')" :moduleitem="moduleitem" :Application="Application" />
