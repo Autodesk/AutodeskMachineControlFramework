@@ -276,6 +276,10 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS 10179 /** Global Timer is not continuous. */
 #define LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED 10180 /** Stream writer is not finished */
 #define LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM 10181 /** Cannot read from ZIP stream */
+#define LIBMCENV_ERROR_EMPTYDATATABLENAME 10182 /** Empty datatable name */
+#define LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER 10183 /** Empty datatable identifier */
+#define LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER 10184 /** Invalid datatable identifier */
+#define LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE 10185 /** Invalid datatable signature */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -464,6 +468,10 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "Global Timer is not continuous.";
     case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "Stream writer is not finished";
     case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "Cannot read from ZIP stream";
+    case LIBMCENV_ERROR_EMPTYDATATABLENAME: return "Empty datatable name";
+    case LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER: return "Empty datatable identifier";
+    case LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER: return "Invalid datatable identifier";
+    case LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE: return "Invalid datatable signature";
     default: return "unknown error";
   }
 }

@@ -718,6 +718,14 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_addcolumn(LibMCEnv_DataTable
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_removecolumn(LibMCEnv_DataTable pDataTable, const char * pIdentifier);
 
 /**
+* Clears all data from the data table.
+*
+* @param[in] pDataTable - DataTable instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_clear(LibMCEnv_DataTable pDataTable);
+
+/**
 * Returns if a column exists in the data field.
 *
 * @param[in] pDataTable - DataTable instance.
@@ -926,6 +934,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_Da
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_writedatatostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableWriteOptions pOptions);
+
+/**
+* Loads the data table from a stream. Clears all existing data from the data table.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pStream - Stream read instance to read from.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_loadfromstream(LibMCEnv_DataTable pDataTable, LibMCEnv_StreamReader pStream);
 
 /*************************************************************************************************************************
  Class definition for DataSeries

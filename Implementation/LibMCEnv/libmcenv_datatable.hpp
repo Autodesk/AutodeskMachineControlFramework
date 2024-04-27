@@ -87,6 +87,8 @@ public:
 
 	virtual void WriteDataToStream(ITempStreamWriter* pWriter) = 0;
 
+	virtual void ReadDataFromStream(IStreamReader* pReader, uint64_t nEntryCount) = 0;
+
 	virtual size_t getEntrySizeInBytes() = 0;
 };
 
@@ -105,7 +107,11 @@ private:
 
 	CDataTableColumn* findColumn(const std::string& sIdentifier, bool bMustExist);
 
+	PDataTableColumn addColumnEx(const std::string& sIdentifier, const std::string& sDescription, const LibMCEnv::eDataTableColumnType eColumnType);
+
 public:
+
+	static CDataTable* makeFromStream (IStreamReader * pStreamReader);
 
 	CDataTable();
 
@@ -153,6 +159,9 @@ public:
 
 	void WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions) override;
 
+	void LoadFromStream(IStreamReader* pStream) override;
+
+	void Clear() override;
 };
 
 } // namespace Impl

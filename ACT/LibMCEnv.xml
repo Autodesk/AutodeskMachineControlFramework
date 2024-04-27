@@ -219,7 +219,11 @@
 		<error name="GLOBALTIMERNOTCONTINUOUS" code="10179" description="Global Timer is not continuous." />	
 		<error name="STREAMWRITERISNOTFINISHED" code="10180" description="Stream writer is not finished" />
 		<error name="CANNOTREADFROMZIPSTREAM" code="10181" description="Cannot read from ZIP stream" />
-		
+		<error name="EMPTYDATATABLENAME" code="10182" description="Empty datatable name" />
+		<error name="EMPTYDATATABLEIDENTIFIER" code="10183" description="Empty datatable identifier" />
+		<error name="INVALIDDATATABLEIDENTIFIER" code="10184" description="Invalid datatable identifier" />
+		<error name="INVALIDDATATABLESIGNATURE" code="10185" description="Invalid datatable signature" />		
+
 		
 	</errors>
 
@@ -691,6 +695,9 @@
 			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
 		</method>
 
+		<method name="Clear" description="Clears all data from the data table.">
+		</method>
+
 		<method name="HasColumn" description="Returns if a column exists in the data field.">
 			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
 			<param name="ColumnExists" type="bool" pass="return" description="Returns if the columns exist." />
@@ -785,6 +792,10 @@
 			<param name="Options" type="optionalclass" class="DataTableWriteOptions" pass="in" description="Optional writer options to use." />
 		</method>
 
+		<method name="LoadFromStream" description="Loads the data table from a stream. Clears all existing data from the data table.">
+			<param name="Stream" type="class" class="StreamReader" pass="in" description="Stream read instance to read from." />
+		</method>
+		
 	</class>
 
 	<class name="DataSeries" parent="Base" description="A data series of points.">

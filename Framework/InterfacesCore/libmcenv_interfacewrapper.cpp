@@ -1814,6 +1814,30 @@ LibMCEnvResult libmcenv_datatable_removecolumn(LibMCEnv_DataTable pDataTable, co
 	}
 }
 
+LibMCEnvResult libmcenv_datatable_clear(LibMCEnv_DataTable pDataTable)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataTable->Clear();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_datatable_hascolumn(LibMCEnv_DataTable pDataTable, const char * pIdentifier, bool * pColumnExists)
 {
 	IBase* pIBaseClass = (IBase *)pDataTable;
@@ -2408,6 +2432,35 @@ LibMCEnvResult libmcenv_datatable_writedatatostream(LibMCEnv_DataTable pDataTabl
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pIDataTable->WriteDataToStream(pIWriter, pIOptions);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatable_loadfromstream(LibMCEnv_DataTable pDataTable, LibMCEnv_StreamReader pStream)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		IBase* pIBaseClassStream = (IBase *)pStream;
+		IStreamReader* pIStream = dynamic_cast<IStreamReader*>(pIBaseClassStream);
+		if (!pIStream)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataTable->LoadFromStream(pIStream);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -23847,6 +23900,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_datatable_addcolumn;
 	if (sProcName == "libmcenv_datatable_removecolumn") 
 		*ppProcAddress = (void*) &libmcenv_datatable_removecolumn;
+	if (sProcName == "libmcenv_datatable_clear") 
+		*ppProcAddress = (void*) &libmcenv_datatable_clear;
 	if (sProcName == "libmcenv_datatable_hascolumn") 
 		*ppProcAddress = (void*) &libmcenv_datatable_hascolumn;
 	if (sProcName == "libmcenv_datatable_getrowcount") 
@@ -23885,6 +23940,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_datatable_writecsvtostream;
 	if (sProcName == "libmcenv_datatable_writedatatostream") 
 		*ppProcAddress = (void*) &libmcenv_datatable_writedatatostream;
+	if (sProcName == "libmcenv_datatable_loadfromstream") 
+		*ppProcAddress = (void*) &libmcenv_datatable_loadfromstream;
 	if (sProcName == "libmcenv_dataseries_getname") 
 		*ppProcAddress = (void*) &libmcenv_dataseries_getname;
 	if (sProcName == "libmcenv_dataseries_getuuid") 

@@ -873,6 +873,11 @@ public:
 	virtual void RemoveColumn(const std::string & sIdentifier) = 0;
 
 	/**
+	* IDataTable::Clear - Clears all data from the data table.
+	*/
+	virtual void Clear() = 0;
+
+	/**
 	* IDataTable::HasColumn - Returns if a column exists in the data field.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @return Returns if the columns exist.
@@ -1018,6 +1023,12 @@ public:
 	* @param[in] pOptions - Optional writer options to use.
 	*/
 	virtual void WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions) = 0;
+
+	/**
+	* IDataTable::LoadFromStream - Loads the data table from a stream. Clears all existing data from the data table.
+	* @param[in] pStream - Stream read instance to read from.
+	*/
+	virtual void LoadFromStream(IStreamReader* pStream) = 0;
 
 };
 

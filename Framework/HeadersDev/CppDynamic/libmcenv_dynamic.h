@@ -705,6 +705,14 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_AddColumnPtr) (LibMCEnv_DataTable pD
 typedef LibMCEnvResult (*PLibMCEnvDataTable_RemoveColumnPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier);
 
 /**
+* Clears all data from the data table.
+*
+* @param[in] pDataTable - DataTable instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_ClearPtr) (LibMCEnv_DataTable pDataTable);
+
+/**
 * Returns if a column exists in the data field.
 *
 * @param[in] pDataTable - DataTable instance.
@@ -913,6 +921,15 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteCSVToStreamPtr) (LibMCEnv_DataT
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteDataToStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableWriteOptions pOptions);
+
+/**
+* Loads the data table from a stream. Clears all existing data from the data table.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pStream - Stream read instance to read from.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_LoadFromStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_StreamReader pStream);
 
 /*************************************************************************************************************************
  Class definition for DataSeries
@@ -7943,6 +7960,7 @@ typedef struct {
 	PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr m_DataTableCSVWriteOptions_SetSeparator;
 	PLibMCEnvDataTable_AddColumnPtr m_DataTable_AddColumn;
 	PLibMCEnvDataTable_RemoveColumnPtr m_DataTable_RemoveColumn;
+	PLibMCEnvDataTable_ClearPtr m_DataTable_Clear;
 	PLibMCEnvDataTable_HasColumnPtr m_DataTable_HasColumn;
 	PLibMCEnvDataTable_GetRowCountPtr m_DataTable_GetRowCount;
 	PLibMCEnvDataTable_GetColumnCountPtr m_DataTable_GetColumnCount;
@@ -7962,6 +7980,7 @@ typedef struct {
 	PLibMCEnvDataTable_SetUint64ColumnValuesPtr m_DataTable_SetUint64ColumnValues;
 	PLibMCEnvDataTable_WriteCSVToStreamPtr m_DataTable_WriteCSVToStream;
 	PLibMCEnvDataTable_WriteDataToStreamPtr m_DataTable_WriteDataToStream;
+	PLibMCEnvDataTable_LoadFromStreamPtr m_DataTable_LoadFromStream;
 	PLibMCEnvDataSeries_GetNamePtr m_DataSeries_GetName;
 	PLibMCEnvDataSeries_GetUUIDPtr m_DataSeries_GetUUID;
 	PLibMCEnvDataSeries_ClearPtr m_DataSeries_Clear;

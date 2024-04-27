@@ -545,6 +545,10 @@ public:
 			case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "GLOBALTIMERNOTCONTINUOUS";
 			case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "STREAMWRITERISNOTFINISHED";
 			case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "CANNOTREADFROMZIPSTREAM";
+			case LIBMCENV_ERROR_EMPTYDATATABLENAME: return "EMPTYDATATABLENAME";
+			case LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER: return "EMPTYDATATABLEIDENTIFIER";
+			case LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER: return "INVALIDDATATABLEIDENTIFIER";
+			case LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE: return "INVALIDDATATABLESIGNATURE";
 		}
 		return "UNKNOWN";
 	}
@@ -733,6 +737,10 @@ public:
 			case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "Global Timer is not continuous.";
 			case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "Stream writer is not finished";
 			case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "Cannot read from ZIP stream";
+			case LIBMCENV_ERROR_EMPTYDATATABLENAME: return "Empty datatable name";
+			case LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER: return "Empty datatable identifier";
+			case LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER: return "Invalid datatable identifier";
+			case LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE: return "Invalid datatable signature";
 		}
 		return "unknown error";
 	}
@@ -1194,6 +1202,7 @@ public:
 	
 	inline void AddColumn(const std::string & sIdentifier, const std::string & sDescription, const eDataTableColumnType eColumnType);
 	inline void RemoveColumn(const std::string & sIdentifier);
+	inline void Clear();
 	inline bool HasColumn(const std::string & sIdentifier);
 	inline LibMCEnv_uint32 GetRowCount();
 	inline LibMCEnv_uint32 GetColumnCount();
@@ -1213,6 +1222,7 @@ public:
 	inline void SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer);
 	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions);
 	inline void WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions);
+	inline void LoadFromStream(classParam<CStreamReader> pStream);
 };
 	
 /*************************************************************************************************************************
@@ -2654,6 +2664,7 @@ public:
 		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = nullptr;
 		pWrapperTable->m_DataTable_AddColumn = nullptr;
 		pWrapperTable->m_DataTable_RemoveColumn = nullptr;
+		pWrapperTable->m_DataTable_Clear = nullptr;
 		pWrapperTable->m_DataTable_HasColumn = nullptr;
 		pWrapperTable->m_DataTable_GetRowCount = nullptr;
 		pWrapperTable->m_DataTable_GetColumnCount = nullptr;
@@ -2673,6 +2684,7 @@ public:
 		pWrapperTable->m_DataTable_SetUint64ColumnValues = nullptr;
 		pWrapperTable->m_DataTable_WriteCSVToStream = nullptr;
 		pWrapperTable->m_DataTable_WriteDataToStream = nullptr;
+		pWrapperTable->m_DataTable_LoadFromStream = nullptr;
 		pWrapperTable->m_DataSeries_GetName = nullptr;
 		pWrapperTable->m_DataSeries_GetUUID = nullptr;
 		pWrapperTable->m_DataSeries_Clear = nullptr;
@@ -3895,6 +3907,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataTable_Clear = (PLibMCEnvDataTable_ClearPtr) GetProcAddress(hLibrary, "libmcenv_datatable_clear");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_Clear = (PLibMCEnvDataTable_ClearPtr) dlsym(hLibrary, "libmcenv_datatable_clear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_Clear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataTable_HasColumn = (PLibMCEnvDataTable_HasColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_hascolumn");
 		#else // _WIN32
 		pWrapperTable->m_DataTable_HasColumn = (PLibMCEnvDataTable_HasColumnPtr) dlsym(hLibrary, "libmcenv_datatable_hascolumn");
@@ -4063,6 +4084,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataTable_WriteDataToStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_LoadFromStream = (PLibMCEnvDataTable_LoadFromStreamPtr) GetProcAddress(hLibrary, "libmcenv_datatable_loadfromstream");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_LoadFromStream = (PLibMCEnvDataTable_LoadFromStreamPtr) dlsym(hLibrary, "libmcenv_datatable_loadfromstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_LoadFromStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10154,6 +10184,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_RemoveColumn == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datatable_clear", (void**)&(pWrapperTable->m_DataTable_Clear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_Clear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_datatable_hascolumn", (void**)&(pWrapperTable->m_DataTable_HasColumn));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_HasColumn == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10228,6 +10262,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_datatable_writedatatostream", (void**)&(pWrapperTable->m_DataTable_WriteDataToStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_WriteDataToStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_loadfromstream", (void**)&(pWrapperTable->m_DataTable_LoadFromStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_LoadFromStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_dataseries_getname", (void**)&(pWrapperTable->m_DataSeries_GetName));
@@ -13583,6 +13621,14 @@ public:
 	}
 	
 	/**
+	* CDataTable::Clear - Clears all data from the data table.
+	*/
+	void CDataTable::Clear()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_Clear(m_pHandle));
+	}
+	
+	/**
 	* CDataTable::HasColumn - Returns if a column exists in the data field.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @return Returns if the columns exist.
@@ -13822,6 +13868,16 @@ public:
 		LibMCEnvHandle hWriter = pWriter.GetHandle();
 		LibMCEnvHandle hOptions = pOptions.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_WriteDataToStream(m_pHandle, hWriter, hOptions));
+	}
+	
+	/**
+	* CDataTable::LoadFromStream - Loads the data table from a stream. Clears all existing data from the data table.
+	* @param[in] pStream - Stream read instance to read from.
+	*/
+	void CDataTable::LoadFromStream(classParam<CStreamReader> pStream)
+	{
+		LibMCEnvHandle hStream = pStream.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_LoadFromStream(m_pHandle, hStream));
 	}
 	
 	/**
