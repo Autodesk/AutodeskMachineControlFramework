@@ -608,6 +608,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_CALLBACKLOGGERDOESNOTSUPPORTRETRIEVAL 591 /** Callback logger does not support retrieval */
 #define LIBMC_ERROR_STDERRLOGGERDOESNOTSUPPORTRETRIEVAL 592 /** Stderr logger does not support retrieval */
 #define LIBMC_ERROR_STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL 593 /** Stdout logger does not support retrieval */
+#define LIBMC_ERROR_EXECUTIONLISTNAMEMISSING 594 /** Execution list name missing */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1128,6 +1129,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_CALLBACKLOGGERDOESNOTSUPPORTRETRIEVAL: return "Callback logger does not support retrieval";
     case LIBMC_ERROR_STDERRLOGGERDOESNOTSUPPORTRETRIEVAL: return "Stderr logger does not support retrieval";
     case LIBMC_ERROR_STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL: return "Stdout logger does not support retrieval";
+    case LIBMC_ERROR_EXECUTIONLISTNAMEMISSING: return "Execution list name missing";
     default: return "unknown error";
   }
 }

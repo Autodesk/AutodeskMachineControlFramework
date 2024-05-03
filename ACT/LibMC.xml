@@ -617,6 +617,9 @@
 		<error name="CALLBACKLOGGERDOESNOTSUPPORTRETRIEVAL" code="591" description="Callback logger does not support retrieval" />		
 		<error name="STDERRLOGGERDOESNOTSUPPORTRETRIEVAL" code="592" description="Stderr logger does not support retrieval" />		
 		<error name="STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL" code="593" description="Stdout logger does not support retrieval" />		
+		<error name="EXECUTIONLISTNAMEMISSING" code="594" description="Execution list name missing" />
+		
+		
 		
 	</errors>
 	

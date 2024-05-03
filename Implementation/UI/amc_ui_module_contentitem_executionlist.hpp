@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_CONTENTITEM_BUILDLIST
-#define __AMC_UI_MODULE_CONTENTITEM_BUILDLIST
+#ifndef __AMC_UI_MODULE_CONTENTITEM_EXECUTIONLIST
+#define __AMC_UI_MODULE_CONTENTITEM_EXEUCTIONLIST
 
 #include "header_protection.hpp"
 
@@ -47,22 +47,20 @@ namespace LibMCData {
 
 namespace AMC {
 
-	amcDeclareDependingClass(CUIModule_ContentBuildList, PUIModule_ContentBuildList);
+	amcDeclareDependingClass(CUIModule_ContentExecutionList, PUIModule_ContentExecutionList);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
-	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
+	class CUIModule_ContentExecutionList : public CUIModule_ContentItem {
 	protected:
 
 		std::string m_sItemName;
 		std::string m_sLoadingText;
-		std::string m_sBuildNameCaption;
-		std::string m_sBuildLayersCaption;
-		std::string m_sBuildUUIDCaption;
-		std::string m_sBuildTimestampCaption;
+		std::string m_sExecutionNameCaption;
+		std::string m_sExecutionUUIDCaption;
 		std::string m_sSelectEvent;
 
-		std::string m_sSelectedBuildField;
+		std::string m_sSelectedExecutionField;
 
 		uint32_t m_nEntriesPerPage;
 
@@ -70,11 +68,11 @@ namespace AMC {
 
 	public:
 
-		static PUIModule_ContentBuildList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+		static PUIModule_ContentExecutionList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath);
+		CUIModule_ContentExecutionList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath);
 
-		virtual ~CUIModule_ContentBuildList();
+		virtual ~CUIModule_ContentExecutionList();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
@@ -95,5 +93,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE_CONTENTITEM_BUILDLIST
+#endif //__AMC_UI_MODULE_CONTENTITEM_EXEUCTIONLIST
 
