@@ -80,6 +80,7 @@ CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadi
 	if (pDataModel.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
+	m_sBuildThumbnailCaption = "Thumbnail";
 	m_sBuildNameCaption = "Build name";
 	m_sBuildLayersCaption = "Layers";
 	m_sBuildUUIDCaption = "UUID";
@@ -107,24 +108,37 @@ void CUIModule_ContentBuildList::addDefinitionToJSON(CJSONWriter& writer, CJSONW
 
 	CJSONWriterArray headersArray(writer);
 
+	CJSONWriterObject headerObject0(writer);
+	headerObject0.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildThumbnailCaption);
+	headerObject0.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDTHUMBNAIL);
+	headerObject0.addBool(AMC_API_KEY_UI_ITEMSORTABLE, true);
+	headerObject0.addString(AMC_API_KEY_UI_ITEMWIDTH, "20vw");
+	headersArray.addObject(headerObject0);
+
 	CJSONWriterObject headerObject1(writer);
 	headerObject1.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildNameCaption);
 	headerObject1.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDNAME);
+	headerObject1.addBool(AMC_API_KEY_UI_ITEMSORTABLE, true);
 	headersArray.addObject(headerObject1);
 
-	CJSONWriterObject headerObject2(writer);
+/*	CJSONWriterObject headerObject2(writer);
 	headerObject2.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildLayersCaption);
+	headerObject2.addBool(AMC_API_KEY_UI_ITEMSORTABLE, true);
 	headerObject2.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDLAYERS);
-	headersArray.addObject(headerObject2);
+	headersArray.addObject(headerObject2); */
 
-	CJSONWriterObject headerObject3(writer);
+/*	CJSONWriterObject headerObject3(writer);
 	headerObject3.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildUUIDCaption);
 	headerObject3.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDUUID);
-	headersArray.addObject(headerObject3);
+	headerObject3.addBool(AMC_API_KEY_UI_ITEMSORTABLE, true);
+	headerObject3.addString(AMC_API_KEY_UI_ITEMWIDTH, "20vw");
+	headersArray.addObject(headerObject3); */
 
 	CJSONWriterObject headerObject4(writer);
 	headerObject4.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildTimestampCaption);
 	headerObject4.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDTIMESTAMP);
+	headerObject4.addBool(AMC_API_KEY_UI_ITEMSORTABLE, true);
+	headerObject4.addString(AMC_API_KEY_UI_ITEMWIDTH, "20vw");
 	headersArray.addObject(headerObject4);
 
 	object.addArray(AMC_API_KEY_UI_ITEMHEADERS, headersArray);

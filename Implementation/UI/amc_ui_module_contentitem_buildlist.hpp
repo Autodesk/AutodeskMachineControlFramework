@@ -57,6 +57,7 @@ namespace AMC {
 		std::string m_sItemName;
 		std::string m_sLoadingText;
 		std::string m_sBuildNameCaption;
+		std::string m_sBuildThumbnailCaption;
 		std::string m_sBuildLayersCaption;
 		std::string m_sBuildUUIDCaption;
 		std::string m_sBuildTimestampCaption;
