@@ -972,6 +972,90 @@ void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
 	writePower(fPowerInPercent, false);
 }
 
+void CRTCContext::AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+{
+
+	float fClippedValue = fOutputValue;
+	if (fClippedValue < 0.0f)
+		fClippedValue = 0.0f;
+	if (fClippedValue > 1.0f)
+		fClippedValue = 1.0f;
+
+	int32_t nDigitalValue = (int32_t)round(fClippedValue * 4095.0);
+	if (nDigitalValue < 0)
+		nDigitalValue = 0;
+	if (nDigitalValue > 4095)
+		nDigitalValue = 4095;
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	switch (eLaserPort) {		
+		case eLaserPort::Port12BitAnalog1:
+			m_pScanLabSDK->n_write_da_1_list(m_CardNo, nDigitalValue);
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+			break;
+
+		case eLaserPort::Port12BitAnalog2:
+			m_pScanLabSDK->n_write_da_2_list(m_CardNo, nDigitalValue);
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+			break;
+
+		case eLaserPort::Port12BitAnalog1andAnalog2:
+			m_pScanLabSDK->n_write_da_1_list(m_CardNo, nDigitalValue);
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+			m_pScanLabSDK->n_write_da_2_list(m_CardNo, nDigitalValue);
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+			break;
+
+		default:
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG);
+	}
+
+}
+
+void CRTCContext::AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+{
+	float fClippedValue = fOutputValue;
+	if (fClippedValue < 0.0f)
+		fClippedValue = 0.0f;
+	if (fClippedValue > 1.0f)
+		fClippedValue = 1.0f;
+
+	int32_t nDigitalValue;
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	switch (eLaserPort) {
+	case eLaserPort::Port16bitDigital:
+		nDigitalValue = (int32_t)round(fClippedValue * 65535.0);
+		if (nDigitalValue < 0)
+			nDigitalValue = 0;
+		if (nDigitalValue > 65535)
+			nDigitalValue = 65535;
+
+		m_pScanLabSDK->n_write_io_port_list(m_CardNo, nDigitalValue);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		break;
+
+	case eLaserPort::Port8bitDigital:
+		nDigitalValue = (int32_t)round(fClippedValue * 255.0);
+		if (nDigitalValue < 0)
+			nDigitalValue = 0;
+		if (nDigitalValue > 255)
+			nDigitalValue = 255;
+
+		m_pScanLabSDK->n_write_8bit_port_list(m_CardNo, nDigitalValue);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		break;
+
+	default:
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL);
+
+	}
+
+}
+
+
 void CRTCContext::AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent)
 {
 	writePower(fPowerInPercent, true);

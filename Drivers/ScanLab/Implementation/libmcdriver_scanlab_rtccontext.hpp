@@ -328,6 +328,10 @@ public:
 
 	void AddSetPower(const LibMCDriver_ScanLab_single fPower) override;
 
+	void AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) override;
+
+	void AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) override;
+
 	void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent) override;
 
 

@@ -274,6 +274,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE: return "SCANAHEADMISSINGRTCRESPONSE";
 			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR: return "SCANAHEADPCIERROR";
 			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "SCANAHEADUNKNOWNERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "PORTNUMBERISNOTDIGITAL";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "PORTNUMBERISNOTANALOG";
 		}
 		return "UNKNOWN";
 	}
@@ -370,6 +372,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE: return "Scanahead missing rtc response.";
 			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR: return "Scanahead PCI error.";
 			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "Scanahead unknown error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
 		}
 		return "unknown error";
 	}
@@ -652,6 +656,8 @@ public:
 	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent);
+	inline void AddSetAnalogOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue);
+	inline void AddSetDigitalOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue);
 	inline void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent);
 	inline void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
 	inline void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
@@ -1028,6 +1034,8 @@ public:
 		pWrapperTable->m_RTCContext_DrawPolylineOIE = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatches = nullptr;
 		pWrapperTable->m_RTCContext_AddSetPower = nullptr;
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = nullptr;
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = nullptr;
 		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = nullptr;
 		pWrapperTable->m_RTCContext_AddSetJumpSpeed = nullptr;
 		pWrapperTable->m_RTCContext_AddSetMarkSpeed = nullptr;
@@ -1647,6 +1655,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_AddSetPower == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = (PLibMCDriver_ScanLabRTCContext_AddSetAnalogOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetanalogout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = (PLibMCDriver_ScanLabRTCContext_AddSetAnalogOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetanalogout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetAnalogOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = (PLibMCDriver_ScanLabRTCContext_AddSetDigitalOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetdigitalout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = (PLibMCDriver_ScanLabRTCContext_AddSetDigitalOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetdigitalout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetDigitalOut == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3185,6 +3211,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPower == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetanalogout", (void**)&(pWrapperTable->m_RTCContext_AddSetAnalogOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetAnalogOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetdigitalout", (void**)&(pWrapperTable->m_RTCContext_AddSetDigitalOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetDigitalOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol", (void**)&(pWrapperTable->m_RTCContext_AddSetPowerForPIDControl));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPowerForPIDControl == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4323,6 +4357,26 @@ public:
 	void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetPower(m_pHandle, fPowerInPercent));
+	}
+	
+	/**
+	* CRTCContext::AddSetAnalogOut - Adds changing an analog port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	void CRTCContext::AddSetAnalogOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetAnalogOut(m_pHandle, eLaserPort, fOutputValue));
+	}
+	
+	/**
+	* CRTCContext::AddSetDigitalOut - Adds changing an digital port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	void CRTCContext::AddSetDigitalOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetDigitalOut(m_pHandle, eLaserPort, fOutputValue));
 	}
 	
 	/**

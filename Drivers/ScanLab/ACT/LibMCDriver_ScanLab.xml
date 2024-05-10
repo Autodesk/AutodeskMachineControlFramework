@@ -129,8 +129,9 @@
 		<error name="SCANAHEADMISSINGRTCRESPONSE" code="1077" description="Scanahead missing rtc response." />		
 		<error name="SCANAHEADPCIERROR" code="1078" description="Scanahead PCI error." />		
 		<error name="SCANAHEADUNKNOWNERROR" code="1079" description="Scanahead unknown error." />		
-		
-						
+		<error name="PORTNUMBERISNOTDIGITAL" code="1080" description="Port number is not digital." />		
+		<error name="PORTNUMBERISNOTANALOG" code="1081" description="Port number is not analog." />		
+										
 	</errors>
 
 
@@ -467,6 +468,16 @@ Custom implementation
 		<method name="AddSetPower" description="adds a power change to the open list. MUST NOT be used for PID control.">
 			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
 		</method>
+
+		<method name="AddSetAnalogOut" description="Adds changing an analog port to the open list. Should not interfere with laser power control.">
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser port to set. MUST not be an analog port or the call fails." />
+			<param name="OutputValue" type="single" pass="in" description="New Normalized output value. Value is clipped between 0 and 1." />
+		</method>
+		
+		<method name="AddSetDigitalOut" description="Adds changing an digital port to the open list. Should not interfere with laser power control.">
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser port to set. MUST not be an digital port or the call fails." />
+			<param name="OutputValue" type="single" pass="in" description="New Normalized output value. Value is clipped between 0 and 1." />
+		</method>		
 
 		<method name="AddSetPowerForPIDControl" description="adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.">
 			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
