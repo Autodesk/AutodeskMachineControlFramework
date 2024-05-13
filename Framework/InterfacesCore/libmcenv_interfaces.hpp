@@ -101,6 +101,7 @@ class IUniformJournalSampling;
 class IJournalVariable;
 class IAlert;
 class IAlertIterator;
+class ILogEntryList;
 class IJournalHandler;
 class IUserDetailList;
 class IUserManagementHandler;
@@ -4594,20 +4595,20 @@ public:
 	virtual IDateTime * GetAcknowledgementTime() = 0;
 
 	/**
-	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
+	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
 	virtual void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment) = 0;
 
 	/**
-	* IAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+	* IAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
 	virtual void AcknowledgeAlertForCurrentUser(const std::string & sUserComment) = 0;
 
 	/**
-	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.
 	*/
 	virtual void DeactivateAlert() = 0;
 
@@ -4631,6 +4632,40 @@ public:
 };
 
 typedef IBaseSharedPtr<IAlertIterator> PIAlertIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for LogEntryList 
+**************************************************************************************************************************/
+
+class ILogEntryList : public virtual IBase {
+public:
+	/**
+	* ILogEntryList::GetCount - Returns the number of log entries in the list.
+	* @return Number of log entries.
+	*/
+	virtual LibMCEnv_uint32 GetCount() = 0;
+
+	/**
+	* ILogEntryList::GetEntry - Returns the a log entry of the list.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @param[out] sMessage - Message of the log entry.
+	* @param[out] sSubSystem - Subsystem of the log entry.
+	* @param[out] nLogID - ID of the log entry.
+	* @param[out] eLogLevel - Level of the log entry.
+	*/
+	virtual void GetEntry(const LibMCEnv_uint32 nIndex, std::string & sMessage, std::string & sSubSystem, LibMCEnv_uint32 & nLogID, LibMCEnv::eLogLevel & eLogLevel) = 0;
+
+	/**
+	* ILogEntryList::GetEntryTime - Returns the time stamp of an entry.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @return Date Time object of the entry.
+	*/
+	virtual IDateTime * GetEntryTime(const LibMCEnv_uint32 nIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<ILogEntryList> PILogEntryList;
 
 
 /*************************************************************************************************************************
@@ -4661,6 +4696,38 @@ public:
 	* @return DateTime Instance
 	*/
 	virtual IDateTime * GetStartTime() = 0;
+
+	/**
+	* IJournalHandler::RetrieveLogEntries - Retrieves the current log entries of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	virtual ILogEntryList * RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel & eMinLogLevel) = 0;
+
+	/**
+	* IJournalHandler::RetrieveLogEntriesFromTimeInterval - Retrieves the log entries of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	virtual ILogEntryList * RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel & eMinLogLevel) = 0;
+
+	/**
+	* IJournalHandler::RetrieveAlerts - Retrieves the alerts of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @return Alert Iterator Instance.
+	*/
+	virtual IAlertIterator * RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) = 0;
+
+	/**
+	* IJournalHandler::RetrieveAlertsFromTimeInterval - Retrieves the alerts of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @return Alert Iterator Instance.
+	*/
+	virtual IAlertIterator * RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
 
 };
 

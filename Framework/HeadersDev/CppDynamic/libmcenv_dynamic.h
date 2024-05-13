@@ -5813,7 +5813,7 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_GetAcknowledgementInformationPtr) (LibMC
 typedef LibMCEnvResult (*PLibMCEnvAlert_GetAcknowledgementTimePtr) (LibMCEnv_Alert pAlert, LibMCEnv_DateTime * pAckTime);
 
 /**
-* Acknowledges an alert for a specific user and sets it inactive. 
+* Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.
 *
 * @param[in] pAlert - Alert instance.
 * @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
@@ -5823,7 +5823,7 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_GetAcknowledgementTimePtr) (LibMCEnv_Ale
 typedef LibMCEnvResult (*PLibMCEnvAlert_AcknowledgeForUserPtr) (LibMCEnv_Alert pAlert, const char * pUserUUID, const char * pUserComment);
 
 /**
-* Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+* Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.
 *
 * @param[in] pAlert - Alert instance.
 * @param[in] pUserComment - User comment to store. May be empty.
@@ -5832,7 +5832,7 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_AcknowledgeForUserPtr) (LibMCEnv_Alert p
 typedef LibMCEnvResult (*PLibMCEnvAlert_AcknowledgeAlertForCurrentUserPtr) (LibMCEnv_Alert pAlert, const char * pUserComment);
 
 /**
-* Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+* Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.
 *
 * @param[in] pAlert - Alert instance.
 * @return error code or 0 (success)
@@ -5851,6 +5851,46 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_DeactivateAlertPtr) (LibMCEnv_Alert pAle
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvAlertIterator_GetCurrentAlertPtr) (LibMCEnv_AlertIterator pAlertIterator, LibMCEnv_Alert * pAlertInstance);
+
+/*************************************************************************************************************************
+ Class definition for LogEntryList
+**************************************************************************************************************************/
+
+/**
+* Returns the number of log entries in the list.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[out] pCount - Number of log entries.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetCountPtr) (LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns the a log entry of the list.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+* @param[in] nMessageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMessageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMessageBuffer -  buffer of Message of the log entry., may be NULL
+* @param[in] nSubSystemBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubSystemNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubSystemBuffer -  buffer of Subsystem of the log entry., may be NULL
+* @param[out] pLogID - ID of the log entry.
+* @param[out] pLogLevel - Level of the log entry.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetEntryPtr) (LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nMessageBufferSize, LibMCEnv_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCEnv_uint32 nSubSystemBufferSize, LibMCEnv_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, LibMCEnv_uint32 * pLogID, LibMCEnv::eLogLevel * pLogLevel);
+
+/**
+* Returns the time stamp of an entry.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+* @param[out] pTimestamp - Date Time object of the entry.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetEntryTimePtr) (LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 nIndex, LibMCEnv_DateTime * pTimestamp);
 
 /*************************************************************************************************************************
  Class definition for JournalHandler
@@ -5887,6 +5927,50 @@ typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariableFromTime
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvJournalHandler_GetStartTimePtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Retrieves the current log entries of the journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+* @param[out] pMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+* @param[out] pEntryList - Log Entry Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveLogEntriesPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel * pMinLogLevel, LibMCEnv_LogEntryList * pEntryList);
+
+/**
+* Retrieves the log entries of the journal over the given time interval.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[out] pMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+* @param[out] pEntryList - Log Entry Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel * pMinLogLevel, LibMCEnv_LogEntryList * pEntryList);
+
+/**
+* Retrieves the alerts of the journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+* @param[out] pIteratorInstance - Alert Iterator Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveAlertsPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_AlertIterator * pIteratorInstance);
+
+/**
+* Retrieves the alerts of the journal over the given time interval.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[out] pIteratorInstance - Alert Iterator Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_AlertIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Class definition for UserDetailList
@@ -8445,9 +8529,16 @@ typedef struct {
 	PLibMCEnvAlert_AcknowledgeAlertForCurrentUserPtr m_Alert_AcknowledgeAlertForCurrentUser;
 	PLibMCEnvAlert_DeactivateAlertPtr m_Alert_DeactivateAlert;
 	PLibMCEnvAlertIterator_GetCurrentAlertPtr m_AlertIterator_GetCurrentAlert;
+	PLibMCEnvLogEntryList_GetCountPtr m_LogEntryList_GetCount;
+	PLibMCEnvLogEntryList_GetEntryPtr m_LogEntryList_GetEntry;
+	PLibMCEnvLogEntryList_GetEntryTimePtr m_LogEntryList_GetEntryTime;
 	PLibMCEnvJournalHandler_RetrieveJournalVariablePtr m_JournalHandler_RetrieveJournalVariable;
 	PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr m_JournalHandler_RetrieveJournalVariableFromTimeInterval;
 	PLibMCEnvJournalHandler_GetStartTimePtr m_JournalHandler_GetStartTime;
+	PLibMCEnvJournalHandler_RetrieveLogEntriesPtr m_JournalHandler_RetrieveLogEntries;
+	PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr m_JournalHandler_RetrieveLogEntriesFromTimeInterval;
+	PLibMCEnvJournalHandler_RetrieveAlertsPtr m_JournalHandler_RetrieveAlerts;
+	PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr m_JournalHandler_RetrieveAlertsFromTimeInterval;
 	PLibMCEnvUserDetailList_CountPtr m_UserDetailList_Count;
 	PLibMCEnvUserDetailList_GetUserPropertiesPtr m_UserDetailList_GetUserProperties;
 	PLibMCEnvUserDetailList_GetUsernamePtr m_UserDetailList_GetUsername;

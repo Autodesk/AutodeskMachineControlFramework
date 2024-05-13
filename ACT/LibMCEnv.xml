@@ -235,7 +235,16 @@
 		<option name="Unknown" value="7"/>
 	</enum>	
 
-
+	<enum name="LogLevel">
+		<option name="FatalError" value="1"/>
+		<option name="CriticalError" value="2"/>
+		<option name="Warning" value="3"/>
+		<option name="Message" value="4"/>
+		<option name="Info" value="5"/>
+		<option name="Debug" value="6"/>
+		<option name="Unknown" value="7"/>
+	</enum>	
+		
 	<enum name="ImagePixelFormat">
 		<option name="Unknown" value="0" />
 		<option name="GreyScale8bit" value="1" />
@@ -3200,16 +3209,16 @@
 			<param name="AckTime" type="class" class="DateTime" pass="return" description="Timestamp Instance." />
 		</method>
 
-		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. ">
+		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.">
 			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
 			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
 		</method>
 
-		<method name="AcknowledgeAlertForCurrentUser" description="Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.">
+		<method name="AcknowledgeAlertForCurrentUser" description="Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.">
 			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
 		</method>
 
-		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user.">
+		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.">
 		</method>
 		
 	</class>
@@ -3220,6 +3229,26 @@
 		</method>
 	</class>
 
+	<class name="LogEntryList" parent="Base" description="Class for accessing an AMCF Log Journal.">
+		
+		<method name="GetCount" description="Returns the number of log entries in the list.">
+			<param name="Count" type="uint32" pass="return" description="Number of log entries."/>
+		</method>
+		
+		<method name="GetEntry" description="Returns the a log entry of the list.">
+			<param name="Index" type="uint32" pass="in" description="Index of entry to retrieve. 0-based. Fails if larger or equal to Count."/>
+			<param name="Message" type="string" pass="out" description="Message of the log entry."/>
+			<param name="SubSystem" type="string" pass="out" description="Subsystem of the log entry."/>
+			<param name="LogID" type="uint32" pass="out" description="ID of the log entry."/>
+			<param name="LogLevel" type="enum" class="LogLevel" pass="out" description="Level of the log entry."/>
+		</method>
+
+		<method name="GetEntryTime" description="Returns the time stamp of an entry.">
+			<param name="Index" type="uint32" pass="in" description="Index of entry to retrieve. 0-based. Fails if larger or equal to Count."/>
+			<param name="Timestamp" type="class" class="DateTime" pass="return" description="Date Time object of the entry."/>
+		</method>
+		
+	</class>
 
 
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
@@ -3241,6 +3270,30 @@
 			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
 		</method>
 	
+		<method name="RetrieveLogEntries" description="Retrieves the current log entries of the journal.">
+			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
+			<param name="MinLogLevel" type="enum" class="LogLevel" pass="out" description="Only entries with a log level that is higher than the given one are returned."/>
+			<param name="EntryList" type="class" class="LogEntryList" pass="return" description="Log Entry Instance." />
+		</method>
+
+		<method name="RetrieveLogEntriesFromTimeInterval" description="Retrieves the log entries of the journal over the given time interval.">
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="MinLogLevel" type="enum" class="LogLevel" pass="out" description="Only entries with a log level that is higher than the given one are returned."/>
+			<param name="EntryList" type="class" class="LogEntryList" pass="return" description="Log Entry Instance." />
+		</method>
+
+		<method name="RetrieveAlerts" description="Retrieves the alerts of the journal.">
+			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="Alert Iterator Instance." />
+		</method>
+
+		<method name="RetrieveAlertsFromTimeInterval" description="Retrieves the alerts of the journal over the given time interval.">
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="Alert Iterator Instance." />
+		</method>
+		
 	</class>
 
 	<class name="UserDetailList" parent="Base" description="List of user details at a certain snapshot time.">

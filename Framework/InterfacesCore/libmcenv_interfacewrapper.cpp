@@ -17456,6 +17456,128 @@ LibMCEnvResult libmcenv_alertiterator_getcurrentalert(LibMCEnv_AlertIterator pAl
 
 
 /*************************************************************************************************************************
+ Class implementation for LogEntryList
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_logentrylist_getcount(LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pLogEntryList;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ILogEntryList* pILogEntryList = dynamic_cast<ILogEntryList*>(pIBaseClass);
+		if (!pILogEntryList)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pILogEntryList->GetCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_logentrylist_getentry(LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nMessageBufferSize, LibMCEnv_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCEnv_uint32 nSubSystemBufferSize, LibMCEnv_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, LibMCEnv_uint32 * pLogID, eLibMCEnvLogLevel * pLogLevel)
+{
+	IBase* pIBaseClass = (IBase *)pLogEntryList;
+
+	try {
+		if ( (!pMessageBuffer) && !(pMessageNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pSubSystemBuffer) && !(pSubSystemNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pLogID)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pLogLevel)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sMessage("");
+		std::string sSubSystem("");
+		ILogEntryList* pILogEntryList = dynamic_cast<ILogEntryList*>(pIBaseClass);
+		if (!pILogEntryList)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pMessageBuffer == nullptr) || (pSubSystemBuffer == nullptr);
+		if (isCacheCall) {
+			pILogEntryList->GetEntry(nIndex, sMessage, sSubSystem, *pLogID, *pLogLevel);
+
+			pILogEntryList->_setCache (new ParameterCache_4<std::string, std::string, LibMCEnv_uint32, LibMCEnv::eLogLevel> (sMessage, sSubSystem, *pLogID, *pLogLevel));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_4<std::string, std::string, LibMCEnv_uint32, LibMCEnv::eLogLevel>*> (pILogEntryList->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sMessage, sSubSystem, *pLogID, *pLogLevel);
+			pILogEntryList->_setCache (nullptr);
+		}
+		
+		if (pMessageNeededChars)
+			*pMessageNeededChars = (LibMCEnv_uint32) (sMessage.size()+1);
+		if (pMessageBuffer) {
+			if (sMessage.size() >= nMessageBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iMessage = 0; iMessage < sMessage.size(); iMessage++)
+				pMessageBuffer[iMessage] = sMessage[iMessage];
+			pMessageBuffer[sMessage.size()] = 0;
+		}
+		if (pSubSystemNeededChars)
+			*pSubSystemNeededChars = (LibMCEnv_uint32) (sSubSystem.size()+1);
+		if (pSubSystemBuffer) {
+			if (sSubSystem.size() >= nSubSystemBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSubSystem = 0; iSubSystem < sSubSystem.size(); iSubSystem++)
+				pSubSystemBuffer[iSubSystem] = sSubSystem[iSubSystem];
+			pSubSystemBuffer[sSubSystem.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_logentrylist_getentrytime(LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 nIndex, LibMCEnv_DateTime * pTimestamp)
+{
+	IBase* pIBaseClass = (IBase *)pLogEntryList;
+
+	try {
+		if (pTimestamp == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseTimestamp(nullptr);
+		ILogEntryList* pILogEntryList = dynamic_cast<ILogEntryList*>(pIBaseClass);
+		if (!pILogEntryList)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseTimestamp = pILogEntryList->GetEntryTime(nIndex);
+
+		*pTimestamp = (IBase*)(pBaseTimestamp);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for JournalHandler
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable)
@@ -17535,6 +17657,122 @@ LibMCEnvResult libmcenv_journalhandler_getstarttime(LibMCEnv_JournalHandler pJou
 		pBaseDateTimeInstance = pIJournalHandler->GetStartTime();
 
 		*pDateTimeInstance = (IBase*)(pBaseDateTimeInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_retrievelogentries(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nTimeDeltaInMicroseconds, eLibMCEnvLogLevel * pMinLogLevel, LibMCEnv_LogEntryList * pEntryList)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (!pMinLogLevel)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pEntryList == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseEntryList(nullptr);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseEntryList = pIJournalHandler->RetrieveLogEntries(nTimeDeltaInMicroseconds, *pMinLogLevel);
+
+		*pEntryList = (IBase*)(pBaseEntryList);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_retrievelogentriesfromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, eLibMCEnvLogLevel * pMinLogLevel, LibMCEnv_LogEntryList * pEntryList)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (!pMinLogLevel)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pEntryList == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseEntryList(nullptr);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseEntryList = pIJournalHandler->RetrieveLogEntriesFromTimeInterval(nStartTimeInMicroseconds, nEndTimeInMicroseconds, *pMinLogLevel);
+
+		*pEntryList = (IBase*)(pBaseEntryList);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_retrievealerts(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_AlertIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIJournalHandler->RetrieveAlerts(nTimeDeltaInMicroseconds);
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_retrievealertsfromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_AlertIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIJournalHandler->RetrieveAlertsFromTimeInterval(nStartTimeInMicroseconds, nEndTimeInMicroseconds);
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -24870,12 +25108,26 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_alert_deactivatealert;
 	if (sProcName == "libmcenv_alertiterator_getcurrentalert") 
 		*ppProcAddress = (void*) &libmcenv_alertiterator_getcurrentalert;
+	if (sProcName == "libmcenv_logentrylist_getcount") 
+		*ppProcAddress = (void*) &libmcenv_logentrylist_getcount;
+	if (sProcName == "libmcenv_logentrylist_getentry") 
+		*ppProcAddress = (void*) &libmcenv_logentrylist_getentry;
+	if (sProcName == "libmcenv_logentrylist_getentrytime") 
+		*ppProcAddress = (void*) &libmcenv_logentrylist_getentrytime;
 	if (sProcName == "libmcenv_journalhandler_retrievejournalvariable") 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalvariable;
 	if (sProcName == "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval") 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalvariablefromtimeinterval;
 	if (sProcName == "libmcenv_journalhandler_getstarttime") 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_getstarttime;
+	if (sProcName == "libmcenv_journalhandler_retrievelogentries") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievelogentries;
+	if (sProcName == "libmcenv_journalhandler_retrievelogentriesfromtimeinterval") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievelogentriesfromtimeinterval;
+	if (sProcName == "libmcenv_journalhandler_retrievealerts") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievealerts;
+	if (sProcName == "libmcenv_journalhandler_retrievealertsfromtimeinterval") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievealertsfromtimeinterval;
 	if (sProcName == "libmcenv_userdetaillist_count") 
 		*ppProcAddress = (void*) &libmcenv_userdetaillist_count;
 	if (sProcName == "libmcenv_userdetaillist_getuserproperties") 

@@ -106,6 +106,7 @@ class CUniformJournalSampling;
 class CJournalVariable;
 class CAlert;
 class CAlertIterator;
+class CLogEntryList;
 class CJournalHandler;
 class CUserDetailList;
 class CUserManagementHandler;
@@ -164,6 +165,7 @@ typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
 typedef CJournalVariable CLibMCEnvJournalVariable;
 typedef CAlert CLibMCEnvAlert;
 typedef CAlertIterator CLibMCEnvAlertIterator;
+typedef CLogEntryList CLibMCEnvLogEntryList;
 typedef CJournalHandler CLibMCEnvJournalHandler;
 typedef CUserDetailList CLibMCEnvUserDetailList;
 typedef CUserManagementHandler CLibMCEnvUserManagementHandler;
@@ -222,6 +224,7 @@ typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
 typedef std::shared_ptr<CJournalVariable> PJournalVariable;
 typedef std::shared_ptr<CAlert> PAlert;
 typedef std::shared_ptr<CAlertIterator> PAlertIterator;
+typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CJournalHandler> PJournalHandler;
 typedef std::shared_ptr<CUserDetailList> PUserDetailList;
 typedef std::shared_ptr<CUserManagementHandler> PUserManagementHandler;
@@ -280,6 +283,7 @@ typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
 typedef PJournalVariable PLibMCEnvJournalVariable;
 typedef PAlert PLibMCEnvAlert;
 typedef PAlertIterator PLibMCEnvAlertIterator;
+typedef PLogEntryList PLibMCEnvLogEntryList;
 typedef PJournalHandler PLibMCEnvJournalHandler;
 typedef PUserDetailList PLibMCEnvUserDetailList;
 typedef PUserManagementHandler PLibMCEnvUserManagementHandler;
@@ -904,6 +908,7 @@ private:
 	friend class CJournalVariable;
 	friend class CAlert;
 	friend class CAlertIterator;
+	friend class CLogEntryList;
 	friend class CJournalHandler;
 	friend class CUserDetailList;
 	friend class CUserManagementHandler;
@@ -2250,6 +2255,25 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CLogEntryList 
+**************************************************************************************************************************/
+class CLogEntryList : public CBase {
+public:
+	
+	/**
+	* CLogEntryList::CLogEntryList - Constructor for LogEntryList class.
+	*/
+	CLogEntryList(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint32 GetCount();
+	inline void GetEntry(const LibMCEnv_uint32 nIndex, std::string & sMessage, std::string & sSubSystem, LibMCEnv_uint32 & nLogID, eLogLevel & eLogLevel);
+	inline PDateTime GetEntryTime(const LibMCEnv_uint32 nIndex);
+};
+	
+/*************************************************************************************************************************
  Class CJournalHandler 
 **************************************************************************************************************************/
 class CJournalHandler : public CBase {
@@ -2266,6 +2290,10 @@ public:
 	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
 	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
 	inline PDateTime GetStartTime();
+	inline PLogEntryList RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, eLogLevel & eMinLogLevel);
+	inline PLogEntryList RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, eLogLevel & eMinLogLevel);
+	inline PAlertIterator RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
+	inline PAlertIterator RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
 };
 	
 /*************************************************************************************************************************
@@ -3149,9 +3177,16 @@ public:
 		pWrapperTable->m_Alert_AcknowledgeAlertForCurrentUser = nullptr;
 		pWrapperTable->m_Alert_DeactivateAlert = nullptr;
 		pWrapperTable->m_AlertIterator_GetCurrentAlert = nullptr;
+		pWrapperTable->m_LogEntryList_GetCount = nullptr;
+		pWrapperTable->m_LogEntryList_GetEntry = nullptr;
+		pWrapperTable->m_LogEntryList_GetEntryTime = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = nullptr;
 		pWrapperTable->m_JournalHandler_GetStartTime = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveLogEntries = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveAlerts = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval = nullptr;
 		pWrapperTable->m_UserDetailList_Count = nullptr;
 		pWrapperTable->m_UserDetailList_GetUserProperties = nullptr;
 		pWrapperTable->m_UserDetailList_GetUsername = nullptr;
@@ -8272,6 +8307,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_GetCount = (PLibMCEnvLogEntryList_GetCountPtr) GetProcAddress(hLibrary, "libmcenv_logentrylist_getcount");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_GetCount = (PLibMCEnvLogEntryList_GetCountPtr) dlsym(hLibrary, "libmcenv_logentrylist_getcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_GetCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_GetEntry = (PLibMCEnvLogEntryList_GetEntryPtr) GetProcAddress(hLibrary, "libmcenv_logentrylist_getentry");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_GetEntry = (PLibMCEnvLogEntryList_GetEntryPtr) dlsym(hLibrary, "libmcenv_logentrylist_getentry");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_GetEntry == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_GetEntryTime = (PLibMCEnvLogEntryList_GetEntryTimePtr) GetProcAddress(hLibrary, "libmcenv_logentrylist_getentrytime");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_GetEntryTime = (PLibMCEnvLogEntryList_GetEntryTimePtr) dlsym(hLibrary, "libmcenv_logentrylist_getentrytime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_GetEntryTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
 		#else // _WIN32
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
@@ -8296,6 +8358,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalHandler_GetStartTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveLogEntries = (PLibMCEnvJournalHandler_RetrieveLogEntriesPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievelogentries");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveLogEntries = (PLibMCEnvJournalHandler_RetrieveLogEntriesPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievelogentries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveLogEntries == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievelogentriesfromtimeinterval");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievelogentriesfromtimeinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveAlerts = (PLibMCEnvJournalHandler_RetrieveAlertsPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievealerts");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveAlerts = (PLibMCEnvJournalHandler_RetrieveAlertsPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievealerts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveAlerts == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievealertsfromtimeinterval");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievealertsfromtimeinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12124,6 +12222,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_AlertIterator_GetCurrentAlert == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_logentrylist_getcount", (void**)&(pWrapperTable->m_LogEntryList_GetCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_logentrylist_getentry", (void**)&(pWrapperTable->m_LogEntryList_GetEntry));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetEntry == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_logentrylist_getentrytime", (void**)&(pWrapperTable->m_LogEntryList_GetEntryTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetEntryTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariable", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariable));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12134,6 +12244,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_getstarttime", (void**)&(pWrapperTable->m_JournalHandler_GetStartTime));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetStartTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievelogentries", (void**)&(pWrapperTable->m_JournalHandler_RetrieveLogEntries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveLogEntries == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievelogentriesfromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievealerts", (void**)&(pWrapperTable->m_JournalHandler_RetrieveAlerts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveAlerts == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievealertsfromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_userdetaillist_count", (void**)&(pWrapperTable->m_UserDetailList_Count));
@@ -20120,7 +20246,7 @@ public:
 	}
 	
 	/**
-	* CAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
+	* CAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
@@ -20130,7 +20256,7 @@ public:
 	}
 	
 	/**
-	* CAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+	* CAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
 	void CAlert::AcknowledgeAlertForCurrentUser(const std::string & sUserComment)
@@ -20139,7 +20265,7 @@ public:
 	}
 	
 	/**
-	* CAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+	* CAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.
 	*/
 	void CAlert::DeactivateAlert()
 	{
@@ -20163,6 +20289,60 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CAlert>(m_pWrapper, hAlertInstance);
+	}
+	
+	/**
+	 * Method definitions for class CLogEntryList
+	 */
+	
+	/**
+	* CLogEntryList::GetCount - Returns the number of log entries in the list.
+	* @return Number of log entries.
+	*/
+	LibMCEnv_uint32 CLogEntryList::GetCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CLogEntryList::GetEntry - Returns the a log entry of the list.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @param[out] sMessage - Message of the log entry.
+	* @param[out] sSubSystem - Subsystem of the log entry.
+	* @param[out] nLogID - ID of the log entry.
+	* @param[out] eLogLevel - Level of the log entry.
+	*/
+	void CLogEntryList::GetEntry(const LibMCEnv_uint32 nIndex, std::string & sMessage, std::string & sSubSystem, LibMCEnv_uint32 & nLogID, eLogLevel & eLogLevel)
+	{
+		LibMCEnv_uint32 bytesNeededMessage = 0;
+		LibMCEnv_uint32 bytesWrittenMessage = 0;
+		LibMCEnv_uint32 bytesNeededSubSystem = 0;
+		LibMCEnv_uint32 bytesWrittenSubSystem = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntry(m_pHandle, nIndex, 0, &bytesNeededMessage, nullptr, 0, &bytesNeededSubSystem, nullptr, &nLogID, &eLogLevel));
+		std::vector<char> bufferMessage(bytesNeededMessage);
+		std::vector<char> bufferSubSystem(bytesNeededSubSystem);
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntry(m_pHandle, nIndex, bytesNeededMessage, &bytesWrittenMessage, &bufferMessage[0], bytesNeededSubSystem, &bytesWrittenSubSystem, &bufferSubSystem[0], &nLogID, &eLogLevel));
+		sMessage = std::string(&bufferMessage[0]);
+		sSubSystem = std::string(&bufferSubSystem[0]);
+	}
+	
+	/**
+	* CLogEntryList::GetEntryTime - Returns the time stamp of an entry.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @return Date Time object of the entry.
+	*/
+	PDateTime CLogEntryList::GetEntryTime(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnvHandle hTimestamp = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntryTime(m_pHandle, nIndex, &hTimestamp));
+		
+		if (!hTimestamp) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hTimestamp);
 	}
 	
 	/**
@@ -20217,6 +20397,74 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveLogEntries - Retrieves the current log entries of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	PLogEntryList CJournalHandler::RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, eLogLevel & eMinLogLevel)
+	{
+		LibMCEnvHandle hEntryList = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveLogEntries(m_pHandle, nTimeDeltaInMicroseconds, &eMinLogLevel, &hEntryList));
+		
+		if (!hEntryList) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CLogEntryList>(m_pWrapper, hEntryList);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveLogEntriesFromTimeInterval - Retrieves the log entries of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	PLogEntryList CJournalHandler::RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, eLogLevel & eMinLogLevel)
+	{
+		LibMCEnvHandle hEntryList = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveLogEntriesFromTimeInterval(m_pHandle, nStartTimeInMicroseconds, nEndTimeInMicroseconds, &eMinLogLevel, &hEntryList));
+		
+		if (!hEntryList) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CLogEntryList>(m_pWrapper, hEntryList);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveAlerts - Retrieves the alerts of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @return Alert Iterator Instance.
+	*/
+	PAlertIterator CJournalHandler::RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveAlerts(m_pHandle, nTimeDeltaInMicroseconds, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveAlertsFromTimeInterval - Retrieves the alerts of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @return Alert Iterator Instance.
+	*/
+	PAlertIterator CJournalHandler::RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveAlertsFromTimeInterval(m_pHandle, nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
 	}
 	
 	/**

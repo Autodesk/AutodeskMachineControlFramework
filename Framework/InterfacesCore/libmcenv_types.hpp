@@ -527,6 +527,7 @@ typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
 typedef LibMCEnvHandle LibMCEnv_JournalVariable;
 typedef LibMCEnvHandle LibMCEnv_Alert;
 typedef LibMCEnvHandle LibMCEnv_AlertIterator;
+typedef LibMCEnvHandle LibMCEnv_LogEntryList;
 typedef LibMCEnvHandle LibMCEnv_JournalHandler;
 typedef LibMCEnvHandle LibMCEnv_UserDetailList;
 typedef LibMCEnvHandle LibMCEnv_UserManagementHandler;
@@ -545,6 +546,16 @@ namespace LibMCEnv {
     CriticalError = 2,
     Warning = 3,
     Message = 4,
+    Unknown = 7
+  };
+  
+  enum class eLogLevel : LibMCEnv_int32 {
+    FatalError = 1,
+    CriticalError = 2,
+    Warning = 3,
+    Message = 4,
+    Info = 5,
+    Debug = 6,
     Unknown = 7
   };
   
@@ -677,6 +688,7 @@ namespace LibMCEnv {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCEnv::eAlertLevel eLibMCEnvAlertLevel;
+typedef LibMCEnv::eLogLevel eLibMCEnvLogLevel;
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
