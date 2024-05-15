@@ -43,12 +43,63 @@ export default class AMCApplicationItem_Content_BuildList extends Common.AMCAppl
 
 		this.entries = [];
 				
-		// TODO: check validity
-		this.headers = itemJSON.headers;
+		this.headers = [];
+		for (let header of itemJSON.headers) {
+			let checkedHeader = {
+				"text": header.text,
+				"value": header.value,						
+				"sortable": header.sortable,
+				"width": header.width
+			}
+			
+			this.headers.push(checkedHeader);
+		}
+
+		this.entrybuttons = [];
+		if (itemJSON.entrybuttons) {
+			for (let entrybutton of itemJSON.entrybuttons) {				
+				
+				let checkedEntryButton = {
+					"uuid": entrybutton.uuid,
+					"caption": entrybutton.caption,
+					"color": entrybutton.color,
+					"cursor": entrybutton.cursor,
+					"selectevent": entrybutton.selectevent
+				}
+				
+				this.entrybuttons.push(checkedEntryButton);
+			}
+		}
+
+		
 		this.loadingtext = "";
 		this.selectevent = "";
 		this.selectionvalueuuid = Common.nullUUID ();
+		this.buttonvalueuuid = Common.nullUUID ();
+		this.thumbnailaspectratio = 1.8;
+		this.thumbnailheight = "150pt";
+		this.thumbnailwidth = "";
 		this.entriesperpage = 25;
+		
+		/*  this.entrybuttons = [
+		{
+			uuid: "123",
+			caption: "Details",
+			color: "primary",
+			cursor: "cursor-pointer",
+			selectionvalueuuid: Common.nullUUID (),
+			selectevent: "12324353",
+							
+		},
+		{
+			uuid: "234",
+			caption: "History",
+			color: "primary",
+			cursor: "cursor-pointer",
+			selectionvalueuuid: Common.nullUUID (),
+			selectevent: "12324353",						
+		}
+		]; */
 		
 		this.updateFromJSON (itemJSON);
 		
@@ -68,6 +119,8 @@ export default class AMCApplicationItem_Content_BuildList extends Common.AMCAppl
 			this.selectevent = Assert.IdentifierString (updateJSON.selectevent);		
 		if (updateJSON.selectionvalueuuid)
 			this.selectionvalueuuid = Assert.IdentifierString (updateJSON.selectionvalueuuid);
+		if (updateJSON.buttonvalueuuid)
+			this.buttonvalueuuid = Assert.IdentifierString (updateJSON.buttonvalueuuid);
 		if (updateJSON.entriesperpage)
 			this.entriesperpage = Assert.IntegerValue (updateJSON.entriesperpage);
 
