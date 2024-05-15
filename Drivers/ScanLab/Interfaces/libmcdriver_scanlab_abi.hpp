@@ -838,6 +838,36 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_initializeforoie(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer, LibMCDriver_ScanLab::eOIEOperationMode eOperationMode);
 
 /**
+* Sets the laser pin outputs to a certain state. Control command, has immediate effect.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserpinout(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOut1, bool bLaserOut2);
+
+/**
+* Read the laser pin input values. Control command, has immediate effect.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pLaserOut1 - Value for Laser In Pin 1
+* @param[out] pLaserOut2 - Value for Laser In Pin 2
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserpinin(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pLaserOut1, bool * pLaserOut2);
+
+/**
+* Adds the laser pin command to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addlaserpinouttolist(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOut1, bool bLaserOut2);
+
+/**
 * Writes an OIE enabling command block to the open list.
 *
 * @param[in] pRTCContext - RTCContext instance.

@@ -678,6 +678,9 @@ public:
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 	inline void InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer, const eOIEOperationMode eOperationMode);
+	inline void SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2);
+	inline void GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2);
+	inline void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2);
 	inline void EnableOIE();
 	inline void DisableOIE();
 	inline void StartOIEMeasurement();
@@ -1054,6 +1057,9 @@ public:
 		pWrapperTable->m_RTCContext_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_RTCContext_GetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_RTCContext_InitializeForOIE = nullptr;
+		pWrapperTable->m_RTCContext_SetLaserPinOut = nullptr;
+		pWrapperTable->m_RTCContext_GetLaserPinIn = nullptr;
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
@@ -1881,6 +1887,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_InitializeForOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetLaserPinOut = (PLibMCDriver_ScanLabRTCContext_SetLaserPinOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserpinout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetLaserPinOut = (PLibMCDriver_ScanLabRTCContext_SetLaserPinOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserpinout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetLaserPinOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetLaserPinIn = (PLibMCDriver_ScanLabRTCContext_GetLaserPinInPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserpinin");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetLaserPinIn = (PLibMCDriver_ScanLabRTCContext_GetLaserPinInPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserpinin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetLaserPinIn == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = (PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addlaserpinouttolist");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = (PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addlaserpinouttolist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddLaserPinOutToList == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3289,6 +3322,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_InitializeForOIE == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlaserpinout", (void**)&(pWrapperTable->m_RTCContext_SetLaserPinOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserPinOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getlaserpinin", (void**)&(pWrapperTable->m_RTCContext_GetLaserPinIn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetLaserPinIn == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addlaserpinouttolist", (void**)&(pWrapperTable->m_RTCContext_AddLaserPinOutToList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddLaserPinOutToList == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoie", (void**)&(pWrapperTable->m_RTCContext_EnableOIE));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableOIE == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4607,6 +4652,36 @@ public:
 	void CRTCContext::InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer, const eOIEOperationMode eOperationMode)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_InitializeForOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)SignalChannelsBuffer.size(), SignalChannelsBuffer.data(), eOperationMode));
+	}
+	
+	/**
+	* CRTCContext::SetLaserPinOut - Sets the laser pin outputs to a certain state. Control command, has immediate effect.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	void CRTCContext::SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserPinOut(m_pHandle, bLaserOut1, bLaserOut2));
+	}
+	
+	/**
+	* CRTCContext::GetLaserPinIn - Read the laser pin input values. Control command, has immediate effect.
+	* @param[out] bLaserOut1 - Value for Laser In Pin 1
+	* @param[out] bLaserOut2 - Value for Laser In Pin 2
+	*/
+	void CRTCContext::GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserPinIn(m_pHandle, &bLaserOut1, &bLaserOut2));
+	}
+	
+	/**
+	* CRTCContext::AddLaserPinOutToList - Adds the laser pin command to the current open list.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddLaserPinOutToList(m_pHandle, bLaserOut1, bLaserOut2));
 	}
 	
 	/**

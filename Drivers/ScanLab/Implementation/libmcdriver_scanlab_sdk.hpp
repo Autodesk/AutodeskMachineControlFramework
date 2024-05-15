@@ -144,6 +144,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_x) (uint32_t nCardNo, uint32_t nX, uint32_t nValue);
 
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_pin_out) (uint32_t nCardNo, uint32_t nPins);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_pin_out_list) (uint32_t nCardNo, uint32_t nPins);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_laser_pin_in) (uint32_t nCardNo);
 
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing_para) (uint32_t nCardNo, double dTimelag, int32_t nLaserOnShift, uint32_t nNprev, uint32_t nNPost);
@@ -322,6 +323,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_write_da_x ptr_n_write_da_x = nullptr;
 			PScanLabPtr_n_set_laser_pin_out ptr_n_set_laser_pin_out = nullptr;
 			PScanLabPtr_n_get_laser_pin_in ptr_n_get_laser_pin_in = nullptr;
+			PScanLabPtr_n_set_laser_pin_out_list ptr_n_set_laser_pin_out_list = nullptr;
 			PScanLabPtr_n_set_sky_writing_para ptr_n_set_sky_writing_para = nullptr;
 			PScanLabPtr_n_set_sky_writing_limit ptr_n_set_sky_writing_limit = nullptr;
 			PScanLabPtr_n_set_sky_writing_mode ptr_n_set_sky_writing_mode = nullptr;
@@ -480,6 +482,7 @@ namespace LibMCDriver_ScanLab {
 
 			void n_set_laser_pin_out (uint32_t nCardNo, uint32_t nPins);
 			uint32_t n_get_laser_pin_in (uint32_t nCardNo);
+			void n_set_laser_pin_out_list(uint32_t nCardNo, uint32_t nPins);
 
 			void n_set_sky_writing_para (uint32_t nCardNo, double dTimelag, int32_t nLaserOnShift, uint32_t nNprev, uint32_t nNPost);
 			void n_set_sky_writing_limit (uint32_t nCardNo, double dCosAngle);

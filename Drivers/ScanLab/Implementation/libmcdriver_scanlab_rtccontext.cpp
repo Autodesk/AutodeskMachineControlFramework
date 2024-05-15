@@ -1208,6 +1208,44 @@ void CRTCContext::sendOIEMeasurementTag(uint32_t nCurrentVectorID)
 
 }
 
+void CRTCContext::SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2)
+{
+	uint32_t nPins = 0;
+	if (bLaserOut1)
+		nPins |= 1;
+	if (bLaserOut2)
+		nPins |= 2;
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_laser_pin_out(m_CardNo, nPins);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::GetLaserPinIn(bool& bLaserOut1, bool& bLaserOut2)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	uint32_t nPins = m_pScanLabSDK->n_get_laser_pin_in(m_CardNo);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	bLaserOut1 = (nPins & 1UL) != 0;
+	bLaserOut2 = (nPins & 2UL) != 0;
+}
+
+void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2)
+{
+	uint32_t nPins = 0;
+	if (bLaserOut1)
+		nPins |= 1;
+	if (bLaserOut2)
+		nPins |= 2;
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_laser_pin_out_list(m_CardNo, nPins);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
 
 void CRTCContext::EnableOIE()
 {

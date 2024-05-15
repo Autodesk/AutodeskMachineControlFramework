@@ -41,7 +41,7 @@ message(STATUS "Including Drivers in build")
 add_subdirectory(Drivers)
 endif()
 
-set(CMAKE_AMCF_PLUGINNAME Examples/LPBFSystem)
+set(CMAKE_AMCF_PLUGINNAME Examples/ScanlabOCM)
 
 set(CMAKE_AMCF_PROJECTDIR ${PROJECT_BINARY_DIR})
 

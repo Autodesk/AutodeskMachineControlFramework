@@ -961,6 +961,27 @@ public:
 	virtual void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer, const LibMCDriver_ScanLab::eOIEOperationMode eOperationMode) = 0;
 
 	/**
+	* IRTCContext::SetLaserPinOut - Sets the laser pin outputs to a certain state. Control command, has immediate effect.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	virtual void SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2) = 0;
+
+	/**
+	* IRTCContext::GetLaserPinIn - Read the laser pin input values. Control command, has immediate effect.
+	* @param[out] bLaserOut1 - Value for Laser In Pin 1
+	* @param[out] bLaserOut2 - Value for Laser In Pin 2
+	*/
+	virtual void GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2) = 0;
+
+	/**
+	* IRTCContext::AddLaserPinOutToList - Adds the laser pin command to the current open list.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	virtual void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2) = 0;
+
+	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
 	*/
 	virtual void EnableOIE() = 0;
