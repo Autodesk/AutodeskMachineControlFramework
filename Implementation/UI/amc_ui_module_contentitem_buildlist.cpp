@@ -219,7 +219,7 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 
 		CJSONWriterObject entryButton(writer);
 		entryButton.addString(AMC_API_KEY_UI_ENTRYBUTTONUUID, pButton->getUUID ());
-		entryButton.addString(AMC_API_KEY_UI_ENTRYBUTTONCAPTION, pButton->getCaptionExpression ().evaluateStringValue ());
+		entryButton.addString(AMC_API_KEY_UI_ENTRYBUTTONCAPTION, "caption" /*pButton->getCaptionExpression ().evaluateStringValue ()*/);
 		entryButton.addString(AMC_API_KEY_UI_ENTRYBUTTONCOLOR, "primary");
 		entryButton.addString(AMC_API_KEY_UI_ENTRYBUTTONCURSOR, "cursor-pointer");
 		entryButton.addString(AMC_API_KEY_UI_ENTRYBUTTONSELECTEVENT, "");
