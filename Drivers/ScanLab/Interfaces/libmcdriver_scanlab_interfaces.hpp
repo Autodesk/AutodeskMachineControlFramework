@@ -766,6 +766,20 @@ public:
 	virtual void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent) = 0;
 
 	/**
+	* IRTCContext::AddSetAnalogOut - Adds changing an analog port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	virtual void AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) = 0;
+
+	/**
+	* IRTCContext::AddSetDigitalOut - Adds changing an digital port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	virtual void AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) = 0;
+
+	/**
 	* IRTCContext::AddSetPowerForPIDControl - adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
 	* @param[in] fPowerInPercent - Laser power in percent
 	*/

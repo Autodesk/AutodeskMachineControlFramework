@@ -98,6 +98,8 @@ namespace Impl {
 
 		void CopyFrom(IStreamReader* pStreamReader) override;
 
+		IStreamReader* GetStreamReader() override;
+
 	};
 
 
@@ -131,6 +133,8 @@ public:
 	LibMCEnv_uint64 GetSize() override;
 
     bool IsFinished() override;
+
+	IStreamReader* GetStreamReader() override;
 
 };
 

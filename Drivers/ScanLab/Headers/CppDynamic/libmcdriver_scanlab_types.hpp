@@ -184,6 +184,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE 1077 /** Scanahead missing rtc response. */
 #define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR 1078 /** Scanahead PCI error. */
 #define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR 1079 /** Scanahead unknown error. */
+#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL 1080 /** Port number is not digital. */
+#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG 1081 /** Port number is not analog. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -280,6 +282,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE: return "Scanahead missing rtc response.";
     case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR: return "Scanahead PCI error.";
     case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "Scanahead unknown error.";
+    case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
+    case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
     default: return "unknown error";
   }
 }

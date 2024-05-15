@@ -38,6 +38,9 @@ Abstract: This is a stub class definition of CBuildExecution
 #include "libmcenv_build.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_streamreader.hpp"
+#include "libmcenv_datatable.hpp"
+#include "libmcenv_tempstreamwriter.hpp"
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
@@ -229,6 +232,19 @@ LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
 	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 }
 
+bool CBuildExecution::HasAttachment(const std::string& sDataUUID)
+{
+	std::lock_guard <std::mutex> lockGuard(m_Mutex);
+	return m_pExecution->HasJobExecutionDataUUID(sDataUUID);
+}
+
+bool CBuildExecution::HasAttachmentIdentifier(const std::string& sIdentifier)
+{
+	std::lock_guard <std::mutex> lockGuard(m_Mutex);
+	return m_pExecution->HasJobExecutionDataIdentifier(sIdentifier);
+}
+
+
 std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string& sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer)
 {
 	auto pStorage = m_pDataModel->CreateStorage();
@@ -282,12 +298,23 @@ std::string CBuildExecution::AttachTempStream(const std::string& sIdentifier, co
 
 IStreamReader* CBuildExecution::LoadStreamByIdentifier(const std::string& sIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pJobExecutionData = m_pExecution->RetrieveJobExecutionDataByIdentifier(sIdentifier);
+	auto pStorageStream = pJobExecutionData->GetStorageStream();
+
+	auto pStorage = m_pDataModel->CreateStorage();
+
+	return new CStreamReader(pStorage, pStorageStream);
 }
 
 IStreamReader* CBuildExecution::LoadStreamByUUID(const std::string& sDataUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+	auto pJobExecutionData = m_pExecution->RetrieveJobExecutionData(sNormalizedUUID);
+	auto pStorageStream = pJobExecutionData->GetStorageStream();
+
+	auto pStorage = m_pDataModel->CreateStorage();
+
+	return new CStreamReader(pStorage, pStorageStream);
 }
 
 IDiscreteFieldData2D * CBuildExecution::LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier)
@@ -340,17 +367,45 @@ std::string CBuildExecution::StoreDiscreteField2D(const std::string & sContextId
 
 IDataTable* CBuildExecution::LoadDataTableByIdentifier(const std::string& sIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pExecutionData = m_pExecution->RetrieveJobExecutionDataByIdentifier(sIdentifier);
+	auto pStorageStream = pExecutionData->GetStorageStream();
+
+	auto pStorage = m_pDataModel->CreateStorage();
+
+	auto pStreamReader = std::make_unique<CStreamReader>(pStorage, pStorageStream);
+	return CDataTable::makeFromStream(pStreamReader.get());
 }
 
 IDataTable* CBuildExecution::LoadDataTableByUUID(const std::string& sDataUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+
+	auto pExecutionData = m_pExecution->RetrieveJobExecutionData(sNormalizedUUID);
+	auto pStorageStream = pExecutionData->GetStorageStream();
+
+	auto pStorage = m_pDataModel->CreateStorage();
+
+	auto pStreamReader = std::make_unique<CStreamReader>(pStorage, pStorageStream);
+	return CDataTable::makeFromStream(pStreamReader.get());
 }
 
 std::string CBuildExecution::StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string& sUserUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (sName.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLENAME);
+	if (sIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER);
+	if (AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER, "invalid datatable identifier: " + sIdentifier);
+
+	if (pFieldDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	auto pStreamWriter = std::make_unique<CTempStreamWriter>(m_pDataModel, sName, "application/amcf-datatable", sUserUUID, m_pGlobalChrono);
+	pFieldDataInstance->WriteDataToStream(pStreamWriter.get(), pStoreOptions);
+	pStreamWriter->Finish();
+
+	return AttachTempStream(sIdentifier, sName, sUserUUID, pStreamWriter.get());
 }
 
 IImageData* CBuildExecution::LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)

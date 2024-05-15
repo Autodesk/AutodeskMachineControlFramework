@@ -101,6 +101,8 @@ public:
 
 	void Finish() override;
 
+	IStreamReader* GetStreamReader() override;
+
 	void CopyFrom(IStreamReader* pStreamReader) override;
 
 };

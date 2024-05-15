@@ -705,6 +705,14 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_AddColumnPtr) (LibMCEnv_DataTable pD
 typedef LibMCEnvResult (*PLibMCEnvDataTable_RemoveColumnPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier);
 
 /**
+* Clears all data from the data table.
+*
+* @param[in] pDataTable - DataTable instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_ClearPtr) (LibMCEnv_DataTable pDataTable);
+
+/**
 * Returns if a column exists in the data field.
 *
 * @param[in] pDataTable - DataTable instance.
@@ -913,6 +921,15 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteCSVToStreamPtr) (LibMCEnv_DataT
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteDataToStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableWriteOptions pOptions);
+
+/**
+* Loads the data table from a stream. Clears all existing data from the data table.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pStream - Stream read instance to read from.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_LoadFromStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_StreamReader pStream);
 
 /*************************************************************************************************************************
  Class definition for DataSeries
@@ -2442,6 +2459,26 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetElapsedTimeInMillisecondsPtr
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetElapsedTimeInMicrosecondsPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint64 * pTimeStampInMicroseconds);
 
 /**
+* Returns if the Execution has an attached data with a certain UUID
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pDataUUID - Data UUID of the attachment to query. 
+* @param[out] pDataExists - Returns true if the data exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_HasAttachmentPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, bool * pDataExists);
+
+/**
+* Returns if the Execution has an attached data with a certain identifier
+*
+* @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] pIdentifier - Identifier of the attachment to query.
+* @param[out] pDataExists - Returns true if the data exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_HasAttachmentIdentifierPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, bool * pDataExists);
+
+/**
 * Adds binary data to store with the build execution.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
@@ -2474,7 +2511,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_AddBinaryDataPtr) (LibMCEnv_Bui
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_AttachTempStreamPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, const char * pUserUUID, LibMCEnv_BaseTempStreamWriter pStreamWriterInstance, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads stream of the build execution by identifier.
+* Loads stream of the build execution by attachment identifier.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the attachment. Fails if name does not exist.
@@ -2494,7 +2531,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadStreamByIdentifierPtr) (Lib
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadStreamByUUIDPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pDataUUID, LibMCEnv_StreamReader * pStreamReaderInstance);
 
 /**
-* Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+* Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
@@ -2504,7 +2541,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadStreamByUUIDPtr) (LibMCEnv_
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadDiscreteField2DByIdentifierPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance);
 
 /**
-* Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+* Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2530,7 +2567,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadDiscreteField2DByUUIDPtr) (
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_StoreDiscreteField2DPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DiscreteFieldData2D pFieldDataInstance, LibMCEnv_DiscreteFieldData2DStoreOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+* Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
@@ -2540,7 +2577,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_StoreDiscreteField2DPtr) (LibMC
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadDataTableByIdentifierPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_DataTable * pDataTableInstance);
 
 /**
-* Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+* Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2566,7 +2603,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadDataTableByUUIDPtr) (LibMCE
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_StoreDataTablePtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, const char * pName, LibMCEnv_DataTable pFieldDataInstance, LibMCEnv_DataTableWriteOptions pStoreOptions, const char * pUserUUID, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /**
-* Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+* Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2579,7 +2616,7 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_StoreDataTablePtr) (LibMCEnv_Bu
 typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadPNGImageByIdentifierPtr) (LibMCEnv_BuildExecution pBuildExecution, const char * pIdentifier, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.
+* Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
 * @param[in] pDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
@@ -2770,6 +2807,26 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_ToolpathIsLoadedPtr) (LibMCEnv_Build pBu
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvBuild_CreateToolpathAccessorPtr) (LibMCEnv_Build pBuild, LibMCEnv_ToolpathAccessor * pToolpathInstance);
+
+/**
+* Returns if the Build has an attached data with a certain UUID
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pDataUUID - Data UUID of the attachment to query. 
+* @param[out] pDataExists - Returns true if the data exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_HasAttachmentPtr) (LibMCEnv_Build pBuild, const char * pDataUUID, bool * pDataExists);
+
+/**
+* Returns if the Build has an attached data with a certain identifier
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pIdentifier - Identifier of the attachment to query.
+* @param[out] pDataExists - Returns true if the data exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_HasAttachmentIdentifierPtr) (LibMCEnv_Build pBuild, const char * pIdentifier, bool * pDataExists);
 
 /**
 * Adds binary data to store with the build.
@@ -5312,6 +5369,15 @@ typedef LibMCEnvResult (*PLibMCEnvBaseTempStreamWriter_FinishPtr) (LibMCEnv_Base
 */
 typedef LibMCEnvResult (*PLibMCEnvBaseTempStreamWriter_IsFinishedPtr) (LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, bool * pFinished);
 
+/**
+* Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.
+*
+* @param[in] pBaseTempStreamWriter - BaseTempStreamWriter instance.
+* @param[out] pStreamReader - Stream reader instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBaseTempStreamWriter_GetStreamReaderPtr) (LibMCEnv_BaseTempStreamWriter pBaseTempStreamWriter, LibMCEnv_StreamReader * pStreamReader);
+
 /*************************************************************************************************************************
  Class definition for TempStreamWriter
 **************************************************************************************************************************/
@@ -5747,7 +5813,7 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_GetAcknowledgementInformationPtr) (LibMC
 typedef LibMCEnvResult (*PLibMCEnvAlert_GetAcknowledgementTimePtr) (LibMCEnv_Alert pAlert, LibMCEnv_DateTime * pAckTime);
 
 /**
-* Acknowledges an alert for a specific user and sets it inactive. 
+* Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.
 *
 * @param[in] pAlert - Alert instance.
 * @param[in] pUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
@@ -5757,7 +5823,7 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_GetAcknowledgementTimePtr) (LibMCEnv_Ale
 typedef LibMCEnvResult (*PLibMCEnvAlert_AcknowledgeForUserPtr) (LibMCEnv_Alert pAlert, const char * pUserUUID, const char * pUserComment);
 
 /**
-* Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+* Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.
 *
 * @param[in] pAlert - Alert instance.
 * @param[in] pUserComment - User comment to store. May be empty.
@@ -5766,7 +5832,7 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_AcknowledgeForUserPtr) (LibMCEnv_Alert p
 typedef LibMCEnvResult (*PLibMCEnvAlert_AcknowledgeAlertForCurrentUserPtr) (LibMCEnv_Alert pAlert, const char * pUserComment);
 
 /**
-* Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+* Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.
 *
 * @param[in] pAlert - Alert instance.
 * @return error code or 0 (success)
@@ -5785,6 +5851,46 @@ typedef LibMCEnvResult (*PLibMCEnvAlert_DeactivateAlertPtr) (LibMCEnv_Alert pAle
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvAlertIterator_GetCurrentAlertPtr) (LibMCEnv_AlertIterator pAlertIterator, LibMCEnv_Alert * pAlertInstance);
+
+/*************************************************************************************************************************
+ Class definition for LogEntryList
+**************************************************************************************************************************/
+
+/**
+* Returns the number of log entries in the list.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[out] pCount - Number of log entries.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetCountPtr) (LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns the a log entry of the list.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+* @param[in] nMessageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMessageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMessageBuffer -  buffer of Message of the log entry., may be NULL
+* @param[in] nSubSystemBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubSystemNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubSystemBuffer -  buffer of Subsystem of the log entry., may be NULL
+* @param[out] pLogID - ID of the log entry.
+* @param[out] pLogLevel - Level of the log entry.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetEntryPtr) (LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nMessageBufferSize, LibMCEnv_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCEnv_uint32 nSubSystemBufferSize, LibMCEnv_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, LibMCEnv_uint32 * pLogID, LibMCEnv::eLogLevel * pLogLevel);
+
+/**
+* Returns the time stamp of an entry.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+* @param[out] pTimestamp - Date Time object of the entry.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetEntryTimePtr) (LibMCEnv_LogEntryList pLogEntryList, LibMCEnv_uint32 nIndex, LibMCEnv_DateTime * pTimestamp);
 
 /*************************************************************************************************************************
  Class definition for JournalHandler
@@ -5821,6 +5927,50 @@ typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariableFromTime
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvJournalHandler_GetStartTimePtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Retrieves the current log entries of the journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+* @param[out] pMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+* @param[out] pEntryList - Log Entry Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveLogEntriesPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel * pMinLogLevel, LibMCEnv_LogEntryList * pEntryList);
+
+/**
+* Retrieves the log entries of the journal over the given time interval.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[out] pMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+* @param[out] pEntryList - Log Entry Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel * pMinLogLevel, LibMCEnv_LogEntryList * pEntryList);
+
+/**
+* Retrieves the alerts of the journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+* @param[out] pIteratorInstance - Alert Iterator Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveAlertsPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_AlertIterator * pIteratorInstance);
+
+/**
+* Retrieves the alerts of the journal over the given time interval.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+* @param[out] pIteratorInstance - Alert Iterator Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_AlertIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Class definition for UserDetailList
@@ -7894,6 +8044,7 @@ typedef struct {
 	PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr m_DataTableCSVWriteOptions_SetSeparator;
 	PLibMCEnvDataTable_AddColumnPtr m_DataTable_AddColumn;
 	PLibMCEnvDataTable_RemoveColumnPtr m_DataTable_RemoveColumn;
+	PLibMCEnvDataTable_ClearPtr m_DataTable_Clear;
 	PLibMCEnvDataTable_HasColumnPtr m_DataTable_HasColumn;
 	PLibMCEnvDataTable_GetRowCountPtr m_DataTable_GetRowCount;
 	PLibMCEnvDataTable_GetColumnCountPtr m_DataTable_GetColumnCount;
@@ -7913,6 +8064,7 @@ typedef struct {
 	PLibMCEnvDataTable_SetUint64ColumnValuesPtr m_DataTable_SetUint64ColumnValues;
 	PLibMCEnvDataTable_WriteCSVToStreamPtr m_DataTable_WriteCSVToStream;
 	PLibMCEnvDataTable_WriteDataToStreamPtr m_DataTable_WriteDataToStream;
+	PLibMCEnvDataTable_LoadFromStreamPtr m_DataTable_LoadFromStream;
 	PLibMCEnvDataSeries_GetNamePtr m_DataSeries_GetName;
 	PLibMCEnvDataSeries_GetUUIDPtr m_DataSeries_GetUUID;
 	PLibMCEnvDataSeries_ClearPtr m_DataSeries_Clear;
@@ -8064,6 +8216,8 @@ typedef struct {
 	PLibMCEnvBuildExecution_GetEndTimeStampInMicrosecondsPtr m_BuildExecution_GetEndTimeStampInMicroseconds;
 	PLibMCEnvBuildExecution_GetElapsedTimeInMillisecondsPtr m_BuildExecution_GetElapsedTimeInMilliseconds;
 	PLibMCEnvBuildExecution_GetElapsedTimeInMicrosecondsPtr m_BuildExecution_GetElapsedTimeInMicroseconds;
+	PLibMCEnvBuildExecution_HasAttachmentPtr m_BuildExecution_HasAttachment;
+	PLibMCEnvBuildExecution_HasAttachmentIdentifierPtr m_BuildExecution_HasAttachmentIdentifier;
 	PLibMCEnvBuildExecution_AddBinaryDataPtr m_BuildExecution_AddBinaryData;
 	PLibMCEnvBuildExecution_AttachTempStreamPtr m_BuildExecution_AttachTempStream;
 	PLibMCEnvBuildExecution_LoadStreamByIdentifierPtr m_BuildExecution_LoadStreamByIdentifier;
@@ -8093,6 +8247,8 @@ typedef struct {
 	PLibMCEnvBuild_UnloadToolpathPtr m_Build_UnloadToolpath;
 	PLibMCEnvBuild_ToolpathIsLoadedPtr m_Build_ToolpathIsLoaded;
 	PLibMCEnvBuild_CreateToolpathAccessorPtr m_Build_CreateToolpathAccessor;
+	PLibMCEnvBuild_HasAttachmentPtr m_Build_HasAttachment;
+	PLibMCEnvBuild_HasAttachmentIdentifierPtr m_Build_HasAttachmentIdentifier;
 	PLibMCEnvBuild_AddBinaryDataPtr m_Build_AddBinaryData;
 	PLibMCEnvBuild_AttachTempStreamPtr m_Build_AttachTempStream;
 	PLibMCEnvBuild_LoadStreamByIdentifierPtr m_Build_LoadStreamByIdentifier;
@@ -8328,6 +8484,7 @@ typedef struct {
 	PLibMCEnvBaseTempStreamWriter_GetSizePtr m_BaseTempStreamWriter_GetSize;
 	PLibMCEnvBaseTempStreamWriter_FinishPtr m_BaseTempStreamWriter_Finish;
 	PLibMCEnvBaseTempStreamWriter_IsFinishedPtr m_BaseTempStreamWriter_IsFinished;
+	PLibMCEnvBaseTempStreamWriter_GetStreamReaderPtr m_BaseTempStreamWriter_GetStreamReader;
 	PLibMCEnvTempStreamWriter_GetWritePositionPtr m_TempStreamWriter_GetWritePosition;
 	PLibMCEnvTempStreamWriter_SeekPtr m_TempStreamWriter_Seek;
 	PLibMCEnvTempStreamWriter_WriteDataPtr m_TempStreamWriter_WriteData;
@@ -8372,9 +8529,16 @@ typedef struct {
 	PLibMCEnvAlert_AcknowledgeAlertForCurrentUserPtr m_Alert_AcknowledgeAlertForCurrentUser;
 	PLibMCEnvAlert_DeactivateAlertPtr m_Alert_DeactivateAlert;
 	PLibMCEnvAlertIterator_GetCurrentAlertPtr m_AlertIterator_GetCurrentAlert;
+	PLibMCEnvLogEntryList_GetCountPtr m_LogEntryList_GetCount;
+	PLibMCEnvLogEntryList_GetEntryPtr m_LogEntryList_GetEntry;
+	PLibMCEnvLogEntryList_GetEntryTimePtr m_LogEntryList_GetEntryTime;
 	PLibMCEnvJournalHandler_RetrieveJournalVariablePtr m_JournalHandler_RetrieveJournalVariable;
 	PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr m_JournalHandler_RetrieveJournalVariableFromTimeInterval;
 	PLibMCEnvJournalHandler_GetStartTimePtr m_JournalHandler_GetStartTime;
+	PLibMCEnvJournalHandler_RetrieveLogEntriesPtr m_JournalHandler_RetrieveLogEntries;
+	PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr m_JournalHandler_RetrieveLogEntriesFromTimeInterval;
+	PLibMCEnvJournalHandler_RetrieveAlertsPtr m_JournalHandler_RetrieveAlerts;
+	PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr m_JournalHandler_RetrieveAlertsFromTimeInterval;
 	PLibMCEnvUserDetailList_CountPtr m_UserDetailList_Count;
 	PLibMCEnvUserDetailList_GetUserPropertiesPtr m_UserDetailList_GetUserProperties;
 	PLibMCEnvUserDetailList_GetUsernamePtr m_UserDetailList_GetUsername;

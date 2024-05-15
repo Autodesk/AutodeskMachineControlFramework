@@ -38,6 +38,9 @@ Abstract: This is a stub class definition of CBuild
 #include "libmcenv_buildexecution.hpp"
 #include "libmcenv_buildexecutioniterator.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_streamreader.hpp"
+#include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_datatable.hpp"
 
 // Include custom headers here.
 #include "amc_systemstate.hpp"
@@ -184,6 +187,22 @@ bool CBuild::ToolpathIsLoaded()
 	return (m_pToolpathHandler->findToolpathEntity(sStreamUUID, false) != nullptr);
 }
 
+bool CBuild::HasAttachment(const std::string& sDataUUID)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->HasJobDataUUID(sDataUUID);
+}
+
+bool CBuild::HasAttachmentIdentifier(const std::string& sIdentifier)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->HasJobDataIdentifier(sIdentifier);
+}
+
+
+
 std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const std::string& sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer)
 {
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
@@ -241,27 +260,76 @@ std::string CBuild::AttachTempStream(const std::string& sIdentifier, const std::
 
 IStreamReader* CBuild::LoadStreamByIdentifier(const std::string& sIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pJobData = pBuildJob->RetrieveJobDataByIdentifier(sIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	return new CStreamReader(pStorage, pStorageStream);
 }
 
 IStreamReader* CBuild::LoadStreamByUUID(const std::string& sDataUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+	auto pJobData = pBuildJob->RetrieveJobData(sNormalizedUUID);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	return new CStreamReader(pStorage, pStorageStream);
 }
 
 IDataTable* CBuild::LoadDataTableByIdentifier(const std::string& sIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pJobData = pBuildJob->RetrieveJobDataByIdentifier(sIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	auto pStreamReader = std::make_unique<CStreamReader>(pStorage, pStorageStream);
+	return CDataTable::makeFromStream(pStreamReader.get());
 }
 
 IDataTable* CBuild::LoadDataTableByUUID(const std::string& sDataUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+
+	auto pJobData = pBuildJob->RetrieveJobData(sNormalizedUUID);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	auto pStreamReader = std::make_unique<CStreamReader> (pStorage, pStorageStream);
+	return CDataTable::makeFromStream (pStreamReader.get ());
 }
 
 std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string& sUserUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (sName.empty ())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLENAME);
+	if (sIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER);
+	if (AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER, "invalid datatable identifier: " + sIdentifier);
+
+	if (pFieldDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	auto pStreamWriter = std::make_unique<CTempStreamWriter> (m_pDataModel, sName, "application/amcf-datatable", sUserUUID, m_pGlobalChrono);	
+	pFieldDataInstance->WriteDataToStream(pStreamWriter.get(), pStoreOptions);
+	pStreamWriter->Finish();
+
+	AttachTempStream(sIdentifier, sName, sUserUUID, pStreamWriter.get());
 }
 
 

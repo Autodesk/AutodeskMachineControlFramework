@@ -1425,6 +1425,54 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetpower(LibMCDriver
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetanalogout(LibMCDriver_ScanLab_RTCContext pRTCContext, eLibMCDriver_ScanLabLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->AddSetAnalogOut(eLaserPort, fOutputValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetdigitalout(LibMCDriver_ScanLab_RTCContext pRTCContext, eLibMCDriver_ScanLabLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->AddSetDigitalOut(eLaserPort, fOutputValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -5366,6 +5414,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_drawhatches;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addsetpower") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addsetpower;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_addsetanalogout") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addsetanalogout;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_addsetdigitalout") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addsetdigitalout;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addsetjumpspeed") 

@@ -565,6 +565,26 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetpower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent);
 
 /**
+* Adds changing an analog port to the open list. Should not interfere with laser power control.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetanalogout(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue);
+
+/**
+* Adds changing an digital port to the open list. Should not interfere with laser power control.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetdigitalout(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue);
+
+/**
 * adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
 *
 * @param[in] pRTCContext - RTCContext instance.

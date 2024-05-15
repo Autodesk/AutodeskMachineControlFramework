@@ -106,6 +106,7 @@ class CUniformJournalSampling;
 class CJournalVariable;
 class CAlert;
 class CAlertIterator;
+class CLogEntryList;
 class CJournalHandler;
 class CUserDetailList;
 class CUserManagementHandler;
@@ -164,6 +165,7 @@ typedef CUniformJournalSampling CLibMCEnvUniformJournalSampling;
 typedef CJournalVariable CLibMCEnvJournalVariable;
 typedef CAlert CLibMCEnvAlert;
 typedef CAlertIterator CLibMCEnvAlertIterator;
+typedef CLogEntryList CLibMCEnvLogEntryList;
 typedef CJournalHandler CLibMCEnvJournalHandler;
 typedef CUserDetailList CLibMCEnvUserDetailList;
 typedef CUserManagementHandler CLibMCEnvUserManagementHandler;
@@ -222,6 +224,7 @@ typedef std::shared_ptr<CUniformJournalSampling> PUniformJournalSampling;
 typedef std::shared_ptr<CJournalVariable> PJournalVariable;
 typedef std::shared_ptr<CAlert> PAlert;
 typedef std::shared_ptr<CAlertIterator> PAlertIterator;
+typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CJournalHandler> PJournalHandler;
 typedef std::shared_ptr<CUserDetailList> PUserDetailList;
 typedef std::shared_ptr<CUserManagementHandler> PUserManagementHandler;
@@ -280,6 +283,7 @@ typedef PUniformJournalSampling PLibMCEnvUniformJournalSampling;
 typedef PJournalVariable PLibMCEnvJournalVariable;
 typedef PAlert PLibMCEnvAlert;
 typedef PAlertIterator PLibMCEnvAlertIterator;
+typedef PLogEntryList PLibMCEnvLogEntryList;
 typedef PJournalHandler PLibMCEnvJournalHandler;
 typedef PUserDetailList PLibMCEnvUserDetailList;
 typedef PUserManagementHandler PLibMCEnvUserManagementHandler;
@@ -544,6 +548,11 @@ public:
 			case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "CANNOTSEEKZIPSTREAM";
 			case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "GLOBALTIMERNOTCONTINUOUS";
 			case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "STREAMWRITERISNOTFINISHED";
+			case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "CANNOTREADFROMZIPSTREAM";
+			case LIBMCENV_ERROR_EMPTYDATATABLENAME: return "EMPTYDATATABLENAME";
+			case LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER: return "EMPTYDATATABLEIDENTIFIER";
+			case LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER: return "INVALIDDATATABLEIDENTIFIER";
+			case LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE: return "INVALIDDATATABLESIGNATURE";
 		}
 		return "UNKNOWN";
 	}
@@ -731,6 +740,11 @@ public:
 			case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "Cannot seek ZIP stream";
 			case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "Global Timer is not continuous.";
 			case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "Stream writer is not finished";
+			case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "Cannot read from ZIP stream";
+			case LIBMCENV_ERROR_EMPTYDATATABLENAME: return "Empty datatable name";
+			case LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER: return "Empty datatable identifier";
+			case LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER: return "Invalid datatable identifier";
+			case LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE: return "Invalid datatable signature";
 		}
 		return "unknown error";
 	}
@@ -894,6 +908,7 @@ private:
 	friend class CJournalVariable;
 	friend class CAlert;
 	friend class CAlertIterator;
+	friend class CLogEntryList;
 	friend class CJournalHandler;
 	friend class CUserDetailList;
 	friend class CUserManagementHandler;
@@ -1192,6 +1207,7 @@ public:
 	
 	inline void AddColumn(const std::string & sIdentifier, const std::string & sDescription, const eDataTableColumnType eColumnType);
 	inline void RemoveColumn(const std::string & sIdentifier);
+	inline void Clear();
 	inline bool HasColumn(const std::string & sIdentifier);
 	inline LibMCEnv_uint32 GetRowCount();
 	inline LibMCEnv_uint32 GetColumnCount();
@@ -1211,6 +1227,7 @@ public:
 	inline void SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer);
 	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions);
 	inline void WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions);
+	inline void LoadFromStream(classParam<CStreamReader> pStream);
 };
 	
 /*************************************************************************************************************************
@@ -1490,6 +1507,8 @@ public:
 	inline LibMCEnv_uint64 GetEndTimeStampInMicroseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInMilliseconds();
 	inline LibMCEnv_uint64 GetElapsedTimeInMicroseconds();
+	inline bool HasAttachment(const std::string & sDataUUID);
+	inline bool HasAttachmentIdentifier(const std::string & sIdentifier);
 	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
 	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
 	inline PStreamReader LoadStreamByIdentifier(const std::string & sIdentifier);
@@ -1551,6 +1570,8 @@ public:
 	inline void UnloadToolpath();
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
+	inline bool HasAttachment(const std::string & sDataUUID);
+	inline bool HasAttachmentIdentifier(const std::string & sIdentifier);
 	inline std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
 	inline std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, classParam<CBaseTempStreamWriter> pStreamWriterInstance);
 	inline PStreamReader LoadStreamByIdentifier(const std::string & sIdentifier);
@@ -2074,6 +2095,7 @@ public:
 	inline LibMCEnv_uint64 GetSize();
 	inline void Finish();
 	inline bool IsFinished();
+	inline PStreamReader GetStreamReader();
 };
 	
 /*************************************************************************************************************************
@@ -2233,6 +2255,25 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CLogEntryList 
+**************************************************************************************************************************/
+class CLogEntryList : public CBase {
+public:
+	
+	/**
+	* CLogEntryList::CLogEntryList - Constructor for LogEntryList class.
+	*/
+	CLogEntryList(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint32 GetCount();
+	inline void GetEntry(const LibMCEnv_uint32 nIndex, std::string & sMessage, std::string & sSubSystem, LibMCEnv_uint32 & nLogID, eLogLevel & eLogLevel);
+	inline PDateTime GetEntryTime(const LibMCEnv_uint32 nIndex);
+};
+	
+/*************************************************************************************************************************
  Class CJournalHandler 
 **************************************************************************************************************************/
 class CJournalHandler : public CBase {
@@ -2249,6 +2290,10 @@ public:
 	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
 	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
 	inline PDateTime GetStartTime();
+	inline PLogEntryList RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, eLogLevel & eMinLogLevel);
+	inline PLogEntryList RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, eLogLevel & eMinLogLevel);
+	inline PAlertIterator RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
+	inline PAlertIterator RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
 };
 	
 /*************************************************************************************************************************
@@ -2647,6 +2692,7 @@ public:
 		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = nullptr;
 		pWrapperTable->m_DataTable_AddColumn = nullptr;
 		pWrapperTable->m_DataTable_RemoveColumn = nullptr;
+		pWrapperTable->m_DataTable_Clear = nullptr;
 		pWrapperTable->m_DataTable_HasColumn = nullptr;
 		pWrapperTable->m_DataTable_GetRowCount = nullptr;
 		pWrapperTable->m_DataTable_GetColumnCount = nullptr;
@@ -2666,6 +2712,7 @@ public:
 		pWrapperTable->m_DataTable_SetUint64ColumnValues = nullptr;
 		pWrapperTable->m_DataTable_WriteCSVToStream = nullptr;
 		pWrapperTable->m_DataTable_WriteDataToStream = nullptr;
+		pWrapperTable->m_DataTable_LoadFromStream = nullptr;
 		pWrapperTable->m_DataSeries_GetName = nullptr;
 		pWrapperTable->m_DataSeries_GetUUID = nullptr;
 		pWrapperTable->m_DataSeries_Clear = nullptr;
@@ -2817,6 +2864,8 @@ public:
 		pWrapperTable->m_BuildExecution_GetEndTimeStampInMicroseconds = nullptr;
 		pWrapperTable->m_BuildExecution_GetElapsedTimeInMilliseconds = nullptr;
 		pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds = nullptr;
+		pWrapperTable->m_BuildExecution_HasAttachment = nullptr;
+		pWrapperTable->m_BuildExecution_HasAttachmentIdentifier = nullptr;
 		pWrapperTable->m_BuildExecution_AddBinaryData = nullptr;
 		pWrapperTable->m_BuildExecution_AttachTempStream = nullptr;
 		pWrapperTable->m_BuildExecution_LoadStreamByIdentifier = nullptr;
@@ -2846,6 +2895,8 @@ public:
 		pWrapperTable->m_Build_UnloadToolpath = nullptr;
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
+		pWrapperTable->m_Build_HasAttachment = nullptr;
+		pWrapperTable->m_Build_HasAttachmentIdentifier = nullptr;
 		pWrapperTable->m_Build_AddBinaryData = nullptr;
 		pWrapperTable->m_Build_AttachTempStream = nullptr;
 		pWrapperTable->m_Build_LoadStreamByIdentifier = nullptr;
@@ -3081,6 +3132,7 @@ public:
 		pWrapperTable->m_BaseTempStreamWriter_GetSize = nullptr;
 		pWrapperTable->m_BaseTempStreamWriter_Finish = nullptr;
 		pWrapperTable->m_BaseTempStreamWriter_IsFinished = nullptr;
+		pWrapperTable->m_BaseTempStreamWriter_GetStreamReader = nullptr;
 		pWrapperTable->m_TempStreamWriter_GetWritePosition = nullptr;
 		pWrapperTable->m_TempStreamWriter_Seek = nullptr;
 		pWrapperTable->m_TempStreamWriter_WriteData = nullptr;
@@ -3125,9 +3177,16 @@ public:
 		pWrapperTable->m_Alert_AcknowledgeAlertForCurrentUser = nullptr;
 		pWrapperTable->m_Alert_DeactivateAlert = nullptr;
 		pWrapperTable->m_AlertIterator_GetCurrentAlert = nullptr;
+		pWrapperTable->m_LogEntryList_GetCount = nullptr;
+		pWrapperTable->m_LogEntryList_GetEntry = nullptr;
+		pWrapperTable->m_LogEntryList_GetEntryTime = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = nullptr;
 		pWrapperTable->m_JournalHandler_GetStartTime = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveLogEntries = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveAlerts = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval = nullptr;
 		pWrapperTable->m_UserDetailList_Count = nullptr;
 		pWrapperTable->m_UserDetailList_GetUserProperties = nullptr;
 		pWrapperTable->m_UserDetailList_GetUsername = nullptr;
@@ -3883,6 +3942,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataTable_Clear = (PLibMCEnvDataTable_ClearPtr) GetProcAddress(hLibrary, "libmcenv_datatable_clear");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_Clear = (PLibMCEnvDataTable_ClearPtr) dlsym(hLibrary, "libmcenv_datatable_clear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_Clear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataTable_HasColumn = (PLibMCEnvDataTable_HasColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_hascolumn");
 		#else // _WIN32
 		pWrapperTable->m_DataTable_HasColumn = (PLibMCEnvDataTable_HasColumnPtr) dlsym(hLibrary, "libmcenv_datatable_hascolumn");
@@ -4051,6 +4119,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataTable_WriteDataToStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_LoadFromStream = (PLibMCEnvDataTable_LoadFromStreamPtr) GetProcAddress(hLibrary, "libmcenv_datatable_loadfromstream");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_LoadFromStream = (PLibMCEnvDataTable_LoadFromStreamPtr) dlsym(hLibrary, "libmcenv_datatable_loadfromstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_LoadFromStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5413,6 +5490,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachment = (PLibMCEnvBuildExecution_HasAttachmentPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_hasattachment");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachment = (PLibMCEnvBuildExecution_HasAttachmentPtr) dlsym(hLibrary, "libmcenv_buildexecution_hasattachment");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_HasAttachment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachmentIdentifier = (PLibMCEnvBuildExecution_HasAttachmentIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_hasattachmentidentifier");
+		#else // _WIN32
+		pWrapperTable->m_BuildExecution_HasAttachmentIdentifier = (PLibMCEnvBuildExecution_HasAttachmentIdentifierPtr) dlsym(hLibrary, "libmcenv_buildexecution_hasattachmentidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildExecution_HasAttachmentIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildExecution_AddBinaryData = (PLibMCEnvBuildExecution_AddBinaryDataPtr) GetProcAddress(hLibrary, "libmcenv_buildexecution_addbinarydata");
 		#else // _WIN32
 		pWrapperTable->m_BuildExecution_AddBinaryData = (PLibMCEnvBuildExecution_AddBinaryDataPtr) dlsym(hLibrary, "libmcenv_buildexecution_addbinarydata");
@@ -5671,6 +5766,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_CreateToolpathAccessor == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_HasAttachment = (PLibMCEnvBuild_HasAttachmentPtr) GetProcAddress(hLibrary, "libmcenv_build_hasattachment");
+		#else // _WIN32
+		pWrapperTable->m_Build_HasAttachment = (PLibMCEnvBuild_HasAttachmentPtr) dlsym(hLibrary, "libmcenv_build_hasattachment");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_HasAttachment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_HasAttachmentIdentifier = (PLibMCEnvBuild_HasAttachmentIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_build_hasattachmentidentifier");
+		#else // _WIN32
+		pWrapperTable->m_Build_HasAttachmentIdentifier = (PLibMCEnvBuild_HasAttachmentIdentifierPtr) dlsym(hLibrary, "libmcenv_build_hasattachmentidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_HasAttachmentIdentifier == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7789,6 +7902,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BaseTempStreamWriter_GetStreamReader = (PLibMCEnvBaseTempStreamWriter_GetStreamReaderPtr) GetProcAddress(hLibrary, "libmcenv_basetempstreamwriter_getstreamreader");
+		#else // _WIN32
+		pWrapperTable->m_BaseTempStreamWriter_GetStreamReader = (PLibMCEnvBaseTempStreamWriter_GetStreamReaderPtr) dlsym(hLibrary, "libmcenv_basetempstreamwriter_getstreamreader");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BaseTempStreamWriter_GetStreamReader == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_TempStreamWriter_GetWritePosition = (PLibMCEnvTempStreamWriter_GetWritePositionPtr) GetProcAddress(hLibrary, "libmcenv_tempstreamwriter_getwriteposition");
 		#else // _WIN32
 		pWrapperTable->m_TempStreamWriter_GetWritePosition = (PLibMCEnvTempStreamWriter_GetWritePositionPtr) dlsym(hLibrary, "libmcenv_tempstreamwriter_getwriteposition");
@@ -8185,6 +8307,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_GetCount = (PLibMCEnvLogEntryList_GetCountPtr) GetProcAddress(hLibrary, "libmcenv_logentrylist_getcount");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_GetCount = (PLibMCEnvLogEntryList_GetCountPtr) dlsym(hLibrary, "libmcenv_logentrylist_getcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_GetCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_GetEntry = (PLibMCEnvLogEntryList_GetEntryPtr) GetProcAddress(hLibrary, "libmcenv_logentrylist_getentry");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_GetEntry = (PLibMCEnvLogEntryList_GetEntryPtr) dlsym(hLibrary, "libmcenv_logentrylist_getentry");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_GetEntry == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_GetEntryTime = (PLibMCEnvLogEntryList_GetEntryTimePtr) GetProcAddress(hLibrary, "libmcenv_logentrylist_getentrytime");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_GetEntryTime = (PLibMCEnvLogEntryList_GetEntryTimePtr) dlsym(hLibrary, "libmcenv_logentrylist_getentrytime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_GetEntryTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
 		#else // _WIN32
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
@@ -8209,6 +8358,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalHandler_GetStartTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveLogEntries = (PLibMCEnvJournalHandler_RetrieveLogEntriesPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievelogentries");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveLogEntries = (PLibMCEnvJournalHandler_RetrieveLogEntriesPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievelogentries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveLogEntries == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievelogentriesfromtimeinterval");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievelogentriesfromtimeinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveAlerts = (PLibMCEnvJournalHandler_RetrieveAlertsPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievealerts");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveAlerts = (PLibMCEnvJournalHandler_RetrieveAlertsPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievealerts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveAlerts == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievealertsfromtimeinterval");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievealertsfromtimeinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10097,6 +10282,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_RemoveColumn == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datatable_clear", (void**)&(pWrapperTable->m_DataTable_Clear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_Clear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_datatable_hascolumn", (void**)&(pWrapperTable->m_DataTable_HasColumn));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_HasColumn == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10171,6 +10360,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_datatable_writedatatostream", (void**)&(pWrapperTable->m_DataTable_WriteDataToStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_WriteDataToStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_loadfromstream", (void**)&(pWrapperTable->m_DataTable_LoadFromStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_LoadFromStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_dataseries_getname", (void**)&(pWrapperTable->m_DataSeries_GetName));
@@ -10777,6 +10970,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetElapsedTimeInMicroseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_hasattachment", (void**)&(pWrapperTable->m_BuildExecution_HasAttachment));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_HasAttachment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_buildexecution_hasattachmentidentifier", (void**)&(pWrapperTable->m_BuildExecution_HasAttachmentIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_HasAttachmentIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_addbinarydata", (void**)&(pWrapperTable->m_BuildExecution_AddBinaryData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_AddBinaryData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10891,6 +11092,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_createtoolpathaccessor", (void**)&(pWrapperTable->m_Build_CreateToolpathAccessor));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_CreateToolpathAccessor == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_hasattachment", (void**)&(pWrapperTable->m_Build_HasAttachment));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_HasAttachment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_hasattachmentidentifier", (void**)&(pWrapperTable->m_Build_HasAttachmentIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_HasAttachmentIdentifier == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_addbinarydata", (void**)&(pWrapperTable->m_Build_AddBinaryData));
@@ -11833,6 +12042,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_IsFinished == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_basetempstreamwriter_getstreamreader", (void**)&(pWrapperTable->m_BaseTempStreamWriter_GetStreamReader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BaseTempStreamWriter_GetStreamReader == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_tempstreamwriter_getwriteposition", (void**)&(pWrapperTable->m_TempStreamWriter_GetWritePosition));
 		if ( (eLookupError != 0) || (pWrapperTable->m_TempStreamWriter_GetWritePosition == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12009,6 +12222,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_AlertIterator_GetCurrentAlert == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_logentrylist_getcount", (void**)&(pWrapperTable->m_LogEntryList_GetCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_logentrylist_getentry", (void**)&(pWrapperTable->m_LogEntryList_GetEntry));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetEntry == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_logentrylist_getentrytime", (void**)&(pWrapperTable->m_LogEntryList_GetEntryTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetEntryTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariable", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariable));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12019,6 +12244,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_getstarttime", (void**)&(pWrapperTable->m_JournalHandler_GetStartTime));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetStartTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievelogentries", (void**)&(pWrapperTable->m_JournalHandler_RetrieveLogEntries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveLogEntries == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievelogentriesfromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievealerts", (void**)&(pWrapperTable->m_JournalHandler_RetrieveAlerts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveAlerts == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievealertsfromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_userdetaillist_count", (void**)&(pWrapperTable->m_UserDetailList_Count));
@@ -13506,6 +13747,14 @@ public:
 	}
 	
 	/**
+	* CDataTable::Clear - Clears all data from the data table.
+	*/
+	void CDataTable::Clear()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_Clear(m_pHandle));
+	}
+	
+	/**
 	* CDataTable::HasColumn - Returns if a column exists in the data field.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @return Returns if the columns exist.
@@ -13745,6 +13994,16 @@ public:
 		LibMCEnvHandle hWriter = pWriter.GetHandle();
 		LibMCEnvHandle hOptions = pOptions.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_WriteDataToStream(m_pHandle, hWriter, hOptions));
+	}
+	
+	/**
+	* CDataTable::LoadFromStream - Loads the data table from a stream. Clears all existing data from the data table.
+	* @param[in] pStream - Stream read instance to read from.
+	*/
+	void CDataTable::LoadFromStream(classParam<CStreamReader> pStream)
+	{
+		LibMCEnvHandle hStream = pStream.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_LoadFromStream(m_pHandle, hStream));
 	}
 	
 	/**
@@ -15645,6 +15904,32 @@ public:
 	}
 	
 	/**
+	* CBuildExecution::HasAttachment - Returns if the Execution has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	bool CBuildExecution::HasAttachment(const std::string & sDataUUID)
+	{
+		bool resultDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_HasAttachment(m_pHandle, sDataUUID.c_str(), &resultDataExists));
+		
+		return resultDataExists;
+	}
+	
+	/**
+	* CBuildExecution::HasAttachmentIdentifier - Returns if the Execution has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	bool CBuildExecution::HasAttachmentIdentifier(const std::string & sIdentifier)
+	{
+		bool resultDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_HasAttachmentIdentifier(m_pHandle, sIdentifier.c_str(), &resultDataExists));
+		
+		return resultDataExists;
+	}
+	
+	/**
 	* CBuildExecution::AddBinaryData - Adds binary data to store with the build execution.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
@@ -15685,7 +15970,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by identifier.
+	* CBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by attachment identifier.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist.
 	* @return Reader class to access the stream.
 	*/
@@ -15717,7 +16002,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* CBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
@@ -15733,7 +16018,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* CBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
@@ -15771,7 +16056,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* CBuildExecution::LoadDataTableByIdentifier - Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded data table instance.
 	*/
@@ -15787,7 +16072,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadDataTableByUUID - Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* CBuildExecution::LoadDataTableByUUID - Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded data table instance.
 	*/
@@ -15825,7 +16110,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+	* CBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -15844,7 +16129,7 @@ public:
 	}
 	
 	/**
-	* CBuildExecution::LoadPNGImageByUUID - Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.
+	* CBuildExecution::LoadPNGImageByUUID - Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -16099,6 +16384,32 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CToolpathAccessor>(m_pWrapper, hToolpathInstance);
+	}
+	
+	/**
+	* CBuild::HasAttachment - Returns if the Build has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	bool CBuild::HasAttachment(const std::string & sDataUUID)
+	{
+		bool resultDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_HasAttachment(m_pHandle, sDataUUID.c_str(), &resultDataExists));
+		
+		return resultDataExists;
+	}
+	
+	/**
+	* CBuild::HasAttachmentIdentifier - Returns if the Build has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	bool CBuild::HasAttachmentIdentifier(const std::string & sIdentifier)
+	{
+		bool resultDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_HasAttachmentIdentifier(m_pHandle, sIdentifier.c_str(), &resultDataExists));
+		
+		return resultDataExists;
 	}
 	
 	/**
@@ -19369,6 +19680,21 @@ public:
 	}
 	
 	/**
+	* CBaseTempStreamWriter::GetStreamReader - Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.
+	* @return Stream reader instance.
+	*/
+	PStreamReader CBaseTempStreamWriter::GetStreamReader()
+	{
+		LibMCEnvHandle hStreamReader = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BaseTempStreamWriter_GetStreamReader(m_pHandle, &hStreamReader));
+		
+		if (!hStreamReader) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStreamReader>(m_pWrapper, hStreamReader);
+	}
+	
+	/**
 	 * Method definitions for class CTempStreamWriter
 	 */
 	
@@ -19920,7 +20246,7 @@ public:
 	}
 	
 	/**
-	* CAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
+	* CAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
@@ -19930,7 +20256,7 @@ public:
 	}
 	
 	/**
-	* CAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+	* CAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
 	void CAlert::AcknowledgeAlertForCurrentUser(const std::string & sUserComment)
@@ -19939,7 +20265,7 @@ public:
 	}
 	
 	/**
-	* CAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+	* CAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.
 	*/
 	void CAlert::DeactivateAlert()
 	{
@@ -19963,6 +20289,60 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CAlert>(m_pWrapper, hAlertInstance);
+	}
+	
+	/**
+	 * Method definitions for class CLogEntryList
+	 */
+	
+	/**
+	* CLogEntryList::GetCount - Returns the number of log entries in the list.
+	* @return Number of log entries.
+	*/
+	LibMCEnv_uint32 CLogEntryList::GetCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CLogEntryList::GetEntry - Returns the a log entry of the list.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @param[out] sMessage - Message of the log entry.
+	* @param[out] sSubSystem - Subsystem of the log entry.
+	* @param[out] nLogID - ID of the log entry.
+	* @param[out] eLogLevel - Level of the log entry.
+	*/
+	void CLogEntryList::GetEntry(const LibMCEnv_uint32 nIndex, std::string & sMessage, std::string & sSubSystem, LibMCEnv_uint32 & nLogID, eLogLevel & eLogLevel)
+	{
+		LibMCEnv_uint32 bytesNeededMessage = 0;
+		LibMCEnv_uint32 bytesWrittenMessage = 0;
+		LibMCEnv_uint32 bytesNeededSubSystem = 0;
+		LibMCEnv_uint32 bytesWrittenSubSystem = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntry(m_pHandle, nIndex, 0, &bytesNeededMessage, nullptr, 0, &bytesNeededSubSystem, nullptr, &nLogID, &eLogLevel));
+		std::vector<char> bufferMessage(bytesNeededMessage);
+		std::vector<char> bufferSubSystem(bytesNeededSubSystem);
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntry(m_pHandle, nIndex, bytesNeededMessage, &bytesWrittenMessage, &bufferMessage[0], bytesNeededSubSystem, &bytesWrittenSubSystem, &bufferSubSystem[0], &nLogID, &eLogLevel));
+		sMessage = std::string(&bufferMessage[0]);
+		sSubSystem = std::string(&bufferSubSystem[0]);
+	}
+	
+	/**
+	* CLogEntryList::GetEntryTime - Returns the time stamp of an entry.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @return Date Time object of the entry.
+	*/
+	PDateTime CLogEntryList::GetEntryTime(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnvHandle hTimestamp = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntryTime(m_pHandle, nIndex, &hTimestamp));
+		
+		if (!hTimestamp) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hTimestamp);
 	}
 	
 	/**
@@ -20017,6 +20397,74 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveLogEntries - Retrieves the current log entries of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	PLogEntryList CJournalHandler::RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, eLogLevel & eMinLogLevel)
+	{
+		LibMCEnvHandle hEntryList = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveLogEntries(m_pHandle, nTimeDeltaInMicroseconds, &eMinLogLevel, &hEntryList));
+		
+		if (!hEntryList) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CLogEntryList>(m_pWrapper, hEntryList);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveLogEntriesFromTimeInterval - Retrieves the log entries of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	PLogEntryList CJournalHandler::RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, eLogLevel & eMinLogLevel)
+	{
+		LibMCEnvHandle hEntryList = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveLogEntriesFromTimeInterval(m_pHandle, nStartTimeInMicroseconds, nEndTimeInMicroseconds, &eMinLogLevel, &hEntryList));
+		
+		if (!hEntryList) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CLogEntryList>(m_pWrapper, hEntryList);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveAlerts - Retrieves the alerts of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @return Alert Iterator Instance.
+	*/
+	PAlertIterator CJournalHandler::RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveAlerts(m_pHandle, nTimeDeltaInMicroseconds, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CJournalHandler::RetrieveAlertsFromTimeInterval - Retrieves the alerts of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @return Alert Iterator Instance.
+	*/
+	PAlertIterator CJournalHandler::RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveAlertsFromTimeInterval(m_pHandle, nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
 	}
 	
 	/**

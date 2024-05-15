@@ -101,6 +101,7 @@ class IUniformJournalSampling;
 class IJournalVariable;
 class IAlert;
 class IAlertIterator;
+class ILogEntryList;
 class IJournalHandler;
 class IUserDetailList;
 class IUserManagementHandler;
@@ -873,6 +874,11 @@ public:
 	virtual void RemoveColumn(const std::string & sIdentifier) = 0;
 
 	/**
+	* IDataTable::Clear - Clears all data from the data table.
+	*/
+	virtual void Clear() = 0;
+
+	/**
 	* IDataTable::HasColumn - Returns if a column exists in the data field.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @return Returns if the columns exist.
@@ -1018,6 +1024,12 @@ public:
 	* @param[in] pOptions - Optional writer options to use.
 	*/
 	virtual void WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions) = 0;
+
+	/**
+	* IDataTable::LoadFromStream - Loads the data table from a stream. Clears all existing data from the data table.
+	* @param[in] pStream - Stream read instance to read from.
+	*/
+	virtual void LoadFromStream(IStreamReader* pStream) = 0;
 
 };
 
@@ -2098,6 +2110,20 @@ public:
 	virtual LibMCEnv_uint64 GetElapsedTimeInMicroseconds() = 0;
 
 	/**
+	* IBuildExecution::HasAttachment - Returns if the Execution has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachment(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildExecution::HasAttachmentIdentifier - Returns if the Execution has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachmentIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
 	* IBuildExecution::AddBinaryData - Adds binary data to store with the build execution.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
@@ -2120,7 +2146,7 @@ public:
 	virtual std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance) = 0;
 
 	/**
-	* IBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by identifier.
+	* IBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by attachment identifier.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist.
 	* @return Reader class to access the stream.
 	*/
@@ -2134,14 +2160,14 @@ public:
 	virtual IStreamReader * LoadStreamByUUID(const std::string & sDataUUID) = 0;
 
 	/**
-	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
 	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* IBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
@@ -2159,14 +2185,14 @@ public:
 	virtual std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
-	* IBuildExecution::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* IBuildExecution::LoadDataTableByIdentifier - Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded data table instance.
 	*/
 	virtual IDataTable * LoadDataTableByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuildExecution::LoadDataTableByUUID - Loads a data table by uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* IBuildExecution::LoadDataTableByUUID - Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded data table instance.
 	*/
@@ -2184,7 +2210,7 @@ public:
 	virtual std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
-	* IBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+	* IBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -2194,7 +2220,7 @@ public:
 	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
-	* IBuildExecution::LoadPNGImageByUUID - Loads a PNG image by uuid which was previously stored in the build execution. MIME Type MUST be image/png.
+	* IBuildExecution::LoadPNGImageByUUID - Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
@@ -2333,6 +2359,20 @@ public:
 	* @return Toolpath instance.
 	*/
 	virtual IToolpathAccessor * CreateToolpathAccessor() = 0;
+
+	/**
+	* IBuild::HasAttachment - Returns if the Build has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachment(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuild::HasAttachmentIdentifier - Returns if the Build has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachmentIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
 	* IBuild::AddBinaryData - Adds binary data to store with the build.
@@ -4214,6 +4254,12 @@ public:
 	*/
 	virtual bool IsFinished() = 0;
 
+	/**
+	* IBaseTempStreamWriter::GetStreamReader - Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.
+	* @return Stream reader instance.
+	*/
+	virtual IStreamReader * GetStreamReader() = 0;
+
 };
 
 typedef IBaseSharedPtr<IBaseTempStreamWriter> PIBaseTempStreamWriter;
@@ -4549,20 +4595,20 @@ public:
 	virtual IDateTime * GetAcknowledgementTime() = 0;
 
 	/**
-	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
+	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
 	virtual void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment) = 0;
 
 	/**
-	* IAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+	* IAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
 	virtual void AcknowledgeAlertForCurrentUser(const std::string & sUserComment) = 0;
 
 	/**
-	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.
 	*/
 	virtual void DeactivateAlert() = 0;
 
@@ -4586,6 +4632,40 @@ public:
 };
 
 typedef IBaseSharedPtr<IAlertIterator> PIAlertIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for LogEntryList 
+**************************************************************************************************************************/
+
+class ILogEntryList : public virtual IBase {
+public:
+	/**
+	* ILogEntryList::GetCount - Returns the number of log entries in the list.
+	* @return Number of log entries.
+	*/
+	virtual LibMCEnv_uint32 GetCount() = 0;
+
+	/**
+	* ILogEntryList::GetEntry - Returns the a log entry of the list.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @param[out] sMessage - Message of the log entry.
+	* @param[out] sSubSystem - Subsystem of the log entry.
+	* @param[out] nLogID - ID of the log entry.
+	* @param[out] eLogLevel - Level of the log entry.
+	*/
+	virtual void GetEntry(const LibMCEnv_uint32 nIndex, std::string & sMessage, std::string & sSubSystem, LibMCEnv_uint32 & nLogID, LibMCEnv::eLogLevel & eLogLevel) = 0;
+
+	/**
+	* ILogEntryList::GetEntryTime - Returns the time stamp of an entry.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @return Date Time object of the entry.
+	*/
+	virtual IDateTime * GetEntryTime(const LibMCEnv_uint32 nIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<ILogEntryList> PILogEntryList;
 
 
 /*************************************************************************************************************************
@@ -4616,6 +4696,38 @@ public:
 	* @return DateTime Instance
 	*/
 	virtual IDateTime * GetStartTime() = 0;
+
+	/**
+	* IJournalHandler::RetrieveLogEntries - Retrieves the current log entries of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	virtual ILogEntryList * RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel & eMinLogLevel) = 0;
+
+	/**
+	* IJournalHandler::RetrieveLogEntriesFromTimeInterval - Retrieves the log entries of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	virtual ILogEntryList * RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel & eMinLogLevel) = 0;
+
+	/**
+	* IJournalHandler::RetrieveAlerts - Retrieves the alerts of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @return Alert Iterator Instance.
+	*/
+	virtual IAlertIterator * RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) = 0;
+
+	/**
+	* IJournalHandler::RetrieveAlertsFromTimeInterval - Retrieves the alerts of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @return Alert Iterator Instance.
+	*/
+	virtual IAlertIterator * RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
 
 };
 
