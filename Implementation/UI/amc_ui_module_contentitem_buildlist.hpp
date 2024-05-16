@@ -66,6 +66,8 @@ namespace AMC {
 
 		virtual ~CUIModule_ContentBuildListButton();
 
+		std::string getButtonName();
+
 		std::string getUUID();
 
 		CUIExpression getCaptionExpression();
@@ -78,18 +80,22 @@ namespace AMC {
 	protected:
 
 		std::string m_sItemName;
-		std::string m_sLoadingText;
-		std::string m_sBuildNameCaption;
-		std::string m_sBuildThumbnailCaption;
-		std::string m_sBuildLayersCaption;
-		std::string m_sBuildUUIDCaption;
-		std::string m_sBuildTimestampCaption;
-		std::string m_sSelectEvent;
 
-		std::string m_sSelectedBuildField;
-		std::string m_sSelectedButtonField;
+		CUIExpression m_LoadingText;
+		CUIExpression m_BuildNameCaption;
+		CUIExpression m_BuildThumbnailCaption;
+		CUIExpression m_BuildLayersCaption;
+		CUIExpression m_BuildUUIDCaption;
+		CUIExpression m_BuildTimestampCaption;
+
+		std::string m_sSelectEvent;
+		std::string m_sSelectedBuildFieldUUID;
+		std::string m_sSelectedButtonFieldUUID;
+		std::string m_sDefaultThumbnailResourceUUID;
 
 		std::vector<PUIModule_ContentBuildListButton> m_Buttons;
+		std::map<std::string, PUIModule_ContentBuildListButton> m_ButtonNameMap;
+		std::map<std::string, PUIModule_ContentBuildListButton> m_ButtonUUIDMap;
 
 		uint32_t m_nEntriesPerPage;
 
@@ -97,11 +103,15 @@ namespace AMC {
 		
 		PStateMachineData m_pStateMachineData;
 
+		void writeHeadersToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
+		void writeButtonsToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
 	public:
 
 		static PUIModule_ContentBuildList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData);
+		CUIModule_ContentBuildList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentBuildList();
 
@@ -117,6 +127,7 @@ namespace AMC {
 
 		virtual std::list <std::string> getReferenceUUIDs() override;
 
+		void addButton(const std::string& sButtonName, CUIExpression captionExpression, const std::string& sEvent);
 
 	};
 
