@@ -105,7 +105,7 @@ namespace AMC {
 			for (int64_t nIndex = 0; nIndex < nEntryCount; nIndex++) {
 				const char* pszName = zip_get_name(m_ZIParchive, (uint64_t)nIndex, ZIP_FL_ENC_GUESS);
 				std::string sName(pszName);
-				m_ZIPEntries.insert(std::make_pair(AMCCommon::CUtils::toLowerString (sName), nIndex));
+				m_ZIPEntries.insert(std::make_pair (sName, nIndex));
 			}
 
 		}
@@ -129,14 +129,14 @@ namespace AMC {
 
 		bool hasFile(const std::string& sName)
 		{
-			auto iIter = m_ZIPEntries.find(AMCCommon::CUtils::toLowerString (sName));
+			auto iIter = m_ZIPEntries.find(sName);
 			return (iIter != m_ZIPEntries.end());
 		}
 
 
 		void unzipFileEx(const std::string& sName, uint8_t* pBuffer, const uint64_t nBufferSize)
 		{
-			auto iIter = m_ZIPEntries.find(AMCCommon::CUtils::toLowerString(sName));
+			auto iIter = m_ZIPEntries.find(sName);
 			if (iIter == m_ZIPEntries.end())
 				throw ELibMCCustomException(LIBMC_ERROR_ZIPENTRYNOTFOUND, m_sZIPDebugName + "|" + sName);
 
@@ -195,7 +195,7 @@ namespace AMC {
 		void unzipFile(const std::string& sName, std::vector<uint8_t>& Buffer)
 		{
 
-			auto iIter = m_ZIPEntries.find(AMCCommon::CUtils::toLowerString(sName));
+			auto iIter = m_ZIPEntries.find(sName);
 			if (iIter == m_ZIPEntries.end())
 				throw ELibMCCustomException(LIBMC_ERROR_ZIPENTRYNOTFOUND, m_sZIPDebugName + "|" + sName);
 
