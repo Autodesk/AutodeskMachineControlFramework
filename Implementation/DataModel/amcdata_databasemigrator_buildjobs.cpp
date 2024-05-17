@@ -130,6 +130,19 @@ namespace AMCData {
 			break;
 		}
 
+		case 11: {
+			std::string sBuildJobUserUUIDQuery = "ALTER TABLE `buildjobs` ADD `useruuid` varchar ( 256 ) DEFAULT `00000000-0000-0000-0000-000000000000`";
+			pTransaction->executeStatement(sBuildJobUserUUIDQuery);
+
+			std::string sBuildJobDataUserUUIDQuery = "ALTER TABLE `buildjobdata` ADD `useruuid` varchar ( 256 ) DEFAULT `00000000-0000-0000-0000-000000000000`";
+			pTransaction->executeStatement(sBuildJobDataUserUUIDQuery);
+
+			std::string sBuildJobExecutionDataUserUUIDQuery = "ALTER TABLE `buildjobexecutiondata` ADD `useruuid` varchar ( 256 ) DEFAULT `00000000-0000-0000-0000-000000000000`";
+			pTransaction->executeStatement(sBuildJobExecutionDataUserUUIDQuery);
+
+			break;
+		}
+
 		}
 
 		

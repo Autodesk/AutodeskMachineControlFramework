@@ -52,12 +52,12 @@ namespace AMC {
 		
 		Lib3MF::PWrapper m_p3MFWrapper;
 		Lib3MF::PModel m_p3MFModel;
-		std::string m_sUserID;
+		std::string m_sUserUUID;
 
 	protected:
 	public:
 
-		CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sUserID, AMCCommon::PChrono pGlobalChrono);
+		CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sUserUUID, AMCCommon::PChrono pGlobalChrono);
 		virtual ~CService_BuildFileParsing();
 
 		virtual void executeBlocking() override;

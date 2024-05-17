@@ -275,7 +275,7 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUUID, pBuildJob->GetUUID());
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDTIMESTAMP, pBuildJob->GetTimeStamp());
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
-		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUSER, "admin");
+		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUSER, pBuildJob->GetCreatorName());
 		entryObject.addInteger(AMC_API_KEY_UI_ITEMBUILPRINTCOUNT, 2);
 
 		pBuildJob->GetTimeStamp();
@@ -313,7 +313,7 @@ void CUIModule_ContentBuildList::setEventPayloadValue(const std::string& sEventN
 		std::string sButtonUUID = AMCCommon::CUtils::normalizeUUIDString(sPayloadValue);
 		std::string sButtonName;
 
-		auto iIter = m_ButtonUUIDMap.find(sButtonUUID);
+		auto iIter = m_ButtonUUIDMap.find(sButtonUUID );
 		if (iIter != m_ButtonUUIDMap.end()) {
 			sButtonName = iIter->second->getButtonName();
 		}

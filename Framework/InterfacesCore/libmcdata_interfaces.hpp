@@ -799,10 +799,10 @@ public:
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Data of stream
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual void StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::BeginPartialStream - starts storing a stream with partial uploads.
@@ -810,10 +810,10 @@ public:
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::StorePartialStream - stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -843,10 +843,10 @@ public:
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	virtual void BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual void BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IStorage::StoreRandomWriteStream - stores data in a stream with random write access. Writing may be in arbitrary order.
@@ -1294,6 +1294,18 @@ public:
 	virtual std::string GetTimeStamp() = 0;
 
 	/**
+	* IBuildJob::GetCreatorUUID - returns the UUID of the user that created the job.
+	* @return User UUID
+	*/
+	virtual std::string GetCreatorUUID() = 0;
+
+	/**
+	* IBuildJob::GetCreatorName - returns the current name of the user that created the job.
+	* @return User UUID
+	*/
+	virtual std::string GetCreatorName() = 0;
+
+	/**
 	* IBuildJob::GetStorageStream - returns the storage stream of the build.
 	* @return Stream Instance.
 	*/
@@ -1343,11 +1355,11 @@ public:
 	* @param[in] sName - Name of the job data
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job data
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
 	* @return Data UUID
 	*/
-	virtual std::string AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual std::string AddJobData(const std::string & sIdentifier, const std::string & sName, IStorageStream* pStream, const LibMCData::eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.
@@ -1475,12 +1487,12 @@ public:
 	* IBuildJobHandler::CreateJob - Creates a new build job.
 	* @param[in] sJobUUID - UUID String for the build job. Must be unique and newly generated.
 	* @param[in] sName - Name String
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] sStorageStreamUUID - Storage stream uuid for the job. Needs not exist yet.
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	* @return Build Job Instance.
 	*/
-	virtual IBuildJob * CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+	virtual IBuildJob * CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserUUID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
 	* IBuildJobHandler::RetrieveJob - Retrieves a job with a specific UUID.

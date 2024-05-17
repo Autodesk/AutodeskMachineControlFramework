@@ -296,11 +296,11 @@ CBuildJobExecutionData* CBuildJobExecution::makeJobExecutionDataEx(AMCData::CSQL
 	LibMCData::eCustomDataType eDataType = CCustomDataStream::convertStringToCustomDataType(pStatement->getColumnString(5));
 	std::string sTimeStamp = pStatement->getColumnString(6);
 	std::string sStorageStreamUUID = pStatement->getColumnUUID(7);
-	std::string sUserID = pStatement->getColumnString(8);
+	std::string sUserUUID = pStatement->getColumnString(8);
 	std::string sSHA2 = pStatement->getColumnString(9);
 	uint64_t nStreamSize = pStatement->getColumnInt64(10);
 
-	return CBuildJobExecutionData::make(sDataUUID, sIdentifier, sName, sExecutionUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, m_pSQLHandler, m_pStorageState);
+	return CBuildJobExecutionData::make(sDataUUID, sIdentifier, sName, sExecutionUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserUUID, sSHA2, nStreamSize, m_pSQLHandler, m_pStorageState);
 }
 
 
@@ -322,7 +322,7 @@ IBuildJobExecutionDataIterator* CBuildJobExecution::listJobExecutionDataEx(AMCDa
 
 IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType)
 {
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? AND datatype=? ORDER BY buildjobexecutiondata.timestamp";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? AND datatype=? ORDER BY buildjobexecutiondata.timestamp";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setInt(2, 1);
@@ -333,7 +333,7 @@ IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionDataByType(c
 
 IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionData()
 {
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? ORDER BY buildjobexecutiondata.timestamp";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? ORDER BY buildjobexecutiondata.timestamp";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setInt(2, 1);
@@ -347,7 +347,7 @@ IBuildJobExecutionData* CBuildJobExecution::RetrieveJobExecutionData(const std::
 
 	std::unique_ptr<CBuildJobExecutionDataIterator> buildJobIterator(new CBuildJobExecutionDataIterator());
 
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND buildjobexecutiondata.uuid=? AND active=?";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND buildjobexecutiondata.uuid=? AND active=?";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setString(2, sNormalizedDataUUID);
@@ -366,7 +366,7 @@ IBuildJobExecutionData* CBuildJobExecution::RetrieveJobExecutionDataByIdentifier
 
 	std::unique_ptr<CBuildJobExecutionDataIterator> buildJobIterator(new CBuildJobExecutionDataIterator());
 
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.userid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND buildjobexecutiondata.identifier=? AND active=?";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND buildjobexecutiondata.identifier=? AND active=?";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setString(2, sIdentifier);

@@ -1324,12 +1324,12 @@ public:
 	
 	inline bool StreamIsReady(const std::string & sUUID);
 	inline PStorageStream RetrieveStream(const std::string & sUUID);
-	inline void StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
-	inline void BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
 	inline void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2);
-	inline void BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline void BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline void StoreRandomWriteStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline LibMCData_uint64 GetRandomWriteStreamSize(const std::string & sUUID);
 	inline void FinishRandomWriteStream(const std::string & sUUID);
@@ -1511,6 +1511,8 @@ public:
 	inline eBuildJobStatus GetStatus();
 	inline LibMCData_uint32 GetLayerCount();
 	inline std::string GetTimeStamp();
+	inline std::string GetCreatorUUID();
+	inline std::string GetCreatorName();
 	inline PStorageStream GetStorageStream();
 	inline std::string GetStorageStreamUUID();
 	inline void StartValidating();
@@ -1519,7 +1521,7 @@ public:
 	inline void UnArchiveJob();
 	inline void DeleteJob();
 	inline bool JobCanBeArchived();
-	inline std::string AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline std::string AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJobDataIterator ListJobDataByType(const eCustomDataType eDataType);
 	inline PBuildJobDataIterator ListJobData();
 	inline PBuildJobData RetrieveJobData(const std::string & sDataUUID);
@@ -1566,7 +1568,7 @@ public:
 	{
 	}
 	
-	inline PBuildJob CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline PBuildJob CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserUUID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJob RetrieveJob(const std::string & sJobUUID);
 	inline PBuildJob FindJobOfData(const std::string & sDataUUID);
 	inline PBuildJobIterator ListJobsByStatus(const eBuildJobStatus eStatus);
@@ -1924,6 +1926,8 @@ public:
 		pWrapperTable->m_BuildJob_GetStatus = nullptr;
 		pWrapperTable->m_BuildJob_GetLayerCount = nullptr;
 		pWrapperTable->m_BuildJob_GetTimeStamp = nullptr;
+		pWrapperTable->m_BuildJob_GetCreatorUUID = nullptr;
+		pWrapperTable->m_BuildJob_GetCreatorName = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStream = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStreamUUID = nullptr;
 		pWrapperTable->m_BuildJob_StartValidating = nullptr;
@@ -3101,6 +3105,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJob_GetTimeStamp == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_GetCreatorUUID = (PLibMCDataBuildJob_GetCreatorUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getcreatoruuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_GetCreatorUUID = (PLibMCDataBuildJob_GetCreatorUUIDPtr) dlsym(hLibrary, "libmcdata_buildjob_getcreatoruuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_GetCreatorUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_GetCreatorName = (PLibMCDataBuildJob_GetCreatorNamePtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getcreatorname");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_GetCreatorName = (PLibMCDataBuildJob_GetCreatorNamePtr) dlsym(hLibrary, "libmcdata_buildjob_getcreatorname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_GetCreatorName == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4425,6 +4447,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetTimeStamp == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_buildjob_getcreatoruuid", (void**)&(pWrapperTable->m_BuildJob_GetCreatorUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetCreatorUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_getcreatorname", (void**)&(pWrapperTable->m_BuildJob_GetCreatorName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetCreatorName == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getstoragestream", (void**)&(pWrapperTable->m_BuildJob_GetStorageStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetStorageStream == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5649,12 +5679,12 @@ public:
 	* @param[in] sName - Name Description of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] ContentBuffer - Data of stream
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	void CStorage::StoreNewStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreNewStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data(), sUserID.c_str(), nAbsoluteTimeStamp));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_StoreNewStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), (LibMCData_uint64)ContentBuffer.size(), ContentBuffer.data(), sUserUUID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -5663,12 +5693,12 @@ public:
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserID.c_str(), nAbsoluteTimeStamp));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserUUID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -5707,12 +5737,12 @@ public:
 	* @param[in] sUUID - UUID of storage stream. MUST be unique and newly generated.
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	*/
-	void CStorage::BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	void CStorage::BeginRandomWriteStream(const std::string & sUUID, const std::string & sName, const std::string & sMimeType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginRandomWriteStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), sUserID.c_str(), nAbsoluteTimeStamp));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginRandomWriteStream(m_pHandle, sUUID.c_str(), sName.c_str(), sMimeType.c_str(), sUserUUID.c_str(), nAbsoluteTimeStamp));
 	}
 	
 	/**
@@ -6506,6 +6536,36 @@ public:
 	}
 	
 	/**
+	* CBuildJob::GetCreatorUUID - returns the UUID of the user that created the job.
+	* @return User UUID
+	*/
+	std::string CBuildJob::GetCreatorUUID()
+	{
+		LibMCData_uint32 bytesNeededUserUUID = 0;
+		LibMCData_uint32 bytesWrittenUserUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetCreatorUUID(m_pHandle, 0, &bytesNeededUserUUID, nullptr));
+		std::vector<char> bufferUserUUID(bytesNeededUserUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetCreatorUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
+		
+		return std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CBuildJob::GetCreatorName - returns the current name of the user that created the job.
+	* @return User UUID
+	*/
+	std::string CBuildJob::GetCreatorName()
+	{
+		LibMCData_uint32 bytesNeededUserName = 0;
+		LibMCData_uint32 bytesWrittenUserName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetCreatorName(m_pHandle, 0, &bytesNeededUserName, nullptr));
+		std::vector<char> bufferUserName(bytesNeededUserName);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetCreatorName(m_pHandle, bytesNeededUserName, &bytesWrittenUserName, &bufferUserName[0]));
+		
+		return std::string(&bufferUserName[0]);
+	}
+	
+	/**
 	* CBuildJob::GetStorageStream - returns the storage stream of the build.
 	* @return Stream Instance.
 	*/
@@ -6594,18 +6654,18 @@ public:
 	* @param[in] sName - Name of the job data
 	* @param[in] pStream - Storage Stream Instance
 	* @param[in] eDataType - Datatype of Job data
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970
 	* @return Data UUID
 	*/
-	std::string CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	std::string CBuildJob::AddJobData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hStream = pStream.GetHandle();
 		LibMCData_uint32 bytesNeededDataUUID = 0;
 		LibMCData_uint32 bytesWrittenDataUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp, 0, &bytesNeededDataUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp, 0, &bytesNeededDataUUID, nullptr));
 		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserID.c_str(), nAbsoluteTimeStamp, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sIdentifier.c_str(), sName.c_str(), hStream, eDataType, sUserUUID.c_str(), nAbsoluteTimeStamp, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
 	}
@@ -6834,15 +6894,15 @@ public:
 	* CBuildJobHandler::CreateJob - Creates a new build job.
 	* @param[in] sJobUUID - UUID String for the build job. Must be unique and newly generated.
 	* @param[in] sName - Name String
-	* @param[in] sUserID - Currently authenticated user
+	* @param[in] sUserUUID - Currently authenticated user
 	* @param[in] sStorageStreamUUID - Storage stream uuid for the job. Needs not exist yet.
 	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
 	* @return Build Job Instance.
 	*/
-	PBuildJob CBuildJobHandler::CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
+	PBuildJob CBuildJobHandler::CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserUUID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
 	{
 		LibMCDataHandle hJobInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_CreateJob(m_pHandle, sJobUUID.c_str(), sName.c_str(), sUserID.c_str(), sStorageStreamUUID.c_str(), nAbsoluteTimeStamp, &hJobInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_CreateJob(m_pHandle, sJobUUID.c_str(), sName.c_str(), sUserUUID.c_str(), sStorageStreamUUID.c_str(), nAbsoluteTimeStamp, &hJobInstance));
 		
 		if (!hJobInstance) {
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);

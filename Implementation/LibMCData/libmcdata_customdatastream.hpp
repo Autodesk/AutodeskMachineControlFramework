@@ -64,13 +64,13 @@ private:
 	LibMCData::eCustomDataType m_eDataType;
 	std::string m_sTimeStamp;
 	std::string m_sStorageStreamUUID;
-	std::string m_sUserID;
+	std::string m_sUserUUID;
 	std::string m_sSHA256;
 	uint64_t m_nStreamSize;
 
 public:
 
-	CCustomDataStream(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserID, const  std::string& sSHA2, uint64_t nStreamSize);
+	CCustomDataStream(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserUUID, const  std::string& sSHA2, uint64_t nStreamSize);
 
 	virtual ~CCustomDataStream();
 

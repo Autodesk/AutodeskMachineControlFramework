@@ -71,20 +71,20 @@ private:
 
 protected:
 
-    CBuildJobExecutionData(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    CBuildJobExecutionData(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
 public:
 
     ~CBuildJobExecutionData();
 
-    static CBuildJobExecutionData* make(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static CBuildJobExecutionData* make(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static CBuildJobExecutionData* makeFrom(CBuildJobExecutionData* pBuildJobExecutionData);
 
-    static PBuildJobExecutionData makeShared(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static PBuildJobExecutionData makeShared(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static PBuildJobExecutionData makeSharedFrom(CBuildJobExecutionData* pBuildJobExecutionData);
 
-    static CBuildJobExecutionData* createInDatabase(const std::string& sIdentifier, const std::string & sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
-    static PBuildJobExecutionData createSharedInDatabase(const std::string& sIdentifier, const std::string & sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static CBuildJobExecutionData* createInDatabase(const std::string& sIdentifier, const std::string & sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static PBuildJobExecutionData createSharedInDatabase(const std::string& sIdentifier, const std::string & sName, const std::string& sExecutionUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
     IStorageStream* GetStorageStream() override;
 

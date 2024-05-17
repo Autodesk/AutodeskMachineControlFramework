@@ -299,7 +299,7 @@ std::string CAPIHandler_Upload::createNewBuild(const std::string& sName, const s
 	auto pGlobalChrono = m_pSystemState->globalChrono();
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
-	pBuildJobHandler->CreateJob(sBuildUUID, sName, pAuth->getUserName(), sStorageStreamUUID, pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
+	pBuildJobHandler->CreateJob(sBuildUUID, sName, pAuth->getUserUUID(), sStorageStreamUUID, pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 	return sBuildUUID;
 }

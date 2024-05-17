@@ -812,7 +812,7 @@
 			<param name="Name" type="string" pass="in" description="Name Description of the stream." />
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Data of stream" />
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
 			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
@@ -821,7 +821,7 @@
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="Size" type="uint64" pass="in" description="Final size of the stream. MUST NOT be 0." />	
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
 			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
@@ -845,7 +845,7 @@
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
 			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
@@ -1134,6 +1134,14 @@
 		<method name="GetTimeStamp" description="returns the timestamp when the job was created.">
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
+		
+		<method name="GetCreatorUUID" description="returns the UUID of the user that created the job.">
+			<param name="UserUUID" type="string" pass="return" description="User UUID" />	
+		</method>
+
+		<method name="GetCreatorName" description="returns the current name of the user that created the job.">
+			<param name="UserName" type="string" pass="return" description="User UUID" />	
+		</method>
 				
 		<method name="GetStorageStream" description="returns the storage stream of the build.">
 			<param name="StreamInstance" type="class" class="StorageStream" pass="return" description="Stream Instance." />
@@ -1168,7 +1176,7 @@
 			<param name="Name" type="string" pass="in" description="Name of the job data" />
 			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
 			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job data" />
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
 			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970" />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID" />
 		</method>
@@ -1257,7 +1265,7 @@
 		<method name="CreateJob" description="Creates a new build job.">
 			<param name="JobUUID" type="string" pass="in" description="UUID String for the build job. Must be unique and newly generated." />	
 			<param name="Name" type="string" pass="in" description="Name String" />	
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
 			<param name="StorageStreamUUID" type="string" pass="in" description="Storage stream uuid for the job. Needs not exist yet." />
 			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
