@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       :hide-default-footer="false"
     >
       <template v-slot:[`item.buildThumbnail`]="{ item }">        
-		 <v-img :height="moduleitem.thumbnailheight" :width="moduleitem.thumbnailwidth" :aspect-ratio="moduleitem.thumbnailaspectratio" contain :src="item.buildThumbnail" v-on:click.stop="uiModuleBuildListDetailsClick (item)" />	   	  
+		 <v-img v-if="(item.buildThumbnail != '00000000-0000-0000-0000-000000000000') && item.buildThumbnail" :height="moduleitem.thumbnailheight" :width="moduleitem.thumbnailwidth" :aspect-ratio="moduleitem.thumbnailaspectratio" contain :src="Application.getImageURL (item.buildThumbnail)" v-on:click.stop="uiModuleBuildListDetailsClick (item)" />	   	  
       </template>
       <template v-slot:[`item.buildName`]="{ item }">
 		<v-card class="ma-2" v-on:click.stop="uiModuleBuildListDetailsClick (item)">
@@ -136,10 +136,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					eventValues[this.moduleitem.selectionvalueuuid] = item.buildUUID;
 					eventValues[this.moduleitem.buttonvalueuuid] = button.uuid;
 					
-					alert ("Item UUID: " + item.buildUUID);
-					alert ("Button UUID: " + button.uuid);
-							
-					this.Application.triggerUIEvent (this.moduleitem.selectevent, this.moduleitem.uuid, eventValues);
+					//alert ("Item UUID: " + item.buildUUID);
+					//alert ("Button UUID: " + button.uuid);
+						
+					this.Application.triggerUIEvent (button.selectevent, this.moduleitem.uuid, eventValues);
 				}
 			}
 		},
