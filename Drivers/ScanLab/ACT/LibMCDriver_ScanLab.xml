@@ -293,7 +293,7 @@ Custom implementation
 	</class>
 
 
-	<class name="RTCContext" parent="Base" description="Selector of the RTC Controller Card">
+	<class name="RTCContext" parent="Base" description="Context of the RTC Controller Card">
 
 		<method name="LoadFirmware" description="Loads card firmware from resource files.">
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
