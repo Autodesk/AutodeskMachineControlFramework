@@ -2796,6 +2796,16 @@
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
 
+		<method name="HasBuildExecution" description="Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionExists" type="bool" pass="return" description="Returns true if execution exists" />
+		</method>
+
+		<method name="GetBuildExecution" description="Returns a instance of a build execution object. Fails if build execution uuid does not exist.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance" />
+		</method>
+
 		<method name="CreateCryptoContext" description="Creates a crypto context.">
 			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
 		</method>
@@ -3520,6 +3530,16 @@
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
 
+		<method name="HasBuildExecution" description="Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionExists" type="bool" pass="return" description="Returns true if execution exists" />
+		</method>
+
+		<method name="GetBuildExecution" description="Returns a instance of a build execution object. Fails if build execution uuid does not exist.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance" />
+		</method>
+
 		<method name="UnloadAllToolpathes" description="unloads all toolpath in memory to clean up">
 		</method>
 
@@ -4109,7 +4129,17 @@
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>		
-	
+
+		<method name="HasBuildExecution" description="Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionExists" type="bool" pass="return" description="Returns true if execution exists" />
+		</method>
+
+		<method name="GetBuildExecution" description="Returns a instance of a build execution object. Fails if build execution uuid does not exist.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance" />
+		</method>
+
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
 			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />

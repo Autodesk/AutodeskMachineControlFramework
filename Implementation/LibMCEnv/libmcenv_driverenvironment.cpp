@@ -42,6 +42,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_buildexecution.hpp"
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_datatable.hpp"
@@ -414,8 +415,8 @@ bool CDriverEnvironment::HasBuildJob(const std::string& sBuildUUID)
 
     try {
         auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
-        pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-        return true;
+        auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+        return (pBuildJob.get () != nullptr);
     }
     catch (std::exception) {
         return false;
@@ -430,6 +431,32 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
     return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_pGlobalChrono);
 }
+
+bool CDriverEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
+{
+    std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+    try {
+        auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+        auto pExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
+
+        return (pExecution.get() != nullptr);
+    }
+    catch (std::exception) {
+        return false;
+    }
+
+}
+
+IBuildExecution* CDriverEnvironment::GetBuildExecution(const std::string& sExecutionUUID)
+{
+    std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+    auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+    auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
+    return new CBuildExecution(pBuildExecution, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono);
+
+}
+
 
 ICryptoContext* CDriverEnvironment::CreateCryptoContext()
 {

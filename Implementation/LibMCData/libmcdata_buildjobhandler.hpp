@@ -90,6 +90,10 @@ public:
 
     LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;
 
+    IBuildJobExecution* RetrieveJobExecution(const std::string& sExecutionUUID) override;
+
+    IBuildJobExecutionIterator* ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter) override;
+
 };
 
 } // namespace Impl

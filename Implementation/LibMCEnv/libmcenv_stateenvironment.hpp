@@ -91,6 +91,10 @@ public:
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
+	bool HasBuildExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecution* GetBuildExecution(const std::string& sExecutionUUID) override;
+
 	void UnloadAllToolpathes() override;
 
 	void GetDriverLibrary(const std::string& sDriverName, std::string& sDriverType, LibMCEnv_pvoid& pDriverLookup) override;

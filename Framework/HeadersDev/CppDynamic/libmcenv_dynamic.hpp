@@ -2007,6 +2007,8 @@ public:
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
+	inline bool HasBuildExecution(const std::string & sExecutionUUID);
+	inline PBuildExecution GetBuildExecution(const std::string & sExecutionUUID);
 	inline PCryptoContext CreateCryptoContext();
 	inline PDateTime GetCurrentDateTime();
 	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
@@ -2381,6 +2383,8 @@ public:
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
+	inline bool HasBuildExecution(const std::string & sExecutionUUID);
+	inline PBuildExecution GetBuildExecution(const std::string & sExecutionUUID);
 	inline void UnloadAllToolpathes();
 	inline void SetNextState(const std::string & sStateName);
 	inline void LogMessage(const std::string & sLogString);
@@ -2521,6 +2525,8 @@ public:
 	inline PDataTable CreateDataTable();
 	inline bool HasBuildJob(const std::string & sBuildUUID);
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
+	inline bool HasBuildExecution(const std::string & sExecutionUUID);
+	inline PBuildExecution GetBuildExecution(const std::string & sExecutionUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool CheckPermission(const std::string & sPermissionIdentifier);
@@ -3092,6 +3098,8 @@ public:
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetBuildJob = nullptr;
+		pWrapperTable->m_DriverEnvironment_HasBuildExecution = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetBuildExecution = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateCryptoContext = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetCurrentDateTime = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetCustomDateTime = nullptr;
@@ -3226,6 +3234,8 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
 		pWrapperTable->m_StateEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBuildJob = nullptr;
+		pWrapperTable->m_StateEnvironment_HasBuildExecution = nullptr;
+		pWrapperTable->m_StateEnvironment_GetBuildExecution = nullptr;
 		pWrapperTable->m_StateEnvironment_UnloadAllToolpathes = nullptr;
 		pWrapperTable->m_StateEnvironment_SetNextState = nullptr;
 		pWrapperTable->m_StateEnvironment_LogMessage = nullptr;
@@ -3334,6 +3344,8 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateDataTable = nullptr;
 		pWrapperTable->m_UIEnvironment_HasBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
+		pWrapperTable->m_UIEnvironment_HasBuildExecution = nullptr;
+		pWrapperTable->m_UIEnvironment_GetBuildExecution = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_UIEnvironment_CheckPermission = nullptr;
@@ -7542,6 +7554,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_HasBuildExecution = (PLibMCEnvDriverEnvironment_HasBuildExecutionPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_hasbuildexecution");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_HasBuildExecution = (PLibMCEnvDriverEnvironment_HasBuildExecutionPtr) dlsym(hLibrary, "libmcenv_driverenvironment_hasbuildexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_HasBuildExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetBuildExecution = (PLibMCEnvDriverEnvironment_GetBuildExecutionPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getbuildexecution");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetBuildExecution = (PLibMCEnvDriverEnvironment_GetBuildExecutionPtr) dlsym(hLibrary, "libmcenv_driverenvironment_getbuildexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetBuildExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateCryptoContext = (PLibMCEnvDriverEnvironment_CreateCryptoContextPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createcryptocontext");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateCryptoContext = (PLibMCEnvDriverEnvironment_CreateCryptoContextPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createcryptocontext");
@@ -8748,6 +8778,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasBuildExecution = (PLibMCEnvStateEnvironment_HasBuildExecutionPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasbuildexecution");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasBuildExecution = (PLibMCEnvStateEnvironment_HasBuildExecutionPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasbuildexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasBuildExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetBuildExecution = (PLibMCEnvStateEnvironment_GetBuildExecutionPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getbuildexecution");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetBuildExecution = (PLibMCEnvStateEnvironment_GetBuildExecutionPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getbuildexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetBuildExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_UnloadAllToolpathes = (PLibMCEnvStateEnvironment_UnloadAllToolpathesPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_unloadalltoolpathes");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_UnloadAllToolpathes = (PLibMCEnvStateEnvironment_UnloadAllToolpathesPtr) dlsym(hLibrary, "libmcenv_stateenvironment_unloadalltoolpathes");
@@ -9717,6 +9765,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_GetBuildJob == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasBuildExecution = (PLibMCEnvUIEnvironment_HasBuildExecutionPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasbuildexecution");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasBuildExecution = (PLibMCEnvUIEnvironment_HasBuildExecutionPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasbuildexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasBuildExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetBuildExecution = (PLibMCEnvUIEnvironment_GetBuildExecutionPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getbuildexecution");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetBuildExecution = (PLibMCEnvUIEnvironment_GetBuildExecutionPtr) dlsym(hLibrary, "libmcenv_uienvironment_getbuildexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetBuildExecution == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11882,6 +11948,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_hasbuildexecution", (void**)&(pWrapperTable->m_DriverEnvironment_HasBuildExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_HasBuildExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getbuildexecution", (void**)&(pWrapperTable->m_DriverEnvironment_GetBuildExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetBuildExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createcryptocontext", (void**)&(pWrapperTable->m_DriverEnvironment_CreateCryptoContext));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateCryptoContext == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12418,6 +12492,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasbuildexecution", (void**)&(pWrapperTable->m_StateEnvironment_HasBuildExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasBuildExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getbuildexecution", (void**)&(pWrapperTable->m_StateEnvironment_GetBuildExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBuildExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_unloadalltoolpathes", (void**)&(pWrapperTable->m_StateEnvironment_UnloadAllToolpathes));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_UnloadAllToolpathes == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12848,6 +12930,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getbuildjob", (void**)&(pWrapperTable->m_UIEnvironment_GetBuildJob));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBuildJob == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasbuildexecution", (void**)&(pWrapperTable->m_UIEnvironment_HasBuildExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasBuildExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getbuildexecution", (void**)&(pWrapperTable->m_UIEnvironment_GetBuildExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBuildExecution == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_UIEnvironment_CreateDiscreteField2D));
@@ -19151,6 +19241,35 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	bool CDriverEnvironment::HasBuildExecution(const std::string & sExecutionUUID)
+	{
+		bool resultExecutionExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_HasBuildExecution(m_pHandle, sExecutionUUID.c_str(), &resultExecutionExists));
+		
+		return resultExecutionExists;
+	}
+	
+	/**
+	* CDriverEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	PBuildExecution CDriverEnvironment::GetBuildExecution(const std::string & sExecutionUUID)
+	{
+		LibMCEnvHandle hExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetBuildExecution(m_pHandle, sExecutionUUID.c_str(), &hExecutionInstance));
+		
+		if (!hExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hExecutionInstance);
+	}
+	
+	/**
 	* CDriverEnvironment::CreateCryptoContext - Creates a crypto context.
 	* @return Cryptographic context instance
 	*/
@@ -21097,6 +21216,35 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	bool CStateEnvironment::HasBuildExecution(const std::string & sExecutionUUID)
+	{
+		bool resultExecutionExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasBuildExecution(m_pHandle, sExecutionUUID.c_str(), &resultExecutionExists));
+		
+		return resultExecutionExists;
+	}
+	
+	/**
+	* CStateEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	PBuildExecution CStateEnvironment::GetBuildExecution(const std::string & sExecutionUUID)
+	{
+		LibMCEnvHandle hExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetBuildExecution(m_pHandle, sExecutionUUID.c_str(), &hExecutionInstance));
+		
+		if (!hExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hExecutionInstance);
+	}
+	
+	/**
 	* CStateEnvironment::UnloadAllToolpathes - unloads all toolpath in memory to clean up
 	*/
 	void CStateEnvironment::UnloadAllToolpathes()
@@ -22604,6 +22752,35 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
+	}
+	
+	/**
+	* CUIEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	bool CUIEnvironment::HasBuildExecution(const std::string & sExecutionUUID)
+	{
+		bool resultExecutionExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasBuildExecution(m_pHandle, sExecutionUUID.c_str(), &resultExecutionExists));
+		
+		return resultExecutionExists;
+	}
+	
+	/**
+	* CUIEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	PBuildExecution CUIEnvironment::GetBuildExecution(const std::string & sExecutionUUID)
+	{
+		LibMCEnvHandle hExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetBuildExecution(m_pHandle, sExecutionUUID.c_str(), &hExecutionInstance));
+		
+		if (!hExecutionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildExecution>(m_pWrapper, hExecutionInstance);
 	}
 	
 	/**

@@ -167,6 +167,10 @@ public:
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
+	bool HasBuildExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecution* GetBuildExecution(const std::string& sExecutionUUID) override;
+
 	ICryptoContext* CreateCryptoContext() override;
 
 	IDateTime* GetCurrentDateTime() override;

@@ -163,4 +163,14 @@ std::string CBuildJobHandler::ConvertBuildStatusToString(const LibMCData::eBuild
 LibMCData::eBuildJobStatus CBuildJobHandler::ConvertStringToBuildStatus(const std::string& sString)
 {
     return CBuildJob::convertStringToBuildJobStatus(sString);
+}  
+
+IBuildJobExecution* CBuildJobHandler::RetrieveJobExecution(const std::string& sExecutionUUID)
+{
+    throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_NOTIMPLEMENTED);
+}
+
+IBuildJobExecutionIterator* CBuildJobHandler::ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter)
+{
+    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
 }

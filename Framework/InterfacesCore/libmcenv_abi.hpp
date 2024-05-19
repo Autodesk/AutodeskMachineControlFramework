@@ -4960,6 +4960,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_hasbuildjob(LibMCEnv
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getbuildjob(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
 
 /**
+* Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionExists - Returns true if execution exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_hasbuildexecution(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pExecutionUUID, bool * pExecutionExists);
+
+/**
+* Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionInstance - Build execution instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getbuildexecution(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance);
+
+/**
 * Creates a crypto context.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -6466,6 +6486,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasbuildjob(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getbuildjob(LibMCEnv_StateEnvironment pStateEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
 
 /**
+* Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionExists - Returns true if execution exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasbuildexecution(LibMCEnv_StateEnvironment pStateEnvironment, const char * pExecutionUUID, bool * pExecutionExists);
+
+/**
+* Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionInstance - Build execution instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getbuildexecution(LibMCEnv_StateEnvironment pStateEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance);
+
+/**
 * unloads all toolpath in memory to clean up
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -7619,6 +7659,26 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasbuildjob(LibMCEnv_UIE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getbuildjob(LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
+
+/**
+* Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionExists - Returns true if execution exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasbuildexecution(LibMCEnv_UIEnvironment pUIEnvironment, const char * pExecutionUUID, bool * pExecutionExists);
+
+/**
+* Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionInstance - Build execution instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getbuildexecution(LibMCEnv_UIEnvironment pUIEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance);
 
 /**
 * Creates an empty discrete field.

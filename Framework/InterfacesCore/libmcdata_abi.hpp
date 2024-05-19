@@ -1698,6 +1698,28 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_convertbuildstatust
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_convertstringtobuildstatus(LibMCData_BuildJobHandler pBuildJobHandler, const char * pString, LibMCData::eBuildJobStatus * pStatus);
 
+/**
+* Retrieves a new build job execution by uuid.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[in] pExecutionUUID - UUID of the execution to retrieve.
+* @param[out] pExecutionInstance - If UUID exists, returns execution instance. Otherwise, returns null.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_retrievejobexecution(LibMCData_BuildJobHandler pBuildJobHandler, const char * pExecutionUUID, LibMCData_BuildJobExecution * pExecutionInstance);
+
+/**
+* Retrieves build executions, filtered by time or journal.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[in] pMinTimestamp - Minimum Timestamp in ISO8601 UTC format. May be empty for no filter.
+* @param[in] pMaxTimestamp - Maximum Timestamp in ISO8601 UTC format. May be empty for no filter.
+* @param[in] pJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+* @param[out] pIteratorInstance - Returns the list of execution instances that are queried. List may be empty.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_listjobexecutions(LibMCData_BuildJobHandler pBuildJobHandler, const char * pMinTimestamp, const char * pMaxTimestamp, const char * pJournalUUIDFilter, LibMCData_BuildJobExecutionIterator * pIteratorInstance);
+
 /*************************************************************************************************************************
  Class definition for UserList
 **************************************************************************************************************************/

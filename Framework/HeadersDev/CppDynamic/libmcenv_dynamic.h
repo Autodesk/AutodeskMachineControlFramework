@@ -4947,6 +4947,26 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_HasBuildJobPtr) (LibMCEnv_Dr
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_GetBuildJobPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
 
 /**
+* Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionExists - Returns true if execution exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_HasBuildExecutionPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pExecutionUUID, bool * pExecutionExists);
+
+/**
+* Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionInstance - Build execution instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_GetBuildExecutionPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance);
+
+/**
 * Creates a crypto context.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -6453,6 +6473,26 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasBuildJobPtr) (LibMCEnv_Sta
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetBuildJobPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
 
 /**
+* Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionExists - Returns true if execution exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasBuildExecutionPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pExecutionUUID, bool * pExecutionExists);
+
+/**
+* Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionInstance - Build execution instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetBuildExecutionPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance);
+
+/**
 * unloads all toolpath in memory to clean up
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -7608,6 +7648,26 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasBuildJobPtr) (LibMCEnv_UIEnvi
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBuildJobPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
 
 /**
+* Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionExists - Returns true if execution exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasBuildExecutionPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pExecutionUUID, bool * pExecutionExists);
+
+/**
+* Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pExecutionUUID - UUID of the execution entity.
+* @param[out] pExecutionInstance - Build execution instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBuildExecutionPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance);
+
+/**
 * Creates an empty discrete field.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -8444,6 +8504,8 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr m_DriverEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvDriverEnvironment_HasBuildJobPtr m_DriverEnvironment_HasBuildJob;
 	PLibMCEnvDriverEnvironment_GetBuildJobPtr m_DriverEnvironment_GetBuildJob;
+	PLibMCEnvDriverEnvironment_HasBuildExecutionPtr m_DriverEnvironment_HasBuildExecution;
+	PLibMCEnvDriverEnvironment_GetBuildExecutionPtr m_DriverEnvironment_GetBuildExecution;
 	PLibMCEnvDriverEnvironment_CreateCryptoContextPtr m_DriverEnvironment_CreateCryptoContext;
 	PLibMCEnvDriverEnvironment_GetCurrentDateTimePtr m_DriverEnvironment_GetCurrentDateTime;
 	PLibMCEnvDriverEnvironment_GetCustomDateTimePtr m_DriverEnvironment_GetCustomDateTime;
@@ -8578,6 +8640,8 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateDriverAccessPtr m_StateEnvironment_CreateDriverAccess;
 	PLibMCEnvStateEnvironment_HasBuildJobPtr m_StateEnvironment_HasBuildJob;
 	PLibMCEnvStateEnvironment_GetBuildJobPtr m_StateEnvironment_GetBuildJob;
+	PLibMCEnvStateEnvironment_HasBuildExecutionPtr m_StateEnvironment_HasBuildExecution;
+	PLibMCEnvStateEnvironment_GetBuildExecutionPtr m_StateEnvironment_GetBuildExecution;
 	PLibMCEnvStateEnvironment_UnloadAllToolpathesPtr m_StateEnvironment_UnloadAllToolpathes;
 	PLibMCEnvStateEnvironment_SetNextStatePtr m_StateEnvironment_SetNextState;
 	PLibMCEnvStateEnvironment_LogMessagePtr m_StateEnvironment_LogMessage;
@@ -8686,6 +8750,8 @@ typedef struct {
 	PLibMCEnvUIEnvironment_CreateDataTablePtr m_UIEnvironment_CreateDataTable;
 	PLibMCEnvUIEnvironment_HasBuildJobPtr m_UIEnvironment_HasBuildJob;
 	PLibMCEnvUIEnvironment_GetBuildJobPtr m_UIEnvironment_GetBuildJob;
+	PLibMCEnvUIEnvironment_HasBuildExecutionPtr m_UIEnvironment_HasBuildExecution;
+	PLibMCEnvUIEnvironment_GetBuildExecutionPtr m_UIEnvironment_GetBuildExecution;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr m_UIEnvironment_CreateDiscreteField2D;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DFromImagePtr m_UIEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvUIEnvironment_CheckPermissionPtr m_UIEnvironment_CheckPermission;

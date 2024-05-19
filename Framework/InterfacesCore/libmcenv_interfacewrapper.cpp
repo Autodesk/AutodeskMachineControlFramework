@@ -14615,6 +14615,66 @@ LibMCEnvResult libmcenv_driverenvironment_getbuildjob(LibMCEnv_DriverEnvironment
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_hasbuildexecution(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pExecutionUUID, bool * pExecutionExists)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pExecutionUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pExecutionExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExecutionUUID(pExecutionUUID);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pExecutionExists = pIDriverEnvironment->HasBuildExecution(sExecutionUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_getbuildexecution(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pExecutionUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pExecutionInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExecutionUUID(pExecutionUUID);
+		IBase* pBaseExecutionInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseExecutionInstance = pIDriverEnvironment->GetBuildExecution(sExecutionUUID);
+
+		*pExecutionInstance = (IBase*)(pBaseExecutionInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_driverenvironment_createcryptocontext(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_CryptoContext * pContext)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
@@ -19507,6 +19567,66 @@ LibMCEnvResult libmcenv_stateenvironment_getbuildjob(LibMCEnv_StateEnvironment p
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_hasbuildexecution(LibMCEnv_StateEnvironment pStateEnvironment, const char * pExecutionUUID, bool * pExecutionExists)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pExecutionUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pExecutionExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExecutionUUID(pExecutionUUID);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pExecutionExists = pIStateEnvironment->HasBuildExecution(sExecutionUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_getbuildexecution(LibMCEnv_StateEnvironment pStateEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pExecutionUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pExecutionInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExecutionUUID(pExecutionUUID);
+		IBase* pBaseExecutionInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseExecutionInstance = pIStateEnvironment->GetBuildExecution(sExecutionUUID);
+
+		*pExecutionInstance = (IBase*)(pBaseExecutionInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_unloadalltoolpathes(LibMCEnv_StateEnvironment pStateEnvironment)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -23019,6 +23139,66 @@ LibMCEnvResult libmcenv_uienvironment_getbuildjob(LibMCEnv_UIEnvironment pUIEnvi
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_hasbuildexecution(LibMCEnv_UIEnvironment pUIEnvironment, const char * pExecutionUUID, bool * pExecutionExists)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pExecutionUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pExecutionExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExecutionUUID(pExecutionUUID);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pExecutionExists = pIUIEnvironment->HasBuildExecution(sExecutionUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_getbuildexecution(LibMCEnv_UIEnvironment pUIEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pExecutionUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pExecutionInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExecutionUUID(pExecutionUUID);
+		IBase* pBaseExecutionInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseExecutionInstance = pIUIEnvironment->GetBuildExecution(sExecutionUUID);
+
+		*pExecutionInstance = (IBase*)(pBaseExecutionInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_creatediscretefield2d(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -24938,6 +25118,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_hasbuildjob;
 	if (sProcName == "libmcenv_driverenvironment_getbuildjob") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_getbuildjob;
+	if (sProcName == "libmcenv_driverenvironment_hasbuildexecution") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_hasbuildexecution;
+	if (sProcName == "libmcenv_driverenvironment_getbuildexecution") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_getbuildexecution;
 	if (sProcName == "libmcenv_driverenvironment_createcryptocontext") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createcryptocontext;
 	if (sProcName == "libmcenv_driverenvironment_getcurrentdatetime") 
@@ -25206,6 +25390,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_hasbuildjob;
 	if (sProcName == "libmcenv_stateenvironment_getbuildjob") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getbuildjob;
+	if (sProcName == "libmcenv_stateenvironment_hasbuildexecution") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_hasbuildexecution;
+	if (sProcName == "libmcenv_stateenvironment_getbuildexecution") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getbuildexecution;
 	if (sProcName == "libmcenv_stateenvironment_unloadalltoolpathes") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_unloadalltoolpathes;
 	if (sProcName == "libmcenv_stateenvironment_setnextstate") 
@@ -25422,6 +25610,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_hasbuildjob;
 	if (sProcName == "libmcenv_uienvironment_getbuildjob") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getbuildjob;
+	if (sProcName == "libmcenv_uienvironment_hasbuildexecution") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_hasbuildexecution;
+	if (sProcName == "libmcenv_uienvironment_getbuildexecution") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getbuildexecution;
 	if (sProcName == "libmcenv_uienvironment_creatediscretefield2d") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_creatediscretefield2d;
 	if (sProcName == "libmcenv_uienvironment_creatediscretefield2dfromimage") 

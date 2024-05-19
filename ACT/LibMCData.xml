@@ -1296,6 +1296,17 @@
 			<param name="Status" type="enum" class="BuildJobStatus" pass="return" description="Status Enum." />	
 		</method>
 
+		<method name="RetrieveJobExecution" description="Retrieves a new build job execution by uuid.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution to retrieve." />
+			<param name="ExecutionInstance" type="optionalclass" class="BuildJobExecution" pass="return" description="If UUID exists, returns execution instance. Otherwise, returns null." />
+		</method>
+
+		<method name="ListJobExecutions" description="Retrieves build executions, filtered by time or journal.">
+			<param name="MinTimestamp" type="string" pass="in" description="Minimum Timestamp in ISO8601 UTC format. May be empty for no filter." />	
+			<param name="MaxTimestamp" type="string" pass="in" description="Maximum Timestamp in ISO8601 UTC format. May be empty for no filter." />	
+			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
+		</method>
 			
 	</class>
 

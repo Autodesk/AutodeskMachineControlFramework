@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_buildexecution.hpp"
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_imagedata.hpp"
@@ -175,8 +176,8 @@ bool CStateEnvironment::HasBuildJob(const std::string& sBuildUUID)
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	try {
-		pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-		return true;
+		auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+		return (pBuildJob.get () != nullptr);
 	}
 	catch (std::exception) {
 		return false;
@@ -191,6 +192,33 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
 	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getGlobalChronoInstance ());
+}
+
+bool CStateEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
+{
+	std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+	try {
+		auto pDataModel = m_pSystemState->getDataModelInstance();
+		auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+		auto pExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
+
+		return (pExecution.get() != nullptr);
+	}
+	catch (std::exception) {
+		return false;
+	}
+
+}
+
+IBuildExecution* CStateEnvironment::GetBuildExecution(const std::string& sExecutionUUID)
+{
+	std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+	auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
+	return new CBuildExecution(pBuildExecution, pDataModel, m_pSystemState->getToolpathHandlerInstance(), m_pSystemState->getGlobalChronoInstance());
+
 }
 
 

@@ -3957,6 +3957,20 @@ public:
 	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
+	* IDriverEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	virtual bool HasBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IDriverEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	virtual IBuildExecution * GetBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
 	* IDriverEnvironment::CreateCryptoContext - Creates a crypto context.
 	* @return Cryptographic context instance
 	*/
@@ -5054,6 +5068,20 @@ public:
 	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
+	* IStateEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	virtual bool HasBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IStateEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	virtual IBuildExecution * GetBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
 	* IStateEnvironment::UnloadAllToolpathes - unloads all toolpath in memory to clean up
 	*/
 	virtual void UnloadAllToolpathes() = 0;
@@ -5867,6 +5895,20 @@ public:
 	* @return Build instance
 	*/
 	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
+
+	/**
+	* IUIEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	virtual bool HasBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IUIEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	virtual IBuildExecution * GetBuildExecution(const std::string & sExecutionUUID) = 0;
 
 	/**
 	* IUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.

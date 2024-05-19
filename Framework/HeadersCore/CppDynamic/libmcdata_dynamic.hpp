@@ -1574,6 +1574,8 @@ public:
 	inline PBuildJobIterator ListJobsByStatus(const eBuildJobStatus eStatus);
 	inline std::string ConvertBuildStatusToString(const eBuildJobStatus eStatus);
 	inline eBuildJobStatus ConvertStringToBuildStatus(const std::string & sString);
+	inline PBuildJobExecution RetrieveJobExecution(const std::string & sExecutionUUID);
+	inline PBuildJobExecutionIterator ListJobExecutions(const std::string & sMinTimestamp, const std::string & sMaxTimestamp, const std::string & sJournalUUIDFilter);
 };
 	
 /*************************************************************************************************************************
@@ -1957,6 +1959,8 @@ public:
 		pWrapperTable->m_BuildJobHandler_ListJobsByStatus = nullptr;
 		pWrapperTable->m_BuildJobHandler_ConvertBuildStatusToString = nullptr;
 		pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus = nullptr;
+		pWrapperTable->m_BuildJobHandler_RetrieveJobExecution = nullptr;
+		pWrapperTable->m_BuildJobHandler_ListJobExecutions = nullptr;
 		pWrapperTable->m_UserList_Count = nullptr;
 		pWrapperTable->m_UserList_GetUserProperties = nullptr;
 		pWrapperTable->m_LoginHandler_UserExists = nullptr;
@@ -3387,6 +3391,24 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJobHandler_RetrieveJobExecution = (PLibMCDataBuildJobHandler_RetrieveJobExecutionPtr) GetProcAddress(hLibrary, "libmcdata_buildjobhandler_retrievejobexecution");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobHandler_RetrieveJobExecution = (PLibMCDataBuildJobHandler_RetrieveJobExecutionPtr) dlsym(hLibrary, "libmcdata_buildjobhandler_retrievejobexecution");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobHandler_RetrieveJobExecution == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobHandler_ListJobExecutions = (PLibMCDataBuildJobHandler_ListJobExecutionsPtr) GetProcAddress(hLibrary, "libmcdata_buildjobhandler_listjobexecutions");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobHandler_ListJobExecutions = (PLibMCDataBuildJobHandler_ListJobExecutionsPtr) dlsym(hLibrary, "libmcdata_buildjobhandler_listjobexecutions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobHandler_ListJobExecutions == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UserList_Count = (PLibMCDataUserList_CountPtr) GetProcAddress(hLibrary, "libmcdata_userlist_count");
 		#else // _WIN32
 		pWrapperTable->m_UserList_Count = (PLibMCDataUserList_CountPtr) dlsym(hLibrary, "libmcdata_userlist_count");
@@ -4569,6 +4591,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobhandler_convertstringtobuildstatus", (void**)&(pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobhandler_retrievejobexecution", (void**)&(pWrapperTable->m_BuildJobHandler_RetrieveJobExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobHandler_RetrieveJobExecution == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobhandler_listjobexecutions", (void**)&(pWrapperTable->m_BuildJobHandler_ListJobExecutions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobHandler_ListJobExecutions == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_userlist_count", (void**)&(pWrapperTable->m_UserList_Count));
@@ -6985,6 +7015,41 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_ConvertStringToBuildStatus(m_pHandle, sString.c_str(), &resultStatus));
 		
 		return resultStatus;
+	}
+	
+	/**
+	* CBuildJobHandler::RetrieveJobExecution - Retrieves a new build job execution by uuid.
+	* @param[in] sExecutionUUID - UUID of the execution to retrieve.
+	* @return If UUID exists, returns execution instance. Otherwise, returns null.
+	*/
+	PBuildJobExecution CBuildJobHandler::RetrieveJobExecution(const std::string & sExecutionUUID)
+	{
+		LibMCDataHandle hExecutionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_RetrieveJobExecution(m_pHandle, sExecutionUUID.c_str(), &hExecutionInstance));
+		
+		if (hExecutionInstance) {
+			return std::make_shared<CBuildJobExecution>(m_pWrapper, hExecutionInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CBuildJobHandler::ListJobExecutions - Retrieves build executions, filtered by time or journal.
+	* @param[in] sMinTimestamp - Minimum Timestamp in ISO8601 UTC format. May be empty for no filter.
+	* @param[in] sMaxTimestamp - Maximum Timestamp in ISO8601 UTC format. May be empty for no filter.
+	* @param[in] sJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+	* @return Returns the list of execution instances that are queried. List may be empty.
+	*/
+	PBuildJobExecutionIterator CBuildJobHandler::ListJobExecutions(const std::string & sMinTimestamp, const std::string & sMaxTimestamp, const std::string & sJournalUUIDFilter)
+	{
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_ListJobExecutions(m_pHandle, sMinTimestamp.c_str(), sMaxTimestamp.c_str(), sJournalUUIDFilter.c_str(), &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobExecutionIterator>(m_pWrapper, hIteratorInstance);
 	}
 	
 	/**

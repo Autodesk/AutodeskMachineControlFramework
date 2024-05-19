@@ -610,6 +610,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL 593 /** Stdout logger does not support retrieval */
 #define LIBMC_ERROR_EXECUTIONLISTNAMEMISSING 594 /** Execution list name missing */
 #define LIBMC_ERROR_BUILDLISTBUTTONNAMEMISSING 595 /** Build list button name missing */
+#define LIBMC_ERROR_EXECUTIONLISTBUTTONNAMEMISSING 596 /** Build execution button name missing */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1132,6 +1133,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL: return "Stdout logger does not support retrieval";
     case LIBMC_ERROR_EXECUTIONLISTNAMEMISSING: return "Execution list name missing";
     case LIBMC_ERROR_BUILDLISTBUTTONNAMEMISSING: return "Build list button name missing";
+    case LIBMC_ERROR_EXECUTIONLISTBUTTONNAMEMISSING: return "Build execution button name missing";
     default: return "unknown error";
   }
 }

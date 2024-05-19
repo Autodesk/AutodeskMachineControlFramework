@@ -619,6 +619,8 @@
 		<error name="STDOUTLOGGERDOESNOTSUPPORTRETRIEVAL" code="593" description="Stdout logger does not support retrieval" />		
 		<error name="EXECUTIONLISTNAMEMISSING" code="594" description="Execution list name missing" />
 		<error name="BUILDLISTBUTTONNAMEMISSING" code="595" description="Build list button name missing" />
+		<error name="EXECUTIONLISTBUTTONNAMEMISSING" code="596" description="Build execution button name missing" />
+		
 		
 		
 		

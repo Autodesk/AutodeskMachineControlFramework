@@ -84,8 +84,6 @@ namespace AMC {
 		CUIExpression m_LoadingText;
 		CUIExpression m_BuildNameCaption;
 		CUIExpression m_BuildThumbnailCaption;
-		CUIExpression m_BuildLayersCaption;
-		CUIExpression m_BuildUUIDCaption;
 		CUIExpression m_BuildTimestampCaption;
 
 		std::string m_sSelectEvent;

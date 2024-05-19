@@ -1529,6 +1529,22 @@ public:
 	*/
 	virtual LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string & sString) = 0;
 
+	/**
+	* IBuildJobHandler::RetrieveJobExecution - Retrieves a new build job execution by uuid.
+	* @param[in] sExecutionUUID - UUID of the execution to retrieve.
+	* @return If UUID exists, returns execution instance. Otherwise, returns null.
+	*/
+	virtual IBuildJobExecution * RetrieveJobExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IBuildJobHandler::ListJobExecutions - Retrieves build executions, filtered by time or journal.
+	* @param[in] sMinTimestamp - Minimum Timestamp in ISO8601 UTC format. May be empty for no filter.
+	* @param[in] sMaxTimestamp - Maximum Timestamp in ISO8601 UTC format. May be empty for no filter.
+	* @param[in] sJournalUUIDFilter - UUID of the journal to filter from. Ignored if empty string.
+	* @return Returns the list of execution instances that are queried. List may be empty.
+	*/
+	virtual IBuildJobExecutionIterator * ListJobExecutions(const std::string & sMinTimestamp, const std::string & sMaxTimestamp, const std::string & sJournalUUIDFilter) = 0;
+
 };
 
 typedef IBaseSharedPtr<IBuildJobHandler> PIBuildJobHandler;

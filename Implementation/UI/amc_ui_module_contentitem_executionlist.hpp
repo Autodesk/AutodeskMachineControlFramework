@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #ifndef __AMC_UI_MODULE_CONTENTITEM_EXECUTIONLIST
-#define __AMC_UI_MODULE_CONTENTITEM_EXEUCTIONLIST
+#define __AMC_UI_MODULE_CONTENTITEM_EXECUTIONLIST
 
 #include "header_protection.hpp"
 
@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "amc_ui_module_contentitem.hpp"
+#include "amc_ui_expression.hpp"
 #include "pugixml.hpp"
 
 namespace LibMCData {
@@ -50,27 +51,65 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_ContentExecutionList, PUIModule_ContentExecutionList);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+	amcDeclareDependingClass(CUIModule_ContentExecutionListButton, PUIModule_ContentExecutionListButton);
+
+	class CUIModule_ContentExecutionListButton {
+	private:
+		std::string m_sUUID;
+		std::string m_sButtonName;
+		CUIExpression m_CaptionExpression;
+		std::string m_sEvent;
+
+	public:
+
+		CUIModule_ContentExecutionListButton(const std::string& sButtonName, CUIExpression captionExpression, const std::string& sEvent);
+
+		virtual ~CUIModule_ContentExecutionListButton();
+
+		std::string getButtonName();
+
+		std::string getUUID();
+
+		CUIExpression getCaptionExpression();
+
+		std::string getEvent();
+	};
+
 
 	class CUIModule_ContentExecutionList : public CUIModule_ContentItem {
 	protected:
 
 		std::string m_sItemName;
-		std::string m_sLoadingText;
-		std::string m_sExecutionNameCaption;
-		std::string m_sExecutionUUIDCaption;
-		std::string m_sSelectEvent;
 
-		std::string m_sSelectedExecutionField;
+		CUIExpression m_LoadingText;
+		CUIExpression m_ExecutionNameCaption;
+		CUIExpression m_ExecutionThumbnailCaption;
+		CUIExpression m_ExecutionTimestampCaption;
+
+		std::string m_sSelectEvent;
+		std::string m_sSelectedExecutionFieldUUID;
+		std::string m_sSelectedButtonFieldUUID;
+		std::string m_sDefaultThumbnailResourceUUID;
+
+		std::vector<PUIModule_ContentExecutionListButton> m_Buttons;
+		std::map<std::string, PUIModule_ContentExecutionListButton> m_ButtonNameMap;
+		std::map<std::string, PUIModule_ContentExecutionListButton> m_ButtonUUIDMap;
 
 		uint32_t m_nEntriesPerPage;
 
 		LibMCData::PDataModel m_pDataModel;
 
+		PStateMachineData m_pStateMachineData;
+
+		void writeHeadersToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
+		void writeButtonsToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
 	public:
 
 		static PUIModule_ContentExecutionList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentExecutionList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath);
+		CUIModule_ContentExecutionList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentExecutionList();
 
@@ -86,6 +125,7 @@ namespace AMC {
 
 		virtual std::list <std::string> getReferenceUUIDs() override;
 
+		void addButton(const std::string& sButtonName, CUIExpression captionExpression, const std::string& sEvent);
 
 	};
 
@@ -93,5 +133,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE_CONTENTITEM_EXEUCTIONLIST
+#endif //__AMC_UI_MODULE_CONTENTITEM_EXECUTIONLIST
 

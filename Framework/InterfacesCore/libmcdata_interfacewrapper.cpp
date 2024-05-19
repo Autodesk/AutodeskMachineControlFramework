@@ -5380,6 +5380,74 @@ LibMCDataResult libmcdata_buildjobhandler_convertstringtobuildstatus(LibMCData_B
 	}
 }
 
+LibMCDataResult libmcdata_buildjobhandler_retrievejobexecution(LibMCData_BuildJobHandler pBuildJobHandler, const char * pExecutionUUID, LibMCData_BuildJobExecution * pExecutionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
+
+	try {
+		if (pExecutionUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pExecutionInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sExecutionUUID(pExecutionUUID);
+		IBase* pBaseExecutionInstance(nullptr);
+		IBuildJobHandler* pIBuildJobHandler = dynamic_cast<IBuildJobHandler*>(pIBaseClass);
+		if (!pIBuildJobHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseExecutionInstance = pIBuildJobHandler->RetrieveJobExecution(sExecutionUUID);
+
+		*pExecutionInstance = (IBase*)(pBaseExecutionInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobhandler_listjobexecutions(LibMCData_BuildJobHandler pBuildJobHandler, const char * pMinTimestamp, const char * pMaxTimestamp, const char * pJournalUUIDFilter, LibMCData_BuildJobExecutionIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
+
+	try {
+		if (pMinTimestamp == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pMaxTimestamp == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pJournalUUIDFilter == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pIteratorInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sMinTimestamp(pMinTimestamp);
+		std::string sMaxTimestamp(pMaxTimestamp);
+		std::string sJournalUUIDFilter(pJournalUUIDFilter);
+		IBase* pBaseIteratorInstance(nullptr);
+		IBuildJobHandler* pIBuildJobHandler = dynamic_cast<IBuildJobHandler*>(pIBaseClass);
+		if (!pIBuildJobHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIBuildJobHandler->ListJobExecutions(sMinTimestamp, sMaxTimestamp, sJournalUUIDFilter);
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for UserList
@@ -8024,6 +8092,10 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_buildjobhandler_convertbuildstatustostring;
 	if (sProcName == "libmcdata_buildjobhandler_convertstringtobuildstatus") 
 		*ppProcAddress = (void*) &libmcdata_buildjobhandler_convertstringtobuildstatus;
+	if (sProcName == "libmcdata_buildjobhandler_retrievejobexecution") 
+		*ppProcAddress = (void*) &libmcdata_buildjobhandler_retrievejobexecution;
+	if (sProcName == "libmcdata_buildjobhandler_listjobexecutions") 
+		*ppProcAddress = (void*) &libmcdata_buildjobhandler_listjobexecutions;
 	if (sProcName == "libmcdata_userlist_count") 
 		*ppProcAddress = (void*) &libmcdata_userlist_count;
 	if (sProcName == "libmcdata_userlist_getuserproperties") 
