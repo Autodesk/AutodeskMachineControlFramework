@@ -260,19 +260,20 @@ void CUIModule_ContentExecutionList::addContentToJSON(CJSONWriter& writer, CJSON
 	CJSONWriterArray entryArray(writer);
 
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
-	auto pBuildJobIterator = pBuildJobHandler->ListJobsByStatus(LibMCData::eBuildJobStatus::Validated);
-	while (pBuildJobIterator->MoveNext()) {
 
-		auto pBuildJob = pBuildJobIterator->GetCurrentJob();
+	auto pExecutionIterator = pBuildJobHandler->ListJobExecutions("", "", "");
+	while (pExecutionIterator->MoveNext()) {
+
+		auto pExecution = pExecutionIterator->GetCurrentJobExecution();
+
+		uint64_t nStartTimeStamp = pExecution->GetStartTimeStampInMicroseconds();
 
 		CJSONWriterObject entryObject(writer);
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONNAME, pBuildJob->GetName());
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUUID, pBuildJob->GetUUID());
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTIMESTAMP, pBuildJob->GetTimeStamp());
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONNAME, pExecution->GetExecutionUUID());
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUUID, pExecution->GetExecutionUUID());
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC (nStartTimeStamp));
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUSER, pBuildJob->GetCreatorName());
-
-		pBuildJob->GetTimeStamp();
+//		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUSER, pExecution->GetCreatorName());
 
 		entryArray.addObject(entryObject);
 

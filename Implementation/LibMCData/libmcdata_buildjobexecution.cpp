@@ -140,7 +140,7 @@ void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus 
 	auto eOldStatus = convertStringToBuildJobExecutionStatus(pSelectStatement->getColumnString(1));
 	int64_t nStartTimeStamp = AMCCommon::CChrono::parseISO8601TimeUTC (pSelectStatement->getColumnString(2));
 
-	if (nStartTimeStamp < (int64_t)nAbsoluteEndTimeStampInMicrosecondsSince1970)
+	if (nStartTimeStamp > (int64_t)nAbsoluteEndTimeStampInMicrosecondsSince1970)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTIMESTAMP, "Build execution end timestamp is before start timestamp!");
 
 	pSelectStatement = nullptr;

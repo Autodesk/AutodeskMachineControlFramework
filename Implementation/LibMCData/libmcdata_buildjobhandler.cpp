@@ -37,6 +37,8 @@ Abstract: This is a stub class definition of CBuildJobHandler
 // Include custom headers here.
 #include "libmcdata_buildjob.hpp"
 #include "libmcdata_buildjobiterator.hpp"
+#include "libmcdata_buildjobexecution.hpp"
+#include "libmcdata_buildjobexecutioniterator.hpp"
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
@@ -167,10 +169,52 @@ LibMCData::eBuildJobStatus CBuildJobHandler::ConvertStringToBuildStatus(const st
 
 IBuildJobExecution* CBuildJobHandler::RetrieveJobExecution(const std::string& sExecutionUUID)
 {
-    throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    return new CBuildJobExecution (m_pSQLHandler, AMCCommon::CUtils::normalizeUUIDString (sExecutionUUID), m_pStorageState);
+
 }
 
 IBuildJobExecutionIterator* CBuildJobHandler::ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter)
 {
-    throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    std::string sQuery = "SELECT uuid FROM buildjobexecutions WHERE active=? ";
+    if (!sJournalUUIDFilter.empty())
+        sQuery += " AND journaluuid=?";
+    if (!sMinTimestamp.empty ())
+        sQuery += " AND startjournaltimestamp>?";
+    if (!sMaxTimestamp.empty())
+        sQuery += " AND startjournaltimestamp<?";
+    sQuery += " ORDER BY startjournaltimestamp";
+
+    uint32_t nColumn = 1;
+
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setInt(nColumn, 1); 
+    nColumn++;
+
+    if (!sJournalUUIDFilter.empty()) {
+        pStatement->setString(nColumn, AMCCommon::CUtils::normalizeUUIDString(sJournalUUIDFilter));
+        nColumn++;
+    }
+    
+    if (!sMinTimestamp.empty())
+    {
+        uint64_t nMinTimeStamp = AMCCommon::CChrono::parseISO8601TimeUTC(sMinTimestamp);
+        pStatement->setString(nColumn, AMCCommon::CChrono::convertToISO8601TimeUTC (nMinTimeStamp));
+        nColumn++;   
+    }
+
+    if (!sMaxTimestamp.empty())
+    {
+        uint64_t nMaxTimeStamp = AMCCommon::CChrono::parseISO8601TimeUTC(sMaxTimestamp);
+        pStatement->setString(nColumn, AMCCommon::CChrono::convertToISO8601TimeUTC(nMaxTimeStamp));
+        nColumn++;
+    }
+
+    std::unique_ptr<CBuildJobExecutionIterator> buildJobIterator(new CBuildJobExecutionIterator());
+
+    while (pStatement->nextRow()) {
+        std::string sExecutionUUID = pStatement->getColumnString(1);
+        buildJobIterator->AddJobExecution(std::make_shared<CBuildJobExecution>(m_pSQLHandler, sExecutionUUID, m_pStorageState));
+    }
+
+    return buildJobIterator.release();
 }
