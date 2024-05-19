@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	import ContentItem_Chart from '../modules/AMCModule_ContentItem_Chart.vue';
 	import ContentItem_Upload from '../modules/AMCModule_ContentItem_Upload.vue';
 	import ContentItem_BuildList from '../modules/AMCModule_ContentItem_BuildList.vue';
+	import ContentItem_ExecutionList from '../modules/AMCModule_ContentItem_ExecutionList.vue';
 	import ContentItem_AlertList from '../modules/AMCModule_ContentItem_AlertList.vue';
 	import ContentItem_ParameterList from '../modules/AMCModule_ContentItem_ParameterList.vue';
 	import ContentItem_ButtonGroup from '../modules/AMCModule_ContentItem_ButtonGroup.vue';
@@ -84,6 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			ContentItem_Chart,
 			ContentItem_Upload,
 			ContentItem_BuildList,
+			ContentItem_ExecutionList,
 			ContentItem_AlertList,
 			ContentItem_ParameterList,
 			ContentItem_ButtonGroup,

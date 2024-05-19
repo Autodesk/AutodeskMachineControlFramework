@@ -1,6 +1,6 @@
 <!--
 
-Copyright (C) 2024 Autodesk Inc.
+Copyright (C) 2020 Autodesk Inc.
 
 All rights reserved.
 
@@ -31,22 +31,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <template>
 
 <div v-if="(moduleitem.type=='executionlist')">  	
-
-	<v-data-table
-		:headers="moduleitem.headers"
-		:items="moduleitem.entries"
-		:items-per-page="moduleitem.entriesperpage"
-		class="elevation-1"
-		disable-pagination
-		hide-default-footer
-		search 
-		width="100%"
-		loadingText="moduleitem.loadingtext"
-		@click:row="uiModuleExecutionListClick"
-		>													
-										
-	</v-data-table>		
-
+<v-container>
+    <!-- Data table for build executions -->
+    <v-data-table
+      :headers="moduleitem.headers"
+      :items="moduleitem.entries"
+      :items-per-page="moduleitem.entriesperpage"
+      class="elevation-1"
+	  search
+	  loadingText="moduleitem.loadingtext"
+      :hide-default-footer="false"
+    >
+      <template v-slot:[`item.executionThumbnail`]="{ item }">        
+		 <v-img v-if="(item.executionThumbnail != '00000000-0000-0000-0000-000000000000') && item.executionThumbnail" :height="moduleitem.thumbnailheight" :width="moduleitem.thumbnailwidth" :aspect-ratio="moduleitem.thumbnailaspectratio" contain :src="Application.getImageURL (item.executionThumbnail)" v-on:click.stop="uiModuleBuildExecutionDetailsClick (item)" />	   	  
+      </template>
+      <template v-slot:[`item.executionName`]="{ item }">
+		<v-card class="ma-2" v-on:click.stop="uiModuleExecutionListDetailsClick (item)">
+          <v-card-title>{{ item.executionName }}</v-card-title>
+          <v-card-subtitle>
+          </v-card-subtitle>
+          <v-card-text>
+            
+          </v-card-text>
+          <v-card-actions>
+		  
+			<template v-for="button in moduleitem.entrybuttons">
+	
+				<span :key="button.uuid" v-on:click.stop="uiModuleExecutionListHistoryClick (button, item);">	
+					<v-btn text color="primary" >
+						<v-icon v-if="button.icon">{{ button.icon }}</v-icon>
+						{{ button.caption }}
+					</v-btn>		
+				
+				</span>	
+			</template>		  
+			
+          </v-card-actions>
+        </v-card>
+        
+      </template>
+      <template v-slot:[`item.executionTimestamp`]="{ item }">
+			<div>
+				<p class="text-center">{{ formatDateTime (item.executionTimestamp) }}<br>uploaded by {{ item.executionUser }}</p>
+				<p class="grey-lighten-4 opacity-80 font-weight-light text-center">{{ item.executionUUID }}</p> 				
+			</div>
+      </template>
+    </v-data-table>
+  </v-container>
 </div>
 
 </template>
@@ -58,17 +89,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	  
 	  methods: {	
 	  
+		formatDateTime(timeString) {
+			const date = new Date(timeString);
+			return new Intl.DateTimeFormat('en-US', {
+				year: 'numeric',
+				month: 'short',
+				day: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit',
+				hour12: false
+			}).format(date);
+		},
+
+	  
 		uiModuleExecutionListClick: function (item) {
 			if (item) {
 				if (this.moduleitem.selectevent && this.moduleitem.selectionvalueuuid) {
+				
+										
 					var eventValues = {}
-					eventValues[this.moduleitem.selectionvalueuuid] = item.buildUUID;
+					eventValues[this.moduleitem.selectionvalueuuid] = item.executionUUID;
 			
 					this.Application.triggerUIEvent (this.moduleitem.selectevent, this.moduleitem.uuid, eventValues);
 				}
 			}
 		},
 				
+		uiModuleExecutionListDetailsClick: function (item) {
+			if (item) {
+				if (this.moduleitem.selectevent && this.moduleitem.selectionvalueuuid) {					
+					
+					var eventValues = {}
+					eventValues[this.moduleitem.selectionvalueuuid] = item.executionUUID;
+			
+					this.Application.triggerUIEvent (this.moduleitem.selectevent, this.moduleitem.uuid, eventValues);
+				}
+			}
+		},
+
+		uiModuleExecutionListHistoryClick: function (button, item) {
+			if (item && button) {
+				if (button.selectevent && this.moduleitem.selectionvalueuuid && this.moduleitem.buttonvalueuuid) {
+				
+					var eventValues = {}							
+					eventValues[this.moduleitem.selectionvalueuuid] = item.executionUUID;
+					eventValues[this.moduleitem.buttonvalueuuid] = button.uuid;
+											
+					this.Application.triggerUIEvent (button.selectevent, this.moduleitem.uuid, eventValues);
+				}
+			}
+		},
+
 	  }
 	};
 	
