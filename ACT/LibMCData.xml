@@ -390,8 +390,8 @@
 		<error name="INVALIDZIPSTREAMENTRYID" code="390" description="Invalid ZIP Stream entry ID." />								
 		<error name="ZIPSTREAMENTRYIDNOTFOUND" code="391" description="ZIP Stream entry ID not found." />	
 		<error name="ZIPWRITINGALREADYFINISHED" code="392" description="ZIP Writing already finished." />	
-		
-		
+		<error name="INVALIDBUILDJOBLAYERCOUNT" code="393" description="Invalid build job layer count." />	
+		<error name="COULDNOTDETERMINEEXECUTIONCOUNT" code="394" description="Could not determine execution count." />	
 		
 		
 	</errors>
@@ -1010,8 +1010,28 @@
 			<param name="UUID" type="string" pass="return" description="UUID String" />	
 		</method>
 		
+		<method name="GetJobName" description="returns the name of the parent build job.">
+			<param name="Name" type="string" pass="return" description="Build job name" />	
+		</method>
+
+		<method name="GetJobStatus" description="returns the status of the parent build job.">
+			<param name="JobStatus" type="enum" class="BuildJobStatus" pass="return" description="Build job status" />	
+		</method>
+
+		<method name="GetJobStatusString" description="returns the status of the parent build job as string.">
+			<param name="JobStatus" type="string" pass="return" description="Build job status" />	
+		</method>
+
+		<method name="GetJobLayerCount" description="returns the number of layers of the parent build job.">
+			<param name="LayerCount" type="uint32" pass="return" description="Build job layer count" />	
+		</method>
+
 		<method name="GetStatus" description="returns the build job execution status.">
 			<param name="ExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="return" description="Status Value" />	
+		</method>
+
+		<method name="GetStatusString" description="returns the build job execution status as string.">
+			<param name="ExecutionStatus" type="string" pass="return" description="Status Value" />	
 		</method>
 
 		<method name="ChangeStatus" description="sets the new build job execution status. Will fail if current status is not InProcess.">
@@ -1129,6 +1149,10 @@
 
 		<method name="GetLayerCount" description="returns the layer count of a build job.">
 			<param name="LayerCount" type="uint32" pass="return" description="Layer Count of build job" />	
+		</method>
+
+		<method name="GetExecutionCount" description="returns the number of executions of a build job.">
+			<param name="ExecutionCount" type="uint32" pass="return" description="Number of executions of a build job" />	
 		</method>
 
 		<method name="GetTimeStamp" description="returns the timestamp when the job was created.">
