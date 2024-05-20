@@ -37,6 +37,7 @@ Abstract: This is a stub class definition of CBuildJobExecution
 // Include custom headers here.
 #include "libmcdata_buildjobexecutiondata.hpp"
 #include "libmcdata_buildjobexecutiondataiterator.hpp"
+#include "libmcdata_buildjob.hpp"
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
 
@@ -46,14 +47,17 @@ using namespace LibMCData::Impl;
  Class definition of CBuildJobExecution 
 **************************************************************************************************************************/
 
-CBuildJobExecution::CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID, const std::string& sJobUUID, const std::string& sJournalUUID, const std::string& sUserUUID, uint64_t nStartJournalTimeStamp, AMCData::PStorageState pStorageState)
+CBuildJobExecution::CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID, const std::string& sJobUUID, const std::string& sJournalUUID, const std::string& sUserUUID, uint64_t nStartJournalTimeStamp, const std::string& sJobName, eBuildJobStatus jobStatus, uint32_t nJobLayerCount, AMCData::PStorageState pStorageState)
 	: m_pSQLHandler (pSQLHandler),
 	m_sExecutionUUID (AMCCommon::CUtils::normalizeUUIDString (sExecutionUUID)),
 	m_pStorageState (pStorageState),
 	m_sJobUUID (AMCCommon::CUtils::normalizeUUIDString (sJobUUID)),
 	m_sJournalUUID(AMCCommon::CUtils::normalizeUUIDString(sJournalUUID)),
 	m_sUserUUID(AMCCommon::CUtils::normalizeUUIDString(sUserUUID)),
-	m_nStartJournalTimestamp (nStartJournalTimeStamp)
+	m_nStartJournalTimestamp (nStartJournalTimeStamp),
+	m_sJobName (sJobName),
+	m_JobStatus (jobStatus),
+	m_nJobLayerCount (nJobLayerCount)
 {
 	if (pSQLHandler.get() == nullptr)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -94,7 +98,13 @@ CBuildJobExecution* CBuildJobExecution::makeFromStatement(AMCData::PSQLHandler p
 
 	uint64_t nStartJournalTimestamp = (uint64_t)nStartTimeStamp;
 
-	auto pExecution = std::make_unique<CBuildJobExecution>(pSQLHandler, sExecutionUUID, sJobUUID, sJournalUUID, sUserUUID, nStartJournalTimestamp, pStorageState);
+	std::string sJobName = pStatement->getColumnString(6);
+	eBuildJobStatus jobStatus = CBuildJob::convertStringToBuildJobStatus (pStatement->getColumnString(7));	
+	int32_t nLayerCount = pStatement->getColumnInt(8);
+	if (nLayerCount < 0)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT, "invalid build job layer count: " + sJobUUID);
+
+	auto pExecution = std::make_unique<CBuildJobExecution>(pSQLHandler, sExecutionUUID, sJobUUID, sJournalUUID, sUserUUID, nStartJournalTimestamp, sJobName, jobStatus, (uint32_t) nLayerCount, pStorageState);
 
 	return pExecution.release();
 }
@@ -145,7 +155,7 @@ CBuildJobExecution* CBuildJobExecution::makeFrom(CBuildJobExecution* pBuildJobEx
 	if (pBuildJobExecution == nullptr)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-	return new CBuildJobExecution(pBuildJobExecution->m_pSQLHandler, pBuildJobExecution->m_sExecutionUUID, pBuildJobExecution->m_sJobUUID, pBuildJobExecution->m_sJournalUUID, pBuildJobExecution->m_sUserUUID, pBuildJobExecution->m_nStartJournalTimestamp, pBuildJobExecution->m_pStorageState);
+	return new CBuildJobExecution(pBuildJobExecution->m_pSQLHandler, pBuildJobExecution->m_sExecutionUUID, pBuildJobExecution->m_sJobUUID, pBuildJobExecution->m_sJournalUUID, pBuildJobExecution->m_sUserUUID, pBuildJobExecution->m_nStartJournalTimestamp, pBuildJobExecution->m_sJobName, pBuildJobExecution->m_JobStatus, pBuildJobExecution->m_nJobLayerCount,  pBuildJobExecution->m_pStorageState);
 }
 
 std::shared_ptr<CBuildJobExecution> CBuildJobExecution::makeSharedFrom(CBuildJobExecution* pBuildJobExecution)
@@ -164,6 +174,27 @@ std::string CBuildJobExecution::GetJobUUID()
 	return m_sJobUUID;
 }
 
+std::string CBuildJobExecution::GetJobName()
+{
+	return m_sJobName;
+}
+
+LibMCData::eBuildJobStatus CBuildJobExecution::GetJobStatus()
+{
+	return m_JobStatus;
+}
+
+std::string CBuildJobExecution::GetJobStatusString()
+{
+	return CBuildJob::convertBuildJobStatusToString (m_JobStatus);
+}
+
+LibMCData_uint32 CBuildJobExecution::GetJobLayerCount()
+{
+	return m_nJobLayerCount;
+}
+
+
 LibMCData::eBuildJobExecutionStatus CBuildJobExecution::GetStatus()
 {
 	std::string sSelectQuery = "SELECT status FROM buildjobexecutions WHERE uuid=? AND active=1";
@@ -174,6 +205,11 @@ LibMCData::eBuildJobExecutionStatus CBuildJobExecution::GetStatus()
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND, "build job execution not found: " + m_sExecutionUUID);
 
 	return CBuildJobExecution::convertStringToBuildJobExecutionStatus (pSelectStatement->getColumnString(1));
+}
+
+std::string CBuildJobExecution::GetStatusString()
+{
+	return convertBuildJobExecutionStatusToString(GetStatus());
 }
 
 void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970)

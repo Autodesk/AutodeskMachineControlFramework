@@ -62,11 +62,16 @@ private:
 
 	AMCData::PSQLHandler m_pSQLHandler;
 	std::string m_sExecutionUUID;
-	std::string m_sJobUUID;
 	std::string m_sUserUUID;
 	std::string m_sJournalUUID;
 	uint64_t m_nStartJournalTimestamp;
 	AMCData::PStorageState m_pStorageState;
+
+	// Build Job related information
+	std::string m_sJobUUID;
+	std::string m_sJobName;
+	eBuildJobStatus m_JobStatus;
+	uint32_t m_nJobLayerCount;
 
 	CBuildJobExecutionData* makeJobExecutionDataEx(AMCData::CSQLStatement* pStatement);
 	IBuildJobExecutionDataIterator* listJobExecutionDataEx(AMCData::CSQLStatement* pStatement);
@@ -86,7 +91,7 @@ public:
 
 	static std::shared_ptr<CBuildJobExecution> makeSharedFromStatement(AMCData::PSQLHandler pSQLHandler, AMCData::PSQLStatement pStatement, AMCData::PStorageState pStorageState);
 
-	CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID, const std::string& sJobUUID, const std::string& sJournalUUID, const std::string& sUserUUID, uint64_t nStartJournalTimeStamp, AMCData::PStorageState pStorageState);
+	CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID, const std::string& sJobUUID, const std::string& sJournalUUID, const std::string& sUserUUID, uint64_t nStartJournalTimeStamp, const std::string & sJobName, eBuildJobStatus jobStatus, uint32_t nJobLayerCount, AMCData::PStorageState pStorageState);
 
 	virtual ~CBuildJobExecution();
 
@@ -94,7 +99,17 @@ public:
 
 	std::string GetJobUUID() override;
 
+	std::string GetJobName() override;
+
+	LibMCData::eBuildJobStatus GetJobStatus() override;
+
+	std::string GetJobStatusString() override;
+
+	LibMCData_uint32 GetJobLayerCount() override;
+
 	LibMCData::eBuildJobExecutionStatus GetStatus() override;
+
+	std::string GetStatusString() override;
 
 	void ChangeStatus(const LibMCData::eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970) override;
 

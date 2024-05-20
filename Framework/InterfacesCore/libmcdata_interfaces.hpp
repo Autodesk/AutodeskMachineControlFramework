@@ -1105,10 +1105,40 @@ public:
 	virtual std::string GetJobUUID() = 0;
 
 	/**
+	* IBuildJobExecution::GetJobName - returns the name of the parent build job.
+	* @return Build job name
+	*/
+	virtual std::string GetJobName() = 0;
+
+	/**
+	* IBuildJobExecution::GetJobStatus - returns the status of the parent build job.
+	* @return Build job status
+	*/
+	virtual LibMCData::eBuildJobStatus GetJobStatus() = 0;
+
+	/**
+	* IBuildJobExecution::GetJobStatusString - returns the status of the parent build job as string.
+	* @return Build job status
+	*/
+	virtual std::string GetJobStatusString() = 0;
+
+	/**
+	* IBuildJobExecution::GetJobLayerCount - returns the number of layers of the parent build job.
+	* @return Build job layer count
+	*/
+	virtual LibMCData_uint32 GetJobLayerCount() = 0;
+
+	/**
 	* IBuildJobExecution::GetStatus - returns the build job execution status.
 	* @return Status Value
 	*/
 	virtual LibMCData::eBuildJobExecutionStatus GetStatus() = 0;
+
+	/**
+	* IBuildJobExecution::GetStatusString - returns the build job execution status as string.
+	* @return Status Value
+	*/
+	virtual std::string GetStatusString() = 0;
 
 	/**
 	* IBuildJobExecution::ChangeStatus - sets the new build job execution status. Will fail if current status is not InProcess.
@@ -1286,6 +1316,12 @@ public:
 	* @return Layer Count of build job
 	*/
 	virtual LibMCData_uint32 GetLayerCount() = 0;
+
+	/**
+	* IBuildJob::GetExecutionCount - returns the number of executions of a build job.
+	* @return Number of executions of a build job
+	*/
+	virtual LibMCData_uint32 GetExecutionCount() = 0;
 
 	/**
 	* IBuildJob::GetTimeStamp - returns the timestamp when the job was created.

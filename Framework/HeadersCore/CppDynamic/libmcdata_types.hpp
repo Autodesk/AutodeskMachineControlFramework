@@ -417,6 +417,8 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID 390 /** Invalid ZIP Stream entry ID. */
 #define LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND 391 /** ZIP Stream entry ID not found. */
 #define LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED 392 /** ZIP Writing already finished. */
+#define LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT 393 /** Invalid build job layer count. */
+#define LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT 394 /** Could not determine execution count. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -746,6 +748,8 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "Invalid ZIP Stream entry ID.";
     case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIP Stream entry ID not found.";
     case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIP Writing already finished.";
+    case LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT: return "Invalid build job layer count.";
+    case LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT: return "Could not determine execution count.";
     default: return "unknown error";
   }
 }

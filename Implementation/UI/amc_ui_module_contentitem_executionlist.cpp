@@ -269,11 +269,16 @@ void CUIModule_ContentExecutionList::addContentToJSON(CJSONWriter& writer, CJSON
 		uint64_t nStartTimeStamp = pExecution->GetStartTimeStampInMicroseconds();
 
 		CJSONWriterObject entryObject(writer);
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONNAME, pExecution->GetExecutionUUID());
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONNAME, pExecution->GetJobName());
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUUID, pExecution->GetExecutionUUID());
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONDESCRIPTION, pExecution->GetDescription());
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC (nStartTimeStamp));
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
-//		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUSER, pExecution->GetCreatorName());
+		entryObject.addInteger(AMC_API_KEY_UI_ITEMEXECUTIONLAYERCOUNT, pExecution->GetJobLayerCount());
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONSTATUS, pExecution->GetStatusString ());
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONBUILDSTATUS, pExecution->GetJobStatusString());
+
+		//		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUSER, pExecution->GetCreatorName());
 
 		entryArray.addObject(entryObject);
 

@@ -103,7 +103,7 @@ IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::s
 
     pTransaction->commit ();
 
-    return CBuildJob::make(sParsedJobUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sNormalizedUserUUID, sUserName, 0, m_pSQLHandler, m_pStorageState);
+    return CBuildJob::make(sParsedJobUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sNormalizedUserUUID, sUserName, 0, 0, m_pSQLHandler, m_pStorageState);
     
 }
 
@@ -117,7 +117,7 @@ IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJob
 
     std::unique_ptr<CBuildJobIterator> pJobIterator(new CBuildJobIterator());
 
-    std::string sQuery = "SELECT buildjobs.uuid, buildjobs.name, buildjobs.status, buildjobs.timestamp, buildjobs.storagestreamuuid, buildjobs.layercount, buildjobs.useruuid, users.login FROM buildjobs LEFT JOIN users On users.uuid=buildjobs.useruuid WHERE status=? ORDER BY timestamp DESC";
+    std::string sQuery = "SELECT buildjobs.uuid, buildjobs.name, buildjobs.status, buildjobs.timestamp, buildjobs.storagestreamuuid, buildjobs.layercount, buildjobs.useruuid, users.login, (SELECT count(buildjobexecutions.uuid) FROM buildjobexecutions WHERE buildjobexecutions.jobuuid=buildjobs.uuid) FROM buildjobs LEFT JOIN users On users.uuid=buildjobs.useruuid WHERE buildjobs.status=? ORDER BY buildjobs.timestamp DESC";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, CBuildJob::convertBuildJobStatusToString(eStatus));
     while (pStatement->nextRow()) {
@@ -134,7 +134,12 @@ IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJob
         if (!pStatement->columnIsNull (8))
             sUserName = pStatement->getColumnString(8);
 
-        pJobIterator->AddJob (CBuildJob::makeShared (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserUUID, sUserName, nLayerCount, m_pSQLHandler, m_pStorageState));
+        int32_t nExecutionCount = pStatement->getColumnInt(9);
+        // This should never happen, because of the SQL Query
+        if (nExecutionCount < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT);
+
+        pJobIterator->AddJob (CBuildJob::makeShared (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserUUID, sUserName, nLayerCount, (uint32_t) nExecutionCount, m_pSQLHandler, m_pStorageState));
     }
 
     return pJobIterator.release();

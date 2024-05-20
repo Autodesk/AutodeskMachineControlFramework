@@ -578,6 +578,8 @@ public:
 			case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "INVALIDZIPSTREAMENTRYID";
 			case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIPSTREAMENTRYIDNOTFOUND";
 			case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIPWRITINGALREADYFINISHED";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT: return "INVALIDBUILDJOBLAYERCOUNT";
+			case LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT: return "COULDNOTDETERMINEEXECUTIONCOUNT";
 		}
 		return "UNKNOWN";
 	}
@@ -907,6 +909,8 @@ public:
 			case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "Invalid ZIP Stream entry ID.";
 			case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIP Stream entry ID not found.";
 			case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIP Writing already finished.";
+			case LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT: return "Invalid build job layer count.";
+			case LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT: return "Could not determine execution count.";
 		}
 		return "unknown error";
 	}
@@ -1454,7 +1458,12 @@ public:
 	
 	inline std::string GetExecutionUUID();
 	inline std::string GetJobUUID();
+	inline std::string GetJobName();
+	inline eBuildJobStatus GetJobStatus();
+	inline std::string GetJobStatusString();
+	inline LibMCData_uint32 GetJobLayerCount();
 	inline eBuildJobExecutionStatus GetStatus();
+	inline std::string GetStatusString();
 	inline void ChangeStatus(const eBuildJobExecutionStatus eNewExecutionStatus, const LibMCData_uint64 nAbsoluteEndTimeStampInMicrosecondsSince1970);
 	inline std::string GetDescription();
 	inline void SetDescription(const std::string & sNewDescription);
@@ -1510,6 +1519,7 @@ public:
 	inline std::string GetName();
 	inline eBuildJobStatus GetStatus();
 	inline LibMCData_uint32 GetLayerCount();
+	inline LibMCData_uint32 GetExecutionCount();
 	inline std::string GetTimeStamp();
 	inline std::string GetCreatorUUID();
 	inline std::string GetCreatorName();
@@ -1903,7 +1913,12 @@ public:
 		pWrapperTable->m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetExecutionUUID = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetJobUUID = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetJobName = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetJobStatus = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetJobStatusString = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetJobLayerCount = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetStatus = nullptr;
+		pWrapperTable->m_BuildJobExecution_GetStatusString = nullptr;
 		pWrapperTable->m_BuildJobExecution_ChangeStatus = nullptr;
 		pWrapperTable->m_BuildJobExecution_GetDescription = nullptr;
 		pWrapperTable->m_BuildJobExecution_SetDescription = nullptr;
@@ -1927,6 +1942,7 @@ public:
 		pWrapperTable->m_BuildJob_GetName = nullptr;
 		pWrapperTable->m_BuildJob_GetStatus = nullptr;
 		pWrapperTable->m_BuildJob_GetLayerCount = nullptr;
+		pWrapperTable->m_BuildJob_GetExecutionCount = nullptr;
 		pWrapperTable->m_BuildJob_GetTimeStamp = nullptr;
 		pWrapperTable->m_BuildJob_GetCreatorUUID = nullptr;
 		pWrapperTable->m_BuildJob_GetCreatorName = nullptr;
@@ -2887,12 +2903,57 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobName = (PLibMCDataBuildJobExecution_GetJobNamePtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getjobname");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobName = (PLibMCDataBuildJobExecution_GetJobNamePtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getjobname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetJobName == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobStatus = (PLibMCDataBuildJobExecution_GetJobStatusPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getjobstatus");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobStatus = (PLibMCDataBuildJobExecution_GetJobStatusPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getjobstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetJobStatus == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobStatusString = (PLibMCDataBuildJobExecution_GetJobStatusStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getjobstatusstring");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobStatusString = (PLibMCDataBuildJobExecution_GetJobStatusStringPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getjobstatusstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetJobStatusString == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobLayerCount = (PLibMCDataBuildJobExecution_GetJobLayerCountPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getjoblayercount");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetJobLayerCount = (PLibMCDataBuildJobExecution_GetJobLayerCountPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getjoblayercount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetJobLayerCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildJobExecution_GetStatus = (PLibMCDataBuildJobExecution_GetStatusPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getstatus");
 		#else // _WIN32
 		pWrapperTable->m_BuildJobExecution_GetStatus = (PLibMCDataBuildJobExecution_GetStatusPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getstatus");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJobExecution_GetStatus == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobExecution_GetStatusString = (PLibMCDataBuildJobExecution_GetStatusStringPtr) GetProcAddress(hLibrary, "libmcdata_buildjobexecution_getstatusstring");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobExecution_GetStatusString = (PLibMCDataBuildJobExecution_GetStatusStringPtr) dlsym(hLibrary, "libmcdata_buildjobexecution_getstatusstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobExecution_GetStatusString == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3100,6 +3161,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJob_GetLayerCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_GetExecutionCount = (PLibMCDataBuildJob_GetExecutionCountPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getexecutioncount");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_GetExecutionCount = (PLibMCDataBuildJob_GetExecutionCountPtr) dlsym(hLibrary, "libmcdata_buildjob_getexecutioncount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_GetExecutionCount == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4369,8 +4439,28 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetJobUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getjobname", (void**)&(pWrapperTable->m_BuildJobExecution_GetJobName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetJobName == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getjobstatus", (void**)&(pWrapperTable->m_BuildJobExecution_GetJobStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetJobStatus == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getjobstatusstring", (void**)&(pWrapperTable->m_BuildJobExecution_GetJobStatusString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetJobStatusString == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getjoblayercount", (void**)&(pWrapperTable->m_BuildJobExecution_GetJobLayerCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetJobLayerCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getstatus", (void**)&(pWrapperTable->m_BuildJobExecution_GetStatus));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetStatus == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobexecution_getstatusstring", (void**)&(pWrapperTable->m_BuildJobExecution_GetStatusString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobExecution_GetStatusString == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobexecution_changestatus", (void**)&(pWrapperTable->m_BuildJobExecution_ChangeStatus));
@@ -4463,6 +4553,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getlayercount", (void**)&(pWrapperTable->m_BuildJob_GetLayerCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetLayerCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_getexecutioncount", (void**)&(pWrapperTable->m_BuildJob_GetExecutionCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetExecutionCount == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_gettimestamp", (void**)&(pWrapperTable->m_BuildJob_GetTimeStamp));
@@ -6210,6 +6304,60 @@ public:
 	}
 	
 	/**
+	* CBuildJobExecution::GetJobName - returns the name of the parent build job.
+	* @return Build job name
+	*/
+	std::string CBuildJobExecution::GetJobName()
+	{
+		LibMCData_uint32 bytesNeededName = 0;
+		LibMCData_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJobName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJobName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CBuildJobExecution::GetJobStatus - returns the status of the parent build job.
+	* @return Build job status
+	*/
+	eBuildJobStatus CBuildJobExecution::GetJobStatus()
+	{
+		eBuildJobStatus resultJobStatus = (eBuildJobStatus) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJobStatus(m_pHandle, &resultJobStatus));
+		
+		return resultJobStatus;
+	}
+	
+	/**
+	* CBuildJobExecution::GetJobStatusString - returns the status of the parent build job as string.
+	* @return Build job status
+	*/
+	std::string CBuildJobExecution::GetJobStatusString()
+	{
+		LibMCData_uint32 bytesNeededJobStatus = 0;
+		LibMCData_uint32 bytesWrittenJobStatus = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJobStatusString(m_pHandle, 0, &bytesNeededJobStatus, nullptr));
+		std::vector<char> bufferJobStatus(bytesNeededJobStatus);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJobStatusString(m_pHandle, bytesNeededJobStatus, &bytesWrittenJobStatus, &bufferJobStatus[0]));
+		
+		return std::string(&bufferJobStatus[0]);
+	}
+	
+	/**
+	* CBuildJobExecution::GetJobLayerCount - returns the number of layers of the parent build job.
+	* @return Build job layer count
+	*/
+	LibMCData_uint32 CBuildJobExecution::GetJobLayerCount()
+	{
+		LibMCData_uint32 resultLayerCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetJobLayerCount(m_pHandle, &resultLayerCount));
+		
+		return resultLayerCount;
+	}
+	
+	/**
 	* CBuildJobExecution::GetStatus - returns the build job execution status.
 	* @return Status Value
 	*/
@@ -6219,6 +6367,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetStatus(m_pHandle, &resultExecutionStatus));
 		
 		return resultExecutionStatus;
+	}
+	
+	/**
+	* CBuildJobExecution::GetStatusString - returns the build job execution status as string.
+	* @return Status Value
+	*/
+	std::string CBuildJobExecution::GetStatusString()
+	{
+		LibMCData_uint32 bytesNeededExecutionStatus = 0;
+		LibMCData_uint32 bytesWrittenExecutionStatus = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetStatusString(m_pHandle, 0, &bytesNeededExecutionStatus, nullptr));
+		std::vector<char> bufferExecutionStatus(bytesNeededExecutionStatus);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_GetStatusString(m_pHandle, bytesNeededExecutionStatus, &bytesWrittenExecutionStatus, &bufferExecutionStatus[0]));
+		
+		return std::string(&bufferExecutionStatus[0]);
 	}
 	
 	/**
@@ -6548,6 +6711,18 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetLayerCount(m_pHandle, &resultLayerCount));
 		
 		return resultLayerCount;
+	}
+	
+	/**
+	* CBuildJob::GetExecutionCount - returns the number of executions of a build job.
+	* @return Number of executions of a build job
+	*/
+	LibMCData_uint32 CBuildJob::GetExecutionCount()
+	{
+		LibMCData_uint32 resultExecutionCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetExecutionCount(m_pHandle, &resultExecutionCount));
+		
+		return resultExecutionCount;
 	}
 	
 	/**

@@ -1093,6 +1093,46 @@ typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetExecutionUUIDPtr) (LibM
 typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetJobUUIDPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
+* returns the name of the parent build job.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Build job name, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetJobNamePtr) (LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the status of the parent build job.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[out] pJobStatus - Build job status
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetJobStatusPtr) (LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eBuildJobStatus * pJobStatus);
+
+/**
+* returns the status of the parent build job as string.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nJobStatusBufferSize - size of the buffer (including trailing 0)
+* @param[out] pJobStatusNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pJobStatusBuffer -  buffer of Build job status, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetJobStatusStringPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nJobStatusBufferSize, LibMCData_uint32* pJobStatusNeededChars, char * pJobStatusBuffer);
+
+/**
+* returns the number of layers of the parent build job.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[out] pLayerCount - Build job layer count
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetJobLayerCountPtr) (LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint32 * pLayerCount);
+
+/**
 * returns the build job execution status.
 *
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
@@ -1100,6 +1140,17 @@ typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetJobUUIDPtr) (LibMCData_
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetStatusPtr) (LibMCData_BuildJobExecution pBuildJobExecution, LibMCData::eBuildJobExecutionStatus * pExecutionStatus);
+
+/**
+* returns the build job execution status as string.
+*
+* @param[in] pBuildJobExecution - BuildJobExecution instance.
+* @param[in] nExecutionStatusBufferSize - size of the buffer (including trailing 0)
+* @param[out] pExecutionStatusNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pExecutionStatusBuffer -  buffer of Status Value, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetStatusStringPtr) (LibMCData_BuildJobExecution pBuildJobExecution, const LibMCData_uint32 nExecutionStatusBufferSize, LibMCData_uint32* pExecutionStatusNeededChars, char * pExecutionStatusBuffer);
 
 /**
 * sets the new build job execution status. Will fail if current status is not InProcess.
@@ -1346,6 +1397,15 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_GetStatusPtr) (LibMCData_BuildJob p
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataBuildJob_GetLayerCountPtr) (LibMCData_BuildJob pBuildJob, LibMCData_uint32 * pLayerCount);
+
+/**
+* returns the number of executions of a build job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[out] pExecutionCount - Number of executions of a build job
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJob_GetExecutionCountPtr) (LibMCData_BuildJob pBuildJob, LibMCData_uint32 * pExecutionCount);
 
 /**
 * returns the timestamp when the job was created.
@@ -2552,7 +2612,12 @@ typedef struct {
 	PLibMCDataBuildJobExecutionDataIterator_GetCurrentJobExecutionDataPtr m_BuildJobExecutionDataIterator_GetCurrentJobExecutionData;
 	PLibMCDataBuildJobExecution_GetExecutionUUIDPtr m_BuildJobExecution_GetExecutionUUID;
 	PLibMCDataBuildJobExecution_GetJobUUIDPtr m_BuildJobExecution_GetJobUUID;
+	PLibMCDataBuildJobExecution_GetJobNamePtr m_BuildJobExecution_GetJobName;
+	PLibMCDataBuildJobExecution_GetJobStatusPtr m_BuildJobExecution_GetJobStatus;
+	PLibMCDataBuildJobExecution_GetJobStatusStringPtr m_BuildJobExecution_GetJobStatusString;
+	PLibMCDataBuildJobExecution_GetJobLayerCountPtr m_BuildJobExecution_GetJobLayerCount;
 	PLibMCDataBuildJobExecution_GetStatusPtr m_BuildJobExecution_GetStatus;
+	PLibMCDataBuildJobExecution_GetStatusStringPtr m_BuildJobExecution_GetStatusString;
 	PLibMCDataBuildJobExecution_ChangeStatusPtr m_BuildJobExecution_ChangeStatus;
 	PLibMCDataBuildJobExecution_GetDescriptionPtr m_BuildJobExecution_GetDescription;
 	PLibMCDataBuildJobExecution_SetDescriptionPtr m_BuildJobExecution_SetDescription;
@@ -2576,6 +2641,7 @@ typedef struct {
 	PLibMCDataBuildJob_GetNamePtr m_BuildJob_GetName;
 	PLibMCDataBuildJob_GetStatusPtr m_BuildJob_GetStatus;
 	PLibMCDataBuildJob_GetLayerCountPtr m_BuildJob_GetLayerCount;
+	PLibMCDataBuildJob_GetExecutionCountPtr m_BuildJob_GetExecutionCount;
 	PLibMCDataBuildJob_GetTimeStampPtr m_BuildJob_GetTimeStamp;
 	PLibMCDataBuildJob_GetCreatorUUIDPtr m_BuildJob_GetCreatorUUID;
 	PLibMCDataBuildJob_GetCreatorNamePtr m_BuildJob_GetCreatorName;
