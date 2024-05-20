@@ -544,29 +544,87 @@ namespace AMCCommon {
 		return true;
 	}
 
-	std::string CUtils::normalizeUUIDString(std::string sRawString)
+	std::string CUtils::normalizeUUIDString(const std::string & sRawString)
 	{
-		
-		// to lowercase, remove all non hex characters, insert dashes again
+		uint32_t nIndex = 0;
+		std::array<char, 37> normalizedArray;
+
+		for (char ch : sRawString) {
+			char lowerChar = ::tolower(ch);
+			bool bCharIsValid = (((lowerChar >= '0') && (lowerChar <= '9')) ||
+				((lowerChar >= 'a') && (lowerChar <= 'f')));
+
+			if (bCharIsValid) {
+				normalizedArray[nIndex] = lowerChar;
+				nIndex++;
+
+				if (nIndex > 36)
+					throw std::runtime_error("invalid uuid string " + sRawString);
+
+				if ((nIndex == 8) || (nIndex == 13) || (nIndex == 18) || (nIndex == 23)) {
+					normalizedArray[nIndex] = '-';
+					nIndex++;
+				}
+			}
+		}
+
+		if (nIndex != 36)
+			throw std::runtime_error("invalid uuid string " + sRawString);
+
+		normalizedArray[36] = 0;
+
+		return std::string(normalizedArray.data());
+
+		/*
+		Depreciated code!
+		 
 		std::transform(sRawString.begin(), sRawString.end(), sRawString.begin(), ::tolower);
 		sRawString.erase(std::remove_if(sRawString.begin(), sRawString.end(), &UUIDInValid), sRawString.end());
 		if (sRawString.length() != 32) {
 			throw std::runtime_error("invalid uuid string " + sRawString);
 		}
 		return sRawString.substr(0, 8) + '-' + sRawString.substr(8, 4) + '-' + sRawString.substr(12, 4) + '-' + sRawString.substr(16, 4) + '-' + sRawString.substr(20, 12);
+		
+		*/
 	}
 
 
-	std::string CUtils::normalizeSHA256String(std::string sRawString)
+	std::string CUtils::normalizeSHA256String(const std::string & sRawString)
 	{
-		// to lowercase, remove all non hex characters, insert dashes again
+		std::array<char, 65> normalizedArray;
+
+		uint32_t nIndex = 0;
+
+		for (char ch : sRawString) {
+			char lowerChar = ::tolower(ch);
+			bool bCharIsValid = (((lowerChar >= '0') && (lowerChar <= '9')) ||
+				((lowerChar >= 'a') && (lowerChar <= 'f')));
+
+			if (bCharIsValid) {
+				normalizedArray[nIndex] = lowerChar;
+				nIndex++;
+
+				if (nIndex > 64)
+					throw std::runtime_error("invalid SHA256 string " + sRawString);
+
+			}
+		}
+
+		if (nIndex != 64)
+			throw std::runtime_error("invalid SHA256 string " + sRawString);
+
+		normalizedArray[64] = 0;
+
+		return std::string(normalizedArray.data());
+
+		/* depreciated code!
 		std::transform(sRawString.begin(), sRawString.end(), sRawString.begin(), ::tolower);
 		sRawString.erase(std::remove_if(sRawString.begin(), sRawString.end(), &UUIDInValid), sRawString.end());
 		if (sRawString.length() != 64) {
 			throw std::runtime_error("invalid sha256 string " + sRawString);
-		}
+		} 
 
-		return sRawString;
+		return sRawString; */
 	}
 
 
