@@ -229,7 +229,7 @@ LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMilliseconds()
 LibMCEnv_uint64 CBuildExecution::GetElapsedTimeInMicroseconds()
 {
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+	return m_pExecution->ComputeElapsedTimeInMicroseconds(m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970(), true);
 }
 
 bool CBuildExecution::HasAttachment(const std::string& sDataUUID)
