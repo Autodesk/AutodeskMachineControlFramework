@@ -1471,7 +1471,7 @@ public:
 	inline std::string GetUserUUID();
 	inline LibMCData_uint64 GetStartTimeStampInMicroseconds();
 	inline LibMCData_uint64 GetEndTimeStampInMicroseconds();
-	inline LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds);
+	inline LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds, const bool bThrowExceptionInFailure);
 	inline std::string AddJobExecutionData(const std::string & sIdentifier, const std::string & sName, classParam<CStorageStream> pStream, const eCustomDataType eDataType, const std::string & sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
 	inline PBuildJobExecutionDataIterator ListJobExecutionDataByType(const eCustomDataType eDataType);
 	inline PBuildJobExecutionDataIterator ListJobExecutionData();
@@ -6475,12 +6475,13 @@ public:
 	/**
 	* CBuildJobExecution::ComputeElapsedTimeInMicroseconds - Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.
 	* @param[in] nGlobalTimerInMicroseconds - The current session global timer.
+	* @param[in] bThrowExceptionInFailure - If true, the method will throw exceptions in any error case. If false, it will just return 0 in any error case.
 	* @return Elapsed time in Microseconds.
 	*/
-	LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds)
+	LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds, const bool bThrowExceptionInFailure)
 	{
 		LibMCData_uint64 resultElapsedTimeInMicroseconds = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ComputeElapsedTimeInMicroseconds(m_pHandle, nGlobalTimerInMicroseconds, &resultElapsedTimeInMicroseconds));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobExecution_ComputeElapsedTimeInMicroseconds(m_pHandle, nGlobalTimerInMicroseconds, bThrowExceptionInFailure, &resultElapsedTimeInMicroseconds));
 		
 		return resultElapsedTimeInMicroseconds;
 	}

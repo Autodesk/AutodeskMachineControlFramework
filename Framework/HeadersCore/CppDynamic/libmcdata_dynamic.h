@@ -1227,10 +1227,11 @@ typedef LibMCDataResult (*PLibMCDataBuildJobExecution_GetEndTimeStampInMicroseco
 *
 * @param[in] pBuildJobExecution - BuildJobExecution instance.
 * @param[in] nGlobalTimerInMicroseconds - The current session global timer.
+* @param[in] bThrowExceptionInFailure - If true, the method will throw exceptions in any error case. If false, it will just return 0 in any error case.
 * @param[out] pElapsedTimeInMicroseconds - Elapsed time in Microseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicrosecondsPtr) (LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 nGlobalTimerInMicroseconds, LibMCData_uint64 * pElapsedTimeInMicroseconds);
+typedef LibMCDataResult (*PLibMCDataBuildJobExecution_ComputeElapsedTimeInMicrosecondsPtr) (LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 nGlobalTimerInMicroseconds, bool bThrowExceptionInFailure, LibMCData_uint64 * pElapsedTimeInMicroseconds);
 
 /**
 * Adds additional data to the Job Execution.

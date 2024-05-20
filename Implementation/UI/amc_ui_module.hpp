@@ -81,7 +81,7 @@ namespace AMC {
 		CUIModule_ContentRegistry* contentRegistry ();
 		CLogger* getLogger();
 
-		uint64_t getAbsoluteTimeStamp();
+		AMCCommon::PChrono getGlobalChrono();
 
 	};
 

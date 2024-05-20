@@ -3934,7 +3934,7 @@ LibMCDataResult libmcdata_buildjobexecution_getendtimestampinmicroseconds(LibMCD
 	}
 }
 
-LibMCDataResult libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 nGlobalTimerInMicroseconds, LibMCData_uint64 * pElapsedTimeInMicroseconds)
+LibMCDataResult libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds(LibMCData_BuildJobExecution pBuildJobExecution, LibMCData_uint64 nGlobalTimerInMicroseconds, bool bThrowExceptionInFailure, LibMCData_uint64 * pElapsedTimeInMicroseconds)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobExecution;
 
@@ -3945,7 +3945,7 @@ LibMCDataResult libmcdata_buildjobexecution_computeelapsedtimeinmicroseconds(Lib
 		if (!pIBuildJobExecution)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		*pElapsedTimeInMicroseconds = pIBuildJobExecution->ComputeElapsedTimeInMicroseconds(nGlobalTimerInMicroseconds);
+		*pElapsedTimeInMicroseconds = pIBuildJobExecution->ComputeElapsedTimeInMicroseconds(nGlobalTimerInMicroseconds, bThrowExceptionInFailure);
 
 		return LIBMCDATA_SUCCESS;
 	}

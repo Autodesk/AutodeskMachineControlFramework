@@ -310,18 +310,26 @@ LibMCData_uint64 CBuildJobExecution::GetEndTimeStampInMicroseconds()
 
 }
 
-LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) 
+LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds, const bool bThrowExceptionInFailure) 
 {
 
-	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears(nGlobalTimerInMicroseconds))
-		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+	if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears(nGlobalTimerInMicroseconds)) {
+		if (bThrowExceptionInFailure)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+		return 0;
+	}
 
 	std::string sSelectQuery = "SELECT status, endjournaltimestamp FROM buildjobexecutions WHERE uuid=? AND active=1";
 	auto pSelectStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
 	pSelectStatement->setString(1, m_sExecutionUUID);
 
-	if (!pSelectStatement->nextRow())
-		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND, "build job execution not found: " + m_sExecutionUUID);
+	if (!pSelectStatement->nextRow()) {
+		if (bThrowExceptionInFailure)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONNOTFOUND, "build job execution not found: " + m_sExecutionUUID);
+
+		return 0;
+	}
 
 	auto eStatus = convertStringToBuildJobExecutionStatus(pSelectStatement->getColumnString(1));
 
@@ -329,11 +337,19 @@ LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibM
 
 		case eBuildJobExecutionStatus::InProcess:
 		{
-			if (m_sJournalUUID != m_pStorageState->getSessionUUID ())
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL, "build job execution is from past journal: " + m_sExecutionUUID);
+			if (m_sJournalUUID != m_pStorageState->getSessionUUID()) {
+				if (bThrowExceptionInFailure)
+					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONISFROMPASTJOURNAL, "build job execution is from past journal: " + m_sExecutionUUID);
 
-			if (nGlobalTimerInMicroseconds < m_nStartJournalTimestamp)
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE, "build job execution start is in the future: " + m_sExecutionUUID);
+				return 0;
+			}
+
+			if (nGlobalTimerInMicroseconds < m_nStartJournalTimestamp) {
+				if (bThrowExceptionInFailure)
+					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONSTARTISINTHEFUTURE, "build job execution start is in the future: " + m_sExecutionUUID);
+
+				return 0;
+			}
 			
 			return nGlobalTimerInMicroseconds - m_nStartJournalTimestamp;
 		}
@@ -342,19 +358,34 @@ LibMCData_uint64 CBuildJobExecution::ComputeElapsedTimeInMicroseconds(const LibM
 		case eBuildJobExecutionStatus::Failed:
 		{
 			int64_t nEndTimeStamp = AMCCommon::CChrono::parseISO8601TimeUTC(pSelectStatement->getColumnString(2));
-			if (nEndTimeStamp < 0)
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND, "invalid build job execution end: " + m_sExecutionUUID);
-			if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears((uint64_t)nEndTimeStamp))
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND, "invalid build job execution end: " + m_sExecutionUUID);
+			if (nEndTimeStamp < 0) {
+				if (bThrowExceptionInFailure)
+					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND, "invalid build job execution end: " + m_sExecutionUUID);
 
-			if ((uint64_t)(nEndTimeStamp) < m_nStartJournalTimestamp)
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART, "Build job execution end is before start: " + m_sExecutionUUID);
+				return 0;
+			}
+			if (!AMCCommon::CChrono::timeStampIsWithinAMillionYears((uint64_t)nEndTimeStamp)) {
+				if (bThrowExceptionInFailure)
+					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUILDJOBEXECUTIONEND, "invalid build job execution end: " + m_sExecutionUUID);
+
+				return 0;
+			}
+
+			if ((uint64_t)(nEndTimeStamp) < m_nStartJournalTimestamp) {
+				if (bThrowExceptionInFailure)
+					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBEXECUTIONENDISBEFORESTART, "Build job execution end is before start: " + m_sExecutionUUID);
+
+				return 0;
+			}
 
 			return (uint64_t)nEndTimeStamp - m_nStartJournalTimestamp;
 		}
 
 		default:
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE, "build job duration is not available: " + m_sExecutionUUID);
+			if (bThrowExceptionInFailure)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBDURATIONNOTAVAILABLE, "build job duration is not available: " + m_sExecutionUUID);
+
+			return 0;
 
 	}
 }

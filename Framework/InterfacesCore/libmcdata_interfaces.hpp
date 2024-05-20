@@ -1186,9 +1186,10 @@ public:
 	/**
 	* IBuildJobExecution::ComputeElapsedTimeInMicroseconds - Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.
 	* @param[in] nGlobalTimerInMicroseconds - The current session global timer.
+	* @param[in] bThrowExceptionInFailure - If true, the method will throw exceptions in any error case. If false, it will just return 0 in any error case.
 	* @return Elapsed time in Microseconds.
 	*/
-	virtual LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds) = 0;
+	virtual LibMCData_uint64 ComputeElapsedTimeInMicroseconds(const LibMCData_uint64 nGlobalTimerInMicroseconds, const bool bThrowExceptionInFailure) = 0;
 
 	/**
 	* IBuildJobExecution::AddJobExecutionData - Adds additional data to the Job Execution.

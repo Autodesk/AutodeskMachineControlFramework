@@ -1065,6 +1065,7 @@
 			
 		<method name="ComputeElapsedTimeInMicroseconds" description="Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.">
 			<param name="GlobalTimerInMicroseconds" type="uint64" pass="in" description="The current session global timer." />
+			<param name="ThrowExceptionInFailure" type="bool" pass="in" description="If true, the method will throw exceptions in any error case. If false, it will just return 0 in any error case." />
 			<param name="ElapsedTimeInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
 		</method>
 

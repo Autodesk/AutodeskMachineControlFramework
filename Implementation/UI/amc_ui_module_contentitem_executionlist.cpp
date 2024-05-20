@@ -121,7 +121,7 @@ PUIModule_ContentExecutionList CUIModule_ContentExecutionList::makeFromXML(const
 
 	CUIExpression loadingText(xmlNode, "loadingtext");
 
-	auto pBuildList = std::make_shared <CUIModule_ContentExecutionList>(loadingText, nEntriesPerPage, sSelectEvent, pUIModuleEnvironment->dataModel(), sItemName, sModulePath, sDefaultThumbnailUUID, pUIModuleEnvironment->stateMachineData());
+	auto pBuildList = std::make_shared <CUIModule_ContentExecutionList>(loadingText, nEntriesPerPage, sSelectEvent, pUIModuleEnvironment->dataModel(), sItemName, sModulePath, sDefaultThumbnailUUID, pUIModuleEnvironment->stateMachineData(), pUIModuleEnvironment->getGlobalChrono ());
 
 	auto buttonNodes = xmlNode.children("button");
 	for (auto buttonNode : buttonNodes) {
@@ -145,13 +145,14 @@ PUIModule_ContentExecutionList CUIModule_ContentExecutionList::makeFromXML(const
 
 }
 
-CUIModule_ContentExecutionList::CUIModule_ContentExecutionList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData)
+CUIModule_ContentExecutionList::CUIModule_ContentExecutionList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData, AMCCommon::PChrono pGlobalChrono)
 	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath),
 	m_LoadingText(loadingText),
 	m_nEntriesPerPage(nEntriesPerPage),
 	m_sSelectEvent(sSelectEvent),
 	m_pDataModel(pDataModel),
 	m_pStateMachineData(pStateMachineData),
+	m_pGlobalChrono (pGlobalChrono),
 	m_sDefaultThumbnailResourceUUID(AMCCommon::CUtils::normalizeUUIDString(sDefaultThumbnailResourceUUID))
 
 {
@@ -162,6 +163,8 @@ CUIModule_ContentExecutionList::CUIModule_ContentExecutionList(const CUIExpressi
 	if (pDataModel.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pStateMachineData.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	m_sSelectedExecutionFieldUUID = AMCCommon::CUtils::createUUID();
@@ -199,7 +202,7 @@ void CUIModule_ContentExecutionList::writeHeadersToJSON(CJSONWriter& writer, CJS
 
 	CJSONWriterObject headerObject4(writer);
 	headerObject4.addString(AMC_API_KEY_UI_ITEMTEXT, m_ExecutionTimestampCaption.evaluateStringValue(m_pStateMachineData));
-	headerObject4.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMEXECUTIONTIMESTAMP);
+	headerObject4.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMEXECUTIONSTARTTIMESTAMP);
 	headerObject4.addBool(AMC_API_KEY_UI_ITEMSORTABLE, true);
 	headerObject4.addString(AMC_API_KEY_UI_ITEMWIDTH, "20vw");
 	headersArray.addObject(headerObject4);
@@ -260,22 +263,36 @@ void CUIModule_ContentExecutionList::addContentToJSON(CJSONWriter& writer, CJSON
 	CJSONWriterArray entryArray(writer);
 
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	
 
 	auto pExecutionIterator = pBuildJobHandler->ListJobExecutions("", "", "");
 	while (pExecutionIterator->MoveNext()) {
 
 		auto pExecution = pExecutionIterator->GetCurrentJobExecution();
 
+		LibMCData::eBuildJobExecutionStatus status = pExecution->GetStatus();
+		std::string sStatusString = pExecution->GetStatusString();
+		bool bHasEndTime = (status == LibMCData::eBuildJobExecutionStatus::Finished);
+
 		uint64_t nStartTimeStamp = pExecution->GetStartTimeStampInMicroseconds();
+		uint64_t nEndTimeStamp = 0;
+		
+		if (bHasEndTime) {
+			nEndTimeStamp = pExecution->GetEndTimeStampInMicroseconds();
+		}
+
+		int64_t nDurationInSeconds = pExecution->ComputeElapsedTimeInMicroseconds (m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 (), false) / 1000000LL;
 
 		CJSONWriterObject entryObject(writer);
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONNAME, pExecution->GetJobName());
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUUID, pExecution->GetExecutionUUID());
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONDESCRIPTION, pExecution->GetDescription());
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC (nStartTimeStamp));
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONSTARTTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC (nStartTimeStamp));
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONENDTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC(nEndTimeStamp));
+		entryObject.addInteger(AMC_API_KEY_UI_ITEMEXECUTIONDURATION, nDurationInSeconds);
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
 		entryObject.addInteger(AMC_API_KEY_UI_ITEMEXECUTIONLAYERCOUNT, pExecution->GetJobLayerCount());
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONSTATUS, pExecution->GetStatusString ());
+		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONSTATUS, sStatusString);
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONBUILDSTATUS, pExecution->GetJobStatusString());
 
 		//		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUSER, pExecution->GetCreatorName());

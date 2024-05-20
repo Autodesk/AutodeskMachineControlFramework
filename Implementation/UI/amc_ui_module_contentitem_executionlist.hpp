@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem.hpp"
 #include "amc_ui_expression.hpp"
 #include "pugixml.hpp"
+#include "common_chrono.hpp"
 
 namespace LibMCData {
 	amcDeclareDependingClass(CDataModel, PDataModel);
@@ -98,6 +99,7 @@ namespace AMC {
 		uint32_t m_nEntriesPerPage;
 
 		LibMCData::PDataModel m_pDataModel;
+		AMCCommon::PChrono m_pGlobalChrono;
 
 		PStateMachineData m_pStateMachineData;
 
@@ -109,7 +111,7 @@ namespace AMC {
 
 		static PUIModule_ContentExecutionList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentExecutionList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData);
+		CUIModule_ContentExecutionList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData, AMCCommon::PChrono pGlobalChrono);
 
 		virtual ~CUIModule_ContentExecutionList();
 

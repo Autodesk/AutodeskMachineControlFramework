@@ -77,9 +77,10 @@ CLogger* CUIModuleEnvironment::getLogger()
 	return m_pUISystemState->getLogger().get();
 }
 
-uint64_t CUIModuleEnvironment::getAbsoluteTimeStamp()
+	
+AMCCommon::PChrono CUIModuleEnvironment::getGlobalChrono()
 {
-	return m_pUISystemState->getAbsoluteTimeStamp();
+	return m_pUISystemState->getGlobalChronoInstance();
 }
 
 
