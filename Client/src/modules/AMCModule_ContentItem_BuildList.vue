@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <template v-slot:[`item.buildName`]="{ item }">
 		<v-card class="ma-2" v-on:click.stop="uiModuleBuildListDetailsClick (item)">
           <v-card-title>{{ item.buildName }}</v-card-title>
-          <v-card-subtitle>{{ item.buildLayers }} layers, printed {{ item.buildPrintCount }} times
+          <v-card-subtitle>{{ item.buildLayers }} layers, printed {{ item.buildExecutionCount }} times
           </v-card-subtitle>
           <v-card-text>
             

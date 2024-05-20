@@ -48,10 +48,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <template v-slot:[`item.executionName`]="{ item }">
 		<v-card class="ma-2" v-on:click.stop="uiModuleExecutionListDetailsClick (item)">
           <v-card-title>{{ item.executionName }}</v-card-title>
-          <v-card-subtitle>
+          <v-card-subtitle>{{ item.executionLayerCount }} layers, {{ item.executionStatus }}
           </v-card-subtitle>
           <v-card-text>
-            
+            {{ item.executionDescription }}
           </v-card-text>
           <v-card-actions>
 		  
@@ -70,9 +70,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </v-card>
         
       </template>
-      <template v-slot:[`item.executionTimestamp`]="{ item }">
+      <template v-slot:[`item.executionStartTimestamp`]="{ item }">
 			<div>
-				<p class="text-center">{{ formatDateTime (item.executionTimestamp) }}<br>uploaded by {{ item.executionUser }}</p>
+				<p class="text-center">Started at {{ formatDateTime (item.executionStartTimestamp) }}</p>
+				<p class="text-center">Finished at {{ formatDateTime (item.executionEndTimestamp) }}</p>
+				<p class="text-center">Duration: {{ formatDuration (item.executionDuration) }}</p>
 				<p class="grey-lighten-4 opacity-80 font-weight-light text-center">{{ item.executionUUID }}</p> 				
 			</div>
       </template>
@@ -102,6 +104,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			}).format(date);
 		},
 
+		formatDuration (durationInSeconds) {
+			const hours = Math.floor(durationInSeconds / 3600);
+			const minutes = Math.floor((durationInSeconds % 3600) / 60);
+			const remainingSeconds = durationInSeconds % 60;
+
+			const formattedHours = String(hours).padStart(2, '0');
+			const formattedMinutes = String(minutes).padStart(2, '0');
+			const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+
+			return formattedHours + ":" + formattedMinutes + ":" + formattedSeconds;
+		},
+	
 	  
 		uiModuleExecutionListClick: function (item) {
 			if (item) {
