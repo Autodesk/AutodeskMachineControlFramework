@@ -529,7 +529,7 @@ IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescr
     pInsertStatement->setString(10, sAbsoluteCreationTimeStamp);
     pInsertStatement->execute();
 
-    return new CBuildJobExecution(m_pSQLHandler, sExecutionUUID, m_pStorageState);
+    return new CBuildJobExecution(m_pSQLHandler, sExecutionUUID, m_sUUID, sJournalUUID, sUserUUID, nAbsoluteStartTimeStampInMicrosecondsSince1970, m_pStorageState);
 
 }
 
@@ -537,48 +537,49 @@ IBuildJobExecution* CBuildJob::RetrieveBuildJobExecution(const std::string& sExe
 {
     std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
 
-    return new CBuildJobExecution(m_pSQLHandler, sNormalizedUUID, m_pStorageState);
+    return CBuildJobExecution::makeFromDatabase(m_pSQLHandler, sNormalizedUUID, m_pStorageState);
 }
-
-IBuildJobExecutionIterator* CBuildJob::listJobExecutionsEx(AMCData::CSQLStatement* pStatement)
-{
-    if (pStatement == nullptr)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
-
-    std::unique_ptr<CBuildJobExecutionIterator> buildJobIterator(new CBuildJobExecutionIterator());
-
-    while (pStatement->nextRow()) {
-        std::string sExecutionUUID = pStatement->getColumnString(1);
-        buildJobIterator->AddJobExecution(std::make_shared<CBuildJobExecution>(m_pSQLHandler, sExecutionUUID, m_pStorageState));
-    }
-
-    return buildJobIterator.release();
-}
-
 
 IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutions(const std::string& sJournalUUIDFilter)
 {
     std::string sJournalQuery;
     if (!sJournalUUIDFilter.empty())
-        sJournalQuery = " AND journaluuid=?";
+        sJournalQuery = " AND buildjobexecutions.journaluuid=?";
 
-    std::string sSelectQuery = "SELECT uuid FROM buildjobexecutions WHERE jobuuid=? AND active=?" + sJournalQuery + " ORDER BY timestamp";
+    std::string sSelectQuery = "SELECT buildjobexecutions.uuid, buildjobexecutions.jobuuid, buildjobexecutions.journaluuid, buildjobexecutions.useruuid, buildjobexecutions.startjournaltimestamp, buildjobs.name, buildjobs.status, buildjobs.layercount FROM buildjobexecutions LEFT JOIN buildjobs ON buildjobs.uuid=buildjobexecutions.jobuuid WHERE buildjobexecutions.jobuuid=? AND buildjobexecutions.active=?" + sJournalQuery + " ORDER BY buildjobexecutions.timestamp";
     auto pStatement = m_pSQLHandler->prepareStatement(sSelectQuery);    
     pStatement->setString(1, m_sUUID);
     pStatement->setInt(2, 1);
     if (!sJournalUUIDFilter.empty())
         pStatement->setString(3, AMCCommon::CUtils::normalizeUUIDString (sJournalUUIDFilter));
 
-    return listJobExecutionsEx(pStatement.get ());
+    std::unique_ptr<CBuildJobExecutionIterator> buildJobExecutionIterator(new CBuildJobExecutionIterator());
+
+    while (pStatement->nextRow()) {
+        // ATTENTION: All callers of makeFromStatement MUST BE in Sync in terms of column order!!
+        // Column 1: Execution UUID
+        // Column 2: Job UUID
+        // Column 3: Journal UUID
+        // Column 4: User UUID
+        // Column 5: Start TimeStamp
+        // Column 6: Job Name
+        // Column 7: Job Status
+        // Column 8: Job Layer Count
+
+        buildJobExecutionIterator->AddJobExecution(CBuildJobExecution::makeSharedFromStatement(m_pSQLHandler, pStatement, m_pStorageState));
+    }
+
+    return buildJobExecutionIterator.release();
 }
 
 IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutionsByStatus(const LibMCData::eBuildJobExecutionStatus eStatusFilter, const std::string& sJournalUUIDFilter)
 {
     std::string sJournalQuery;
     if (!sJournalUUIDFilter.empty())
-        sJournalQuery = " AND journaluuid=?";
+        sJournalQuery = " AND buildjobexecutions.journaluuid=?";
 
-    std::string sSelectQuery = "SELECT uuid FROM buildjobexecutions WHERE jobuuid=? AND active=? AND status=?" + sJournalQuery + " ORDER BY timestamp";
+    std::string sSelectQuery = "SELECT buildjobexecutions.uuid, buildjobexecutions.jobuuid, buildjobexecutions.journaluuid, buildjobexecutions.useruuid, buildjobexecutions.startjournaltimestamp, buildjobs.name, buildjobs.status, buildjobs.layercount FROM buildjobexecutions LEFT JOIN buildjobs ON buildjobs.uuid=buildjobexecutions.jobuuid WHERE buildjobexecutions.jobuuid=? AND buildjobexecutions.active=? AND buildjobexecutions.status=?" + sJournalQuery + " ORDER BY buildjobexecutions.timestamp";
+
     auto pStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
     pStatement->setString(1, m_sUUID);
     pStatement->setInt(2, 1);
@@ -586,7 +587,23 @@ IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutionsByStatus(const 
     if (!sJournalUUIDFilter.empty())
         pStatement->setString(4, AMCCommon::CUtils::normalizeUUIDString(sJournalUUIDFilter));
 
-    return listJobExecutionsEx(pStatement.get());
+    std::unique_ptr<CBuildJobExecutionIterator> buildJobExecutionIterator(new CBuildJobExecutionIterator());
+
+    while (pStatement->nextRow()) {
+        // ATTENTION: All callers of makeFromStatement MUST BE in Sync in terms of column order!!
+        // Column 1: Execution UUID
+        // Column 2: Job UUID
+        // Column 3: Journal UUID
+        // Column 4: User UUID
+        // Column 5: Start TimeStamp
+        // Column 6: Job Name
+        // Column 7: Job Status
+        // Column 8: Job Layer Count
+
+        buildJobExecutionIterator->AddJobExecution(CBuildJobExecution::makeSharedFromStatement(m_pSQLHandler, pStatement, m_pStorageState));
+    }
+
+    return buildJobExecutionIterator.release();
 }
 
 

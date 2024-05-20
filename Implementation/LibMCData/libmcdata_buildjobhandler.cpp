@@ -169,20 +169,20 @@ LibMCData::eBuildJobStatus CBuildJobHandler::ConvertStringToBuildStatus(const st
 
 IBuildJobExecution* CBuildJobHandler::RetrieveJobExecution(const std::string& sExecutionUUID)
 {
-    return new CBuildJobExecution (m_pSQLHandler, AMCCommon::CUtils::normalizeUUIDString (sExecutionUUID), m_pStorageState);
+    return CBuildJobExecution::makeFromDatabase (m_pSQLHandler, AMCCommon::CUtils::normalizeUUIDString (sExecutionUUID), m_pStorageState);
 
 }
 
 IBuildJobExecutionIterator* CBuildJobHandler::ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter)
 {
-    std::string sQuery = "SELECT uuid FROM buildjobexecutions WHERE active=? ";
+    std::string sQuery = "SELECT buildjobexecutions.uuid, buildjobexecutions.jobuuid, buildjobexecutions.journaluuid, buildjobexecutions.useruuid, buildjobexecutions.startjournaltimestamp, buildjobs.name, buildjobs.status, buildjobs.layercount FROM buildjobexecutions LEFT JOIN buildjobs ON buildjobs.uuid=buildjobexecutions.jobuuid WHERE buildjobexecutions.active=?";
     if (!sJournalUUIDFilter.empty())
-        sQuery += " AND journaluuid=?";
+        sQuery += " AND buildjobexecutions.journaluuid=?";
     if (!sMinTimestamp.empty ())
-        sQuery += " AND startjournaltimestamp>?";
+        sQuery += " AND buildjobexecutions.startjournaltimestamp>?";
     if (!sMaxTimestamp.empty())
-        sQuery += " AND startjournaltimestamp<?";
-    sQuery += " ORDER BY startjournaltimestamp";
+        sQuery += " AND buildjobexecutions.startjournaltimestamp<?";
+    sQuery += " ORDER BY buildjobexecutions.startjournaltimestamp";
 
     uint32_t nColumn = 1;
 
@@ -212,8 +212,17 @@ IBuildJobExecutionIterator* CBuildJobHandler::ListJobExecutions(const std::strin
     std::unique_ptr<CBuildJobExecutionIterator> buildJobIterator(new CBuildJobExecutionIterator());
 
     while (pStatement->nextRow()) {
-        std::string sExecutionUUID = pStatement->getColumnString(1);
-        buildJobIterator->AddJobExecution(std::make_shared<CBuildJobExecution>(m_pSQLHandler, sExecutionUUID, m_pStorageState));
+        // ATTENTION: All callers of makeFromStatement MUST BE in Sync in terms of column order!!
+        // Column 1: Execution UUID
+        // Column 2: Job UUID
+        // Column 3: Journal UUID
+        // Column 4: User UUID
+        // Column 5: Start TimeStamp
+        // Column 6: Job Name
+        // Column 7: Job Status
+        // Column 8: Job Layer Count
+
+        buildJobIterator->AddJobExecution(CBuildJobExecution::makeSharedFromStatement(m_pSQLHandler, pStatement, m_pStorageState));
     }
 
     return buildJobIterator.release();

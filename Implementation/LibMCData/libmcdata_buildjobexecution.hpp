@@ -78,7 +78,15 @@ public:
 
 	static std::shared_ptr<CBuildJobExecution> makeSharedFrom(CBuildJobExecution* pBuildJobExecution);
 
-	CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string & sExecutionUUID, AMCData::PStorageState pStorageState);
+	static CBuildJobExecution* makeFromDatabase(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID, AMCData::PStorageState pStorageState);
+
+	static std::shared_ptr<CBuildJobExecution> makeSharedFromDatabase(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID, AMCData::PStorageState pStorageState);
+
+	static CBuildJobExecution* makeFromStatement(AMCData::PSQLHandler pSQLHandler, AMCData::PSQLStatement pStatement, AMCData::PStorageState pStorageState);
+
+	static std::shared_ptr<CBuildJobExecution> makeSharedFromStatement(AMCData::PSQLHandler pSQLHandler, AMCData::PSQLStatement pStatement, AMCData::PStorageState pStorageState);
+
+	CBuildJobExecution(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID, const std::string& sJobUUID, const std::string& sJournalUUID, const std::string& sUserUUID, uint64_t nStartJournalTimeStamp, AMCData::PStorageState pStorageState);
 
 	virtual ~CBuildJobExecution();
 
