@@ -335,7 +335,7 @@ std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::st
 	pFieldDataInstance->WriteDataToStream(pStreamWriter.get(), pStoreOptions);
 	pStreamWriter->Finish();
 
-	AttachTempStream(sIdentifier, sName, sUserUUID, pStreamWriter.get());
+	return AttachTempStream(sIdentifier, sName, sUserUUID, pStreamWriter.get());
 }
 
 
