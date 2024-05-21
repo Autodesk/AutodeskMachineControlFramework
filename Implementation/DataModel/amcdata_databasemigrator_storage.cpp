@@ -102,6 +102,12 @@ namespace AMCData {
 				break;
 			}
 
+			case 12: {
+				std::string sStreamsQuery = "ALTER TABLE `storage_streams` ";
+				sStreamsQuery += "ADD `useruuid` varchar (256) DEFAULT `00000000-0000-0000-0000-000000000000`;";
+				pTransaction->executeStatement(sStreamsQuery);
+				break;
+			}
 		}
 	}
 
