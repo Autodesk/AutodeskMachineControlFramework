@@ -798,7 +798,7 @@ IAlert* CStateEnvironment::FindAlert(const std::string& sUUID)
 	auto pAlertSession = pDataModel->CreateAlertSession();
 
 	if (!pAlertSession->HasAlert(sNormalizedUUID))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID + " (in StateEnvironment::FindAlert)");
 
 	auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
 

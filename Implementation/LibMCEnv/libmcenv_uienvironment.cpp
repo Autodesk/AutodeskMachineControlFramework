@@ -772,7 +772,7 @@ IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
     auto pAlertSession = pDataModel->CreateAlertSession();
 
     if (!pAlertSession->HasAlert(sNormalizedUUID))
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID + " (in UIEnvironment::FindAlert)");
 
     auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
     auto pUserInformation = m_pAPIAuth->getUserInformation();
