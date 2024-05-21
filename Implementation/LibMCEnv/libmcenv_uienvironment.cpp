@@ -864,7 +864,9 @@ IZIPStreamWriter* CUIEnvironment::CreateZIPStream(const std::string& sName)
 
     auto pChrono = m_pUISystemState->getGlobalChronoInstance();
 
-    std::string sUserUUID = AMCCommon::CUtils::createEmptyUUID();
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    std::string sUserUUID = pUserInformation->getUUID();
+
     std::string sStreamUUID = AMCCommon::CUtils::createUUID();
 
     auto pDataModel = m_pUISystemState->getDataModel();

@@ -48,7 +48,7 @@ namespace AMCData {
 				sStreamsQuery += "`sha2`  varchar ( 64 ) NOT NULL,";
 				sStreamsQuery += "`size`  integer DEFAULT 0,";
 				sStreamsQuery += "`status`  varchar ( 256 ) NOT NULL,";
-				sStreamsQuery += "`userid`  varchar ( 64 ) NOT NULL,";
+				sStreamsQuery += "`userid`  varchar ( 64 ) DEFAULT '',";
 				sStreamsQuery += "`updateuuid`  varchar ( 64 ),";
 				sStreamsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 				pTransaction->executeStatement(sStreamsQuery);

@@ -221,7 +221,7 @@ std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::str
 	auto sDataUUID = AMCCommon::CUtils::createUUID();
 	uint64_t nTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
-	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sUserUUID, nTimeStamp);
+	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sNormalizedUserUUID, nTimeStamp);
 
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
 	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sNormalizedUserUUID, nTimeStamp);
@@ -325,7 +325,13 @@ std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::st
 	if (pFieldDataInstance == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 
-	auto pStreamWriter = std::make_unique<CTempStreamWriter> (m_pDataModel, sName, "application/amcf-datatable", sUserUUID, m_pGlobalChrono);	
+	std::string sNormalizedUserUUID;
+	if (!sUserUUID.empty())
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sNormalizedUserUUID);
+	else
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+
+	auto pStreamWriter = std::make_unique<CTempStreamWriter> (m_pDataModel, sName, "application/amcf-datatable", sNormalizedUserUUID, m_pGlobalChrono);
 	pFieldDataInstance->WriteDataToStream(pStreamWriter.get(), pStoreOptions);
 	pStreamWriter->Finish();
 

@@ -251,20 +251,20 @@ std::string CBuildExecution::AddBinaryData(const std::string & sIdentifier, cons
 
 	auto sDataUUID = AMCCommon::CUtils::createUUID();
 
-	std::string sNormalizedUUID;
+	std::string sNormalizedUserUUID;
 	if (sUserUUID.empty()) {
-		sNormalizedUUID = AMCCommon::CUtils::createEmptyUUID();
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 	}
 	else {
-		sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 	}
 
-	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sNormalizedUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sNormalizedUserUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 
 	auto nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
-	m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sNormalizedUUID, nAbsoluteTimeStamp);
+	m_pExecution->AddJobExecutionData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sNormalizedUserUUID, nAbsoluteTimeStamp);
 
 	return sDataUUID;
 }
@@ -401,7 +401,13 @@ std::string CBuildExecution::StoreDataTable(const std::string& sIdentifier, cons
 	if (pFieldDataInstance == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 
-	auto pStreamWriter = std::make_unique<CTempStreamWriter>(m_pDataModel, sName, "application/amcf-datatable", sUserUUID, m_pGlobalChrono);
+	std::string sNormalizedUserUUID;
+	if (!sUserUUID.empty())
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sNormalizedUserUUID);
+	else
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+
+	auto pStreamWriter = std::make_unique<CTempStreamWriter>(m_pDataModel, sName, "application/amcf-datatable", sNormalizedUserUUID, m_pGlobalChrono);
 	pFieldDataInstance->WriteDataToStream(pStreamWriter.get(), pStoreOptions);
 	pStreamWriter->Finish();
 

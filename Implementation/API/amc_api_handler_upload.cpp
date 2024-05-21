@@ -184,7 +184,7 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	if (!pAuth->contextUUIDIsAuthorized(sContextUUID))
 		throw ELibMCInterfaceException(LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED);
 
-	pStorage->BeginPartialStream (sUUID, sName, sMimeType, nSize, pAuth->getUserName (), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
+	pStorage->BeginPartialStream (sUUID, sName, sMimeType, nSize, pAuth->getUserUUID (), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 	writer.addString(AMC_API_KEY_UPLOAD_STREAMUUID, sUUID);
 	writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sContextUUID);
