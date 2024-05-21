@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 
+#include <thread>
+
 using namespace LibMCUI::Impl;
 
 #ifdef _MSC_VER
@@ -391,6 +393,37 @@ public:
 };
 
 
+class CEvent_OnFakeJob : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onfakejob";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		auto sSender = pUIEnvironment->RetrieveEventSender();
+		pUIEnvironment->LogMessage("Build item selected from " + sSender);
+
+		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
+		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
+
+		auto sButtonUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "buttonuuid");
+		pUIEnvironment->LogMessage("Button UUID " + sButtonUUID);
+
+		auto pBuildJob = pUIEnvironment->GetBuildJob(sBuildUUID);
+		auto pExecution = pBuildJob->StartExecution("This is a test description", pUIEnvironment->GetCurrentUserUUID());
+
+		std::this_thread::sleep_for(std::chrono::milliseconds (5000));
+
+		pExecution->SetStatusToFinished();
+
+	}
+
+};
+
 class CEvent_OnChangeSimulationParameterEvent : public virtual CEvent {
 
 public:
@@ -590,6 +623,9 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_TestJournal>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnFakeJob>(sEventName, pEventInstance))
+		return pEventInstance;
+	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);
 }

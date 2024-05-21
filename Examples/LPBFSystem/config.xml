@@ -446,11 +446,23 @@
 		<page name="buildlist">
 			<content name="buildlibrary" title="Build Library">
 				<upload class="build" caption="Select 3MF files to upload" successevent="onuploadfinished"/>
-				<buildlist loadingtext="Loading builds" entriesperpage="20" selectevent="onselectbuild"/>
+				
+        <buildlist loadingtext="Loading builds" entriesperpage="20" selectevent="onselectbuild" thumbnail="thumbnail_default">
+          <button name="selectbuild" caption="Select" event="onselectbuild"/>
+          <button name="view3d" caption="View in 3D" event=""/>
+          <button name="viewhistory" caption="Show History" event=""/>
+          <button name="fakejob" caption="Run Fake Job" event="onfakejob"/>
+        </buildlist>
 			</content>
 		</page>
 
-
+    <page name="buildhistory">
+      <content name="executionlibrary" title="Build History">
+        <executionlist loadingtext="Loading builds" entriesperpage="20" selectevent=""  thumbnail="thumbnail_default">
+          <button name="details" caption="Details" selectevent=""/>
+        </executionlist>
+      </content>
+    </page>
 
 		<page name="buildstatus">
 
@@ -668,7 +680,8 @@
 		<menu>
 			<item id="buildlist" icon="mdi-library" permission="permission_view_builds" description="Upload build files and start build jobs." caption="Build Library" targetpage="buildlist"/>
 			<item id="buildprocess" icon="mdi-printer-3d" caption="Build Process" description="Manage and monitor current build process" targetpage="buildstatus"/>
-			<item id="systemstatus" icon="mdi-factory" caption="Current Status" description="Display current machine status." targetpage="systemstatus"/>
+      <item id="buildhistory" icon="mdi-library" permission="permission_view_builds" description="Browse past build jobs running on this machine." caption="Build History" targetpage="buildhistory"/>
+      <item id="systemstatus" icon="mdi-factory" caption="Current Status" description="Display current machine status." targetpage="systemstatus"/>
 			<item id="systemlog" icon="mdi-book-open-variant" caption="System Logs" description="Browse and display stored system log files." targetpage="systemlog"/>
       <item id="modelview" icon="mdi-book-open-variant" caption="3D Model View" description="View Build Job in 3D." targetpage="modelview"/>
     </menu>
