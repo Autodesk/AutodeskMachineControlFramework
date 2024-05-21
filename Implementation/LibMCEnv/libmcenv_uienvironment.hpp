@@ -245,6 +245,8 @@ public:
 
 	IDateTime* GetStartDateTime() override;
 
+	void Sleep(const LibMCEnv_uint32 nDelay) override;
+
 };
 
 } // namespace Impl

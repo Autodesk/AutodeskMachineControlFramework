@@ -6133,6 +6133,12 @@ public:
 	*/
 	virtual IDateTime * GetStartDateTime() = 0;
 
+	/**
+	* IUIEnvironment::Sleep - Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
+
 };
 
 typedef IBaseSharedPtr<IUIEnvironment> PIUIEnvironment;

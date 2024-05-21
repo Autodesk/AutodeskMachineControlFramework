@@ -2557,6 +2557,7 @@ public:
 	inline PDateTime GetCurrentDateTime();
 	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
 	inline PDateTime GetStartDateTime();
+	inline void Sleep(const LibMCEnv_uint32 nDelay);
 };
 	
 	/**
@@ -3376,6 +3377,7 @@ public:
 		pWrapperTable->m_UIEnvironment_GetCurrentDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCustomDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_GetStartDateTime = nullptr;
+		pWrapperTable->m_UIEnvironment_Sleep = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -10056,6 +10058,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_Sleep = (PLibMCEnvUIEnvironment_SleepPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_sleep");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_Sleep = (PLibMCEnvUIEnvironment_SleepPtr) dlsym(hLibrary, "libmcenv_uienvironment_sleep");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_Sleep == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -13058,6 +13069,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getstartdatetime", (void**)&(pWrapperTable->m_UIEnvironment_GetStartDateTime));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetStartDateTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_sleep", (void**)&(pWrapperTable->m_UIEnvironment_Sleep));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_Sleep == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -23255,6 +23270,15 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDateTime>(m_pWrapper, hDateTime);
+	}
+	
+	/**
+	* CUIEnvironment::Sleep - Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	void CUIEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_Sleep(m_pHandle, nDelay));
 	}
 
 } // namespace LibMCEnv

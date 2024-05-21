@@ -917,3 +917,9 @@ IDateTime* CUIEnvironment::GetStartDateTime()
     auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
     return new CDateTime(pGlobalChrono->getStartTimeStampInMicrosecondsSince1970());
 }
+
+void CUIEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+{
+    AMCCommon::CChrono chrono;
+    chrono.sleepMilliseconds(nDelay);
+}

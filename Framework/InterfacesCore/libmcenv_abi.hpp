@@ -8003,6 +8003,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcustomdatetime(LibMCE
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getstartdatetime(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_DateTime * pDateTime);
 
+/**
+* Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nDelay - Milliseconds to sleeps
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_sleep(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nDelay);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/

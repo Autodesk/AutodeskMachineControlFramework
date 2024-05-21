@@ -7990,6 +7990,15 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetCustomDateTimePtr) (LibMCEnv_
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetStartDateTimePtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_DateTime * pDateTime);
 
+/**
+* Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nDelay - Milliseconds to sleeps
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SleepPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nDelay);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -8782,6 +8791,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_GetCurrentDateTimePtr m_UIEnvironment_GetCurrentDateTime;
 	PLibMCEnvUIEnvironment_GetCustomDateTimePtr m_UIEnvironment_GetCustomDateTime;
 	PLibMCEnvUIEnvironment_GetStartDateTimePtr m_UIEnvironment_GetStartDateTime;
+	PLibMCEnvUIEnvironment_SleepPtr m_UIEnvironment_Sleep;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

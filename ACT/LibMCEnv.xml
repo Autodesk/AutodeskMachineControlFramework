@@ -4303,6 +4303,10 @@
 			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
 		</method>
 
+		<method name="Sleep" description="Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
 	</class>
 
 

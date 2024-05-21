@@ -24187,6 +24187,30 @@ LibMCEnvResult libmcenv_uienvironment_getstartdatetime(LibMCEnv_UIEnvironment pU
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_sleep(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nDelay)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUIEnvironment->Sleep(nDelay);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -25674,6 +25698,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getcustomdatetime;
 	if (sProcName == "libmcenv_uienvironment_getstartdatetime") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getstartdatetime;
+	if (sProcName == "libmcenv_uienvironment_sleep") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_sleep;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 
