@@ -187,7 +187,7 @@ IBuildJobExecutionIterator* CBuildJobHandler::ListJobExecutions(const std::strin
         sQuery += " AND buildjobexecutions.startjournaltimestamp>?";
     if (!sMaxTimestamp.empty())
         sQuery += " AND buildjobexecutions.startjournaltimestamp<?";
-    sQuery += " ORDER BY buildjobexecutions.startjournaltimestamp";
+    sQuery += " ORDER BY buildjobexecutions.startjournaltimestamp DESC";
 
     uint32_t nColumn = 1;
 

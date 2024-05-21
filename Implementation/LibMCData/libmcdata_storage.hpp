@@ -68,7 +68,7 @@ private:
     AMCData::PStorageState m_pStorageState;
     AMCData::PSQLHandler m_pSQLHandler;
 
-    void insertDBEntry(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, uint64_t nAbsoluteTimeStamp);
+    void insertDBEntry(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, uint64_t nAbsoluteTimeStamp, const std::string & sUserUUID);
 
 protected:
 

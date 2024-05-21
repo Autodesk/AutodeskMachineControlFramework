@@ -443,7 +443,7 @@ IBuildJobExecutionDataIterator* CBuildJobExecution::listJobExecutionDataEx(AMCDa
 
 IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionDataByType(const LibMCData::eCustomDataType eDataType)
 {
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? AND datatype=? ORDER BY buildjobexecutiondata.timestamp";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? AND datatype=? ORDER BY buildjobexecutiondata.timestamp DESC";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setInt(2, 1);
@@ -454,7 +454,7 @@ IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionDataByType(c
 
 IBuildJobExecutionDataIterator* CBuildJobExecution::ListJobExecutionData()
 {
-	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? ORDER BY buildjobexecutiondata.timestamp";
+	std::string sQuery = "SELECT buildjobexecutiondata.uuid, buildjobexecutiondata.executionuuid, buildjobexecutiondata.identifier, buildjobexecutiondata.name, buildjobexecutiondata.datatype, buildjobexecutiondata.timestamp, buildjobexecutiondata.storagestreamuuid, buildjobexecutiondata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobexecutiondata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE executionuuid=? AND active=? ORDER BY buildjobexecutiondata.timestamp DESC";
 	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, m_sExecutionUUID);
 	pStatement->setInt(2, 1);

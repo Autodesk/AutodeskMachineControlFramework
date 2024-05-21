@@ -57,6 +57,7 @@ CBuildJob::CBuildJob(const std::string& sUUID, const std::string& sName, LibMCDa
     m_sStorageStreamUUID (AMCCommon::CUtils::normalizeUUIDString(sStorageStreamUUID)),
     m_sUserUUID (AMCCommon::CUtils::normalizeUUIDString (sUserUUID)),
     m_pSQLHandler(pSQLHandler),
+    m_sUserName(sUserName),
     m_nLayerCount(nLayerCount),
     m_nExecutionCount (nExecutionCount),
     m_pStorageState (pStorageState)
@@ -344,7 +345,7 @@ IBuildJobDataIterator* CBuildJob::listJobDataEx(AMCData::CSQLStatement* pStateme
 IBuildJobDataIterator* CBuildJob::ListJobDataByType(const LibMCData::eCustomDataType eDataType)
 {
 
-    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? AND datatype=? ORDER BY buildjobdata.timestamp";
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? AND datatype=? ORDER BY buildjobdata.timestamp DESC";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString (1, m_sUUID);
     pStatement->setInt(2, 1);
@@ -357,7 +358,7 @@ IBuildJobDataIterator* CBuildJob::ListJobData()
 {
     std::unique_ptr<CBuildJobDataIterator> buildJobIterator (new CBuildJobDataIterator ());
 
-    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? ORDER BY buildjobdata.timestamp";
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.identifier, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.useruuid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? ORDER BY buildjobdata.timestamp DESC";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, m_sUUID);
     pStatement->setInt(2, 1);
@@ -556,7 +557,7 @@ IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutions(const std::str
     if (!sJournalUUIDFilter.empty())
         sJournalQuery = " AND buildjobexecutions.journaluuid=?";
 
-    std::string sSelectQuery = "SELECT buildjobexecutions.uuid, buildjobexecutions.jobuuid, buildjobexecutions.journaluuid, buildjobexecutions.useruuid, buildjobexecutions.startjournaltimestamp, buildjobs.name, buildjobs.status, buildjobs.layercount FROM buildjobexecutions LEFT JOIN buildjobs ON buildjobs.uuid=buildjobexecutions.jobuuid WHERE buildjobexecutions.jobuuid=? AND buildjobexecutions.active=?" + sJournalQuery + " ORDER BY buildjobexecutions.timestamp";
+    std::string sSelectQuery = "SELECT buildjobexecutions.uuid, buildjobexecutions.jobuuid, buildjobexecutions.journaluuid, buildjobexecutions.useruuid, buildjobexecutions.startjournaltimestamp, buildjobs.name, buildjobs.status, buildjobs.layercount FROM buildjobexecutions LEFT JOIN buildjobs ON buildjobs.uuid=buildjobexecutions.jobuuid WHERE buildjobexecutions.jobuuid=? AND buildjobexecutions.active=?" + sJournalQuery + " ORDER BY buildjobexecutions.timestamp DESC";
     auto pStatement = m_pSQLHandler->prepareStatement(sSelectQuery);    
     pStatement->setString(1, m_sUUID);
     pStatement->setInt(2, 1);
@@ -588,7 +589,7 @@ IBuildJobExecutionIterator* CBuildJob::RetrieveBuildJobExecutionsByStatus(const 
     if (!sJournalUUIDFilter.empty())
         sJournalQuery = " AND buildjobexecutions.journaluuid=?";
 
-    std::string sSelectQuery = "SELECT buildjobexecutions.uuid, buildjobexecutions.jobuuid, buildjobexecutions.journaluuid, buildjobexecutions.useruuid, buildjobexecutions.startjournaltimestamp, buildjobs.name, buildjobs.status, buildjobs.layercount FROM buildjobexecutions LEFT JOIN buildjobs ON buildjobs.uuid=buildjobexecutions.jobuuid WHERE buildjobexecutions.jobuuid=? AND buildjobexecutions.active=? AND buildjobexecutions.status=?" + sJournalQuery + " ORDER BY buildjobexecutions.timestamp";
+    std::string sSelectQuery = "SELECT buildjobexecutions.uuid, buildjobexecutions.jobuuid, buildjobexecutions.journaluuid, buildjobexecutions.useruuid, buildjobexecutions.startjournaltimestamp, buildjobs.name, buildjobs.status, buildjobs.layercount FROM buildjobexecutions LEFT JOIN buildjobs ON buildjobs.uuid=buildjobexecutions.jobuuid WHERE buildjobexecutions.jobuuid=? AND buildjobexecutions.active=? AND buildjobexecutions.status=?" + sJournalQuery + " ORDER BY buildjobexecutions.timestamp DESC";
 
     auto pStatement = m_pSQLHandler->prepareStatement(sSelectQuery);
     pStatement->setString(1, m_sUUID);
