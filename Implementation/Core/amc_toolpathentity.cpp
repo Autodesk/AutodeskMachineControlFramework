@@ -52,6 +52,8 @@ namespace AMC {
 		m_pStorageStream->GetCallbacks(pReadCallback, pSeekCallback, pUserData);
 		uint64_t nStreamSize = m_pStorageStream->GetSize();
 
+		m_p3MFWrapper = p3MFWrapper;
+
 		m_p3MFModel = p3MFWrapper->CreateModel();
 		m_pPersistentSource = m_p3MFModel->CreatePersistentSourceFromCallback((Lib3MF::ReadCallback)pReadCallback, nStreamSize, (Lib3MF::SeekCallback)pSeekCallback, pUserData);
 
@@ -70,7 +72,7 @@ namespace AMC {
 
 		auto pBuildItems = m_p3MFModel->GetBuildItems();
 		while (pBuildItems->MoveNext()) {
-			auto pPart = std::make_shared<CToolpathPart>(m_p3MFModel, pBuildItems->GetCurrent());
+			auto pPart = std::make_shared<CToolpathPart>(m_p3MFModel, pBuildItems->GetCurrent(), m_p3MFWrapper);
 			m_PartList.push_back(pPart);
 			m_PartMap.insert(std::make_pair (pPart->getUUID (), pPart));
 		}
@@ -85,6 +87,7 @@ namespace AMC {
 		m_pPersistentSource = nullptr;
 		m_p3MFModel = nullptr;
 		m_pStorageStream = nullptr;
+		m_p3MFWrapper = nullptr;
 	}
 
 	void CToolpathEntity::IncRef()
