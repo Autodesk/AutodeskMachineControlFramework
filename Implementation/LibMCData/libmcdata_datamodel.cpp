@@ -111,6 +111,9 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     m_pStorageState->addAcceptedContent("image/png");
     m_pStorageState->addAcceptedContent("image/jpeg");
 
+    m_pStorageState->addImageContent("image/png");
+    m_pStorageState->addImageContent("image/jpeg");
+
     if (dataBaseType == eDataBaseType::SqLite) {
         m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(sConnectionString);
     }

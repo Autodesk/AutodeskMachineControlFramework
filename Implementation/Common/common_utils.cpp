@@ -547,7 +547,7 @@ namespace AMCCommon {
 	bool CUtils::stringIsUUIDString(const std::string& sRawString)
 	{
 		std::string sTrimmedString = trimString(sRawString);
-		if (sTrimmedString.length() != 40)
+		if (sTrimmedString.length() != 36)
 			return false;
 
 		size_t nIndex = 0;

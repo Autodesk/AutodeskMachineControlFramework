@@ -376,7 +376,7 @@ bool CStorage::StreamIsImage(const std::string& sUUID)
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, sParsedUUID);
     if (!pStatement->nextRow())
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND);
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND, "storage stream not found: " + sParsedUUID);
 
     auto sMimeType = pStatement->getColumnString(1);
     auto sLowerMimeType = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(sMimeType));
