@@ -183,7 +183,28 @@ public:
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
-		pUIEnvironment->LogMessage("Clicked on Test Journal Button");
+
+
+		pUIEnvironment->LogMessage("Clicked on Test Journal Button: " + pUIEnvironment->RetrieveEventSender ());
+		//pUIEnvironment->SetUIProperty("main.machineimage.testimage", "imageresource", "ui_logo");
+
+		auto pImage = pUIEnvironment->CreateEmptyImage(500, 400, 10.0, 10, LibMCEnv::eImagePixelFormat::RGB24bit);
+		pImage->Clear(0x228899);
+
+		std::vector<uint8_t> dataBuffer;
+		auto pPNGImage = pImage->CreatePNGImage(nullptr);
+		pPNGImage->GetPNGDataStream(dataBuffer);
+
+		auto pTempStream = pUIEnvironment->CreateTemporaryStream("tempimage", "image/png");
+		pTempStream->WriteData(dataBuffer);
+		pTempStream->Finish();
+
+		std::string sImageUUID = pTempStream->GetUUID();
+		pUIEnvironment->LogMessage("temp UUID: " + sImageUUID);
+
+		pUIEnvironment->SetUIProperty("main.machineimage.testimage", "imageresource", sImageUUID);
+
+		/*
 
 		auto pZIPStream = pUIEnvironment->CreateZIPStream("test_zip");
 		auto pEntry1 = pZIPStream->CreateZIPEntry("file1.txt");
@@ -195,7 +216,7 @@ public:
 
 		pZIPStream->Finish();
 
-		pUIEnvironment->StartStreamDownload(pZIPStream->GetUUID(), "download.zip");
+		pUIEnvironment->StartStreamDownload(pZIPStream->GetUUID(), "download.zip"); */
 
 		/*auto pUserManagement = pUIEnvironment->CreateUserManagement();
 		auto activeUsers = pUserManagement->GetActiveUsers();
@@ -212,6 +233,7 @@ public:
 
 		//pUserManagement->CreateUser("dummy", "administrator", "3fbde1f66fb512223edb195d247fe770130f59fdd914e3ffa7327af53fe4cb46", "dd9a86491eb7572c1a9cda800e6eb81bb9dad55576b01416d06cdf6ae181fb33", "This is the new dummy user."); */
 
+		/*
 
 		auto pJournal = pUIEnvironment->GetCurrentJournal();
 		auto pJournalVariable = pJournal->RetrieveJournalVariable ("main.jobinfo.countertest", 10000);
@@ -251,7 +273,7 @@ public:
 			pUIEnvironment->SetUIPropertyAsUUID("main.infobox.chart1", "dataseries", sUUID);
 		}
 
-
+		 */
 
 	}
 
