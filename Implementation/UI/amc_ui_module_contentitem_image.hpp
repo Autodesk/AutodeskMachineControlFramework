@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module_contentitem.hpp"
 #include "pugixml.hpp"
+#include "amc_ui_expression.hpp"
+#include "amc_resourcepackage.hpp"
 
 
 namespace AMC {
@@ -49,27 +51,31 @@ namespace AMC {
 
 	class CUIModule_ContentImage : public CUIModule_ContentItem {
 	protected:		
-		double m_dAspectRatio;
-		double m_dMaxWidth;
-		double m_dMaxHeight;
-		bool m_bHasMaxWidth;
-		bool m_bHasMaxHeight;
+		CUIExpression m_ImageResource;
+		CUIExpression m_AspectRatio;
+		CUIExpression m_MaxWidth;
+		CUIExpression m_MaxHeight;
+
+		PStateMachineData m_pStateMachineData;
+		PResourcePackage m_pResourcePackage;
 
 	public:
 
 		static PUIModule_ContentImage makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentImage(const std::string & sUUID, double dAspectRatio, const std::string& sItemName, const std::string& sModulePath);
+		CUIModule_ContentImage(const std::string & sUUID, const std::string& sItemName, const std::string& sModulePath, CUIExpression imageResource, CUIExpression dAspectRatio, CUIExpression maxWidth, CUIExpression maxHeight, PStateMachineData pStateMachineData, PResourcePackage pResourcePackage);
 		
 		virtual ~CUIModule_ContentImage();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
-		void setMaxWidth(double dMaxWidth);
-		void clearMaxWidth();
-		void setMaxHeight(double dMaxHeight);
-		void clearMaxHeight();
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
 
+		virtual void configurePostLoading() override;
+
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+
+		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 	};
 
 

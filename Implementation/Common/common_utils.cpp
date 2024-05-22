@@ -544,6 +544,34 @@ namespace AMCCommon {
 		return true;
 	}
 
+	bool CUtils::stringIsUUIDString(const std::string& sRawString)
+	{
+		std::string sTrimmedString = trimString(sRawString);
+		if (sTrimmedString.length() != 40)
+			return false;
+
+		size_t nIndex = 0;
+		for (char ch : sTrimmedString) {
+			char lowerChar = ::tolower(ch);
+
+			if ((nIndex == 8) || (nIndex == 13) || (nIndex == 18) || (nIndex == 23)) {
+				if (lowerChar != '-')
+					return false;
+			}
+			else {
+				bool bCharIsValid = (((lowerChar >= '0') && (lowerChar <= '9')) ||
+					((lowerChar >= 'a') && (lowerChar <= 'f')));
+				if (!bCharIsValid)
+					return false;
+			}
+
+			nIndex++;
+
+		}
+
+		return true;
+	}
+
 	std::string CUtils::normalizeUUIDString(const std::string & sRawString)
 	{
 		uint32_t nIndex = 0;

@@ -42,11 +42,19 @@ export default class AMCApplicationItem_Content_Image extends Common.AMCApplicat
 		super (moduleInstance, itemJSON.uuid, itemJSON.type);		
 		this.registerClass ("amcItem_Image");
 		
-		this.aspectratio = Assert.NumberValue (itemJSON.aspectratio);		
-		if (itemJSON.maxwidth) 
-			this.maxwidth = Assert.NumberValue (itemJSON.maxwidth);
-		if (itemJSON.maxheight) 
-			this.maxheight = Assert.NumberValue (itemJSON.maxheight);
+		this.updateFromJSON (itemJSON);
+		
+		this.setRefreshFlag ();		
+	}
+	
+	updateFromJSON (updateJSON)
+	{	
+		this.imageresource = Assert.UUIDValue (updateJSON.imageresource);		
+		this.aspectratio = Assert.NumberValue (updateJSON.aspectratio);		
+		if (updateJSON.maxwidth) 
+			this.maxwidth = Assert.NumberValue (updateJSON.maxwidth);
+		if (updateJSON.maxheight) 
+			this.maxheight = Assert.NumberValue (updateJSON.maxheight);
 		
 	}
 		
