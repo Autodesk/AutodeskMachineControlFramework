@@ -48,7 +48,7 @@ namespace AMC {
 		
 	public:
 
-		CLogger_StdOut();
+		CLogger_StdOut(AMCCommon::PChrono pGlobalChrono);
 		virtual ~CLogger_StdOut();
 
 		void logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) override;

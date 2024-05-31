@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 // Include custom headers here.
-
+#include "common_chrono.hpp"
 
 
 namespace LibMCEnv {
@@ -66,11 +66,13 @@ private:
 	AMC::PParameterGroup m_pParameterGroup;
 	AMC::PParameterGroup m_pResultGroup;
 
+	AMCCommon::PChrono m_pGlobalChrono;
+
 protected:
 
 public:
 
-	CSignalHandler(AMC::PStateSignalHandler pSignalHandler, std::string & sSignalUUID);
+	CSignalHandler(AMC::PStateSignalHandler pSignalHandler, std::string & sSignalUUID, AMCCommon::PChrono pGlobalChrono);
 
 	void SignalHandled() override;
 

@@ -43,14 +43,14 @@ using namespace LibMCData::Impl;
  Class definition of CCustomDataStream 
 **************************************************************************************************************************/
 
-CCustomDataStream::CCustomDataStream(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, LibMCData::eCustomDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize)
+CCustomDataStream::CCustomDataStream(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserUUID, const std::string& sSHA2, uint64_t nStreamSize)
 	: m_sIdentifier(sIdentifier),
     m_sName(sName),
     m_eDataType(eDataType),
     m_sDataUUID(AMCCommon::CUtils::normalizeUUIDString(sDataUUID)),
     m_sTimeStamp(sTimeStamp),
     m_sStorageStreamUUID(AMCCommon::CUtils::normalizeUUIDString(sStorageStreamUUID)),
-    m_sUserID(sUserID),
+    m_sUserUUID(AMCCommon::CUtils::normalizeUUIDString (sUserUUID)),
     m_sSHA256(sSHA2),
     m_nStreamSize(nStreamSize)
 
@@ -111,7 +111,7 @@ std::string CCustomDataStream::GetDataTypeAsString()
 
 std::string CCustomDataStream::GetUserUUID()
 {
-    return m_sUserID;
+    return m_sUserUUID;
 }
 
 std::string CCustomDataStream::convertCustomDataTypeToString(const LibMCData::eCustomDataType dataType)

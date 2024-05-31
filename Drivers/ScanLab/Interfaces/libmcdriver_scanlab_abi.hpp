@@ -565,6 +565,26 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetpower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_single fPowerInPercent);
 
 /**
+* Adds changing an analog port to the open list. Should not interfere with laser power control.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetanalogout(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue);
+
+/**
+* Adds changing an digital port to the open list. Should not interfere with laser power control.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addsetdigitalout(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue);
+
+/**
 * adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -836,6 +856,36 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_initializeforoie(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer, LibMCDriver_ScanLab::eOIEOperationMode eOperationMode);
+
+/**
+* Sets the laser pin outputs to a certain state. Control command, has immediate effect.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserpinout(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOut1, bool bLaserOut2);
+
+/**
+* Read the laser pin input values. Control command, has immediate effect.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pLaserOut1 - Value for Laser In Pin 1
+* @param[out] pLaserOut2 - Value for Laser In Pin 2
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getlaserpinin(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pLaserOut1, bool * pLaserOut2);
+
+/**
+* Adds the laser pin command to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addlaserpinouttolist(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOut1, bool bLaserOut2);
 
 /**
 * Writes an OIE enabling command block to the open list.
@@ -1248,6 +1298,80 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_createuartconnection(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDesiredBaudRate, LibMCDriver_ScanLab_UARTConnection * pConnection);
+
+/**
+* Enables the Scanahead mode of the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nHeadNo - Head Number
+* @param[in] nTableNo - Table Number
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablescanahead(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nHeadNo, LibMCDriver_ScanLab_uint32 nTableNo);
+
+/**
+* Disables the Scanahead mode of the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablescanahead(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Activates the ScanAhead Auto Delays.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_activatescanaheadautodelays(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Deactivates the ScanAhead Auto Delays.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_deactivatescanaheadautodelays(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns if ScanAhead Auto Delays are activated.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pActivated - Returns true if Auto Delays are activated.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_scanaheadautodelaysareactivated(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pActivated);
+
+/**
+* Enables the Scanahead mode of the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dLaserOnShiftInMicroSeconds - Laser on shift in Microseconds. Will be rounded to 64th microseconds.
+* @param[in] dLaserOffShiftInMicroSeconds - Laser off shift in Microseconds. Will be rounded to 64th microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinmicroseconds(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds);
+
+/**
+* Enables the Scanahead mode of the RTC card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nLaserOnShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+* @param[in] nLaserOffShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinunits(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_int32 nLaserOnShift, LibMCDriver_ScanLab_int32 nLaserOffShift);
+
+/**
+* Controls the Scanahead Line parameters.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCornerScale - Corner sharpness scale in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+* @param[in] nEndScale - Line end sharpness scale in Percent.. 100 percent means straight line ends. Values above 100 will be clipped to 100.
+* @param[in] nAccelerationScale - Fraction of active laser time (not path lenght) during acceleration in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setscanaheadlineparameters(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nCornerScale, LibMCDriver_ScanLab_uint32 nEndScale, LibMCDriver_ScanLab_uint32 nAccelerationScale);
 
 /*************************************************************************************************************************
  Class definition for RTCSelector

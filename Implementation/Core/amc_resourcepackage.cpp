@@ -104,7 +104,8 @@ namespace AMC {
 
 			for (int64_t nIndex = 0; nIndex < nEntryCount; nIndex++) {
 				const char* pszName = zip_get_name(m_ZIParchive, (uint64_t)nIndex, ZIP_FL_ENC_GUESS);
-				m_ZIPEntries.insert(std::make_pair(pszName, nIndex));
+				std::string sName(pszName);
+				m_ZIPEntries.insert(std::make_pair (sName, nIndex));
 			}
 
 		}
@@ -377,7 +378,7 @@ namespace AMC {
 			if (contenttypeAttrib.empty())
 				throw ELibMCCustomException(LIBMC_ERROR_MISSINGRESOURCECONTENTTYPE, m_sPackageDebugName);
 
-			std::string sName = nameAttrib.as_string();
+			std::string sName = AMCCommon::CUtils::toLowerString (nameAttrib.as_string());
 			std::string sFileName = fileNameAttrib.as_string();
 			std::string sContentType = contenttypeAttrib.as_string();
 			std::string sUUID = AMCCommon::CUtils::createUUID();
@@ -430,7 +431,7 @@ namespace AMC {
 
 	PResourcePackageEntry CResourcePackage::findEntryByName(const std::string& sName, const bool bHasToExist)
 	{
-		auto iIter = m_NameMap.find(sName);
+		auto iIter = m_NameMap.find(AMCCommon::CUtils::toLowerString (sName));
 		if (iIter == m_NameMap.end()) {
 			if (bHasToExist)
 				throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sName);
@@ -449,7 +450,7 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-		auto iIter = m_NameMap.find(sName);
+		auto iIter = m_NameMap.find(AMCCommon::CUtils::toLowerString (sName));
 		if (iIter == m_NameMap.end())
 			throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sName);
 
@@ -463,7 +464,7 @@ namespace AMC {
 
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-		auto iIter = m_NameMap.find(sName);
+		auto iIter = m_NameMap.find(AMCCommon::CUtils::toLowerString (sName));
 		if (iIter == m_NameMap.end())
 			throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sName);
 
@@ -486,7 +487,7 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-		auto iIter = m_NameMap.find(sName);
+		auto iIter = m_NameMap.find(AMCCommon::CUtils::toLowerString (sName));
 		if (iIter == m_NameMap.end())
 			throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sName);
 

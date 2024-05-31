@@ -121,7 +121,17 @@
 		<error name="RS232READTIMEOUT" code="1069" description="RS232 read timeout." />		
 		<error name="RS232READLINEOVERRUN" code="1070" description="RS232 read line overrun." />		
 		<error name="RS232RINGBUFFEROVERRUN" code="1071" description="RS232 ring buffer overrun." />		
-						
+		<error name="NOSCANAHEADOPTION" code="1072" description="No Scanahead option." />		
+		<error name="NOEXCELLISCAN" code="1073" description="No Excelli Scan." />		
+		<error name="SCANAHEADLISTISACTIVE" code="1074" description="Scanahead - list is active." />		
+		<error name="SCANAHEADPARAMETERERROR" code="1075" description="Scanahead parameter error." />		
+		<error name="SCANAHEADSCALINGERROR" code="1076" description="Scanahead scaling error." />		
+		<error name="SCANAHEADMISSINGRTCRESPONSE" code="1077" description="Scanahead missing rtc response." />		
+		<error name="SCANAHEADPCIERROR" code="1078" description="Scanahead PCI error." />		
+		<error name="SCANAHEADUNKNOWNERROR" code="1079" description="Scanahead unknown error." />		
+		<error name="PORTNUMBERISNOTDIGITAL" code="1080" description="Port number is not digital." />		
+		<error name="PORTNUMBERISNOTANALOG" code="1081" description="Port number is not analog." />		
+										
 	</errors>
 
 
@@ -283,7 +293,7 @@ Custom implementation
 	</class>
 
 
-	<class name="RTCContext" parent="Base" description="Selector of the RTC Controller Card">
+	<class name="RTCContext" parent="Base" description="Context of the RTC Controller Card">
 
 		<method name="LoadFirmware" description="Loads card firmware from resource files.">
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
@@ -459,6 +469,16 @@ Custom implementation
 			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
 		</method>
 
+		<method name="AddSetAnalogOut" description="Adds changing an analog port to the open list. Should not interfere with laser power control.">
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser port to set. MUST not be an analog port or the call fails." />
+			<param name="OutputValue" type="single" pass="in" description="New Normalized output value. Value is clipped between 0 and 1." />
+		</method>
+		
+		<method name="AddSetDigitalOut" description="Adds changing an digital port to the open list. Should not interfere with laser power control.">
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser port to set. MUST not be an digital port or the call fails." />
+			<param name="OutputValue" type="single" pass="in" description="New Normalized output value. Value is clipped between 0 and 1." />
+		</method>		
+
 		<method name="AddSetPowerForPIDControl" description="adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.">
 			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
 		</method>
@@ -539,7 +559,7 @@ Custom implementation
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">
-			<param name="Delay" type="uint32" pass="in" description="Custom delay value in microseconds (MUST be multiple of 10)" />
+			<param name="DelayInMicroseconds" type="uint32" pass="in" description="Custom delay value in microseconds (MUST be multiple of 10)" />
 		</method>
 
 		<method name="GetCorrectionFactor" description="Returns correction factor of Card Calibration (in bits per mm)">
@@ -598,6 +618,21 @@ Custom implementation
 		<method name="InitializeForOIE" description="Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.">
 			<param name="SignalChannels" type="basicarray" class="uint32" pass="in" description="Array of signal channels. MUST NOT be empty" />
 			<param name="OperationMode" type="enum" class="OIEOperationMode" pass="in" description="OIE Operation Mode" />			
+		</method>
+
+		<method name="SetLaserPinOut" description="Sets the laser pin outputs to a certain state. Control command, has immediate effect.">
+			<param name="LaserOut1" type="bool" pass="in" description="Value for Laser Out Pin 1" />
+			<param name="LaserOut2" type="bool" pass="in" description="Value for Laser Out Pin 2" />
+		</method>
+
+		<method name="GetLaserPinIn" description="Read the laser pin input values. Control command, has immediate effect.">
+			<param name="LaserOut1" type="bool" pass="out" description="Value for Laser In Pin 1" />
+			<param name="LaserOut2" type="bool" pass="out" description="Value for Laser In Pin 2" />
+		</method>
+
+		<method name="AddLaserPinOutToList" description="Adds the laser pin command to the current open list.">
+			<param name="LaserOut1" type="bool" pass="in" description="Value for Laser Out Pin 1" />
+			<param name="LaserOut2" type="bool" pass="in" description="Value for Laser Out Pin 2" />
 		</method>
 				
 		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">
@@ -787,6 +822,40 @@ Custom implementation
 		<method name="CreateUARTConnection" description="Creates a new UART Connection. Closes any other one that might be active.">
 			<param name="DesiredBaudRate" type="uint32" pass="in" description="Desired baud rate. 160 Bd…12.8 MBd.  The other RS-232 interface parameters cannot be altered (data bits: 8, start bits: 1, stop bits: 1, parity: none)." />
 			<param name="Connection" type="class" class="UARTConnection" pass="return" description="UART Connection instance." />
+		</method>
+
+		<method name="EnableScanAhead" description="Enables the Scanahead mode of the RTC card.">
+			<param name="HeadNo" type="uint32" pass="in" description="Head Number" />
+			<param name="TableNo" type="uint32" pass="in" description="Table Number" />		
+		</method>
+		
+		<method name="DisableScanAhead" description="Disables the Scanahead mode of the RTC card.">
+		</method>
+
+		<method name="ActivateScanAheadAutoDelays" description="Activates the ScanAhead Auto Delays.">
+		</method>
+
+		<method name="DeactivateScanAheadAutoDelays" description="Deactivates the ScanAhead Auto Delays.">
+		</method>
+
+		<method name="ScanAheadAutoDelaysAreActivated" description="Returns if ScanAhead Auto Delays are activated.">
+			<param name="Activated" type="bool" pass="return" description="Returns true if Auto Delays are activated." />
+		</method>
+
+		<method name="SetScanAheadLaserShiftsInMicroseconds" description="Enables the Scanahead mode of the RTC card.">
+			<param name="LaserOnShiftInMicroSeconds" type="double" pass="in" description="Laser on shift in Microseconds. Will be rounded to 64th microseconds." />
+			<param name="LaserOffShiftInMicroSeconds" type="double" pass="in" description="Laser off shift in Microseconds. Will be rounded to 64th microseconds." />
+		</method>
+
+		<method name="SetScanAheadLaserShiftsInUnits" description="Enables the Scanahead mode of the RTC card.">
+			<param name="LaserOnShift" type="int32" pass="in" description="Laser on shift in Units, which are 1/64th of a Microsecond." />
+			<param name="LaserOffShift" type="int32" pass="in" description="Laser on shift in Units, which are 1/64th of a Microsecond." />
+		</method>
+		
+		<method name="SetScanAheadLineParameters" description="Controls the Scanahead Line parameters.">
+			<param name="CornerScale" type="uint32" pass="in" description="Corner sharpness scale in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100." />
+			<param name="EndScale" type="uint32" pass="in" description="Line end sharpness scale in Percent.. 100 percent means straight line ends. Values above 100 will be clipped to 100." />
+			<param name="AccelerationScale" type="uint32" pass="in" description="Fraction of active laser time (not path lenght) during acceleration in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100." />
 		</method>
 		
 	</class>

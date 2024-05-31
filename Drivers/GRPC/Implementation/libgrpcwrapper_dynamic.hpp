@@ -202,6 +202,15 @@ public:
 			case LIBGRPCWRAPPER_ERROR_MESSAGEDESCRIPTORISNULL: return "MESSAGEDESCRIPTORISNULL";
 			case LIBGRPCWRAPPER_ERROR_MESSAGISNULL: return "MESSAGISNULL";
 			case LIBGRPCWRAPPER_ERROR_MESSAGREFLECTIONISNULL: return "MESSAGREFLECTIONISNULL";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTRETRIEVETEMPPATHS: return "COULDNOTRETRIEVETEMPPATHS";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTCONVERTUNICODESTRING: return "COULDNOTCONVERTUNICODESTRING";
+			case LIBGRPCWRAPPER_ERROR_MESSAGEFIELDNOTFOUND: return "MESSAGEFIELDNOTFOUND";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTSTARTRPCCALL: return "COULDNOTSTARTRPCCALL";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTSENDREQUEST: return "COULDNOTSENDREQUEST";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTINDICATEENDOFREQUEST: return "COULDNOTINDICATEENDOFREQUEST";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTRECEIVERESPONSE: return "COULDNOTRECEIVERESPONSE";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTFINISHRPCCALL: return "COULDNOTFINISHRPCCALL";
+			case LIBGRPCWRAPPER_ERROR_RPCFAILED: return "RPCFAILED";
 		}
 		return "UNKNOWN";
 	}
@@ -235,6 +244,15 @@ public:
 			case LIBGRPCWRAPPER_ERROR_MESSAGEDESCRIPTORISNULL: return "Internal error: Message descriptor is null";
 			case LIBGRPCWRAPPER_ERROR_MESSAGISNULL: return "Internal error: Message is null";
 			case LIBGRPCWRAPPER_ERROR_MESSAGREFLECTIONISNULL: return "Internal error: Message reflection is null";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTRETRIEVETEMPPATHS: return "Could not retrieve temp paths";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTCONVERTUNICODESTRING: return "Could not convert unicode string";
+			case LIBGRPCWRAPPER_ERROR_MESSAGEFIELDNOTFOUND: return "Message field not found";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTSTARTRPCCALL: return "Could not start RPC Call";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTSENDREQUEST: return "Could not send request";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTINDICATEENDOFREQUEST: return "Could not indicate end of request";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTRECEIVERESPONSE: return "Could not receive response";
+			case LIBGRPCWRAPPER_ERROR_COULDNOTFINISHRPCCALL: return "Could not finish RPC Call";
+			case LIBGRPCWRAPPER_ERROR_RPCFAILED: return "RPC failed";
 		}
 		return "unknown error";
 	}
@@ -434,6 +452,8 @@ public:
 	
 	inline bool HasField(const std::string & sFieldName);
 	inline bool HasStringField(const std::string & sFieldName);
+	inline bool HasMessageField(const std::string & sFieldName);
+	inline PMessage GetMessageField(const std::string & sFieldName);
 	inline void SetStringField(const std::string & sFieldName, const std::string & sValue);
 	inline std::string GetStringField(const std::string & sFieldName);
 	inline void SetInt32Field(const std::string & sFieldName, const LibGRPCWrapper_int32 nValue);
@@ -449,7 +469,7 @@ public:
 	inline void SetFloatField(const std::string & sFieldName, const LibGRPCWrapper_single fValue);
 	inline LibGRPCWrapper_single GetFloatField(const std::string & sFieldName);
 	inline void SetDoubleField(const std::string & sFieldName, const LibGRPCWrapper_double dValue);
-	inline LibGRPCWrapper_int32 GetDoubleField(const std::string & sFieldName);
+	inline LibGRPCWrapper_double GetDoubleField(const std::string & sFieldName);
 };
 	
 /*************************************************************************************************************************
@@ -625,6 +645,8 @@ public:
 		pWrapperTable->m_LibraryHandle = nullptr;
 		pWrapperTable->m_Message_HasField = nullptr;
 		pWrapperTable->m_Message_HasStringField = nullptr;
+		pWrapperTable->m_Message_HasMessageField = nullptr;
+		pWrapperTable->m_Message_GetMessageField = nullptr;
 		pWrapperTable->m_Message_SetStringField = nullptr;
 		pWrapperTable->m_Message_GetStringField = nullptr;
 		pWrapperTable->m_Message_SetInt32Field = nullptr;
@@ -723,6 +745,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Message_HasStringField == nullptr)
+			return LIBGRPCWRAPPER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Message_HasMessageField = (PLibGRPCWrapperMessage_HasMessageFieldPtr) GetProcAddress(hLibrary, "libgrpcwrapper_message_hasmessagefield");
+		#else // _WIN32
+		pWrapperTable->m_Message_HasMessageField = (PLibGRPCWrapperMessage_HasMessageFieldPtr) dlsym(hLibrary, "libgrpcwrapper_message_hasmessagefield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Message_HasMessageField == nullptr)
+			return LIBGRPCWRAPPER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Message_GetMessageField = (PLibGRPCWrapperMessage_GetMessageFieldPtr) GetProcAddress(hLibrary, "libgrpcwrapper_message_getmessagefield");
+		#else // _WIN32
+		pWrapperTable->m_Message_GetMessageField = (PLibGRPCWrapperMessage_GetMessageFieldPtr) dlsym(hLibrary, "libgrpcwrapper_message_getmessagefield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Message_GetMessageField == nullptr)
 			return LIBGRPCWRAPPER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1037,6 +1077,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Message_HasStringField == nullptr) )
 			return LIBGRPCWRAPPER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libgrpcwrapper_message_hasmessagefield", (void**)&(pWrapperTable->m_Message_HasMessageField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Message_HasMessageField == nullptr) )
+			return LIBGRPCWRAPPER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libgrpcwrapper_message_getmessagefield", (void**)&(pWrapperTable->m_Message_GetMessageField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Message_GetMessageField == nullptr) )
+			return LIBGRPCWRAPPER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libgrpcwrapper_message_setstringfield", (void**)&(pWrapperTable->m_Message_SetStringField));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Message_SetStringField == nullptr) )
 			return LIBGRPCWRAPPER_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1202,6 +1250,35 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Message_HasStringField(m_pHandle, sFieldName.c_str(), &resultStringFieldExists));
 		
 		return resultStringFieldExists;
+	}
+	
+	/**
+	* CMessage::HasMessageField - Returns if the message has a field of a certain name and this field is a submessage field.
+	* @param[in] sFieldName - Name of the field.
+	* @return True if field exists and is of type message.
+	*/
+	bool CMessage::HasMessageField(const std::string & sFieldName)
+	{
+		bool resultMessageFieldExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Message_HasMessageField(m_pHandle, sFieldName.c_str(), &resultMessageFieldExists));
+		
+		return resultMessageFieldExists;
+	}
+	
+	/**
+	* CMessage::GetMessageField - Returns the submessage of a field. Fails if the field does not exist or is not a submessage field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Sub message object
+	*/
+	PMessage CMessage::GetMessageField(const std::string & sFieldName)
+	{
+		LibGRPCWrapperHandle hMessageFieldInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Message_GetMessageField(m_pHandle, sFieldName.c_str(), &hMessageFieldInstance));
+		
+		if (!hMessageFieldInstance) {
+			CheckError(LIBGRPCWRAPPER_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMessage>(m_pWrapper, hMessageFieldInstance);
 	}
 	
 	/**
@@ -1383,9 +1460,9 @@ public:
 	* @param[in] sFieldName - Name of the field.
 	* @return Current value of the field.
 	*/
-	LibGRPCWrapper_int32 CMessage::GetDoubleField(const std::string & sFieldName)
+	LibGRPCWrapper_double CMessage::GetDoubleField(const std::string & sFieldName)
 	{
-		LibGRPCWrapper_int32 resultValue = 0;
+		LibGRPCWrapper_double resultValue = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_Message_GetDoubleField(m_pHandle, sFieldName.c_str(), &resultValue));
 		
 		return resultValue;

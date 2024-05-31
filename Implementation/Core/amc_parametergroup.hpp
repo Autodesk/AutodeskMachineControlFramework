@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_parametertype.hpp"
 
+#include "common_chrono.hpp"
+
 namespace LibMCData {
 
 	class CPersistencyHandler;
@@ -71,14 +73,16 @@ namespace AMC {
 		PStateJournal m_pStateJournal;
 		std::string m_sInstanceName;
 
+		AMCCommon::PChrono m_pGlobalChrono;
+
 		std::mutex m_GroupMutex;
 
 		void addParameterInternal(PParameter pParameter);
 
 	public:
 
-		CParameterGroup();
-		CParameterGroup(const std::string & sName, const std::string& sDescription);
+		CParameterGroup(AMCCommon::PChrono pGlobalChrono);
+		CParameterGroup(const std::string & sName, const std::string& sDescription, AMCCommon::PChrono pGlobalChrono);
 		
 		virtual ~CParameterGroup();		
 		
@@ -87,7 +91,11 @@ namespace AMC {
 
 		bool hasParameter (const std::string & sName);
 
-		std::string getParameterPath(const std::string& sName);
+		// Returns the original source parameter path of the parameter (resolving all derives)
+		std::string getOriginalParameterPath(const std::string& sName);
+
+		// Returns the local parameter path, like "statemachine.groupname.parametername"
+		std::string getLocalParameterPath(const std::string& sName);
 
 		void addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue);
 		void addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits);
@@ -126,7 +134,7 @@ namespace AMC {
 		void removeValue(const std::string& sName);
 
 		std::string serializeToJSON();
-		void deserializeJSON(const std::string & sJSON);
+		void deserializeJSON(const std::string & sJSON, uint64_t nAbsoluteTimeStamp);
 
 		void copyToGroup (CParameterGroup * pParameterGroup);
 
@@ -136,7 +144,7 @@ namespace AMC {
 		void setJournal(PStateJournal pStateJournal, const std::string & sInstanceName);
 
 		void setParameterPersistentUUID (const std::string& sParameterName, const std::string& sPersistentUUID);
-		void updateParameterPersistencyHandler (LibMCData::PPersistencyHandler pPersistencyHandler);
+		void updateParameterPersistencyHandler (LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp);
 
 	};
 

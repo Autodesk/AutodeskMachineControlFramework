@@ -176,6 +176,16 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT 1069 /** RS232 read timeout. */
 #define LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN 1070 /** RS232 read line overrun. */
 #define LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN 1071 /** RS232 ring buffer overrun. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION 1072 /** No Scanahead option. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN 1073 /** No Excelli Scan. */
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE 1074 /** Scanahead - list is active. */
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR 1075 /** Scanahead parameter error. */
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR 1076 /** Scanahead scaling error. */
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE 1077 /** Scanahead missing rtc response. */
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR 1078 /** Scanahead PCI error. */
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR 1079 /** Scanahead unknown error. */
+#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL 1080 /** Port number is not digital. */
+#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG 1081 /** Port number is not analog. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -264,6 +274,16 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT: return "RS232 read timeout.";
     case LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN: return "RS232 read line overrun.";
     case LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN: return "RS232 ring buffer overrun.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION: return "No Scanahead option.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN: return "No Excelli Scan.";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE: return "Scanahead - list is active.";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR: return "Scanahead parameter error.";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR: return "Scanahead scaling error.";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE: return "Scanahead missing rtc response.";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR: return "Scanahead PCI error.";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "Scanahead unknown error.";
+    case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
+    case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
     default: return "unknown error";
   }
 }

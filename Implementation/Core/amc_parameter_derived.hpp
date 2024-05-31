@@ -59,18 +59,20 @@ namespace AMC {
 		virtual std::string getDefaultValue() const override;
 
 		virtual std::string getStringValue() const override;
-		virtual void setStringValue(const std::string& sValue) override;
+		virtual void setStringValue(const std::string& sValue, uint64_t nAbsoluteTimeStamp) override;
 
 		virtual double getDoubleValue() const override;
-		virtual void setDoubleValue(const double dValue) override;
+		virtual void setDoubleValue(const double dValue, uint64_t nAbsoluteTimeStamp) override;
 
 		virtual int64_t getIntValue() const override;
-		virtual void setIntValue(const int64_t nValue) override;
+		virtual void setIntValue(const int64_t nValue, uint64_t nAbsoluteTimeStamp) override;
 
 		virtual bool getBoolValue() const override;
-		virtual void setBoolValue(const bool bValue) override;
+		virtual void setBoolValue(const bool bValue, uint64_t nAbsoluteTimeStamp) override;
 
 		virtual eParameterDataType getDataType() const override;
+
+		virtual std::string getOriginalPath() override;
 
 		virtual PParameter duplicate() override;
 

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02" xmlns:i18n="http://schemas.autodesk.com/amc/internationalization/2023/08">
+	<services threadcount="32"/>
+
+  <internationalization default="en">
+		<language identifier="en" name="English" resource="language_english" />
+		<language identifier="de" name="Deutsch" resource="language_german" />
+  </internationalization>
+
+  <accesscontrol>
+
+    <defaultusers>
+      <defaultuser name="test" salt="f735faa2ac49ac0a68dbf41d9cd57cfb426ef91eb19726afd8f075ac625cccb2" passwordhash="556080937385d8eb21ea0e8707d7cf3e94b79ed234596ba8a2ac98da1ff4fee3" description="This is a test user." />
+    </defaultusers>
+
+    <permissions>
+    </permissions>
+
+
+    <roles default="administrator">
+
+      <role identifier="administrator" displayname="Administrator" description="Machine Administration Access">
+      </role>
+
+    </roles>
+        
+  </accesscontrol>
+
+  <alerts>
+    <alert identifier="testalert"	level="warning"	description="Test alert description" />
+  </alerts>
+  
+  <statemachine name="main" description="Minimal System" initstate="init" failedstate="fatalerror" library="plugin_main">
+
+		<state name="init" repeatdelay="10">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="idle" repeatdelay="10">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="5000">
+			<outstate target="init"/>
+		</state>
+
+	</statemachine>
+
+
+	<userinterface appname="Autodesk Machine Control Framework" copyright="2024 Autodesk Inc." mainpage="main" library="plugin_userinterface">
+
+		<logo resource="ui_logo" aspectratio="3.0"/>
+
+		<login
+			backgroundresource="login_background"
+			welcomemessage="Welcome to the Autodesk Machine Control Framework. This is a minimal example implementation of a system."
+		/>
+
+		<colors>
+			<color name="primary" red="0.00" green="0.0" blue="0.0"/>
+			<color name="secondary" red="0.3" green="0.3" blue="0.3"/>
+			<color name="accent" red="0.400" green="0.400" blue="0.400"/>
+			<color name="error" red="0.867" green="0.133" blue="0.133"/>
+		</colors>
+
+		<page name="main">
+
+				<content name="infobox" title="Minimal Example Project." columnstart="1" rowstart="1" columnend="1" rowend="1">
+					<image resource="ui_logo" aspectratio="2" maxheight="50"/>
+					<paragraph text="."/>
+				</content>
+
+		</page>
+
+		<menu>
+			<item id="main" icon="mdi-apps" description="Minimal main page" caption="Main Page" targetpage="main"/>
+		</menu>
+
+
+		<toolbar logoresource="ui_toolbarlogo">
+			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
+			<item id="logout" icon="mdi-logout" caption="Log out" event="logout"/>
+		</toolbar>
+
+
+	</userinterface>
+</machinedefinition>

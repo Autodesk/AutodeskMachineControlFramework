@@ -77,17 +77,17 @@ public:
 
 	bool DeletePersistentParameter(const std::string & sUUID) override;
 
-	void StorePersistentParameter(const std::string & sUUID, const std::string & sName, const LibMCData::eParameterDataType eDataType, const std::string & sValue) override;
+	void StorePersistentParameter(const std::string & sUUID, const std::string & sName, const LibMCData::eParameterDataType eDataType, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
-	void StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue) override;
+	void StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
-	void StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue) override;
+	void StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
-	void StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue) override;
+	void StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
-	void StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue) override;
+	void StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
-	void StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue) override;
+	void StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	std::string RetrievePersistentStringParameter(const std::string & sUUID) override;
 

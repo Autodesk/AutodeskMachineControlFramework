@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 // Include custom headers here.
-
+#include "common_chrono.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -64,13 +64,16 @@ private:
 	AMC::PParameterGroup m_pParameterGroup;
 	AMC::PParameterGroup m_pResultGroup;
 
+	AMCCommon::PChrono m_pGlobalChrono;
+
 
 protected:
 
 
 public:
 
-	CSignalTrigger(AMC::PStateSignalHandler pSignalHandler, std::string sInstanceName, std::string sSignalName);
+	CSignalTrigger(AMC::PStateSignalHandler pSignalHandler, std::string sInstanceName, std::string sSignalName, AMCCommon::PChrono pGlobalChrono);
+
 	virtual ~CSignalTrigger();
 
 

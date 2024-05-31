@@ -89,10 +89,10 @@ LibMCEnv_uint64 CStreamReader::GetReadPosition()
 
 void CStreamReader::Seek(const LibMCEnv_uint64 nReadPosition)
 {
-	if (m_nReadPosition > m_nSize)
+	if (nReadPosition > m_nSize)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDSTREAMSEEKPOSITION);
 
-	m_nReadPosition = m_nSize;
+	m_nReadPosition = nReadPosition;
 
 }
 

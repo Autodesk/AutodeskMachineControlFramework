@@ -233,7 +233,11 @@ int main(int argc, char* argv[])
 		std::cout << std::endl;
 		std::cout << "Creating Package XML for project..." << std::endl;
 
+#ifdef _WIN32
 		std::string sExtension = "dll";
+#else
+		std::string sExtension = "so";
+#endif
 		std::string sPackageName = "Build " + sDevPackagePrefix;
 		std::string sConfigName = sDevPackagePrefix + "_config.xml";
 		std::string sClientName = sDevPackagePrefix + "_core.client";

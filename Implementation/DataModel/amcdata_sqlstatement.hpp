@@ -82,6 +82,7 @@ namespace AMCData {
 		virtual int64_t getColumnInt64(uint32_t nIdx) = 0;
 		virtual eSQLColumnType getColumnType(uint32_t nIdx) = 0;
 		virtual std::string getColumnUUID(uint32_t nIdx) = 0;
+		virtual bool columnIsNull(uint32_t nIdx) = 0;
 
 
 	};

@@ -43,8 +43,56 @@ using namespace LibMCEnv::Impl;
  Class definition of CBuildExecutionIterator 
 **************************************************************************************************************************/
 
-IBuildExecution * CBuildExecutionIterator::GetCurrentExecution()
+CBuildExecutionIterator::CBuildExecutionIterator()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
 }
+
+CBuildExecutionIterator::~CBuildExecutionIterator()
+{
+
+}
+
+
+IBase* CBuildExecutionIterator::GetCurrent()
+{
+    return GetCurrentExecution();
+}
+
+IBuildExecution* CBuildExecutionIterator::GetCurrentExecution()
+{
+    if ((m_nCurrentIndex < 0) || (m_nCurrentIndex >= m_List.size()))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDITERATOR);
+
+    auto pBuildExecution = std::dynamic_pointer_cast<CBuildExecution> (m_List[m_nCurrentIndex]);
+    if (pBuildExecution.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+    return CBuildExecution::makeFrom(pBuildExecution.get());
+}
+
+
+IIterator* CBuildExecutionIterator::Clone()
+{
+    std::unique_ptr<CBuildExecutionIterator> pNewIterator(new CBuildExecutionIterator());
+
+    for (auto pBase : m_List) {
+        auto pBuildExecution = std::dynamic_pointer_cast<CBuildExecution> (pBase);
+        if (pBuildExecution.get() == nullptr)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+        pNewIterator->AddBuildExecution(CBuildExecution::makeSharedFrom(pBuildExecution.get()));
+    }
+
+    return pNewIterator.release();
+}
+
+void CBuildExecutionIterator::AddBuildExecution(std::shared_ptr<CBuildExecution> pBuildExecution)
+{
+    if (pBuildExecution.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    m_List.push_back(pBuildExecution);
+}
+
+
 
