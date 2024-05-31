@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <template>
 
 <div v-if="(moduleitem.type=='upload')">  	
-	<v-file-input accept=".3mf" show-size full-width v-model="moduleitem.state.chosenFile" v-bind:label="moduleitem.uploadcaption" v-bind:messages="moduleitem.state.messages" @change="uiUploadStart (moduleitem)"></v-file-input>
+	<v-file-input accept=".3mf,.3mftoolpath" show-size full-width v-model="moduleitem.state.chosenFile" v-bind:label="moduleitem.uploadcaption" v-bind:messages="moduleitem.state.messages" @change="uiUploadStart (moduleitem)"></v-file-input>
 </div>
 
 </template>

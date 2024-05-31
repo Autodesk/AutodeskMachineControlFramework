@@ -75,7 +75,7 @@ namespace AMC {
 		std::promise<void> m_TerminateSignal;
 		std::future<void> m_TerminateFuture;
 
-		uint64_t m_nEndTimeOfPreviousStateInMicroseconds;
+		uint64_t m_nAbsoluteEndTimeOfPreviousStateInMicroseconds;
 		std::string m_sPreviousState;
 
 		// Externally accessible members		

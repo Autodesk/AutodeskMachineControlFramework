@@ -148,7 +148,7 @@ public:
 
     tmlWord readAxisStatus(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, tmlShort sReadRegister);
 
-    void CTMLInstance::resetAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const bool bForceFull);
+    void resetAxis(const std::string& sChannelIdentifier, const std::string& sAxisIdentifier, const bool bForceFull);
 
 };
 

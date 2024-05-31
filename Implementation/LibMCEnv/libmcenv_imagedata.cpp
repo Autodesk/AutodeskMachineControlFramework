@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CImageData
 
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_pngimagedata.hpp"
 
 // Include custom headers here.
 #include "Libraries/LodePNG/lodepng.h"
@@ -55,6 +56,7 @@ CImageData* CImageData::createFromPNG(const uint8_t* pBuffer, uint64_t nBufferSi
 
 	std::unique_ptr <std::vector<uint8_t>> pixelBuffer(new std::vector<uint8_t>());
 	
+
 	unsigned int width = 0;
 	unsigned int height = 0;
 	lodepng::State state;
@@ -100,7 +102,7 @@ CImageData* CImageData::createFromPNG(const uint8_t* pBuffer, uint64_t nBufferSi
 			pSource += 4; // Skip Alpha
 		}
 
-		return new CImageData(convertedPixelBuffer.release(), width, height, dDPIValueX, dDPIValueY, eImagePixelFormat::RGB24bit, false);
+		return new CImageData(convertedPixelBuffer.release(), width, height, dDPIValueX, dDPIValueY, eImagePixelFormat::GreyScale8bit, false);
 	}
 
 	default:
@@ -230,77 +232,59 @@ void CImageData::ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nP
 
 IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
+	unsigned int error = 0;
 
-
-void CImageData::LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer) 
-{
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-}
-
-void CImageData::EncodePNG()
-{
 	if (m_PixelData.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
 
-	m_EncodedPNGData.clear();
-	unsigned int error = 0;
+	std::unique_ptr<CPNGImageData> pResult (new CPNGImageData (m_nPixelCountX, m_nPixelCountY));
 
 	switch (m_PixelFormat) {
-		case eImagePixelFormat::GreyScale8bit:
-			error = lodepng::encode(m_EncodedPNGData, *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
-			break;
-		case eImagePixelFormat::RGB24bit:
-			error = lodepng::encode(m_EncodedPNGData, *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGB, 8);
-			break;
-		case eImagePixelFormat::RGBA32bit:
-			error = lodepng::encode(m_EncodedPNGData, *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGBA, 8);
-			break;
+	case eImagePixelFormat::GreyScale8bit:
+		error = lodepng::encode(pResult->getPNGStreamBuffer (), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
+		break;
+	case eImagePixelFormat::RGB24bit:
+		error = lodepng::encode(pResult->getPNGStreamBuffer(), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGB, 8);
+		break;
+	case eImagePixelFormat::RGBA32bit:
+		error = lodepng::encode(pResult->getPNGStreamBuffer(), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGBA, 8);
+		break;
 
-		default:
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
 
 	}
-
 
 	if (error)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE);
 
-	if (m_EncodedPNGData.empty())
+	if (pResult->getPNGStreamBuffer().empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTSTOREPNGIMAGE);
+
+	return pResult.release();
+}
+
+
+void CImageData::EncodePNG()
+{
+
+	m_EncodedPNGDataCache.reset(CreatePNGImage (nullptr));
+
 }
 
 void CImageData::GetEncodedPNGData(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer)
 {
-	if (m_PixelData.get() == nullptr)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
 
-	if (m_EncodedPNGData.empty())
+	if (m_EncodedPNGDataCache.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPNGIMAGEDATA);
 
-	size_t nPNGSize = m_EncodedPNGData.size();
+	m_EncodedPNGDataCache->GetPNGDataStream(nPNGDataBufferSize, pPNGDataNeededCount, pPNGDataBuffer);
 
-	if (pPNGDataNeededCount != nullptr)
-		*pPNGDataNeededCount = m_EncodedPNGData.size();
-
-	if (pPNGDataBuffer != nullptr) {
-
-		if (nPNGDataBufferSize < nPNGSize)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
-
-		uint8_t* pSrc = m_EncodedPNGData.data();
-		uint8_t* pDst = pPNGDataBuffer;
-
-		for (size_t nIndex = 0; nIndex < nPNGSize; nIndex++) {
-			*pDst = *pSrc; pDst++; pSrc++;
-		}
-	}
 }
 
 void CImageData::ClearEncodedPNGData()
 {
-	m_EncodedPNGData.clear();
+	m_EncodedPNGDataCache.reset ();
 }
 
 void CImageData::Clear(const LibMCEnv_uint32 nValue)

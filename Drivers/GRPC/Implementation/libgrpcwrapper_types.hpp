@@ -121,6 +121,15 @@ typedef void * LibGRPCWrapper_pvoid;
 #define LIBGRPCWRAPPER_ERROR_MESSAGEDESCRIPTORISNULL 1023 /** Internal error: Message descriptor is null */
 #define LIBGRPCWRAPPER_ERROR_MESSAGISNULL 1024 /** Internal error: Message is null */
 #define LIBGRPCWRAPPER_ERROR_MESSAGREFLECTIONISNULL 1025 /** Internal error: Message reflection is null */
+#define LIBGRPCWRAPPER_ERROR_COULDNOTRETRIEVETEMPPATHS 1026 /** Could not retrieve temp paths */
+#define LIBGRPCWRAPPER_ERROR_COULDNOTCONVERTUNICODESTRING 1027 /** Could not convert unicode string */
+#define LIBGRPCWRAPPER_ERROR_MESSAGEFIELDNOTFOUND 1028 /** Message field not found */
+#define LIBGRPCWRAPPER_ERROR_COULDNOTSTARTRPCCALL 1029 /** Could not start RPC Call */
+#define LIBGRPCWRAPPER_ERROR_COULDNOTSENDREQUEST 1030 /** Could not send request */
+#define LIBGRPCWRAPPER_ERROR_COULDNOTINDICATEENDOFREQUEST 1031 /** Could not indicate end of request */
+#define LIBGRPCWRAPPER_ERROR_COULDNOTRECEIVERESPONSE 1032 /** Could not receive response */
+#define LIBGRPCWRAPPER_ERROR_COULDNOTFINISHRPCCALL 1033 /** Could not finish RPC Call */
+#define LIBGRPCWRAPPER_ERROR_RPCFAILED 1034 /** RPC failed */
 
 /*************************************************************************************************************************
  Error strings for LibGRPCWrapper
@@ -154,6 +163,15 @@ inline const char * LIBGRPCWRAPPER_GETERRORSTRING (LibGRPCWrapperResult nErrorCo
     case LIBGRPCWRAPPER_ERROR_MESSAGEDESCRIPTORISNULL: return "Internal error: Message descriptor is null";
     case LIBGRPCWRAPPER_ERROR_MESSAGISNULL: return "Internal error: Message is null";
     case LIBGRPCWRAPPER_ERROR_MESSAGREFLECTIONISNULL: return "Internal error: Message reflection is null";
+    case LIBGRPCWRAPPER_ERROR_COULDNOTRETRIEVETEMPPATHS: return "Could not retrieve temp paths";
+    case LIBGRPCWRAPPER_ERROR_COULDNOTCONVERTUNICODESTRING: return "Could not convert unicode string";
+    case LIBGRPCWRAPPER_ERROR_MESSAGEFIELDNOTFOUND: return "Message field not found";
+    case LIBGRPCWRAPPER_ERROR_COULDNOTSTARTRPCCALL: return "Could not start RPC Call";
+    case LIBGRPCWRAPPER_ERROR_COULDNOTSENDREQUEST: return "Could not send request";
+    case LIBGRPCWRAPPER_ERROR_COULDNOTINDICATEENDOFREQUEST: return "Could not indicate end of request";
+    case LIBGRPCWRAPPER_ERROR_COULDNOTRECEIVERESPONSE: return "Could not receive response";
+    case LIBGRPCWRAPPER_ERROR_COULDNOTFINISHRPCCALL: return "Could not finish RPC Call";
+    case LIBGRPCWRAPPER_ERROR_RPCFAILED: return "RPC failed";
     default: return "unknown error";
   }
 }

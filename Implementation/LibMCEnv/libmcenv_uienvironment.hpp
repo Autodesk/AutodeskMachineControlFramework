@@ -181,6 +181,10 @@ public:
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
+	bool HasBuildExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecution* GetBuildExecution(const std::string& sExecutionUUID) override;
+
 	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
 
 	IDiscreteFieldData2D* CreateDiscreteField2DFromImage(IImageData* pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY) override;
@@ -231,7 +235,17 @@ public:
 
 	ITempStreamWriter* CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType) override;
 
-	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
+	IZIPStreamWriter* CreateZIPStream(const std::string& sName) override;
+
+	IStreamReader* LoadStream(const std::string& sUUID, const bool bMustExist) override;
+
+	IDateTime* GetCurrentDateTime()  override;
+
+	IDateTime* GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)  override;
+
+	IDateTime* GetStartDateTime() override;
+
+	void Sleep(const LibMCEnv_uint32 nDelay) override;
 
 };
 

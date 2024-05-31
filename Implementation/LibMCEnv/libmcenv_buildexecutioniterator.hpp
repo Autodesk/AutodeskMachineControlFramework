@@ -45,6 +45,7 @@ Abstract: This is the class declaration of CBuildExecutionIterator
 #endif
 
 // Include custom headers here.
+#include "libmcenv_buildexecution.hpp"
 
 
 namespace LibMCEnv {
@@ -56,30 +57,19 @@ namespace Impl {
 **************************************************************************************************************************/
 
 class CBuildExecutionIterator : public virtual IBuildExecutionIterator, public virtual CIterator {
-private:
-
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
 
 public:
+    CBuildExecutionIterator();
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+    virtual ~CBuildExecutionIterator();
 
+    IIterator* Clone() override;
 
-	/**
-	* Public member functions to implement.
-	*/
+    IBase* GetCurrent() override;
 
-	IBuildExecution * GetCurrentExecution() override;
+    IBuildExecution* GetCurrentExecution() override;
+
+    void AddBuildExecution(std::shared_ptr<CBuildExecution> pBuildExecution);
 
 };
 

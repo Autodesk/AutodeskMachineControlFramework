@@ -68,7 +68,7 @@ private:
     AMCData::PStorageState m_pStorageState;
     AMCData::PSQLHandler m_pSQLHandler;
 
-    void insertDBEntry(const std::string& sUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID);
+    void insertDBEntry(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, uint64_t nAbsoluteTimeStamp, const std::string & sUserUUID);
 
 protected:
 
@@ -82,9 +82,9 @@ public:
 
     IStorageStream* RetrieveStream(const std::string& sUUID) override;
     
-    void StoreNewStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserID) override;
+    void StoreNewStream(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
-    void BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserID) override;
+    void BeginPartialStream(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer) override;
 
@@ -92,13 +92,15 @@ public:
 
     void FinishPartialStreamBlockwiseSHA256(const std::string& sUUID, const std::string& sBlockwiseSHA2) override;
 
-	void BeginRandomWriteStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sContextIdentifier, const std::string& sName, const std::string& sMimeType, const std::string& sUserID) override;
+	void BeginRandomWriteStream(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	void StoreRandomWriteStream(const std::string& sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer) override;
 
     LibMCData_uint64 GetRandomWriteStreamSize(const std::string& sUUID) override;
 
 	void FinishRandomWriteStream(const std::string& sUUID) override;
+
+    IStorageZIPWriter* CreateZIPStream(const std::string& sUUID, const std::string& sName, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
     LibMCData_uint64 GetMaxStreamSize() override;
 
@@ -107,9 +109,9 @@ public:
     bool StreamIsImage(const std::string& sUUID) override;
 
 
-    void CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sClientFileName, const std::string& sSessionUUID, const std::string& sUserUUID) override;
+    void CreateDownloadTicket(const std::string& sTicketUUID, const std::string& sStreamUUID, const std::string& sClientFileName, const std::string& sSessionUUID, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
-    void RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, std::string& sStreamUUID, std::string& sClientFileName, std::string& sSessionUUID, std::string& sUserUUID) override;
+    void RequestDownloadTicket(const std::string& sTicketUUID, const std::string& sIPAddress, const LibMCData_uint64 nAbsoluteTimeStamp, std::string& sStreamUUID, std::string& sClientFileName, std::string& sSessionUUID, std::string& sUserUUID) override;
 
     void AttachStreamToJournal(const std::string& sStreamUUID, const std::string& sJournalUUID) override;
 };

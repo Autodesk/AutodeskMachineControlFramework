@@ -83,7 +83,7 @@ namespace AMC {
 
 	}
 
-	void CParameter_Derived::setStringValue(const std::string& sValue)
+	void CParameter_Derived::setStringValue(const std::string& sValue, uint64_t nAbsoluteTimeStamp)
 	{
 		throw ELibMCCustomException (LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
@@ -94,7 +94,7 @@ namespace AMC {
 		return m_pParameterGroup->getDoubleParameterValueByName(m_sSourceParameterName);
 	}
 
-	void CParameter_Derived::setDoubleValue(const double dValue)
+	void CParameter_Derived::setDoubleValue(const double dValue, uint64_t nAbsoluteTimeStamp)
 	{
 		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
@@ -104,7 +104,7 @@ namespace AMC {
 		return m_pParameterGroup->getIntParameterValueByName(m_sSourceParameterName);
 	}
 
-	void CParameter_Derived::setIntValue(const int64_t nValue)
+	void CParameter_Derived::setIntValue(const int64_t nValue, uint64_t nAbsoluteTimeStamp)
 	{
 		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
@@ -114,7 +114,7 @@ namespace AMC {
 		return m_pParameterGroup->getBoolParameterValueByName(m_sSourceParameterName);
 	}
 
-	void CParameter_Derived::setBoolValue(const bool bValue)
+	void CParameter_Derived::setBoolValue(const bool bValue, uint64_t nAbsoluteTimeStamp)
 	{
 		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
@@ -130,6 +130,10 @@ namespace AMC {
 		return std::make_shared<CParameter_Derived>(m_sName, m_pParameterGroup, m_sSourceParameterName);
 	}
 
+	std::string CParameter_Derived::getOriginalPath()
+	{
+		return m_pParameterGroup->getOriginalParameterPath(m_sSourceParameterName);
+	}
 
 
 

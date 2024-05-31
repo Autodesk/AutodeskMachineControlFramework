@@ -138,7 +138,7 @@ CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID,
 	pStatement->setString(1, sParsedStreamUUID);
 	//pStatement->setString(2, AMCData::CStorageState::storageStreamStatusToString(AMCData::sssValidated));
 	if (!pStatement->nextRow())
-		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND);
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND, "storage stream not found: " + sParsedStreamUUID);
 
 	auto sUUID = pStatement->getColumnString(1);
 	auto sContextIdentifier = pStatement->getColumnString(2);

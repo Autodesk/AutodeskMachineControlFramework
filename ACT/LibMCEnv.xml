@@ -214,7 +214,16 @@
 		<error name="DATETIMEDIFFERENCEISINVALID" code="10174" description="Date Time difference is invalid" />		
 		<error name="DATETIMEISINVALID" code="10175" description="Date Time is invalid" />		
 		<error name="DATETIMEOUTOFBOUNDS" code="10176" description="Date Time out of bounds" />		
-		
+		<error name="EMPTYPNGBUFFER" code="10177" description="Empty PNG buffer" />						
+		<error name="CANNOTSEEKZIPSTREAM" code="10178" description="Cannot seek ZIP stream" />
+		<error name="GLOBALTIMERNOTCONTINUOUS" code="10179" description="Global Timer is not continuous." />	
+		<error name="STREAMWRITERISNOTFINISHED" code="10180" description="Stream writer is not finished" />
+		<error name="CANNOTREADFROMZIPSTREAM" code="10181" description="Cannot read from ZIP stream" />
+		<error name="EMPTYDATATABLENAME" code="10182" description="Empty datatable name" />
+		<error name="EMPTYDATATABLEIDENTIFIER" code="10183" description="Empty datatable identifier" />
+		<error name="INVALIDDATATABLEIDENTIFIER" code="10184" description="Invalid datatable identifier" />
+		<error name="INVALIDDATATABLESIGNATURE" code="10185" description="Invalid datatable signature" />		
+
 		
 	</errors>
 
@@ -226,7 +235,16 @@
 		<option name="Unknown" value="7"/>
 	</enum>	
 
-
+	<enum name="LogLevel">
+		<option name="FatalError" value="1"/>
+		<option name="CriticalError" value="2"/>
+		<option name="Warning" value="3"/>
+		<option name="Message" value="4"/>
+		<option name="Info" value="5"/>
+		<option name="Debug" value="6"/>
+		<option name="Unknown" value="7"/>
+	</enum>	
+		
 	<enum name="ImagePixelFormat">
 		<option name="Unknown" value="0" />
 		<option name="GreyScale8bit" value="1" />
@@ -471,10 +489,6 @@
 			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
 		</method>		
 
-		<method name="LoadPNG" description="Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="PNG Data stream." />
-		</method>		
-
 		<method name="CreatePNGImage" description="Creates PNG Image out of the pixel data.">		
 			<param name="PNGStorageOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="Optional encoding options for the image." />		
 			<param name="PNGImage" type="class" class="PNGImageData" pass="return" description="Image data." />		
@@ -690,6 +704,9 @@
 			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
 		</method>
 
+		<method name="Clear" description="Clears all data from the data table.">
+		</method>
+
 		<method name="HasColumn" description="Returns if a column exists in the data field.">
 			<param name="Identifier" type="string" pass="in" description="Identifier of the column." />
 			<param name="ColumnExists" type="bool" pass="return" description="Returns if the columns exist." />
@@ -784,6 +801,10 @@
 			<param name="Options" type="optionalclass" class="DataTableWriteOptions" pass="in" description="Optional writer options to use." />
 		</method>
 
+		<method name="LoadFromStream" description="Loads the data table from a stream. Clears all existing data from the data table.">
+			<param name="Stream" type="class" class="StreamReader" pass="in" description="Stream read instance to read from." />
+		</method>
+		
 	</class>
 
 	<class name="DataSeries" parent="Base" description="A data series of points.">
@@ -1506,52 +1527,108 @@
 		<method name="GetElapsedTimeInMicroseconds" description="Returns the relative time of the build execution. If status is Finished or Failed, the full duration is returned.">
 			<param name="TimeStampInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
 		</method>
+
+		<method name="HasAttachment" description="Returns if the Execution has an attached data with a certain UUID">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment to query. " />
+			<param name="DataExists" type="bool" pass="return" description="Returns true if the data exists." />
+		</method>
+
+		<method name="HasAttachmentIdentifier" description="Returns if the Execution has an attached data with a certain identifier">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the attachment to query." />
+			<param name="DataExists" type="bool" pass="return" description="Returns true if the data exists." />
+		</method>
 		
-		<method name="AddBinaryData" description="Adds binary data to store with the build.">
+		<method name="AddBinaryData" description="Adds binary data to store with the build execution.">
 			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
 			<param name="Name" type="string" pass="in" description="Name of the attache data" />
 			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
 		
-		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+		<method name="AttachTempStream" description="Attaches a temp stream to the build execution.">
+			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
+			<param name="Name" type="string" pass="in" description="Name of the attached data" />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
+			<param name="StreamWriterInstance" type="class" class="BaseTempStreamWriter" pass="in" description="Stream to attach to the build." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>
+		
+		<method name="LoadStreamByIdentifier" description="Loads stream of the build execution by attachment identifier.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does not exist." />
+			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
+		</method>
+
+		<method name="LoadStreamByUUID" description="Loads stream of the build by attachment UUID.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if uuid does not exist." />
+			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
+		</method>
+		
+		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
 		</method>	
 		
-		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+		<method name="LoadDiscreteField2DByUUID" description="Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
 		</method>	
 
-		<method name="StoreDiscreteField2D" description="Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
-			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+		<method name="StoreDiscreteField2D" description="Stores a discrete field in the build execution. MIME Type will be application/amcf-discretefield2d.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if identifier already exists or is invalid." />
+			<param name="Name" type="string" pass="in" description="Human Readable name of the attachment." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
 			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
-		<method name="LoadPNGImageByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+		<method name="LoadDataTableByIdentifier" description="Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Loaded data table instance." />
+		</method>	
+		
+		<method name="LoadDataTableByUUID" description="Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Loaded data table instance." />
+		</method>	
+
+		<method name="StoreDataTable" description="Stores a data table in the build execution. MIME Type will be application/amcf-datatable.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if identifier already exists or is invalid." />
+			<param name="Name" type="string" pass="in" description="Human Readable name of the attachment." />
+			<param name="FieldDataInstance" type="class" class="DataTable" pass="in" description="Field instance to store." />
+			<param name="StoreOptions" type="optionalclass" class="DataTableWriteOptions" pass="in" description="Data Table Write Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
+
+		<method name="LoadPNGImageByIdentifier" description="Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 		
-		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
+		<method name="LoadPNGImageByUUID" description="Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 
-		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
-			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+		<method name="StorePNGImage" description="Stores a PNG image in the build job. MIME Type will be image/png">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="Name" type="string" pass="in" description="Unique name of the attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
 			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>			
 
-		<method name="AddMetaDataString" description="Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
+		<method name="StoreMetaDataString" description="Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
 		</method>
@@ -1565,6 +1642,11 @@
 			<param name="Key" type="string" pass="in" description="Unique key of value. Fails if Key already exists." />
 			<param name="Value" type="string" pass="return" description="Return value." />
 		</method>
+		
+		<method name="LoadAttachedJournal" description="Loads the journal that is associated with the build execution and returns an accessor instance.">
+			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
+		</method>	
+		
 
 	</class>
 	
@@ -1621,16 +1703,45 @@
 			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
 		</method>
 
+		<method name="HasAttachment" description="Returns if the Build has an attached data with a certain UUID">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment to query. " />
+			<param name="DataExists" type="bool" pass="return" description="Returns true if the data exists." />
+		</method>
+
+		<method name="HasAttachmentIdentifier" description="Returns if the Build has an attached data with a certain identifier">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the attachment to query." />
+			<param name="DataExists" type="bool" pass="return" description="Returns true if the data exists." />
+		</method>
+		
 		<method name="AddBinaryData" description="Adds binary data to store with the build.">
 			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
 			<param name="Name" type="string" pass="in" description="Name of the attache data" />
 			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>
+
+		<method name="AttachTempStream" description="Attaches a temp stream to the build.">
+			<param name="Identifier" type="string" pass="in" description="Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier." />
+			<param name="Name" type="string" pass="in" description="Name of the attached data" />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
+			<param name="StreamWriterInstance" type="class" class="BaseTempStreamWriter" pass="in" description="Stream to attach to the build." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>
 		
-		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+		<method name="LoadStreamByIdentifier" description="Loads stream of the build by identifier.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist." />
+			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
+		</method>
+
+		<method name="LoadStreamByUUID" description="Loads stream of the build by attachment UUID.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if uuid does not exist." />
+			<param name="StreamReaderInstance" type="class" class="StreamReader" pass="return" description="Reader class to access the stream." />
+		</method>
+
+		<method name="LoadDiscreteField2DByIdentifier" description="Loads a discrete field by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="return" description="Loaded field instance." />
 		</method>	
 		
@@ -1640,28 +1751,56 @@
 		</method>	
 
 		<method name="StoreDiscreteField2D" description="Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
-			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="Identifier" type="string" pass="in" description="Unique name of the build attachment. Fails if identifier already exists or is invalid." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment." />
 			<param name="FieldDataInstance" type="class" class="DiscreteFieldData2D" pass="in" description="Field instance to store." />
 			<param name="StoreOptions" type="optionalclass" class="DiscreteFieldData2DStoreOptions" pass="in" description="Field Data Store Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
-		<method name="LoadPNGImageByIdentifier" description="Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+		<method name="LoadDataTableByIdentifier" description="Loads a data table by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-datatable.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Data Table instance." />
+		</method>	
+		
+		<method name="LoadDataTableByUUID" description="Loads a data table by uuid which previously stored in the build job. MIME Type MUST be application/amcf-datatable.">
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DataTableInstance" type="class" class="DataTable" pass="return" description="Data Table instance." />
+		</method>	
+
+		<method name="StoreDataTable" description="Stores a data table in the build job. MIME Type will be application/amcf-datatable.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the build attachment. Fails if identifier already exists or is invalid." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment." />
+			<param name="DataTableInstance" type="class" class="DataTable" pass="in" description="Data Table instance to store." />
+			<param name="StoreOptions" type="optionalclass" class="DataTableWriteOptions" pass="in" description="Data Table Write Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>	
+
+
+		<method name="LoadPNGImageByIdentifier" description="Loads a PNG image by identifier which was previously stored in the build job. MIME Type MUST be image/png.">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 		
-		<method name="LoadPNGImageByUUID" description="Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
+		<method name="LoadPNGImageByUUID" description="Loads a PNG image by uuid which was previously stored in the build job. MIME Type MUST be image/png.">
 			<param name="DataUUID" type="string" pass="in" description="Data UUID of the attachment. Fails if name does not exist or has invalid Mime type." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image data instance." />
 		</method>	
 
-		<method name="StorePNGImage" description="Stores a discrete field in the build job. MIME Type will be image/png">
-			<param name="ContextIdentifier" type="string" pass="in" description="Unique name of the attachment. Fails if name does already exist or has invalid Mime type." />
-			<param name="Name" type="string" pass="in" description="Unique name of the build attachment. Fails if name does not exist or has invalid Mime type." />
+		<method name="StorePNGImage" description="Stores a PNG Image in the build job. MIME Type will be image/png">
+			<param name="Identifier" type="string" pass="in" description="Unique name of the attachment. Fails if identifier does already exist or is invalid." />
+			<param name="Name" type="string" pass="in" description="Unique name of the build attachment." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="in" description="Image data instance." />
 			<param name="StoreOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="PNG Store Options." />
+			<param name="UserUUID" type="string" pass="in" description="User UUID of the user that this data comes from. Empty string means no user attached." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
 		</method>	
 
@@ -1692,7 +1831,7 @@
 			<param name="IteratorInstance" type="class" class="BuildExecutionIterator" pass="return" description="Iterator instance." />
 		</method>
 		
-		<method name="AddMetaDataString" description="Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
+		<method name="StoreMetaDataString" description="Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
 		</method>
@@ -2657,8 +2796,37 @@
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
 
+		<method name="HasBuildExecution" description="Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionExists" type="bool" pass="return" description="Returns true if execution exists" />
+		</method>
+
+		<method name="GetBuildExecution" description="Returns a instance of a build execution object. Fails if build execution uuid does not exist.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance" />
+		</method>
+
 		<method name="CreateCryptoContext" description="Creates a crypto context.">
 			<param name="Context" type="class" class="CryptoContext" pass="return" description="Cryptographic context instance" />
+		</method>
+
+		<method name="GetCurrentDateTime" description="Returns the current time as DateTime object instance.">
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
+		</method>
+
+		<method name="GetCustomDateTime" description="Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.">
+			<param name="Year" type="uint32" pass="in" description="Year. Must be larger or equal than 1970." />
+			<param name="Month" type="uint32" pass="in" description="Month. Must be between 1 and 12." />
+			<param name="Day" type="uint32" pass="in" description="Day. Must be between 1 and 31." />
+			<param name="Hour" type="uint32" pass="in" description="Hour. Must be between 0 and 23." />
+			<param name="Minute" type="uint32" pass="in" description="Minute. Must be between 0 and 59." />
+			<param name="Second" type="uint32" pass="in" description="Second. Must be between 0 and 59." />
+			<param name="Microsecond" type="uint32" pass="in" description="Microsecond. Must be between 0 and 999999." />
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
+		</method>
+
+		<method name="GetStartDateTime" description="Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.">
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
 		</method>
 
 	</class>
@@ -2816,8 +2984,9 @@
 	</class>
 
 
-	<class name="TempStreamWriter" parent="Base" description="A writer that allows to create a temporary storage stream.">
-	
+
+	<class name="BaseTempStreamWriter" parent="Base" description="Base class for writing temporary storage streams.">
+
 		<method name="GetUUID" description="Returns the UUID of the stream.">
 			<param name="UUID" type="string" pass="return" description="Returns stream uuid." />
 		</method>
@@ -2833,18 +3002,29 @@
 		<method name="GetSize" description="Returns the current size of the stream.">
 			<param name="Size" type="uint64" pass="return" description="Current size of the stream." />
 		</method>
+
+		<method name="Finish" description="Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.">
+		</method>
+
+		<method name="IsFinished" description="Returns if the stream writing has already been finished.">
+			<param name="Finished" type="bool" pass="return" description="If true, writing into the stream is not possible anymore." />
+		</method>
+
+		<method name="GetStreamReader" description="Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.">
+			<param name="StreamReader" type="class" class="StreamReader" pass="return" description="Stream reader instance." />
+		</method>
 		
+	</class>
+	
+	<class name="TempStreamWriter" parent="BaseTempStreamWriter" description="A writer that allows to create a temporary storage stream.">
+			
 		<method name="GetWritePosition" description="Returns the current write position of the stream.">
 			<param name="WritePosition" type="uint64" pass="return" description="Current write position of the stream." />
 		</method>		
 
 		<method name="Seek" description="Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.">
-			<param name="WritePosition" type="uint64" pass="in" description="New write position of the stream." />
+			<param name="WritePosition" type="uint64" pass="in" description="New write position of the stream. If Temp stream is living in a ZIP Writer, seeking is not possible." />
 		</method>		
-
-		<method name="IsFinished" description="Returns if the stream writing has been finished.">
-			<param name="WritingIsFinished" type="bool" pass="return" description="Returns true if writing is finished." />
-		</method>
 		
 		<method name="WriteData" description="Writes a data array into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.">
 			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data array to write into the stream" />
@@ -2857,8 +3037,23 @@
 		<method name="WriteLine" description="Writes a string into the stream and adds a newline character. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.">
 			<param name="Line" type="string" pass="in" description="String to write into the stream" />
 		</method>
+		
+		<method name="CopyFrom" description="Copies the full content of a StreamReader Instance.">
+			<param name="StreamReader" type="class" class="StreamReader" pass="in" description="Stream to read from." />
+		</method>
 
-		<method name="Finish" description="Finishes the stream writing. Fails if stream has been finished already.">
+	</class>
+	
+	<class name="ZIPStreamWriter" parent="BaseTempStreamWriter" description="A writer that allows to create a ZIP file storage stream.">
+	
+		<method name="CreateZIPEntry" description="Creates a new ZIP entry in the ZIP file. All currently open ZIP Entry streams will be finished and closed.">
+			<param name="FileName" type="string" pass="in" description="File Name for the new entry in the ZIP file. Entry MUST not exist yet." />
+			<param name="TempStream" type="class" class="TempStreamWriter" pass="return" description="Returns temp stream to write into." />
+		</method>
+		
+		<method name="CreateZIPEntryFromStream" description="Adds the full content of a StreamReader Instance.">
+			<param name="FileName" type="string" pass="in" description="File Name for the new entry in the ZIP file. Entry MUST not exist yet." />
+			<param name="StreamReader" type="class" class="StreamReader" pass="in" description="Stream to read from." />
 		</method>
 		
 	</class>
@@ -3024,16 +3219,16 @@
 			<param name="AckTime" type="class" class="DateTime" pass="return" description="Timestamp Instance." />
 		</method>
 
-		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. ">
+		<method name="AcknowledgeForUser" description="Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.">
 			<param name="UserUUID" type="string" pass="in" description="UUID of the user to acknowledge. Fails if user does not exist." />
 			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
 		</method>
 
-		<method name="AcknowledgeAlertForCurrentUser" description="Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.">
+		<method name="AcknowledgeAlertForCurrentUser" description="Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.">
 			<param name="UserComment" type="string" pass="in" description="User comment to store. May be empty." />
 		</method>
 
-		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user.">
+		<method name="DeactivateAlert" description="Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.">
 		</method>
 		
 	</class>
@@ -3044,6 +3239,26 @@
 		</method>
 	</class>
 
+	<class name="LogEntryList" parent="Base" description="Class for accessing an AMCF Log Journal.">
+		
+		<method name="GetCount" description="Returns the number of log entries in the list.">
+			<param name="Count" type="uint32" pass="return" description="Number of log entries."/>
+		</method>
+		
+		<method name="GetEntry" description="Returns the a log entry of the list.">
+			<param name="Index" type="uint32" pass="in" description="Index of entry to retrieve. 0-based. Fails if larger or equal to Count."/>
+			<param name="Message" type="string" pass="out" description="Message of the log entry."/>
+			<param name="SubSystem" type="string" pass="out" description="Subsystem of the log entry."/>
+			<param name="LogID" type="uint32" pass="out" description="ID of the log entry."/>
+			<param name="LogLevel" type="enum" class="LogLevel" pass="out" description="Level of the log entry."/>
+		</method>
+
+		<method name="GetEntryTime" description="Returns the time stamp of an entry.">
+			<param name="Index" type="uint32" pass="in" description="Index of entry to retrieve. 0-based. Fails if larger or equal to Count."/>
+			<param name="Timestamp" type="class" class="DateTime" pass="return" description="Date Time object of the entry."/>
+		</method>
+		
+	</class>
 
 
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
@@ -3065,6 +3280,30 @@
 			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
 		</method>
 	
+		<method name="RetrieveLogEntries" description="Retrieves the current log entries of the journal.">
+			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
+			<param name="MinLogLevel" type="enum" class="LogLevel" pass="out" description="Only entries with a log level that is higher than the given one are returned."/>
+			<param name="EntryList" type="class" class="LogEntryList" pass="return" description="Log Entry Instance." />
+		</method>
+
+		<method name="RetrieveLogEntriesFromTimeInterval" description="Retrieves the log entries of the journal over the given time interval.">
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="MinLogLevel" type="enum" class="LogLevel" pass="out" description="Only entries with a log level that is higher than the given one are returned."/>
+			<param name="EntryList" type="class" class="LogEntryList" pass="return" description="Log Entry Instance." />
+		</method>
+
+		<method name="RetrieveAlerts" description="Retrieves the alerts of the journal.">
+			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="Alert Iterator Instance." />
+		</method>
+
+		<method name="RetrieveAlertsFromTimeInterval" description="Retrieves the alerts of the journal over the given time interval.">
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="Alert Iterator Instance." />
+		</method>
+		
 	</class>
 
 	<class name="UserDetailList" parent="Base" description="List of user details at a certain snapshot time.">
@@ -3291,6 +3530,16 @@
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
 
+		<method name="HasBuildExecution" description="Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionExists" type="bool" pass="return" description="Returns true if execution exists" />
+		</method>
+
+		<method name="GetBuildExecution" description="Returns a instance of a build execution object. Fails if build execution uuid does not exist.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance" />
+		</method>
+
 		<method name="UnloadAllToolpathes" description="unloads all toolpath in memory to clean up">
 		</method>
 
@@ -3452,30 +3701,48 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
 		</method>
 
-		<method name="GetStartTimeOfStateInMilliseconds" description="Returns the global start time of the current state in milliseconds.">
+		<method name="GetStartTimeOfStateInMilliseconds" description="Returns the global start timer of the current state in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
-		<method name="GetStartTimeOfStateInMicroseconds" description="Returns the global start time of the current state in microseconds.">
+		<method name="GetStartTimeOfStateInMicroseconds" description="Returns the global start timer of the current state in microseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
-		<method name="GetEndTimeOfPreviousStateInMicroseconds" description="Returns the global finish time of the previous state in microseconds.">
+		<method name="GetEndTimeOfPreviousStateInMicroseconds" description="Returns the global finish timer of the previous state in microseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
 		</method>
 
-		<method name="GetEndTimeOfPreviousStateInMilliseconds" description="Returns the global finish time of the previous state in milliseconds.">
+		<method name="GetEndTimeOfPreviousStateInMilliseconds" description="Returns the global finish timer of the previous state in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
-		<method name="GetElapsedTimeInStateInMilliseconds" description="Returns the global finish time of the previous state in milliseconds.">
+		<method name="GetElapsedTimeInStateInMilliseconds" description="Returns the global finish timer of the previous state in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
-		<method name="GetElapsedTimeInStateInMicroseconds" description="Returns the global finish time of the previous state in microseconds.">
+		<method name="GetElapsedTimeInStateInMicroseconds" description="Returns the global finish timer of the previous state in microseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Microseconds" />
 		</method>
 
+		<method name="GetCurrentDateTime" description="Returns the current time as DateTime object instance.">
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
+		</method>
+
+		<method name="GetCustomDateTime" description="Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.">
+			<param name="Year" type="uint32" pass="in" description="Year. Must be larger or equal than 1970." />
+			<param name="Month" type="uint32" pass="in" description="Month. Must be between 1 and 12." />
+			<param name="Day" type="uint32" pass="in" description="Day. Must be between 1 and 31." />
+			<param name="Hour" type="uint32" pass="in" description="Hour. Must be between 0 and 23." />
+			<param name="Minute" type="uint32" pass="in" description="Minute. Must be between 0 and 59." />
+			<param name="Second" type="uint32" pass="in" description="Second. Must be between 0 and 59." />
+			<param name="Microsecond" type="uint32" pass="in" description="Microsecond. Must be between 0 and 999999." />
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
+		</method>
+
+		<method name="GetStartDateTime" description="Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.">
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
+		</method>
 
 		<method name="GetTestEnvironment" description="Returns a test environment instance.">
 			<param name="TestEnvironment" type="class" class="TestEnvironment" pass="return" description="Test Environment Instance" />
@@ -3593,7 +3860,12 @@
 			<param name="TempStreamInstance" type="class" class="TempStreamWriter" pass="return" description="Temp stream writer instance" />
 		</method>
 		
-		<method name="FindStream" description="Finds a stream in the storage system.">
+		<method name="CreateZIPStream" description="Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip">
+			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
+			<param name="ZIPStreamInstance" type="class" class="ZIPStreamWriter" pass="return" description="ZIP stream writer instance" />
+		</method>
+
+		<method name="LoadStream" description="Loads a stream in the storage system.">
 			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
 			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />
@@ -3857,7 +4129,17 @@
 			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
 			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>		
-	
+
+		<method name="HasBuildExecution" description="Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionExists" type="bool" pass="return" description="Returns true if execution exists" />
+		</method>
+
+		<method name="GetBuildExecution" description="Returns a instance of a build execution object. Fails if build execution uuid does not exist.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
+			<param name="ExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance" />
+		</method>
+
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
 			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
@@ -3991,10 +4273,38 @@
 			<param name="TempStreamInstance" type="class" class="TempStreamWriter" pass="return" description="Temp stream writer instance" />
 		</method>
 
-		<method name="FindStream" description="Finds a stream in the storage system.">
+		<method name="CreateZIPStream" description="Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip">
+			<param name="Name" type="string" pass="in" description="Name of the storage stream." />
+			<param name="ZIPStreamInstance" type="class" class="ZIPStreamWriter" pass="return" description="ZIP stream writer instance" />
+		</method>
+
+		<method name="LoadStream" description="Loads a stream in the storage system.">
 			<param name="UUID" type="string" pass="in" description="UUID of the storage stream." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if the stream does not exist." />
 			<param name="StreamInstance" type="optionalclass" class="StreamReader" pass="return" description="Stream Instance. Will return null if not found and MustExists is false." />
+		</method>
+
+		<method name="GetCurrentDateTime" description="Returns the current time as DateTime object instance.">
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
+		</method>
+
+		<method name="GetCustomDateTime" description="Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.">
+			<param name="Year" type="uint32" pass="in" description="Year. Must be larger or equal than 1970." />
+			<param name="Month" type="uint32" pass="in" description="Month. Must be between 1 and 12." />
+			<param name="Day" type="uint32" pass="in" description="Day. Must be between 1 and 31." />
+			<param name="Hour" type="uint32" pass="in" description="Hour. Must be between 0 and 23." />
+			<param name="Minute" type="uint32" pass="in" description="Minute. Must be between 0 and 59." />
+			<param name="Second" type="uint32" pass="in" description="Second. Must be between 0 and 59." />
+			<param name="Microsecond" type="uint32" pass="in" description="Microsecond. Must be between 0 and 999999." />
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
+		</method>
+
+		<method name="GetStartDateTime" description="Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.">
+			<param name="DateTime" type="class" class="DateTime" pass="return" description="Date Time Instance." />
+		</method>
+
+		<method name="Sleep" description="Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
 		</method>
 
 	</class>

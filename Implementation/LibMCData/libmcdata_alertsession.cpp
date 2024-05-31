@@ -78,7 +78,7 @@ IAlert* CAlertSession::GetAlertByUUID(const std::string& sUUID)
 {
     std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
     if (!m_pJournal->hasAlert(sNormalizedUUID))
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID + " (in CAlertSession::GetAlertByUUID)");
 
     return new CAlert (m_pJournal, sUUID);
 }

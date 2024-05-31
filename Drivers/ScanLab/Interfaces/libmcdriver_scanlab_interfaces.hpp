@@ -766,6 +766,20 @@ public:
 	virtual void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent) = 0;
 
 	/**
+	* IRTCContext::AddSetAnalogOut - Adds changing an analog port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	virtual void AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) = 0;
+
+	/**
+	* IRTCContext::AddSetDigitalOut - Adds changing an digital port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	virtual void AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) = 0;
+
+	/**
 	* IRTCContext::AddSetPowerForPIDControl - adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
 	* @param[in] fPowerInPercent - Laser power in percent
 	*/
@@ -959,6 +973,27 @@ public:
 	* @param[in] eOperationMode - OIE Operation Mode
 	*/
 	virtual void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer, const LibMCDriver_ScanLab::eOIEOperationMode eOperationMode) = 0;
+
+	/**
+	* IRTCContext::SetLaserPinOut - Sets the laser pin outputs to a certain state. Control command, has immediate effect.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	virtual void SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2) = 0;
+
+	/**
+	* IRTCContext::GetLaserPinIn - Read the laser pin input values. Control command, has immediate effect.
+	* @param[out] bLaserOut1 - Value for Laser In Pin 1
+	* @param[out] bLaserOut2 - Value for Laser In Pin 2
+	*/
+	virtual void GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2) = 0;
+
+	/**
+	* IRTCContext::AddLaserPinOutToList - Adds the laser pin command to the current open list.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	virtual void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2) = 0;
 
 	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
@@ -1239,6 +1274,56 @@ public:
 	* @return UART Connection instance.
 	*/
 	virtual IUARTConnection * CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) = 0;
+
+	/**
+	* IRTCContext::EnableScanAhead - Enables the Scanahead mode of the RTC card.
+	* @param[in] nHeadNo - Head Number
+	* @param[in] nTableNo - Table Number
+	*/
+	virtual void EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo) = 0;
+
+	/**
+	* IRTCContext::DisableScanAhead - Disables the Scanahead mode of the RTC card.
+	*/
+	virtual void DisableScanAhead() = 0;
+
+	/**
+	* IRTCContext::ActivateScanAheadAutoDelays - Activates the ScanAhead Auto Delays.
+	*/
+	virtual void ActivateScanAheadAutoDelays() = 0;
+
+	/**
+	* IRTCContext::DeactivateScanAheadAutoDelays - Deactivates the ScanAhead Auto Delays.
+	*/
+	virtual void DeactivateScanAheadAutoDelays() = 0;
+
+	/**
+	* IRTCContext::ScanAheadAutoDelaysAreActivated - Returns if ScanAhead Auto Delays are activated.
+	* @return Returns true if Auto Delays are activated.
+	*/
+	virtual bool ScanAheadAutoDelaysAreActivated() = 0;
+
+	/**
+	* IRTCContext::SetScanAheadLaserShiftsInMicroseconds - Enables the Scanahead mode of the RTC card.
+	* @param[in] dLaserOnShiftInMicroSeconds - Laser on shift in Microseconds. Will be rounded to 64th microseconds.
+	* @param[in] dLaserOffShiftInMicroSeconds - Laser off shift in Microseconds. Will be rounded to 64th microseconds.
+	*/
+	virtual void SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds) = 0;
+
+	/**
+	* IRTCContext::SetScanAheadLaserShiftsInUnits - Enables the Scanahead mode of the RTC card.
+	* @param[in] nLaserOnShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+	* @param[in] nLaserOffShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+	*/
+	virtual void SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift) = 0;
+
+	/**
+	* IRTCContext::SetScanAheadLineParameters - Controls the Scanahead Line parameters.
+	* @param[in] nCornerScale - Corner sharpness scale in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+	* @param[in] nEndScale - Line end sharpness scale in Percent.. 100 percent means straight line ends. Values above 100 will be clipped to 100.
+	* @param[in] nAccelerationScale - Fraction of active laser time (not path lenght) during acceleration in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+	*/
+	virtual void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale) = 0;
 
 };
 

@@ -158,6 +158,7 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pStorage = pDataModel->CreateStorage();
+	auto pGlobalChrono = m_pSystemState->globalChrono();
 
 	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
 
@@ -183,7 +184,7 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	if (!pAuth->contextUUIDIsAuthorized(sContextUUID))
 		throw ELibMCInterfaceException(LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED);
 
-	pStorage->BeginPartialStream (sUUID, sContextUUID, sContextIdentifier, sName, sMimeType, nSize, pAuth->getUserName ());
+	pStorage->BeginPartialStream (sUUID, sName, sMimeType, nSize, pAuth->getUserUUID (), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 	writer.addString(AMC_API_KEY_UPLOAD_STREAMUUID, sUUID);
 	writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sContextUUID);
@@ -295,9 +296,10 @@ std::string CAPIHandler_Upload::createNewBuild(const std::string& sName, const s
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	std::string sBuildUUID = AMCCommon::CUtils::createUUID();
 
+	auto pGlobalChrono = m_pSystemState->globalChrono();
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
-	pBuildJobHandler->CreateJob(sBuildUUID, sName, pAuth->getUserName(), sStorageStreamUUID);
+	pBuildJobHandler->CreateJob(sBuildUUID, sName, pAuth->getUserUUID(), sStorageStreamUUID, pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 	return sBuildUUID;
 }

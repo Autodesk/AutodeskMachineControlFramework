@@ -33,9 +33,7 @@ Abstract: This is a stub class definition of CGRPCRequest
 
 #include "libmcdriver_grpc_grpcrequest.hpp"
 #include "libmcdriver_grpc_interfaceexception.hpp"
-
-// Include custom headers here.
-
+#include "libmcdriver_grpc_grpcresponse.hpp"
 
 using namespace LibMCDriver_GRPC::Impl;
 
@@ -65,16 +63,21 @@ LibGRPCWrapper::CRequest* CGRPCRequest::getRequest()
 
 std::string CGRPCRequest::GetRequestType()
 {
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
+    auto pRequest = getRequest();
+    return pRequest->GetRequestType();
 }
 
 std::string CGRPCRequest::GetExpectedResponseType()
 {
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
+    auto pRequest = getRequest();
+    return pRequest->GetExpectedResponseType();
 }
 
 IGRPCResponse * CGRPCRequest::SendBlocking(const std::string & sServiceMethod, const LibMCDriver_GRPC_uint32 nTimeOutInMS)
 {
-	throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_NOTIMPLEMENTED);
+    auto pRequest = getRequest();
+    auto pResponse = pRequest->SendBlocking(sServiceMethod, nTimeOutInMS);
+
+    return new CGRPCResponse(getWrapper(), pResponse);
 }
 

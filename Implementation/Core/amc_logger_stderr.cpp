@@ -42,8 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 		
-	CLogger_StdErr::CLogger_StdErr()
+	CLogger_StdErr::CLogger_StdErr(AMCCommon::PChrono pGlobalChrono)
+		: CLogger (pGlobalChrono)
 	{
+		if (pGlobalChrono.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	}
 	
 	CLogger_StdErr::~CLogger_StdErr()
@@ -57,7 +60,7 @@ namespace AMC {
 
 	void CLogger_StdErr::retrieveLogMessages(std::vector<CLoggerEntry>& entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+		throw ELibMCInterfaceException(LIBMC_ERROR_STDERRLOGGERDOESNOTSUPPORTRETRIEVAL);
 	}
 
 }

@@ -266,6 +266,16 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT: return "RS232READTIMEOUT";
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN: return "RS232READLINEOVERRUN";
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN: return "RS232RINGBUFFEROVERRUN";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION: return "NOSCANAHEADOPTION";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN: return "NOEXCELLISCAN";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE: return "SCANAHEADLISTISACTIVE";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR: return "SCANAHEADPARAMETERERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR: return "SCANAHEADSCALINGERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE: return "SCANAHEADMISSINGRTCRESPONSE";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR: return "SCANAHEADPCIERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "SCANAHEADUNKNOWNERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "PORTNUMBERISNOTDIGITAL";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "PORTNUMBERISNOTANALOG";
 		}
 		return "UNKNOWN";
 	}
@@ -354,6 +364,16 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT: return "RS232 read timeout.";
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN: return "RS232 read line overrun.";
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN: return "RS232 ring buffer overrun.";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION: return "No Scanahead option.";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN: return "No Excelli Scan.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE: return "Scanahead - list is active.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR: return "Scanahead parameter error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR: return "Scanahead scaling error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE: return "Scanahead missing rtc response.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR: return "Scanahead PCI error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "Scanahead unknown error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
 		}
 		return "unknown error";
 	}
@@ -636,6 +656,8 @@ public:
 	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent);
+	inline void AddSetAnalogOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue);
+	inline void AddSetDigitalOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue);
 	inline void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent);
 	inline void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
 	inline void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
@@ -662,6 +684,9 @@ public:
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 	inline void InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer, const eOIEOperationMode eOperationMode);
+	inline void SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2);
+	inline void GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2);
+	inline void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2);
 	inline void EnableOIE();
 	inline void DisableOIE();
 	inline void StartOIEMeasurement();
@@ -706,6 +731,14 @@ public:
 	inline void DisableLineSubdivision();
 	inline LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo);
 	inline PUARTConnection CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate);
+	inline void EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo);
+	inline void DisableScanAhead();
+	inline void ActivateScanAheadAutoDelays();
+	inline void DeactivateScanAheadAutoDelays();
+	inline bool ScanAheadAutoDelaysAreActivated();
+	inline void SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds);
+	inline void SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift);
+	inline void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale);
 };
 	
 /*************************************************************************************************************************
@@ -1004,6 +1037,8 @@ public:
 		pWrapperTable->m_RTCContext_DrawPolylineOIE = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatches = nullptr;
 		pWrapperTable->m_RTCContext_AddSetPower = nullptr;
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = nullptr;
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = nullptr;
 		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = nullptr;
 		pWrapperTable->m_RTCContext_AddSetJumpSpeed = nullptr;
 		pWrapperTable->m_RTCContext_AddSetMarkSpeed = nullptr;
@@ -1030,6 +1065,9 @@ public:
 		pWrapperTable->m_RTCContext_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_RTCContext_GetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_RTCContext_InitializeForOIE = nullptr;
+		pWrapperTable->m_RTCContext_SetLaserPinOut = nullptr;
+		pWrapperTable->m_RTCContext_GetLaserPinIn = nullptr;
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
@@ -1074,6 +1112,14 @@ public:
 		pWrapperTable->m_RTCContext_DisableLineSubdivision = nullptr;
 		pWrapperTable->m_RTCContext_ReadMultiMCBSP = nullptr;
 		pWrapperTable->m_RTCContext_CreateUARTConnection = nullptr;
+		pWrapperTable->m_RTCContext_EnableScanAhead = nullptr;
+		pWrapperTable->m_RTCContext_DisableScanAhead = nullptr;
+		pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays = nullptr;
+		pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays = nullptr;
+		pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated = nullptr;
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds = nullptr;
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits = nullptr;
+		pWrapperTable->m_RTCContext_SetScanAheadLineParameters = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -1618,6 +1664,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = (PLibMCDriver_ScanLabRTCContext_AddSetAnalogOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetanalogout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = (PLibMCDriver_ScanLabRTCContext_AddSetAnalogOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetanalogout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetAnalogOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = (PLibMCDriver_ScanLabRTCContext_AddSetDigitalOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetdigitalout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = (PLibMCDriver_ScanLabRTCContext_AddSetDigitalOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetdigitalout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetDigitalOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = (PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = (PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol");
@@ -1849,6 +1913,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_InitializeForOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetLaserPinOut = (PLibMCDriver_ScanLabRTCContext_SetLaserPinOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserpinout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetLaserPinOut = (PLibMCDriver_ScanLabRTCContext_SetLaserPinOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserpinout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetLaserPinOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetLaserPinIn = (PLibMCDriver_ScanLabRTCContext_GetLaserPinInPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserpinin");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetLaserPinIn = (PLibMCDriver_ScanLabRTCContext_GetLaserPinInPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserpinin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetLaserPinIn == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = (PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addlaserpinouttolist");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = (PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addlaserpinouttolist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddLaserPinOutToList == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2245,6 +2336,78 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_CreateUARTConnection == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableScanAhead = (PLibMCDriver_ScanLabRTCContext_EnableScanAheadPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enablescanahead");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableScanAhead = (PLibMCDriver_ScanLabRTCContext_EnableScanAheadPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enablescanahead");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableScanAhead == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableScanAhead = (PLibMCDriver_ScanLabRTCContext_DisableScanAheadPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disablescanahead");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableScanAhead = (PLibMCDriver_ScanLabRTCContext_DisableScanAheadPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disablescanahead");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableScanAhead == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays = (PLibMCDriver_ScanLabRTCContext_ActivateScanAheadAutoDelaysPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_activatescanaheadautodelays");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays = (PLibMCDriver_ScanLabRTCContext_ActivateScanAheadAutoDelaysPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_activatescanaheadautodelays");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays = (PLibMCDriver_ScanLabRTCContext_DeactivateScanAheadAutoDelaysPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_deactivatescanaheadautodelays");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays = (PLibMCDriver_ScanLabRTCContext_DeactivateScanAheadAutoDelaysPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_deactivatescanaheadautodelays");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated = (PLibMCDriver_ScanLabRTCContext_ScanAheadAutoDelaysAreActivatedPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_scanaheadautodelaysareactivated");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated = (PLibMCDriver_ScanLabRTCContext_ScanAheadAutoDelaysAreActivatedPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_scanaheadautodelaysareactivated");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLaserShiftsInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLaserShiftsInMicrosecondsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLaserShiftsInUnitsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinunits");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLaserShiftsInUnitsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinunits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLineParameters = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLineParametersPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlineparameters");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLineParameters = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLineParametersPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlineparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetScanAheadLineParameters == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3081,6 +3244,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPower == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetanalogout", (void**)&(pWrapperTable->m_RTCContext_AddSetAnalogOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetAnalogOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetdigitalout", (void**)&(pWrapperTable->m_RTCContext_AddSetDigitalOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetDigitalOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol", (void**)&(pWrapperTable->m_RTCContext_AddSetPowerForPIDControl));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPowerForPIDControl == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3183,6 +3354,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_initializeforoie", (void**)&(pWrapperTable->m_RTCContext_InitializeForOIE));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_InitializeForOIE == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlaserpinout", (void**)&(pWrapperTable->m_RTCContext_SetLaserPinOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserPinOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getlaserpinin", (void**)&(pWrapperTable->m_RTCContext_GetLaserPinIn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetLaserPinIn == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addlaserpinouttolist", (void**)&(pWrapperTable->m_RTCContext_AddLaserPinOutToList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddLaserPinOutToList == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoie", (void**)&(pWrapperTable->m_RTCContext_EnableOIE));
@@ -3359,6 +3542,38 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_createuartconnection", (void**)&(pWrapperTable->m_RTCContext_CreateUARTConnection));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_CreateUARTConnection == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablescanahead", (void**)&(pWrapperTable->m_RTCContext_EnableScanAhead));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableScanAhead == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablescanahead", (void**)&(pWrapperTable->m_RTCContext_DisableScanAhead));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableScanAhead == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_activatescanaheadautodelays", (void**)&(pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_deactivatescanaheadautodelays", (void**)&(pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_scanaheadautodelaysareactivated", (void**)&(pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinmicroseconds", (void**)&(pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinunits", (void**)&(pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setscanaheadlineparameters", (void**)&(pWrapperTable->m_RTCContext_SetScanAheadLineParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetScanAheadLineParameters == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
@@ -4190,6 +4405,26 @@ public:
 	}
 	
 	/**
+	* CRTCContext::AddSetAnalogOut - Adds changing an analog port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	void CRTCContext::AddSetAnalogOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetAnalogOut(m_pHandle, eLaserPort, fOutputValue));
+	}
+	
+	/**
+	* CRTCContext::AddSetDigitalOut - Adds changing an digital port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	void CRTCContext::AddSetDigitalOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetDigitalOut(m_pHandle, eLaserPort, fOutputValue));
+	}
+	
+	/**
 	* CRTCContext::AddSetPowerForPIDControl - adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
 	* @param[in] fPowerInPercent - Laser power in percent
 	*/
@@ -4471,6 +4706,36 @@ public:
 	void CRTCContext::InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer, const eOIEOperationMode eOperationMode)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_InitializeForOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)SignalChannelsBuffer.size(), SignalChannelsBuffer.data(), eOperationMode));
+	}
+	
+	/**
+	* CRTCContext::SetLaserPinOut - Sets the laser pin outputs to a certain state. Control command, has immediate effect.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	void CRTCContext::SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserPinOut(m_pHandle, bLaserOut1, bLaserOut2));
+	}
+	
+	/**
+	* CRTCContext::GetLaserPinIn - Read the laser pin input values. Control command, has immediate effect.
+	* @param[out] bLaserOut1 - Value for Laser In Pin 1
+	* @param[out] bLaserOut2 - Value for Laser In Pin 2
+	*/
+	void CRTCContext::GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserPinIn(m_pHandle, &bLaserOut1, &bLaserOut2));
+	}
+	
+	/**
+	* CRTCContext::AddLaserPinOutToList - Adds the laser pin command to the current open list.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddLaserPinOutToList(m_pHandle, bLaserOut1, bLaserOut2));
 	}
 	
 	/**
@@ -4905,6 +5170,83 @@ public:
 			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CUARTConnection>(m_pWrapper, hConnection);
+	}
+	
+	/**
+	* CRTCContext::EnableScanAhead - Enables the Scanahead mode of the RTC card.
+	* @param[in] nHeadNo - Head Number
+	* @param[in] nTableNo - Table Number
+	*/
+	void CRTCContext::EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableScanAhead(m_pHandle, nHeadNo, nTableNo));
+	}
+	
+	/**
+	* CRTCContext::DisableScanAhead - Disables the Scanahead mode of the RTC card.
+	*/
+	void CRTCContext::DisableScanAhead()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableScanAhead(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::ActivateScanAheadAutoDelays - Activates the ScanAhead Auto Delays.
+	*/
+	void CRTCContext::ActivateScanAheadAutoDelays()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ActivateScanAheadAutoDelays(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DeactivateScanAheadAutoDelays - Deactivates the ScanAhead Auto Delays.
+	*/
+	void CRTCContext::DeactivateScanAheadAutoDelays()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DeactivateScanAheadAutoDelays(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::ScanAheadAutoDelaysAreActivated - Returns if ScanAhead Auto Delays are activated.
+	* @return Returns true if Auto Delays are activated.
+	*/
+	bool CRTCContext::ScanAheadAutoDelaysAreActivated()
+	{
+		bool resultActivated = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ScanAheadAutoDelaysAreActivated(m_pHandle, &resultActivated));
+		
+		return resultActivated;
+	}
+	
+	/**
+	* CRTCContext::SetScanAheadLaserShiftsInMicroseconds - Enables the Scanahead mode of the RTC card.
+	* @param[in] dLaserOnShiftInMicroSeconds - Laser on shift in Microseconds. Will be rounded to 64th microseconds.
+	* @param[in] dLaserOffShiftInMicroSeconds - Laser off shift in Microseconds. Will be rounded to 64th microseconds.
+	*/
+	void CRTCContext::SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetScanAheadLaserShiftsInMicroseconds(m_pHandle, dLaserOnShiftInMicroSeconds, dLaserOffShiftInMicroSeconds));
+	}
+	
+	/**
+	* CRTCContext::SetScanAheadLaserShiftsInUnits - Enables the Scanahead mode of the RTC card.
+	* @param[in] nLaserOnShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+	* @param[in] nLaserOffShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+	*/
+	void CRTCContext::SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetScanAheadLaserShiftsInUnits(m_pHandle, nLaserOnShift, nLaserOffShift));
+	}
+	
+	/**
+	* CRTCContext::SetScanAheadLineParameters - Controls the Scanahead Line parameters.
+	* @param[in] nCornerScale - Corner sharpness scale in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+	* @param[in] nEndScale - Line end sharpness scale in Percent.. 100 percent means straight line ends. Values above 100 will be clipped to 100.
+	* @param[in] nAccelerationScale - Fraction of active laser time (not path lenght) during acceleration in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+	*/
+	void CRTCContext::SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetScanAheadLineParameters(m_pHandle, nCornerScale, nEndScale, nAccelerationScale));
 	}
 	
 	/**

@@ -438,6 +438,20 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddM
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddRTCSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
 
 /**
+* Writes a certain RTC channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+* @param[in] dOffset - Offset that the raw value is scaled with.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddScaledRTCSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLabOIE_double dScaleFactor, LibMCDriver_ScanLabOIE_double dOffset);
+
+/**
 * Writes a certain sensor channel to a data table as int32 columns.
 *
 * @param[in] pDataRecording - DataRecording instance.
@@ -474,6 +488,20 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddS
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddAdditionalSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes a certain RTC channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nAdditionalIndex - Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+* @param[in] dOffset - Offset that the raw value is scaled with.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddScaledAdditionalSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLabOIE_double dScaleFactor, LibMCDriver_ScanLabOIE_double dOffset);
 
 /*************************************************************************************************************************
  Class definition for OIEDevice
@@ -996,9 +1024,11 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEDataRecording_AddYCoordinatesToDataTablePtr m_DataRecording_AddYCoordinatesToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddMeasurementTagsToDataTablePtr m_DataRecording_AddMeasurementTagsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddRTCSignalsToDataTablePtr m_DataRecording_AddRTCSignalsToDataTable;
+	PLibMCDriver_ScanLabOIEDataRecording_AddScaledRTCSignalsToDataTablePtr m_DataRecording_AddScaledRTCSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddSensorSignalsToDataTablePtr m_DataRecording_AddSensorSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddScaledSensorSignalsToDataTablePtr m_DataRecording_AddScaledSensorSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddAdditionalSignalsToDataTablePtr m_DataRecording_AddAdditionalSignalsToDataTable;
+	PLibMCDriver_ScanLabOIEDataRecording_AddScaledAdditionalSignalsToDataTablePtr m_DataRecording_AddScaledAdditionalSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetDeviceNamePtr m_OIEDevice_GetDeviceName;
 	PLibMCDriver_ScanLabOIEOIEDevice_SetHostNamePtr m_OIEDevice_SetHostName;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetHostNamePtr m_OIEDevice_GetHostName;

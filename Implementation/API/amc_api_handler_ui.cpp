@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_dynamic.hpp"
 
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 #include <cmath>
 #include <vector>
@@ -318,6 +319,7 @@ PAPIResponse CAPIHandler_UI::handleDownloadRequest(const std::string& sParameter
 
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pStorage = pDataModel->CreateStorage();
+	auto pGlobalChrono = m_pSystemState->globalChrono();
 
 	std::string sIPAddress;
 
@@ -326,7 +328,7 @@ PAPIResponse CAPIHandler_UI::handleDownloadRequest(const std::string& sParameter
 	std::string sUserUUID;
 	std::string sDownloadFileName;
 
-	pStorage->RequestDownloadTicket(sParameterUUID, sIPAddress, sStreamUUID, sDownloadFileName, sSessionUUID, sUserUUID);
+	pStorage->RequestDownloadTicket(sParameterUUID, sIPAddress, pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970(), sStreamUUID, sDownloadFileName, sSessionUUID, sUserUUID);
 
 	auto pStream = pStorage->RetrieveStream(sStreamUUID);
 	auto sContentType = pStream->GetMIMEType();

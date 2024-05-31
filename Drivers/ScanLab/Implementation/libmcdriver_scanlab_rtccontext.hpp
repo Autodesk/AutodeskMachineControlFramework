@@ -242,6 +242,12 @@ public:
 
 	void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer, const LibMCDriver_ScanLab::eOIEOperationMode eOperationMode) override;
 
+	void SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2) override;
+
+	void GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2) override;
+
+	void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2) override;
+
 	void EnableOIE() override;
 
 	void DisableOIE() override;
@@ -328,6 +334,10 @@ public:
 
 	void AddSetPower(const LibMCDriver_ScanLab_single fPower) override;
 
+	void AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) override;
+
+	void AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) override;
+
 	void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent) override;
 
 
@@ -365,7 +375,23 @@ public:
 
 	LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) override;
 
-	IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) override;
+	IUARTConnection* CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) override;
+
+	void EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo) override;
+
+	void DisableScanAhead() override;
+
+	void ActivateScanAheadAutoDelays() override;
+
+	void DeactivateScanAheadAutoDelays() override;
+
+	bool ScanAheadAutoDelaysAreActivated() override;
+
+	void SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds) override;
+
+	void SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift) override;
+
+	void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale) override;
 
 };
 

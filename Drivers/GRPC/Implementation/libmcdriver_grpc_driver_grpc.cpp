@@ -165,6 +165,7 @@ IGRPCConnection* CDriver_GRPC::ConnectUnsecure(const std::string& sIdentifier, c
 	auto pProtocol = m_pGRPCWrapper->CreateProtocol(sProtobufDefinition);
 
 	auto pConnection = pProtocol->ConnectUnsecure(sNetworkCredentials);
+	m_Connections.insert(std::make_pair(sIdentifier, pConnection));
 
 	pProtocol = nullptr;
 
@@ -197,8 +198,8 @@ IGRPCConnection* CDriver_GRPC::ConnectUnsecure(const std::string& sIdentifier, c
 IGRPCConnection* CDriver_GRPC::FindConnection(const std::string& sIdentifier, const bool bMustExist)
 {
 	auto iIter = m_Connections.find(sIdentifier);
-	if (iIter != m_Connections.end())
-		throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDCONNECTIONIDENTIFIER, "duplicate connection identifier: " + sIdentifier);
+	if (iIter == m_Connections.end())
+		throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_COULDNOTFINDCONNECTIONIDENTIFIER, "could not find connection identifier: " + sIdentifier);
 
 	if (m_pGRPCWrapper.get() == nullptr)
 		throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_GRPCWRAPPERNOTLOADED);
