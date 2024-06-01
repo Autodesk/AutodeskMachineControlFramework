@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_server_win32.hpp"
 #include "common_utils.hpp"
+#include <shellscalingapi.h>
 
 #ifndef __GNUC__
 #include <SDKDDKVer.h>
@@ -216,7 +217,8 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {   
-    HFONT fontHandle;
+    static HFONT fontHandle = nullptr;
+
     HINSTANCE hInst = (HINSTANCE)GetWindowLongPtrW(hWnd, GWLP_HINSTANCE);
 
    
@@ -224,19 +226,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
-        fontHandle = CreateFontW(-12,
+        UINT dpi = GetDpiForWindow(hWnd);
+
+        // Calculate the initial font size based on DPI (example uses 12-point font)
+        int fontSize = MulDiv(14, dpi, 96);
+
+        fontHandle = CreateFontW(fontSize,
             0,
             0,
             0,
-            FW_DONTCARE,
-            FW_DONTCARE,
-            FW_DONTCARE,
-            FW_DONTCARE,
-            ANSI_CHARSET,
-            OUT_TT_PRECIS,
-            CLIP_DEFAULT_PRECIS,
-            ANTIALIASED_QUALITY,
-            FF_DONTCARE | DEFAULT_PITCH,
+            FW_DONTCARE,           // Font weight
+            FALSE,                 // Italic attribute option
+            FALSE,                 // Underline attribute option
+            FALSE,                 // Strikeout attribute option
+            DEFAULT_CHARSET,       // Character set identifier
+            OUT_TT_PRECIS,         // Output precision
+            CLIP_DEFAULT_PRECIS,   // Clipping precision
+            CLEARTYPE_QUALITY,     // Output quality
+            DEFAULT_PITCH | FF_SWISS, // Pitch and family
             L"Courier New");
 
 
@@ -293,6 +300,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return 0;
     }
 
+    case WM_DPICHANGED:
+    {
+        // Get the recommended new size and position of the window
+        RECT* const prcNewWindow = (RECT*)lParam;
+        SetWindowPos(hWnd,
+            NULL,
+            prcNewWindow->left,
+            prcNewWindow->top,
+            prcNewWindow->right - prcNewWindow->left,
+            prcNewWindow->bottom - prcNewWindow->top,
+            SWP_NOZORDER | SWP_NOACTIVATE);
+
+        // Update font size
+        // Recreate the font with the new DPI
+        UINT dpi = HIWORD(wParam); // New DPI
+        int fontSize = MulDiv(12, dpi, 96);
+        if (fontHandle)
+        {
+            DeleteObject(fontHandle); // Delete the old font
+            fontHandle = nullptr;
+        }
+
+        fontHandle = CreateFontW(
+            -fontSize,             // Height of font
+            0,                     // Width of font
+            0,                     // Angle of escapement
+            0,                     // Orientation angle
+            FW_DONTCARE,           // Font weight
+            FALSE,                 // Italic attribute option
+            FALSE,                 // Underline attribute option
+            FALSE,                 // Strikeout attribute option
+            DEFAULT_CHARSET,       // Character set identifier
+            OUT_TT_PRECIS,         // Output precision
+            CLIP_DEFAULT_PRECIS,   // Clipping precision
+            CLEARTYPE_QUALITY,     // Output quality
+            DEFAULT_PITCH | FF_SWISS, // Pitch and family
+            L"Courier New");          // Font family
+
+        HWND hwndListBox = GetDlgItem(hWnd, ID_EDITCHILD);
+        SendMessage(hwndListBox, WM_SETFONT, (WPARAM)fontHandle, TRUE);
+
+        return 0;
+    }
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -301,7 +352,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         EndPaint(hWnd, &ps);
     }
     break;
+
     case WM_DESTROY:
+        if (fontHandle)
+        {
+            DeleteObject(fontHandle); // Clean up the font object
+            fontHandle = nullptr;
+        }
+
         PostQuitMessage(0);
         break;
     default:
@@ -319,6 +377,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
+    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 
     auto pServer = std::make_shared<CServer_Win32> (hInstance);
     pServer->registerWindowClass();

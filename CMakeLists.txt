@@ -630,6 +630,7 @@ target_compile_options(amc_win32 PRIVATE "-D_UNICODE")
 	target_link_libraries(amc_win32 psapi.lib)
 	target_link_libraries(amc_win32 bcrypt.lib)	
 	target_link_libraries(amc_win32 iphlpapi.lib)
+	target_link_libraries(amc_win32 Shcore.lib)
 
 if(MSVC)
 	target_link_libraries(amc_win32 ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl/win64/tls-24.lib)
