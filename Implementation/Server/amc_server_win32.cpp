@@ -62,6 +62,8 @@ using namespace AMC;
 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
+#define FONTSIZE_AT_96DPI 18
+
 CServerWin32IO::CServerWin32IO()
     : m_pServer (nullptr)
 {
@@ -229,7 +231,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         UINT dpi = GetDpiForWindow(hWnd);
 
         // Calculate the initial font size based on DPI (example uses 12-point font)
-        int fontSize = MulDiv(14, dpi, 96);
+        int fontSize = MulDiv(FONTSIZE_AT_96DPI, dpi, 96);
 
         fontHandle = CreateFontW(fontSize,
             0,
@@ -250,7 +252,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         HWND hwndListBox = CreateWindowExW(
             0, L"LISTBOX",   // predefined class 
             NULL,         // no window title 
-            WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_DISABLENOSCROLL,
+            WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_DISABLENOSCROLL | LBS_NOTIFY | LBS_EXTENDEDSEL,
             0, 0, 0, 0,   // set size in WM_SIZE message 
             hWnd,         // parent window 
             (HMENU)ID_EDITCHILD,   // edit control ID 
@@ -282,6 +284,64 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_EXIT:
             DestroyWindow(hWnd);
             break;
+        case ID_EDITCHILD:
+        {
+            if (HIWORD(wParam) == LBN_SELCHANGE)
+            {
+
+                HWND hwndListBox = GetDlgItem(hWnd, ID_EDITCHILD);
+
+
+                // Get the count of selected items
+                int selCount = (int)SendMessage(hwndListBox, LB_GETSELCOUNT, 0, 0);
+
+                if (selCount > 0)
+                {
+                    // Allocate memory for the selected item indices
+                    std::vector<int> selIndices(selCount);
+                    SendMessage(hwndListBox, LB_GETSELITEMS, (WPARAM)selCount, (LPARAM)selIndices.data());
+
+                    // Concatenate the selected item texts
+                    std::wstring combinedText;
+                    for (int index : selIndices)
+                    {
+                        int length = (int)SendMessage(hwndListBox, LB_GETTEXTLEN, (WPARAM)index, 0);
+                        if (length != LB_ERR)
+                        {
+                            std::wstring itemText(length, L'\0');
+                            SendMessage(hwndListBox, LB_GETTEXT, (WPARAM)index, (LPARAM)itemText.data());
+                            combinedText += itemText + L"\r\n";  // Add each item text followed by a new line
+                        }
+                    }
+
+                    // Open the clipboard
+                    if (OpenClipboard(hWnd))
+                    {
+                        // Clear the clipboard
+                        EmptyClipboard();
+
+                        // Allocate a global memory object for the text
+                        HGLOBAL hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (combinedText.size() + 1) * sizeof(wchar_t));
+                        if (hglbCopy)
+                        {
+                            // Lock the handle and copy the text to the buffer
+                            wchar_t* buffer = (wchar_t*)GlobalLock(hglbCopy);
+                            if (buffer != nullptr) {
+                                memcpy(buffer, combinedText.c_str(), (combinedText.size() + 1) * sizeof(wchar_t));
+                            }
+                            GlobalUnlock(hglbCopy);
+
+                            // Place the handle on the clipboard
+                            SetClipboardData(CF_UNICODETEXT, hglbCopy);
+                        }
+                        // Close the clipboard
+                        CloseClipboard();
+                    }
+
+                    
+                }
+            }
+        }
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
@@ -315,7 +375,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // Update font size
         // Recreate the font with the new DPI
         UINT dpi = HIWORD(wParam); // New DPI
-        int fontSize = MulDiv(12, dpi, 96);
+        int fontSize = MulDiv(FONTSIZE_AT_96DPI, dpi, 96);
         if (fontHandle)
         {
             DeleteObject(fontHandle); // Delete the old font
@@ -352,6 +412,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         EndPaint(hWnd, &ps);
     }
     break;
+
 
     case WM_DESTROY:
         if (fontHandle)
