@@ -328,6 +328,16 @@
 		<member name="Y2" type="int32" />
 	</struct>
 
+	<struct name="MeshVertex3D">
+		<member name="VertexID" type="uint32" />
+		<member name="Coordinates" type="double" rows="3"/>
+	</struct>	
+	
+	<struct name="MeshTriangle3D">
+		<member name="TriangleID" type="uint32" />
+		<member name="Vertices" type="uint32" rows="3"/>
+	</struct>	
+
 	<struct name="FloatPosition2D">
 		<member name="Coordinates" type="double" rows="2"/>
 	</struct>
@@ -1073,13 +1083,76 @@
 			<param name="UUID" type="string" pass="return" description="Returns mesh uuid." />
 		</method>
 
-		<method name="GetTriangleCount" description="Returns the number of triangles.">
+		<method name="GetTriangleCount" description="Returns the number of triangles in the mesh.">
 			<param name="TriangleCount" type="uint32" pass="return" description="Number of triangles." />
 		</method>
 	
-		<method name="GetVertexCount" description="Returns the number of vertices.">
+		<method name="GetVertexCount" description="Returns the number of vertices in the mesh.">
 			<param name="VertexCount" type="uint32" pass="return" description="Number of vertices." />
 		</method>
+
+		<method name="IsManifold" description="Checks if the mesh topology is closed and every edge has two adjacent faces.">
+			<param name="ManifoldResult" type="bool" pass="return" description="Returns true if the mesh is manifold." />
+		</method>
+
+		<method name="IsOriented" description="Checks if the mesh topology is oriented, so no Mobius strip or Klein bottle for example.">
+			<param name="OrientedResult" type="bool" pass="return" description="Returns true if the mesh is oriented." />
+		</method>
+
+		<method name="IsWatertight" description="Checks if the mesh topology is oriented and manifold, e.g is describing a 3D volume.">
+			<param name="WatertightResult" type="bool" pass="return" description="Returns true if the mesh is watertight." />
+		</method>
+
+		<method name="GetMaxVertexID" description="Returns the maximum vertex ID occuring in the mesh.">
+			<param name="MaxVertexID" type="uint32" pass="return" description="All vertices will have an ID smaller or equal this ID." />
+		</method>
+
+		<method name="VertexExists" description="Returns if a vertex with an ID exists.">
+			<param name="VertexID" type="uint32" pass="in" description="Vertex ID to check." />
+			<param name="VertexExists" type="bool" pass="return" description="Returns true if the vertex exists." />
+		</method>
+
+		<method name="GetVertex" description="Returns position of a vertex. Will return 0 if vertex does not exist.">
+			<param name="VertexID" type="uint32" pass="in" description="Vertex ID to retrieve." />
+			<param name="X" type="double" pass="out" description="Returns the X coordinate of the vertex. Returns 0 if vertex does not exist." />
+			<param name="Y" type="double" pass="out" description="Returns the Y coordinate of the vertex. Returns 0 if vertex does not exist." />
+			<param name="Z" type="double" pass="out" description="Returns the Z coordinate of the vertex. Returns 0 if vertex does not exist." />
+			<param name="VertexExists" type="bool" pass="return" description="Returns true if the vertex exists." />
+		</method>
+
+		<method name="GetVertexIDs" description="Returns all IDs of the vertices. Ordered sequentially.">
+			<param name="VertexIDs" type="basicarray" class="uint32" pass="out" description="Vertex ID array." />
+		</method>
+
+		<method name="GetAllVertices" description="Returns all the vertex information. Ordered sequentially by ID.">
+			<param name="Vertices" type="structarray" class="MeshVertex3D" pass="out" description="Vertex array." />
+		</method>
+
+		<method name="GetMaxTriangleID" description="Returns the maximum triangle ID occuring in the mesh.">
+			<param name="MaxTriangleID" type="uint32" pass="return" description="All triangles will have an ID smaller or equal this ID." />
+		</method>
+
+		<method name="TriangeExists" description="Returns if a triangle with an ID exists.">
+			<param name="TriangleID" type="uint32" pass="in" description="Triangle ID to check." />
+			<param name="TriangleExists" type="bool" pass="return" description="Returns true if the triangle exists." />
+		</method>
+
+		<method name="GetTriangle" description="Returns vertex IDs of a triangle. Will return 0 if triangle does not exist.">
+			<param name="TriangleID" type="uint32" pass="in" description="Triangle ID to retrieve." />
+			<param name="Vertex1ID" type="uint32" pass="out" description="Returns the vertex ID of the first corner. Returns 0 if triangle does not exist." />
+			<param name="Vertex2ID" type="uint32" pass="out" description="Returns the vertex ID of the second corner. Returns 0 if triangle does not exist." />
+			<param name="Vertex3ID" type="uint32" pass="out" description="Returns the vertex ID of the third corner. Returns 0 if triangle does not exist." />
+			<param name="VertexExists" type="bool" pass="return" description="Returns true if the triangle exists." />
+		</method>
+
+		<method name="GetTriangleIDs" description="Returns all IDs of the triangles. Ordered sequentially.">
+			<param name="TriangleIDs" type="basicarray" class="uint32" pass="out" description="Triangle ID array." />
+		</method>
+
+		<method name="GetAllTriangles" description="Returns all the triangle information. Ordered sequentially by ID.">
+			<param name="Triangles" type="structarray" class="MeshTriangle3D" pass="out" description="Triangle array." />
+		</method>
+
 
 	</class>
 

@@ -1454,16 +1454,112 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* IMeshObject::GetTriangleCount - Returns the number of triangles.
+	* IMeshObject::GetTriangleCount - Returns the number of triangles in the mesh.
 	* @return Number of triangles.
 	*/
 	virtual LibMCEnv_uint32 GetTriangleCount() = 0;
 
 	/**
-	* IMeshObject::GetVertexCount - Returns the number of vertices.
+	* IMeshObject::GetVertexCount - Returns the number of vertices in the mesh.
 	* @return Number of vertices.
 	*/
 	virtual LibMCEnv_uint32 GetVertexCount() = 0;
+
+	/**
+	* IMeshObject::IsManifold - Checks if the mesh topology is closed and every edge has two adjacent faces.
+	* @return Returns true if the mesh is manifold.
+	*/
+	virtual bool IsManifold() = 0;
+
+	/**
+	* IMeshObject::IsOriented - Checks if the mesh topology is oriented, so no Mobius strip or Klein bottle for example.
+	* @return Returns true if the mesh is oriented.
+	*/
+	virtual bool IsOriented() = 0;
+
+	/**
+	* IMeshObject::IsWatertight - Checks if the mesh topology is oriented and manifold, e.g is describing a 3D volume.
+	* @return Returns true if the mesh is watertight.
+	*/
+	virtual bool IsWatertight() = 0;
+
+	/**
+	* IMeshObject::GetMaxVertexID - Returns the maximum vertex ID occuring in the mesh.
+	* @return All vertices will have an ID smaller or equal this ID.
+	*/
+	virtual LibMCEnv_uint32 GetMaxVertexID() = 0;
+
+	/**
+	* IMeshObject::VertexExists - Returns if a vertex with an ID exists.
+	* @param[in] nVertexID - Vertex ID to check.
+	* @return Returns true if the vertex exists.
+	*/
+	virtual bool VertexExists(const LibMCEnv_uint32 nVertexID) = 0;
+
+	/**
+	* IMeshObject::GetVertex - Returns position of a vertex. Will return 0 if vertex does not exist.
+	* @param[in] nVertexID - Vertex ID to retrieve.
+	* @param[out] dX - Returns the X coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @param[out] dY - Returns the Y coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @param[out] dZ - Returns the Z coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @return Returns true if the vertex exists.
+	*/
+	virtual bool GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double & dX, LibMCEnv_double & dY, LibMCEnv_double & dZ) = 0;
+
+	/**
+	* IMeshObject::GetVertexIDs - Returns all IDs of the vertices. Ordered sequentially.
+	* @param[in] nVertexIDsBufferSize - Number of elements in buffer
+	* @param[out] pVertexIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pVertexIDsBuffer - uint32 buffer of Vertex ID array.
+	*/
+	virtual void GetVertexIDs(LibMCEnv_uint64 nVertexIDsBufferSize, LibMCEnv_uint64* pVertexIDsNeededCount, LibMCEnv_uint32 * pVertexIDsBuffer) = 0;
+
+	/**
+	* IMeshObject::GetAllVertices - Returns all the vertex information. Ordered sequentially by ID.
+	* @param[in] nVerticesBufferSize - Number of elements in buffer
+	* @param[out] pVerticesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pVerticesBuffer - MeshVertex3D buffer of Vertex array.
+	*/
+	virtual void GetAllVertices(LibMCEnv_uint64 nVerticesBufferSize, LibMCEnv_uint64* pVerticesNeededCount, LibMCEnv::sMeshVertex3D * pVerticesBuffer) = 0;
+
+	/**
+	* IMeshObject::GetMaxTriangleID - Returns the maximum triangle ID occuring in the mesh.
+	* @return All triangles will have an ID smaller or equal this ID.
+	*/
+	virtual LibMCEnv_uint32 GetMaxTriangleID() = 0;
+
+	/**
+	* IMeshObject::TriangeExists - Returns if a triangle with an ID exists.
+	* @param[in] nTriangleID - Triangle ID to check.
+	* @return Returns true if the triangle exists.
+	*/
+	virtual bool TriangeExists(const LibMCEnv_uint32 nTriangleID) = 0;
+
+	/**
+	* IMeshObject::GetTriangle - Returns vertex IDs of a triangle. Will return 0 if triangle does not exist.
+	* @param[in] nTriangleID - Triangle ID to retrieve.
+	* @param[out] nVertex1ID - Returns the vertex ID of the first corner. Returns 0 if triangle does not exist.
+	* @param[out] nVertex2ID - Returns the vertex ID of the second corner. Returns 0 if triangle does not exist.
+	* @param[out] nVertex3ID - Returns the vertex ID of the third corner. Returns 0 if triangle does not exist.
+	* @return Returns true if the triangle exists.
+	*/
+	virtual bool GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32 & nVertex1ID, LibMCEnv_uint32 & nVertex2ID, LibMCEnv_uint32 & nVertex3ID) = 0;
+
+	/**
+	* IMeshObject::GetTriangleIDs - Returns all IDs of the triangles. Ordered sequentially.
+	* @param[in] nTriangleIDsBufferSize - Number of elements in buffer
+	* @param[out] pTriangleIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTriangleIDsBuffer - uint32 buffer of Triangle ID array.
+	*/
+	virtual void GetTriangleIDs(LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEnv_uint64* pTriangleIDsNeededCount, LibMCEnv_uint32 * pTriangleIDsBuffer) = 0;
+
+	/**
+	* IMeshObject::GetAllTriangles - Returns all the triangle information. Ordered sequentially by ID.
+	* @param[in] nTrianglesBufferSize - Number of elements in buffer
+	* @param[out] pTrianglesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTrianglesBuffer - MeshTriangle3D buffer of Triangle array.
+	*/
+	virtual void GetAllTriangles(LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D * pTrianglesBuffer) = 0;
 
 };
 

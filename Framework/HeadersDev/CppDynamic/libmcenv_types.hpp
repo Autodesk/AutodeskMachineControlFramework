@@ -645,6 +645,16 @@ namespace LibMCEnv {
       LibMCEnv_int32 m_Y2;
   } sHatch2D;
   
+  typedef struct sMeshVertex3D {
+      LibMCEnv_uint32 m_VertexID;
+      LibMCEnv_double m_Coordinates[3];
+  } sMeshVertex3D;
+  
+  typedef struct sMeshTriangle3D {
+      LibMCEnv_uint32 m_TriangleID;
+      LibMCEnv_uint32 m_Vertices[3];
+  } sMeshTriangle3D;
+  
   typedef struct sFloatPosition2D {
       LibMCEnv_double m_Coordinates[2];
   } sFloatPosition2D;
@@ -699,6 +709,8 @@ typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
 typedef LibMCEnv::eDataTableColumnType eLibMCEnvDataTableColumnType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
+typedef LibMCEnv::sMeshVertex3D sLibMCEnvMeshVertex3D;
+typedef LibMCEnv::sMeshTriangle3D sLibMCEnvMeshTriangle3D;
 typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;
 typedef LibMCEnv::sFieldData2DPoint sLibMCEnvFieldData2DPoint;
 typedef LibMCEnv::sFieldData3DPoint sLibMCEnvFieldData3DPoint;

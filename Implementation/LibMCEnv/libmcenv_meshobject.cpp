@@ -91,3 +91,70 @@ AMC::PMeshEntity CMeshObject::getMeshEntity()
     return pMeshEntity;
 }
 
+
+bool CMeshObject::IsManifold()
+{
+    return getMeshEntity()->isManifold ();
+}
+
+bool CMeshObject::IsOriented()
+{
+    return getMeshEntity()->isOriented();
+}
+
+bool CMeshObject::IsWatertight()
+{
+    auto pMeshEntity = getMeshEntity();
+    return (pMeshEntity->isOriented() && pMeshEntity->isManifold());
+}
+
+LibMCEnv_uint32 CMeshObject::GetMaxVertexID()
+{
+    return getMeshEntity()->getMaxVertexID();
+}
+
+bool CMeshObject::VertexExists(const LibMCEnv_uint32 nVertexID)
+{
+    return getMeshEntity()->vertexExists(nVertexID);
+}
+
+bool CMeshObject::GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double& dX, LibMCEnv_double& dY, LibMCEnv_double& dZ)
+{
+    return getMeshEntity()->getVertex(nVertexID, dX, dY, dZ);
+}
+
+void CMeshObject::GetVertexIDs(LibMCEnv_uint64 nVertexIDsBufferSize, LibMCEnv_uint64* pVertexIDsNeededCount, LibMCEnv_uint32* pVertexIDsBuffer)
+{
+    getMeshEntity()->getVertexIDs(nVertexIDsBufferSize, pVertexIDsNeededCount, pVertexIDsBuffer);
+}
+
+void CMeshObject::GetAllVertices(LibMCEnv_uint64 nVerticesBufferSize, LibMCEnv_uint64* pVerticesNeededCount, LibMCEnv::sMeshVertex3D* pVerticesBuffer)
+{
+    getMeshEntity()->getAllVertices(nVerticesBufferSize, pVerticesNeededCount, pVerticesBuffer);
+}
+
+
+LibMCEnv_uint32 CMeshObject::GetMaxTriangleID()
+{
+    return getMeshEntity()->getMaxTriangleID();
+}
+
+bool CMeshObject::TriangeExists(const LibMCEnv_uint32 nTriangleID)
+{
+    return getMeshEntity()->triangeExists(nTriangleID);
+}
+
+bool CMeshObject::GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32& nVertex1ID, LibMCEnv_uint32& nVertex2ID, LibMCEnv_uint32& nVertex3ID)
+{
+    return getMeshEntity()->getTriangle(nTriangleID, nVertex1ID, nVertex2ID, nVertex3ID);
+}
+
+void CMeshObject::GetTriangleIDs(LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEnv_uint64* pTriangleIDsNeededCount, LibMCEnv_uint32* pTriangleIDsBuffer)
+{
+    getMeshEntity()->getTriangleIDs(nTriangleIDsBufferSize, pTriangleIDsNeededCount, pTriangleIDsBuffer);
+}
+
+void CMeshObject::GetAllTriangles(LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D* pTrianglesBuffer)
+{
+    getMeshEntity()->getAllTriangles(nTrianglesBufferSize, pTrianglesNeededCount, pTrianglesBuffer);
+}

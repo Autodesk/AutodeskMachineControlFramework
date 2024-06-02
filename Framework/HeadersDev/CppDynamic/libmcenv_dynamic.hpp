@@ -1359,6 +1359,19 @@ public:
 	inline std::string GetUUID();
 	inline LibMCEnv_uint32 GetTriangleCount();
 	inline LibMCEnv_uint32 GetVertexCount();
+	inline bool IsManifold();
+	inline bool IsOriented();
+	inline bool IsWatertight();
+	inline LibMCEnv_uint32 GetMaxVertexID();
+	inline bool VertexExists(const LibMCEnv_uint32 nVertexID);
+	inline bool GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double & dX, LibMCEnv_double & dY, LibMCEnv_double & dZ);
+	inline void GetVertexIDs(std::vector<LibMCEnv_uint32> & VertexIDsBuffer);
+	inline void GetAllVertices(std::vector<sMeshVertex3D> & VerticesBuffer);
+	inline LibMCEnv_uint32 GetMaxTriangleID();
+	inline bool TriangeExists(const LibMCEnv_uint32 nTriangleID);
+	inline bool GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32 & nVertex1ID, LibMCEnv_uint32 & nVertex2ID, LibMCEnv_uint32 & nVertex3ID);
+	inline void GetTriangleIDs(std::vector<LibMCEnv_uint32> & TriangleIDsBuffer);
+	inline void GetAllTriangles(std::vector<sMeshTriangle3D> & TrianglesBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -2787,6 +2800,19 @@ public:
 		pWrapperTable->m_MeshObject_GetUUID = nullptr;
 		pWrapperTable->m_MeshObject_GetTriangleCount = nullptr;
 		pWrapperTable->m_MeshObject_GetVertexCount = nullptr;
+		pWrapperTable->m_MeshObject_IsManifold = nullptr;
+		pWrapperTable->m_MeshObject_IsOriented = nullptr;
+		pWrapperTable->m_MeshObject_IsWatertight = nullptr;
+		pWrapperTable->m_MeshObject_GetMaxVertexID = nullptr;
+		pWrapperTable->m_MeshObject_VertexExists = nullptr;
+		pWrapperTable->m_MeshObject_GetVertex = nullptr;
+		pWrapperTable->m_MeshObject_GetVertexIDs = nullptr;
+		pWrapperTable->m_MeshObject_GetAllVertices = nullptr;
+		pWrapperTable->m_MeshObject_GetMaxTriangleID = nullptr;
+		pWrapperTable->m_MeshObject_TriangeExists = nullptr;
+		pWrapperTable->m_MeshObject_GetTriangle = nullptr;
+		pWrapperTable->m_MeshObject_GetTriangleIDs = nullptr;
+		pWrapperTable->m_MeshObject_GetAllTriangles = nullptr;
 		pWrapperTable->m_ToolpathPart_GetName = nullptr;
 		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
 		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
@@ -4745,6 +4771,123 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MeshObject_GetVertexCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_IsManifold = (PLibMCEnvMeshObject_IsManifoldPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_ismanifold");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_IsManifold = (PLibMCEnvMeshObject_IsManifoldPtr) dlsym(hLibrary, "libmcenv_meshobject_ismanifold");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_IsManifold == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_IsOriented = (PLibMCEnvMeshObject_IsOrientedPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_isoriented");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_IsOriented = (PLibMCEnvMeshObject_IsOrientedPtr) dlsym(hLibrary, "libmcenv_meshobject_isoriented");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_IsOriented == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_IsWatertight = (PLibMCEnvMeshObject_IsWatertightPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_iswatertight");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_IsWatertight = (PLibMCEnvMeshObject_IsWatertightPtr) dlsym(hLibrary, "libmcenv_meshobject_iswatertight");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_IsWatertight == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetMaxVertexID = (PLibMCEnvMeshObject_GetMaxVertexIDPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getmaxvertexid");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetMaxVertexID = (PLibMCEnvMeshObject_GetMaxVertexIDPtr) dlsym(hLibrary, "libmcenv_meshobject_getmaxvertexid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetMaxVertexID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_VertexExists = (PLibMCEnvMeshObject_VertexExistsPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_vertexexists");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_VertexExists = (PLibMCEnvMeshObject_VertexExistsPtr) dlsym(hLibrary, "libmcenv_meshobject_vertexexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_VertexExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetVertex = (PLibMCEnvMeshObject_GetVertexPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getvertex");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetVertex = (PLibMCEnvMeshObject_GetVertexPtr) dlsym(hLibrary, "libmcenv_meshobject_getvertex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetVertex == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetVertexIDs = (PLibMCEnvMeshObject_GetVertexIDsPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getvertexids");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetVertexIDs = (PLibMCEnvMeshObject_GetVertexIDsPtr) dlsym(hLibrary, "libmcenv_meshobject_getvertexids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetVertexIDs == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetAllVertices = (PLibMCEnvMeshObject_GetAllVerticesPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getallvertices");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetAllVertices = (PLibMCEnvMeshObject_GetAllVerticesPtr) dlsym(hLibrary, "libmcenv_meshobject_getallvertices");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetAllVertices == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetMaxTriangleID = (PLibMCEnvMeshObject_GetMaxTriangleIDPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getmaxtriangleid");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetMaxTriangleID = (PLibMCEnvMeshObject_GetMaxTriangleIDPtr) dlsym(hLibrary, "libmcenv_meshobject_getmaxtriangleid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetMaxTriangleID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_TriangeExists = (PLibMCEnvMeshObject_TriangeExistsPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_triangeexists");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_TriangeExists = (PLibMCEnvMeshObject_TriangeExistsPtr) dlsym(hLibrary, "libmcenv_meshobject_triangeexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_TriangeExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetTriangle = (PLibMCEnvMeshObject_GetTrianglePtr) GetProcAddress(hLibrary, "libmcenv_meshobject_gettriangle");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetTriangle = (PLibMCEnvMeshObject_GetTrianglePtr) dlsym(hLibrary, "libmcenv_meshobject_gettriangle");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetTriangle == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetTriangleIDs = (PLibMCEnvMeshObject_GetTriangleIDsPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_gettriangleids");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetTriangleIDs = (PLibMCEnvMeshObject_GetTriangleIDsPtr) dlsym(hLibrary, "libmcenv_meshobject_gettriangleids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetTriangleIDs == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetAllTriangles = (PLibMCEnvMeshObject_GetAllTrianglesPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getalltriangles");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetAllTriangles = (PLibMCEnvMeshObject_GetAllTrianglesPtr) dlsym(hLibrary, "libmcenv_meshobject_getalltriangles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetAllTriangles == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10711,6 +10854,58 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetVertexCount == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_meshobject_ismanifold", (void**)&(pWrapperTable->m_MeshObject_IsManifold));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_IsManifold == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_isoriented", (void**)&(pWrapperTable->m_MeshObject_IsOriented));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_IsOriented == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_iswatertight", (void**)&(pWrapperTable->m_MeshObject_IsWatertight));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_IsWatertight == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getmaxvertexid", (void**)&(pWrapperTable->m_MeshObject_GetMaxVertexID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetMaxVertexID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_vertexexists", (void**)&(pWrapperTable->m_MeshObject_VertexExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_VertexExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getvertex", (void**)&(pWrapperTable->m_MeshObject_GetVertex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetVertex == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getvertexids", (void**)&(pWrapperTable->m_MeshObject_GetVertexIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetVertexIDs == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getallvertices", (void**)&(pWrapperTable->m_MeshObject_GetAllVertices));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetAllVertices == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getmaxtriangleid", (void**)&(pWrapperTable->m_MeshObject_GetMaxTriangleID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetMaxTriangleID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_triangeexists", (void**)&(pWrapperTable->m_MeshObject_TriangeExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_TriangeExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_gettriangle", (void**)&(pWrapperTable->m_MeshObject_GetTriangle));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetTriangle == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_gettriangleids", (void**)&(pWrapperTable->m_MeshObject_GetTriangleIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetTriangleIDs == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getalltriangles", (void**)&(pWrapperTable->m_MeshObject_GetAllTriangles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetAllTriangles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -14811,7 +15006,7 @@ public:
 	}
 	
 	/**
-	* CMeshObject::GetTriangleCount - Returns the number of triangles.
+	* CMeshObject::GetTriangleCount - Returns the number of triangles in the mesh.
 	* @return Number of triangles.
 	*/
 	LibMCEnv_uint32 CMeshObject::GetTriangleCount()
@@ -14823,7 +15018,7 @@ public:
 	}
 	
 	/**
-	* CMeshObject::GetVertexCount - Returns the number of vertices.
+	* CMeshObject::GetVertexCount - Returns the number of vertices in the mesh.
 	* @return Number of vertices.
 	*/
 	LibMCEnv_uint32 CMeshObject::GetVertexCount()
@@ -14832,6 +15027,176 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertexCount(m_pHandle, &resultVertexCount));
 		
 		return resultVertexCount;
+	}
+	
+	/**
+	* CMeshObject::IsManifold - Checks if the mesh topology is closed and every edge has two adjacent faces.
+	* @return Returns true if the mesh is manifold.
+	*/
+	bool CMeshObject::IsManifold()
+	{
+		bool resultManifoldResult = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_IsManifold(m_pHandle, &resultManifoldResult));
+		
+		return resultManifoldResult;
+	}
+	
+	/**
+	* CMeshObject::IsOriented - Checks if the mesh topology is oriented, so no Mobius strip or Klein bottle for example.
+	* @return Returns true if the mesh is oriented.
+	*/
+	bool CMeshObject::IsOriented()
+	{
+		bool resultOrientedResult = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_IsOriented(m_pHandle, &resultOrientedResult));
+		
+		return resultOrientedResult;
+	}
+	
+	/**
+	* CMeshObject::IsWatertight - Checks if the mesh topology is oriented and manifold, e.g is describing a 3D volume.
+	* @return Returns true if the mesh is watertight.
+	*/
+	bool CMeshObject::IsWatertight()
+	{
+		bool resultWatertightResult = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_IsWatertight(m_pHandle, &resultWatertightResult));
+		
+		return resultWatertightResult;
+	}
+	
+	/**
+	* CMeshObject::GetMaxVertexID - Returns the maximum vertex ID occuring in the mesh.
+	* @return All vertices will have an ID smaller or equal this ID.
+	*/
+	LibMCEnv_uint32 CMeshObject::GetMaxVertexID()
+	{
+		LibMCEnv_uint32 resultMaxVertexID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetMaxVertexID(m_pHandle, &resultMaxVertexID));
+		
+		return resultMaxVertexID;
+	}
+	
+	/**
+	* CMeshObject::VertexExists - Returns if a vertex with an ID exists.
+	* @param[in] nVertexID - Vertex ID to check.
+	* @return Returns true if the vertex exists.
+	*/
+	bool CMeshObject::VertexExists(const LibMCEnv_uint32 nVertexID)
+	{
+		bool resultVertexExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_VertexExists(m_pHandle, nVertexID, &resultVertexExists));
+		
+		return resultVertexExists;
+	}
+	
+	/**
+	* CMeshObject::GetVertex - Returns position of a vertex. Will return 0 if vertex does not exist.
+	* @param[in] nVertexID - Vertex ID to retrieve.
+	* @param[out] dX - Returns the X coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @param[out] dY - Returns the Y coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @param[out] dZ - Returns the Z coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @return Returns true if the vertex exists.
+	*/
+	bool CMeshObject::GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double & dX, LibMCEnv_double & dY, LibMCEnv_double & dZ)
+	{
+		bool resultVertexExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertex(m_pHandle, nVertexID, &dX, &dY, &dZ, &resultVertexExists));
+		
+		return resultVertexExists;
+	}
+	
+	/**
+	* CMeshObject::GetVertexIDs - Returns all IDs of the vertices. Ordered sequentially.
+	* @param[out] VertexIDsBuffer - Vertex ID array.
+	*/
+	void CMeshObject::GetVertexIDs(std::vector<LibMCEnv_uint32> & VertexIDsBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededVertexIDs = 0;
+		LibMCEnv_uint64 elementsWrittenVertexIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertexIDs(m_pHandle, 0, &elementsNeededVertexIDs, nullptr));
+		VertexIDsBuffer.resize((size_t) elementsNeededVertexIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertexIDs(m_pHandle, elementsNeededVertexIDs, &elementsWrittenVertexIDs, VertexIDsBuffer.data()));
+	}
+	
+	/**
+	* CMeshObject::GetAllVertices - Returns all the vertex information. Ordered sequentially by ID.
+	* @param[out] VerticesBuffer - Vertex array.
+	*/
+	void CMeshObject::GetAllVertices(std::vector<sMeshVertex3D> & VerticesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededVertices = 0;
+		LibMCEnv_uint64 elementsWrittenVertices = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetAllVertices(m_pHandle, 0, &elementsNeededVertices, nullptr));
+		VerticesBuffer.resize((size_t) elementsNeededVertices);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetAllVertices(m_pHandle, elementsNeededVertices, &elementsWrittenVertices, VerticesBuffer.data()));
+	}
+	
+	/**
+	* CMeshObject::GetMaxTriangleID - Returns the maximum triangle ID occuring in the mesh.
+	* @return All triangles will have an ID smaller or equal this ID.
+	*/
+	LibMCEnv_uint32 CMeshObject::GetMaxTriangleID()
+	{
+		LibMCEnv_uint32 resultMaxTriangleID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetMaxTriangleID(m_pHandle, &resultMaxTriangleID));
+		
+		return resultMaxTriangleID;
+	}
+	
+	/**
+	* CMeshObject::TriangeExists - Returns if a triangle with an ID exists.
+	* @param[in] nTriangleID - Triangle ID to check.
+	* @return Returns true if the triangle exists.
+	*/
+	bool CMeshObject::TriangeExists(const LibMCEnv_uint32 nTriangleID)
+	{
+		bool resultTriangleExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_TriangeExists(m_pHandle, nTriangleID, &resultTriangleExists));
+		
+		return resultTriangleExists;
+	}
+	
+	/**
+	* CMeshObject::GetTriangle - Returns vertex IDs of a triangle. Will return 0 if triangle does not exist.
+	* @param[in] nTriangleID - Triangle ID to retrieve.
+	* @param[out] nVertex1ID - Returns the vertex ID of the first corner. Returns 0 if triangle does not exist.
+	* @param[out] nVertex2ID - Returns the vertex ID of the second corner. Returns 0 if triangle does not exist.
+	* @param[out] nVertex3ID - Returns the vertex ID of the third corner. Returns 0 if triangle does not exist.
+	* @return Returns true if the triangle exists.
+	*/
+	bool CMeshObject::GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32 & nVertex1ID, LibMCEnv_uint32 & nVertex2ID, LibMCEnv_uint32 & nVertex3ID)
+	{
+		bool resultVertexExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetTriangle(m_pHandle, nTriangleID, &nVertex1ID, &nVertex2ID, &nVertex3ID, &resultVertexExists));
+		
+		return resultVertexExists;
+	}
+	
+	/**
+	* CMeshObject::GetTriangleIDs - Returns all IDs of the triangles. Ordered sequentially.
+	* @param[out] TriangleIDsBuffer - Triangle ID array.
+	*/
+	void CMeshObject::GetTriangleIDs(std::vector<LibMCEnv_uint32> & TriangleIDsBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededTriangleIDs = 0;
+		LibMCEnv_uint64 elementsWrittenTriangleIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetTriangleIDs(m_pHandle, 0, &elementsNeededTriangleIDs, nullptr));
+		TriangleIDsBuffer.resize((size_t) elementsNeededTriangleIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetTriangleIDs(m_pHandle, elementsNeededTriangleIDs, &elementsWrittenTriangleIDs, TriangleIDsBuffer.data()));
+	}
+	
+	/**
+	* CMeshObject::GetAllTriangles - Returns all the triangle information. Ordered sequentially by ID.
+	* @param[out] TrianglesBuffer - Triangle array.
+	*/
+	void CMeshObject::GetAllTriangles(std::vector<sMeshTriangle3D> & TrianglesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededTriangles = 0;
+		LibMCEnv_uint64 elementsWrittenTriangles = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetAllTriangles(m_pHandle, 0, &elementsNeededTriangles, nullptr));
+		TrianglesBuffer.resize((size_t) elementsNeededTriangles);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetAllTriangles(m_pHandle, elementsNeededTriangles, &elementsWrittenTriangles, TrianglesBuffer.data()));
 	}
 	
 	/**

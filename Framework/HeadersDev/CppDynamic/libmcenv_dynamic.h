@@ -1535,7 +1535,7 @@ typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetNamePtr) (LibMCEnv_MeshObject pM
 typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetUUIDPtr) (LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
-* Returns the number of triangles.
+* Returns the number of triangles in the mesh.
 *
 * @param[in] pMeshObject - MeshObject instance.
 * @param[out] pTriangleCount - Number of triangles.
@@ -1544,13 +1544,148 @@ typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetUUIDPtr) (LibMCEnv_MeshObject pM
 typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetTriangleCountPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pTriangleCount);
 
 /**
-* Returns the number of vertices.
+* Returns the number of vertices in the mesh.
 *
 * @param[in] pMeshObject - MeshObject instance.
 * @param[out] pVertexCount - Number of vertices.
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetVertexCountPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pVertexCount);
+
+/**
+* Checks if the mesh topology is closed and every edge has two adjacent faces.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pManifoldResult - Returns true if the mesh is manifold.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_IsManifoldPtr) (LibMCEnv_MeshObject pMeshObject, bool * pManifoldResult);
+
+/**
+* Checks if the mesh topology is oriented, so no Mobius strip or Klein bottle for example.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pOrientedResult - Returns true if the mesh is oriented.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_IsOrientedPtr) (LibMCEnv_MeshObject pMeshObject, bool * pOrientedResult);
+
+/**
+* Checks if the mesh topology is oriented and manifold, e.g is describing a 3D volume.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pWatertightResult - Returns true if the mesh is watertight.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_IsWatertightPtr) (LibMCEnv_MeshObject pMeshObject, bool * pWatertightResult);
+
+/**
+* Returns the maximum vertex ID occuring in the mesh.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pMaxVertexID - All vertices will have an ID smaller or equal this ID.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetMaxVertexIDPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pMaxVertexID);
+
+/**
+* Returns if a vertex with an ID exists.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nVertexID - Vertex ID to check.
+* @param[out] pVertexExists - Returns true if the vertex exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_VertexExistsPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 nVertexID, bool * pVertexExists);
+
+/**
+* Returns position of a vertex. Will return 0 if vertex does not exist.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nVertexID - Vertex ID to retrieve.
+* @param[out] pX - Returns the X coordinate of the vertex. Returns 0 if vertex does not exist.
+* @param[out] pY - Returns the Y coordinate of the vertex. Returns 0 if vertex does not exist.
+* @param[out] pZ - Returns the Z coordinate of the vertex. Returns 0 if vertex does not exist.
+* @param[out] pVertexExists - Returns true if the vertex exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetVertexPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 nVertexID, LibMCEnv_double * pX, LibMCEnv_double * pY, LibMCEnv_double * pZ, bool * pVertexExists);
+
+/**
+* Returns all IDs of the vertices. Ordered sequentially.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nVertexIDsBufferSize - Number of elements in buffer
+* @param[out] pVertexIDsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pVertexIDsBuffer - uint32  buffer of Vertex ID array.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetVertexIDsPtr) (LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nVertexIDsBufferSize, LibMCEnv_uint64* pVertexIDsNeededCount, LibMCEnv_uint32 * pVertexIDsBuffer);
+
+/**
+* Returns all the vertex information. Ordered sequentially by ID.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nVerticesBufferSize - Number of elements in buffer
+* @param[out] pVerticesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pVerticesBuffer - MeshVertex3D  buffer of Vertex array.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetAllVerticesPtr) (LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nVerticesBufferSize, LibMCEnv_uint64* pVerticesNeededCount, LibMCEnv::sMeshVertex3D * pVerticesBuffer);
+
+/**
+* Returns the maximum triangle ID occuring in the mesh.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pMaxTriangleID - All triangles will have an ID smaller or equal this ID.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetMaxTriangleIDPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pMaxTriangleID);
+
+/**
+* Returns if a triangle with an ID exists.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nTriangleID - Triangle ID to check.
+* @param[out] pTriangleExists - Returns true if the triangle exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_TriangeExistsPtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 nTriangleID, bool * pTriangleExists);
+
+/**
+* Returns vertex IDs of a triangle. Will return 0 if triangle does not exist.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nTriangleID - Triangle ID to retrieve.
+* @param[out] pVertex1ID - Returns the vertex ID of the first corner. Returns 0 if triangle does not exist.
+* @param[out] pVertex2ID - Returns the vertex ID of the second corner. Returns 0 if triangle does not exist.
+* @param[out] pVertex3ID - Returns the vertex ID of the third corner. Returns 0 if triangle does not exist.
+* @param[out] pVertexExists - Returns true if the triangle exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetTrianglePtr) (LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32 * pVertex1ID, LibMCEnv_uint32 * pVertex2ID, LibMCEnv_uint32 * pVertex3ID, bool * pVertexExists);
+
+/**
+* Returns all IDs of the triangles. Ordered sequentially.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nTriangleIDsBufferSize - Number of elements in buffer
+* @param[out] pTriangleIDsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTriangleIDsBuffer - uint32  buffer of Triangle ID array.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetTriangleIDsPtr) (LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEnv_uint64* pTriangleIDsNeededCount, LibMCEnv_uint32 * pTriangleIDsBuffer);
+
+/**
+* Returns all the triangle information. Ordered sequentially by ID.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] nTrianglesBufferSize - Number of elements in buffer
+* @param[out] pTrianglesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTrianglesBuffer - MeshTriangle3D  buffer of Triangle array.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshObject_GetAllTrianglesPtr) (LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D * pTrianglesBuffer);
 
 /*************************************************************************************************************************
  Class definition for ToolpathPart
@@ -8201,6 +8336,19 @@ typedef struct {
 	PLibMCEnvMeshObject_GetUUIDPtr m_MeshObject_GetUUID;
 	PLibMCEnvMeshObject_GetTriangleCountPtr m_MeshObject_GetTriangleCount;
 	PLibMCEnvMeshObject_GetVertexCountPtr m_MeshObject_GetVertexCount;
+	PLibMCEnvMeshObject_IsManifoldPtr m_MeshObject_IsManifold;
+	PLibMCEnvMeshObject_IsOrientedPtr m_MeshObject_IsOriented;
+	PLibMCEnvMeshObject_IsWatertightPtr m_MeshObject_IsWatertight;
+	PLibMCEnvMeshObject_GetMaxVertexIDPtr m_MeshObject_GetMaxVertexID;
+	PLibMCEnvMeshObject_VertexExistsPtr m_MeshObject_VertexExists;
+	PLibMCEnvMeshObject_GetVertexPtr m_MeshObject_GetVertex;
+	PLibMCEnvMeshObject_GetVertexIDsPtr m_MeshObject_GetVertexIDs;
+	PLibMCEnvMeshObject_GetAllVerticesPtr m_MeshObject_GetAllVertices;
+	PLibMCEnvMeshObject_GetMaxTriangleIDPtr m_MeshObject_GetMaxTriangleID;
+	PLibMCEnvMeshObject_TriangeExistsPtr m_MeshObject_TriangeExists;
+	PLibMCEnvMeshObject_GetTrianglePtr m_MeshObject_GetTriangle;
+	PLibMCEnvMeshObject_GetTriangleIDsPtr m_MeshObject_GetTriangleIDs;
+	PLibMCEnvMeshObject_GetAllTrianglesPtr m_MeshObject_GetAllTriangles;
 	PLibMCEnvToolpathPart_GetNamePtr m_ToolpathPart_GetName;
 	PLibMCEnvToolpathPart_GetUUIDPtr m_ToolpathPart_GetUUID;
 	PLibMCEnvToolpathPart_GetMeshUUIDPtr m_ToolpathPart_GetMeshUUID;
