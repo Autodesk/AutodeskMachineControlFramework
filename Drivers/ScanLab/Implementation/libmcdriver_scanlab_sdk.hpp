@@ -132,6 +132,7 @@ namespace LibMCDriver_ScanLab {
 		
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_trigger) (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_trigger4) (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_trigger8) (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4, uint32_t nSignal5, uint32_t nSignal6, uint32_t nSignal7, uint32_t nSignal8);
 
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_control_mode) (uint32_t nCardNo, uint32_t nMode);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_pulses_ctrl) (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
@@ -195,6 +196,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y_pos) (uint32_t nCardNo, const double ScaleY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_x) (uint32_t nCardNo, const double ScaleX);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y) (uint32_t nCardNo, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_fly_return) (uint32_t nCardNo, int32_t sX, int32_t nY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_encoder) (uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_marking_info) (uint32_t nCardNo);		
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_wait_for_encoder) (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo);
@@ -312,6 +314,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_get_free_variable ptr_n_get_free_variable = nullptr;
 			PScanLabPtr_n_set_trigger ptr_n_set_trigger = nullptr;
 			PScanLabPtr_n_set_trigger4 ptr_n_set_trigger4 = nullptr;
+			PScanLabPtr_n_set_trigger8 ptr_n_set_trigger8 = nullptr;
 			PScanLabPtr_n_set_control_mode ptr_n_set_control_mode = nullptr;
 			PScanLabPtr_n_set_laser_pulses_ctrl ptr_n_set_laser_pulses_ctrl = nullptr;
 			PScanLabPtr_n_set_mark_speed_ctrl ptr_n_set_mark_speed_ctrl = nullptr;
@@ -368,6 +371,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_fly_y_pos ptr_n_set_fly_y_pos = nullptr;
 			PScanLabPtr_n_set_fly_x ptr_n_set_fly_x = nullptr;
 			PScanLabPtr_n_set_fly_y ptr_n_set_fly_y = nullptr;
+			PScanLabPtr_n_fly_return ptr_n_fly_return = nullptr;
 			PScanLabPtr_n_get_encoder ptr_n_get_encoder = nullptr;
 			PScanLabPtr_n_get_marking_info ptr_n_get_marking_info = nullptr;
 			PScanLabPtr_n_wait_for_encoder ptr_n_wait_for_encoder = nullptr;
@@ -469,6 +473,7 @@ namespace LibMCDriver_ScanLab {
 
 			void n_set_trigger (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2);
 			void n_set_trigger4 (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4);
+			void n_set_trigger8 (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4, uint32_t nSignal5, uint32_t nSignal6, uint32_t nSignal7, uint32_t nSignal8);
 
 			void n_set_control_mode (uint32_t nCardNo, uint32_t nMode);
 			void n_set_laser_pulses_ctrl (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
@@ -532,6 +537,7 @@ namespace LibMCDriver_ScanLab {
 			void n_set_fly_y_pos (uint32_t nCardNo, const double ScaleY);
 			void n_set_fly_x (uint32_t nCardNo, const double ScaleX);
 			void n_set_fly_y (uint32_t nCardNo, const double ScaleY);
+			void n_fly_return (uint32_t nCardNo, int32_t sX, int32_t nY);
 			void n_get_encoder (uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY);
 			uint32_t n_get_marking_info (uint32_t nCardNo);
 			void n_wait_for_encoder (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo);

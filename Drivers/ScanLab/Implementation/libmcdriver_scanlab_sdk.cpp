@@ -245,6 +245,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_get_free_variable = (PScanLabPtr_n_get_free_variable)_loadScanLabAddress(hLibrary, "n_get_free_variable");
 	this->ptr_n_set_trigger = (PScanLabPtr_n_set_trigger)_loadScanLabAddress(hLibrary, "n_set_trigger");
 	this->ptr_n_set_trigger4 = (PScanLabPtr_n_set_trigger4)_loadScanLabAddress(hLibrary, "n_set_trigger4");
+	this->ptr_n_set_trigger8 = (PScanLabPtr_n_set_trigger8)_loadScanLabAddress(hLibrary, "n_set_trigger8");
 	this->ptr_n_set_control_mode = (PScanLabPtr_n_set_control_mode)_loadScanLabAddress(hLibrary, "n_set_control_mode");
 	this->ptr_n_set_laser_pulses_ctrl = (PScanLabPtr_n_set_laser_pulses_ctrl)_loadScanLabAddress(hLibrary, "n_set_laser_pulses_ctrl");
 	this->ptr_n_set_mark_speed_ctrl = (PScanLabPtr_n_set_mark_speed_ctrl)_loadScanLabAddress(hLibrary, "n_set_mark_speed_ctrl");
@@ -303,6 +304,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_set_fly_y_pos = (PScanLabPtr_n_set_fly_y_pos)_loadScanLabAddress(hLibrary, "n_set_fly_y_pos");
 	this->ptr_n_set_fly_x = (PScanLabPtr_n_set_fly_x)_loadScanLabAddress(hLibrary, "n_set_fly_x");
 	this->ptr_n_set_fly_y = (PScanLabPtr_n_set_fly_y)_loadScanLabAddress(hLibrary, "n_set_fly_y");
+	this->ptr_n_fly_return = (PScanLabPtr_n_fly_return)_loadScanLabAddress(hLibrary, "n_fly_return");
 	this->ptr_n_get_encoder = (PScanLabPtr_n_get_encoder)_loadScanLabAddress(hLibrary, "n_get_encoder");
 	this->ptr_n_get_marking_info = (PScanLabPtr_n_get_marking_info)_loadScanLabAddress(hLibrary, "n_get_marking_info");
 	this->ptr_n_wait_for_encoder = (PScanLabPtr_n_wait_for_encoder)_loadScanLabAddress(hLibrary, "n_wait_for_encoder");
@@ -440,6 +442,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_get_free_variable = nullptr;
 	ptr_n_set_trigger = nullptr;
 	ptr_n_set_trigger4 = nullptr;
+	ptr_n_set_trigger8 = nullptr;
 	ptr_n_set_control_mode = nullptr;
 	ptr_n_set_laser_pulses_ctrl = nullptr;
 	ptr_n_set_mark_speed_ctrl = nullptr;
@@ -500,6 +503,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_set_fly_x = nullptr;
 	ptr_n_set_fly_y = nullptr;
 	ptr_n_get_encoder = nullptr;
+	ptr_n_fly_return = nullptr;
 
 	ptr_n_get_marking_info = nullptr;
 	ptr_n_wait_for_encoder = nullptr;
@@ -1084,6 +1088,14 @@ void CScanLabSDK::n_set_trigger4(uint32_t nCardNo, uint32_t nPeriod, uint32_t nS
 	ptr_n_set_trigger4(nCardNo, nPeriod, nSignal1, nSignal2, nSignal3, nSignal4);
 }
 
+void CScanLabSDK::n_set_trigger8(uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4, uint32_t nSignal5, uint32_t nSignal6, uint32_t nSignal7, uint32_t nSignal8)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_set_trigger4", std::to_string(nCardNo) + ", " + std::to_string(nPeriod) + ", " + std::to_string(nSignal1) + ", " + std::to_string(nSignal2) + ", " + std::to_string(nSignal3) + ", " + std::to_string(nSignal4) + ", " + std::to_string(nSignal5) + ", " + std::to_string(nSignal6) + ", " + std::to_string(nSignal7) + ", " + std::to_string(nSignal8));
+
+	ptr_n_set_trigger8(nCardNo, nPeriod, nSignal1, nSignal2, nSignal3, nSignal4, nSignal5, nSignal6, nSignal7, nSignal8);
+}
+
 
 void CScanLabSDK::n_set_control_mode(uint32_t nCardNo, uint32_t nMode)
 {
@@ -1510,6 +1522,15 @@ void CScanLabSDK::n_set_fly_y(uint32_t nCardNo, const double ScaleY)
 
 	ptr_n_set_fly_y(nCardNo, ScaleY);
 }
+
+void CScanLabSDK::n_fly_return(uint32_t nCardNo, int32_t nX, int32_t nY)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_fly_return", std::to_string(nCardNo) + ", " + std::to_string(nX) + ", " + std::to_string(nY));
+
+	ptr_n_fly_return(nCardNo, nX, nY);
+}
+
 
 void CScanLabSDK::n_get_encoder(uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY)
 {

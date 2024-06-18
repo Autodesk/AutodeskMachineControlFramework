@@ -1252,6 +1252,30 @@ void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChann
 	// No PID control for now
 	m_pScanLabSDK->n_set_multi_mcbsp_in(m_CardNo, 0, 0, 0);
 
+
+	// Workaround: Ensure that MCBSP Mark On The Fly is disabled!
+	SetStartList(1, 0);
+	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 1.0, 1.0);
+	m_pScanLabSDK->n_long_delay(m_CardNo, 10);
+	m_pScanLabSDK->n_fly_return(m_CardNo, 0, 0);
+	SetEndOfList();
+	ExecuteList(1, 0);
+
+	bool Busy = true;
+	uint32_t Pos = 0;
+	uint32_t nMaxRetries = 256;
+
+	for (uint32_t nRetries = 0; nRetries < nMaxRetries; nRetries++) {
+		GetStatus(Busy, Pos);
+		if (!Busy)
+			break;
+
+		m_pDriverEnvironment->Sleep(10);
+	}
+
+	if (Busy)
+		throw std::runtime_error("could not properly intialise MCBSP connection to OIE");
+
 	// Check Error
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
@@ -1568,31 +1592,37 @@ void CRTCContext::SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11,
 
 void CRTCContext::PrepareRecording()
 {
+	bool bCheckIfScanHeadIsConnected = false;
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	m_HeadTransform.resize(528520 * 4);
 	
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_upload_transform(m_CardNo, 1, m_HeadTransform.data()));
 	 
-	double CalibrationFactorXY = 10000;  // get_table_para(1,1)
+	double CalibrationFactorXY = m_dCorrectionFactor; 
 
 	uint32_t nHeadNoXY = 1;
 	uint32_t nHeadNoZ = 2;
 	uint32_t nAxisX = 1;
 	uint32_t nAxisY = 2;
-	uint32_t nAxisZ = 2;
+	uint32_t nAxisZ = 1;
 
 	// check whether scan head is connected
-	uint32_t HeadStatus1 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoXY);
-	if (!HeadStatus1)
-	{
-		throw std::runtime_error("head status 1 invalid");
-	}
+	if (bCheckIfScanHeadIsConnected) {
 
-	uint32_t HeadStatus2 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoZ);
-	if (!HeadStatus2)
-	{
-		throw std::runtime_error("head status 2 invalid");
+		// TODO: Check Head Status bits
+		uint32_t HeadStatus1 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoXY);
+		if (!HeadStatus1)
+		{
+			throw std::runtime_error("head status 1 invalid");
+		}
+
+		uint32_t HeadStatus2 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoZ);
+		if (!HeadStatus2)
+		{
+			throw std::runtime_error("head status 2 invalid");
+		} 
 	}
 
 	uint32_t ControlCommand = 0x0501; // activates actual position recording
@@ -1603,10 +1633,10 @@ void CRTCContext::PrepareRecording()
 	m_pScanLabSDK->n_control_command(m_CardNo, nHeadNoXY, nAxisY, ControlCommand);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_control_command(m_CardNo, 2, 1, ControlCommand);
+	m_pScanLabSDK->n_control_command(m_CardNo, nHeadNoZ, nAxisZ, ControlCommand);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_control_command(m_CardNo, 2, 2, ControlCommand);
+	m_pScanLabSDK->n_control_command(m_CardNo, nHeadNoZ, 2, ControlCommand);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
@@ -1614,8 +1644,8 @@ void CRTCContext::PrepareRecording()
 void CRTCContext::EnableRecording ()
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 1, 2, 4, 32); // record signals: 1=StatusAX (actual x position of first scanhead), 2=StatusAY (actual y position of first scanhead), 0=LaserOn
-	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 7, 8, 9, 0); // 
+	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 1, 2, 4, 32); // record signals: 1=StatusAX (actual x position of first scanhead), 2=StatusAY (actual y position of first scanhead), 0=LaserOn
+	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 7, 8, 52, 0); // 
 	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 10, 11, 12, 0); // 
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
@@ -1624,7 +1654,7 @@ void CRTCContext::EnableRecording ()
 void CRTCContext::DisableRecording()
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pScanLabSDK->n_long_delay(m_CardNo, 1200); // add long delay ~ tracking error or preview time
+	m_pScanLabSDK->n_long_delay(m_CardNo, 1200); // add long delay ~ TODO: tracking error or preview time
 	m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 1, 2, 4, 32); // deactivates signal recording
 	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 7, 8, 9, 0); // deactivates signal recording
 	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 10, 11, 12, 0); // deactivates signal recording
@@ -1690,7 +1720,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 
 	uint32_t Busy, Position, MesBusy, MesPosition;
 	uint32_t LastPosition = 0;
-	uint32_t Increment = 100000;
+	uint32_t Increment = 600000;
 
 	std::string sFileName = "c:/temp/recording_out_" + return_current_time_and_date() + ".csv";
 	std::cout << "Creating recording file" << std::endl;
@@ -1700,7 +1730,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 	if (!MyFile.is_open())
 		throw std::runtime_error("could not create file");
 
-	double CalibrationFactorXY = 10000;  // get_table_para(1,1)
+	double CalibrationFactorXY = m_dCorrectionFactor;
 
 	std::cout << "Wait for measurement to start" << std::endl;
 	do // Wait for measurement to start
@@ -1718,6 +1748,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 		if (MesPosition > LastPosition + Increment)
 		{
 			saveRecordedDataBlock(MyFile, LastPosition, LastPosition + Increment, CalibrationFactorXY);
+			LastPosition += Increment;
 		}
 		else if (MesPosition < LastPosition)
 		{
@@ -1919,9 +1950,8 @@ void CRTCContext::DisableMarkOnTheFly2D()
 	m_b2DMarkOnTheFlyEnabled = false;
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 0.0, 0.0);
 
-	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
+	m_pScanLabSDK->n_fly_return(m_CardNo, 0, 0);
 	m_nCurrentScanPositionX = 0;
 	m_nCurrentScanPositionY = 0;
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
