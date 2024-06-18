@@ -893,9 +893,9 @@ public:
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
-	* @param[in] nDelay - Custom delay value in microseconds (MUST be multiple of 10)
+	* @param[in] nDelayInMicroseconds - Custom delay value in microseconds (MUST be multiple of 10)
 	*/
-	virtual void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay) = 0;
+	virtual void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelayInMicroseconds) = 0;
 
 	/**
 	* IRTCContext::GetCorrectionFactor - Returns correction factor of Card Calibration (in bits per mm)

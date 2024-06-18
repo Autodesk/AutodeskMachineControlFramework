@@ -139,8 +139,14 @@ IRTCContext * CRTCSelector::AcquireCardBySerial(const LibMCDriver_ScanLab_uint32
 
 	for (nCardNo = 1; nCardNo <= nCardCount; nCardNo++) {
 		uint32_t nCardSerial = m_pScanLabSDK->n_get_serial_number(nCardNo);
-		if (nCardSerial == nSerialNumber)
+		if (nCardSerial == 0) {
+			// LoadFirmware
+			// Trigger complete retry
+		}
+		if (nCardSerial == nSerialNumber) {
+			// LoadFirmware first
 			return AcquireCard(nCardNo);
+		}
 	}
 
 	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTFOUND);
@@ -169,10 +175,14 @@ IRTCContext * CRTCSelector::AcquireEthernetCardBySerial(const LibMCDriver_ScanLa
 
 	for (nSearchNo = 1; nSearchNo <= nSearchCount; nSearchNo++) {
 		uint32_t nCardSerial = m_pScanLabSDK->eth_get_serial_search(nSearchNo);
-		if (nCardSerial == 0)
+		if (nCardSerial == 0) {
+			// LoadFirmware
+			// Trigger complete retry
 			m_pScanLabSDK->checkError(m_pScanLabSDK->get_last_error());
+		}
 
 		if (nCardSerial == nSerialNumber)
+			// LoadFirmware first
 			return AcquireEthernetCard(nSearchNo);
 	}
 

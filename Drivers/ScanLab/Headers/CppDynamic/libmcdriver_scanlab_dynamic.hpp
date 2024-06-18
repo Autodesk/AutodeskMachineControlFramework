@@ -277,8 +277,6 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "PORTNUMBERISNOTDIGITAL";
 			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "PORTNUMBERISNOTANALOG";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE: return "INVALIDOIECHANNELSIZE";
-			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "PORTNUMBERISNOTDIGITAL";
-			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "PORTNUMBERISNOTANALOG";
 		}
 		return "UNKNOWN";
 	}
@@ -378,8 +376,6 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
 			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE: return "Invalid OIE Channel size.";
-			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
-			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
 		}
 		return "unknown error";
 	}
@@ -680,7 +676,7 @@ public:
 	inline void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane);
 	inline void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane);
 	inline void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane);
-	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
+	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelayInMicroseconds);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
 	inline void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK);
@@ -4598,11 +4594,11 @@ public:
 	
 	/**
 	* CRTCContext::AddCustomDelay - Adds a custom delay to the list
-	* @param[in] nDelay - Custom delay value in microseconds (MUST be multiple of 10)
+	* @param[in] nDelayInMicroseconds - Custom delay value in microseconds (MUST be multiple of 10)
 	*/
-	void CRTCContext::AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay)
+	void CRTCContext::AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelayInMicroseconds)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddCustomDelay(m_pHandle, nDelay));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddCustomDelay(m_pHandle, nDelayInMicroseconds));
 	}
 	
 	/**

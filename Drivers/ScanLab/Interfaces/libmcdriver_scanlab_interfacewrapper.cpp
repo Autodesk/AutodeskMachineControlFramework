@@ -1868,7 +1868,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_waitforencoderysteps(Li
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addcustomdelay(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDelay)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addcustomdelay(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDelayInMicroseconds)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -1877,7 +1877,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addcustomdelay(LibMCDri
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->AddCustomDelay(nDelay);
+		pIRTCContext->AddCustomDelay(nDelayInMicroseconds);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}

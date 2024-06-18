@@ -748,10 +748,10 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * Adds a custom delay to the list
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] nDelay - Custom delay value in microseconds (MUST be multiple of 10)
+* @param[in] nDelayInMicroseconds - Custom delay value in microseconds (MUST be multiple of 10)
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addcustomdelay(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDelay);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addcustomdelay(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDelayInMicroseconds);
 
 /**
 * Returns correction factor of Card Calibration (in bits per mm)
