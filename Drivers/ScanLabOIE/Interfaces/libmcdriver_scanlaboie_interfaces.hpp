@@ -633,6 +633,12 @@ public:
 	virtual std::string GetHostName() = 0;
 
 	/**
+	* IOIEDevice::SetRTC6IPAddress - Sets the RTC 6 IP Address for data streaming (100kHz mode).
+	* @param[in] sRTC6IPAddress - New RTC6 IP Address. Will only be effective in a StartApp call.
+	*/
+	virtual void SetRTC6IPAddress(const std::string & sRTC6IPAddress) = 0;
+
+	/**
 	* IOIEDevice::SetPort - Sets the port of the device. Fails if device is already connected.
 	* @param[in] nPort - New port of device.
 	*/

@@ -147,6 +147,9 @@ protected:
 	void jumpAbsoluteEx (double dTargetXInMM, double dTargetYInMM);
 	void markAbsoluteEx (double dStartXInMM, double dStartYInMM, double dTargetXInMM, double dTargetYInMM, double dLaserPowerInPercent, bool bOIEControlFlag);
 
+	// Calls the SetTriggerX Call that is necessary for the specific OIE board
+	void callSetTriggerOIE(uint32_t nPeriod);
+
 public:
 
 	CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);

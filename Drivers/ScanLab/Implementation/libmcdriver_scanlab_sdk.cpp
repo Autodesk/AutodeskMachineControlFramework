@@ -318,6 +318,9 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_rs232_write_data = (PScanLabPtr_n_rs232_write_data)_loadScanLabAddress(hLibrary, "n_rs232_write_data");
 	this->ptr_n_rs232_read_data = (PScanLabPtr_n_rs232_read_data)_loadScanLabAddress(hLibrary, "n_rs232_read_data");
 
+	this->ptr_n_set_mcbsp_out_oie_ctrl = (PScanLabPtr_n_set_mcbsp_out_oie_ctrl)_loadScanLabAddress(hLibrary, "n_set_mcbsp_out_oie_ctrl");
+	this->ptr_n_eth_config_waveform_streaming_ctrl = (PScanLabPtr_n_eth_config_waveform_streaming_ctrl)_loadScanLabAddress(hLibrary, "n_eth_config_waveform_streaming_ctrl");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -518,6 +521,9 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_uart_config = nullptr;
 	ptr_n_rs232_write_data = nullptr;
 	ptr_n_rs232_read_data = nullptr;
+
+	ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
+	ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
 
 }
 
@@ -1089,13 +1095,14 @@ void CScanLabSDK::n_set_trigger4(uint32_t nCardNo, uint32_t nPeriod, uint32_t nS
 }
 
 void CScanLabSDK::n_set_trigger8(uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4, uint32_t nSignal5, uint32_t nSignal6, uint32_t nSignal7, uint32_t nSignal8)
+
 {
 	if (m_pLogJournal.get() != nullptr)
-		m_pLogJournal->logCall("n_set_trigger4", std::to_string(nCardNo) + ", " + std::to_string(nPeriod) + ", " + std::to_string(nSignal1) + ", " + std::to_string(nSignal2) + ", " + std::to_string(nSignal3) + ", " + std::to_string(nSignal4) + ", " + std::to_string(nSignal5) + ", " + std::to_string(nSignal6) + ", " + std::to_string(nSignal7) + ", " + std::to_string(nSignal8));
+		m_pLogJournal->logCall("n_set_trigger8", std::to_string(nCardNo) + ", " + std::to_string(nPeriod) + ", " + std::to_string(nSignal1) + ", " + std::to_string(nSignal2) + ", " + std::to_string(nSignal3) + ", " + std::to_string(nSignal4) + ", " + std::to_string(nSignal5) + ", " + std::to_string(nSignal6) + ", " + std::to_string(nSignal7) + ", " + std::to_string(nSignal8));
 
 	ptr_n_set_trigger8(nCardNo, nPeriod, nSignal1, nSignal2, nSignal3, nSignal4, nSignal5, nSignal6, nSignal7, nSignal8);
-}
 
+}
 
 void CScanLabSDK::n_set_control_mode(uint32_t nCardNo, uint32_t nMode)
 {
@@ -1630,8 +1637,26 @@ uint32_t CScanLabSDK::n_rs232_read_data(uint32_t nCardNo)
 	return ptr_n_rs232_read_data(nCardNo);
 }
 
+
+void CScanLabSDK::n_set_mcbsp_out_oie_ctrl(uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_set_mcbsp_out_oie_ctrl", std::to_string(nCardNo) + ", " + std::to_string (nSignalID1) + ", " + std::to_string (nSignalID2));
+
+	ptr_n_set_mcbsp_out_oie_ctrl(nCardNo, nSignalID1, nSignalID2);
+}
+
+void CScanLabSDK::n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_t nSize, uint32_t nFlags)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_eth_config_waveform_streaming_ctrl", std::to_string(nCardNo) + ", " + std::to_string(nSize) + ", " + std::to_string(nFlags));
+
+	ptr_n_eth_config_waveform_streaming_ctrl(nCardNo, nSize, nFlags);
+
+}
+
+
 void CScanLabSDK::setJournal(PScanLabSDKJournal pLogJournal)
 {
 	m_pLogJournal = pLogJournal;
 }
-

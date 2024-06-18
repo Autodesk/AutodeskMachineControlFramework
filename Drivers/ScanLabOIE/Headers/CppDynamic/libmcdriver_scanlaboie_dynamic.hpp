@@ -240,6 +240,10 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE: return "NOSENSORVALUESAVAILABLE";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE: return "NOADDITIONALVALUESAVAILABLE";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX: return "INVALIDADDITIONALINDEX";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE: return "OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTIN100KHZMODE: return "OIEDRIVERTYPEISNOTIN100KHZMODE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEEXECUTIONMODE: return "INVALIDOIEEXECUTIONMODE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_POSITIONMISSINGINOIERTCIDLIST: return "POSITIONMISSINGINOIERTCIDLIST";
 		}
 		return "UNKNOWN";
 	}
@@ -310,6 +314,10 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE: return "No Sensor values available.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE: return "No Additional values available.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX: return "Invalid additional index.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE: return "OIE Driver Type is not in compatibility mode.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTIN100KHZMODE: return "OIE Driver Type is not in 100kHz mode.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEEXECUTIONMODE: return "Invalid OIE Execution mode.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_POSITIONMISSINGINOIERTCIDLIST: return "Position missing in OIE RTC ID List.";
 		}
 		return "unknown error";
 	}
@@ -602,6 +610,7 @@ public:
 	inline std::string GetDeviceName();
 	inline void SetHostName(const std::string & sHostName);
 	inline std::string GetHostName();
+	inline void SetRTC6IPAddress(const std::string & sRTC6IPAddress);
 	inline void SetPort(const LibMCDriver_ScanLabOIE_uint32 nPort);
 	inline LibMCDriver_ScanLabOIE_uint32 GetPort();
 	inline bool IsConnected();
@@ -822,6 +831,7 @@ public:
 		pWrapperTable->m_OIEDevice_GetDeviceName = nullptr;
 		pWrapperTable->m_OIEDevice_SetHostName = nullptr;
 		pWrapperTable->m_OIEDevice_GetHostName = nullptr;
+		pWrapperTable->m_OIEDevice_SetRTC6IPAddress = nullptr;
 		pWrapperTable->m_OIEDevice_SetPort = nullptr;
 		pWrapperTable->m_OIEDevice_GetPort = nullptr;
 		pWrapperTable->m_OIEDevice_IsConnected = nullptr;
@@ -1301,6 +1311,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_OIEDevice_GetHostName == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_OIEDevice_SetRTC6IPAddress = (PLibMCDriver_ScanLabOIEOIEDevice_SetRTC6IPAddressPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_setrtc6ipaddress");
+		#else // _WIN32
+		pWrapperTable->m_OIEDevice_SetRTC6IPAddress = (PLibMCDriver_ScanLabOIEOIEDevice_SetRTC6IPAddressPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_setrtc6ipaddress");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OIEDevice_SetRTC6IPAddress == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1885,6 +1904,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_gethostname", (void**)&(pWrapperTable->m_OIEDevice_GetHostName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_GetHostName == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_setrtc6ipaddress", (void**)&(pWrapperTable->m_OIEDevice_SetRTC6IPAddress));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_SetRTC6IPAddress == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_setport", (void**)&(pWrapperTable->m_OIEDevice_SetPort));
@@ -2649,6 +2672,15 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_GetHostName(m_pHandle, bytesNeededHostName, &bytesWrittenHostName, &bufferHostName[0]));
 		
 		return std::string(&bufferHostName[0]);
+	}
+	
+	/**
+	* COIEDevice::SetRTC6IPAddress - Sets the RTC 6 IP Address for data streaming (100kHz mode).
+	* @param[in] sRTC6IPAddress - New RTC6 IP Address. Will only be effective in a StartApp call.
+	*/
+	void COIEDevice::SetRTC6IPAddress(const std::string & sRTC6IPAddress)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_SetRTC6IPAddress(m_pHandle, sRTC6IPAddress.c_str()));
 	}
 	
 	/**

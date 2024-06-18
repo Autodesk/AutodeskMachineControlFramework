@@ -104,6 +104,9 @@ protected:
 	// RTC 6 Correction File Data
 	bool m_bHasCorrectionData;
 
+	// For OIE Version 3 (100kHz mode), we need to specify the RTC Ethernet IP Address
+	std::string m_sRTC6IPAddress;
+
 	std::mutex m_RecordingMutex;
 
 	void ensureConnectivity();
@@ -186,6 +189,8 @@ public:
 
 	PDataRecordingInstance LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID);
 
+	void SetRTC6IPAddress (const std::string & sRTC6IPAddress);
+
 };
 
 typedef std::shared_ptr<COIEDeviceInstance> POIEDeviceInstance;
@@ -208,6 +213,8 @@ public:
 	void SetHostName(const std::string & sHostName) override;
 
 	std::string GetHostName() override;
+
+	void SetRTC6IPAddress(const std::string& sRTC6IPAddress) override;
 
 	void SetPort(const LibMCDriver_ScanLabOIE_uint32 nPort) override;
 

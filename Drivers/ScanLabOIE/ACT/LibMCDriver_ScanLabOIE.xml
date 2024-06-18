@@ -111,6 +111,12 @@
 		<error name="NOADDITIONALVALUESAVAILABLE" code="1052" description="No Additional values available." />	
 		<error name="INVALIDADDITIONALINDEX" code="1053" description="Invalid additional index." />	
 		
+		<error name="OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE" code="1054" description="OIE Driver Type is not in compatibility mode." />	
+		<error name="OIEDRIVERTYPEISNOTIN100KHZMODE" code="1055" description="OIE Driver Type is not in 100kHz mode." />	
+		<error name="INVALIDOIEEXECUTIONMODE" code="1056" description="Invalid OIE Execution mode." />	
+		
+		<error name="POSITIONMISSINGINOIERTCIDLIST" code="1057" description="Position missing in OIE RTC ID List." />	
+		
 		
 		
 		
@@ -385,7 +391,11 @@ Custom implementation
 		<method name="GetHostName" description="Returns the host name of the device.">
 			<param name="HostName" type="string" pass="return" description="Host name of device." />
 		</method>
-	
+
+		<method name="SetRTC6IPAddress" description="Sets the RTC 6 IP Address for data streaming (100kHz mode).">
+			<param name="RTC6IPAddress" type="string" pass="in" description="New RTC6 IP Address. Will only be effective in a StartApp call." />
+		</method>
+
 		<method name="SetPort" description="Sets the port of the device. Fails if device is already connected.">
 			<param name="Port" type="uint32" pass="in" description="New port of device." />
 		</method>

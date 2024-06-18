@@ -539,6 +539,15 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_SetHostN
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_GetHostNamePtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const LibMCDriver_ScanLabOIE_uint32 nHostNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pHostNameNeededChars, char * pHostNameBuffer);
 
 /**
+* Sets the RTC 6 IP Address for data streaming (100kHz mode).
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[in] pRTC6IPAddress - New RTC6 IP Address. Will only be effective in a StartApp call.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_SetRTC6IPAddressPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pRTC6IPAddress);
+
+/**
 * Sets the port of the device. Fails if device is already connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
@@ -1032,6 +1041,7 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEOIEDevice_GetDeviceNamePtr m_OIEDevice_GetDeviceName;
 	PLibMCDriver_ScanLabOIEOIEDevice_SetHostNamePtr m_OIEDevice_SetHostName;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetHostNamePtr m_OIEDevice_GetHostName;
+	PLibMCDriver_ScanLabOIEOIEDevice_SetRTC6IPAddressPtr m_OIEDevice_SetRTC6IPAddress;
 	PLibMCDriver_ScanLabOIEOIEDevice_SetPortPtr m_OIEDevice_SetPort;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetPortPtr m_OIEDevice_GetPort;
 	PLibMCDriver_ScanLabOIEOIEDevice_IsConnectedPtr m_OIEDevice_IsConnected;

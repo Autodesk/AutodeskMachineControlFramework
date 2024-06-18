@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <array>
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -1213,6 +1214,10 @@ void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChann
 			m_OIEOperationMode = LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility;
 			break;
 
+		case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3:
+			m_OIEOperationMode = LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3;
+			break;
+
 		default:
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE);
 	}
@@ -1244,10 +1249,39 @@ void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChann
 	m_pScanLabSDK->n_mcbsp_init(m_CardNo, 1, 1);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	// Set signal channels
-	uint32_t nTransferLaserOnFlag = (1UL << 31);
-	m_pScanLabSDK->n_set_mcbsp_out_ptr(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size () | nTransferLaserOnFlag, m_MCBSPSignalChannels.data ());
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	switch (eOperationMode) {
+	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion2:
+	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility:
+	{
+		// Set signal channels
+		uint32_t nTransferLaserOnFlag = (1UL << 31);
+		m_pScanLabSDK->n_set_mcbsp_out_ptr(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size() | nTransferLaserOnFlag, m_MCBSPSignalChannels.data());
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+		break;
+	}
+
+	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3:
+	{
+		// Set signal channels
+		if (m_MCBSPSignalChannels.size() < 2)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE);
+
+		m_pScanLabSDK->n_set_mcbsp_out_oie_ctrl(m_CardNo, m_MCBSPSignalChannels.at(0), m_MCBSPSignalChannels.at(1));
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+		// See documentation. 8192 is the packet stream size,
+		// The 1 means datastreaming is on
+		m_pScanLabSDK->n_eth_config_waveform_streaming_ctrl(m_CardNo, 8192, 1);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+		break;
+	}
+
+	default:
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE);
+	}
+
 
 	// No PID control for now
 	m_pScanLabSDK->n_set_multi_mcbsp_in(m_CardNo, 0, 0, 0);
@@ -1290,7 +1324,13 @@ uint32_t CRTCContext::getCurrentFreeVariable0()
 
 void CRTCContext::sendFreeVariable0(uint32_t nValue)
 {
-	m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size());
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3) {
+		m_pScanLabSDK->n_list_nop(m_CardNo);
+	}
+	else {
+		m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size());
+	}
+	
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, nValue);
@@ -1355,6 +1395,32 @@ void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserO
 }
 
 
+void CRTCContext::callSetTriggerOIE(uint32_t nPeriod)
+{
+
+
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3) {
+
+		std::array<uint32_t, 8> channelArray;
+		for (uint32_t nIndex = 0; nIndex < 8; nIndex++) {
+			if (nIndex < m_MCBSPSignalChannels.size())
+				channelArray.at(nIndex) = m_MCBSPSignalChannels.at(nIndex);
+			else
+				channelArray.at(nIndex) = 0;
+		}
+
+		m_pScanLabSDK->n_set_trigger8(m_CardNo, nPeriod, channelArray[0], channelArray[1], channelArray[2], channelArray[3], channelArray[4], channelArray[5], channelArray[6], channelArray[7]);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	}
+	else {
+
+		// Compatibility with Version less than 3 final.
+		m_pScanLabSDK->n_set_trigger4(m_CardNo, nPeriod, 20, 21, 1, 2);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	}
+}
+
+
 void CRTCContext::EnableOIE()
 {
 	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIENotInitialized)
@@ -1367,8 +1433,8 @@ void CRTCContext::EnableOIE()
 	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, 0);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 20, 21, 1, 2);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	callSetTriggerOIE(1);
+
 
 }
 
@@ -1379,8 +1445,7 @@ void CRTCContext::DisableOIE()
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 20, 21, 1, 2);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	callSetTriggerOIE(0);
 
 	sendFreeVariable0(0);
 

@@ -129,8 +129,14 @@
 		<error name="SCANAHEADMISSINGRTCRESPONSE" code="1077" description="Scanahead missing rtc response." />		
 		<error name="SCANAHEADPCIERROR" code="1078" description="Scanahead PCI error." />		
 		<error name="SCANAHEADUNKNOWNERROR" code="1079" description="Scanahead unknown error." />		
+
+		
 		<error name="PORTNUMBERISNOTDIGITAL" code="1080" description="Port number is not digital." />		
 		<error name="PORTNUMBERISNOTANALOG" code="1081" description="Port number is not analog." />		
+										
+		<error name="PORTNUMBERISNOTDIGITAL" code="1082" description="Port number is not digital." />		
+		<error name="PORTNUMBERISNOTANALOG" code="1083" description="Port number is not analog." />		
+		<error name="INVALIDOIECHANNELSIZE" code="1084" description="Invalid OIE Channel size." />		
 										
 	</errors>
 

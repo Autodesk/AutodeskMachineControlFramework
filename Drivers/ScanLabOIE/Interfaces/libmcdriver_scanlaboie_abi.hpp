@@ -552,6 +552,15 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_gethostname(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const LibMCDriver_ScanLabOIE_uint32 nHostNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pHostNameNeededChars, char * pHostNameBuffer);
 
 /**
+* Sets the RTC 6 IP Address for data streaming (100kHz mode).
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[in] pRTC6IPAddress - New RTC6 IP Address. Will only be effective in a StartApp call.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_setrtc6ipaddress(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pRTC6IPAddress);
+
+/**
 * Sets the port of the device. Fails if device is already connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.

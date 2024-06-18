@@ -209,6 +209,9 @@ namespace LibMCDriver_ScanLab {
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_uart_config) (uint32_t nCardNo, uint32_t nBaudRate);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_rs232_write_data) (uint32_t nCardNo, uint32_t nData);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_rs232_read_data) (uint32_t nCardNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_mcbsp_out_oie_ctrl) (uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_config_waveform_streaming_ctrl) (uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
+			
 
 		class CScanLabSDKJournal {
 		private:
@@ -384,6 +387,8 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_uart_config ptr_n_uart_config = nullptr;
 			PScanLabPtr_n_rs232_write_data ptr_n_rs232_write_data = nullptr;
 			PScanLabPtr_n_rs232_read_data ptr_n_rs232_read_data = nullptr;
+			PScanLabPtr_n_set_mcbsp_out_oie_ctrl ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
+			PScanLabPtr_n_eth_config_waveform_streaming_ctrl ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
 
 			void resetFunctionPtrs ();
 		public:
@@ -550,6 +555,9 @@ namespace LibMCDriver_ScanLab {
 			uint32_t n_uart_config(uint32_t nCardNo, uint32_t nBaudRate);
 			void n_rs232_write_data(uint32_t nCardNo, uint32_t nData);
 			uint32_t n_rs232_read_data(uint32_t nCardNo);
+			void n_set_mcbsp_out_oie_ctrl (uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2);
+			void n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
+
 
 		};
 

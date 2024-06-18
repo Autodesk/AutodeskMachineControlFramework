@@ -186,6 +186,9 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR 1079 /** Scanahead unknown error. */
 #define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL 1080 /** Port number is not digital. */
 #define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG 1081 /** Port number is not analog. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE 1082 /** Invalid OIE Channel size. */
+#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL 1080 /** Port number is not digital. */
+#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG 1081 /** Port number is not analog. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
