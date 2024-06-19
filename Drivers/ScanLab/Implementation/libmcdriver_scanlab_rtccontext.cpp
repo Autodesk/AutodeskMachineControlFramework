@@ -184,8 +184,6 @@ void CRTCContext::loadFirmwareEx(PScanLabSDK pSDK, uint32_t nCardNo, const LibMC
 	if (pDriverEnvironment.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
-	pSDK->checkGlobalErrorOfCard(nCardNo);
-
 	auto pWorkingDirectory = pDriverEnvironment->CreateWorkingDirectory();
 
 	std::string sFirmwareName;
@@ -212,7 +210,6 @@ void CRTCContext::loadFirmwareEx(PScanLabSDK pSDK, uint32_t nCardNo, const LibMC
 	if (nErrorCode != 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE, "could not load program file: #" + std::to_string(nErrorCode));
 
-	pSDK->checkGlobalErrorOfCard(nCardNo);
 
 }
 

@@ -185,7 +185,10 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
                     bSuccess = true;
                 }
                 else {
-                    m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
+                    uint32_t nCardCount = m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
+                    if (nCardCount == 0)
+                        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS, "No Card found at IP Address: " + sIP);
+
                     auto pContext = m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber);
                     m_pRTCContext = act_managed_ptr<IRTCContext>(pContext);
 
@@ -198,10 +201,14 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
 
             }
             catch (ELibMCDriver_ScanLabInterfaceException& E) {
-                if (E.getErrorCode() == LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER) {
+                uint32_t nErrorCode = E.getErrorCode();
+                if ((nErrorCode == LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER) ||
+                    (nErrorCode == LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS) ||
+                    (nErrorCode == LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE)) {
                     // Only retry if serial numbers could not be determined....
 
-                    m_pDriverEnvironment->LogWarning("RTC Serial initialization timeout, Retrying... " + std::to_string (nNumberOfRetries) + " remaining...");
+                    m_pDriverEnvironment->LogWarning("RTC Initialization error: " + std::string (E.what ()));
+                    m_pDriverEnvironment->LogWarning("Retrying... " + std::to_string (nNumberOfRetries) + " remaining...");
                     m_pDriverEnvironment->Sleep(SCANLAB_DEFAULTTIMEOUT_RETRYDELAYINMILLISECONDS);
 
                     m_pRTCContext = nullptr;

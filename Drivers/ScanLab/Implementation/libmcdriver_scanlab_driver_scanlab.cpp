@@ -63,7 +63,7 @@ IRTCSelector * CDriver_ScanLab::CreateRTCSelector()
     if (m_pScanLabSDK.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKNOTLOADED);
 
-    return new CRTCSelector(m_pOwnerData, m_pDriverEnvironment, m_dDefaultInitialTimeout, m_dDefaultMaxTimeout, m_dDefaultMultiplier);
+    return new CRTCSelector(m_pOwnerData, m_pDriverEnvironment, m_dDefaultInitialTimeout, m_dDefaultMaxTimeout, m_dDefaultMultiplier, m_FirmwareData, m_FPGAData, m_AuxiliaryData);
 }
 
 

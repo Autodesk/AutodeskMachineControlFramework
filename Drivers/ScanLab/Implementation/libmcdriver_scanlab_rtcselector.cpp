@@ -39,9 +39,12 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CRTCSelector 
 **************************************************************************************************************************/
 
-CRTCSelector::CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment, double dDefaultInitialTimeout, double dDefaultMaxTimeout, double dDefaultMultiplier) :
+CRTCSelector::CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment, double dDefaultInitialTimeout, double dDefaultMaxTimeout, double dDefaultMultiplier, const std::vector<uint8_t>& FirmwareData, const std::vector<uint8_t>& FPGAData, const std::vector<uint8_t>& AuxiliaryData) :
 	 m_pDriverEnvironment (pDriverEnvironment), m_pRTCContextOwnerData (pRTCContextOwnerData),
-	m_dDefaultInitialTimeout (dDefaultInitialTimeout), m_dDefaultMaxTimeout (dDefaultMaxTimeout), m_dDefaultMultiplier (dDefaultMultiplier)
+	m_dDefaultInitialTimeout (dDefaultInitialTimeout), m_dDefaultMaxTimeout (dDefaultMaxTimeout), m_dDefaultMultiplier (dDefaultMultiplier),
+	m_FirmwareData (FirmwareData),
+	m_FPGAData (FPGAData),
+	m_AuxiliaryData (AuxiliaryData)
 
 {
 	if (pRTCContextOwnerData == nullptr)
@@ -74,7 +77,7 @@ LibMCDriver_ScanLab_uint32 CRTCSelector::SearchCards(const std::string & sIP, co
 	// eth search cards timeout ethernet
 	m_pScanLabSDK->eth_set_search_cards_timeout(nTimeout);
 
-	uint32_t nCount = m_pScanLabSDK->eth_search_cards(nIP, nNetMask);
+	uint32_t nCount = m_pScanLabSDK->eth_search_cards_range(nIP, nIP);
 
 	return nCount;
 
@@ -209,7 +212,7 @@ IRTCContext * CRTCSelector::AcquireEthernetCardBySerial(const LibMCDriver_ScanLa
 		uint32_t nCardSerial = m_pScanLabSDK->eth_get_serial_search(nSearchNo);
 		if (nCardSerial == 0) {
 			// LoadFirmware
-			
+			loadFirmwareForSearchNumber(nSearchNo, true);
 			
 			// Trigger complete retry
 			bSerialAcquisitionError = true;

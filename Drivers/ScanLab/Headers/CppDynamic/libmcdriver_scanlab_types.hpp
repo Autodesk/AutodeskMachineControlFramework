@@ -194,6 +194,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA 1089 /** Missing FPGA Data. */
 #define LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA 1090 /** Missing Auxiliary Data. */
 #define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA 1091 /** Missing Firmware Initialisation Data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS 1092 /** No Card found at IP Address. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE 1093 /** No Card found in IP Range. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -300,6 +302,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA: return "Missing FPGA Data.";
     case LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA: return "Missing Auxiliary Data.";
     case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA: return "Missing Firmware Initialisation Data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS: return "No Card found at IP Address.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE: return "No Card found in IP Range.";
     default: return "unknown error";
   }
 }

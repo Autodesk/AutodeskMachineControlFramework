@@ -67,7 +67,7 @@ protected:
 
 public:
 
-	CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment, double dDefaultInitialTimeout, double dDefaultMaxTimeout, double dDefaultMultiplier);
+	CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment, double dDefaultInitialTimeout, double dDefaultMaxTimeout, double dDefaultMultiplier, const std::vector<uint8_t> & FirmwareData, const std::vector<uint8_t>& FPGAData, const std::vector<uint8_t>& AuxiliaryData);
 
 	virtual ~CRTCSelector();
 

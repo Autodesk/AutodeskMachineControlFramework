@@ -140,6 +140,8 @@
 		<error name="MISSINGFPGADATA" code="1089" description="Missing FPGA Data." />
 		<error name="MISSINGAUXILIARYDATA" code="1090" description="Missing Auxiliary Data." />
 		<error name="MISSINGFIRMWAREINITIZATIONDATA" code="1091" description="Missing Firmware Initialisation Data." />
+		<error name="NOCARDFOUNDATIPADDRESS" code="1092" description="No Card found at IP Address." />		
+		<error name="NOCARDFOUNDATINIPRANGE" code="1093" description="No Card found in IP Range." />		
 		
 		
 
