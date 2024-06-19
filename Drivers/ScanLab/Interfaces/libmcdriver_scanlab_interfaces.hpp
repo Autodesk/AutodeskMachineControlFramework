@@ -951,7 +951,7 @@ public:
 	virtual void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion) = 0;
 
 	/**
-	* IRTCContext::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* IRTCContext::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts for a specific connection. The Driver defaults will not be changed.
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
 	* @param[in] dMultiplier - Multiplier
@@ -1429,6 +1429,25 @@ public:
 	*/
 	virtual void EnableJournaling() = 0;
 
+	/**
+	* IDriver_ScanLab::SetFirmware - Sets the default firmware from the driver resources. If given, Initialise will upload this firmware before acquiring the RTC card.
+	* @param[in] sFirmwareResource - resource name of the firmware program file.
+	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
+	*/
+	virtual void SetFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource) = 0;
+
+	/**
+	* IDriver_ScanLab::SetCustomFirmware - Sets the default firmware from a binary array. If given, Initialise will upload this firmware before acquiring the RTC card.
+	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] nFPGADataBufferSize - Number of elements in buffer
+	* @param[in] pFPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+	* @param[in] pAuxiliaryDataBuffer - byte array of the binary auxiliary file.
+	*/
+	virtual void SetCustomFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver_ScanLab> PIDriver_ScanLab;
@@ -1473,7 +1492,7 @@ public:
 	virtual void InitialiseFromConfiguration(const std::string & sPresetName) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* IDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts. The given values will be defaults for all subsequent connections.
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
 	* @param[in] dMultiplier - Multiplier
@@ -1511,7 +1530,7 @@ public:
 	virtual IRTCSelector * GetSelector() = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::LoadFirmware - Loads the firmware from the driver resources.
+	* IDriver_ScanLab_RTC6::LoadFirmware - Loads the firmware from the driver resources. DEPRECIATED. Use SetFirmare before calling Initialise..
 	* @param[in] sFirmwareResource - resource name of the firmware program file.
 	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
 	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
@@ -1519,7 +1538,7 @@ public:
 	virtual void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::LoadCustomFirmware - Loads the firmware from custom resources.
+	* IDriver_ScanLab_RTC6::LoadCustomFirmware - Loads the firmware from custom resources. DEPRECIATED. Use SetCustomFirmare before calling Initialise..
 	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
 	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
 	* @param[in] nFPGADataBufferSize - Number of elements in buffer
@@ -1597,12 +1616,20 @@ public:
 	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* IDriver_ScanLab_RTC6::GetCommunicationTimeouts - Returns the current RTC Ethernet communication timeouts. Fails, if no RTC card has been acquired yet.
 	* @param[out] dInitialTimeout - Initial timeout in ms
 	* @param[out] dMaxTimeout - Max timeout in ms
 	* @param[out] dMultiplier - Multiplier
 	*/
 	virtual void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::GetDefaultCommunicationTimeouts - Returns the RTC Ethernet communication timeouts that will be used for a subsequent connection.
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	virtual void GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::EnableTimelagCompensation - Enables timelag compensation.
@@ -1717,7 +1744,7 @@ public:
 	virtual IRTCContext * GetContext(const LibMCDriver_ScanLab_uint32 nScannerIndex) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6xN::LoadFirmware - Loads the firmware from the driver resources.
+	* IDriver_ScanLab_RTC6xN::LoadFirmware - Loads the firmware from the driver resources and for a specific scanner. DEPRECIATED. Use SetFirmare before calling Initialise..
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] sFirmwareResource - resource name of the firmware program file.
 	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
@@ -1726,7 +1753,7 @@ public:
 	virtual void LoadFirmware(const LibMCDriver_ScanLab_uint32 nScannerIndex, const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6xN::LoadCustomFirmware - Loads the firmware from custom resources.
+	* IDriver_ScanLab_RTC6xN::LoadCustomFirmware - Loads the firmware from custom resources and for a specific scanner. DEPRECIATED. Use SetCustomFirmare before calling Initialise..
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
 	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
@@ -1809,7 +1836,15 @@ public:
 	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6xN::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* IDriver_ScanLab_RTC6xN::SetAllCommunicationTimeouts - Set RTC Ethernet communication timeouts for all existing and future connections.
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	virtual void SetAllCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts for a specific scanner. The given values will be defaults for all subsequent connections.
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
@@ -1818,13 +1853,21 @@ public:
 	virtual void SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
 
 	/**
-	* IDriver_ScanLab_RTC6xN::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* IDriver_ScanLab_RTC6xN::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts. Fails if the RTC Card is not connected.
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[out] dInitialTimeout - Initial timeout in ms
 	* @param[out] dMaxTimeout - Max timeout in ms
 	* @param[out] dMultiplier - Multiplier
 	*/
 	virtual void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6xN::GetDefaultCommunicationTimeouts - Returns the RTC Ethernet communication timeouts that will be used for any subsequent connection.
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	virtual void GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6xN::EnableTimelagCompensation - Enables timelag compensation.

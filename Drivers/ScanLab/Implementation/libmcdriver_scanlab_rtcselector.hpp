@@ -46,9 +46,28 @@ protected:
 
 	PRTCContextOwnerData m_pRTCContextOwnerData;
 
+	double m_dDefaultInitialTimeout;
+
+	double m_dDefaultMaxTimeout;
+
+	double m_dDefaultMultiplier;
+
+	std::vector<uint8_t> m_FirmwareData;
+
+	std::vector<uint8_t> m_FPGAData;
+
+	std::vector<uint8_t> m_AuxiliaryData;
+
+	void setCommunicationTimeoutsBeforeAcquire (uint32_t nCardNo);
+
+	void loadFirmwareBeforeAcquisition (uint32_t nCardNo, bool bIsNetwork, bool bMustHaveData);
+
+	void loadFirmwareForSearchNumber (uint32_t nSearchNo, bool bMustHaveData);
+
+
 public:
 
-	CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment, double dDefaultInitialTimeout, double dDefaultMaxTimeout, double dDefaultMultiplier);
 
 	virtual ~CRTCSelector();
 

@@ -131,7 +131,18 @@
 		<error name="SCANAHEADUNKNOWNERROR" code="1079" description="Scanahead unknown error." />												
 		<error name="PORTNUMBERISNOTDIGITAL" code="1082" description="Port number is not digital." />		
 		<error name="PORTNUMBERISNOTANALOG" code="1083" description="Port number is not analog." />		
-		<error name="INVALIDOIECHANNELSIZE" code="1084" description="Invalid OIE Channel size." />		
+		<error name="INVALIDOIECHANNELSIZE" code="1084" description="Invalid OIE Channel size." />
+		<error name="INTERNALACQUISITIONERROR" code="1085" description="Internal Acquisition Error." />
+		<error name="COULDNOTDETERMINESERIALNUMBER" code="1086" description="Could not determine serial number." />
+		
+		<error name="COULDNOTASSIGNETHERNETCARD" code="1087" description="Could not assign ethernet card." />
+		<error name="MISSINGFIRMWAREDATA" code="1088" description="Missing Firmware Data." />
+		<error name="MISSINGFPGADATA" code="1089" description="Missing FPGA Data." />
+		<error name="MISSINGAUXILIARYDATA" code="1090" description="Missing Auxiliary Data." />
+		<error name="MISSINGFIRMWAREINITIZATIONDATA" code="1091" description="Missing Firmware Initialisation Data." />
+		
+		
+
 										
 	</errors>
 
@@ -604,7 +615,7 @@ Custom implementation
 			<param name="BIOSVersion" type="uint32" pass="out" description="RTC BIOS Version" />
 		</method>
 		
-		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts for a specific connection. The Driver defaults will not be changed.">
 			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
@@ -929,6 +940,18 @@ Custom implementation
 		<method name="EnableJournaling" description="Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.">
 		</method>
 
+		<method name="SetFirmware" description="Sets the default firmware from the driver resources. If given, Initialise will upload this firmware before acquiring the RTC card.">
+			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
+			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
+			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+		</method>		
+
+		<method name="SetCustomFirmware" description="Sets the default firmware from a binary array. If given, Initialise will upload this firmware before acquiring the RTC card.">
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
+		</method>		
+
 	</class>
 
 
@@ -956,7 +979,7 @@ Custom implementation
 			<param name="PresetName" type="string" pass="in" description="Name of the configuration preset." />
 		</method>
 
-		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts. The given values will be defaults for all subsequent connections.">
 			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
@@ -982,13 +1005,13 @@ Custom implementation
 			<param name="SelectorInstance" type="class" class="RTCSelector" pass="return" description="RTC Selector Instance." />
 		</method>
 
-		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
+		<method name="LoadFirmware" description="Loads the firmware from the driver resources. DEPRECIATED. Use SetFirmare before calling Initialise..">
 			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
 			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
 			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
 		</method>		
 
-		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources.">
+		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources. DEPRECIATED. Use SetCustomFirmare before calling Initialise..">
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
 			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
 			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
@@ -1044,12 +1067,18 @@ Custom implementation
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 		</method>
 						
-		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+		<method name="GetCommunicationTimeouts" description="Returns the current RTC Ethernet communication timeouts. Fails, if no RTC card has been acquired yet.">
 			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
-						
+
+		<method name="GetDefaultCommunicationTimeouts" description="Returns the RTC Ethernet communication timeouts that will be used for a subsequent connection.">
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+
 		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
 			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />
 			<param name="TimeLagZInMicroseconds" type="uint32" pass="in" description="Time lag of Z axis (in microseconds). MUST be a multiple of 10." />
@@ -1128,14 +1157,14 @@ Custom implementation
 			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
 		</method>
 				
-		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
+		<method name="LoadFirmware" description="Loads the firmware from the driver resources and for a specific scanner. DEPRECIATED. Use SetFirmare before calling Initialise..">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
 			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
 			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
 			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
 		</method>		
 
-		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources.">
+		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources and for a specific scanner. DEPRECIATED. Use SetCustomFirmare before calling Initialise..">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
 			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
@@ -1196,15 +1225,27 @@ Custom implementation
 			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card." />
 		</method>
 
-		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+		<method name="SetAllCommunicationTimeouts" description="Set RTC Ethernet communication timeouts for all existing and future connections.">
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
+
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts for a specific scanner. The given values will be defaults for all subsequent connections.">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
 			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
 		</method>		
 						
-		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts. Fails if the RTC Card is not connected.">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+						
+		<method name="GetDefaultCommunicationTimeouts" description="Returns the RTC Ethernet communication timeouts that will be used for any subsequent connection.">
 			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />

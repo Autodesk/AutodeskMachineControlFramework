@@ -277,6 +277,13 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "PORTNUMBERISNOTDIGITAL";
 			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "PORTNUMBERISNOTANALOG";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE: return "INVALIDOIECHANNELSIZE";
+			case LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR: return "INTERNALACQUISITIONERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER: return "COULDNOTDETERMINESERIALNUMBER";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD: return "COULDNOTASSIGNETHERNETCARD";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA: return "MISSINGFIRMWAREDATA";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA: return "MISSINGFPGADATA";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA: return "MISSINGAUXILIARYDATA";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA: return "MISSINGFIRMWAREINITIZATIONDATA";
 		}
 		return "UNKNOWN";
 	}
@@ -376,6 +383,13 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
 			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE: return "Invalid OIE Channel size.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR: return "Internal Acquisition Error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER: return "Could not determine serial number.";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD: return "Could not assign ethernet card.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA: return "Missing Firmware Data.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA: return "Missing FPGA Data.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA: return "Missing Auxiliary Data.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA: return "Missing Firmware Initialisation Data.";
 		}
 		return "unknown error";
 	}
@@ -785,6 +799,8 @@ public:
 	inline void LoadCustomSDK(const CInputVector<LibMCDriver_ScanLab_uint8> & ScanlabDLLBuffer);
 	inline PRTCSelector CreateRTCSelector();
 	inline void EnableJournaling();
+	inline void SetFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
+	inline void SetCustomFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -823,6 +839,7 @@ public:
 	inline void DisableAttributeFilter();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
+	inline void GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
 	inline void DisableTimelagCompensation();
 };
@@ -864,8 +881,10 @@ public:
 	inline void EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue);
 	inline void DisableAttributeFilter();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists);
+	inline void SetAllCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
+	inline void GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
 	inline void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex);
 };
@@ -1134,6 +1153,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_LoadCustomSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = nullptr;
 		pWrapperTable->m_Driver_ScanLab_EnableJournaling = nullptr;
+		pWrapperTable->m_Driver_ScanLab_SetFirmware = nullptr;
+		pWrapperTable->m_Driver_ScanLab_SetCustomFirmware = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_IsInitialized = nullptr;
@@ -1156,6 +1177,7 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6_DisableAttributeFilter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode = nullptr;
@@ -1181,8 +1203,10 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableAttributeFilter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableAttributeFilter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
@@ -2521,6 +2545,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_SetFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_SetFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_setfirmware");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_SetFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_SetFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_setfirmware");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_SetFirmware == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_SetCustomFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_SetCustomFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_setcustomfirmware");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_SetCustomFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_SetCustomFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_setcustomfirmware");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_SetCustomFirmware == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode");
@@ -2716,6 +2758,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetDefaultCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetDefaultCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2944,6 +2995,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAllCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAllCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts");
@@ -2959,6 +3019,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetDefaultCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetDefaultCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3626,6 +3695,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_EnableJournaling == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_setfirmware", (void**)&(pWrapperTable->m_Driver_ScanLab_SetFirmware));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_SetFirmware == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_setcustomfirmware", (void**)&(pWrapperTable->m_Driver_ScanLab_SetCustomFirmware));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_SetCustomFirmware == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3712,6 +3789,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_enabletimelagcompensation", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation));
@@ -3814,12 +3895,20 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_enabletimelagcompensation", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation));
@@ -4679,7 +4768,7 @@ public:
 	}
 	
 	/**
-	* CRTCContext::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* CRTCContext::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts for a specific connection. The Driver defaults will not be changed.
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
 	* @param[in] dMultiplier - Multiplier
@@ -5419,6 +5508,28 @@ public:
 	}
 	
 	/**
+	* CDriver_ScanLab::SetFirmware - Sets the default firmware from the driver resources. If given, Initialise will upload this firmware before acquiring the RTC card.
+	* @param[in] sFirmwareResource - resource name of the firmware program file.
+	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
+	*/
+	void CDriver_ScanLab::SetFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_SetFirmware(m_pHandle, sFirmwareResource.c_str(), sFPGAResource.c_str(), sAuxiliaryResource.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLab::SetCustomFirmware - Sets the default firmware from a binary array. If given, Initialise will upload this firmware before acquiring the RTC card.
+	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] AuxiliaryDataBuffer - byte array of the binary auxiliary file.
+	*/
+	void CDriver_ScanLab::SetCustomFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_SetCustomFirmware(m_pHandle, (LibMCDriver_ScanLab_uint64)FirmwareDataBuffer.size(), FirmwareDataBuffer.data(), (LibMCDriver_ScanLab_uint64)FPGADataBuffer.size(), FPGADataBuffer.data(), (LibMCDriver_ScanLab_uint64)AuxiliaryDataBuffer.size(), AuxiliaryDataBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CDriver_ScanLab_RTC6
 	 */
 	
@@ -5476,7 +5587,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* CDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts. The given values will be defaults for all subsequent connections.
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
 	* @param[in] dMultiplier - Multiplier
@@ -5559,7 +5670,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::LoadFirmware - Loads the firmware from the driver resources.
+	* CDriver_ScanLab_RTC6::LoadFirmware - Loads the firmware from the driver resources. DEPRECIATED. Use SetFirmare before calling Initialise..
 	* @param[in] sFirmwareResource - resource name of the firmware program file.
 	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
 	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
@@ -5570,7 +5681,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::LoadCustomFirmware - Loads the firmware from custom resources.
+	* CDriver_ScanLab_RTC6::LoadCustomFirmware - Loads the firmware from custom resources. DEPRECIATED. Use SetCustomFirmare before calling Initialise..
 	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
 	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
 	* @param[in] AuxiliaryDataBuffer - byte array of the binary auxiliary file.
@@ -5674,7 +5785,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* CDriver_ScanLab_RTC6::GetCommunicationTimeouts - Returns the current RTC Ethernet communication timeouts. Fails, if no RTC card has been acquired yet.
 	* @param[out] dInitialTimeout - Initial timeout in ms
 	* @param[out] dMaxTimeout - Max timeout in ms
 	* @param[out] dMultiplier - Multiplier
@@ -5682,6 +5793,17 @@ public:
 	void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_GetCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::GetDefaultCommunicationTimeouts - Returns the RTC Ethernet communication timeouts that will be used for a subsequent connection.
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	void CDriver_ScanLab_RTC6::GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
 	}
 	
 	/**
@@ -5877,7 +5999,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::LoadFirmware - Loads the firmware from the driver resources.
+	* CDriver_ScanLab_RTC6xN::LoadFirmware - Loads the firmware from the driver resources and for a specific scanner. DEPRECIATED. Use SetFirmare before calling Initialise..
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] sFirmwareResource - resource name of the firmware program file.
 	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
@@ -5889,7 +6011,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::LoadCustomFirmware - Loads the firmware from custom resources.
+	* CDriver_ScanLab_RTC6xN::LoadCustomFirmware - Loads the firmware from custom resources and for a specific scanner. DEPRECIATED. Use SetCustomFirmare before calling Initialise..
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
 	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
@@ -5998,7 +6120,18 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* CDriver_ScanLab_RTC6xN::SetAllCommunicationTimeouts - Set RTC Ethernet communication timeouts for all existing and future connections.
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	void CDriver_ScanLab_RTC6xN::SetAllCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts(m_pHandle, dInitialTimeout, dMaxTimeout, dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts for a specific scanner. The given values will be defaults for all subsequent connections.
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
@@ -6010,7 +6143,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts. Fails if the RTC Card is not connected.
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[out] dInitialTimeout - Initial timeout in ms
 	* @param[out] dMaxTimeout - Max timeout in ms
@@ -6019,6 +6152,17 @@ public:
 	void CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts(m_pHandle, nScannerIndex, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::GetDefaultCommunicationTimeouts - Returns the RTC Ethernet communication timeouts that will be used for any subsequent connection.
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	void CDriver_ScanLab_RTC6xN::GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
 	}
 	
 	/**

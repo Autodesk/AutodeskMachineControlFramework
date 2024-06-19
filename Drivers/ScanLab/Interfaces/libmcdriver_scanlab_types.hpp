@@ -187,6 +187,13 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL 1082 /** Port number is not digital. */
 #define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG 1083 /** Port number is not analog. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE 1084 /** Invalid OIE Channel size. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR 1085 /** Internal Acquisition Error. */
+#define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER 1086 /** Could not determine serial number. */
+#define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD 1087 /** Could not assign ethernet card. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA 1088 /** Missing Firmware Data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA 1089 /** Missing FPGA Data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA 1090 /** Missing Auxiliary Data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA 1091 /** Missing Firmware Initialisation Data. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -286,6 +293,13 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
     case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE: return "Invalid OIE Channel size.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR: return "Internal Acquisition Error.";
+    case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER: return "Could not determine serial number.";
+    case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD: return "Could not assign ethernet card.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA: return "Missing Firmware Data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA: return "Missing FPGA Data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA: return "Missing Auxiliary Data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA: return "Missing Firmware Initialisation Data.";
     default: return "unknown error";
   }
 }

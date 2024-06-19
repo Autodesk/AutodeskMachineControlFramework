@@ -812,7 +812,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetInputPoint
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pRTCVersion, LibMCDriver_ScanLab_uint32 * pRTCType, LibMCDriver_ScanLab_uint32 * pDLLVersion, LibMCDriver_ScanLab_uint32 * pHEXVersion, LibMCDriver_ScanLab_uint32 * pBIOSVersion);
 
 /**
-* Set RTC Ethernet communication timeouts
+* Set RTC Ethernet communication timeouts for a specific connection. The Driver defaults will not be changed.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] dInitialTimeout - Initial timeout in ms
@@ -1486,6 +1486,31 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_CreateRTC
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_EnableJournalingPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab);
 
+/**
+* Sets the default firmware from the driver resources. If given, Initialise will upload this firmware before acquiring the RTC card.
+*
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
+* @param[in] pFirmwareResource - resource name of the firmware program file.
+* @param[in] pFPGAResource - resource name of the firmware FPGA file.
+* @param[in] pAuxiliaryResource - resource name of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_SetFirmwarePtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
+
+/**
+* Sets the default firmware from a binary array. If given, Initialise will upload this firmware before acquiring the RTC card.
+*
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
+* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+* @param[in] pFirmwareDataBuffer - uint8 buffer of byte array of the firmware program file.
+* @param[in] nFPGADataBufferSize - Number of elements in buffer
+* @param[in] pFPGADataBuffer - uint8 buffer of byte array of the firmware FPGA file.
+* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+* @param[in] pAuxiliaryDataBuffer - uint8 buffer of byte array of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_SetCustomFirmwarePtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer);
+
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_RTC6
 **************************************************************************************************************************/
@@ -1538,7 +1563,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Init
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialiseFromConfigurationPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pPresetName);
 
 /**
-* Set RTC Ethernet communication timeouts
+* Set RTC Ethernet communication timeouts. The given values will be defaults for all subsequent connections.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[in] dInitialTimeout - Initial timeout in ms
@@ -1598,7 +1623,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetC
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetSelectorPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_RTCSelector * pSelectorInstance);
 
 /**
-* Loads the firmware from the driver resources.
+* Loads the firmware from the driver resources. DEPRECIATED. Use SetFirmare before calling Initialise..
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[in] pFirmwareResource - resource name of the firmware program file.
@@ -1609,7 +1634,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetS
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadFirmwarePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
 
 /**
-* Loads the firmware from custom resources.
+* Loads the firmware from custom resources. DEPRECIATED. Use SetCustomFirmare before calling Initialise..
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[in] nFirmwareDataBufferSize - Number of elements in buffer
@@ -1714,7 +1739,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Disa
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex);
 
 /**
-* Get RTC Ethernet communication timeouts
+* Returns the current RTC Ethernet communication timeouts. Fails, if no RTC card has been acquired yet.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
 * @param[out] pInitialTimeout - Initial timeout in ms
@@ -1723,6 +1748,17 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Draw
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
+
+/**
+* Returns the RTC Ethernet communication timeouts that will be used for a subsequent connection.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[out] pInitialTimeout - Initial timeout in ms
+* @param[out] pMaxTimeout - Max timeout in ms
+* @param[out] pMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetDefaultCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
 
 /**
 * Enables timelag compensation.
@@ -1879,7 +1915,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Ge
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetContextPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_RTCContext * pContextInstance);
 
 /**
-* Loads the firmware from the driver resources.
+* Loads the firmware from the driver resources and for a specific scanner. DEPRECIATED. Use SetFirmare before calling Initialise..
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
 * @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
@@ -1891,7 +1927,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Ge
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_LoadFirmwarePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
 
 /**
-* Loads the firmware from custom resources.
+* Loads the firmware from custom resources and for a specific scanner. DEPRECIATED. Use SetCustomFirmare before calling Initialise..
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
 * @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
@@ -2001,7 +2037,18 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Di
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DrawLayerPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists);
 
 /**
-* Set RTC Ethernet communication timeouts
+* Set RTC Ethernet communication timeouts for all existing and future connections.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[in] dInitialTimeout - Initial timeout in ms
+* @param[in] dMaxTimeout - Max timeout in ms
+* @param[in] dMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAllCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier);
+
+/**
+* Set RTC Ethernet communication timeouts for a specific scanner. The given values will be defaults for all subsequent connections.
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
 * @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
@@ -2013,7 +2060,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Dr
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier);
 
 /**
-* Get RTC Ethernet communication timeouts
+* Get RTC Ethernet communication timeouts. Fails if the RTC Card is not connected.
 *
 * @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
 * @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
@@ -2023,6 +2070,17 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_Se
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
+
+/**
+* Returns the RTC Ethernet communication timeouts that will be used for any subsequent connection.
+*
+* @param[in] pDriver_ScanLab_RTC6xN - Driver_ScanLab_RTC6xN instance.
+* @param[out] pInitialTimeout - Initial timeout in ms
+* @param[out] pMaxTimeout - Max timeout in ms
+* @param[out] pMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetDefaultCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
 
 /**
 * Enables timelag compensation.
@@ -2262,6 +2320,8 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_LoadCustomSDKPtr m_Driver_ScanLab_LoadCustomSDK;
 	PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr m_Driver_ScanLab_CreateRTCSelector;
 	PLibMCDriver_ScanLabDriver_ScanLab_EnableJournalingPtr m_Driver_ScanLab_EnableJournaling;
+	PLibMCDriver_ScanLabDriver_ScanLab_SetFirmwarePtr m_Driver_ScanLab_SetFirmware;
+	PLibMCDriver_ScanLabDriver_ScanLab_SetCustomFirmwarePtr m_Driver_ScanLab_SetCustomFirmware;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr m_Driver_ScanLab_RTC6_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr m_Driver_ScanLab_RTC6_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsInitializedPtr m_Driver_ScanLab_RTC6_IsInitialized;
@@ -2284,6 +2344,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableAttributeFilterPtr m_Driver_ScanLab_RTC6_DisableAttributeFilter;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr m_Driver_ScanLab_RTC6_DrawLayer;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_GetCommunicationTimeouts;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetDefaultCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_EnableTimelagCompensationPtr m_Driver_ScanLab_RTC6_EnableTimelagCompensation;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DisableTimelagCompensationPtr m_Driver_ScanLab_RTC6_DisableTimelagCompensation;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetToSimulationModePtr m_Driver_ScanLab_RTC6xN_SetToSimulationMode;
@@ -2309,8 +2370,10 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableAttributeFilterPtr m_Driver_ScanLab_RTC6xN_EnableAttributeFilter;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableAttributeFilterPtr m_Driver_ScanLab_RTC6xN_DisableAttributeFilter;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DrawLayerPtr m_Driver_ScanLab_RTC6xN_DrawLayer;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAllCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetDefaultCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_EnableTimelagCompensationPtr m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_DisableTimelagCompensationPtr m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation;
 	PLibMCDriver_ScanLabGetVersionPtr m_GetVersion;

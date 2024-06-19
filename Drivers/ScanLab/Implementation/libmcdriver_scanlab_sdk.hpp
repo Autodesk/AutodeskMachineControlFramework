@@ -66,6 +66,7 @@ namespace LibMCDriver_ScanLab {
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_count_cards) ();
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_found_cards) ();
 		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_assign_card) (const uint32_t nSearchNo, const uint32_t nCardNo);		
+		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_remove_card) (const uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_acquire_rtc) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_release_rtc) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_serial_number) (uint32_t nCardNo);
@@ -212,6 +213,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_mcbsp_out_oie_ctrl) (uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_config_waveform_streaming_ctrl) (uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
 			
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_set_high_performance_mode) (uint32_t nCardNo, uint32_t nMode);
 
 		class CScanLabSDKJournal {
 		private:
@@ -257,6 +259,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_eth_count_cards ptr_eth_count_cards = nullptr;
 			PScanLabPtr_eth_found_cards ptr_eth_found_cards = nullptr;
 			PScanLabPtr_eth_assign_card ptr_eth_assign_card = nullptr;
+			PScanLabPtr_eth_remove_card ptr_eth_remove_card = nullptr;
 			PScanLabPtr_acquire_rtc ptr_acquire_rtc = nullptr;
 			PScanLabPtr_release_rtc ptr_release_rtc = nullptr;
 			PScanLabPtr_n_get_serial_number ptr_n_get_serial_number = nullptr;
@@ -389,6 +392,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_rs232_read_data ptr_n_rs232_read_data = nullptr;
 			PScanLabPtr_n_set_mcbsp_out_oie_ctrl ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
 			PScanLabPtr_n_eth_config_waveform_streaming_ctrl ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
+			PScanLabPtr_n_eth_set_high_performance_mode ptr_n_eth_set_high_performance_mode = nullptr;
 
 			void resetFunctionPtrs ();
 		public:
@@ -399,6 +403,8 @@ namespace LibMCDriver_ScanLab {
 			void setJournal(PScanLabSDKJournal pLogJournal);
 
 			void initDLL();
+			void reinitDLL();
+
 			void checkError(uint32_t nRTCError);
 			void checkLastErrorOfCard(uint32_t nCardNo);
 			void checkGlobalErrorOfCard(uint32_t nCardNo);
@@ -412,6 +418,7 @@ namespace LibMCDriver_ScanLab {
 			uint32_t eth_count_cards ();
 			uint32_t eth_found_cards ();
 			int32_t eth_assign_card (const uint32_t nSearchNo, const uint32_t nCardNo);
+			int32_t eth_remove_card(const uint32_t nCardNo);
 			uint32_t acquire_rtc (uint32_t nCardNo);
 			uint32_t release_rtc (uint32_t nCardNo);
 			uint32_t n_get_serial_number (uint32_t nCardNo);
@@ -557,7 +564,7 @@ namespace LibMCDriver_ScanLab {
 			uint32_t n_rs232_read_data(uint32_t nCardNo);
 			void n_set_mcbsp_out_oie_ctrl (uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2);
 			void n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
-
+			void n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMode);
 
 		};
 

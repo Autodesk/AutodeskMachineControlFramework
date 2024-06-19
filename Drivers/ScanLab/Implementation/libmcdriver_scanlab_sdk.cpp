@@ -184,6 +184,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_eth_count_cards = (PScanLabPtr_eth_count_cards)_loadScanLabAddress(hLibrary, "eth_count_cards");
 	this->ptr_eth_found_cards = (PScanLabPtr_eth_found_cards)_loadScanLabAddress(hLibrary, "eth_found_cards");
 	this->ptr_eth_assign_card = (PScanLabPtr_eth_assign_card)_loadScanLabAddress(hLibrary, "eth_assign_card");
+	this->ptr_eth_remove_card = (PScanLabPtr_eth_remove_card)_loadScanLabAddress(hLibrary, "eth_remove_card");
 	this->ptr_acquire_rtc = (PScanLabPtr_acquire_rtc)_loadScanLabAddress(hLibrary, "acquire_rtc");
 	this->ptr_release_rtc = (PScanLabPtr_release_rtc)_loadScanLabAddress(hLibrary, "release_rtc");
 	this->ptr_n_get_serial_number = (PScanLabPtr_n_get_serial_number)_loadScanLabAddress(hLibrary, "n_get_serial_number");
@@ -320,6 +321,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 
 	this->ptr_n_set_mcbsp_out_oie_ctrl = (PScanLabPtr_n_set_mcbsp_out_oie_ctrl)_loadScanLabAddress(hLibrary, "n_set_mcbsp_out_oie_ctrl");
 	this->ptr_n_eth_config_waveform_streaming_ctrl = (PScanLabPtr_n_eth_config_waveform_streaming_ctrl)_loadScanLabAddress(hLibrary, "n_eth_config_waveform_streaming_ctrl");
+	this->ptr_n_eth_set_high_performance_mode = (PScanLabPtr_n_eth_set_high_performance_mode)_loadScanLabAddress(hLibrary, "n_eth_set_high_performance_mode");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -354,6 +356,19 @@ void CScanLabSDK::initDLL()
 	}
 }
 
+void CScanLabSDK::reinitDLL()
+{
+	if (ptr_free_rtc6_dll == nullptr)
+		throw std::runtime_error("RTC DLL not loaded");
+
+	ptr_free_rtc6_dll();
+	m_bIsInitialized = false;
+
+	initDLL();
+
+}
+
+
 void CScanLabSDK::checkError(uint32_t nRTCError)
 {
 	if (nRTCError != 0)
@@ -383,6 +398,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_eth_count_cards = nullptr;
 	ptr_eth_found_cards = nullptr;
 	ptr_eth_assign_card = nullptr;
+	ptr_eth_remove_card = nullptr;
 	ptr_acquire_rtc = nullptr;
 	ptr_release_rtc = nullptr;
 	ptr_n_get_serial_number = nullptr;
@@ -524,6 +540,7 @@ void CScanLabSDK::resetFunctionPtrs()
 
 	ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
 	ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
+	ptr_n_eth_set_high_performance_mode = nullptr;
 
 }
 
@@ -599,6 +616,14 @@ int32_t CScanLabSDK::eth_assign_card(const uint32_t nSearchNo, const uint32_t nC
 		m_pLogJournal->logCall("eth_assign_card", std::to_string (nSearchNo) + ", " + std::to_string (nCardNo));
 
 	return ptr_eth_assign_card(nSearchNo, nCardNo);
+}
+
+int32_t CScanLabSDK::eth_remove_card(const uint32_t nCardNo)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("eth_remove_card", std::to_string(nCardNo));
+
+	return ptr_eth_remove_card(nCardNo);
 }
 
 uint32_t CScanLabSDK::acquire_rtc(uint32_t nCardNo)
@@ -1652,6 +1677,15 @@ void CScanLabSDK::n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_
 		m_pLogJournal->logCall("n_eth_config_waveform_streaming_ctrl", std::to_string(nCardNo) + ", " + std::to_string(nSize) + ", " + std::to_string(nFlags));
 
 	ptr_n_eth_config_waveform_streaming_ctrl(nCardNo, nSize, nFlags);
+
+}
+
+void CScanLabSDK::n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMode)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_eth_set_high_performance_mode", std::to_string(nCardNo) + ", " + std::to_string(nMode));
+
+	ptr_n_eth_set_high_performance_mode(nCardNo, nMode);
 
 }
 

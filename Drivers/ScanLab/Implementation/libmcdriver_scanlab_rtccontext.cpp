@@ -177,6 +177,63 @@ CRTCContext::~CRTCContext()
 	}
 }
 
+void CRTCContext::loadFirmwareEx(PScanLabSDK pSDK, uint32_t nCardNo, const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+{
+	if (pSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+	if (pDriverEnvironment.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	pSDK->checkGlobalErrorOfCard(nCardNo);
+
+	auto pWorkingDirectory = pDriverEnvironment->CreateWorkingDirectory();
+
+	std::string sFirmwareName;
+	if (bIsNetwork) {
+		sFirmwareName = "RTC6ETH.out";
+	}
+	else {
+		sFirmwareName = "RTC6OUT.out";
+	}
+
+	auto pFirmwareFile = pWorkingDirectory->StoreCustomData(sFirmwareName, LibMCEnv::CInputVector<uint8_t>(pFirmwareDataBuffer, nFirmwareDataBufferSize));
+	auto pFPGAFile = pWorkingDirectory->StoreCustomData("RTC6RBF.rbf", LibMCEnv::CInputVector<uint8_t>(pFPGADataBuffer, nFPGADataBufferSize));
+	auto pAuxiliaryFile = pWorkingDirectory->StoreCustomData("RTC6DAT.dat", LibMCEnv::CInputVector<uint8_t>(pAuxiliaryDataBuffer, nAuxiliaryDataBufferSize));
+
+	// TODO: Convert to ANSI
+	uint32_t nErrorCode = pSDK->n_load_program_file(nCardNo, pWorkingDirectory->GetAbsoluteFilePath().c_str());
+
+	pFirmwareFile = nullptr;
+	pFPGAFile = nullptr;
+	pAuxiliaryFile = nullptr;
+
+	pWorkingDirectory->CleanUp();
+
+	if (nErrorCode != 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE, "could not load program file: #" + std::to_string(nErrorCode));
+
+	pSDK->checkGlobalErrorOfCard(nCardNo);
+
+}
+
+void CRTCContext::setCommunicationTimeoutsEx(PScanLabSDK pSDK, uint32_t nCardNo, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+{
+	if (pSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	double dOldInitialTimeout = 0.0;
+	double dOldMaxTimeout = 0.0;
+	double dOldMultiplier = 0.0;
+	uint32_t nOldMode = 0;
+
+	// Turn on high performance mode...
+	pSDK->n_eth_set_high_performance_mode(nCardNo, 1);
+
+	// Set Timeouts, but keep old mode
+	pSDK->n_eth_get_com_timeouts_auto(nCardNo, &dOldInitialTimeout, &dOldMaxTimeout, &dOldMultiplier, &nOldMode);
+	pSDK->n_eth_set_com_timeouts_auto(nCardNo, dInitialTimeout, dMaxTimeout, dMultiplier, nOldMode);
+}
+
 
 std::string CRTCContext::GetIPAddress()
 {
@@ -203,36 +260,7 @@ void CRTCContext::setLaserIndex(const uint32_t nLaserIndex)
 
 void CRTCContext::LoadFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer)
 {
-	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-
-	auto pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
-
-	std::string sFirmwareName;
-	if (m_bIsNetwork) {
-		sFirmwareName = "RTC6ETH.out";
-	}
-	else {
-		sFirmwareName = "RTC6OUT.out";
-	}
-
-	auto pFirmwareFile = pWorkingDirectory->StoreCustomData (sFirmwareName, LibMCEnv::CInputVector<uint8_t> (pFirmwareDataBuffer, nFirmwareDataBufferSize));
-	auto pFPGAFile = pWorkingDirectory->StoreCustomData("RTC6RBF.rbf", LibMCEnv::CInputVector<uint8_t>(pFPGADataBuffer, nFPGADataBufferSize));
-	auto pAuxiliaryFile = pWorkingDirectory->StoreCustomData("RTC6DAT.dat", LibMCEnv::CInputVector<uint8_t>(pAuxiliaryDataBuffer, nAuxiliaryDataBufferSize));
-
-	// TODO: Convert to ANSI
-	uint32_t nErrorCode = m_pScanLabSDK->n_load_program_file (m_CardNo, pWorkingDirectory->GetAbsoluteFilePath().c_str ());
-
-	pFirmwareFile = nullptr;
-	pFPGAFile = nullptr;
-	pAuxiliaryFile = nullptr;
-
-	pWorkingDirectory->CleanUp();
-
-	if (nErrorCode != 0)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE, "could not load program file: #" + std::to_string (nErrorCode));
-
-	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-
+	loadFirmwareEx(m_pScanLabSDK, m_CardNo, nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer, m_bIsNetwork, m_pDriverEnvironment);
 }
 
 void CRTCContext::LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
@@ -1181,12 +1209,7 @@ void CRTCContext::GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_int32& nP
 
 void CRTCContext::SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
 {
-	double dOldInitialTimeout = 0.0;
-	double dOldMaxTimeout = 0.0;
-	double dOldMultiplier = 0.0;
-	uint32_t nOldMode = 0;
-	m_pScanLabSDK->n_eth_get_com_timeouts_auto(m_CardNo, &dOldInitialTimeout, &dOldMaxTimeout, &dOldMultiplier, &nOldMode);
-	m_pScanLabSDK->n_eth_set_com_timeouts_auto(m_CardNo, dInitialTimeout, dMaxTimeout, dMultiplier, nOldMode);
+	setCommunicationTimeoutsEx(m_pScanLabSDK, m_CardNo, dInitialTimeout, dMaxTimeout, dMultiplier);
 }
 
 void CRTCContext::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier)
@@ -1734,7 +1757,7 @@ uint32_t CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t Data
 	uint32_t Error = 0;
 	uint32_t nDataLength = DataEnd - DataStart;
 
-	//std::cout << "Saving RTC Data Block (" << nDataLength << " bytes" << std::endl;
+	std::cout << "Saving RTC Data Block FROM " << DataStart << " TO " << DataEnd << std::endl;
 
 	if (nDataLength > 0) {
 
@@ -1785,7 +1808,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 
 	uint32_t Busy, Position, MesBusy, MesPosition;
 	uint32_t LastPosition = 0;
-	uint32_t Increment = 600000;
+	uint32_t Increment = 100000;
 
 	std::string sFileName = "c:/temp/recording_out_" + return_current_time_and_date() + ".csv";
 	std::cout << "Creating recording file" << std::endl;
@@ -1806,6 +1829,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 
 	do   //blockwise data polling
 	{
+
 		m_pScanLabSDK->n_get_status(m_CardNo, &Busy, &Position);
 		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
 		std::cout << "RTC Status busy: " << Busy << " Position: " << Position << " Measure Busy: " << MesBusy << " Measure Position: " << MesPosition << std::endl;
@@ -1820,10 +1844,18 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 			saveRecordedDataBlock(MyFile, LastPosition, MAXMESPOSITION, CalibrationFactorXY);
 			LastPosition = 0;
 		}
+		else {
+			if (!MesBusy) {
+				saveRecordedDataBlock(MyFile, LastPosition, MesPosition, CalibrationFactorXY);
+				LastPosition = MesPosition;
+			}
+		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-	} while (Busy);           // Wait for the job to be finished executing
+		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
+
+	} while (MesBusy || (MesPosition != LastPosition));           // Wait for the job to be finished executing
 
 }
 

@@ -3857,6 +3857,69 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_enablejournaling(Li
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_setfirmware(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab;
+
+	try {
+		if (pFirmwareResource == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pFPGAResource == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pAuxiliaryResource == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sFirmwareResource(pFirmwareResource);
+		std::string sFPGAResource(pFPGAResource);
+		std::string sAuxiliaryResource(pAuxiliaryResource);
+		IDriver_ScanLab* pIDriver_ScanLab = dynamic_cast<IDriver_ScanLab*>(pIBaseClass);
+		if (!pIDriver_ScanLab)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab->SetFirmware(sFirmwareResource, sFPGAResource, sAuxiliaryResource);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_setcustomfirmware(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab;
+
+	try {
+		if ( (!pFirmwareDataBuffer) && (nFirmwareDataBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if ( (!pFPGADataBuffer) && (nFPGADataBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if ( (!pAuxiliaryDataBuffer) && (nAuxiliaryDataBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IDriver_ScanLab* pIDriver_ScanLab = dynamic_cast<IDriver_ScanLab*>(pIBaseClass);
+		if (!pIDriver_ScanLab)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab->SetCustomFirmware(nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_ScanLab_RTC6
@@ -4480,6 +4543,36 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicati
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		pIDriver_ScanLab_RTC6->GetCommunicationTimeouts(*pInitialTimeout, *pMaxTimeout, *pMultiplier);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
+
+	try {
+		if (!pInitialTimeout)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pMaxTimeout)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pMultiplier)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IDriver_ScanLab_RTC6* pIDriver_ScanLab_RTC6 = dynamic_cast<IDriver_ScanLab_RTC6*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC6->GetDefaultCommunicationTimeouts(*pInitialTimeout, *pMaxTimeout, *pMultiplier);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -5203,6 +5296,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer(Li
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
+
+	try {
+		IDriver_ScanLab_RTC6xN* pIDriver_ScanLab_RTC6xN = dynamic_cast<IDriver_ScanLab_RTC6xN*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6xN)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC6xN->SetAllCommunicationTimeouts(dInitialTimeout, dMaxTimeout, dMultiplier);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
@@ -5243,6 +5360,36 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getcommunica
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		pIDriver_ScanLab_RTC6xN->GetCommunicationTimeouts(nScannerIndex, *pInitialTimeout, *pMaxTimeout, *pMultiplier);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6xN pDriver_ScanLab_RTC6xN, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6xN;
+
+	try {
+		if (!pInitialTimeout)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pMaxTimeout)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pMultiplier)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IDriver_ScanLab_RTC6xN* pIDriver_ScanLab_RTC6xN = dynamic_cast<IDriver_ScanLab_RTC6xN*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6xN)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC6xN->GetDefaultCommunicationTimeouts(*pInitialTimeout, *pMaxTimeout, *pMultiplier);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -5604,6 +5751,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_creatertcselector;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_enablejournaling") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_enablejournaling;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_setfirmware") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_setfirmware;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_setcustomfirmware") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_setcustomfirmware;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode") 
@@ -5648,6 +5799,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_enabletimelagcompensation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_enabletimelagcompensation;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_disabletimelagcompensation") 
@@ -5698,10 +5851,14 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_disableattributefilter;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_drawlayer;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_getcommunicationtimeouts") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getcommunicationtimeouts;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_enabletimelagcompensation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6xn_enabletimelagcompensation;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6xn_disabletimelagcompensation") 

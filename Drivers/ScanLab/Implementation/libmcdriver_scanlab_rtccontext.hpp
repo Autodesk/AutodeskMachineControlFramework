@@ -156,6 +156,10 @@ public:
 
 	~CRTCContext();
 
+	static void loadFirmwareEx(PScanLabSDK pSDK, uint32_t nCardID, const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+	static void setCommunicationTimeoutsEx(PScanLabSDK pSDK, uint32_t nCardID, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
+
 	std::string GetIPAddress();
 
 	std::string GetNetmask();
