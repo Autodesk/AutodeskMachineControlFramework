@@ -223,6 +223,9 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
 
         }
 
+        if (!bSuccess)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD);
+
         uint32_t nRTCVersion = 0;
         uint32_t nRTCType = 0;
         uint32_t nDLLVersion = 0;

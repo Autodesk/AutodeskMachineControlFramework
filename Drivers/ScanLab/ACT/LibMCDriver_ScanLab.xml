@@ -142,6 +142,8 @@
 		<error name="MISSINGFIRMWAREINITIZATIONDATA" code="1091" description="Missing Firmware Initialisation Data." />
 		<error name="NOCARDFOUNDATIPADDRESS" code="1092" description="No Card found at IP Address." />		
 		<error name="NOCARDFOUNDATINIPRANGE" code="1093" description="No Card found in IP Range." />		
+		<error name="COULDNOTINITIALISERTCCARD" code="1094" description="Could not initialize RTC Card." />		
+		
 		
 		
 
@@ -304,6 +306,10 @@ Custom implementation
 		</method>
 		
 		
+	</class>
+
+
+	<class name="RTCJob" parent="Base" description="An in memory representation of an RTC Job..">
 	</class>
 
 

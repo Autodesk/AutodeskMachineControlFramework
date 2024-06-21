@@ -196,6 +196,7 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA 1091 /** Missing Firmware Initialisation Data. */
 #define LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS 1092 /** No Card found at IP Address. */
 #define LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE 1093 /** No Card found in IP Range. */
+#define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD 1094 /** Could not initialize RTC Card. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -304,6 +305,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA: return "Missing Firmware Initialisation Data.";
     case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS: return "No Card found at IP Address.";
     case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE: return "No Card found in IP Range.";
+    case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD: return "Could not initialize RTC Card.";
     default: return "unknown error";
   }
 }
