@@ -58,6 +58,8 @@ namespace Impl {
 class IBase;
 class IDriver;
 class IUARTConnection;
+class IRTCJob;
+class IRTCRecording;
 class IRTCContext;
 class IRTCSelector;
 class IDriver_ScanLab;
@@ -512,6 +514,236 @@ public:
 };
 
 typedef IBaseSharedPtr<IUARTConnection> PIUARTConnection;
+
+
+/*************************************************************************************************************************
+ Class interface for RTCJob 
+**************************************************************************************************************************/
+
+class IRTCJob : public virtual IBase {
+public:
+	/**
+	* IRTCJob::DrawPolyline - Writes a polyline into the open list
+	* @param[in] nPointsBufferSize - Number of elements in buffer
+	* @param[in] pPointsBuffer - Points of polyline to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	*/
+	virtual void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
+
+	/**
+	* IRTCJob::DrawPolylineOIE - Writes a polyline into the open list with OIE Enabled.
+	* @param[in] nPointsBufferSize - Number of elements in buffer
+	* @param[in] pPointsBuffer - Points of polyline to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
+	*/
+	virtual void DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex) = 0;
+
+	/**
+	* IRTCJob::DrawHatches - Writes a list of hatches into the open list
+	* @param[in] nHatchesBufferSize - Number of elements in buffer
+	* @param[in] pHatchesBuffer - Hatches to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	*/
+	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
+
+	/**
+	* IRTCJob::AddSetPower - adds a power change to the open list. MUST NOT be used for PID control.
+	* @param[in] fPowerInPercent - Laser power in percent
+	*/
+	virtual void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent) = 0;
+
+	/**
+	* IRTCJob::AddSetAnalogOut - Adds changing an analog port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	virtual void AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) = 0;
+
+	/**
+	* IRTCJob::AddSetDigitalOut - Adds changing an digital port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	virtual void AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) = 0;
+
+	/**
+	* IRTCJob::AddSetPowerForPIDControl - adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
+	* @param[in] fPowerInPercent - Laser power in percent
+	*/
+	virtual void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent) = 0;
+
+	/**
+	* IRTCJob::AddSetJumpSpeed - adds a jump speed change to the open list
+	* @param[in] fJumpSpeedInMMPerSecond - Jump speed in mm/s
+	*/
+	virtual void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond) = 0;
+
+	/**
+	* IRTCJob::AddSetMarkSpeed - adds a mark speed change to the open list
+	* @param[in] fMarkSpeedInMMPerSecond - Mark speed in mm/s
+	*/
+	virtual void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond) = 0;
+
+	/**
+	* IRTCJob::AddJumpMovement - Adds a Jump movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	virtual void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) = 0;
+
+	/**
+	* IRTCJob::AddMarkMovement - Adds a Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	virtual void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY) = 0;
+
+	/**
+	* IRTCJob::AddTimedMarkMovement - Adds a timed Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	* @param[in] dDurationInMicroseconds - Duration of mark movement in Microseconds.
+	*/
+	virtual void AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDurationInMicroseconds) = 0;
+
+	/**
+	* IRTCJob::AddFreeVariable - Adds a free variable set to the open list
+	* @param[in] nVariableNo - Number of the variable (0-7).
+	* @param[in] nValue - Value to set.
+	*/
+	virtual void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue) = 0;
+
+};
+
+typedef IBaseSharedPtr<IRTCJob> PIRTCJob;
+
+
+/*************************************************************************************************************************
+ Class interface for RTCRecording 
+**************************************************************************************************************************/
+
+class IRTCRecording : public virtual IBase {
+public:
+	/**
+	* IRTCRecording::ScanheadConnectionCheckIsEnabled - Returns if the scan head connection is checked when recording
+	* @return If true, the Scanhead connection will be checked for an error when recording.
+	*/
+	virtual bool ScanheadConnectionCheckIsEnabled() = 0;
+
+	/**
+	* IRTCRecording::EnableScanheadConnectionCheck - Enables the Scanhead connection check. The check is enabled by default.
+	*/
+	virtual void EnableScanheadConnectionCheck() = 0;
+
+	/**
+	* IRTCRecording::DisableScanheadConnectionCheck - Disables the Scanhead connection check.
+	*/
+	virtual void DisableScanheadConnectionCheck() = 0;
+
+	/**
+	* IRTCRecording::Clear - Clears all recording data and channels.
+	*/
+	virtual void Clear() = 0;
+
+	/**
+	* IRTCRecording::AddChannel - Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique.
+	* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined.
+	*/
+	virtual void AddChannel(const std::string & sChannelName, const LibMCDriver_ScanLab::eRTCChannelType eChannelType) = 0;
+
+	/**
+	* IRTCRecording::RemoveChannel - Removes a new channel from the recording and all recorded data of that channel. Does nothing if channel does not exist. 
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	*/
+	virtual void RemoveChannel(const std::string & sChannelName) = 0;
+
+	/**
+	* IRTCRecording::HasChannel - Returns if a channel name exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @return Returns true if channel exists.
+	*/
+	virtual bool HasChannel(const std::string & sChannelName) = 0;
+
+	/**
+	* IRTCRecording::GetChannelType - Returns the type of a channel. Returns Undefined if channel does not exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @return Channel type enum.
+	*/
+	virtual LibMCDriver_ScanLab::eRTCChannelType GetChannelType(const std::string & sChannelName) = 0;
+
+	/**
+	* IRTCRecording::GetRecordCount - Returns how many record entries have been recorded.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @return The number of record entries.
+	*/
+	virtual LibMCDriver_ScanLab_uint64 GetRecordCount(const std::string & sChannelName) = 0;
+
+	/**
+	* IRTCRecording::GetRecordEntry - Returns a specific record entry. Fails if Channel does not exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @param[in] nRecordIndex - Index of Record entry. MUST be between 0 and RecordCount - 1.
+	* @return Value of record entry.
+	*/
+	virtual LibMCDriver_ScanLab_int32 GetRecordEntry(const std::string & sChannelName, const LibMCDriver_ScanLab_uint64 nRecordIndex) = 0;
+
+	/**
+	* IRTCRecording::GetAllRecordEntries - Returns all record entries of a channel. Fails if Channel does not exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @param[in] nValuesBufferSize - Number of elements in buffer
+	* @param[out] pValuesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValuesBuffer - int32 buffer of Array of all record entries.
+	*/
+	virtual void GetAllRecordEntries(const std::string & sChannelName, LibMCDriver_ScanLab_uint64 nValuesBufferSize, LibMCDriver_ScanLab_uint64* pValuesNeededCount, LibMCDriver_ScanLab_int32 * pValuesBuffer) = 0;
+
+	/**
+	* IRTCRecording::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
+	*/
+	virtual void EnableRecording() = 0;
+
+	/**
+	* IRTCRecording::DisableRecording - Disables recording of position data of the RTC Card. This is a list command.
+	*/
+	virtual void DisableRecording() = 0;
+
+	/**
+	* IRTCRecording::ExecuteListWithRecording - Executes the list with recording the position data from the RTC card. DEPRECIATED!
+	*/
+	virtual void ExecuteListWithRecording() = 0;
+
+	/**
+	* IRTCRecording::AddRecordsToDataTable - Writes a certain channel to a data table as int32 columns. Fails if Channel does not exist
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	virtual void AddRecordsToDataTable(const std::string & sChannelName, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IRTCRecording::AddScaledRecordsToDataTable - Writes a certain channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset. Fails if Channel does not exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+	* @param[in] dOffset - Offset that the raw value is scaled with.
+	*/
+	virtual void AddScaledRecordsToDataTable(const std::string & sChannelName, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset) = 0;
+
+};
+
+typedef IBaseSharedPtr<IRTCRecording> PIRTCRecording;
 
 
 /*************************************************************************************************************************
@@ -1135,25 +1367,9 @@ public:
 
 	/**
 	* IRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+	* @return Recording instance.
 	*/
-	virtual void PrepareRecording() = 0;
-
-	/**
-	* IRTCContext::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
-	*/
-	virtual void EnableRecording() = 0;
-
-	/**
-	* IRTCContext::DisableRecording - Disables recording of position data of the RTC Card. This is a list command.
-	*/
-	virtual void DisableRecording() = 0;
-
-	/**
-	* IRTCContext::ExecuteListWithRecording - Executes the list with recording the position data from the RTC card.
-	* @param[in] nListIndex - Index of List (1 or 2).
-	* @param[in] nPosition - Relative Position in List.
-	*/
-	virtual void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) = 0;
+	virtual IRTCRecording * PrepareRecording() = 0;
 
 	/**
 	* IRTCContext::EnableTimelagCompensation - Enables timelag compensation.

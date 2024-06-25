@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_rtccontext.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 #include "libmcdriver_scanlab_uartconnection.hpp"
+#include "libmcdriver_scanlab_rtcrecording.hpp"
 
 // Include custom headers here.
 #include <math.h>
@@ -1674,8 +1675,16 @@ void CRTCContext::SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11,
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
 
+IRTCRecording* CRTCContext::PrepareRecording()
+{
+	auto pCryptoContext = m_pDriverEnvironment->CreateCryptoContext();
+	std::string sUUID = pCryptoContext->CreateUUID();
+	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, RTC_CHUNKSIZE_DEFAULT);
 
-void CRTCContext::PrepareRecording()
+	return new CRTCRecording(pInstance);
+}
+
+/*void CRTCContext::PrepareRecording()
 {
 	bool bCheckIfScanHeadIsConnected = false;
 
@@ -1741,8 +1750,6 @@ void CRTCContext::DisableRecording()
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 	m_pScanLabSDK->n_long_delay(m_CardNo, 1200); // add long delay ~ TODO: tracking error or preview time
 	m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 1, 2, 4, 32); // deactivates signal recording
-	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 7, 8, 9, 0); // deactivates signal recording
-	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 10, 11, 12, 0); // deactivates signal recording
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
@@ -1854,7 +1861,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 
 	} while (MesBusy || (MesPosition != LastPosition));           // Wait for the job to be finished executing
 
-}
+}  */
 
 void CRTCContext::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
 {
@@ -2123,8 +2130,8 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	uint32_t nSegmentCount = pLayer->GetSegmentCount();
 	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 
-		m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = nSegmentIndex + 1;
-		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "measurementid", 0);
+		m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = (uint32_t) (nSegmentIndex + 1);
+		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = (uint32_t) pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "measurementid", 0);
 
 		LibMCEnv::eToolpathSegmentType eSegmentType;
 		uint32_t nPointCount;
@@ -2495,3 +2502,4 @@ void CRTCContext::SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nC
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
+

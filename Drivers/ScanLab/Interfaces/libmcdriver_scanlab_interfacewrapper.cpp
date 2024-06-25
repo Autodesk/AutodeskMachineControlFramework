@@ -551,6 +551,777 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readline(LibMCDrive
 
 
 /*************************************************************************************************************************
+ Class implementation for RTCJob
+**************************************************************************************************************************/
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_drawpolyline(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const sLibMCDriver_ScanLabPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		if ( (!pPointsBuffer) && (nPointsBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->DrawPolyline(nPointsBufferSize, pPointsBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_drawpolylineoie(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const sLibMCDriver_ScanLabPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue, LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		if ( (!pPointsBuffer) && (nPointsBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->DrawPolylineOIE(nPointsBufferSize, pPointsBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue, nOIEPIDControlIndex);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_drawhatches(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const sLibMCDriver_ScanLabHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		if ( (!pHatchesBuffer) && (nHatchesBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->DrawHatches(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetpower(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_single fPowerInPercent)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddSetPower(fPowerInPercent);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetanalogout(LibMCDriver_ScanLab_RTCJob pRTCJob, eLibMCDriver_ScanLabLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddSetAnalogOut(eLaserPort, fOutputValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetdigitalout(LibMCDriver_ScanLab_RTCJob pRTCJob, eLibMCDriver_ScanLabLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddSetDigitalOut(eLaserPort, fOutputValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetpowerforpidcontrol(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_single fPowerInPercent)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddSetPowerForPIDControl(fPowerInPercent);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetjumpspeed(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddSetJumpSpeed(fJumpSpeedInMMPerSecond);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetmarkspeed(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddSetMarkSpeed(fMarkSpeedInMMPerSecond);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addjumpmovement(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddJumpMovement(dTargetX, dTargetY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addmarkmovement(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddMarkMovement(dTargetX, dTargetY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addtimedmarkmovement(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY, LibMCDriver_ScanLab_double dDurationInMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddTimedMarkMovement(dTargetX, dTargetY, dDurationInMicroseconds);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addfreevariable(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCJob;
+
+	try {
+		IRTCJob* pIRTCJob = dynamic_cast<IRTCJob*>(pIBaseClass);
+		if (!pIRTCJob)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCJob->AddFreeVariable(nVariableNo, nValue);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for RTCRecording
+**************************************************************************************************************************/
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled(LibMCDriver_ScanLab_RTCRecording pRTCRecording, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pValue = pIRTCRecording->ScanheadConnectionCheckIsEnabled();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck(LibMCDriver_ScanLab_RTCRecording pRTCRecording)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->EnableScanheadConnectionCheck();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck(LibMCDriver_ScanLab_RTCRecording pRTCRecording)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->DisableScanheadConnectionCheck();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_clear(LibMCDriver_ScanLab_RTCRecording pRTCRecording)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->Clear();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addchannel(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, eLibMCDriver_ScanLabRTCChannelType eChannelType)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->AddChannel(sChannelName, eChannelType);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_removechannel(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->RemoveChannel(sChannelName);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_haschannel(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, bool * pChannelExists)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pChannelExists == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pChannelExists = pIRTCRecording->HasChannel(sChannelName);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getchanneltype(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, eLibMCDriver_ScanLabRTCChannelType * pChannelType)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pChannelType == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pChannelType = pIRTCRecording->GetChannelType(sChannelName);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getrecordcount(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCDriver_ScanLab_uint64 * pRecordCount)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pRecordCount == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pRecordCount = pIRTCRecording->GetRecordCount(sChannelName);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getrecordentry(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCDriver_ScanLab_uint64 nRecordIndex, LibMCDriver_ScanLab_int32 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pValue = pIRTCRecording->GetRecordEntry(sChannelName, nRecordIndex);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getallrecordentries(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, const LibMCDriver_ScanLab_uint64 nValuesBufferSize, LibMCDriver_ScanLab_uint64* pValuesNeededCount, LibMCDriver_ScanLab_int32 * pValuesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if ((!pValuesBuffer) && !(pValuesNeededCount))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->GetAllRecordEntries(sChannelName, nValuesBufferSize, pValuesNeededCount, pValuesBuffer);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablerecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->EnableRecording();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_disablerecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->DisableRecording();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_executelistwithrecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->ExecuteListWithRecording();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addrecordstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->AddRecordsToDataTable(sChannelName, pIDataTable, sColumnIdentifier, sColumnDescription);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLab_double dScaleFactor, LibMCDriver_ScanLab_double dOffset)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pChannelName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pColumnDescription == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sChannelName(pChannelName);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifier(pColumnIdentifier);
+		std::string sColumnDescription(pColumnDescription);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->AddScaledRecordsToDataTable(sChannelName, pIDataTable, sColumnIdentifier, sColumnDescription, dScaleFactor, dOffset);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for RTCContext
 **************************************************************************************************************************/
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadfirmware(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer)
@@ -2748,89 +3519,21 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationmatrix
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
 	try {
+		if (pRecordingInstance == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IBase* pBaseRecordingInstance(nullptr);
 		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->PrepareRecording();
+		pBaseRecordingInstance = pIRTCContext->PrepareRecording();
 
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablerecording(LibMCDriver_ScanLab_RTCContext pRTCContext)
-{
-	IBase* pIBaseClass = (IBase *)pRTCContext;
-
-	try {
-		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
-		if (!pIRTCContext)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
-		
-		pIRTCContext->EnableRecording();
-
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablerecording(LibMCDriver_ScanLab_RTCContext pRTCContext)
-{
-	IBase* pIBaseClass = (IBase *)pRTCContext;
-
-	try {
-		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
-		if (!pIRTCContext)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
-		
-		pIRTCContext->DisableRecording();
-
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_executelistwithrecording(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition)
-{
-	IBase* pIBaseClass = (IBase *)pRTCContext;
-
-	try {
-		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
-		if (!pIRTCContext)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
-		
-		pIRTCContext->ExecuteListWithRecording(nListIndex, nPosition);
-
+		*pRecordingInstance = (IBase*)(pBaseRecordingInstance);
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
@@ -5495,6 +6198,64 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_readdata;
 	if (sProcName == "libmcdriver_scanlab_uartconnection_readline") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_uartconnection_readline;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_drawpolyline") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_drawpolyline;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_drawpolylineoie") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_drawpolylineoie;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_drawhatches") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_drawhatches;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addsetpower") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addsetpower;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addsetanalogout") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addsetanalogout;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addsetdigitalout") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addsetdigitalout;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addsetpowerforpidcontrol") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addsetpowerforpidcontrol;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addsetjumpspeed") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addsetjumpspeed;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addsetmarkspeed") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addsetmarkspeed;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addjumpmovement") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addjumpmovement;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addmarkmovement") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addmarkmovement;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addtimedmarkmovement") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addtimedmarkmovement;
+	if (sProcName == "libmcdriver_scanlab_rtcjob_addfreevariable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcjob_addfreevariable;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_clear") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_clear;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_addchannel") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_addchannel;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_removechannel") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_removechannel;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_haschannel") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_haschannel;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_getchanneltype") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_getchanneltype;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_getrecordcount") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_getrecordcount;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_getrecordentry") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_getrecordentry;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_getallrecordentries") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_getallrecordentries;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_enablerecording") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_enablerecording;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_disablerecording") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_disablerecording;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_executelistwithrecording") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_executelistwithrecording;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_addrecordstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_addrecordstodatatable;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadfirmware") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_loadfirmware;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadcorrectionfile") 
@@ -5667,12 +6428,6 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_settransformationmatrix;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_preparerecording") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_preparerecording;
-	if (sProcName == "libmcdriver_scanlab_rtccontext_enablerecording") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enablerecording;
-	if (sProcName == "libmcdriver_scanlab_rtccontext_disablerecording") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disablerecording;
-	if (sProcName == "libmcdriver_scanlab_rtccontext_executelistwithrecording") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_executelistwithrecording;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_enabletimelagcompensation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enabletimelagcompensation;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disabletimelagcompensation") 

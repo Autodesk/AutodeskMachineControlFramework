@@ -144,9 +144,26 @@
 		<error name="NOCARDFOUNDATINIPRANGE" code="1093" description="No Card found in IP Range." />		
 		<error name="COULDNOTINITIALISERTCCARD" code="1094" description="Could not initialize RTC Card." />		
 		
+		<error name="INVALIDCHANNELNAME" code="1095" description="Invalid Channel Name." />
+		<error name="EMPTYCHANNELNAME" code="1096" description="Empty Channel Name." />
+		<error name="CANNOTADDCHANNELDURINGRECORDING" code="1097" description="Cannot add channel during recording." />
+		<error name="DUPLICATECHANNELNAME" code="1098" description="Duplicate channel name." />
+		<error name="NORECORDINGCHANNELAVAILABLE" code="1099" description="No recording channel available." />
+		<error name="INVALIDCHANNELID" code="1100" description="Invalid Channel ID." />
+		<error name="CHANNELTYPECANNOTBEUNDEFINED" code="1101" description="Channel Type cannot be undefined." />
+		<error name="INVALIDCHUNKSIZE" code="1102" description="Invalid Chunk Size" />
+		<error name="CHANNELNOTFOUND" code="1103" description="Channel not found" />
+		<error name="INVALIDRECORDINDEX" code="1104" description="Invalid record index" />		
+		<error name="INVALIDCHUNKINDEX" code="1105" description="Invalid chunk index" />		
+		<error name="CHUNKENTRYINDEXOUTOFBOUNDS" code="1106" description="Chunk entry index out of bounds" />		
+		<error name="INVALIDDATARECORDINGINTERVAL" code="1107" description="Invalid data recording interval" />		
+		<error name="DATARECORDINGOVERFLOW" code="1108" description="Data recording overflow" />		
+		<error name="DATARECORDINGUNDERFLOW" code="1109" description="Data recording underflow" />				
+		<error name="DATABUFFERISFULL" code="1110" description="Data buffer is full" />		
+		<error name="DATABUFFERREADEMPTY" code="1111" description="Data buffer read empty" />		
 		
 		
-
+		
 										
 	</errors>
 
@@ -176,6 +193,20 @@
 	   <option name="OIEVersion3Compatibility" value="2" />
 	   <option name="OIEVersion3" value="3" />
 	</enum>
+
+	<enum name="RTCChannelType">
+	   <option name="ChannelUndefined" value="0" />
+	   <option name="ChannelCurrentXRaw" value="1" />
+	   <option name="ChannelCurrentYRaw" value="2" />
+	   <option name="ChannelTargetXRaw" value="3" />
+	   <option name="ChannelTargetYRaw" value="4" />
+	   <option name="ChannelCurrentXBacktransformed" value="101" />
+	   <option name="ChannelCurrentYBacktransformed" value="102" />
+	   <option name="ChannelTargetXBacktransformed" value="103" />
+	   <option name="ChannelTargetYBacktransformed" value="104" />
+	</enum>
+	
+	
 	
 	
 	<enum name="OIERecordingMode">
@@ -310,8 +341,158 @@ Custom implementation
 
 
 	<class name="RTCJob" parent="Base" description="An in memory representation of an RTC Job..">
+	
+		<method name="DrawPolyline" description="Writes a polyline into the open list">
+			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+		</method>
+		
+		<method name="DrawPolylineOIE" description="Writes a polyline into the open list with OIE Enabled.">
+			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
+		</method>
+
+		<method name="DrawHatches" description="Writes a list of hatches into the open list">
+			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+		</method>
+		
+		<method name="AddSetPower" description="adds a power change to the open list. MUST NOT be used for PID control.">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+
+		<method name="AddSetAnalogOut" description="Adds changing an analog port to the open list. Should not interfere with laser power control.">
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser port to set. MUST not be an analog port or the call fails." />
+			<param name="OutputValue" type="single" pass="in" description="New Normalized output value. Value is clipped between 0 and 1." />
+		</method>
+		
+		<method name="AddSetDigitalOut" description="Adds changing an digital port to the open list. Should not interfere with laser power control.">
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser port to set. MUST not be an digital port or the call fails." />
+			<param name="OutputValue" type="single" pass="in" description="New Normalized output value. Value is clipped between 0 and 1." />
+		</method>		
+
+		<method name="AddSetPowerForPIDControl" description="adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+		
+		<method name="AddSetJumpSpeed" description="adds a jump speed change to the open list">
+			<param name="JumpSpeedInMMPerSecond" type="single" pass="in" description="Jump speed in mm/s" />
+		</method>
+
+		<method name="AddSetMarkSpeed" description="adds a mark speed change to the open list">
+			<param name="MarkSpeedInMMPerSecond" type="single" pass="in" description="Mark speed in mm/s" />
+		</method>
+
+		<method name="AddJumpMovement" description="Adds a Jump movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddMarkMovement" description="Adds a Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddTimedMarkMovement" description="Adds a timed Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+			<param name="DurationInMicroseconds" type="double" pass="in" description="Duration of mark movement in Microseconds." />
+		</method>		
+
+		<method name="AddFreeVariable" description="Adds a free variable set to the open list">
+			<param name="VariableNo" type="uint32" pass="in" description="Number of the variable (0-7)." />
+			<param name="Value" type="uint32" pass="in" description="Value to set." />
+		</method>	
+	
 	</class>
 
+	<class name="RTCRecording" parent="Base" description="A recording instance for an RTC Job..">
+
+		<method name="ScanheadConnectionCheckIsEnabled" description="Returns if the scan head connection is checked when recording">
+			<param name="Value" type="bool" pass="return" description="If true, the Scanhead connection will be checked for an error when recording." />
+		</method>	
+		
+		<method name="EnableScanheadConnectionCheck" description="Enables the Scanhead connection check. The check is enabled by default.">
+		</method>	
+
+		<method name="DisableScanheadConnectionCheck" description="Disables the Scanhead connection check.">
+		</method>	
+		
+		<method name="Clear" description="Clears all recording data and channels.">
+		</method>	
+		
+		<method name="AddChannel" description="Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique." />
+			<param name="ChannelType" type="enum" class="RTCChannelType" pass="in" description="Channel type enum. MUST NOT be Undefined." />
+		</method>	
+
+		<method name="RemoveChannel" description="Removes a new channel from the recording and all recorded data of that channel. Does nothing if channel does not exist. ">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+		</method>	
+
+		<method name="HasChannel" description="Returns if a channel name exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="ChannelExists" type="bool" pass="return" description="Returns true if channel exists." />
+		</method>	
+
+		<method name="GetChannelType" description="Returns the type of a channel. Returns Undefined if channel does not exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="ChannelType" type="enum" class="RTCChannelType" pass="return" description="Channel type enum." />
+		</method>	
+
+		<method name="GetRecordCount" description="Returns how many record entries have been recorded.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="RecordCount" type="uint64" pass="return" description="The number of record entries." />
+		</method>	
+
+		<method name="GetRecordEntry" description="Returns a specific record entry. Fails if Channel does not exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="RecordIndex" type="uint64" pass="in" description="Index of Record entry. MUST be between 0 and RecordCount - 1." />
+			<param name="Value" type="int32" pass="return" description="Value of record entry." />
+		</method>	
+		
+		<method name="GetAllRecordEntries" description="Returns all record entries of a channel. Fails if Channel does not exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="Values" type="basicarray" class="int32" pass="out" description="Array of all record entries." />
+		</method>	
+		
+		<method name="EnableRecording" description="Enables recording of position data of the RTC Card. This is a list command.">
+		</method>
+
+		<method name="DisableRecording" description="Disables recording of position data of the RTC Card. This is a list command.">
+		</method>
+
+		<method name="ExecuteListWithRecording" description="Executes the list with recording the position data from the RTC card. DEPRECIATED!">
+		</method>
+		
+		<method name="AddRecordsToDataTable" description="Writes a certain channel to a data table as int32 columns. Fails if Channel does not exist">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
+		
+		<method name="AddScaledRecordsToDataTable" description="Writes a certain channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset. Fails if Channel does not exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+			<param name="ScaleFactor" type="double" pass="in" description="Factor that the raw value is scaled with." />
+			<param name="Offset" type="double" pass="in" description="Offset that the raw value is scaled with." />
+		</method>	
+		
+		
+	</class>
 
 	<class name="RTCContext" parent="Base" description="Context of the RTC Controller Card">
 
@@ -752,18 +933,9 @@ Custom implementation
 		</method>
 
 		<method name="PrepareRecording" description="Prepares recording of position data of the RTC Card. This needs to be called before any list is started.">
+			<param name="RecordingInstance" type="class" class="RTCRecording" pass="return" description="Recording instance." />		
 		</method>
 
-		<method name="EnableRecording" description="Enables recording of position data of the RTC Card. This is a list command.">
-		</method>
-
-		<method name="DisableRecording" description="Disables recording of position data of the RTC Card. This is a list command.">
-		</method>
-
-		<method name="ExecuteListWithRecording" description="Executes the list with recording the position data from the RTC card.">
-			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
-			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
-		</method>
 
 		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
 			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />

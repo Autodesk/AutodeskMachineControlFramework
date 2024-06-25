@@ -197,6 +197,23 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS 1092 /** No Card found at IP Address. */
 #define LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE 1093 /** No Card found in IP Range. */
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD 1094 /** Could not initialize RTC Card. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELNAME 1095 /** Invalid Channel Name. */
+#define LIBMCDRIVER_SCANLAB_ERROR_EMPTYCHANNELNAME 1096 /** Empty Channel Name. */
+#define LIBMCDRIVER_SCANLAB_ERROR_CANNOTADDCHANNELDURINGRECORDING 1097 /** Cannot add channel during recording. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECHANNELNAME 1098 /** Duplicate channel name. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NORECORDINGCHANNELAVAILABLE 1099 /** No recording channel available. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELID 1100 /** Invalid Channel ID. */
+#define LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPECANNOTBEUNDEFINED 1101 /** Channel Type cannot be undefined. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKSIZE 1102 /** Invalid Chunk Size */
+#define LIBMCDRIVER_SCANLAB_ERROR_CHANNELNOTFOUND 1103 /** Channel not found */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDRECORDINDEX 1104 /** Invalid record index */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKINDEX 1105 /** Invalid chunk index */
+#define LIBMCDRIVER_SCANLAB_ERROR_CHUNKENTRYINDEXOUTOFBOUNDS 1106 /** Chunk entry index out of bounds */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDDATARECORDINGINTERVAL 1107 /** Invalid data recording interval */
+#define LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW 1108 /** Data recording overflow */
+#define LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW 1109 /** Data recording underflow */
+#define LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL 1110 /** Data buffer is full */
+#define LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY 1111 /** Data buffer read empty */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -306,6 +323,23 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS: return "No Card found at IP Address.";
     case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE: return "No Card found in IP Range.";
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD: return "Could not initialize RTC Card.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELNAME: return "Invalid Channel Name.";
+    case LIBMCDRIVER_SCANLAB_ERROR_EMPTYCHANNELNAME: return "Empty Channel Name.";
+    case LIBMCDRIVER_SCANLAB_ERROR_CANNOTADDCHANNELDURINGRECORDING: return "Cannot add channel during recording.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECHANNELNAME: return "Duplicate channel name.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NORECORDINGCHANNELAVAILABLE: return "No recording channel available.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELID: return "Invalid Channel ID.";
+    case LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPECANNOTBEUNDEFINED: return "Channel Type cannot be undefined.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKSIZE: return "Invalid Chunk Size";
+    case LIBMCDRIVER_SCANLAB_ERROR_CHANNELNOTFOUND: return "Channel not found";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRECORDINDEX: return "Invalid record index";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKINDEX: return "Invalid chunk index";
+    case LIBMCDRIVER_SCANLAB_ERROR_CHUNKENTRYINDEXOUTOFBOUNDS: return "Chunk entry index out of bounds";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDATARECORDINGINTERVAL: return "Invalid data recording interval";
+    case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW: return "Data recording overflow";
+    case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW: return "Data recording underflow";
+    case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL: return "Data buffer is full";
+    case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "Data buffer read empty";
     default: return "unknown error";
   }
 }
@@ -317,6 +351,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Base;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_UARTConnection;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCJob;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCRecording;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCContext;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCSelector;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab;
@@ -352,6 +388,18 @@ namespace LibMCDriver_ScanLab {
     OIEVersion2 = 1,
     OIEVersion3Compatibility = 2,
     OIEVersion3 = 3
+  };
+  
+  enum class eRTCChannelType : LibMCDriver_ScanLab_int32 {
+    ChannelUndefined = 0,
+    ChannelCurrentXRaw = 1,
+    ChannelCurrentYRaw = 2,
+    ChannelTargetXRaw = 3,
+    ChannelTargetYRaw = 4,
+    ChannelCurrentXBacktransformed = 101,
+    ChannelCurrentYBacktransformed = 102,
+    ChannelTargetXBacktransformed = 103,
+    ChannelTargetYBacktransformed = 104
   };
   
   enum class eOIERecordingMode : LibMCDriver_ScanLab_int32 {
@@ -412,6 +460,7 @@ namespace LibMCDriver_ScanLab {
 typedef LibMCDriver_ScanLab::eLaserMode eLibMCDriver_ScanLabLaserMode;
 typedef LibMCDriver_ScanLab::eLaserPort eLibMCDriver_ScanLabLaserPort;
 typedef LibMCDriver_ScanLab::eOIEOperationMode eLibMCDriver_ScanLabOIEOperationMode;
+typedef LibMCDriver_ScanLab::eRTCChannelType eLibMCDriver_ScanLabRTCChannelType;
 typedef LibMCDriver_ScanLab::eOIERecordingMode eLibMCDriver_ScanLabOIERecordingMode;
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;

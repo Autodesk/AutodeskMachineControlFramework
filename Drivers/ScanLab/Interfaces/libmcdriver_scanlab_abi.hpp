@@ -213,6 +213,309 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartc
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_uartconnection_readline(LibMCDriver_ScanLab_UARTConnection pUARTConnection, const char * pSeparator, LibMCDriver_ScanLab_uint32 nMaxLineLength, LibMCDriver_ScanLab_uint32 nTimeOutInMS, const LibMCDriver_ScanLab_uint32 nLineBufferSize, LibMCDriver_ScanLab_uint32* pLineNeededChars, char * pLineBuffer);
 
 /*************************************************************************************************************************
+ Class definition for RTCJob
+**************************************************************************************************************************/
+
+/**
+* Writes a polyline into the open list
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] nPointsBufferSize - Number of elements in buffer
+* @param[in] pPointsBuffer - Point2D buffer of Points of polyline to draw.
+* @param[in] fMarkSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
+* @param[in] fPower - Laser power in percent
+* @param[in] fZValue - Focus Z Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_drawpolyline(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
+
+/**
+* Writes a polyline into the open list with OIE Enabled.
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] nPointsBufferSize - Number of elements in buffer
+* @param[in] pPointsBuffer - Point2D buffer of Points of polyline to draw.
+* @param[in] fMarkSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
+* @param[in] fPower - Laser power in percent
+* @param[in] fZValue - Focus Z Value
+* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_drawpolylineoie(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue, LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
+
+/**
+* Writes a list of hatches into the open list
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] nHatchesBufferSize - Number of elements in buffer
+* @param[in] pHatchesBuffer - Hatch2D buffer of Hatches to draw.
+* @param[in] fMarkSpeed - Mark speed in mm/s
+* @param[in] fJumpSpeed - Jump speed in mm/s
+* @param[in] fPower - Laser power in percent
+* @param[in] fZValue - Focus Z Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_drawhatches(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
+
+/**
+* adds a power change to the open list. MUST NOT be used for PID control.
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] fPowerInPercent - Laser power in percent
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetpower(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_single fPowerInPercent);
+
+/**
+* Adds changing an analog port to the open list. Should not interfere with laser power control.
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetanalogout(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue);
+
+/**
+* Adds changing an digital port to the open list. Should not interfere with laser power control.
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetdigitalout(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_single fOutputValue);
+
+/**
+* adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] fPowerInPercent - Laser power in percent
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetpowerforpidcontrol(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_single fPowerInPercent);
+
+/**
+* adds a jump speed change to the open list
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] fJumpSpeedInMMPerSecond - Jump speed in mm/s
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetjumpspeed(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
+
+/**
+* adds a mark speed change to the open list
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] fMarkSpeedInMMPerSecond - Mark speed in mm/s
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addsetmarkspeed(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
+
+/**
+* Adds a Jump movement to the open list
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addjumpmovement(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY);
+
+/**
+* Adds a Mark movement to the open list
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addmarkmovement(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY);
+
+/**
+* Adds a timed Mark movement to the open list
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] dTargetX - X Position.
+* @param[in] dTargetY - Y Position.
+* @param[in] dDurationInMicroseconds - Duration of mark movement in Microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addtimedmarkmovement(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_double dTargetX, LibMCDriver_ScanLab_double dTargetY, LibMCDriver_ScanLab_double dDurationInMicroseconds);
+
+/**
+* Adds a free variable set to the open list
+*
+* @param[in] pRTCJob - RTCJob instance.
+* @param[in] nVariableNo - Number of the variable (0-7).
+* @param[in] nValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjob_addfreevariable(LibMCDriver_ScanLab_RTCJob pRTCJob, LibMCDriver_ScanLab_uint32 nVariableNo, LibMCDriver_ScanLab_uint32 nValue);
+
+/*************************************************************************************************************************
+ Class definition for RTCRecording
+**************************************************************************************************************************/
+
+/**
+* Returns if the scan head connection is checked when recording
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[out] pValue - If true, the Scanhead connection will be checked for an error when recording.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled(LibMCDriver_ScanLab_RTCRecording pRTCRecording, bool * pValue);
+
+/**
+* Enables the Scanhead connection check. The check is enabled by default.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
+
+/**
+* Disables the Scanhead connection check.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
+
+/**
+* Clears all recording data and channels.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_clear(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
+
+/**
+* Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique.
+* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addchannel(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCDriver_ScanLab::eRTCChannelType eChannelType);
+
+/**
+* Removes a new channel from the recording and all recorded data of that channel. Does nothing if channel does not exist. 
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_removechannel(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName);
+
+/**
+* Returns if a channel name exist.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+* @param[out] pChannelExists - Returns true if channel exists.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_haschannel(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, bool * pChannelExists);
+
+/**
+* Returns the type of a channel. Returns Undefined if channel does not exist.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+* @param[out] pChannelType - Channel type enum.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getchanneltype(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCDriver_ScanLab::eRTCChannelType * pChannelType);
+
+/**
+* Returns how many record entries have been recorded.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+* @param[out] pRecordCount - The number of record entries.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getrecordcount(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCDriver_ScanLab_uint64 * pRecordCount);
+
+/**
+* Returns a specific record entry. Fails if Channel does not exist.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+* @param[in] nRecordIndex - Index of Record entry. MUST be between 0 and RecordCount - 1.
+* @param[out] pValue - Value of record entry.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getrecordentry(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCDriver_ScanLab_uint64 nRecordIndex, LibMCDriver_ScanLab_int32 * pValue);
+
+/**
+* Returns all record entries of a channel. Fails if Channel does not exist.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+* @param[in] nValuesBufferSize - Number of elements in buffer
+* @param[out] pValuesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValuesBuffer - int32  buffer of Array of all record entries.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getallrecordentries(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, const LibMCDriver_ScanLab_uint64 nValuesBufferSize, LibMCDriver_ScanLab_uint64* pValuesNeededCount, LibMCDriver_ScanLab_int32 * pValuesBuffer);
+
+/**
+* Enables recording of position data of the RTC Card. This is a list command.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablerecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
+
+/**
+* Disables recording of position data of the RTC Card. This is a list command.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_disablerecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
+
+/**
+* Executes the list with recording the position data from the RTC card. DEPRECIATED!
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_executelistwithrecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
+
+/**
+* Writes a certain channel to a data table as int32 columns. Fails if Channel does not exist
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addrecordstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
+
+/**
+* Writes a certain channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset. Fails if Channel does not exist.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+* @param[in] dOffset - Offset that the raw value is scaled with.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLab_double dScaleFactor, LibMCDriver_ScanLab_double dOffset);
+
+/*************************************************************************************************************************
  Class definition for RTCContext
 **************************************************************************************************************************/
 
@@ -1092,35 +1395,10 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 *
 * @param[in] pRTCContext - RTCContext instance.
+* @param[out] pRecordingInstance - Recording instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext);
-
-/**
-* Enables recording of position data of the RTC Card. This is a list command.
-*
-* @param[in] pRTCContext - RTCContext instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enablerecording(LibMCDriver_ScanLab_RTCContext pRTCContext);
-
-/**
-* Disables recording of position data of the RTC Card. This is a list command.
-*
-* @param[in] pRTCContext - RTCContext instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablerecording(LibMCDriver_ScanLab_RTCContext pRTCContext);
-
-/**
-* Executes the list with recording the position data from the RTC card.
-*
-* @param[in] pRTCContext - RTCContext instance.
-* @param[in] nListIndex - Index of List (1 or 2).
-* @param[in] nPosition - Relative Position in List.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_executelistwithrecording(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nListIndex, LibMCDriver_ScanLab_uint32 nPosition);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
 
 /**
 * Enables timelag compensation.

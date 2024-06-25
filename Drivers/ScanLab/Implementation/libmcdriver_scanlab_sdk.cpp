@@ -74,7 +74,6 @@ void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName, bool bMandat
 
 CScanLabSDKJournal::CScanLabSDKJournal(const std::string& sDebugFileName)	
 {
-	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	m_CStream.open(sDebugFileName, std::ios::out);
 	if (!m_CStream.is_open())
@@ -352,7 +351,7 @@ void CScanLabSDK::initDLL()
 
 		ptr_init_rtc6_dll();
 		m_bIsInitialized = true;
-
+	
 	}
 }
 

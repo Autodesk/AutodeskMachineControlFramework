@@ -297,13 +297,7 @@ public:
 	
 	void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) override;
 
-	void PrepareRecording() override;
-
-	void EnableRecording() override;
-
-	void DisableRecording() override;
-
-	void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) override;
+	IRTCRecording* PrepareRecording() override;
 
 	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
 
