@@ -1395,10 +1395,31 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 *
 * @param[in] pRTCContext - RTCContext instance.
+* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance.
 * @param[out] pRecordingInstance - Recording instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bKeepInMemory, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
+
+/**
+* Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pUUID - UUID of the recording to find.
+* @param[out] pRecordingExists - Returns if the recording exists.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_hasrecording(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pUUID, bool * pRecordingExists);
+
+/**
+* Find a recording in the driver memory. Recording MUST have been created with KeepInMemory set to true. Fails if recording does not exist.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pUUID - UUID of the recording to find.
+* @param[out] pRecordingInstance - Recording instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_findrecording(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pUUID, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
 
 /**
 * Enables timelag compensation.

@@ -1675,13 +1675,39 @@ void CRTCContext::SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11,
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
 
-IRTCRecording* CRTCContext::PrepareRecording()
+IRTCRecording* CRTCContext::PrepareRecording(const bool bKeepInMemory)
 {
 	auto pCryptoContext = m_pDriverEnvironment->CreateCryptoContext();
 	std::string sUUID = pCryptoContext->CreateUUID();
 	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, RTC_CHUNKSIZE_DEFAULT);
 
+	if (bKeepInMemory)
+		m_Recordings.insert(std::make_pair (pInstance->getUUID(), pInstance));
+
 	return new CRTCRecording(pInstance);
+}
+
+bool CRTCContext::HasRecording(const std::string& sUUID)
+{
+	auto iIter = m_Recordings.find(sUUID);
+	return (iIter != m_Recordings.end());
+}
+
+IRTCRecording* CRTCContext::FindRecording(const std::string& sUUID)
+{
+	auto pCryptoContext = m_pDriverEnvironment->CreateCryptoContext();
+	std::string sNormalizedUUID = pCryptoContext->NormalizeUUIDString(sUUID);
+
+	auto iIter = m_Recordings.find(sNormalizedUUID);
+	if (iIter != m_Recordings.end())
+	{
+		return new CRTCRecording(iIter->second);
+	}
+	else
+	{
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING, "Could not find recording: " + sNormalizedUUID);
+	}
+
 }
 
 /*void CRTCContext::PrepareRecording()

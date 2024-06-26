@@ -161,6 +161,8 @@
 		<error name="DATARECORDINGUNDERFLOW" code="1109" description="Data recording underflow" />				
 		<error name="DATABUFFERISFULL" code="1110" description="Data buffer is full" />		
 		<error name="DATABUFFERREADEMPTY" code="1111" description="Data buffer read empty" />		
+		<error name="COULDNOTFINDRECORDING" code="1112" description="Could not find recording." />		
+		
 		
 		
 		
@@ -933,9 +935,19 @@ Custom implementation
 		</method>
 
 		<method name="PrepareRecording" description="Prepares recording of position data of the RTC Card. This needs to be called before any list is started.">
+			<param name="KeepInMemory" type="bool" pass="in" description="If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance." />
 			<param name="RecordingInstance" type="class" class="RTCRecording" pass="return" description="Recording instance." />		
 		</method>
 
+		<method name="HasRecording" description="Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.">
+			<param name="UUID" type="string" pass="in" description="UUID of the recording to find." />		
+			<param name="RecordingExists" type="bool" pass="return" description="Returns if the recording exists." />		
+		</method>
+
+		<method name="FindRecording" description="Find a recording in the driver memory. Recording MUST have been created with KeepInMemory set to true. Fails if recording does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the recording to find." />		
+			<param name="RecordingInstance" type="class" class="RTCRecording" pass="return" description="Recording instance." />		
+		</method>
 
 		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
 			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />

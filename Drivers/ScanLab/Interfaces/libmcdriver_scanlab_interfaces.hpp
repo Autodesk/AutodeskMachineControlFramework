@@ -1367,9 +1367,24 @@ public:
 
 	/**
 	* IRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+	* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance.
 	* @return Recording instance.
 	*/
-	virtual IRTCRecording * PrepareRecording() = 0;
+	virtual IRTCRecording * PrepareRecording(const bool bKeepInMemory) = 0;
+
+	/**
+	* IRTCContext::HasRecording - Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.
+	* @param[in] sUUID - UUID of the recording to find.
+	* @return Returns if the recording exists.
+	*/
+	virtual bool HasRecording(const std::string & sUUID) = 0;
+
+	/**
+	* IRTCContext::FindRecording - Find a recording in the driver memory. Recording MUST have been created with KeepInMemory set to true. Fails if recording does not exist.
+	* @param[in] sUUID - UUID of the recording to find.
+	* @return Recording instance.
+	*/
+	virtual IRTCRecording * FindRecording(const std::string & sUUID) = 0;
 
 	/**
 	* IRTCContext::EnableTimelagCompensation - Enables timelag compensation.

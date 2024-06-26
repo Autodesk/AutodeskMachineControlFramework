@@ -3519,7 +3519,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationmatrix
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bKeepInMemory, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -3531,7 +3531,67 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCD
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pBaseRecordingInstance = pIRTCContext->PrepareRecording();
+		pBaseRecordingInstance = pIRTCContext->PrepareRecording(bKeepInMemory);
+
+		*pRecordingInstance = (IBase*)(pBaseRecordingInstance);
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_hasrecording(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pUUID, bool * pRecordingExists)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pRecordingExists == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pRecordingExists = pIRTCContext->HasRecording(sUUID);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_findrecording(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pUUID, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pRecordingInstance == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IBase* pBaseRecordingInstance(nullptr);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pBaseRecordingInstance = pIRTCContext->FindRecording(sUUID);
 
 		*pRecordingInstance = (IBase*)(pBaseRecordingInstance);
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
@@ -6428,6 +6488,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_settransformationmatrix;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_preparerecording") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_preparerecording;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_hasrecording") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_hasrecording;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_findrecording") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_findrecording;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_enabletimelagcompensation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enabletimelagcompensation;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disabletimelagcompensation") 

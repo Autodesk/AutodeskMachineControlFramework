@@ -118,6 +118,8 @@ protected:
 
 	double m_dLaserPowerCalibrationUnits;
 	std::vector<sLaserCalibrationPoint> m_LaserPowerCalibrationList;
+
+	std::map<std::string, PRTCRecordingInstance> m_Recordings;
 	
 	void writeJumpSpeed (float jumpSpeed);
 
@@ -297,7 +299,11 @@ public:
 	
 	void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) override;
 
-	IRTCRecording* PrepareRecording() override;
+	IRTCRecording* PrepareRecording(const bool bKeepInMemory) override;
+
+	bool HasRecording(const std::string& sUUID) override;
+
+	IRTCRecording* FindRecording(const std::string& sUUID) override;
 
 	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
 

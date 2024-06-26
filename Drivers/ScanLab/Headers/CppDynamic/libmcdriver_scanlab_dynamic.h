@@ -1382,10 +1382,31 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransforma
 * Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 *
 * @param[in] pRTCContext - RTCContext instance.
+* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance.
 * @param[out] pRecordingInstance - Recording instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bKeepInMemory, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
+
+/**
+* Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pUUID - UUID of the recording to find.
+* @param[out] pRecordingExists - Returns if the recording exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_HasRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pUUID, bool * pRecordingExists);
+
+/**
+* Find a recording in the driver memory. Recording MUST have been created with KeepInMemory set to true. Fails if recording does not exist.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pUUID - UUID of the recording to find.
+* @param[out] pRecordingInstance - Recording instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_FindRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pUUID, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
 
 /**
 * Enables timelag compensation.
@@ -2585,6 +2606,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr m_RTCContext_SetTransformationOffset;
 	PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr m_RTCContext_SetTransformationMatrix;
 	PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr m_RTCContext_PrepareRecording;
+	PLibMCDriver_ScanLabRTCContext_HasRecordingPtr m_RTCContext_HasRecording;
+	PLibMCDriver_ScanLabRTCContext_FindRecordingPtr m_RTCContext_FindRecording;
 	PLibMCDriver_ScanLabRTCContext_EnableTimelagCompensationPtr m_RTCContext_EnableTimelagCompensation;
 	PLibMCDriver_ScanLabRTCContext_DisableTimelagCompensationPtr m_RTCContext_DisableTimelagCompensation;
 	PLibMCDriver_ScanLabRTCContext_EnableMarkOnTheFly2DPtr m_RTCContext_EnableMarkOnTheFly2D;

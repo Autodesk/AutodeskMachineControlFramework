@@ -312,6 +312,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW: return "DATARECORDINGUNDERFLOW";
 			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL: return "DATABUFFERISFULL";
 			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "DATABUFFERREADEMPTY";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "COULDNOTFINDRECORDING";
 		}
 		return "UNKNOWN";
 	}
@@ -438,6 +439,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW: return "Data recording underflow";
 			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL: return "Data buffer is full";
 			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "Data buffer read empty";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "Could not find recording.";
 		}
 		return "unknown error";
 	}
@@ -835,7 +837,9 @@ public:
 	inline void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor);
 	inline void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY);
 	inline void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22);
-	inline PRTCRecording PrepareRecording();
+	inline PRTCRecording PrepareRecording(const bool bKeepInMemory);
+	inline bool HasRecording(const std::string & sUUID);
+	inline PRTCRecording FindRecording(const std::string & sUUID);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
 	inline void DisableTimelagCompensation();
 	inline void EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep);
@@ -1248,6 +1252,8 @@ public:
 		pWrapperTable->m_RTCContext_SetTransformationOffset = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationMatrix = nullptr;
 		pWrapperTable->m_RTCContext_PrepareRecording = nullptr;
+		pWrapperTable->m_RTCContext_HasRecording = nullptr;
+		pWrapperTable->m_RTCContext_FindRecording = nullptr;
 		pWrapperTable->m_RTCContext_EnableTimelagCompensation = nullptr;
 		pWrapperTable->m_RTCContext_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_RTCContext_EnableMarkOnTheFly2D = nullptr;
@@ -2559,6 +2565,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_PrepareRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_HasRecording = (PLibMCDriver_ScanLabRTCContext_HasRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_hasrecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_HasRecording = (PLibMCDriver_ScanLabRTCContext_HasRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_hasrecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_HasRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_FindRecording = (PLibMCDriver_ScanLabRTCContext_FindRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_findrecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_FindRecording = (PLibMCDriver_ScanLabRTCContext_FindRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_findrecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_FindRecording == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4009,6 +4033,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_preparerecording", (void**)&(pWrapperTable->m_RTCContext_PrepareRecording));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_PrepareRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_hasrecording", (void**)&(pWrapperTable->m_RTCContext_HasRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_HasRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_findrecording", (void**)&(pWrapperTable->m_RTCContext_FindRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_FindRecording == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enabletimelagcompensation", (void**)&(pWrapperTable->m_RTCContext_EnableTimelagCompensation));
@@ -5823,12 +5855,42 @@ public:
 	
 	/**
 	* CRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+	* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance.
 	* @return Recording instance.
 	*/
-	PRTCRecording CRTCContext::PrepareRecording()
+	PRTCRecording CRTCContext::PrepareRecording(const bool bKeepInMemory)
 	{
 		LibMCDriver_ScanLabHandle hRecordingInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_PrepareRecording(m_pHandle, &hRecordingInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_PrepareRecording(m_pHandle, bKeepInMemory, &hRecordingInstance));
+		
+		if (!hRecordingInstance) {
+			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CRTCRecording>(m_pWrapper, hRecordingInstance);
+	}
+	
+	/**
+	* CRTCContext::HasRecording - Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.
+	* @param[in] sUUID - UUID of the recording to find.
+	* @return Returns if the recording exists.
+	*/
+	bool CRTCContext::HasRecording(const std::string & sUUID)
+	{
+		bool resultRecordingExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_HasRecording(m_pHandle, sUUID.c_str(), &resultRecordingExists));
+		
+		return resultRecordingExists;
+	}
+	
+	/**
+	* CRTCContext::FindRecording - Find a recording in the driver memory. Recording MUST have been created with KeepInMemory set to true. Fails if recording does not exist.
+	* @param[in] sUUID - UUID of the recording to find.
+	* @return Recording instance.
+	*/
+	PRTCRecording CRTCContext::FindRecording(const std::string & sUUID)
+	{
+		LibMCDriver_ScanLabHandle hRecordingInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_FindRecording(m_pHandle, sUUID.c_str(), &hRecordingInstance));
 		
 		if (!hRecordingInstance) {
 			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
