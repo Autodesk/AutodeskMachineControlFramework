@@ -801,6 +801,14 @@
 			<param name="Values" type="basicarray" class="uint64" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
 		</method>
 		
+		<method name="CreateWriteOptions" description="Creates a Write Option.">
+			<param name="Options" type="class" class="DataTableWriteOptions" pass="return" description="Writer Options Instance to pass on to WriteDataToStream." />
+		</method>
+
+		<method name="CreateCSVWriteOptions" description="Creates a CSV Write Option.">
+			<param name="Options" type="class" class="DataTableCSVWriteOptions" pass="return" description="Writer Options Instance to pass on to WriteCSVToStream." />
+		</method>
+
 		<method name="WriteCSVToStream" description="Writes the data as CSV to a temporary stream.">
 			<param name="Writer" type="class" class="TempStreamWriter" pass="in" description="Stream writer to use." />
 			<param name="Options" type="optionalclass" class="DataTableCSVWriteOptions" pass="in" description="Optional CSV writer options to use." />

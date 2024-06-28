@@ -2384,6 +2384,62 @@ LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCEnv_DataTable pData
 	}
 }
 
+LibMCEnvResult libmcenv_datatable_createwriteoptions(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableWriteOptions * pOptions)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		if (pOptions == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseOptions(nullptr);
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseOptions = pIDataTable->CreateWriteOptions();
+
+		*pOptions = (IBase*)(pBaseOptions);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatable_createcsvwriteoptions(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableCSVWriteOptions * pOptions)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		if (pOptions == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseOptions(nullptr);
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseOptions = pIDataTable->CreateCSVWriteOptions();
+
+		*pOptions = (IBase*)(pBaseOptions);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableCSVWriteOptions pOptions)
 {
 	IBase* pIBaseClass = (IBase *)pDataTable;
@@ -24728,6 +24784,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_datatable_setuint32columnvalues;
 	if (sProcName == "libmcenv_datatable_setuint64columnvalues") 
 		*ppProcAddress = (void*) &libmcenv_datatable_setuint64columnvalues;
+	if (sProcName == "libmcenv_datatable_createwriteoptions") 
+		*ppProcAddress = (void*) &libmcenv_datatable_createwriteoptions;
+	if (sProcName == "libmcenv_datatable_createcsvwriteoptions") 
+		*ppProcAddress = (void*) &libmcenv_datatable_createcsvwriteoptions;
 	if (sProcName == "libmcenv_datatable_writecsvtostream") 
 		*ppProcAddress = (void*) &libmcenv_datatable_writecsvtostream;
 	if (sProcName == "libmcenv_datatable_writedatatostream") 

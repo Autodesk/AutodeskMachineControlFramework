@@ -1225,6 +1225,8 @@ public:
 	inline void SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer);
 	inline void SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer);
 	inline void SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer);
+	inline PDataTableWriteOptions CreateWriteOptions();
+	inline PDataTableCSVWriteOptions CreateCSVWriteOptions();
 	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions);
 	inline void WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions);
 	inline void LoadFromStream(classParam<CStreamReader> pStream);
@@ -2730,6 +2732,8 @@ public:
 		pWrapperTable->m_DataTable_SetInt64ColumnValues = nullptr;
 		pWrapperTable->m_DataTable_SetUint32ColumnValues = nullptr;
 		pWrapperTable->m_DataTable_SetUint64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_CreateWriteOptions = nullptr;
+		pWrapperTable->m_DataTable_CreateCSVWriteOptions = nullptr;
 		pWrapperTable->m_DataTable_WriteCSVToStream = nullptr;
 		pWrapperTable->m_DataTable_WriteDataToStream = nullptr;
 		pWrapperTable->m_DataTable_LoadFromStream = nullptr;
@@ -4141,6 +4145,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_CreateWriteOptions = (PLibMCEnvDataTable_CreateWriteOptionsPtr) GetProcAddress(hLibrary, "libmcenv_datatable_createwriteoptions");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_CreateWriteOptions = (PLibMCEnvDataTable_CreateWriteOptionsPtr) dlsym(hLibrary, "libmcenv_datatable_createwriteoptions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_CreateWriteOptions == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_CreateCSVWriteOptions = (PLibMCEnvDataTable_CreateCSVWriteOptionsPtr) GetProcAddress(hLibrary, "libmcenv_datatable_createcsvwriteoptions");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_CreateCSVWriteOptions = (PLibMCEnvDataTable_CreateCSVWriteOptionsPtr) dlsym(hLibrary, "libmcenv_datatable_createcsvwriteoptions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_CreateCSVWriteOptions == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10574,6 +10596,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datatable_createwriteoptions", (void**)&(pWrapperTable->m_DataTable_CreateWriteOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_CreateWriteOptions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_createcsvwriteoptions", (void**)&(pWrapperTable->m_DataTable_CreateCSVWriteOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_CreateCSVWriteOptions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_datatable_writecsvtostream", (void**)&(pWrapperTable->m_DataTable_WriteCSVToStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_WriteCSVToStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -14270,6 +14300,36 @@ public:
 	void CDataTable::SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_SetUint64ColumnValues(m_pHandle, sIdentifier.c_str(), (LibMCEnv_uint64)ValuesBuffer.size(), ValuesBuffer.data()));
+	}
+	
+	/**
+	* CDataTable::CreateWriteOptions - Creates a Write Option.
+	* @return Writer Options Instance to pass on to WriteDataToStream.
+	*/
+	PDataTableWriteOptions CDataTable::CreateWriteOptions()
+	{
+		LibMCEnvHandle hOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_CreateWriteOptions(m_pHandle, &hOptions));
+		
+		if (!hOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTableWriteOptions>(m_pWrapper, hOptions);
+	}
+	
+	/**
+	* CDataTable::CreateCSVWriteOptions - Creates a CSV Write Option.
+	* @return Writer Options Instance to pass on to WriteCSVToStream.
+	*/
+	PDataTableCSVWriteOptions CDataTable::CreateCSVWriteOptions()
+	{
+		LibMCEnvHandle hOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_CreateCSVWriteOptions(m_pHandle, &hOptions));
+		
+		if (!hOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTableCSVWriteOptions>(m_pWrapper, hOptions);
 	}
 	
 	/**

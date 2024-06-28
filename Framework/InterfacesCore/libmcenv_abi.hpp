@@ -916,6 +916,24 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint32columnvalues(LibMCE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer);
 
 /**
+* Creates a Write Option.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pOptions - Writer Options Instance to pass on to WriteDataToStream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_createwriteoptions(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableWriteOptions * pOptions);
+
+/**
+* Creates a CSV Write Option.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pOptions - Writer Options Instance to pass on to WriteCSVToStream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_createcsvwriteoptions(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableCSVWriteOptions * pOptions);
+
+/**
 * Writes the data as CSV to a temporary stream.
 *
 * @param[in] pDataTable - DataTable instance.

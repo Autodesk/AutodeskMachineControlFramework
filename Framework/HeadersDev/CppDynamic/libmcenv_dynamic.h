@@ -903,6 +903,24 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint32ColumnValuesPtr) (LibMCEnv_
 typedef LibMCEnvResult (*PLibMCEnvDataTable_SetUint64ColumnValuesPtr) (LibMCEnv_DataTable pDataTable, const char * pIdentifier, LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer);
 
 /**
+* Creates a Write Option.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pOptions - Writer Options Instance to pass on to WriteDataToStream.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_CreateWriteOptionsPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableWriteOptions * pOptions);
+
+/**
+* Creates a CSV Write Option.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pOptions - Writer Options Instance to pass on to WriteCSVToStream.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_CreateCSVWriteOptionsPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableCSVWriteOptions * pOptions);
+
+/**
 * Writes the data as CSV to a temporary stream.
 *
 * @param[in] pDataTable - DataTable instance.
@@ -8266,6 +8284,8 @@ typedef struct {
 	PLibMCEnvDataTable_SetInt64ColumnValuesPtr m_DataTable_SetInt64ColumnValues;
 	PLibMCEnvDataTable_SetUint32ColumnValuesPtr m_DataTable_SetUint32ColumnValues;
 	PLibMCEnvDataTable_SetUint64ColumnValuesPtr m_DataTable_SetUint64ColumnValues;
+	PLibMCEnvDataTable_CreateWriteOptionsPtr m_DataTable_CreateWriteOptions;
+	PLibMCEnvDataTable_CreateCSVWriteOptionsPtr m_DataTable_CreateCSVWriteOptions;
 	PLibMCEnvDataTable_WriteCSVToStreamPtr m_DataTable_WriteCSVToStream;
 	PLibMCEnvDataTable_WriteDataToStreamPtr m_DataTable_WriteDataToStream;
 	PLibMCEnvDataTable_LoadFromStreamPtr m_DataTable_LoadFromStream;

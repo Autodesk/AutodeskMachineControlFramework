@@ -1012,6 +1012,18 @@ public:
 	virtual void SetUint64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer) = 0;
 
 	/**
+	* IDataTable::CreateWriteOptions - Creates a Write Option.
+	* @return Writer Options Instance to pass on to WriteDataToStream.
+	*/
+	virtual IDataTableWriteOptions * CreateWriteOptions() = 0;
+
+	/**
+	* IDataTable::CreateCSVWriteOptions - Creates a CSV Write Option.
+	* @return Writer Options Instance to pass on to WriteCSVToStream.
+	*/
+	virtual IDataTableCSVWriteOptions * CreateCSVWriteOptions() = 0;
+
+	/**
 	* IDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
 	* @param[in] pWriter - Stream writer to use.
 	* @param[in] pOptions - Optional CSV writer options to use.
