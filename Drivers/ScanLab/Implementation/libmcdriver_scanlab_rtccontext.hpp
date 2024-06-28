@@ -14,6 +14,7 @@ Abstract: This is the class declaration of CRTCContext
 
 #include "libmcdriver_scanlab_interfaces.hpp"
 #include "libmcdriver_scanlab_sdk.hpp"
+#include "libmcdriver_scanlab_rtcrecordinginstance.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlab_base.hpp"
