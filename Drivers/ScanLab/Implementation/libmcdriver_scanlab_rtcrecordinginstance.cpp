@@ -92,9 +92,9 @@ bool CRTCRecordingChunk::isFull()
 	return (m_nWriteOffset >= m_Buffer.size());
 }
 
-int32_t* CRTCRecordingChunk::reserveDataBuffer(uint32_t nCount, uint32_t& nBytesToRead)
+int32_t* CRTCRecordingChunk::reserveDataBuffer(uint32_t nCount, uint32_t& nEntriesToRead)
 {
-	nBytesToRead = 0;
+	nEntriesToRead = 0;
 
 	if (isFull ())
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL);
@@ -105,13 +105,13 @@ int32_t* CRTCRecordingChunk::reserveDataBuffer(uint32_t nCount, uint32_t& nBytes
 	size_t nResultOffset = m_nWriteOffset;
 
 	if ((nResultOffset + nCount) > m_Buffer.size()) {
-		nBytesToRead = (uint32_t) (m_Buffer.size() - nResultOffset);
+		nEntriesToRead = (uint32_t) (m_Buffer.size() - nResultOffset);
 	}
 	else {
-		nBytesToRead = nCount;
+		nEntriesToRead = nCount;
 	}
 
-	m_nWriteOffset += nBytesToRead;
+	m_nWriteOffset += nEntriesToRead;
 
 	return &m_Buffer.at(nResultOffset);
 }
@@ -185,13 +185,21 @@ void CRTCRecordingChannel::getAllRecordEntries(uint64_t nValuesBufferSize, uint6
 		uint64_t nIndex = 0;
 		int32_t* pTarget = pValuesBuffer;
 		for (auto pChunk : m_Chunks) {
-			auto & buffer = pChunk->getBuffer();
-			for (int32_t value : buffer) {
-				*pTarget = value;
-				nIndex++;
-				pTarget++;
-			}
+			if (nIndex < m_nEntryCount) {
 
+
+				auto& buffer = pChunk->getBuffer();
+				for (int32_t value : buffer) {
+					*pTarget = value;
+					nIndex++;
+					pTarget++;
+
+					if (nIndex >= m_nEntryCount)
+						break;
+				}
+			} else {
+				break;
+			}
 		}
 
 	}
@@ -245,7 +253,7 @@ CRTCRecordingInstance::CRTCRecordingInstance(const std::string& sUUID, PScanLabS
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKSIZE, "Invalid chunk size: " + std::to_string (nChunkSize));
 
 	m_AvailableChannelIDs.reserve(RTC_CHANNELCOUNT);
-	for (auto nChannelID = 1; nChannelID <= RTC_CHANNELCOUNT; nChannelID++)
+	for (int32_t nChannelID = RTC_CHANNELCOUNT; nChannelID > 0; nChannelID--)
 		m_AvailableChannelIDs.push_back(nChannelID);
 }
 
@@ -347,9 +355,9 @@ CRTCRecordingChannel* CRTCRecordingInstance::findChannel(const std::string& sCha
 
 
 
-int32_t * CRTCRecordingChannel::reserveDataBuffer(uint32_t nCount, uint32_t& nBytesToRead)
+int32_t * CRTCRecordingChannel::reserveDataBuffer(uint32_t nCount, uint32_t& nEntriesToRead)
 {
-	nBytesToRead = 0;
+	nEntriesToRead = 0;
 
 	if (nCount == 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW, "data recording interval underflow");
@@ -366,7 +374,10 @@ int32_t * CRTCRecordingChannel::reserveDataBuffer(uint32_t nCount, uint32_t& nBy
 		m_Chunks.push_back(m_pCurrentChunk);
 	}
 
-	return m_pCurrentChunk->reserveDataBuffer(nCount, nBytesToRead);
+	auto pBuffer =  m_pCurrentChunk->reserveDataBuffer(nCount, nEntriesToRead);
+	m_nEntryCount += nEntriesToRead;
+
+	return pBuffer;
 
 }
 
@@ -431,9 +442,18 @@ void CRTCRecordingInstance::enableRecording()
 
 	std::array<uint32_t, 8> rtcChannels;
 	uint32_t nPeriod = 1;
+	rtcChannels.at(0) = 1;
+	rtcChannels.at(1) = 1;
+	rtcChannels.at(2) = 1;
+	rtcChannels.at(3) = 1;
+	rtcChannels.at(4) = 1;
+	rtcChannels.at(5) = 1;
+	rtcChannels.at(6) = 1;
+	rtcChannels.at(7) = 0;
 
 	m_pSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pSDK->n_set_trigger8(m_CardNo, nPeriod, rtcChannels[0], rtcChannels[1], rtcChannels[2], rtcChannels[3], rtcChannels[4], rtcChannels[5], rtcChannels[6], rtcChannels[7]);
+	//m_pSDK->n_set_trigger8(m_CardNo, nPeriod, rtcChannels[0], rtcChannels[1], rtcChannels[2], rtcChannels[3], rtcChannels[4], rtcChannels[5], rtcChannels[6], rtcChannels[7]);
+	m_pSDK->n_set_trigger4(m_CardNo, 1, 7, 8, 52, 0);
 	m_pSDK->checkLastErrorOfCard(m_CardNo);
 
 }
@@ -464,22 +484,26 @@ void CRTCRecordingInstance::readRecordedDataBlockFromRTC(uint32_t DataStart, uin
 		
 		for (auto pChannel : m_Channels) {
 
-			uint32_t nBytesLeft = nDataLength;
-			uint32_t nDataAddress = DataStart;
-			while (nBytesLeft > 0) {
-				uint32_t nBytesToRead = 0;
+			if (pChannel.get() > 0) {
 
-				int32_t* pBuffer = pChannel->reserveDataBuffer(nBytesLeft, nBytesToRead);
-				if (nBytesToRead > nBytesLeft)
-					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW, "data recording interval overflow: " + std::to_string(nBytesToRead) + " of " + std::to_string(nBytesLeft) + " bytes");
-				if ((nBytesToRead == 0) || (pBuffer == nullptr))
-					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW, "data recording interval underflow: " + std::to_string(nBytesToRead) + " of " + std::to_string(nBytesLeft) + " bytes");
+				uint32_t nEntriesLeft = nDataLength;
+				uint32_t nDataAddress = DataStart;
+				while (nEntriesLeft > 0) {
+					uint32_t nEntriesToRead = 0;
 
-				m_pSDK->n_get_waveform_offset(m_CardNo, pChannel->getRTCChannelID(), nDataAddress, nBytesToRead, pBuffer);
-				m_pSDK->checkLastErrorOfCard(m_CardNo);
+					int32_t* pBuffer = pChannel->reserveDataBuffer(nEntriesLeft, nEntriesToRead);
+					if (nEntriesToRead > nEntriesLeft)
+						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW, "data recording interval overflow: " + std::to_string(nEntriesToRead) + " of " + std::to_string(nEntriesLeft) + " bytes");
+					if ((nEntriesToRead == 0) || (pBuffer == nullptr))
+						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW, "data recording interval underflow: " + std::to_string(nEntriesToRead) + " of " + std::to_string(nEntriesLeft) + " bytes");
 
-				nDataAddress += nBytesToRead;
+					m_pSDK->n_get_waveform_offset(m_CardNo, pChannel->getRTCChannelID(), nDataAddress, nEntriesToRead, pBuffer);
+					m_pSDK->checkLastErrorOfCard(m_CardNo);
 
+					nDataAddress += nEntriesToRead;
+					nEntriesLeft -= nEntriesToRead;
+
+				}
 			}
 
 		}

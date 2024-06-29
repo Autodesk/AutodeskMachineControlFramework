@@ -89,7 +89,7 @@ public:
 
 	bool isFull ();
 
-	int32_t* reserveDataBuffer(uint32_t nCount, uint32_t& nBytesToRead);
+	int32_t* reserveDataBuffer(uint32_t nCount, uint32_t& nEntriesToRead);
 
 
 };
@@ -131,7 +131,7 @@ public:
 
 	void getAllScaledRecordEntries(uint64_t nValuesBufferSize, uint64_t* pValuesNeededCount, double* pValuesBuffer, double dScaleFactor, double dOffset);
 
-	int32_t* reserveDataBuffer(uint32_t nCount, uint32_t& nBytesToRead);
+	int32_t* reserveDataBuffer(uint32_t nCount, uint32_t& nEntriesToRead);
 };
 
 
