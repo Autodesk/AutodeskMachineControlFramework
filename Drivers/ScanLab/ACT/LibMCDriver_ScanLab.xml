@@ -196,16 +196,50 @@
 	   <option name="OIEVersion3" value="3" />
 	</enum>
 
-	<enum name="RTCChannelType">
-	   <option name="ChannelUndefined" value="0" />
-	   <option name="ChannelCurrentXRaw" value="1" />
-	   <option name="ChannelCurrentYRaw" value="2" />
-	   <option name="ChannelTargetXRaw" value="3" />
-	   <option name="ChannelTargetYRaw" value="4" />
-	   <option name="ChannelCurrentXBacktransformed" value="101" />
-	   <option name="ChannelCurrentYBacktransformed" value="102" />
-	   <option name="ChannelTargetXBacktransformed" value="103" />
-	   <option name="ChannelTargetYBacktransformed" value="104" />
+	<enum name="RTCChannelType" description="Channel type to record. See RTC Documentation set_trigger for details.">
+	   <option name="ChannelUndefined" value="0" description="Undefined or invalid channel" />	   
+	   <option name="ChannelCurrentXRaw" value="1" description="Raw X Value of the Scan Head (RTC Channel 1, StatusAX)"  />
+	   <option name="ChannelCurrentYRaw" value="2" description="Raw Y Value of the Scan Head (RTC Channel 2, StatusAY)" />
+	   <option name="ChannelCurrentZRaw" value="4" description="Raw Z Value of the Scan Head (RTC Channel 4, StatusBX)" />
+	   <option name="ChannelTargetXRaw" value="7" description="Target X Value of the Scan Head (RTC Channel 7, SampleX)" />
+	   <option name="ChannelTargetYRaw" value="8" description="Target Y Value of the Scan Head (RTC Channel 8, SampleY)" />
+	   <option name="ChannelTargetZRaw" value="9" description="Target Z Value of the Scan Head (RTC Channel 9, SampleZ)" />
+	   <option name="ChannelAutoLaserControlMode" value="24" description="Control Parameter of AutoLaserControl (RTC Channel 24)" />
+	   <option name="ChannelVectorControlMode" value="31" description="Control Parameter of VectorControl (RTC Channel 31)" />
+	   <option name="ChannelDefocus" value="32" description="Defocus setting (RTC Channel 32)" />
+	   <option name="ChannelAnalogOut1" value="33" description="Analog Out 1 Signal (RTC Channel 33)" />
+	   <option name="ChannelAnalogOut2" value="34" description="Analog Out 2 Signal (RTC Channel 34)" />
+	   <option name="ChannelDigitalOut16Bit" value="35" description="16 Bit Digital Out Signal (RTC Channel 35)" />
+	   <option name="ChannelDigitalOut8Bit" value="36" description="8 Bit Digital Out Signal (RTC Channel 36)" />
+	   <option name="ChannelPulseLength" value="37" description="Pulse length of laser control (RTC Channel 37)" />
+	   <option name="ChannelHalfPeriod" value="38"  description="Half period of laser control (RTC Channel 38)" />
+	   <option name="ChannelFreeVariable0" value="39" description="Free Variable 0 (RTC Channel 39)" />
+	   <option name="ChannelFreeVariable1" value="40" description="Free Variable 1 (RTC Channel 40)" />
+	   <option name="ChannelFreeVariable2" value="41" description="Free Variable 2 (RTC Channel 41)"/>
+	   <option name="ChannelFreeVariable3" value="42" description="Free Variable 3 (RTC Channel 42)"/>
+	   <option name="ChannelEncoder0" value="43" description="Counter value of Encoder 0 (RTC Channel 43)" />
+	   <option name="ChannelEncoder1" value="44" description="Counter value of Encoder 1 (RTC Channel 44)" />
+	   <option name="ChannelMarkSpeed" value="45" description="Laser Mark Speed in Bits/ms (RTC Channel 45)" />
+	   <option name="ChannelDigitalIn16Bit" value="46" description="16bit Digital In Channel of EXTENSION 1 (RTC Channel 46)" />
+	   <option name="ChannelFreeVariable4" value="48" description="Free Variable 4 (RTC Channel 48)"/>
+	   <option name="ChannelFreeVariable5" value="49" description="Free Variable 5 (RTC Channel 49)"/>
+	   <option name="ChannelFreeVariable6" value="50" description="Free Variable 6 (RTC Channel 50)"/>
+	   <option name="ChannelFreeVariable7" value="51" description="Free Variable 7 (RTC Channel 51)"/>
+	   <option name="ChannelTimeStamp" value="52" description="RTC Time Stamp (RTC Channel 52)" />
+	   <option name="ChannelWobbleAmplitude" value="53" description="Wobble Amplitude (RTC Channel 53)" />
+	   <option name="ChannelAnalogIn" value="54" description="Analog Input Value (RTC Channel 54)" />
+	   <option name="ChannelScaledEncoderX" value="55" description="Scaled Encoder Value for X Axis (RTC Channel 55)" />
+	   <option name="ChannelScaledEncoderY" value="56" description="Scaled Encoder Value for Y Axis (RTC Channel 56)" />
+	   <option name="ChannelScaledEncoderZ" value="57" description="Scaled Encoder Value for Z Axis (RTC Channel 57)" />
+	   <option name="ChannelRS232" value="58" description="RS232 Channel Value (RTC Channel 58)" />	   
+	   <option name="ChannelLaserOn" value="100" description="Laser On Value (RTC Channel 0, LASERON)" />
+	   <option name="ChannelCurrentXBacktransformed" value="101" description="Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX)"  />
+	   <option name="ChannelCurrentYBacktransformed" value="102" description="Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY)" />
+	   <option name="ChannelCurrentZBacktransformed" value="104" description="Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX)" />
+	   <option name="ChannelTargetXBacktransformed" value="107" description="Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX)" />
+	   <option name="ChannelTargetYBacktransformed" value="108" description="Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY)" />
+	   <option name="ChannelTargetZBacktransformed" value="109" description="Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ)" />
+
 	</enum>
 	
 	

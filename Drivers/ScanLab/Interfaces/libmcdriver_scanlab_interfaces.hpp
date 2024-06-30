@@ -1367,7 +1367,7 @@ public:
 
 	/**
 	* IRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
-	* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance.
+	* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance.
 	* @return Recording instance.
 	*/
 	virtual IRTCRecording * PrepareRecording(const bool bKeepInMemory) = 0;

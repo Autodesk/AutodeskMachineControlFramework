@@ -1395,7 +1395,7 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance.
+* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance.
 * @param[out] pRecordingInstance - Recording instance.
 * @return error code or 0 (success)
 */

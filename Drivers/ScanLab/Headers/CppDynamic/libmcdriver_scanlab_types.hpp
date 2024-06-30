@@ -392,16 +392,52 @@ namespace LibMCDriver_ScanLab {
     OIEVersion3 = 3
   };
   
+  /**
+  * enum class eRTCChannelType - Channel type to record. See RTC Documentation set_trigger for details.
+  */
   enum class eRTCChannelType : LibMCDriver_ScanLab_int32 {
-    ChannelUndefined = 0,
-    ChannelCurrentXRaw = 1,
-    ChannelCurrentYRaw = 2,
-    ChannelTargetXRaw = 3,
-    ChannelTargetYRaw = 4,
-    ChannelCurrentXBacktransformed = 101,
-    ChannelCurrentYBacktransformed = 102,
-    ChannelTargetXBacktransformed = 103,
-    ChannelTargetYBacktransformed = 104
+    ChannelUndefined = 0, /** Undefined or invalid channel */
+    ChannelCurrentXRaw = 1, /** Raw X Value of the Scan Head (RTC Channel 1, StatusAX) */
+    ChannelCurrentYRaw = 2, /** Raw Y Value of the Scan Head (RTC Channel 2, StatusAY) */
+    ChannelCurrentZRaw = 4, /** Raw Z Value of the Scan Head (RTC Channel 4, StatusBX) */
+    ChannelTargetXRaw = 7, /** Target X Value of the Scan Head (RTC Channel 7, SampleX) */
+    ChannelTargetYRaw = 8, /** Target Y Value of the Scan Head (RTC Channel 8, SampleY) */
+    ChannelTargetZRaw = 9, /** Target Z Value of the Scan Head (RTC Channel 9, SampleZ) */
+    ChannelAutoLaserControlMode = 24, /** Control Parameter of AutoLaserControl (RTC Channel 24) */
+    ChannelVectorControlMode = 31, /** Control Parameter of VectorControl (RTC Channel 31) */
+    ChannelDefocus = 32, /** Defocus setting (RTC Channel 32) */
+    ChannelAnalogOut1 = 33, /** Analog Out 1 Signal (RTC Channel 33) */
+    ChannelAnalogOut2 = 34, /** Analog Out 2 Signal (RTC Channel 34) */
+    ChannelDigitalOut16Bit = 35, /** 16 Bit Digital Out Signal (RTC Channel 35) */
+    ChannelDigitalOut8Bit = 36, /** 8 Bit Digital Out Signal (RTC Channel 36) */
+    ChannelPulseLength = 37, /** Pulse length of laser control (RTC Channel 37) */
+    ChannelHalfPeriod = 38, /** Half period of laser control (RTC Channel 38) */
+    ChannelFreeVariable0 = 39, /** Free Variable 0 (RTC Channel 39) */
+    ChannelFreeVariable1 = 40, /** Free Variable 1 (RTC Channel 40) */
+    ChannelFreeVariable2 = 41, /** Free Variable 2 (RTC Channel 41) */
+    ChannelFreeVariable3 = 42, /** Free Variable 3 (RTC Channel 42) */
+    ChannelEncoder0 = 43, /** Counter value of Encoder 0 (RTC Channel 43) */
+    ChannelEncoder1 = 44, /** Counter value of Encoder 1 (RTC Channel 44) */
+    ChannelMarkSpeed = 45, /** Laser Mark Speed in Bits/ms (RTC Channel 45) */
+    ChannelDigitalIn16Bit = 46, /** 16bit Digital In Channel of EXTENSION 1 (RTC Channel 46) */
+    ChannelFreeVariable4 = 48, /** Free Variable 4 (RTC Channel 48) */
+    ChannelFreeVariable5 = 49, /** Free Variable 5 (RTC Channel 49) */
+    ChannelFreeVariable6 = 50, /** Free Variable 6 (RTC Channel 50) */
+    ChannelFreeVariable7 = 51, /** Free Variable 7 (RTC Channel 51) */
+    ChannelTimeStamp = 52, /** RTC Time Stamp (RTC Channel 52) */
+    ChannelWobbleAmplitude = 53, /** Wobble Amplitude (RTC Channel 53) */
+    ChannelAnalogIn = 54, /** Analog Input Value (RTC Channel 54) */
+    ChannelScaledEncoderX = 55, /** Scaled Encoder Value for X Axis (RTC Channel 55) */
+    ChannelScaledEncoderY = 56, /** Scaled Encoder Value for Y Axis (RTC Channel 56) */
+    ChannelScaledEncoderZ = 57, /** Scaled Encoder Value for Z Axis (RTC Channel 57) */
+    ChannelRS232 = 58, /** RS232 Channel Value (RTC Channel 58) */
+    ChannelLaserOn = 100, /** Laser On Value (RTC Channel 0, LASERON) */
+    ChannelCurrentXBacktransformed = 101, /** Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX) */
+    ChannelCurrentYBacktransformed = 102, /** Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY) */
+    ChannelCurrentZBacktransformed = 104, /** Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX) */
+    ChannelTargetXBacktransformed = 107, /** Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX) */
+    ChannelTargetYBacktransformed = 108, /** Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY) */
+    ChannelTargetZBacktransformed = 109 /** Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ) */
   };
   
   enum class eOIERecordingMode : LibMCDriver_ScanLab_int32 {
