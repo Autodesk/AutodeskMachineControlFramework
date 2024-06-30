@@ -215,6 +215,7 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL 1110 /** Data buffer is full */
 #define LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY 1111 /** Data buffer read empty */
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING 1112 /** Could not find recording. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE 1113 /** Invalid channel type. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -342,6 +343,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL: return "Data buffer is full";
     case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "Data buffer read empty";
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "Could not find recording.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "Invalid channel type.";
     default: return "unknown error";
   }
 }

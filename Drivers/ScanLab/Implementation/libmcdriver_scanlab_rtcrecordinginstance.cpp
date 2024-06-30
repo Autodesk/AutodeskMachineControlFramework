@@ -153,6 +153,139 @@ LibMCDriver_ScanLab::eRTCChannelType CRTCRecordingChannel::getChannelType()
 	return m_ChannelType;
 }
 
+uint32_t CRTCRecordingChannel::getRTCTrigger8Parameter()
+{
+	switch (m_ChannelType) {
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentXRaw:
+			return 1; /** Raw X Value of the Scan Head (RTC Channel 1, StatusAX) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentYRaw:
+			return 2; /** Raw Y Value of the Scan Head (RTC Channel 2, StatusAY) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentZRaw: 
+			return 4; /** Raw Z Value of the Scan Head (RTC Channel 4, StatusBX) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetXRaw:
+			return 7; /** Target X Value of the Scan Head (RTC Channel 7, SampleX) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetYRaw:
+			return 8; /** Target Y Value of the Scan Head (RTC Channel 8, SampleY) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetZRaw:
+			return  9; /** Target Z Value of the Scan Head (RTC Channel 9, SampleZ) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelAutoLaserControlMode:
+			return 24; /** Control Parameter of AutoLaserControl (RTC Channel 24) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelVectorControlMode: 
+			return 31; /** Control Parameter of VectorControl (RTC Channel 31) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelDefocus: 
+			return 32; /** Defocus setting (RTC Channel 32) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelAnalogOut1:
+			return 33; /** Analog Out 1 Signal (RTC Channel 33) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelAnalogOut2:
+			return 34; /** Analog Out 2 Signal (RTC Channel 34) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelDigitalOut16Bit:
+			return 35; /** 16 Bit Digital Out Signal (RTC Channel 35) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelDigitalOut8Bit:
+			return 36; /** 8 Bit Digital Out Signal (RTC Channel 36) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelPulseLength:
+			return 37; /** Pulse length of laser control (RTC Channel 37) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelHalfPeriod:
+			return 38; /** Half period of laser control (RTC Channel 38) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelFreeVariable0:
+			return 39; /** Free Variable 0 (RTC Channel 39) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelFreeVariable1:
+			return 40; /** Free Variable 1 (RTC Channel 40) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelFreeVariable2: 
+			return 41; /** Free Variable 2 (RTC Channel 41) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelFreeVariable3:
+			return 42; /** Free Variable 3 (RTC Channel 42) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelEncoder0:
+			return 43; /** Counter value of Encoder 0 (RTC Channel 43) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelEncoder1:
+			return 44; /** Counter value of Encoder 1 (RTC Channel 44) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelMarkSpeed:
+			return 45; /** Laser Mark Speed in Bits/ms (RTC Channel 45) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelDigitalIn16Bit:
+			return 46; /** 16bit Digital In Channel of EXTENSION 1 (RTC Channel 46) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelFreeVariable4:
+			return 48; /** Free Variable 4 (RTC Channel 48) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelFreeVariable5:
+			return 49; /** Free Variable 5 (RTC Channel 49) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelFreeVariable6:
+			return 50; /** Free Variable 6 (RTC Channel 50) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelFreeVariable7:
+			return 51; /** Free Variable 7 (RTC Channel 51) */
+		
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTimeStamp:
+			return 52; /** RTC Time Stamp (RTC Channel 52) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelWobbleAmplitude:
+			return 53; /** Wobble Amplitude (RTC Channel 53) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelAnalogIn:
+			return 54; /** Analog Input Value (RTC Channel 54) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelScaledEncoderX:
+			return 55; /** Scaled Encoder Value for X Axis (RTC Channel 55) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelScaledEncoderY: 
+			return 56; /** Scaled Encoder Value for Y Axis (RTC Channel 56) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelScaledEncoderZ:
+			return 57; /** Scaled Encoder Value for Z Axis (RTC Channel 57) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelRS232: 
+			return 58; /** RS232 Channel Value (RTC Channel 58) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelLaserOn:
+			return 0; /** Laser On Value (RTC Channel 0, LASERON) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentXBacktransformed:
+			return 1; /** Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentYBacktransformed:
+			return 2; /** Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentZBacktransformed:
+			return 4; /** Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetXBacktransformed:
+			return 7; /** Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetYBacktransformed:
+			return 8; /** Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetZBacktransformed:
+			return 9; /** Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ) */
+			
+			
+		default:
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE, "invalid channel type: " + std::to_string ((uint32_t) m_ChannelType));
+	}
+}
+
+
 uint64_t CRTCRecordingChannel::getRecordCount()
 {
 	return m_nEntryCount;
@@ -440,20 +573,18 @@ void CRTCRecordingInstance::getAllRecordEntries(const std::string& sChannelName,
 void CRTCRecordingInstance::enableRecording()
 {
 
-	std::array<uint32_t, 8> rtcChannels;
+	std::array<uint32_t, RTC_CHANNELCOUNT> rtcChannels;
 	uint32_t nPeriod = 1;
-	rtcChannels.at(0) = 1;
-	rtcChannels.at(1) = 1;
-	rtcChannels.at(2) = 1;
-	rtcChannels.at(3) = 1;
-	rtcChannels.at(4) = 1;
-	rtcChannels.at(5) = 1;
-	rtcChannels.at(6) = 1;
-	rtcChannels.at(7) = 0;
+	for (uint32_t nIndex = 0; nIndex < RTC_CHANNELCOUNT; nIndex++) {
+		auto pChannel = m_Channels.at(nIndex);
+		if (pChannel.get() != nullptr)
+			rtcChannels.at(nIndex) = pChannel->getRTCTrigger8Parameter();
+		else
+			rtcChannels.at(nIndex) = 0;
+	}
 
 	m_pSDK->checkGlobalErrorOfCard(m_CardNo);
-	//m_pSDK->n_set_trigger8(m_CardNo, nPeriod, rtcChannels[0], rtcChannels[1], rtcChannels[2], rtcChannels[3], rtcChannels[4], rtcChannels[5], rtcChannels[6], rtcChannels[7]);
-	m_pSDK->n_set_trigger4(m_CardNo, 1, 7, 8, 52, 0);
+	m_pSDK->n_set_trigger8(m_CardNo, nPeriod, rtcChannels.at (0), rtcChannels.at (1), rtcChannels.at (2), rtcChannels.at(3), rtcChannels.at(4), rtcChannels.at(5), rtcChannels.at (6), rtcChannels.at(7));
 	m_pSDK->checkLastErrorOfCard(m_CardNo);
 
 }

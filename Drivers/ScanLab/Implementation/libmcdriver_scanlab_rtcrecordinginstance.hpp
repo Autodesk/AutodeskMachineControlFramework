@@ -121,6 +121,8 @@ public:
 
 	uint32_t getRTCChannelID();
 
+	uint32_t getRTCTrigger8Parameter();
+
 	LibMCDriver_ScanLab::eRTCChannelType getChannelType ();
 
 	uint64_t getRecordCount();
