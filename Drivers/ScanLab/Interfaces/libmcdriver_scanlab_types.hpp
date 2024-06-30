@@ -216,6 +216,7 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY 1111 /** Data buffer read empty */
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING 1112 /** Could not find recording. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE 1113 /** Invalid channel type. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY 1114 /** Invalid RTC recording frequency. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -344,6 +345,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "Data buffer read empty";
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "Could not find recording.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "Invalid channel type.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "Invalid RTC recording frequency.";
     default: return "unknown error";
   }
 }
@@ -442,6 +444,22 @@ namespace LibMCDriver_ScanLab {
     ChannelTargetZBacktransformed = 109 /** Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ) */
   };
   
+  /**
+  * enum class eRTCRecordingFrequency - Frequency to record RTC values.
+  */
+  enum class eRTCRecordingFrequency : LibMCDriver_ScanLab_int32 {
+    InvalidFrequency = 0, /** Invalid Frequency */
+    Record100kHz = 1, /** Record with 100.000 entries per second (1:1) */
+    Record50kHz = 2, /** Record with 50.000 entries per second (1:2) */
+    Record25kHz = 4, /** Record with 25.000 entries per second (1:4) */
+    Record20kHz = 5, /** Record with 20.000 entries per second (1:5) */
+    Record10kHz = 10, /** Record with 10.000 entries per second (1:10) */
+    Record5kHz = 20, /** Record with 5.000 entries per second (1:20) */
+    Record4kHz = 25, /** Record with 4.000 entries per second (1:25) */
+    Record2kHz = 50, /** Record with 2.000 entries per second (1:50) */
+    Record1kHz = 100 /** Record with 1.000 entries per second (1:100) */
+  };
+  
   enum class eOIERecordingMode : LibMCDriver_ScanLab_int32 {
     OIERecordingDisabled = 0, /** OIE shall not record anything. */
     OIEContinuousMeasurement = 1, /** OIE shall continuously record, even if the laser is off. OIE must be enabled before drawing a layer. */
@@ -501,6 +519,7 @@ typedef LibMCDriver_ScanLab::eLaserMode eLibMCDriver_ScanLabLaserMode;
 typedef LibMCDriver_ScanLab::eLaserPort eLibMCDriver_ScanLabLaserPort;
 typedef LibMCDriver_ScanLab::eOIEOperationMode eLibMCDriver_ScanLabOIEOperationMode;
 typedef LibMCDriver_ScanLab::eRTCChannelType eLibMCDriver_ScanLabRTCChannelType;
+typedef LibMCDriver_ScanLab::eRTCRecordingFrequency eLibMCDriver_ScanLabRTCRecordingFrequency;
 typedef LibMCDriver_ScanLab::eOIERecordingMode eLibMCDriver_ScanLabOIERecordingMode;
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;

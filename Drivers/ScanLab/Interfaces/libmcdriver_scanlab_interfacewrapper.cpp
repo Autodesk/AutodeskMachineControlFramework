@@ -1172,7 +1172,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_getallrecordentries(L
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablerecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablerecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording, eLibMCDriver_ScanLabRTCRecordingFrequency eFrequency)
 {
 	IBase* pIBaseClass = (IBase *)pRTCRecording;
 
@@ -1181,7 +1181,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablerecording(LibMC
 		if (!pIRTCRecording)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCRecording->EnableRecording();
+		pIRTCRecording->EnableRecording(eFrequency);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}

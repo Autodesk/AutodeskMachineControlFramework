@@ -89,7 +89,7 @@ public:
 
 	void GetAllRecordEntries(const std::string & sChannelName, LibMCDriver_ScanLab_uint64 nValuesBufferSize, LibMCDriver_ScanLab_uint64* pValuesNeededCount, LibMCDriver_ScanLab_int32 * pValuesBuffer) override;
 
-	void EnableRecording() override;
+	void EnableRecording(const LibMCDriver_ScanLab::eRTCRecordingFrequency eFrequency) override;
 
 	void DisableRecording() override;
 

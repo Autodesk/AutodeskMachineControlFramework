@@ -110,9 +110,34 @@ void CRTCRecording::GetAllRecordEntries(const std::string & sChannelName, LibMCD
 	m_pInstance->getAllRecordEntries(sChannelName, nValuesBufferSize, pValuesNeededCount, pValuesBuffer);
 }
 
-void CRTCRecording::EnableRecording()
+void CRTCRecording::EnableRecording(const LibMCDriver_ScanLab::eRTCRecordingFrequency eFrequency)
 {
-	m_pInstance->enableRecording();
+	uint32_t nPeriod = 1;
+
+	switch (eFrequency) {
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record100kHz:
+			nPeriod = 1; break;
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record50kHz:
+			nPeriod = 2; break;
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record25kHz:
+			nPeriod = 4; break;
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record20kHz:
+			nPeriod = 5; break;
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record10kHz:
+			nPeriod = 10; break;
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record5kHz:
+			nPeriod = 20; break;
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record4kHz:
+			nPeriod = 25; break;
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record2kHz:
+			nPeriod = 50; break;
+		case LibMCDriver_ScanLab::eRTCRecordingFrequency::Record1kHz:
+			nPeriod = 100; break;
+
+		default:
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY, "Invalid RTC Recording Frequency: " + std::to_string ((uint32_t)eFrequency));
+	}
+	m_pInstance->enableRecording(nPeriod);
 }
 
 void CRTCRecording::DisableRecording()

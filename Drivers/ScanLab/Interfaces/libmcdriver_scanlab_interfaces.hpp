@@ -708,8 +708,9 @@ public:
 
 	/**
 	* IRTCRecording::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
+	* @param[in] eFrequency - Recording frequency.
 	*/
-	virtual void EnableRecording() = 0;
+	virtual void EnableRecording(const LibMCDriver_ScanLab::eRTCRecordingFrequency eFrequency) = 0;
 
 	/**
 	* IRTCRecording::DisableRecording - Disables recording of position data of the RTC Card. This is a list command.

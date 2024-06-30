@@ -314,6 +314,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "DATABUFFERREADEMPTY";
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "COULDNOTFINDRECORDING";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "INVALIDCHANNELTYPE";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "INVALIDRTCRECORDINGFREQUENCY";
 		}
 		return "UNKNOWN";
 	}
@@ -442,6 +443,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "Data buffer read empty";
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "Could not find recording.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "Invalid channel type.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "Invalid RTC recording frequency.";
 		}
 		return "unknown error";
 	}
@@ -733,7 +735,7 @@ public:
 	inline LibMCDriver_ScanLab_uint64 GetRecordCount(const std::string & sChannelName);
 	inline LibMCDriver_ScanLab_int32 GetRecordEntry(const std::string & sChannelName, const LibMCDriver_ScanLab_uint64 nRecordIndex);
 	inline void GetAllRecordEntries(const std::string & sChannelName, std::vector<LibMCDriver_ScanLab_int32> & ValuesBuffer);
-	inline void EnableRecording();
+	inline void EnableRecording(const eRTCRecordingFrequency eFrequency);
 	inline void DisableRecording();
 	inline void ExecuteListWithRecording();
 	inline void AddRecordsToDataTable(const std::string & sChannelName, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
@@ -4908,10 +4910,11 @@ public:
 	
 	/**
 	* CRTCRecording::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
+	* @param[in] eFrequency - Recording frequency.
 	*/
-	void CRTCRecording::EnableRecording()
+	void CRTCRecording::EnableRecording(const eRTCRecordingFrequency eFrequency)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_EnableRecording(m_pHandle));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_EnableRecording(m_pHandle, eFrequency));
 	}
 	
 	/**

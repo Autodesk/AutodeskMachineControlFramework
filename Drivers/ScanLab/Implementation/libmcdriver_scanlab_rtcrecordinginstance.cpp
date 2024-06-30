@@ -570,11 +570,10 @@ void CRTCRecordingInstance::getAllRecordEntries(const std::string& sChannelName,
 
 }
 
-void CRTCRecordingInstance::enableRecording()
+void CRTCRecordingInstance::enableRecording(uint32_t nPeriod)
 {
 
 	std::array<uint32_t, RTC_CHANNELCOUNT> rtcChannels;
-	uint32_t nPeriod = 1;
 	for (uint32_t nIndex = 0; nIndex < RTC_CHANNELCOUNT; nIndex++) {
 		auto pChannel = m_Channels.at(nIndex);
 		if (pChannel.get() != nullptr)

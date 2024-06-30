@@ -456,9 +456,10 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_GetAllRecor
 * Enables recording of position data of the RTC Card. This is a list command.
 *
 * @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] eFrequency - Recording frequency.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_EnableRecordingPtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_EnableRecordingPtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCDriver_ScanLab::eRTCRecordingFrequency eFrequency);
 
 /**
 * Disables recording of position data of the RTC Card. This is a list command.

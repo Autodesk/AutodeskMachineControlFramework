@@ -189,7 +189,7 @@ public:
 
 	void getAllRecordEntries(const std::string & sChannelName, LibMCDriver_ScanLab_uint64 nValuesBufferSize, LibMCDriver_ScanLab_uint64* pValuesNeededCount, LibMCDriver_ScanLab_int32 * pValuesBuffer);
 
-	void enableRecording();
+	void enableRecording(uint32_t nPeriod);
 
 	void disableRecording();
 

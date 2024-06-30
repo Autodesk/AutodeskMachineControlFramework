@@ -469,9 +469,10 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcre
 * Enables recording of position data of the RTC Card. This is a list command.
 *
 * @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] eFrequency - Recording frequency.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablerecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablerecording(LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCDriver_ScanLab::eRTCRecordingFrequency eFrequency);
 
 /**
 * Disables recording of position data of the RTC Card. This is a list command.
