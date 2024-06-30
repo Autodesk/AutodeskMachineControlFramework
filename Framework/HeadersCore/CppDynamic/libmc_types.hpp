@@ -1143,6 +1143,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCHandle LibMC_Base;
+typedef LibMCHandle LibMC_StreamData;
+typedef LibMCHandle LibMC_StreamConnection;
 typedef LibMCHandle LibMC_APIRequestHandler;
 typedef LibMCHandle LibMC_MCContext;
 

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_mccontext.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "libmc_apirequesthandler.hpp"
+#include "libmc_streamconnection.hpp"
 #include "pugixml.hpp"
 
 #include "amc_statemachineinstance.hpp"
@@ -886,16 +887,6 @@ void CMCContext::TerminateInstanceThread(const std::string& sInstanceName)
     pInstance->terminateThread();
 }
 
-std::string CMCContext::GetInstanceThreadState(const std::string& sInstanceName)
-{
-    if (sInstanceName.empty())
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATEMACHINENAME);
-
-    auto pInstance = findMachineInstance(sInstanceName, true);
-    return pInstance->getCurrentStateName ();
-
-}
-
 bool CMCContext::InstanceStateIsSuccessful(const std::string& sInstanceName)
 {
     if (sInstanceName.empty())
@@ -971,6 +962,15 @@ IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI,
      
 
     return new CAPIRequestHandler(m_pAPI, sURI, requestType, pAuth, m_pSystemState->getLoggerInstance ());
+
+}
+
+IStreamConnection* CMCContext::CreateStreamConnection(const std::string& sStreamUUID)
+{
+    std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+
+    return new CStreamConnection(sNormalizedStreamUUID);
+
 
 }
 

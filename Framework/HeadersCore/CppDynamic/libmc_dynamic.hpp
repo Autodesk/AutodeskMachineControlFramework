@@ -61,6 +61,8 @@ namespace LibMC {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
+class CStreamData;
+class CStreamConnection;
 class CAPIRequestHandler;
 class CMCContext;
 
@@ -69,6 +71,8 @@ class CMCContext;
 **************************************************************************************************************************/
 typedef CWrapper CLibMCWrapper;
 typedef CBase CLibMCBase;
+typedef CStreamData CLibMCStreamData;
+typedef CStreamConnection CLibMCStreamConnection;
 typedef CAPIRequestHandler CLibMCAPIRequestHandler;
 typedef CMCContext CLibMCMCContext;
 
@@ -77,6 +81,8 @@ typedef CMCContext CLibMCMCContext;
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
+typedef std::shared_ptr<CStreamData> PStreamData;
+typedef std::shared_ptr<CStreamConnection> PStreamConnection;
 typedef std::shared_ptr<CAPIRequestHandler> PAPIRequestHandler;
 typedef std::shared_ptr<CMCContext> PMCContext;
 
@@ -85,6 +91,8 @@ typedef std::shared_ptr<CMCContext> PMCContext;
 **************************************************************************************************************************/
 typedef PWrapper PLibMCWrapper;
 typedef PBase PLibMCBase;
+typedef PStreamData PLibMCStreamData;
+typedef PStreamConnection PLibMCStreamConnection;
 typedef PAPIRequestHandler PLibMCAPIRequestHandler;
 typedef PMCContext PLibMCMCContext;
 
@@ -1325,6 +1333,8 @@ private:
 	LibMCResult loadWrapperTableFromSymbolLookupMethod(sLibMCDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
+	friend class CStreamData;
+	friend class CStreamConnection;
 	friend class CAPIRequestHandler;
 	friend class CMCContext;
 
@@ -1388,6 +1398,42 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CStreamData 
+**************************************************************************************************************************/
+class CStreamData : public CBase {
+public:
+	
+	/**
+	* CStreamData::CStreamData - Constructor for StreamData class.
+	*/
+	CStreamData(CWrapper* pWrapper, LibMCHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetData(std::vector<LibMC_uint8> & DataBuffer);
+	inline std::string GetMIMEType();
+};
+	
+/*************************************************************************************************************************
+ Class CStreamConnection 
+**************************************************************************************************************************/
+class CStreamConnection : public CBase {
+public:
+	
+	/**
+	* CStreamConnection::CStreamConnection - Constructor for StreamConnection class.
+	*/
+	CStreamConnection(CWrapper* pWrapper, LibMCHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline PStreamData GetNewContent();
+	inline LibMC_uint32 GetIdleDelay();
+};
+	
+/*************************************************************************************************************************
  Class CAPIRequestHandler 
 **************************************************************************************************************************/
 class CAPIRequestHandler : public CBase {
@@ -1432,12 +1478,12 @@ public:
 	inline void TerminateAllThreads();
 	inline void StartInstanceThread(const std::string & sInstanceName);
 	inline void TerminateInstanceThread(const std::string & sInstanceName);
-	inline std::string GetInstanceThreadState(const std::string & sInstanceName);
 	inline bool InstanceStateIsSuccessful(const std::string & sInstanceName);
 	inline bool InstanceStateHasFailed(const std::string & sInstanceName);
 	inline void LoadClientPackage(const std::string & sResourcePath);
 	inline void Log(const std::string & sMessage, const eLogSubSystem eSubsystem, const eLogLevel eLogLevel);
 	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization);
+	inline PStreamConnection CreateStreamConnection(const std::string & sStreamUUID);
 };
 	
 	/**
@@ -1547,6 +1593,10 @@ public:
 			return LIBMC_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_StreamData_GetData = nullptr;
+		pWrapperTable->m_StreamData_GetMIMEType = nullptr;
+		pWrapperTable->m_StreamConnection_GetNewContent = nullptr;
+		pWrapperTable->m_StreamConnection_GetIdleDelay = nullptr;
 		pWrapperTable->m_APIRequestHandler_ExpectsRawBody = nullptr;
 		pWrapperTable->m_APIRequestHandler_ExpectsFormData = nullptr;
 		pWrapperTable->m_APIRequestHandler_GetFormDataDetails = nullptr;
@@ -1562,12 +1612,12 @@ public:
 		pWrapperTable->m_MCContext_TerminateAllThreads = nullptr;
 		pWrapperTable->m_MCContext_StartInstanceThread = nullptr;
 		pWrapperTable->m_MCContext_TerminateInstanceThread = nullptr;
-		pWrapperTable->m_MCContext_GetInstanceThreadState = nullptr;
 		pWrapperTable->m_MCContext_InstanceStateIsSuccessful = nullptr;
 		pWrapperTable->m_MCContext_InstanceStateHasFailed = nullptr;
 		pWrapperTable->m_MCContext_LoadClientPackage = nullptr;
 		pWrapperTable->m_MCContext_Log = nullptr;
 		pWrapperTable->m_MCContext_CreateAPIRequestHandler = nullptr;
+		pWrapperTable->m_MCContext_CreateStreamConnection = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1623,6 +1673,42 @@ public:
 			return LIBMC_ERROR_COULDNOTLOADLIBRARY;
 		dlerror();
 		#endif // _WIN32
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamData_GetData = (PLibMCStreamData_GetDataPtr) GetProcAddress(hLibrary, "libmc_streamdata_getdata");
+		#else // _WIN32
+		pWrapperTable->m_StreamData_GetData = (PLibMCStreamData_GetDataPtr) dlsym(hLibrary, "libmc_streamdata_getdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamData_GetData == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamData_GetMIMEType = (PLibMCStreamData_GetMIMETypePtr) GetProcAddress(hLibrary, "libmc_streamdata_getmimetype");
+		#else // _WIN32
+		pWrapperTable->m_StreamData_GetMIMEType = (PLibMCStreamData_GetMIMETypePtr) dlsym(hLibrary, "libmc_streamdata_getmimetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamData_GetMIMEType == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamConnection_GetNewContent = (PLibMCStreamConnection_GetNewContentPtr) GetProcAddress(hLibrary, "libmc_streamconnection_getnewcontent");
+		#else // _WIN32
+		pWrapperTable->m_StreamConnection_GetNewContent = (PLibMCStreamConnection_GetNewContentPtr) dlsym(hLibrary, "libmc_streamconnection_getnewcontent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamConnection_GetNewContent == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StreamConnection_GetIdleDelay = (PLibMCStreamConnection_GetIdleDelayPtr) GetProcAddress(hLibrary, "libmc_streamconnection_getidledelay");
+		#else // _WIN32
+		pWrapperTable->m_StreamConnection_GetIdleDelay = (PLibMCStreamConnection_GetIdleDelayPtr) dlsym(hLibrary, "libmc_streamconnection_getidledelay");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StreamConnection_GetIdleDelay == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
 		pWrapperTable->m_APIRequestHandler_ExpectsRawBody = (PLibMCAPIRequestHandler_ExpectsRawBodyPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_expectsrawbody");
@@ -1760,15 +1846,6 @@ public:
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_MCContext_GetInstanceThreadState = (PLibMCMCContext_GetInstanceThreadStatePtr) GetProcAddress(hLibrary, "libmc_mccontext_getinstancethreadstate");
-		#else // _WIN32
-		pWrapperTable->m_MCContext_GetInstanceThreadState = (PLibMCMCContext_GetInstanceThreadStatePtr) dlsym(hLibrary, "libmc_mccontext_getinstancethreadstate");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_MCContext_GetInstanceThreadState == nullptr)
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_MCContext_InstanceStateIsSuccessful = (PLibMCMCContext_InstanceStateIsSuccessfulPtr) GetProcAddress(hLibrary, "libmc_mccontext_instancestateissuccessful");
 		#else // _WIN32
 		pWrapperTable->m_MCContext_InstanceStateIsSuccessful = (PLibMCMCContext_InstanceStateIsSuccessfulPtr) dlsym(hLibrary, "libmc_mccontext_instancestateissuccessful");
@@ -1811,6 +1888,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MCContext_CreateAPIRequestHandler == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MCContext_CreateStreamConnection = (PLibMCMCContext_CreateStreamConnectionPtr) GetProcAddress(hLibrary, "libmc_mccontext_createstreamconnection");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_CreateStreamConnection = (PLibMCMCContext_CreateStreamConnectionPtr) dlsym(hLibrary, "libmc_mccontext_createstreamconnection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_CreateStreamConnection == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1883,6 +1969,22 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCResult eLookupError = LIBMC_SUCCESS;
+		eLookupError = (*pLookup)("libmc_streamdata_getdata", (void**)&(pWrapperTable->m_StreamData_GetData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamData_GetData == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_streamdata_getmimetype", (void**)&(pWrapperTable->m_StreamData_GetMIMEType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamData_GetMIMEType == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_streamconnection_getnewcontent", (void**)&(pWrapperTable->m_StreamConnection_GetNewContent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamConnection_GetNewContent == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_streamconnection_getidledelay", (void**)&(pWrapperTable->m_StreamConnection_GetIdleDelay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamConnection_GetIdleDelay == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmc_apirequesthandler_expectsrawbody", (void**)&(pWrapperTable->m_APIRequestHandler_ExpectsRawBody));
 		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_ExpectsRawBody == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1943,10 +2045,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_TerminateInstanceThread == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmc_mccontext_getinstancethreadstate", (void**)&(pWrapperTable->m_MCContext_GetInstanceThreadState));
-		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_GetInstanceThreadState == nullptr) )
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmc_mccontext_instancestateissuccessful", (void**)&(pWrapperTable->m_MCContext_InstanceStateIsSuccessful));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_InstanceStateIsSuccessful == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1965,6 +2063,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmc_mccontext_createapirequesthandler", (void**)&(pWrapperTable->m_MCContext_CreateAPIRequestHandler));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_CreateAPIRequestHandler == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_createstreamconnection", (void**)&(pWrapperTable->m_MCContext_CreateStreamConnection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_CreateStreamConnection == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmc_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1999,6 +2101,70 @@ public:
 	/**
 	 * Method definitions for class CBase
 	 */
+	
+	/**
+	 * Method definitions for class CStreamData
+	 */
+	
+	/**
+	* CStreamData::GetData - returns the data to return.
+	* @param[out] DataBuffer - Binary stream data
+	*/
+	void CStreamData::GetData(std::vector<LibMC_uint8> & DataBuffer)
+	{
+		LibMC_uint64 elementsNeededData = 0;
+		LibMC_uint64 elementsWrittenData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamData_GetData(m_pHandle, 0, &elementsNeededData, nullptr));
+		DataBuffer.resize((size_t) elementsNeededData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamData_GetData(m_pHandle, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
+	}
+	
+	/**
+	* CStreamData::GetMIMEType - returns the content type of the data.
+	* @return Content type of the return data.
+	*/
+	std::string CStreamData::GetMIMEType()
+	{
+		LibMC_uint32 bytesNeededMIMEType = 0;
+		LibMC_uint32 bytesWrittenMIMEType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamData_GetMIMEType(m_pHandle, 0, &bytesNeededMIMEType, nullptr));
+		std::vector<char> bufferMIMEType(bytesNeededMIMEType);
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamData_GetMIMEType(m_pHandle, bytesNeededMIMEType, &bytesWrittenMIMEType, &bufferMIMEType[0]));
+		
+		return std::string(&bufferMIMEType[0]);
+	}
+	
+	/**
+	 * Method definitions for class CStreamConnection
+	 */
+	
+	/**
+	* CStreamConnection::GetNewContent - Returns new content for the stream or null, if no new content is available.
+	* @return Stream Data Instance.
+	*/
+	PStreamData CStreamConnection::GetNewContent()
+	{
+		LibMCHandle hNewContent = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamConnection_GetNewContent(m_pHandle, &hNewContent));
+		
+		if (hNewContent) {
+			return std::make_shared<CStreamData>(m_pWrapper, hNewContent);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CStreamConnection::GetIdleDelay - Returns the number of milliseconds, that the caller should wait before checking for another content.
+	* @return Idle Delay.
+	*/
+	LibMC_uint32 CStreamConnection::GetIdleDelay()
+	{
+		LibMC_uint32 resultIdleDelay = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamConnection_GetIdleDelay(m_pHandle, &resultIdleDelay));
+		
+		return resultIdleDelay;
+	}
 	
 	/**
 	 * Method definitions for class CAPIRequestHandler
@@ -2178,22 +2344,6 @@ public:
 	}
 	
 	/**
-	* CMCContext::GetInstanceThreadState - returns current state of a instance thread.
-	* @param[in] sInstanceName - Instance name of state machine.
-	* @return State of state machine.
-	*/
-	std::string CMCContext::GetInstanceThreadState(const std::string & sInstanceName)
-	{
-		LibMC_uint32 bytesNeededStateName = 0;
-		LibMC_uint32 bytesWrittenStateName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_GetInstanceThreadState(m_pHandle, sInstanceName.c_str(), 0, &bytesNeededStateName, nullptr));
-		std::vector<char> bufferStateName(bytesNeededStateName);
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_GetInstanceThreadState(m_pHandle, sInstanceName.c_str(), bytesNeededStateName, &bytesWrittenStateName, &bufferStateName[0]));
-		
-		return std::string(&bufferStateName[0]);
-	}
-	
-	/**
 	* CMCContext::InstanceStateIsSuccessful - returns if an instance thread is in success state.
 	* @param[in] sInstanceName - Instance name of state machine.
 	* @return State of state machine is in success state.
@@ -2255,6 +2405,22 @@ public:
 			CheckError(LIBMC_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CAPIRequestHandler>(m_pWrapper, hHandlerInstance);
+	}
+	
+	/**
+	* CMCContext::CreateStreamConnection - creates an API stream connection instance. Fails if stream does not exist.
+	* @param[in] sStreamUUID - UUID of stream to serve.
+	* @return StreamConnection Handler instance.
+	*/
+	PStreamConnection CMCContext::CreateStreamConnection(const std::string & sStreamUUID)
+	{
+		LibMCHandle hStreamConnectionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_CreateStreamConnection(m_pHandle, sStreamUUID.c_str(), &hStreamConnectionInstance));
+		
+		if (!hStreamConnectionInstance) {
+			CheckError(LIBMC_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStreamConnection>(m_pWrapper, hStreamConnectionInstance);
 	}
 
 } // namespace LibMC

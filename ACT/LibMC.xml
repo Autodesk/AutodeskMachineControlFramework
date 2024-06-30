@@ -649,7 +649,36 @@
 	<class name="Base">
 	
 	</class>
+
+	<!-- StreamData is NOT thread safe! Do not call any method from separate threads. -->
+	<class name="StreamData" parent="Base" description="API Stream Data">
+
+		<method name="GetData" description="returns the data to return.">
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Binary stream data" />	
+		</method>
+
+		<method name="GetMIMEType" description="returns the content type of the data.">
+			<param name="MIMEType" type="string" pass="return" description="Content type of the return data." />	
+		</method>
+
+	</class>
+
+
+	<!-- StreamConnection is thread safe and can be called from any request ! -->
+	<class name="StreamConnection" parent="Base" description="API Stream Connection">
+		
+		<method name="GetNewContent" description="Returns new content for the stream or null, if no new content is available.">
+			<param name="NewContent" type="optionalclass" class="StreamData" pass="return" description="Stream Data Instance." />	
+		</method>
+
+		<method name="GetIdleDelay" description="Returns the number of milliseconds, that the caller should wait before checking for another content.">
+			<param name="IdleDelay" type="uint32" pass="return" description="Idle Delay." />	
+		</method>
+
+	</class>
+
 	
+	<!-- APIRequestHandler is NOT thread safe! Do not call any method from separate threads. -->
 	<class name="APIRequestHandler" parent="Base" description="API Request Handler">
 
 		<method name="ExpectsRawBody" description="checks if the raw body is needed to handle the request.">
@@ -697,6 +726,7 @@
 	</class>
 
 
+	<!-- MCContext is thread safe! -->
 	<class name="MCContext" parent="Base" description="MC Context">
 
 		<method name="RegisterLibraryPath" description="registers a library for a given name.">
@@ -727,11 +757,6 @@
 			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to terminate." />
 		</method>
 
-		<method name="GetInstanceThreadState" description="returns current state of a instance thread.">
-			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
-			<param name="StateName" type="string" pass="return" description="State of state machine." />
-		</method>
-
 		<method name="InstanceStateIsSuccessful" description="returns if an instance thread is in success state.">
 			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
 			<param name="IsSuccessful" type="bool" pass="return" description="State of state machine is in success state." />
@@ -760,6 +785,12 @@
 			<param name="Authorization" type="string" pass="in" description="Authorization Header String" />
 			<param name="HandlerInstance" type="class" class="APIRequestHandler" pass="return" description="Request Handler instance." />
 		</method>
+		
+		<method name="CreateStreamConnection" description="creates an API stream connection instance. Fails if stream does not exist.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of stream to serve." />
+			<param name="StreamConnectionInstance" type="class" class="StreamConnection" pass="return" description="StreamConnection Handler instance." />
+		</method>
+		
 						
 	</class>
 

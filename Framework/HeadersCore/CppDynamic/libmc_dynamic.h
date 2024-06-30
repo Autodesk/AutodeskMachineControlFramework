@@ -49,6 +49,54 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for StreamData
+**************************************************************************************************************************/
+
+/**
+* returns the data to return.
+*
+* @param[in] pStreamData - StreamData instance.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Binary stream data
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCStreamData_GetDataPtr) (LibMC_StreamData pStreamData, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer);
+
+/**
+* returns the content type of the data.
+*
+* @param[in] pStreamData - StreamData instance.
+* @param[in] nMIMETypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMIMETypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMIMETypeBuffer -  buffer of Content type of the return data., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCStreamData_GetMIMETypePtr) (LibMC_StreamData pStreamData, const LibMC_uint32 nMIMETypeBufferSize, LibMC_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer);
+
+/*************************************************************************************************************************
+ Class definition for StreamConnection
+**************************************************************************************************************************/
+
+/**
+* Returns new content for the stream or null, if no new content is available.
+*
+* @param[in] pStreamConnection - StreamConnection instance.
+* @param[out] pNewContent - Stream Data Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCStreamConnection_GetNewContentPtr) (LibMC_StreamConnection pStreamConnection, LibMC_StreamData * pNewContent);
+
+/**
+* Returns the number of milliseconds, that the caller should wait before checking for another content.
+*
+* @param[in] pStreamConnection - StreamConnection instance.
+* @param[out] pIdleDelay - Idle Delay.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCStreamConnection_GetIdleDelayPtr) (LibMC_StreamConnection pStreamConnection, LibMC_uint32 * pIdleDelay);
+
+/*************************************************************************************************************************
  Class definition for APIRequestHandler
 **************************************************************************************************************************/
 
@@ -210,18 +258,6 @@ typedef LibMCResult (*PLibMCMCContext_StartInstanceThreadPtr) (LibMC_MCContext p
 typedef LibMCResult (*PLibMCMCContext_TerminateInstanceThreadPtr) (LibMC_MCContext pMCContext, const char * pInstanceName);
 
 /**
-* returns current state of a instance thread.
-*
-* @param[in] pMCContext - MCContext instance.
-* @param[in] pInstanceName - Instance name of state machine.
-* @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pStateNameBuffer -  buffer of State of state machine., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCResult (*PLibMCMCContext_GetInstanceThreadStatePtr) (LibMC_MCContext pMCContext, const char * pInstanceName, const LibMC_uint32 nStateNameBufferSize, LibMC_uint32* pStateNameNeededChars, char * pStateNameBuffer);
-
-/**
 * returns if an instance thread is in success state.
 *
 * @param[in] pMCContext - MCContext instance.
@@ -272,6 +308,16 @@ typedef LibMCResult (*PLibMCMCContext_LogPtr) (LibMC_MCContext pMCContext, const
 * @return error code or 0 (success)
 */
 typedef LibMCResult (*PLibMCMCContext_CreateAPIRequestHandlerPtr) (LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, const char * pAuthorization, LibMC_APIRequestHandler * pHandlerInstance);
+
+/**
+* creates an API stream connection instance. Fails if stream does not exist.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pStreamUUID - UUID of stream to serve.
+* @param[out] pStreamConnectionInstance - StreamConnection Handler instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_CreateStreamConnectionPtr) (LibMC_MCContext pMCContext, const char * pStreamUUID, LibMC_StreamConnection * pStreamConnectionInstance);
 
 /*************************************************************************************************************************
  Global functions
@@ -339,6 +385,10 @@ typedef LibMCResult (*PLibMCCreateMCContextPtr) (LibMCData_DataModel pDataModel,
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCStreamData_GetDataPtr m_StreamData_GetData;
+	PLibMCStreamData_GetMIMETypePtr m_StreamData_GetMIMEType;
+	PLibMCStreamConnection_GetNewContentPtr m_StreamConnection_GetNewContent;
+	PLibMCStreamConnection_GetIdleDelayPtr m_StreamConnection_GetIdleDelay;
 	PLibMCAPIRequestHandler_ExpectsRawBodyPtr m_APIRequestHandler_ExpectsRawBody;
 	PLibMCAPIRequestHandler_ExpectsFormDataPtr m_APIRequestHandler_ExpectsFormData;
 	PLibMCAPIRequestHandler_GetFormDataDetailsPtr m_APIRequestHandler_GetFormDataDetails;
@@ -354,12 +404,12 @@ typedef struct {
 	PLibMCMCContext_TerminateAllThreadsPtr m_MCContext_TerminateAllThreads;
 	PLibMCMCContext_StartInstanceThreadPtr m_MCContext_StartInstanceThread;
 	PLibMCMCContext_TerminateInstanceThreadPtr m_MCContext_TerminateInstanceThread;
-	PLibMCMCContext_GetInstanceThreadStatePtr m_MCContext_GetInstanceThreadState;
 	PLibMCMCContext_InstanceStateIsSuccessfulPtr m_MCContext_InstanceStateIsSuccessful;
 	PLibMCMCContext_InstanceStateHasFailedPtr m_MCContext_InstanceStateHasFailed;
 	PLibMCMCContext_LoadClientPackagePtr m_MCContext_LoadClientPackage;
 	PLibMCMCContext_LogPtr m_MCContext_Log;
 	PLibMCMCContext_CreateAPIRequestHandlerPtr m_MCContext_CreateAPIRequestHandler;
+	PLibMCMCContext_CreateStreamConnectionPtr m_MCContext_CreateStreamConnection;
 	PLibMCGetVersionPtr m_GetVersion;
 	PLibMCGetLastErrorPtr m_GetLastError;
 	PLibMCReleaseInstancePtr m_ReleaseInstance;
