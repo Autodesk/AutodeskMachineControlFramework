@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	enum APIHandler_BuildType {
+	enum class APIHandler_BuildType : uint32_t {
 		btUnknown = 0,
 		btStartPrepareJob = 1,
 		btListJobs = 2,

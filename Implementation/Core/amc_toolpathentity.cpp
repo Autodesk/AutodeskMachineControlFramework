@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName)
+	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName, bool bAllowEmptyToolpath)
 		: m_ReferenceCount (0), m_sDebugName (sDebugName)
 	{
 		LibMCAssertNotNull(pDataModel.get());
@@ -65,10 +65,15 @@ namespace AMC {
 		   //m_p3MFReader->ReadFromCallback((Lib3MF::ReadCallback) pReadCallback, nStreamSize, (Lib3MF::SeekCallback) pSeekCallback, pUserData);
 
 		auto pToolpathIterator = m_p3MFModel->GetToolpaths();
-		if (!pToolpathIterator->MoveNext())
-			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE, m_sDebugName);
+		if (pToolpathIterator->MoveNext()) {
+			m_pToolpath = pToolpathIterator->GetCurrentToolpath();
+		}
+		else {
 
-		m_pToolpath = pToolpathIterator->GetCurrentToolpath();
+			if (!bAllowEmptyToolpath)
+				throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE, m_sDebugName);
+
+		}
 
 		auto pBuildItems = m_p3MFModel->GetBuildItems();
 		while (pBuildItems->MoveNext()) {
@@ -111,20 +116,30 @@ namespace AMC {
 	uint32_t CToolpathEntity::getLayerCount()
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);		
-		return m_pToolpath->GetLayerCount ();
+		if (m_pToolpath.get () != nullptr)
+			return m_pToolpath->GetLayerCount ();
+
+		return 0;
 	}
 
 	uint32_t CToolpathEntity::getLayerZInUnits(uint32_t nLayerIndex)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+		if (m_pToolpath.get() != nullptr) {
+			auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
 
-		return nZValue;
+			return nZValue;
+		}
+
+		return 0;
 	}
 
 	PToolpathLayerData CToolpathEntity::readLayer(uint32_t nLayerIndex)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 		double dUnits = m_pToolpath->GetUnits();
 
@@ -138,6 +153,9 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
+
 		return m_pToolpath->GetUnits();
 
 	}
@@ -146,12 +164,18 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
+
 		return m_pToolpath->GetCustomDataCount();
 
 	}
 	void CToolpathEntity::getMetaDataInfo(uint32_t nMetaDataIndex, std::string& sNameSpace, std::string& sName)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
 		if (nMetaDataIndex >= nDataCount)
@@ -164,6 +188,9 @@ namespace AMC {
 	PXMLDocumentInstance CToolpathEntity::getMetaData(uint32_t nMetaDataIndex)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
 		if (nMetaDataIndex >= nDataCount)
@@ -209,6 +236,9 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
+
 		uint32_t nFoundData = 0;
 		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
 
@@ -228,6 +258,9 @@ namespace AMC {
 
 		{
 			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+			if (m_pToolpath.get() == nullptr)
+				throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 			uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
 
@@ -278,6 +311,9 @@ namespace AMC {
 	void CToolpathEntity::registerCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 		auto key = std::make_pair(sNameSpace, sAttributeName);
 

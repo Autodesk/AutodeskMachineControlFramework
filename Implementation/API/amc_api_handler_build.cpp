@@ -73,11 +73,11 @@ APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, co
 	if (requestType == eAPIRequestType::rtPost) {
 
 		if ((sParameterString == "/prepare") || (sParameterString == "/prepare/")) {
-			return btStartPrepareJob;
+			return APIHandler_BuildType::btStartPrepareJob;
 		}
 
 		if ((sParameterString == "/toolpath") || (sParameterString == "/toolpath/")) {
-			return btToolpath;
+			return APIHandler_BuildType::btToolpath;
 		}
 
 	}
@@ -85,23 +85,23 @@ APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, co
 	if (requestType == eAPIRequestType::rtGet) {
 
 		if ((sParameterString == "/") || (sParameterString == "")) {
-			return btListJobs;
+			return APIHandler_BuildType::btListJobs;
 		}
 
 		if (sParameterString.substr(0, 15) == "/listbuilddata/") {
 			paramUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(15));
-			return btListBuildData;
+			return APIHandler_BuildType::btListBuildData;
 		}
 
 		if (sParameterString.substr (0, 6) == "/data/") {
 			paramUUID = AMCCommon::CUtils::normalizeUUIDString (sParameterString.substr(6));
-			return btGetBuildData;
+			return APIHandler_BuildType::btGetBuildData;
 		}
 
 	}
 
 
-	return btUnknown;
+	return APIHandler_BuildType::btUnknown;
 }
 
 
@@ -110,9 +110,9 @@ bool CAPIHandler_Build::expectsRawBody(const std::string& sURI, const eAPIReques
 	std::string jobUUID;
 
 	switch (parseRequest(sURI, requestType, jobUUID)) {
-		case btStartPrepareJob:
+		case APIHandler_BuildType::btStartPrepareJob:
 			return true;
-		case btToolpath:
+		case APIHandler_BuildType::btToolpath:
 			return true;
 
 		default:
@@ -347,21 +347,21 @@ PAPIResponse CAPIHandler_Build::handleRequest(const std::string& sURI, const eAP
 	writeJSONHeader(writer, AMC_API_PROTOCOL_BUILD);
 
 	switch (buildType) {
-	case btStartPrepareJob:
+	case APIHandler_BuildType::btStartPrepareJob:
 		handlePrepareJobRequest(writer, pBodyData, nBodyDataSize, pAuth);
 		break;
-	case btListJobs:
+	case APIHandler_BuildType::btListJobs:
 		handleListJobsRequest(writer, pAuth);
 		break;
-	case btToolpath:
+	case APIHandler_BuildType::btToolpath:
 		handleToolpathRequest(writer, pBodyData, nBodyDataSize, pAuth);
 		break;
 
-	case btListBuildData:
+	case APIHandler_BuildType::btListBuildData:
 		handleListBuildDataRequest(writer, pAuth, paramUUID);
 		break;
 
-	case btGetBuildData:
+	case APIHandler_BuildType::btGetBuildData:
 		return handleGetBuildDataRequest(pAuth, paramUUID);
 		break;
 

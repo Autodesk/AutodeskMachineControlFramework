@@ -73,8 +73,7 @@ namespace AMC {
 		auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 		auto pStorageStream = pBuildJob->GetStorageStream();
 		
-		// TODO: Check Toolpath Entity Integrity
-		CToolpathEntity toolpathEntity (m_pDataModel, pStorageStream->GetUUID(), m_p3MFWrapper, pBuildJob->GetName ());		
+		CToolpathEntity toolpathEntity (m_pDataModel, pStorageStream->GetUUID(), m_p3MFWrapper, pBuildJob->GetName (), true);		
 		pBuildJob->FinishValidating (toolpathEntity.getLayerCount ());
 		pBuildJob->AddJobData(pStorageStream->GetContextIdentifier (),  pStorageStream->GetName(), pStorageStream, LibMCData::eCustomDataType::Toolpath, m_sUserUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 		

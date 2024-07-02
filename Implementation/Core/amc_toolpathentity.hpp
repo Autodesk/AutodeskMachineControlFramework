@@ -78,7 +78,7 @@ namespace AMC {
 
 	public:
 
-		CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string & sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
+		CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string & sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName, bool bAllowEmptyToolpaths);
 		virtual ~CToolpathEntity();		
 
 		void IncRef();

@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <iostream>
 
+#include "amc_toolpathentity.hpp"
+#include "amc_toolpathhandler.hpp"
 
 using namespace AMC;
 
@@ -73,30 +75,30 @@ APIHandler_UploadType CAPIHandler_Upload::parseRequest(const std::string& sURI, 
 	if (requestType == eAPIRequestType::rtPut) {
 		if ((sParameterString.substr(0, 1) == "/") && (sParameterString.length() == 37)) {
 			uploadUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(1));
-			return utStreamUpload;
+			return APIHandler_UploadType::utStreamUpload;
 		}
 	}
 
 
 	if (requestType == eAPIRequestType::rtPost) {
 		if ((sParameterString == "") || (sParameterString == "/")) {
-			return utInitUpload;
+			return APIHandler_UploadType::utInitUpload;
 		}
 		else {
 
 			if (sParameterString == "/finish") {
-				return utFinishUpload;
+				return APIHandler_UploadType::utFinishUpload;
 			}
 
 			if ((sParameterString.substr(0,1) == "/") && (sParameterString.length() == 37)) {
 				uploadUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(1));
-				return utStreamUpload;
+				return APIHandler_UploadType::utStreamUpload;
 			}
 		}
 	
 	}
 
-	return utUnknown;
+	return APIHandler_UploadType::utUnknown;
 }
 
 
@@ -105,8 +107,8 @@ bool CAPIHandler_Upload::expectsRawBody(const std::string& sURI, const eAPIReque
 	std::string uploadUUID;
 
 	switch (parseRequest(sURI, requestType, uploadUUID)) {
-		case utInitUpload:
-		case utFinishUpload:
+		case APIHandler_UploadType::utInitUpload:
+		case APIHandler_UploadType::utFinishUpload:
 			return true;
 
 		default:
@@ -121,7 +123,7 @@ uint32_t CAPIHandler_Upload::getFormDataFieldCount(const std::string& sURI, cons
 	auto uploadType = parseRequest(sURI, requestType, uploadUUID);
 
 	switch (uploadType) {
-		case utStreamUpload: return (uint32_t) m_StreamUploadFields.size();
+		case APIHandler_UploadType::utStreamUpload: return (uint32_t) m_StreamUploadFields.size();
 		default: return 0;
 	}
 	
@@ -133,7 +135,7 @@ CAPIFieldDetails CAPIHandler_Upload::getFormDataFieldDetails(const std::string& 
 	auto uploadType = parseRequest(sURI, requestType, uploadUUID);
 
 	switch (uploadType) {
-	case utStreamUpload: 
+	case APIHandler_UploadType::utStreamUpload:
 		if (nFieldIndex >= m_StreamUploadFields.size ())
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
 
@@ -167,27 +169,28 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	auto sMimeType = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_MIMETYPE, LIBMC_ERROR_INVALIDMIMETYPE);
 	auto nSize = jsonRequest.getUint64(AMC_API_KEY_UPLOAD_SIZE, 1, pStorage->GetMaxStreamSize(), LIBMC_ERROR_INVALIDSTREAMSIZE);
 
-	std::string sContextUUID;
-	std::string sContextIdentifier;
-
+	/*std::string sContextIdentifier;
 	if (sContext == "build") {
-		sContextUUID = createNewBuild (sName, sUUID, pAuth);
+		//sContextUUID = createNewBuild(sName, sUUID, pAuth);
 		sContextIdentifier = "builddata";
+	}
+	else if (sContext == "image") {
+		sContextIdentifier = "imagedata";
 	}
 	else {
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCONTEXTUUID);
-	}
-		
+	} */
+
 	if (!pStorage->ContentTypeIsAccepted(sMimeType))
 		throw ELibMCInterfaceException(LIBMC_ERROR_CONTENTTYPENOTACCEPTED);
 	
-	if (!pAuth->contextUUIDIsAuthorized(sContextUUID))
-		throw ELibMCInterfaceException(LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED);
+	/*if (!pAuth->contextUUIDIsAuthorized(sContextUUID))
+		throw ELibMCInterfaceException(LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED); */
 
 	pStorage->BeginPartialStream (sUUID, sName, sMimeType, nSize, pAuth->getUserUUID (), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 	writer.addString(AMC_API_KEY_UPLOAD_STREAMUUID, sUUID);
-	writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sContextUUID);
+	//writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sContextUUID);
 
 }
 
@@ -225,6 +228,28 @@ void CAPIHandler_Upload::handleFinishUploadRequest(CJSONWriter& writer, const ui
 	writer.addInteger(AMC_API_KEY_UPLOAD_SIZE, pStreamObject->GetSize());
 	writer.addString(AMC_API_KEY_UPLOAD_TIMESTAMP, pStreamObject->GetTimeStamp());
 
+	auto sContext = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_CONTEXT, LIBMC_ERROR_MISSINGUPLOADCONTEXT);
+
+	if (sContext == "build") {
+		std::string sBuildUUID = createNewBuild(pStreamObject->GetName (), sUUID, pAuth);
+		auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+		auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+		auto pToolpathHandler = m_pSystemState->toolpathHandler();
+		auto pGlobalChrono = m_pSystemState->getGlobalChronoInstance();
+		
+		pBuildJob->StartValidating();
+		CToolpathEntity toolpathEntity(pDataModel, pStreamObject->GetUUID(), pToolpathHandler->getLib3MFWrapper(), pBuildJob->GetName(), true);
+		pBuildJob->FinishValidating(toolpathEntity.getLayerCount());
+		pBuildJob->AddJobData(pStreamObject->GetContextIdentifier(), pStreamObject->GetName(), pStreamObject, LibMCData::eCustomDataType::Toolpath, pAuth->getUserUUID (), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+		writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sBuildUUID);
+	}
+	else if (sContext == "image") {
+		writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sUUID);
+	}
+	else {
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDUPLOADCONTEXT);
+	}
 
 
 
@@ -265,15 +290,15 @@ PAPIResponse CAPIHandler_Upload::handleRequest(const std::string& sURI, const eA
 		writeJSONHeader(writer, AMC_API_PROTOCOL_UPLOAD);
 
 		switch (uploadType) {
-			case utInitUpload:
+			case APIHandler_UploadType::utInitUpload:
 				handleInitUploadRequest (writer, pBodyData, nBodyDataSize, pAuth);
 				break;
 
-			case utFinishUpload:
+			case APIHandler_UploadType::utFinishUpload:
 				handleFinishUploadRequest(writer, pBodyData, nBodyDataSize, pAuth);
 				break;
 
-			case utStreamUpload:
+			case APIHandler_UploadType::utStreamUpload:
 				handleStreamUploadRequest(writer, pFormFields, sUploadUUID, pAuth);
 				break;
 

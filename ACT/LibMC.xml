@@ -620,11 +620,11 @@
 		<error name="EXECUTIONLISTNAMEMISSING" code="594" description="Execution list name missing" />
 		<error name="BUILDLISTBUTTONNAMEMISSING" code="595" description="Build list button name missing" />
 		<error name="EXECUTIONLISTBUTTONNAMEMISSING" code="596" description="Build execution button name missing" />
-		
-		
-		
-		
-		
+		<error name="BUILDHASNOTOOLPATH" code="597" description="Build has not toolpath" />
+		<error name="MISSINGUPLOADCONTEXT" code="598" description="Missing upload context" />
+		<error name="INVALIDUPLOADCONTEXT" code="599" description="Build has not toolpath" />
+
+
 	</errors>
 	
 	
