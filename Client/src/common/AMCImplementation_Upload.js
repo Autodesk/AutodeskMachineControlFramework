@@ -36,20 +36,18 @@ import * as Common from "./AMCCommon.js"
 
 export default class AMCUpload extends Common.AMCObject {
 	
-	constructor (itemState, streamuuid, contextuuid) 
+	constructor (itemState, streamuuid) 
 	{		
 		super ();
 		
 		Assert.ObjectInstance (itemState, "amcUploadState");
 		Assert.UUIDValue (streamuuid);
-		Assert.UUIDValue (contextuuid);
 		
 		this.registerClass ("amcUpload");
 								
 		this.itemState = itemState;
 		this.uploadID = Assert.IntegerValue (itemState.getUploadID ());
 		this.streamuuid = streamuuid;
-		this.contextuuid = contextuuid;
 		this.sha256sum = Common.nullToken ();
 		this.successEvent = "";
 		this.failureEvent = "";

@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <template>
 
 <div v-if="(moduleitem.type=='upload')">  	
-	<v-file-input accept=".3mf,.3mftoolpath" show-size full-width v-model="moduleitem.state.chosenFile" v-bind:label="moduleitem.uploadcaption" v-bind:messages="moduleitem.state.messages" @change="uiUploadStart (moduleitem)"></v-file-input>
+	<v-file-input v-bind:accept="moduleitem.acceptedtypes" show-size full-width v-model="moduleitem.state.chosenFile" v-bind:label="moduleitem.uploadcaption" v-bind:messages="moduleitem.state.messages" @change="uiUploadStart (moduleitem)"></v-file-input>
 </div>
 
 </template>
@@ -49,7 +49,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						if (item.state) {
 							if (item.state.chosenFile) {
 								item.state.generateUploadID ();
-								this.Application.performJobUpload (item.state, item.uploadsuccessevent, item.uploadfailureevent);
+								if (item.uploadclass == "build") {
+									item.state.mimeType = "application/3mf";
+									this.Application.performJobUpload (item.state, item.uploadsuccessevent, item.uploadfailureevent);
+								}
+								if (item.uploadclass == "image") {
+									let chosenfile = item.state.getChosenFile ();		
+									item.state.mimeType = chosenfile.type;
+									this.Application.performImageUpload (item.state, item.uploadsuccessevent, item.uploadfailureevent);
+								}
 							} else {		
 								item.state.cancelUpload ();
 							}
