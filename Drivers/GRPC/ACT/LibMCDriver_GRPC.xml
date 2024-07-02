@@ -125,6 +125,16 @@ Custom implementation
 			<param name="FieldExists" type="bool" pass="return" description="True if field exists." />
 		</method>
 
+		<method name="HasMessageField" description="Returns if the message has a field of a certain name and this field is a submessage field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="MessageFieldExists" type="bool" pass="return" description="True if field exists and is of type message." />
+		</method>
+
+		<method name="GetMessageField" description="Returns the submessage of a field. Fails if the field does not exist or is not a submessage field.">
+			<param name="FieldName" type="string" pass="in" description="Name of the field." />
+			<param name="MessageFieldInstance" type="class" class="GRPCMessage" pass="return" description="Sub message object" />
+		</method>
+		
 		<method name="HasStringField" description="Returns if the message has a field of a certain name and this field is a string field.">
 			<param name="FieldName" type="string" pass="in" description="Name of the field." />
 			<param name="StringFieldExists" type="bool" pass="return" description="True if field exists and is of type string." />

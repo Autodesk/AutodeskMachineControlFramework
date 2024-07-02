@@ -35,9 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CToolpathPart::CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem)
-		: m_p3MFModel (p3MFModel), m_pBuildItem (pBuildItem)
+	CToolpathPart::CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem, Lib3MF::PWrapper pWrapper)
+		: m_p3MFModel (p3MFModel), m_pBuildItem (pBuildItem), m_pWrapper (pWrapper)
 	{
+		if (m_p3MFModel.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (m_pBuildItem.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (m_pWrapper.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
 		auto p3MFObject = m_pBuildItem->GetObjectResource();
 		m_sName = p3MFObject->GetName();
 
@@ -54,7 +61,9 @@ namespace AMC {
 
 	CToolpathPart::~CToolpathPart()
 	{
-
+		m_pBuildItem = nullptr;
+		m_p3MFModel = nullptr;
+		m_pWrapper = nullptr;
 	}
 
 	std::string CToolpathPart::getUUID()

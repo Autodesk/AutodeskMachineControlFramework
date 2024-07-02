@@ -78,7 +78,7 @@ public:
 
     CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
-    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID) override;
+    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
 	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
 
@@ -89,6 +89,10 @@ public:
     std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
 
     LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;
+
+    IBuildJobExecution* RetrieveJobExecution(const std::string& sExecutionUUID) override;
+
+    IBuildJobExecutionIterator* ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter) override;
 
 };
 

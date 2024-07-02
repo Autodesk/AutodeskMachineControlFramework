@@ -54,7 +54,7 @@ namespace AMC {
 		
 	public:
 
-		CLogger_Multi();
+		CLogger_Multi(AMCCommon::PChrono pGlobalChrono);
 		virtual ~CLogger_Multi();
 		
 		void addLogger (PLogger pLogger);

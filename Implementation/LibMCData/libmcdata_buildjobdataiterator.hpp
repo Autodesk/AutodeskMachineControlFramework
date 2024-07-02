@@ -65,6 +65,8 @@ protected:
 public:
     CBuildJobDataIterator();
 
+    virtual ~CBuildJobDataIterator();
+
     IBase* GetCurrent() override;
 
     IBuildJobData* GetCurrentJobData() override;

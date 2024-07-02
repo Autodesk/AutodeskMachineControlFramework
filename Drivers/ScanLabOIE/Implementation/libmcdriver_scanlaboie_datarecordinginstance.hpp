@@ -159,12 +159,15 @@ public:
 
     void copyAllRTCSignalsByIndex(uint32_t nRTCIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize);
 
+    void copyAllScaledRTCSignalsByIndex(uint32_t nRTCIndex, double* pRTCSignalBuffer, size_t nRTCSignalBufferSize, double dScaleFactor, double dOffset);
+
     void copyAllSensorSignalsByIndex(uint32_t nSensorIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
 
     void copyAllScaledSensorSignalsByIndex(uint32_t nSensorIndex, double* pSensorSignalBuffer, size_t nSensorSignalBufferSize, double dScaleFactor, double dOffset);
 
-    void copyAllAdditionalSignalsByIndex(uint32_t nSensnAdditionalIndexorIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize);
+    void copyAllAdditionalSignalsByIndex(uint32_t nAdditionalIndex, int32_t* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize);
 
+    void copyAllScaledAdditionalSignalsByIndex(uint32_t nAdditionalIndex, double* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize, double dScaleFactor, double dOffset);
 
     void writeToFile(const std::string & sFileName);
 

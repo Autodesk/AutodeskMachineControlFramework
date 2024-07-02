@@ -233,6 +233,10 @@ void CDriver_A3200::Connect()
 	if (m_pSDK.get () == nullptr) 
 		loadSDK();
 
+	if ((m_pHandle != nullptr) && (m_pSDK.get() != nullptr)) {
+		m_pSDK->A3200Disconnect(m_pHandle);
+	}
+
 	m_pHandle = nullptr;
 	m_pSDK->checkError(m_pSDK->A3200Connect(&m_pHandle));
 

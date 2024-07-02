@@ -44,9 +44,9 @@ using namespace LibMCData::Impl;
  Class definition of CBuildJobData 
 **************************************************************************************************************************/
 
-CBuildJobData::CBuildJobData(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+CBuildJobData::CBuildJobData(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
     : 
-    CCustomDataStream (sDataUUID, sIdentifier, sName, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize),
+    CCustomDataStream (sDataUUID, sIdentifier, sName, eDataType, sTimeStamp, sStorageStreamUUID, sUserUUID, sSHA2, nStreamSize),
     m_sJobUUID (AMCCommon::CUtils::normalizeUUIDString (sJobUUID)),
     m_pSQLHandler(pSQLHandler),
     m_pStorageState(pStorageState)
@@ -59,8 +59,6 @@ CBuildJobData::CBuildJobData(const std::string& sDataUUID, const std::string& sI
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBNAME);
     if (sTimeStamp.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBTIMESTAMP);
-    if (sUserID.empty())
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDUSERID);
 }
 
 CBuildJobData::~CBuildJobData()
@@ -68,9 +66,9 @@ CBuildJobData::~CBuildJobData()
 
 }
 
-CBuildJobData* CBuildJobData::make(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+CBuildJobData* CBuildJobData::make(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
 {
-    return new CBuildJobData(sDataUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, pSQLHandler, pStorageState);
+    return new CBuildJobData(sDataUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserUUID, sSHA2, nStreamSize, pSQLHandler, pStorageState);
 }
 
 CBuildJobData* CBuildJobData::makeFrom(CBuildJobData* pBuildJobData)
@@ -81,9 +79,9 @@ CBuildJobData* CBuildJobData::makeFrom(CBuildJobData* pBuildJobData)
     return make(pBuildJobData->GetDataUUID (), pBuildJobData->GetIdentifier (), pBuildJobData->GetName (), pBuildJobData->GetJobUUID (), pBuildJobData->GetDataType (), pBuildJobData->GetTimeStamp (), pBuildJobData->GetStorageStreamUUID (), pBuildJobData->GetUserUUID (), pBuildJobData->GetStorageStreamSHA2 (), pBuildJobData->GetStorageStreamSize (), pBuildJobData->m_pSQLHandler, pBuildJobData->m_pStorageState);
 }
 
-PBuildJobData CBuildJobData::makeShared(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+PBuildJobData CBuildJobData::makeShared(const std::string& sDataUUID, const std::string& sIdentifier, const std::string& sName, const std::string& sJobUUID, LibMCData::eCustomDataType eDataType, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, const std::string& sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
 {
-    return std::shared_ptr<CBuildJobData>(make(sDataUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, pSQLHandler, pStorageState));
+    return std::shared_ptr<CBuildJobData>(make(sDataUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserUUID, sSHA2, nStreamSize, pSQLHandler, pStorageState));
 }
 
 PBuildJobData CBuildJobData::makeSharedFrom(CBuildJobData* pBuildJobData)
@@ -91,31 +89,31 @@ PBuildJobData CBuildJobData::makeSharedFrom(CBuildJobData* pBuildJobData)
     return std::shared_ptr<CBuildJobData> (makeFrom (pBuildJobData));
 }
 
-CBuildJobData* CBuildJobData::createInDatabase(const std::string& sIdentifier, const std::string sName,  const std::string & sJobUUID, LibMCData::eCustomDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+CBuildJobData* CBuildJobData::createInDatabase(const std::string& sIdentifier, const std::string sName,  const std::string & sJobUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
 {
     if (pSQLHandler.get() == nullptr)
         throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 
     std::string sUUID = AMCCommon::CUtils::createUUID ();
 
-    std::string sInsertQuery = "INSERT INTO buildjobdata (uuid, jobuuid, identifier, name, datatype, timestamp, storagestreamuuid, userid, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)";
+    std::string sInsertQuery = "INSERT INTO buildjobdata (uuid, jobuuid, identifier, name, datatype, timestamp, storagestreamuuid, useruuid, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)";
     auto pInsertStatement = pSQLHandler->prepareStatement(sInsertQuery);
     pInsertStatement->setString(1, sUUID);
-    pInsertStatement->setString(2, sJobUUID);
+    pInsertStatement->setString(2, AMCCommon::CUtils::normalizeUUIDString (sJobUUID));
     pInsertStatement->setString(3, sIdentifier);
     pInsertStatement->setString(4, sName);
     pInsertStatement->setString(5, convertCustomDataTypeToString(eDataType));
     pInsertStatement->setString(6, sTimeStamp);
-    pInsertStatement->setString(7, sStorageStreamUUID);
-    pInsertStatement->setString(8, sUserID);
+    pInsertStatement->setString(7, AMCCommon::CUtils::normalizeUUIDString (sStorageStreamUUID));
+    pInsertStatement->setString(8, AMCCommon::CUtils::normalizeUUIDString (sUserUUID));
     pInsertStatement->execute();
 
-    return make(sUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, pSQLHandler, pStorageState);
+    return make(sUUID, sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, AMCCommon::CUtils::normalizeUUIDString(sUserUUID), sSHA2, nStreamSize, pSQLHandler, pStorageState);
 }
 
-PBuildJobData CBuildJobData::createSharedInDatabase(const std::string& sIdentifier, const std::string sName, const std::string & sJobUUID, LibMCData::eCustomDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+PBuildJobData CBuildJobData::createSharedInDatabase(const std::string& sIdentifier, const std::string & sName, const std::string & sJobUUID, LibMCData::eCustomDataType eDataType, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, const std::string & sUserUUID, const std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
 {
-    return std::shared_ptr<CBuildJobData>(createInDatabase(sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, pSQLHandler, pStorageState));
+    return std::shared_ptr<CBuildJobData>(createInDatabase(sIdentifier, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserUUID, sSHA2, nStreamSize, pSQLHandler, pStorageState));
 }
 
 

@@ -62,6 +62,54 @@ extern "C" {
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for StreamData
+**************************************************************************************************************************/
+
+/**
+* returns the data to return.
+*
+* @param[in] pStreamData - StreamData instance.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Binary stream data
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_streamdata_getdata(LibMC_StreamData pStreamData, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer);
+
+/**
+* returns the content type of the data.
+*
+* @param[in] pStreamData - StreamData instance.
+* @param[in] nMIMETypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMIMETypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMIMETypeBuffer -  buffer of Content type of the return data., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_streamdata_getmimetype(LibMC_StreamData pStreamData, const LibMC_uint32 nMIMETypeBufferSize, LibMC_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer);
+
+/*************************************************************************************************************************
+ Class definition for StreamConnection
+**************************************************************************************************************************/
+
+/**
+* Returns new content for the stream or null, if no new content is available.
+*
+* @param[in] pStreamConnection - StreamConnection instance.
+* @param[out] pNewContent - Stream Data Instance.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_streamconnection_getnewcontent(LibMC_StreamConnection pStreamConnection, LibMC_StreamData * pNewContent);
+
+/**
+* Returns the number of milliseconds, that the caller should wait before checking for another content.
+*
+* @param[in] pStreamConnection - StreamConnection instance.
+* @param[out] pIdleDelay - Idle Delay.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_streamconnection_getidledelay(LibMC_StreamConnection pStreamConnection, LibMC_uint32 * pIdleDelay);
+
+/*************************************************************************************************************************
  Class definition for APIRequestHandler
 **************************************************************************************************************************/
 
@@ -223,18 +271,6 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_startinstancethread(LibMC_MCContext p
 LIBMC_DECLSPEC LibMCResult libmc_mccontext_terminateinstancethread(LibMC_MCContext pMCContext, const char * pInstanceName);
 
 /**
-* returns current state of a instance thread.
-*
-* @param[in] pMCContext - MCContext instance.
-* @param[in] pInstanceName - Instance name of state machine.
-* @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pStateNameBuffer -  buffer of State of state machine., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMC_DECLSPEC LibMCResult libmc_mccontext_getinstancethreadstate(LibMC_MCContext pMCContext, const char * pInstanceName, const LibMC_uint32 nStateNameBufferSize, LibMC_uint32* pStateNameNeededChars, char * pStateNameBuffer);
-
-/**
 * returns if an instance thread is in success state.
 *
 * @param[in] pMCContext - MCContext instance.
@@ -285,6 +321,16 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_log(LibMC_MCContext pMCContext, const
 * @return error code or 0 (success)
 */
 LIBMC_DECLSPEC LibMCResult libmc_mccontext_createapirequesthandler(LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, const char * pAuthorization, LibMC_APIRequestHandler * pHandlerInstance);
+
+/**
+* creates an API stream connection instance. Fails if stream does not exist.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pStreamUUID - UUID of stream to serve.
+* @param[out] pStreamConnectionInstance - StreamConnection Handler instance.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_createstreamconnection(LibMC_MCContext pMCContext, const char * pStreamUUID, LibMC_StreamConnection * pStreamConnectionInstance);
 
 /*************************************************************************************************************************
  Global functions

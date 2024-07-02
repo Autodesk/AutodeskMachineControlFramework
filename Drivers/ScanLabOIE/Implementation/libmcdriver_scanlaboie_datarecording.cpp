@@ -306,6 +306,27 @@ void CDataRecording::AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint3
 
 }
 
+void CDataRecording::AddScaledRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	if (nRTCIndex >= GetRTCSignalCount())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<double> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllScaledRTCSignalsByIndex(nRTCIndex, buffer.data(), buffer.size(), dScaleFactor, dOffset);
+		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+
 void CDataRecording::AddSensorSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription)
 {
 	if (pDataTable.get() == nullptr)
@@ -363,6 +384,28 @@ void CDataRecording::AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOI
 		m_pDataRecordingInstance->copyAllAdditionalSignalsByIndex(nAdditionalIndex, buffer.data(), buffer.size());
 		pDataTable->SetInt32ColumnValues(sColumnIdentifier, buffer);
 	}
+
+}
+
+void CDataRecording::AddScaledAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifier, const std::string& sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset)
+{
+
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	if (nAdditionalIndex >= GetAdditionalSignalCount())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX);
+
+	pDataTable->AddColumn(sColumnIdentifier, sColumnDescription, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (nRecordCount > 0) {
+		std::vector<double> buffer;
+		buffer.resize(nRecordCount);
+		m_pDataRecordingInstance->copyAllScaledAdditionalSignalsByIndex(nAdditionalIndex, buffer.data(), buffer.size(), dScaleFactor, dOffset);
+		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
+	}
+
 
 }
 

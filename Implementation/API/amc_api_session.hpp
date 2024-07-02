@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "header_protection.hpp"
 #include "amc_api_types.hpp"
 
+#include "common_chrono.hpp"
+
 #include <mutex>
 
 namespace AMC {
@@ -68,7 +70,7 @@ namespace AMC {
 					
 	public:
 
-		CAPISession();
+		CAPISession(AMCCommon::PChrono pGlobalChrono);
 		virtual ~CAPISession();
 
 		std::string getUUID ();		

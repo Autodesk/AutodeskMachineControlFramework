@@ -138,6 +138,19 @@ namespace AMCData {
 	}
 
 
+	bool CSQLStatement_SQLite::columnIsNull(uint32_t nIdx)
+	{
+		if (!m_bHasColumn)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCOLUMNAVAILABLE);
+		if (nIdx == 0)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDINDEX);
+
+		int columnType = sqlite3_column_type((sqlite3_stmt*)m_pStmtHandle, nIdx - 1);
+
+		return columnType == SQLITE_NULL;
+
+	}
+
 
 	std::string CSQLStatement_SQLite::getColumnString(uint32_t nIdx)
 	{

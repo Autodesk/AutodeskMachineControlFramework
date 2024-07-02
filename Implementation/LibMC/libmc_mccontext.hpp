@@ -128,11 +128,11 @@ public:
 
 	IAPIRequestHandler* CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod, const std::string& sAuthorization) override;
 
+	IStreamConnection* CreateStreamConnection(const std::string& sStreamUUID) override;
+
 	void StartInstanceThread(const std::string& sInstanceName) override;
 
 	void TerminateInstanceThread(const std::string& sInstanceName) override;
-
-	std::string GetInstanceThreadState(const std::string& sInstanceName) override;
 
 	bool InstanceStateIsSuccessful(const std::string& sInstanceName) override;
 

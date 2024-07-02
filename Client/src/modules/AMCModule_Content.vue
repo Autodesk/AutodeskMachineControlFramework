@@ -30,15 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <template>
 
-	<div width="99%" flat v-if="(module.type == 'content')" style="max-height:50vh">
-			<div v-if="module.title != ''"> {{ module.headline }}</div>
-			<p v-if="module.title != ''" class="display-1 text--primary">
-				{{ module.title }}
-			</p>
-			<p v-if="module.subtitle != ''" >{{ module.subtitle }}</p>
-
-			<div v-if="module.items.length > 0" class="text--primary" width="100%">
-
+		<div width="100%" height="100%" flat v-if="(module.type == 'content')">
+          <v-card-title v-if="module.title != ''">{{ module.title }}</v-card-title>
+          <v-card-subtitle v-if="(module.subtitle != '')">	{{ module.subtitle }}</v-card-subtitle>
+          <div v-if="module.items.length > 0" class="text--primary" width="100%">
 				<template v-for="moduleitem in module.items">
 					
 					<ContentItem_Paragraph :key="moduleitem.uuid" v-if="(moduleitem.type=='paragraph')" :moduleitem="moduleitem" :Application="Application" />
@@ -51,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 																
 					<ContentItem_BuildList :key="moduleitem.uuid" v-if="(moduleitem.type=='buildlist')" :moduleitem="moduleitem" :Application="Application" />										
 
+					<ContentItem_ExecutionList :key="moduleitem.uuid" v-if="(moduleitem.type=='executionlist')" :moduleitem="moduleitem" :Application="Application" />										
+
 					<ContentItem_AlertList :key="moduleitem.uuid" v-if="(moduleitem.type=='alertlist')" :moduleitem="moduleitem" :Application="Application" />										
 																																			
 					<ContentItem_ParameterList :key="moduleitem.uuid" v-if="(moduleitem.type=='parameterlist')" :moduleitem="moduleitem" :Application="Application" />
@@ -60,11 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					<ContentItem_Form :key="moduleitem.uuid" v-if="(moduleitem.type=='form')" :moduleitem="moduleitem" :Application="Application" />
 						
 				</template>
-					
 			</div>
-			
-												
-
 	</div>
 
 </template>
@@ -76,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	import ContentItem_Chart from '../modules/AMCModule_ContentItem_Chart.vue';
 	import ContentItem_Upload from '../modules/AMCModule_ContentItem_Upload.vue';
 	import ContentItem_BuildList from '../modules/AMCModule_ContentItem_BuildList.vue';
+	import ContentItem_ExecutionList from '../modules/AMCModule_ContentItem_ExecutionList.vue';
 	import ContentItem_AlertList from '../modules/AMCModule_ContentItem_AlertList.vue';
 	import ContentItem_ParameterList from '../modules/AMCModule_ContentItem_ParameterList.vue';
 	import ContentItem_ButtonGroup from '../modules/AMCModule_ContentItem_ButtonGroup.vue';
@@ -91,6 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			ContentItem_Chart,
 			ContentItem_Upload,
 			ContentItem_BuildList,
+			ContentItem_ExecutionList,
 			ContentItem_AlertList,
 			ContentItem_ParameterList,
 			ContentItem_ButtonGroup,

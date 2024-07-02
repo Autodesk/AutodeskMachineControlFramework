@@ -125,7 +125,7 @@ public:
 
 	bool VerifyImages();
 
-	std::string CDriverContextInstance::FindAndExtract(std::string sTotalMessage, std::string sRangeStart, std::string sRangeEnd);
+	std::string FindAndExtract(std::string sTotalMessage, std::string sRangeStart, std::string sRangeEnd);
 
 };
 

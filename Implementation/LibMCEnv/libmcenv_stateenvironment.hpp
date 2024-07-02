@@ -63,8 +63,8 @@ private:
 	AMC::PSystemState m_pSystemState;
 	AMC::PParameterHandler m_pParameterHandler;
 
-	uint64_t m_nStartTimeOfStateInMicroseconds;
-	uint64_t m_nEndTimeOfPreviousStateInMicroseconds;
+	uint64_t m_nAbsoluteStartTimeOfStateInMicroseconds;
+	uint64_t m_nAbsoluteEndTimeOfPreviousStateInMicroseconds;
 
 	std::string m_sPreviousStateName;
 
@@ -73,7 +73,7 @@ protected:
 
 public:
 
-	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string & sPreviousStateName);
+	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName, uint64_t nAbsoluteEndTimeOfPreviousStateInMicroseconds, const std::string & sPreviousStateName);
 
 	std::string GetMachineState(const std::string& sMachineInstance);
 
@@ -90,6 +90,10 @@ public:
 	bool HasBuildJob(const std::string& sBuildUUID) override;
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
+
+	bool HasBuildExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecution* GetBuildExecution(const std::string& sExecutionUUID) override;
 
 	void UnloadAllToolpathes() override;
 
@@ -211,7 +215,15 @@ public:
 
 	ITempStreamWriter* CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType) override;
 
-	IStreamReader* FindStream(const std::string& sUUID, const bool bMustExist) override;
+	IZIPStreamWriter* CreateZIPStream(const std::string& sName) override;
+
+	IStreamReader* LoadStream(const std::string& sUUID, const bool bMustExist) override;
+
+	IDateTime* GetCurrentDateTime() override;
+
+	IDateTime* GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)  override;
+
+	IDateTime* GetStartDateTime() override;
 
 };
 

@@ -36,6 +36,11 @@ Abstract: This is a stub class definition of CBuild
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_buildexecution.hpp"
+#include "libmcenv_buildexecutioniterator.hpp"
+#include "libmcenv_imagedata.hpp"
+#include "libmcenv_streamreader.hpp"
+#include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_datatable.hpp"
 
 // Include custom headers here.
 #include "amc_systemstate.hpp"
@@ -52,11 +57,10 @@ using namespace LibMCEnv::Impl;
  Class definition of CBuild 
 **************************************************************************************************************************/
 
-CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, const std::string& sSystemUserID, AMCCommon::PChrono pGlobalChrono)
+CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, AMCCommon::PChrono pGlobalChrono)
 	: m_pDataModel(pDataModel),
 	m_sBuildJobUUID(AMCCommon::CUtils::normalizeUUIDString(sBuildJobUUID)),
 	m_pToolpathHandler(pToolpathHandler),
-	m_sSystemUserID(sSystemUserID),
 	m_pGlobalChrono (pGlobalChrono)
 {
 	if (pToolpathHandler.get() == nullptr)
@@ -183,23 +187,157 @@ bool CBuild::ToolpathIsLoaded()
 	return (m_pToolpathHandler->findToolpathEntity(sStreamUUID, false) != nullptr);
 }
 
-std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer)
+bool CBuild::HasAttachment(const std::string& sDataUUID)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->HasJobDataUUID(sDataUUID);
+}
+
+bool CBuild::HasAttachmentIdentifier(const std::string& sIdentifier)
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->HasJobDataIdentifier(sIdentifier);
+}
+
+
+
+std::string CBuild::AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const std::string& sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer)
 {
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 	auto pStorage = m_pDataModel->CreateStorage();
 
-	auto sDataUUID = AMCCommon::CUtils::createUUID();
-	auto sSystemUserID = m_sSystemUserID;
+	std::string sNormalizedUserUUID;
+	if (sUserUUID.empty()) {
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	}
+	else {
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+	}
+	
 
-	pStorage->StoreNewStream(sDataUUID, pBuildJob->GetUUID(), sIdentifier, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sSystemUserID);
+	auto sDataUUID = AMCCommon::CUtils::createUUID();
+	uint64_t nTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+	pStorage->StoreNewStream(sDataUUID, sName, sMIMEType, LibMCData::CInputVector<uint8_t>(pContentBuffer, nContentBufferSize), sNormalizedUserUUID, nTimeStamp);
 
 	auto pStorageStream = pStorage->RetrieveStream(sDataUUID);
-	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sSystemUserID);
+	pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sNormalizedUserUUID, nTimeStamp);
 
 	return sDataUUID;
 
 }
+
+std::string CBuild::AttachTempStream(const std::string& sIdentifier, const std::string& sName, const std::string& sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance)
+{
+	if (pStreamWriterInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	if (!pStreamWriterInstance->IsFinished())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED);
+
+	std::string sStreamUUID = pStreamWriterInstance->GetUUID();
+
+	std::string sNormalizedUserUUID;
+	if (sUserUUID.empty()) {
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+	}
+	else {
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
+	}
+
+	auto nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pStorageStream = pStorage->RetrieveStream(sStreamUUID);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->AddJobData(sIdentifier, sName, pStorageStream, LibMCData::eCustomDataType::CustomBinaryData, sNormalizedUserUUID, nAbsoluteTimeStamp);
+}
+
+IStreamReader* CBuild::LoadStreamByIdentifier(const std::string& sIdentifier)
+{
+
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pJobData = pBuildJob->RetrieveJobDataByIdentifier(sIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	return new CStreamReader(pStorage, pStorageStream);
+}
+
+IStreamReader* CBuild::LoadStreamByUUID(const std::string& sDataUUID)
+{
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+	auto pJobData = pBuildJob->RetrieveJobData(sNormalizedUUID);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	return new CStreamReader(pStorage, pStorageStream);
+}
+
+IDataTable* CBuild::LoadDataTableByIdentifier(const std::string& sIdentifier)
+{
+	
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	auto pJobData = pBuildJob->RetrieveJobDataByIdentifier(sIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	auto pStreamReader = std::make_unique<CStreamReader>(pStorage, pStorageStream);
+	return CDataTable::makeFromStream(pStreamReader.get());
+}
+
+IDataTable* CBuild::LoadDataTableByUUID(const std::string& sDataUUID)
+{
+	auto pStorage = m_pDataModel->CreateStorage();
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sDataUUID);
+
+	auto pJobData = pBuildJob->RetrieveJobData(sNormalizedUUID);
+	auto pStorageStream = pJobData->GetStorageStream();
+
+	auto pStreamReader = std::make_unique<CStreamReader> (pStorage, pStorageStream);
+	return CDataTable::makeFromStream (pStreamReader.get ());
+}
+
+std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string& sUserUUID)
+{
+	if (sName.empty ())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLENAME);
+	if (sIdentifier.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER);
+	if (AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER, "invalid datatable identifier: " + sIdentifier);
+
+	if (pFieldDataInstance == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	std::string sNormalizedUserUUID;
+	if (!sUserUUID.empty())
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sNormalizedUserUUID);
+	else
+		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
+
+	auto pStreamWriter = std::make_unique<CTempStreamWriter> (m_pDataModel, sName, "application/amcf-datatable", sNormalizedUserUUID, m_pGlobalChrono);
+	pFieldDataInstance->WriteDataToStream(pStreamWriter.get(), pStoreOptions);
+	pStreamWriter->Finish();
+
+	return AttachTempStream(sIdentifier, sName, sUserUUID, pStreamWriter.get());
+}
+
 
 IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByIdentifier(const std::string& sContextIdentifier)
 {
@@ -238,7 +376,7 @@ IDiscreteFieldData2D* CBuild::LoadDiscreteField2DByUUID(const std::string& sData
 	
 }
 
-std::string CBuild::StoreDiscreteField2D(const std::string& sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions)
+std::string CBuild::StoreDiscreteField2D(const std::string& sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string& sUserUUID)
 {
 	if (pFieldDataInstance == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -255,33 +393,57 @@ std::string CBuild::StoreDiscreteField2D(const std::string& sContextIdentifier, 
 	if (Buffer.size () == 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTSTOREFIELDDATA);
 
-	return AddBinaryData(sContextIdentifier, sName, "application/amcf-discretefield2d", Buffer.size(), Buffer.data());
+	return AddBinaryData(sContextIdentifier, sName, "application/amcf-discretefield2d", sUserUUID, Buffer.size(), Buffer.data());
 
 
 
 }
 
-IImageData* CBuild::LoadPNGImageByIdentifier(const std::string& sContext)
+
+
+IImageData* CBuild::LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) 
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::vector<uint8_t> Buffer;
+
+	auto pJobData = pBuildJob->RetrieveJobDataByIdentifier(sContextIdentifier);
+	auto pStorageStream = pJobData->GetStorageStream();
+	pStorageStream->GetContent(Buffer);
+
+	if (Buffer.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPNGBUFFER);
+
+	return CImageData::createFromPNG(Buffer.data(), Buffer.size(), dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData* CBuild::LoadPNGImageByUUID(const std::string& sDataUUID)
+IImageData* CBuild::LoadPNGImageByUUID(const std::string& sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) 
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	std::vector<uint8_t> Buffer;
+
+	auto pJobData = pBuildJob->RetrieveJobData(AMCCommon::CUtils::normalizeUUIDString(sDataUUID));
+	auto pStorageStream = pJobData->GetStorageStream();
+	pStorageStream->GetContent(Buffer);
+
+	if (Buffer.empty ())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYPNGBUFFER);
+
+	return CImageData::createFromPNG (Buffer.data (), Buffer.size (), dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions)
+std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const std::string& sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions, const std::string& sUserUUID)
 {
 	if (pImageDataInstance == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 	uint64_t nNeededCount = 0;
-	/*std::unique_ptr<LibMCEnv::Impl::IPNGImageData> pPNGImage(pImageDataInstance->CreatePNGImage(pStoreOptions));
-	pPNGImage->GetPNGDataStream(0, &nNeededCount, nullptr); */
-
-	pImageDataInstance->EncodePNG();
-	pImageDataInstance->GetEncodedPNGData(0, &nNeededCount, nullptr);
+	std::unique_ptr<LibMCEnv::Impl::IPNGImageData> pPNGImage(pImageDataInstance->CreatePNGImage(pStoreOptions));
+	pPNGImage->GetPNGDataStream(0, &nNeededCount, nullptr); 
 
 	if (nNeededCount == 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE);
@@ -290,13 +452,12 @@ std::string CBuild::StorePNGImage(const std::string& sContextIdentifier, const s
 	pngBuffer.resize(nNeededCount);
 
 	uint64_t nWrittenCount = 0;
-	pImageDataInstance->GetEncodedPNGData(pngBuffer.size(), &nWrittenCount, pngBuffer.data());
-	//pPNGImage->GetPNGDataStream(pngBuffer.size (), &nWrittenCount, pngBuffer.data ());
+	pPNGImage->GetPNGDataStream(pngBuffer.size (), &nWrittenCount, pngBuffer.data ());
 
 	if (nWrittenCount != pngBuffer.size())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTRETRIEVEPNGSTREAM);
 
-	return AddBinaryData(sContextIdentifier, sName, "image/png", pngBuffer.size(), pngBuffer.data());
+	return AddBinaryData(sContextIdentifier, sName, "image/png", sUserUUID, pngBuffer.size(), pngBuffer.data());
 
 }
 
@@ -315,9 +476,9 @@ IBuildExecution* CBuild::StartExecution(const std::string& sDescription, const s
 		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 	}
 
-	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID, m_pGlobalChrono->getExistenceTimeInMicroseconds ());
+	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
-	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono);
 
 }
 
@@ -343,22 +504,63 @@ IBuildExecution* CBuild::FindExecution(const std::string& sExecutionUUID)
 
 	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution(sNormalizedExecutionUUID);
 
-	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono);
 }
 
 IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 
+	std::string sJournalUUIDFilter;
+	if (bOnlyCurrentJournalSession) {
+		auto pJournalSession = m_pDataModel->CreateJournalSession();
+		sJournalUUIDFilter = pJournalSession->GetSessionUUID();
+	}
+
+	std::unique_ptr<CBuildExecutionIterator> pResult(new CBuildExecutionIterator ());
+		
+	auto pIterator = pBuildJob->RetrieveBuildJobExecutions (sJournalUUIDFilter);
+	while (pIterator->MoveNext()) {
+		auto pExecutionData = pIterator->GetCurrentJobExecution();
+		pResult->AddBuildExecution (std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono));
+	}
+
+	return pResult.release();
 }
 
 IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 
+	std::string sJournalUUIDFilter;
+	if (bOnlyCurrentJournalSession) {
+		auto pJournalSession = m_pDataModel->CreateJournalSession();
+		sJournalUUIDFilter = pJournalSession->GetSessionUUID();
+	}
+
+	LibMCData::eBuildJobExecutionStatus eLibMCDataStatus = LibMCData::eBuildJobExecutionStatus::Unknown;
+
+	switch (eExecutionStatus) {
+	case LibMCEnv::eBuildExecutionStatus::InProcess: eLibMCDataStatus = LibMCData::eBuildJobExecutionStatus::InProcess; break;
+	case LibMCEnv::eBuildExecutionStatus::Finished: eLibMCDataStatus = LibMCData::eBuildJobExecutionStatus::Finished; break;
+	case LibMCEnv::eBuildExecutionStatus::Failed: eLibMCDataStatus = LibMCData::eBuildJobExecutionStatus::Failed; break;
+	}
+
+
+	std::unique_ptr<CBuildExecutionIterator> pResult(new CBuildExecutionIterator());
+
+	auto pIterator = pBuildJob->RetrieveBuildJobExecutionsByStatus(eLibMCDataStatus, sJournalUUIDFilter);
+	while (pIterator->MoveNext()) {
+		auto pExecutionData = pIterator->GetCurrentJobExecution();
+		pResult->AddBuildExecution(std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono));
+	}
+
+	return pResult.release();
 }
 
-void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValue)
+void CBuild::StoreMetaDataString(const std::string& sKey, const std::string& sValue)
 {
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
@@ -366,7 +568,7 @@ void CBuild::AddMetaDataString(const std::string& sKey, const std::string& sValu
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sKey))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMETADATAKEY);
 
-	pBuildJob->AddMetaDataString(sKey, sValue);
+	pBuildJob->StoreMetaDataString(sKey, sValue, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 }
 

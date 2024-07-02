@@ -39,6 +39,8 @@ Abstract: This is the class declaration of CBuildJobExecutionIterator
 
 // Parent classes
 #include "libmcdata_iterator.hpp"
+#include "libmcdata_buildjobexecution.hpp"
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -56,31 +58,20 @@ namespace Impl {
 **************************************************************************************************************************/
 
 class CBuildJobExecutionIterator : public virtual IBuildJobExecutionIterator, public virtual CIterator {
-private:
-
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
-
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+    CBuildJobExecutionIterator();
 
+    virtual ~CBuildJobExecutionIterator ();
 
-	/**
-	* Public member functions to implement.
-	*/
+    IBase* GetCurrent() override;
 
-	IBuildJobExecution * GetCurrentJobData() override;
+    IBuildJobExecution* GetCurrentJobExecution() override;
 
+    IIterator* Clone() override;
+
+    void AddJobExecution(std::shared_ptr<CBuildJobExecution> pBuildJobExecution);
+    
 };
 
 } // namespace Impl

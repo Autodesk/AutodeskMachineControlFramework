@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "amc_ui_module_contentitem.hpp"
+#include "amc_ui_expression.hpp"
 #include "pugixml.hpp"
 
 namespace LibMCData {
@@ -50,28 +51,65 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_ContentBuildList, PUIModule_ContentBuildList);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+	amcDeclareDependingClass(CUIModule_ContentBuildListButton, PUIModule_ContentBuildListButton);
+
+	class CUIModule_ContentBuildListButton {
+	private:
+		std::string m_sUUID;
+		std::string m_sButtonName;
+		CUIExpression m_CaptionExpression;
+		std::string m_sEvent;
+
+	public:
+
+		CUIModule_ContentBuildListButton(const std::string& sButtonName, CUIExpression captionExpression, const std::string& sEvent);
+
+		virtual ~CUIModule_ContentBuildListButton();
+
+		std::string getButtonName();
+
+		std::string getUUID();
+
+		CUIExpression getCaptionExpression();
+
+		std::string getEvent();
+	};
+
 
 	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
 	protected:
 
 		std::string m_sItemName;
-		std::string m_sLoadingText;
-		std::string m_sBuildNameCaption;
-		std::string m_sBuildLayersCaption;
-		std::string m_sBuildUUIDCaption;
-		std::string m_sSelectEvent;
 
-		std::string m_sSelectedBuildField;
+		CUIExpression m_LoadingText;
+		CUIExpression m_BuildNameCaption;
+		CUIExpression m_BuildThumbnailCaption;
+		CUIExpression m_BuildTimestampCaption;
+
+		std::string m_sSelectEvent;
+		std::string m_sSelectedBuildFieldUUID;
+		std::string m_sSelectedButtonFieldUUID;
+		std::string m_sDefaultThumbnailResourceUUID;
+
+		std::vector<PUIModule_ContentBuildListButton> m_Buttons;
+		std::map<std::string, PUIModule_ContentBuildListButton> m_ButtonNameMap;
+		std::map<std::string, PUIModule_ContentBuildListButton> m_ButtonUUIDMap;
 
 		uint32_t m_nEntriesPerPage;
 
 		LibMCData::PDataModel m_pDataModel;
+		
+		PStateMachineData m_pStateMachineData;
+
+		void writeHeadersToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
+		void writeButtonsToJSON(CJSONWriter& writer, CJSONWriterObject& object);
 
 	public:
 
 		static PUIModule_ContentBuildList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath);
+		CUIModule_ContentBuildList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentBuildList();
 
@@ -87,6 +125,7 @@ namespace AMC {
 
 		virtual std::list <std::string> getReferenceUUIDs() override;
 
+		void addButton(const std::string& sButtonName, CUIExpression captionExpression, const std::string& sEvent);
 
 	};
 

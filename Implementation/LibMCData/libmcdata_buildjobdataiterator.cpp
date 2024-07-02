@@ -48,6 +48,11 @@ CBuildJobDataIterator::CBuildJobDataIterator()
 
 }
 
+CBuildJobDataIterator::~CBuildJobDataIterator()
+{
+
+}
+
 IBase* CBuildJobDataIterator::GetCurrent()
 {
     return GetCurrentJobData();

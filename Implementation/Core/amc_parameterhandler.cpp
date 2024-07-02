@@ -38,9 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CParameterHandler::CParameterHandler(std::string sDescription)
-		: m_sDescription (sDescription)
+	CParameterHandler::CParameterHandler(std::string sDescription, AMCCommon::PChrono pGlobalChrono)
+		: m_sDescription (sDescription), m_pGlobalChrono (pGlobalChrono)
 	{
+		if (pGlobalChrono.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	}
 
 	CParameterHandler::~CParameterHandler()
@@ -77,7 +79,7 @@ namespace AMC {
 		if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sName))
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sName);
 
-		PParameterGroup pGroup = std::make_shared<CParameterGroup>(sName, sDescription);
+		PParameterGroup pGroup = std::make_shared<CParameterGroup>(sName, sDescription, m_pGlobalChrono);
 		addGroup(pGroup);
 		return pGroup;
 	}
@@ -134,7 +136,7 @@ namespace AMC {
 
 	PParameterHandler CParameterHandler::duplicate()
 	{
-		auto pResult = std::make_shared<CParameterHandler>(m_sDescription);
+		auto pResult = std::make_shared<CParameterHandler>(m_sDescription, m_pGlobalChrono);
 		for (auto pGroup : m_GroupList) {
 			auto pNewGroup = pResult->addGroup(pGroup->getName(), pGroup->getDescription());
 			pNewGroup->addDuplicatesFromGroup(pGroup.get());
@@ -143,10 +145,10 @@ namespace AMC {
 		return pResult;
 	}
 
-	void CParameterHandler::loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler)
+	void CParameterHandler::loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp)
 	{
 		for (auto pGroup : m_GroupList) {
-			pGroup->updateParameterPersistencyHandler(pPersistencyHandler);
+			pGroup->updateParameterPersistencyHandler(pPersistencyHandler, nAbsoluteTimeStamp);
 		}
 
 	}

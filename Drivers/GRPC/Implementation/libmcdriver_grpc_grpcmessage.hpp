@@ -68,6 +68,10 @@ public:
 	virtual ~CGRPCMessage();
 
 	bool HasField(const std::string & sFieldName) override;
+	
+	bool HasMessageField(const std::string& sFieldName) override;
+	
+	IGRPCMessage* GetMessageField(const std::string& sFieldName) override;
 
 	bool HasStringField(const std::string & sFieldName) override;
 

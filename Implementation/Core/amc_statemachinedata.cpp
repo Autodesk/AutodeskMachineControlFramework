@@ -48,13 +48,17 @@ namespace AMC {
 	}
 
 
-	void CStateMachineData::registerParameterHandler(const std::string& sInstanceName, PParameterHandler pParameterHandler)
+	void CStateMachineData::registerParameterHandler(const std::string& sInstanceName, PParameterHandler pParameterHandler, AMCCommon::PChrono pGlobalChrono)
 	{
-		LibMCAssertNotNull(pParameterHandler.get());
+		if (pParameterHandler.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pGlobalChrono.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 		m_StateMachineParameters.insert(std::make_pair(sInstanceName, pParameterHandler));
-		m_StateMachineDataStores.insert(std::make_pair(sInstanceName, std::make_shared<CParameterGroup> ("", "")));
+		m_StateMachineDataStores.insert(std::make_pair(sInstanceName, std::make_shared<CParameterGroup> ("", "", pGlobalChrono)));
 		m_StateMachineStates.insert(std::make_pair(sInstanceName, ""));
 	}
 

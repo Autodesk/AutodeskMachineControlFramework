@@ -142,9 +142,6 @@ fi
 
 cmake --build . --config Release
 
-echo "Building Core Resources"
-go run ../BuildScripts/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
-
 cd $builddir
 echo "Building Package XML"
 

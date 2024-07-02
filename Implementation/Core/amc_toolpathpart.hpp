@@ -54,10 +54,11 @@ namespace AMC {
 		
 		Lib3MF::PModel m_p3MFModel;
 		Lib3MF::PBuildItem m_pBuildItem;
+		Lib3MF::PWrapper m_pWrapper;
 		
 	public:
 	
-		CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem);
+		CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem, Lib3MF::PWrapper pWrapper);
 		virtual ~CToolpathPart();		
 
 		std::string getUUID ();

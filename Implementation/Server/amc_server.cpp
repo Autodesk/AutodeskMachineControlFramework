@@ -276,6 +276,73 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 		try {
 
+			auto streamHandler = [this](const httplib::Request& req, httplib::Response& res) {
+
+				try {
+
+				std::string sPath = req.path;
+				if (sPath.length() > 8) {
+					if (sPath.substr(0, 8) == "/stream/") {
+
+						//std::cout << req.path << std::endl;
+
+						std::string sStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sPath.substr(8));
+
+						std::string sBoundary = AMCCommon::CUtils::calculateRandomSHA256String(4) + "_" + sStreamUUID;
+
+						std::string sContentType = "multipart/x-mixed-replace;boundary=" + sBoundary;
+
+						auto pStreamConnection = m_pContext->CreateStreamConnection(sStreamUUID);
+
+						res.set_content_provider(
+							sContentType.c_str (),
+							[sBoundary, pStreamConnection](size_t offset, httplib::DataSink& sink) {
+
+								std::this_thread::sleep_for(std::chrono::milliseconds(pStreamConnection->GetIdleDelay ()));
+
+								auto pContent = pStreamConnection->GetNewContent();
+								if (pContent.get() != nullptr) {
+									std::vector<uint8_t> dataBuffer;
+									pContent->GetData(dataBuffer);
+									std::string sMIMEType = pContent->GetMIMEType();
+
+									//std::cout << "writing " << dataBuffer.size() << " bytes.." << std::endl;
+									
+									if (dataBuffer.size() > 0) {
+
+										std::string sHeader = sBoundary + "\r\n" +
+											"Content-Type: " + sMIMEType + "\r\n" +
+											"Content-Length: " + std::to_string (dataBuffer.size()) + "\r\n\r\n";
+
+										sink.os.write(sHeader.c_str(), sHeader.length());
+										sink.os.write((char*)dataBuffer.data(), dataBuffer.size());
+									}
+								}
+
+								return true; 
+							});
+
+
+					}
+				}
+
+
+				}
+				catch (std::exception& E) {
+					this->log("Internal server error: " + std::string(E.what()));
+					res.status = 500;
+					res.set_content("Internal Server Error", "text/plain");
+				}
+				catch (...) {
+					this->log("Internal server error (Unknown)");
+
+					res.status = 500;
+					res.set_content("Internal Server Error", "text/plain");
+				}
+
+			};
+
+
 			auto requestHandler = [this](const httplib::Request& req, httplib::Response& res) {
 				try {
 
@@ -381,6 +448,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 					httplib::SSLServer sslsvr(serverCertificate.getCertificate(), privateKey.getPrivateKey());
 
+					sslsvr.Get("^/stream/.*", streamHandler);
 					sslsvr.Get("(.*?)", requestHandler);
 					sslsvr.Post("(.*?)", requestHandler);
 					sslsvr.Put("(.*?)", requestHandler);
@@ -407,6 +475,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 			else {
 
 				httplib::Server svr;
+				svr.Get("^/stream/.*", streamHandler);
 				svr.Get("(.*?)", requestHandler);
 				svr.Post("(.*?)", requestHandler);
 				svr.Put("(.*?)", requestHandler);

@@ -33,9 +33,12 @@ Abstract: This is a stub class definition of CTempStreamWriter
 
 #include "libmcenv_tempstreamwriter.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_streamreader.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
+
+#define TEMPSTREAMCOPY_CHUNKSIZE (1024 * 1024)
 
 using namespace LibMCEnv::Impl;
 
@@ -43,10 +46,12 @@ using namespace LibMCEnv::Impl;
  Class definition of CTempStreamWriter 
 **************************************************************************************************************************/
 
-CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sMIMEType, const std::string& sCurrentUserUUID)
-    : m_pDataModel(pDataModel), m_sName(sName), m_sMIMEType(sMIMEType), m_nWritePosition (0), m_bIsFinished (false)
+CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std::string& sName, const std::string& sMIMEType, const std::string& sCurrentUserUUID, AMCCommon::PChrono pGlobalChrono)
+    : m_pDataModel(pDataModel), m_sName(sName), m_sMIMEType(sMIMEType), m_nWritePosition (0), m_bIsFinished (false), m_pGlobalChrono (pGlobalChrono)
 {
     if (pDataModel.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pGlobalChrono.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
     m_sUUID = AMCCommon::CUtils::createUUID();
@@ -54,9 +59,10 @@ CTempStreamWriter::CTempStreamWriter(LibMCData::PDataModel pDataModel, const std
     auto pJournalSession = pDataModel->CreateJournalSession();
 
     std::string sJournalUUID = pJournalSession->GetSessionUUID();
+    std::string sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sCurrentUserUUID);
 
     m_pStorage = m_pDataModel->CreateStorage();
-    m_pStorage->BeginRandomWriteStream(m_sUUID, sJournalUUID, "journal", sName, sMIMEType, sCurrentUserUUID);
+    m_pStorage->BeginRandomWriteStream(m_sUUID, sName, sMIMEType, sNormalizedUserUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
     m_pStorage->AttachStreamToJournal(m_sUUID, sJournalUUID);
 }
 
@@ -128,5 +134,45 @@ void CTempStreamWriter::Finish()
 {
     m_pStorage->FinishRandomWriteStream(m_sUUID);
     m_bIsFinished = true;
+}
+
+IStreamReader* CTempStreamWriter::GetStreamReader()
+{
+    if (!m_bIsFinished) {
+        Finish();
+    }
+
+    auto pStorage = m_pDataModel->CreateStorage();
+    auto pStream = pStorage->RetrieveStream(m_sUUID);
+
+    return new CStreamReader(pStorage, pStream);
+
+}
+
+
+void CTempStreamWriter::CopyFrom(IStreamReader* pStreamReader)
+{
+    if (pStreamReader == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "streamreader is null object");
+
+    pStreamReader->Seek(0);
+    size_t nSize = pStreamReader->GetSize();
+    if (nSize > 0) {
+        std::vector<uint8_t> Buffer;
+        Buffer.resize(TEMPSTREAMCOPY_CHUNKSIZE);
+
+        while (nSize > 0) {
+            size_t nChunkSize = TEMPSTREAMCOPY_CHUNKSIZE;
+            if (nChunkSize > nSize)
+                nChunkSize = nSize;
+
+            uint64_t dataNeeded = 0;
+            pStreamReader->ReadData(nChunkSize, nChunkSize, &dataNeeded, Buffer.data());
+            WriteData(nChunkSize, Buffer.data());
+
+            nSize -= nChunkSize;
+        }
+
+    }
 }
 

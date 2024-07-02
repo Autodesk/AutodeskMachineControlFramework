@@ -73,7 +73,7 @@ PAPIResponse CAPIHandler_Root::handleRequest(const std::string& sURI, const eAPI
 {
 
 	if (requestType == eAPIRequestType::rtGet) {
-		auto iIterator = m_FilesToServe.find(sURI);
+		auto iIterator = m_FilesToServe.find(AMCCommon::CUtils::toLowerString (sURI));
 		if (iIterator != m_FilesToServe.end())
 			return iIterator->second;
 	}
@@ -92,7 +92,7 @@ void CAPIHandler_Root::LoadClientPackage(PResourcePackage pResourcePackage)
 
 		auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(pEntry->getContentType());
 		pResourcePackage->readEntry(pEntry->getName (), apiResponse->getBuffer());
-		m_FilesToServe.insert(std::make_pair(pEntry->getName (), apiResponse));
+		m_FilesToServe.insert(std::make_pair(AMCCommon::CUtils::toLowerString (pEntry->getName ()), apiResponse));
 	}
 
 

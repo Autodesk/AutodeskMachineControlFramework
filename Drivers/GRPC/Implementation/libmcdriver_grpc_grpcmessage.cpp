@@ -64,6 +64,18 @@ bool CGRPCMessage::HasField(const std::string & sFieldName)
 	return m_pMessage->HasField(sFieldName);
 }
 
+bool CGRPCMessage::HasMessageField(const std::string& sFieldName)
+{
+	return m_pMessage->HasMessageField(sFieldName);
+}
+
+IGRPCMessage* CGRPCMessage::GetMessageField(const std::string& sFieldName)
+{
+	auto pSubMessage = m_pMessage->GetMessageField(sFieldName);
+	return new CGRPCMessage(m_pWrapper, pSubMessage);
+}
+
+
 bool CGRPCMessage::HasStringField(const std::string & sFieldName)
 {
 	return m_pMessage->HasStringField(sFieldName);

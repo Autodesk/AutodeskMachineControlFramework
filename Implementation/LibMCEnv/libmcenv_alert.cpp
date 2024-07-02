@@ -45,12 +45,14 @@ using namespace LibMCEnv::Impl;
  Class definition of CAlert 
 **************************************************************************************************************************/
 
-CAlert::CAlert(LibMCData::PDataModel pDataModel, const std::string& sUUID, const std::string& sCurrentUserUUID, AMC::PLogger pLogger, const std::string& sLogInstance)
-	: m_pDataModel(pDataModel), m_pLogger (pLogger), m_sLogInstance (sLogInstance)
+CAlert::CAlert(LibMCData::PDataModel pDataModel, const std::string& sUUID, const std::string& sCurrentUserUUID, AMC::PLogger pLogger, const std::string& sLogInstance, AMCCommon::PChrono pGlobalChrono)
+	: m_pDataModel(pDataModel), m_pLogger (pLogger), m_sLogInstance (sLogInstance), m_pGlobalChrono (pGlobalChrono)
 {
 	if (pDataModel.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pLogger.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 	m_sCurrentUserUUID = AMCCommon::CUtils::normalizeUUIDString(sCurrentUserUUID);
@@ -144,7 +146,7 @@ CAlert* CAlert::makeFrom(CAlert* pAlert)
 	if (pAlert == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	return new CAlert(pAlert->getDataModel(), pAlert->GetUUID (), pAlert->getCurrentUserUUID (), pAlert->getLogger (), pAlert->getLogInstance ());
+	return new CAlert(pAlert->getDataModel(), pAlert->GetUUID (), pAlert->getCurrentUserUUID (), pAlert->getLogger (), pAlert->getLogInstance (), pAlert->m_pGlobalChrono);
 }
 
 std::shared_ptr<CAlert> CAlert::makeSharedFrom(CAlert* pAlert)
@@ -157,9 +159,7 @@ void CAlert::AcknowledgeForUser(const std::string& sUserUUID, const std::string&
 	std::lock_guard<std::mutex> lockGuard(m_AlertMutex);
 	std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 
-	AMCCommon::CChrono chrono;	
-
-	m_pAlertData->AcknowledgeForUser(sNormalizedUUID, sUserComment, chrono.getStartTimeISO8601TimeUTC());
+	m_pAlertData->AcknowledgeForUser(sNormalizedUUID, sUserComment, m_pGlobalChrono->getUTCTimeInISO8601 ());
 
 	std::string sLogString = "Acknowledged alert " + m_pAlertData->GetUUID () + " (" + m_pAlertData->GetIdentifier () + ") for user " + sNormalizedUUID + " with comment: " + sUserComment;
 	m_pLogger->logMessage(sLogString, m_sLogInstance, AMC::eLogLevel::Message);
@@ -171,9 +171,7 @@ void CAlert::AcknowledgeAlertForCurrentUser(const std::string& sUserComment)
 	if (!m_bUserContextExists)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTHASNOUSERCONTEXT, "alert has no user context: " + m_pAlertData->GetUUID ());
 
-	AMCCommon::CChrono chrono;
-
-	m_pAlertData->AcknowledgeForUser(m_sCurrentUserUUID, sUserComment, chrono.getStartTimeISO8601TimeUTC());
+	m_pAlertData->AcknowledgeForUser(m_sCurrentUserUUID, sUserComment, m_pGlobalChrono->getUTCTimeInISO8601 ());
 
 	std::string sLogString = "Acknowledged alert " + m_pAlertData->GetUUID() + " (" + m_pAlertData->GetIdentifier() + ") for current user " + m_sCurrentUserUUID + " with comment: " + sUserComment;
 	m_pLogger->logMessage(sLogString, m_sLogInstance, AMC::eLogLevel::Message);

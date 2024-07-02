@@ -65,6 +65,8 @@ public:
 
     CBuildJobIterator();
 
+    virtual ~CBuildJobIterator();
+
     IBase* GetCurrent() override;
 
     IBuildJob * GetCurrentJob() override;

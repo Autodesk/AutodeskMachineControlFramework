@@ -60,6 +60,7 @@ namespace AMC {
 		std::mutex m_Mutex;
 		LibMCData::PStorageStream m_pStorageStream;
 
+		Lib3MF::PWrapper m_p3MFWrapper;
 		Lib3MF::PModel m_p3MFModel;
 		Lib3MF::PReader m_p3MFReader;
 		Lib3MF::PToolpath m_pToolpath;

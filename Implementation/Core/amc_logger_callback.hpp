@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "amc_logger.hpp"
+#include "common_chrono.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -47,11 +48,11 @@ namespace AMC {
 
 	class CLogger_Callback : public CLogger {
 	private:
-		LibMCData::PDataModel m_pDataModel;
-		
+		LibMCData::PDataModel m_pDataModel;		
 	public:
 
-		CLogger_Callback(LibMCData::PDataModel pDataModel);
+		CLogger_Callback(LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono);
+
 		virtual ~CLogger_Callback();
 
 		void logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) override;

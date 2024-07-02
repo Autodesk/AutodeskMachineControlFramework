@@ -712,8 +712,8 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
     std::string sDummySessionUUID = AMCCommon::CUtils::createUUID();
     std::string sDummySessionKey = AMCCommon::CUtils::calculateRandomSHA256String(1);
 
-    auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
-    auto pDummyAPIAuth = std::make_shared<CAPIAuth>(sDummySessionUUID, sDummySessionKey, CUserInformation::makeEmpty (), false, pDummyClientVariableHandler);
+    auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("", m_pUISystemState->getGlobalChronoInstance ());
+    auto pDummyAPIAuth = std::make_shared<CAPIAuth>(sDummySessionUUID, sDummySessionKey, CUserInformation::makeEmpty (), false, pDummyClientVariableHandler, m_pUISystemState->getGlobalChronoInstance ());
 
     LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(this, sSenderUUID, "", pDummyAPIAuth, m_pUISystemState->getTestOutputPath ());
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);

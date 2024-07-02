@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <map>
 
+#include "common_utils.hpp"
+#include "common_chrono.hpp"
+
 namespace AMC {
 
 	class CAPIAuth;
@@ -65,7 +68,7 @@ namespace AMC {
 
 	public:
 
-		CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, PUserInformation pUserInformation, bool bIsAuthorized, PParameterHandler pClientVariableHandler);
+		CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, PUserInformation pUserInformation, bool bIsAuthorized, PParameterHandler pClientVariableHandler, AMCCommon::PChrono pGlobalChrono);
 
 		virtual ~CAPIAuth();
 		

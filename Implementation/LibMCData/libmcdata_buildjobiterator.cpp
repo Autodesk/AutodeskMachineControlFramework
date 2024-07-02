@@ -50,6 +50,11 @@ CBuildJobIterator::CBuildJobIterator()
 }
 
 
+CBuildJobIterator::~CBuildJobIterator()
+{
+
+}
+
 void CBuildJobIterator::AddJob(std::shared_ptr<CBuildJob> pBuildJob)
 {
     if (pBuildJob.get() == nullptr)

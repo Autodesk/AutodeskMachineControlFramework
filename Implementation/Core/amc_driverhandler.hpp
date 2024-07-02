@@ -80,8 +80,6 @@ namespace AMC {
 		AMCCommon::PChrono m_pGlobalChrono;
 		PStateJournal m_pStateJournal;
 
-		std::string m_sSystemUserID;
-
 		// List and Map of registered drivers
 		std::list<PDriver> m_DriverList;
 		std::map<std::string, PDriver> m_DriverMap;
@@ -96,7 +94,7 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, PStateJournal pStateJournal);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, PStateJournal pStateJournal);
 
 		virtual ~CDriverHandler();
 

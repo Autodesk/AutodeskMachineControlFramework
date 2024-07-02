@@ -401,6 +401,29 @@ void CDataRecordingInstance::copyAllRTCSignalsByIndex(uint32_t nRTCIndex, int32_
     }
 }
 
+void CDataRecordingInstance::copyAllScaledRTCSignalsByIndex(uint32_t nRTCIndex, double* pRTCSignalBuffer, size_t nRTCSignalBufferSize, double dScaleFactor, double dOffset)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (nRTCIndex >= getRTCValuesPerRecord())
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX);
+
+    if (pRTCSignalBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nRTCSignalBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    double* pTarget = pRTCSignalBuffer;
+    for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+        int32_t* pRTCData = getRTCData(nRecordIndex);
+        *pTarget = pRTCData[nRTCIndex] * dScaleFactor + dOffset;
+        pTarget++;
+    }
+}
+
 
 void CDataRecordingInstance::copyAllSensorSignalsByIndex(uint32_t nSensorIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize)
 {
@@ -475,4 +498,27 @@ void CDataRecordingInstance::copyAllAdditionalSignalsByIndex(uint32_t nAdditiona
 
 }
 
+void CDataRecordingInstance::copyAllScaledAdditionalSignalsByIndex(uint32_t nAdditionalIndex, double* pAdditionalSignalBuffer, size_t nAdditionalSignalBufferSize, double dScaleFactor, double dOffset)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (nAdditionalIndex >= getAdditionalValuesPerRecord())
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX);
+
+    if (pAdditionalSignalBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nAdditionalSignalBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    double* pTarget = pAdditionalSignalBuffer;
+    for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+        int32_t* pAdditionalData = getAdditionalData(nRecordIndex);
+        *pTarget = pAdditionalData[nAdditionalIndex] * dScaleFactor + dOffset;
+        pTarget++;
+    }
+
+}
 

@@ -58,9 +58,12 @@ namespace AMC {
 		std::string m_sDefaultValue;
 		
 		std::string m_sValue;
+
+		// The global original path of the parameter..
+		std::string m_sOriginalPath;
 		
 		// update value including persistency storage
-		void setValueEx(const std::string& sValue);
+		void setValueEx(const std::string& sValue, uint64_t nAbsoluteTimeStamp);
 
 		eParameterDataType m_DataType;
 		
@@ -74,10 +77,10 @@ namespace AMC {
 
 	public:
 
-		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string & sOriginalPath);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath);
 
 		virtual ~CParameter_Valued();
 
@@ -90,22 +93,24 @@ namespace AMC {
 		eParameterDataType getDataType() const override;
 
 		std::string getStringValue() const override;
-		void setStringValue(const std::string& sValue) override;
+		void setStringValue(const std::string& sValue, uint64_t nAbsoluteTimeStamp) override;
 
 		double getDoubleValue() const override;
-		void setDoubleValue(const double dValue) override;
+		void setDoubleValue(const double dValue, uint64_t nAbsoluteTimeStamp) override;
 
 		int64_t getIntValue() const override;
-		void setIntValue(const int64_t nValue) override;
+		void setIntValue(const int64_t nValue, uint64_t nAbsoluteTimeStamp) override;
 
 		bool getBoolValue() const override;
-		void setBoolValue(const bool bValue) override;
+		void setBoolValue(const bool bValue, uint64_t nAbsoluteTimeStamp) override;
 
 		virtual PParameter duplicate() override;
 
+		virtual std::string getOriginalPath() override;
+
 		void enablePersistency (const std::string& sPersistentName, const std::string& sPersistentUUID);
 		void disablePersistency();
-		void setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler);
+		void setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp);
 
 	};
 	

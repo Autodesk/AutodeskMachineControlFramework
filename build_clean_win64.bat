@@ -94,9 +94,15 @@ cd "%builddir%"
 
 echo "Building Core Modules"
 call cmake ..
+if "%ERRORLEVEL%" neq "0" (
+	goto ERROR
+)
+
 REM call cmake -G "MinGW Makefiles" ..
 call cmake --build . --config Release
-
+if "%ERRORLEVEL%" neq "0" (
+	goto ERROR
+)
 
 echo "Building Package XML"
 
@@ -131,6 +137,13 @@ copy "%builddir%\DevPackage\amcf_win64_%LONGGITHASH%.zip" "%builddir%\Artifacts\
 
 echo "Build done!"
 
+IF "%UPLOADTOPACKAGEREPOSITORY%"=="true" (
+    echo "Uploading to package repository: %AMCF_PACKAGE_REPOSITORY%"
+    echo "Using key file: %AMCF_PACKAGE_REPOSITORY_KEYFILE%"
+	cd "%basepath%"
+    "%basepath%\DevTools\pscp.exe" -hostkey %AMCF_HOSTKEY% -batch -i "%AMCF_PACKAGE_REPOSITORY_KEYFILE%" -v "%builddir%\DevPackage\amcf_win64_%LONGGITHASH%.zip" %AMCF_PACKAGE_REPOSITORY%
+)
+
 goto END
 
 :ERROR
@@ -143,10 +156,5 @@ if "%1" neq "NOPAUSE" (
 	pause
 )
 
-IF "%UPLOADTOPACKAGEREPOSITORY%"=="true" (
-    echo "Uploading to package repository: %AMCF_PACKAGE_REPOSITORY%"
-    echo "Using key file: %AMCF_PACKAGE_REPOSITORY_KEYFILE%"
-    "%basepath%\DevTools\pscp.exe" -hostkey %AMCF_HOSTKEY% -batch -i "%AMCF_PACKAGE_REPOSITORY_KEYFILE%" -v "%builddir%\DevPackage\amcf_win64_%LONGGITHASH%.zip" %AMCF_PACKAGE_REPOSITORY%
-)
 
 exit 0

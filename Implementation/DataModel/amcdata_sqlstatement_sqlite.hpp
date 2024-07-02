@@ -74,6 +74,8 @@ namespace AMCData {
 		bool nextRow() override;
 		void execute() override;
 
+		bool columnIsNull (uint32_t nIdx) override;
+
 		std::string getColumnString (uint32_t nIdx) override;
 		double getColumnDouble (uint32_t nIdx) override;
 		int32_t getColumnInt (uint32_t nIdx) override;

@@ -55,7 +55,7 @@ CAPISessionHandler::~CAPISessionHandler()
 {
 }
 
-PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizationJSON)
+PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizationJSON, AMCCommon::PChrono pGlobalChrono)
 {
 	if (!sAuthorizationJSON.empty()) {
 		
@@ -74,7 +74,7 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 		if (pSession->getToken () != sToken)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONTOKEN);
 
-		return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->createUserInformation(), pSession->isAuthenticated(), pSession->getClientVariableHandler ());
+		return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->createUserInformation(), pSession->isAuthenticated(), pSession->getClientVariableHandler (), pGlobalChrono);
 	}
 	else {
 		return nullptr;
@@ -83,25 +83,25 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 }
 
 
-PAPIAuth CAPISessionHandler::createNewAuthenticationSession()
+PAPIAuth CAPISessionHandler::createNewAuthenticationSession(AMCCommon::PChrono pGlobalChrono)
 {
-	auto pSession = std::make_shared<CAPISession>();
+	auto pSession = std::make_shared<CAPISession>(pGlobalChrono);
 
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 	m_SessionMap.insert (std::make_pair (pSession->getUUID(), pSession));
 
-	return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->createUserInformation(), pSession->isAuthenticated(), pSession->getClientVariableHandler());
+	return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->createUserInformation(), pSession->isAuthenticated(), pSession->getClientVariableHandler(), pGlobalChrono);
 
 }
 
 
-PAPIAuth CAPISessionHandler::createEmptyAuthenticationSession()
+PAPIAuth CAPISessionHandler::createEmptyAuthenticationSession(AMCCommon::PChrono pGlobalChrono)
 {
 	
 	std::string sEmptyUUID = "00000000-0000-0000-0000-000000000000";
 	std::string sEmptyKey = "0000000000000000000000000000000000000000000000000000000000000000";
 	
-	return std::make_shared<CAPIAuth>(sEmptyUUID, sEmptyKey, CUserInformation::makeEmpty (), false, nullptr);
+	return std::make_shared<CAPIAuth>(sEmptyUUID, sEmptyKey, CUserInformation::makeEmpty (), false, nullptr, pGlobalChrono);
 }
 
 

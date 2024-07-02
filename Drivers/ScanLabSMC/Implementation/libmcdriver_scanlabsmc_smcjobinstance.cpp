@@ -52,9 +52,9 @@ CSMCJobInstance::CSMCJobInstance(PSMCContextHandle pContextHandle, double dStart
 {
     m_pSDK = m_pContextHandle->getSDK();
 
-    //m_pSDK->checkError(m_pSDK->slsc_cfg_set_blend_mode(contextHandle, (slsc_BlendModes)eBlendMode));
-    m_pSDK->checkError(m_pSDK->slsc_job_begin(m_pContextHandle->getHandle(), &m_JobID));
     auto contextHandle = m_pContextHandle->getHandle();
+    //m_pSDK->checkError(m_pSDK->slsc_cfg_set_blend_mode(contextHandle, (slsc_BlendModes)eBlendMode));
+    m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_begin(contextHandle, &m_JobID));
 
 }
 
@@ -72,8 +72,10 @@ void CSMCJobInstance::Finalize()
 {
     if (m_bIsFinalized)
         throw std::runtime_error("Job is already finalized!");
+    
+    auto contextHandle = m_pContextHandle->getHandle();
 
-    m_pSDK->checkError(m_pSDK->slsc_job_end(m_pContextHandle->getHandle()));
+    m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_end(contextHandle));
     m_bIsFinalized = true;
 }
 
@@ -94,7 +96,7 @@ void CSMCJobInstance::drawPolylineEx(slscHandle contextHandle, const uint64_t nP
     std::array<double, 2> startPosition;
     startPosition[0] = startPoint.m_X;
     startPosition[1] = startPoint.m_Y;
-    m_pSDK->checkError(m_pSDK->slsc_job_jump(contextHandle, startPosition.data()));
+    m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_jump(contextHandle, startPosition.data()));
 
     slsc_PolylineOptions polyLineOptions;
     if (bIsClosed) {
@@ -104,17 +106,17 @@ void CSMCJobInstance::drawPolylineEx(slscHandle contextHandle, const uint64_t nP
         polyLineOptions.Geometry = slsc_PolylineGeometry::slsc_Polyline_Open;
     }
     polyLineOptions.ProfileType = slsc_PolylineProfile::slsc_Maximize_Velocity;
-    m_pSDK->checkError(m_pSDK->slsc_job_begin_polyline(contextHandle, polyLineOptions));
+    m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_begin_polyline(contextHandle, polyLineOptions));
 
     for (size_t nPointIndex = 1; nPointIndex < nPointsBufferSize; nPointIndex++) {
         auto& nextPoint = pPointsBuffer[nPointIndex];
         std::array<double, 2> nextPosition;
         nextPosition[0] = nextPoint.m_X;
         nextPosition[1] = nextPoint.m_Y;
-        m_pSDK->checkError(m_pSDK->slsc_job_line(contextHandle, nextPosition.data()));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_line(contextHandle, nextPosition.data()));
     }
 
-    m_pSDK->checkError(m_pSDK->slsc_job_end_polyline(contextHandle)); 
+    m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_end_polyline(contextHandle));
 }
 
 
@@ -127,9 +129,9 @@ void CSMCJobInstance::DrawPolyline(const LibMCDriver_ScanLabSMC_uint64 nPointsBu
 
         auto contextHandle = m_pContextHandle->getHandle();
 
-        m_pSDK->checkError(m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
-        m_pSDK->checkError(m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
-        m_pSDK->checkError(m_pSDK->slsc_job_set_min_mark_speed(contextHandle, dMinimalMarkSpeed));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_min_mark_speed(contextHandle, dMinimalMarkSpeed));
 
         drawPolylineEx(contextHandle, nPointsBufferSize, pPointsBuffer, false);
 
@@ -147,9 +149,9 @@ void CSMCJobInstance::DrawLoop(const LibMCDriver_ScanLabSMC_uint64 nPointsBuffer
 
         auto contextHandle = m_pContextHandle->getHandle();
 
-        m_pSDK->checkError(m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
-        m_pSDK->checkError(m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
-        m_pSDK->checkError(m_pSDK->slsc_job_set_min_mark_speed(contextHandle, dMinimalMarkSpeed));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_min_mark_speed(contextHandle, dMinimalMarkSpeed));
         drawPolylineEx(contextHandle, nPointsBufferSize, pPointsBuffer, true);
 
 
@@ -169,8 +171,8 @@ void CSMCJobInstance::DrawHatches(const LibMCDriver_ScanLabSMC_uint64 nHatchesBu
 
         auto contextHandle = m_pContextHandle->getHandle();
 
-        m_pSDK->checkError(m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
-        m_pSDK->checkError(m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
 
         for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchesBufferSize; nHatchIndex++) {
             auto& hatch = pHatchesBuffer[nHatchIndex];
@@ -183,8 +185,8 @@ void CSMCJobInstance::DrawHatches(const LibMCDriver_ScanLabSMC_uint64 nHatchesBu
             point2[1] = hatch.m_Y2;
 
 
-            m_pSDK->checkError(m_pSDK->slsc_job_jump(contextHandle, point1.data()));
-            m_pSDK->checkError(m_pSDK->slsc_job_line(contextHandle, point2.data()));
+            m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_jump(contextHandle, point1.data()));
+            m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_line(contextHandle, point2.data()));
 
         }
     }
@@ -204,19 +206,19 @@ void CSMCJobInstance::Execute(const bool bBlocking)
 
     slsc_ExecState execState1 = slsc_ExecState_NotInitOrError;
     while (execState1 != slsc_ExecState_ReadyForExecution) {
-        m_pSDK->checkError(m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState1));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState1));
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     } 
 
     //std::cout << "Starting execution" << std::endl;
 
-    m_pSDK->checkError(m_pSDK->slsc_ctrl_start_execution(contextHandle));
+    m_pSDK->checkError(contextHandle, m_pSDK->slsc_ctrl_start_execution(contextHandle));
 
     //std::cout << "Waiting for execution finished" << std::endl;
 
     slsc_ExecState execState2 = slsc_ExecState_Executing;
     while (execState2 == slsc_ExecState_Executing) {
-        m_pSDK->checkError(m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState2));
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState2));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     } 
 }

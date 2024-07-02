@@ -55,10 +55,12 @@ namespace AMC {
 
 		std::mutex m_Mutex;
 		std::string m_sDescription;
+
+		AMCCommon::PChrono m_pGlobalChrono;
 		
 	public:
 
-		CParameterHandler(std::string sDescription);
+		CParameterHandler(std::string sDescription, AMCCommon::PChrono pGlobalChrono);
 		
 		virtual ~CParameterHandler();		
 		
@@ -75,7 +77,7 @@ namespace AMC {
 
 		PParameterHandler duplicate();
 
-		void loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler);
+		void loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp);
 
 	};
 

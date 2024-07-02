@@ -48,7 +48,7 @@ namespace AMCData {
 				sStreamsQuery += "`sha2`  varchar ( 64 ) NOT NULL,";
 				sStreamsQuery += "`size`  integer DEFAULT 0,";
 				sStreamsQuery += "`status`  varchar ( 256 ) NOT NULL,";
-				sStreamsQuery += "`userid`  varchar ( 64 ) NOT NULL,";
+				sStreamsQuery += "`userid`  varchar ( 64 ) DEFAULT '',";
 				sStreamsQuery += "`updateuuid`  varchar ( 64 ),";
 				sStreamsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 				pTransaction->executeStatement(sStreamsQuery);
@@ -102,6 +102,12 @@ namespace AMCData {
 				break;
 			}
 
+			case 12: {
+				std::string sStreamsQuery = "ALTER TABLE `storage_streams` ";
+				sStreamsQuery += "ADD `useruuid` varchar (256) DEFAULT `00000000-0000-0000-0000-000000000000`;";
+				pTransaction->executeStatement(sStreamsQuery);
+				break;
+			}
 		}
 	}
 

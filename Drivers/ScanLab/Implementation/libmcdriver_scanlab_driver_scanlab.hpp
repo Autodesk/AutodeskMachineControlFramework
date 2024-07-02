@@ -69,6 +69,11 @@ Abstract: This is the class declaration of CDriver_ScanLab
 namespace LibMCDriver_ScanLab {
 namespace Impl {
 
+#define SCANLAB_DEFAULTTIMEOUT_INITIAL 25.0
+#define SCANLAB_DEFAULTTIMEOUT_MAX 5000.0
+#define SCANLAB_DEFAULTTIMEOUT_MULTIPLIER 1.25
+#define SCANLAB_DEFAULTTIMEOUT_RETRIESPERRTCCARD 5
+#define SCANLAB_DEFAULTTIMEOUT_RETRYDELAYINMILLISECONDS 100
 
 /*************************************************************************************************************************
  Class declaration of CDriver_ScanLab 
@@ -90,6 +95,14 @@ protected:
     uint32_t m_nDLLVersion;
     bool m_bEnableJournaling;
 
+    double m_dDefaultInitialTimeout;
+    double m_dDefaultMaxTimeout;
+    double m_dDefaultMultiplier;
+
+    std::vector<uint8_t> m_FirmwareData;
+    std::vector<uint8_t> m_FPGAData;
+    std::vector<uint8_t> m_AuxiliaryData;
+
     virtual void updateDLLVersionParameter(uint32_t nDLLVersionParameter) = 0;
 
 public:
@@ -106,6 +119,9 @@ public:
 
     uint32_t getDLLVersion();
 
+    void SetFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource) override;
+
+    void SetCustomFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer) override;
 
 };
 

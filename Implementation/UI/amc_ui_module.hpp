@@ -81,6 +81,8 @@ namespace AMC {
 		CUIModule_ContentRegistry* contentRegistry ();
 		CLogger* getLogger();
 
+		AMCCommon::PChrono getGlobalChrono();
+
 	};
 
 	class CUIModule {

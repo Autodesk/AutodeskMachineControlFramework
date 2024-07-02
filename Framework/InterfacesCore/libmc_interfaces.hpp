@@ -56,6 +56,8 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
+class IStreamData;
+class IStreamConnection;
 class IAPIRequestHandler;
 class IMCContext;
 
@@ -239,6 +241,54 @@ typedef IBaseSharedPtr<IBase> PIBase;
 
 
 /*************************************************************************************************************************
+ Class interface for StreamData 
+**************************************************************************************************************************/
+
+class IStreamData : public virtual IBase {
+public:
+	/**
+	* IStreamData::GetData - returns the data to return.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[out] pDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBuffer - uint8 buffer of Binary stream data
+	*/
+	virtual void GetData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer) = 0;
+
+	/**
+	* IStreamData::GetMIMEType - returns the content type of the data.
+	* @return Content type of the return data.
+	*/
+	virtual std::string GetMIMEType() = 0;
+
+};
+
+typedef IBaseSharedPtr<IStreamData> PIStreamData;
+
+
+/*************************************************************************************************************************
+ Class interface for StreamConnection 
+**************************************************************************************************************************/
+
+class IStreamConnection : public virtual IBase {
+public:
+	/**
+	* IStreamConnection::GetNewContent - Returns new content for the stream or null, if no new content is available.
+	* @return Stream Data Instance.
+	*/
+	virtual IStreamData * GetNewContent() = 0;
+
+	/**
+	* IStreamConnection::GetIdleDelay - Returns the number of milliseconds, that the caller should wait before checking for another content.
+	* @return Idle Delay.
+	*/
+	virtual LibMC_uint32 GetIdleDelay() = 0;
+
+};
+
+typedef IBaseSharedPtr<IStreamConnection> PIStreamConnection;
+
+
+/*************************************************************************************************************************
  Class interface for APIRequestHandler 
 **************************************************************************************************************************/
 
@@ -358,13 +408,6 @@ public:
 	virtual void TerminateInstanceThread(const std::string & sInstanceName) = 0;
 
 	/**
-	* IMCContext::GetInstanceThreadState - returns current state of a instance thread.
-	* @param[in] sInstanceName - Instance name of state machine.
-	* @return State of state machine.
-	*/
-	virtual std::string GetInstanceThreadState(const std::string & sInstanceName) = 0;
-
-	/**
 	* IMCContext::InstanceStateIsSuccessful - returns if an instance thread is in success state.
 	* @param[in] sInstanceName - Instance name of state machine.
 	* @return State of state machine is in success state.
@@ -400,6 +443,13 @@ public:
 	* @return Request Handler instance.
 	*/
 	virtual IAPIRequestHandler * CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization) = 0;
+
+	/**
+	* IMCContext::CreateStreamConnection - creates an API stream connection instance. Fails if stream does not exist.
+	* @param[in] sStreamUUID - UUID of stream to serve.
+	* @return StreamConnection Handler instance.
+	*/
+	virtual IStreamConnection * CreateStreamConnection(const std::string & sStreamUUID) = 0;
 
 };
 

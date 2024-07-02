@@ -68,6 +68,8 @@ private:
 	LibMCData::PDataModel m_pDataModel;
 	LibMCData::PAlertSession m_pAlertSession;
 	LibMCData::PAlert m_pAlertData;
+	AMCCommon::PChrono m_pGlobalChrono;
+
 	AMC::PLogger m_pLogger;
 	std::string m_sLogInstance;
 
@@ -81,7 +83,7 @@ public:
 
 	static std::shared_ptr<CAlert> makeSharedFrom(CAlert* pAlert);
 
-	CAlert(LibMCData::PDataModel pDataModel, const std::string & sUUID, const std::string & sCurrentUserUUID, AMC::PLogger pLogger, const std::string & sLogInstance);
+	CAlert(LibMCData::PDataModel pDataModel, const std::string& sUUID, const std::string& sCurrentUserUUID, AMC::PLogger pLogger, const std::string& sLogInstance, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CAlert();
 

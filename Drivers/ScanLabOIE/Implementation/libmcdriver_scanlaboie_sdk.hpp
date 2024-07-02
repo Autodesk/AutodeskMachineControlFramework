@@ -105,6 +105,7 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_get_board_version) (oie_device pDevice, uint32_t * pVersion);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_packet_listener) (oie_device pDevice, oie_pkt_listener pListener, void * pUserData);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_runtime_error_listener) (oie_device pDevice, oie_err_listener pListener, void* pUserData);
+		typedef void(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_rtc6eth_ip_address) (oie_device pDevice, const char* pIPAddress);
 
 		typedef uint32_t(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_rtc_signal_count) (const oie_pkt* pPacket);
 		typedef uint32_t(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_sensor_signal_count) (const oie_pkt* pPacket);
@@ -120,6 +121,9 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_sensor_signals) (const char* pDeviceConfigPath, uint32_t* pSignalBuffer, uint32_t* pSignalBufferSize);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_additional_app_data_signals) (const char* pDeviceConfigPath, oie_signalinfo* pSignalInfoBuffer, uint32_t* pSignalBufferSize);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_measurement_tag_usage) (const char* pDeviceConfigPath, uint32_t* mtagUsage);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_execution_mode) (const char* pDeviceConfigPath, uint32_t* pExecutionMode);
+
+		
 
 		
 
@@ -191,6 +195,8 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_get_sensor_signals oie_get_sensor_signals = nullptr;
 			PScanLabOIEPtr_oie_get_additional_app_data_signals oie_get_additional_app_data_signals = nullptr;
 			PScanLabOIEPtr_oie_get_measurement_tag_usage oie_get_measurement_tag_usage = nullptr;
+			PScanLabOIEPtr_oie_get_execution_mode oie_get_execution_mode = nullptr;
+			PScanLabOIEPtr_oie_set_rtc6eth_ip_address oie_set_rtc6eth_ip_address = nullptr;
 
 			CScanLabOIESDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8, LibMCDriver_ScanLabOIE::eOIEDeviceDriverType deviceDriverType);
 			~CScanLabOIESDK();

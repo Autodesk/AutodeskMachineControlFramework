@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include "amc_statejournalstream.hpp"
+#include "common_chrono.hpp"
 
 namespace AMC {
 
@@ -80,7 +81,7 @@ namespace AMC {
 
 	public:
 
-		CStateJournal(PStateJournalStream pStream);
+		CStateJournal(PStateJournalStream pStream, AMCCommon::PChrono pGlobalChrono);
 		virtual ~CStateJournal();
 
 		void startRecording ();

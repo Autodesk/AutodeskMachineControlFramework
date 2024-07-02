@@ -77,6 +77,13 @@ CLogger* CUIModuleEnvironment::getLogger()
 	return m_pUISystemState->getLogger().get();
 }
 
+	
+AMCCommon::PChrono CUIModuleEnvironment::getGlobalChrono()
+{
+	return m_pUISystemState->getGlobalChronoInstance();
+}
+
+
 PMeshHandler CUIModuleEnvironment::meshHandler()
 {
 	return m_pUISystemState->getMeshHandler ();

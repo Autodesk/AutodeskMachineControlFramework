@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_server_win32.hpp"
 #include "common_utils.hpp"
+#include <shellscalingapi.h>
 
 #ifndef __GNUC__
 #include <SDKDDKVer.h>
@@ -60,6 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
+
+#define FONTSIZE_AT_96DPI 18
 
 CServerWin32IO::CServerWin32IO()
     : m_pServer (nullptr)
@@ -216,7 +219,8 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {   
-    HFONT fontHandle;
+    static HFONT fontHandle = nullptr;
+
     HINSTANCE hInst = (HINSTANCE)GetWindowLongPtrW(hWnd, GWLP_HINSTANCE);
 
    
@@ -224,26 +228,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
-        fontHandle = CreateFontW(-12,
+        UINT dpi = GetDpiForWindow(hWnd);
+
+        // Calculate the initial font size based on DPI (example uses 12-point font)
+        int fontSize = MulDiv(FONTSIZE_AT_96DPI, dpi, 96);
+
+        fontHandle = CreateFontW(fontSize,
             0,
             0,
             0,
-            FW_DONTCARE,
-            FW_DONTCARE,
-            FW_DONTCARE,
-            FW_DONTCARE,
-            ANSI_CHARSET,
-            OUT_TT_PRECIS,
-            CLIP_DEFAULT_PRECIS,
-            ANTIALIASED_QUALITY,
-            FF_DONTCARE | DEFAULT_PITCH,
+            FW_DONTCARE,           // Font weight
+            FALSE,                 // Italic attribute option
+            FALSE,                 // Underline attribute option
+            FALSE,                 // Strikeout attribute option
+            DEFAULT_CHARSET,       // Character set identifier
+            OUT_TT_PRECIS,         // Output precision
+            CLIP_DEFAULT_PRECIS,   // Clipping precision
+            CLEARTYPE_QUALITY,     // Output quality
+            DEFAULT_PITCH | FF_SWISS, // Pitch and family
             L"Courier New");
 
 
         HWND hwndListBox = CreateWindowExW(
             0, L"LISTBOX",   // predefined class 
             NULL,         // no window title 
-            WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_DISABLENOSCROLL,
+            WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_DISABLENOSCROLL | LBS_NOTIFY | LBS_EXTENDEDSEL,
             0, 0, 0, 0,   // set size in WM_SIZE message 
             hWnd,         // parent window 
             (HMENU)ID_EDITCHILD,   // edit control ID 
@@ -275,6 +284,64 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_EXIT:
             DestroyWindow(hWnd);
             break;
+        case ID_EDITCHILD:
+        {
+            if (HIWORD(wParam) == LBN_SELCHANGE)
+            {
+
+                HWND hwndListBox = GetDlgItem(hWnd, ID_EDITCHILD);
+
+
+                // Get the count of selected items
+                int selCount = (int)SendMessage(hwndListBox, LB_GETSELCOUNT, 0, 0);
+
+                if (selCount > 0)
+                {
+                    // Allocate memory for the selected item indices
+                    std::vector<int> selIndices(selCount);
+                    SendMessage(hwndListBox, LB_GETSELITEMS, (WPARAM)selCount, (LPARAM)selIndices.data());
+
+                    // Concatenate the selected item texts
+                    std::wstring combinedText;
+                    for (int index : selIndices)
+                    {
+                        int length = (int)SendMessage(hwndListBox, LB_GETTEXTLEN, (WPARAM)index, 0);
+                        if (length != LB_ERR)
+                        {
+                            std::wstring itemText(length, L'\0');
+                            SendMessage(hwndListBox, LB_GETTEXT, (WPARAM)index, (LPARAM)itemText.data());
+                            combinedText += itemText + L"\r\n";  // Add each item text followed by a new line
+                        }
+                    }
+
+                    // Open the clipboard
+                    if (OpenClipboard(hWnd))
+                    {
+                        // Clear the clipboard
+                        EmptyClipboard();
+
+                        // Allocate a global memory object for the text
+                        HGLOBAL hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (combinedText.size() + 1) * sizeof(wchar_t));
+                        if (hglbCopy)
+                        {
+                            // Lock the handle and copy the text to the buffer
+                            wchar_t* buffer = (wchar_t*)GlobalLock(hglbCopy);
+                            if (buffer != nullptr) {
+                                memcpy(buffer, combinedText.c_str(), (combinedText.size() + 1) * sizeof(wchar_t));
+                            }
+                            GlobalUnlock(hglbCopy);
+
+                            // Place the handle on the clipboard
+                            SetClipboardData(CF_UNICODETEXT, hglbCopy);
+                        }
+                        // Close the clipboard
+                        CloseClipboard();
+                    }
+
+                    
+                }
+            }
+        }
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
@@ -293,6 +360,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return 0;
     }
 
+    case WM_DPICHANGED:
+    {
+        // Get the recommended new size and position of the window
+        RECT* const prcNewWindow = (RECT*)lParam;
+        SetWindowPos(hWnd,
+            NULL,
+            prcNewWindow->left,
+            prcNewWindow->top,
+            prcNewWindow->right - prcNewWindow->left,
+            prcNewWindow->bottom - prcNewWindow->top,
+            SWP_NOZORDER | SWP_NOACTIVATE);
+
+        // Update font size
+        // Recreate the font with the new DPI
+        UINT dpi = HIWORD(wParam); // New DPI
+        int fontSize = MulDiv(FONTSIZE_AT_96DPI, dpi, 96);
+        if (fontHandle)
+        {
+            DeleteObject(fontHandle); // Delete the old font
+            fontHandle = nullptr;
+        }
+
+        fontHandle = CreateFontW(
+            -fontSize,             // Height of font
+            0,                     // Width of font
+            0,                     // Angle of escapement
+            0,                     // Orientation angle
+            FW_DONTCARE,           // Font weight
+            FALSE,                 // Italic attribute option
+            FALSE,                 // Underline attribute option
+            FALSE,                 // Strikeout attribute option
+            DEFAULT_CHARSET,       // Character set identifier
+            OUT_TT_PRECIS,         // Output precision
+            CLIP_DEFAULT_PRECIS,   // Clipping precision
+            CLEARTYPE_QUALITY,     // Output quality
+            DEFAULT_PITCH | FF_SWISS, // Pitch and family
+            L"Courier New");          // Font family
+
+        HWND hwndListBox = GetDlgItem(hWnd, ID_EDITCHILD);
+        SendMessage(hwndListBox, WM_SETFONT, (WPARAM)fontHandle, TRUE);
+
+        return 0;
+    }
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -301,7 +412,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         EndPaint(hWnd, &ps);
     }
     break;
+
+
     case WM_DESTROY:
+        if (fontHandle)
+        {
+            DeleteObject(fontHandle); // Clean up the font object
+            fontHandle = nullptr;
+        }
+
         PostQuitMessage(0);
         break;
     default:
@@ -319,6 +438,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
+    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 
     auto pServer = std::make_shared<CServer_Win32> (hInstance);
     pServer->registerWindowClass();

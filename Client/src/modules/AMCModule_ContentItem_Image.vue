@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <template>
 
 <div v-if="(moduleitem.type=='image')">  	
-	<v-img v-bind:src="Application.getImageURL (moduleitem.uuid)" v-bind:aspect-ratio="moduleitem.aspectratio" v-bind:max-width="moduleitem.maxwidth" v-bind:max-height="moduleitem.maxheight" contain></v-img>
+	<v-img v-bind:src="Application.getImageURL (moduleitem.imageresource)" v-bind:aspect-ratio="moduleitem.aspectratio" v-bind:max-width="moduleitem.maxwidth" v-bind:max-height="moduleitem.maxheight" contain></v-img>
 </div>
 
 </template>

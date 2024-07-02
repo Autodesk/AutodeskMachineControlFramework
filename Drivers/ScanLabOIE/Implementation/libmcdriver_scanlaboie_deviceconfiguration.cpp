@@ -76,9 +76,9 @@ CDeviceConfiguration::CDeviceConfiguration(PScanLabOIESDK pSDK, const std::strin
 
         if (m_pSDK->oie_get_rtc_signal_ids != nullptr) {
 
-            m_pSDK->checkError(m_pSDK->oie_get_rtc_signal_ids(sTempFileName.c_str(), buffer.data(), &nRTCSignalBufferSize));
-            for (uint32_t nIndex = 0; nIndex < nRTCSignalBufferSize; nIndex++)
-                m_RTCSignalIDs.push_back(buffer.at(nIndex));
+                m_pSDK->checkError(m_pSDK->oie_get_rtc_signal_ids(sTempFileName.c_str(), buffer.data(), &nRTCSignalBufferSize));
+                for (uint32_t nIndex = 0; nIndex < nRTCSignalBufferSize; nIndex++)
+                    m_RTCSignalIDs.push_back(buffer.at(nIndex));
 
         }
         else {

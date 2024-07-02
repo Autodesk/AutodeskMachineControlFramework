@@ -346,6 +346,66 @@ LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasfield(LibMCDriver_GRPC_GR
 	}
 }
 
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasmessagefield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pMessageFieldExists)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pMessageFieldExists == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		*pMessageFieldExists = pIGRPCMessage->HasMessageField(sFieldName);
+
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getmessagefield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_GRPCMessage * pMessageFieldInstance)
+{
+	IBase* pIBaseClass = (IBase *)pGRPCMessage;
+
+	try {
+		if (pFieldName == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		if (pMessageFieldInstance == nullptr)
+			throw ELibMCDriver_GRPCInterfaceException (LIBMCDRIVER_GRPC_ERROR_INVALIDPARAM);
+		std::string sFieldName(pFieldName);
+		IBase* pBaseMessageFieldInstance(nullptr);
+		IGRPCMessage* pIGRPCMessage = dynamic_cast<IGRPCMessage*>(pIBaseClass);
+		if (!pIGRPCMessage)
+			throw ELibMCDriver_GRPCInterfaceException(LIBMCDRIVER_GRPC_ERROR_INVALIDCAST);
+		
+		pBaseMessageFieldInstance = pIGRPCMessage->GetMessageField(sFieldName);
+
+		*pMessageFieldInstance = (IBase*)(pBaseMessageFieldInstance);
+		return LIBMCDRIVER_GRPC_SUCCESS;
+	}
+	catch (ELibMCDriver_GRPCInterfaceException & Exception) {
+		return handleLibMCDriver_GRPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasstringfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pStringFieldExists)
 {
 	IBase* pIBaseClass = (IBase *)pGRPCMessage;
@@ -1292,6 +1352,10 @@ LibMCDriver_GRPCResult LibMCDriver_GRPC::Impl::LibMCDriver_GRPC_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_grpc_driver_queryparametersex;
 	if (sProcName == "libmcdriver_grpc_grpcmessage_hasfield") 
 		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_hasfield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_hasmessagefield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_hasmessagefield;
+	if (sProcName == "libmcdriver_grpc_grpcmessage_getmessagefield") 
+		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_getmessagefield;
 	if (sProcName == "libmcdriver_grpc_grpcmessage_hasstringfield") 
 		*ppProcAddress = (void*) &libmcdriver_grpc_grpcmessage_hasstringfield;
 	if (sProcName == "libmcdriver_grpc_grpcmessage_setstringfield") 

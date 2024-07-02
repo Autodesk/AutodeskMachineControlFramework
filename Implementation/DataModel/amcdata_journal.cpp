@@ -296,7 +296,6 @@ namespace AMCData {
 
 			eLevel = convertStringToAlertLevel(sAlertLevel, false);
 
-
 			sDescription = pStatement->getColumnString(3);
 			sDescriptionIdentifier = pStatement->getColumnString(4);
 			sReadableContextInformation = pStatement->getColumnString(5);
@@ -304,7 +303,7 @@ namespace AMCData {
 			sTimestampUTC = pStatement->getColumnString(7);
 		}
 		else {
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert information not found: " + sNormalizedUUID);
 		}
 
 
@@ -344,7 +343,7 @@ namespace AMCData {
 
 		}
 		else {
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_ALERTNOTFOUND, "alert not found for acknowledgment: " + sNormalizedUUID);
 		}
 
 

@@ -43,8 +43,53 @@ using namespace LibMCData::Impl;
  Class definition of CBuildJobExecutionIterator 
 **************************************************************************************************************************/
 
-IBuildJobExecution * CBuildJobExecutionIterator::GetCurrentJobData()
+CBuildJobExecutionIterator::CBuildJobExecutionIterator()
+    : CIterator()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
 }
 
+
+CBuildJobExecutionIterator::~CBuildJobExecutionIterator()
+{
+
+}
+
+void CBuildJobExecutionIterator::AddJobExecution(std::shared_ptr<CBuildJobExecution> pBuildJobExecution)
+{
+    if (pBuildJobExecution.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    m_List.push_back(pBuildJobExecution);
+}
+
+IBase* CBuildJobExecutionIterator::GetCurrent()
+{
+    return GetCurrentJobExecution();
+}
+
+IBuildJobExecution* CBuildJobExecutionIterator::GetCurrentJobExecution()
+{
+    if ((m_nCurrentIndex < 0) || (m_nCurrentIndex >= m_List.size()))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDITERATOR);
+
+    auto pBuildJobExecution = std::dynamic_pointer_cast<CBuildJobExecution> (m_List[m_nCurrentIndex]);
+    if (pBuildJobExecution.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+
+    return CBuildJobExecution::makeFrom(pBuildJobExecution.get());
+}
+
+IIterator* CBuildJobExecutionIterator::Clone()
+{
+    std::unique_ptr<CBuildJobExecutionIterator> pNewIterator(new CBuildJobExecutionIterator());
+
+    for (auto pBase : m_List) {
+        auto pBuildJobExecution = std::dynamic_pointer_cast<CBuildJobExecution> (pBase);
+        if (pBuildJobExecution.get() == nullptr)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+        pNewIterator->AddJobExecution(CBuildJobExecution::makeSharedFrom(pBuildJobExecution.get()));
+    }
+
+    return pNewIterator.release();
+
+}

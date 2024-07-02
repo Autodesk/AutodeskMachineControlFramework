@@ -39,8 +39,12 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CRTCSelector 
 **************************************************************************************************************************/
 
-CRTCSelector::CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment) :
-	 m_pDriverEnvironment (pDriverEnvironment), m_pRTCContextOwnerData (pRTCContextOwnerData)
+CRTCSelector::CRTCSelector(PRTCContextOwnerData pRTCContextOwnerData, LibMCEnv::PDriverEnvironment pDriverEnvironment, double dDefaultInitialTimeout, double dDefaultMaxTimeout, double dDefaultMultiplier, const std::vector<uint8_t>& FirmwareData, const std::vector<uint8_t>& FPGAData, const std::vector<uint8_t>& AuxiliaryData) :
+	 m_pDriverEnvironment (pDriverEnvironment), m_pRTCContextOwnerData (pRTCContextOwnerData),
+	m_dDefaultInitialTimeout (dDefaultInitialTimeout), m_dDefaultMaxTimeout (dDefaultMaxTimeout), m_dDefaultMultiplier (dDefaultMultiplier),
+	m_FirmwareData (FirmwareData),
+	m_FPGAData (FPGAData),
+	m_AuxiliaryData (AuxiliaryData)
 
 {
 	if (pRTCContextOwnerData == nullptr)
@@ -73,7 +77,7 @@ LibMCDriver_ScanLab_uint32 CRTCSelector::SearchCards(const std::string & sIP, co
 	// eth search cards timeout ethernet
 	m_pScanLabSDK->eth_set_search_cards_timeout(nTimeout);
 
-	uint32_t nCount = m_pScanLabSDK->eth_search_cards(nIP, nNetMask);
+	uint32_t nCount = m_pScanLabSDK->eth_search_cards_range(nIP, nIP);
 
 	return nCount;
 
@@ -114,11 +118,20 @@ IRTCContext* CRTCSelector::acquireCardEx(const LibMCDriver_ScanLab_uint32 nNumbe
 {
 	m_pScanLabSDK->initDLL();
 
+	setCommunicationTimeoutsBeforeAcquire(nNumber);
+
+	loadFirmwareBeforeAcquisition(nNumber, bIsNetworkCard, false);
+
 	uint32_t cardNo = m_pScanLabSDK->acquire_rtc(nNumber);
 	if (cardNo == 0) {
 		m_pScanLabSDK->checkError(m_pScanLabSDK->get_last_error());
 
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYACQUIRED);
+	}
+
+	if (cardNo != nNumber) {
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR);
+
 	}
 
 	return new CRTCContext(m_pRTCContextOwnerData, cardNo, bIsNetworkCard, m_pDriverEnvironment);
@@ -136,14 +149,38 @@ IRTCContext * CRTCSelector::AcquireCardBySerial(const LibMCDriver_ScanLab_uint32
 
 	uint32_t nCardCount = GetCardCount();
 	uint32_t nCardNo;
+	uint32_t nFoundCardNo = 0;
 
+	bool bSerialAcquisitionError = false;
 	for (nCardNo = 1; nCardNo <= nCardCount; nCardNo++) {
 		uint32_t nCardSerial = m_pScanLabSDK->n_get_serial_number(nCardNo);
-		if (nCardSerial == nSerialNumber)
-			return AcquireCard(nCardNo);
+
+		if (nCardSerial == nSerialNumber) {
+			nFoundCardNo = nCardNo;
+		}
+
+		if (nCardSerial == 0) {
+			// If Card Serial is 0, we need to flash new firmware on card...
+			loadFirmwareBeforeAcquisition(nCardNo, false, false);
+
+			bSerialAcquisitionError = true;
+		}
+
 	}
 
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTFOUND);
+	// If card was found, acquire card...
+	if (nFoundCardNo != 0)
+		return AcquireCard(nFoundCardNo);
+
+	// If we did not find a card
+	// Trigger complete retry of acquisition, in case of one serial number was 0
+	if (bSerialAcquisitionError) {
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER);
+	}
+	else {
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTFOUND);
+	}
+
 }
 
 IRTCContext * CRTCSelector::AcquireEthernetCard(const LibMCDriver_ScanLab_uint32 nNumber)
@@ -166,16 +203,96 @@ IRTCContext * CRTCSelector::AcquireEthernetCardBySerial(const LibMCDriver_ScanLa
 
 	uint32_t nSearchCount = GetEthernetCardCount();
 	uint32_t nSearchNo;
+	uint32_t nFoundSearchNo = 0;
+
+	bool bSerialAcquisitionError = false;
+
 
 	for (nSearchNo = 1; nSearchNo <= nSearchCount; nSearchNo++) {
 		uint32_t nCardSerial = m_pScanLabSDK->eth_get_serial_search(nSearchNo);
-		if (nCardSerial == 0)
-			m_pScanLabSDK->checkError(m_pScanLabSDK->get_last_error());
+		if (nCardSerial == 0) {
+			// LoadFirmware
+			loadFirmwareForSearchNumber(nSearchNo, true);
+			
+			// Trigger complete retry
+			bSerialAcquisitionError = true;
+		}
 
-		if (nCardSerial == nSerialNumber)
-			return AcquireEthernetCard(nSearchNo);
+		if (nCardSerial == nSerialNumber) {
+			nFoundSearchNo = nSearchNo;
+		}
 	}
 
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTFOUND);
+	// LoadFirmware first
+	if (nFoundSearchNo != 0) {
+		return AcquireEthernetCard(nFoundSearchNo);
+	}
+
+	if (bSerialAcquisitionError) {
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER);
+	}
+	else {
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTFOUND);
+	}
 }
 
+
+void CRTCSelector::setCommunicationTimeoutsBeforeAcquire(uint32_t nCardNo)
+{
+	// ATTENTION: Please sync this code with CRTCContext::SetCommunicationTimeouts
+	double dOldInitialTimeout = 0.0;
+	double dOldMaxTimeout = 0.0;
+	double dOldMultiplier = 0.0;
+	uint32_t nOldMode = 0;
+
+	// Turn on high performance mode...
+	m_pScanLabSDK->n_eth_set_high_performance_mode(nCardNo, 1);
+
+	// Set Timeouts, but keep old mode
+	m_pScanLabSDK->n_eth_get_com_timeouts_auto(nCardNo, &dOldInitialTimeout, &dOldMaxTimeout, &dOldMultiplier, &nOldMode);
+	m_pScanLabSDK->n_eth_set_com_timeouts_auto(nCardNo, m_dDefaultInitialTimeout, m_dDefaultMaxTimeout, m_dDefaultMultiplier, nOldMode);
+
+}
+
+void CRTCSelector::loadFirmwareBeforeAcquisition(uint32_t nCardNo, bool bIsNetwork, bool bMustHaveData)
+{
+	bool bHasFirmwareData = ((m_FirmwareData.size() > 0) || (m_FPGAData.size() > 0) || (m_AuxiliaryData.size() > 0));
+
+	if (bHasFirmwareData) {
+		if (m_FirmwareData.size() == 0)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA);
+		if (m_FPGAData.size() == 0)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA);
+		if (m_AuxiliaryData.size() == 0)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA);
+
+		CRTCContext::loadFirmwareEx(m_pScanLabSDK, nCardNo, m_FirmwareData.size(), m_FirmwareData.data(), m_FPGAData.size(), m_FPGAData.data(), m_AuxiliaryData.size(), m_AuxiliaryData.data(), bIsNetwork, m_pDriverEnvironment);
+
+	}
+	else {
+		if (bMustHaveData)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA);
+	}
+}
+
+void CRTCSelector::loadFirmwareForSearchNumber(uint32_t nSearchNo, bool bMustHaveData)
+{
+	uint32_t nNewCardNo = m_pScanLabSDK->eth_assign_card(nSearchNo, 0);
+	if (nNewCardNo == 0) {
+		m_pScanLabSDK->checkError(m_pScanLabSDK->get_last_error());
+
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD);
+	}
+	
+	try {
+		loadFirmwareBeforeAcquisition(nNewCardNo, true, bMustHaveData);
+
+		m_pScanLabSDK->eth_remove_card(nNewCardNo);
+	}
+	catch (...) {
+		m_pScanLabSDK->eth_remove_card(nNewCardNo);
+		throw;
+	}
+
+
+}

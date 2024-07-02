@@ -71,6 +71,14 @@ public:
 	IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
 
     IDateTime* GetStartTime() override;
+
+	ILogEntryList* RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
+
+	ILogEntryList* RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
+
+	IAlertIterator* RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
+
+	IAlertIterator* RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
 };
 
 } // namespace Impl

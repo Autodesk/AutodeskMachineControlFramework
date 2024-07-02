@@ -117,7 +117,7 @@ namespace AMC {
 
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, PStateJournal pStateJournal, const std::string & sTestEnvironmentPath);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, AMCCommon::PChrono pGlobalChrono);
 
 		virtual ~CSystemState();
 
@@ -154,13 +154,14 @@ namespace AMC {
 		std::string getLibraryPath(const std::string& sLibraryName);
 		std::string getLibraryResourcePath(const std::string& sLibraryName);
 
-		std::string getSystemUserID();
 		std::string getInstallationUUID(); // Returns a unique UUID of the installation
 		std::string getInstallationSecret(); // Returns a unique Secret SHA256 String of the installation. MUST NOT be shared externally.
 		std::string getGitHash();
 		std::string getClientHash();
 
 		std::string getTestEnvironmentPath();
+
+		uint64_t getAbsoluteTimeStamp();
 
 
 

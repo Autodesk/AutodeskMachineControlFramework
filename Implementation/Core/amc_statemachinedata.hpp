@@ -59,7 +59,7 @@ namespace AMC {
 		CStateMachineData();
 		virtual ~CStateMachineData();
 
-		void registerParameterHandler (const std::string & sInstanceName, PParameterHandler pParameterHandler);
+		void registerParameterHandler (const std::string & sInstanceName, PParameterHandler pParameterHandler, AMCCommon::PChrono pChrono);
 		PParameterHandler getParameterHandler (const std::string& sInstanceName);
 
 		CParameterGroup* getDataStore(const std::string& sInstanceName);

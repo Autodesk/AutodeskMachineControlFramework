@@ -142,6 +142,26 @@ LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_driver_querypa
 LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasfield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pFieldExists);
 
 /**
+* Returns if the message has a field of a certain name and this field is a submessage field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pMessageFieldExists - True if field exists and is of type message.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_hasmessagefield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pMessageFieldExists);
+
+/**
+* Returns the submessage of a field. Fails if the field does not exist or is not a submessage field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pMessageFieldInstance - Sub message object
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_GRPC_DECLSPEC LibMCDriver_GRPCResult libmcdriver_grpc_grpcmessage_getmessagefield(LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_GRPCMessage * pMessageFieldInstance);
+
+/**
 * Returns if the message has a field of a certain name and this field is a string field.
 *
 * @param[in] pGRPCMessage - GRPCMessage instance.

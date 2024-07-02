@@ -56,16 +56,27 @@ namespace AMC {
 
 	class CLogger {
 	private:
-			
+		
+		AMCCommon::PChrono m_pGlobalChrono;
+
 	public:
 
-		CLogger()
-		{}
+		CLogger(AMCCommon::PChrono pGlobalChrono)
+			: m_pGlobalChrono (pGlobalChrono)
+		{			
+		}
 
 		virtual ~CLogger()
 		{}
 
-		virtual void logMessageEx (const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) = 0;
+		virtual void logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) = 0;
+
+		virtual void logMessage(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel)
+		{
+			if (m_pGlobalChrono.get() != nullptr) {
+				logMessageEx(sMessage, sSubSystem, logLevel, m_pGlobalChrono->getUTCTimeInISO8601());
+			}
+		}
 
 		virtual bool supportsLogMessagesRetrieval()
 		{
@@ -79,13 +90,6 @@ namespace AMC {
 			return 0;
 		}
 		
-		void logMessage(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel)
-		{
-			AMCCommon::CChrono chrono;
-			logMessageEx(sMessage, sSubSystem, logLevel, chrono.getStartTimeISO8601TimeUTC());
-		}
-
-
 
 		static std::string logLevelToString(eLogLevel logLevel)
 		{

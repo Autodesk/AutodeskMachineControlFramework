@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <memory>
+#include <map>
 #include <mutex>
 #include "common_exportstream.hpp"
+#include "common_portablezipwriter.hpp"
 
 namespace AMCData {
 
@@ -106,7 +108,54 @@ public:
 
 };
 
+
+class CStorageWriter_ZIPStream : public CStorageWriter {
+private:
+    std::string m_sUUID;
+    std::string m_sPath;
+    AMCCommon::PExportStream m_pExportStream;
+    AMCCommon::PExportStream m_pCurrentEntryExportStream;
+    AMCCommon::PPortableZIPWriter m_pPortableZIPWriter;
+
+    uint32_t m_nEntryIDCounter;
+    uint32_t m_nCurrentEntryID;
+    uint64_t m_nCurrentEntryDataSize;
+    uint64_t m_nZIPSize;
+
+    std::map <uint32_t, uint64_t> m_nEntryDataSizes;
+
+    std::mutex m_WriteMutex;
+
+public:
+
+    CStorageWriter_ZIPStream(const std::string& sUUID, const std::string& sPath);
+
+    virtual ~CStorageWriter_ZIPStream();
+
+    std::string getUUID() override;
+
+    void writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset) override;
+
+    uint32_t startNewEntry (const std::string & sFileName, uint64_t nAbsoluteTimeStamp);
+
+    void finishCurrentEntry();
+
+    uint32_t getOpenEntryID();
+
+    void writeToCurrentEntry (uint32_t nEntryID, const uint8_t* pChunkData, const uint64_t nChunkSize);
+
+    void finalize(std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256);
+
+    uint64_t getEntrySize(uint32_t nEntryID);
+    
+    bool isFinalized();
+
+    uint64_t getZIPStreamSize();
+
+};
+
 typedef std::shared_ptr <CStorageWriter> PStorageWriter;
+typedef std::shared_ptr <CStorageWriter_ZIPStream> PStorageWriter_ZIPStream;
 
 } // namespace AMCDATA
 
