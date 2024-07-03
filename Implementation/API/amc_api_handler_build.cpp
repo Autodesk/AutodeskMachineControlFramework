@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
 
-#include "amc_service_buildfileparsing.hpp"
 #include "amc_toolpathhandler.hpp"
 
 #include "common_utils.hpp"
@@ -72,10 +71,6 @@ APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, co
 
 	if (requestType == eAPIRequestType::rtPost) {
 
-		if ((sParameterString == "/prepare") || (sParameterString == "/prepare/")) {
-			return APIHandler_BuildType::btStartPrepareJob;
-		}
-
 		if ((sParameterString == "/toolpath") || (sParameterString == "/toolpath/")) {
 			return APIHandler_BuildType::btToolpath;
 		}
@@ -110,8 +105,6 @@ bool CAPIHandler_Build::expectsRawBody(const std::string& sURI, const eAPIReques
 	std::string jobUUID;
 
 	switch (parseRequest(sURI, requestType, jobUUID)) {
-		case APIHandler_BuildType::btStartPrepareJob:
-			return true;
 		case APIHandler_BuildType::btToolpath:
 			return true;
 
@@ -129,32 +122,6 @@ uint32_t CAPIHandler_Build::getFormDataFieldCount(const std::string& sURI, const
 CAPIFieldDetails CAPIHandler_Build::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
 {
 	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
-}
-
-void CAPIHandler_Build::handlePrepareJobRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
-{
-	if (pBodyData == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pAuth.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
-
-	auto sBuildUUID = jsonRequest.getUUID(AMC_API_KEY_BUILDUUID, LIBMC_ERROR_INVALIDBUILDUUID);
-
-	auto pDataModel = m_pSystemState->getDataModelInstance();
-	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
-	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
-
-	pBuildJob->StartValidating();
-
-	auto pServiceHandler = m_pSystemState->serviceHandler();
-	auto pLib3MFWrapper = m_pSystemState->toolpathHandler()->getLib3MFWrapper();
-
-	pServiceHandler->addServiceToQueue (std::make_shared <CService_BuildFileParsing> (pServiceHandler, pDataModel, pBuildJob->GetUUID(), pLib3MFWrapper, pAuth->getUserUUID(), m_pSystemState->getGlobalChronoInstance ()));
-
-	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBNAME, pBuildJob->GetName());
-
 }
 
 
@@ -347,9 +314,6 @@ PAPIResponse CAPIHandler_Build::handleRequest(const std::string& sURI, const eAP
 	writeJSONHeader(writer, AMC_API_PROTOCOL_BUILD);
 
 	switch (buildType) {
-	case APIHandler_BuildType::btStartPrepareJob:
-		handlePrepareJobRequest(writer, pBodyData, nBodyDataSize, pAuth);
-		break;
 	case APIHandler_BuildType::btListJobs:
 		handleListJobsRequest(writer, pAuth);
 		break;

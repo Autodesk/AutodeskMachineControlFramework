@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_multi.hpp"
 #include "amc_logger_callback.hpp"
 #include "amc_logger_database.hpp"
-#include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_accesscontrol.hpp"
@@ -176,21 +175,6 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             if (xmlns != MACHINEDEFINITION_XMLSCHEMA)
                 throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLSCHEMA, xmlns);
 
-        }
-
-        auto servicesNode = mainNode.child("services");
-        if (!servicesNode.empty()) {
-
-            auto threadCountAttrib = servicesNode.attribute("threadcount");
-            if (threadCountAttrib.empty()) 
-                throw ELibMCNoContextException(LIBMC_ERROR_MISSINGTHREADCOUNT);
-            auto nMaxThreadCount = threadCountAttrib.as_uint(SERVICETHREADCOUNT_DEFAULT);
-            if ((nMaxThreadCount < SERVICETHREADCOUNT_MIN) || (nMaxThreadCount > SERVICETHREADCOUNT_MAX))
-                throw ELibMCCustomException(LIBMC_ERROR_INVALIDTHREADCOUNT, threadCountAttrib.as_string());
-            m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t)nMaxThreadCount);
-        }
-        else {
-            m_pSystemState->serviceHandler()->setMaxThreadCount(SERVICETHREADCOUNT_DEFAULT);            
         }
 
 
