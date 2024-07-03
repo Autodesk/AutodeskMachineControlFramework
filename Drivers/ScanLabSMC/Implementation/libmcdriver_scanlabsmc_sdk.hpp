@@ -76,14 +76,13 @@ namespace LibMCDriver_ScanLabSMC {
 			slsc_PolylineProfile ProfileType;
 		};
 
-		enum slsc_ExecState
+		enum class slsc_ExecState : int32_t
 		{
 			slsc_ExecState_Idle = 0, 
 			slsc_ExecState_ReadyForExecution = 1, //!< The RTC6 board is ready to execute jobs.
 			slsc_ExecState_Executing = 2,         //!< The RTC6 board is executing a job.
 			slsc_ExecState_NotInitOrError = 3,    //!< The RTC6 board is not initialized or an error is present.
 		};
-		typedef enum slsc_ExecState slsc_ExecState;
 
 		typedef struct _slsc_PolylineOptions slsc_PolylineOptions;
 

@@ -204,8 +204,8 @@ void CSMCJobInstance::Execute(const bool bBlocking)
 
     std::cout << "Waiting for execution" << std::endl;
 
-    slsc_ExecState execState1 = slsc_ExecState_NotInitOrError;
-    while (execState1 != slsc_ExecState_ReadyForExecution) {
+    slsc_ExecState execState1 = slsc_ExecState::slsc_ExecState_NotInitOrError;
+    while (execState1 != slsc_ExecState::slsc_ExecState_ReadyForExecution) {
         m_pSDK->checkError(contextHandle, m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState1));
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     } 
@@ -216,8 +216,8 @@ void CSMCJobInstance::Execute(const bool bBlocking)
 
     //std::cout << "Waiting for execution finished" << std::endl;
 
-    slsc_ExecState execState2 = slsc_ExecState_Executing;
-    while (execState2 == slsc_ExecState_Executing) {
+    slsc_ExecState execState2 = slsc_ExecState::slsc_ExecState_Executing;
+    while (execState2 == slsc_ExecState::slsc_ExecState_Executing) {
         m_pSDK->checkError(contextHandle, m_pSDK->slsc_ctrl_get_exec_state(contextHandle, &execState2));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     } 
@@ -280,8 +280,8 @@ void CSMCJobInstance::AddLayerToList(LibMCEnv::PToolpathLayer pLayer)
 
                     for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
                         auto pContourPoint = &ContourPoints.at(nPointIndex);
-                        pContourPoint->m_X = (double)(Points[nPointIndex].m_Coordinates[0] * dUnits);
-                        pContourPoint->m_Y = (double)(Points[nPointIndex].m_Coordinates[1] * dUnits);
+                        pContourPoint->m_X = (float)(((double)Points[nPointIndex].m_Coordinates[0]) * dUnits);
+                        pContourPoint->m_Y = (float)(((double)Points[nPointIndex].m_Coordinates[1]) * dUnits);
                     } 
 
                     if (ContourPoints.size() > 0) {
@@ -308,10 +308,10 @@ void CSMCJobInstance::AddLayerToList(LibMCEnv::PToolpathLayer pLayer)
 
                     for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
                         auto pHatch = &Hatches.at(nHatchIndex);
-                        pHatch->m_X1 = (double)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
-                        pHatch->m_Y1 = (double)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
-                        pHatch->m_X2 = (double)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
-                        pHatch->m_Y2 = (double)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
+                        pHatch->m_X1 = (float)((double)Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
+                        pHatch->m_Y1 = (float)((double)Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
+                        pHatch->m_X2 = (float)((double)Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
+                        pHatch->m_Y2 = (float)((double)Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
                     }
 
                     if (Hatches.size() > 0) {
