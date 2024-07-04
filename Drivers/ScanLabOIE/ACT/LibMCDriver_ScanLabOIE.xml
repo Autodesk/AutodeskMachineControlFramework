@@ -113,9 +113,10 @@
 		
 		<error name="OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE" code="1054" description="OIE Driver Type is not in compatibility mode." />	
 		<error name="OIEDRIVERTYPEISNOTIN100KHZMODE" code="1055" description="OIE Driver Type is not in 100kHz mode." />	
-		<error name="INVALIDOIEEXECUTIONMODE" code="1056" description="Invalid OIE Execution mode." />	
-		
+		<error name="INVALIDOIEEXECUTIONMODE" code="1056" description="Invalid OIE Execution mode." />			
 		<error name="POSITIONMISSINGINOIERTCIDLIST" code="1057" description="Position missing in OIE RTC ID List." />	
+		<error name="INVALIDOIEDEVICESTATE" code="1058" description="Invalid OIE device state." />	
+		
 		
 		
 		
@@ -404,7 +405,7 @@ Custom implementation
 			<param name="Port" type="uint32" pass="return" description="Port of device." />
 		</method>
 
-		<method name="IsConnected" description="Returns if the device is connected and logged in.">
+		<method name="IsConnected" description="Returns if the device is connected.">
 			<param name="Value" type="bool" pass="return" description="Flag if the device is connected." />
 		</method>
 		
@@ -469,11 +470,11 @@ Custom implementation
 
 		<method name="StopApp" description="Stops the currently running app. Does nothing if no app is running. Stops recording of signals.">
 		</method>
-		
+				
 		<method name="AppIsRunning" description="Returns if the device is running an app.">
 			<param name="Value" type="bool" pass="return" description="Flag if the device is running an app." />
 		</method>		
-		
+
 		<method name="GetRunningApp" description="Returns if the app that is currently running on the device. Fails if no app is running on the device.">
 			<param name="Name" type="string" pass="out" description="Name of app." />
 			<param name="Major" type="uint32" pass="out" description="Major version of the app." />
@@ -510,12 +511,19 @@ Custom implementation
 		
 		<method name="ClearCurrentRecording" description="Clears the current recording data and continues recording into a new empty instance.">
 		</method>
+				
 		
-		<method name="LoadRecordingFromBuild" description="Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.">
-			<param name="Build" type="class" class="LibMCEnv:Build" pass="in" description="Build that contains the data." />
-			<param name="DataUUID" type="string" pass="in" description="Data UUID of the build data." />
-			<param name="RecordingInstance" type="class" class="DataRecording" pass="return" description="Recording instance" />
-		</method>
+		<method name="IsLoggedIn" description="Returns if the device is logged in.">
+			<param name="Value" type="bool" pass="return" description="Flag if the device is logged in." />
+		</method>		
+
+		<method name="IsStreaming" description="Returns if the device is streaming.">
+			<param name="Value" type="bool" pass="return" description="Flag if the device is streaming." />
+		</method>		
+		
+		<method name="RTCIsBusy" description="Returns if the connected RTC is busy.">
+			<param name="Value" type="bool" pass="return" description="Flag if the connected RTC is busy." />
+		</method>		
 		
 	</class>
 	
