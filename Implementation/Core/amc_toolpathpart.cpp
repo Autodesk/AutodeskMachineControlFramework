@@ -53,6 +53,8 @@ namespace AMC {
 		if (!bHasUUID)
 			throw ELibMCCustomException (LIBMC_ERROR_BUILDITEMHASNOUUID, m_sName);
 
+		m_sPartNumber = m_pBuildItem->GetPartNumber();
+
 		m_sMeshUUID = p3MFObject->GetUUID(bHasUUID);
 		if (!bHasUUID)
 			throw ELibMCCustomException(LIBMC_ERROR_OBJECTHASNOUUID, m_sName);
@@ -79,6 +81,11 @@ namespace AMC {
 	std::string CToolpathPart::getName()
 	{
 		return m_sName;
+	}
+
+	std::string CToolpathPart::getPartNumber()
+	{
+		return m_sPartNumber;
 	}
 }
 

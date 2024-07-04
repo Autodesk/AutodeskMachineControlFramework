@@ -614,6 +614,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_BUILDHASNOTOOLPATH 597 /** Build has not toolpath */
 #define LIBMC_ERROR_MISSINGUPLOADCONTEXT 598 /** Missing upload context */
 #define LIBMC_ERROR_INVALIDUPLOADCONTEXT 599 /** Build has not toolpath */
+#define LIBMC_ERROR_MESHHASTOOMANYVERTICES 600 /** Mesh has too many vertices */
+#define LIBMC_ERROR_MESHHASTOOMANYTRIANGLES 601 /** Mesh has too many triangles */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1140,6 +1142,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_BUILDHASNOTOOLPATH: return "Build has not toolpath";
     case LIBMC_ERROR_MISSINGUPLOADCONTEXT: return "Missing upload context";
     case LIBMC_ERROR_INVALIDUPLOADCONTEXT: return "Build has not toolpath";
+    case LIBMC_ERROR_MESHHASTOOMANYVERTICES: return "Mesh has too many vertices";
+    case LIBMC_ERROR_MESHHASTOOMANYTRIANGLES: return "Mesh has too many triangles";
     default: return "unknown error";
   }
 }

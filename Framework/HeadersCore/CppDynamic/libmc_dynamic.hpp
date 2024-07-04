@@ -692,6 +692,8 @@ public:
 			case LIBMC_ERROR_BUILDHASNOTOOLPATH: return "BUILDHASNOTOOLPATH";
 			case LIBMC_ERROR_MISSINGUPLOADCONTEXT: return "MISSINGUPLOADCONTEXT";
 			case LIBMC_ERROR_INVALIDUPLOADCONTEXT: return "INVALIDUPLOADCONTEXT";
+			case LIBMC_ERROR_MESHHASTOOMANYVERTICES: return "MESHHASTOOMANYVERTICES";
+			case LIBMC_ERROR_MESHHASTOOMANYTRIANGLES: return "MESHHASTOOMANYTRIANGLES";
 		}
 		return "UNKNOWN";
 	}
@@ -1218,6 +1220,8 @@ public:
 			case LIBMC_ERROR_BUILDHASNOTOOLPATH: return "Build has not toolpath";
 			case LIBMC_ERROR_MISSINGUPLOADCONTEXT: return "Missing upload context";
 			case LIBMC_ERROR_INVALIDUPLOADCONTEXT: return "Build has not toolpath";
+			case LIBMC_ERROR_MESHHASTOOMANYVERTICES: return "Mesh has too many vertices";
+			case LIBMC_ERROR_MESHHASTOOMANYTRIANGLES: return "Mesh has too many triangles";
 		}
 		return "unknown error";
 	}

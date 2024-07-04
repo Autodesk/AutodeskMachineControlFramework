@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_dynamic.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
+#include <common_utils.hpp>
+
 namespace AMC {
 
 	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName, bool bAllowEmptyToolpath)
@@ -59,10 +61,6 @@ namespace AMC {
 
 		m_p3MFReader = m_p3MFModel->QueryReader("3mf");
 		m_p3MFReader->ReadFromPersistentSource(m_pPersistentSource.get ());
-
-		// Depreciated read from memory 
-		   //m_p3MFReader->AddRelationToRead("http://schemas.microsoft.com/3dmanufacturing/2019/05/toolpath");
-		   //m_p3MFReader->ReadFromCallback((Lib3MF::ReadCallback) pReadCallback, nStreamSize, (Lib3MF::SeekCallback) pSeekCallback, pUserData);
 
 		auto pToolpathIterator = m_p3MFModel->GetToolpaths();
 		if (pToolpathIterator->MoveNext()) {
@@ -342,6 +340,43 @@ namespace AMC {
 
 		m_CustomSegmentAttributeMap.insert(std::make_pair (key, pSegmentAttribute));
 		
+	}
+
+	bool CToolpathEntity::readThumbnail(std::vector<uint8_t>& thumbnailBuffer, std::string& sMimeType)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		if (m_p3MFModel.get() != nullptr) {
+			auto pThumbnailAttachment = m_p3MFModel->GetPackageThumbnailAttachment();
+			if (pThumbnailAttachment.get() != nullptr) {
+
+				std::string sPath = AMCCommon::CUtils::toLowerString (pThumbnailAttachment->GetPath());
+
+				// TODO: Move this function into proper Lib3MF code...
+				size_t nLength = sPath.length();
+				if (nLength >= 4) {
+					std::string sSubstr = sPath.substr(nLength - 4, 4);
+					if (sSubstr == ".png")
+						sMimeType = "image/png";
+					if (sSubstr == ".jpg")
+						sMimeType = "image/jpeg";
+				}
+
+				if (nLength >= 5) {
+					std::string sSubstr = sPath.substr(nLength - 5, 5);
+					if (sSubstr == ".jpeg")
+						sMimeType = "image/jpeg";
+				}
+
+				pThumbnailAttachment->WriteToBuffer(thumbnailBuffer);
+
+
+				return true;
+			}
+
+		}
+
+
+		return false;
 	}
 
 

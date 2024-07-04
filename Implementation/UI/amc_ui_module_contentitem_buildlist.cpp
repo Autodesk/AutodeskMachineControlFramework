@@ -270,7 +270,11 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 		entryObject.addInteger(AMC_API_KEY_UI_ITEMBUILDLAYERS, pBuildJob->GetLayerCount());
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUUID, pBuildJob->GetUUID());
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDTIMESTAMP, pBuildJob->GetTimeStamp());
-		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
+		if (pBuildJob->HasThumbnailStream ())
+			entryObject.addString(AMC_API_KEY_UI_ITEMBUILDTHUMBNAIL, pBuildJob->GetThumbnailStreamUUID ());
+		else
+			entryObject.addString(AMC_API_KEY_UI_ITEMBUILDTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
+
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUSER, pBuildJob->GetCreatorName());
 		entryObject.addInteger(AMC_API_KEY_UI_ITEMBUILDEXECUTIONCOUNT, pBuildJob->GetExecutionCount());
 

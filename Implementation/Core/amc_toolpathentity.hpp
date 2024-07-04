@@ -105,6 +105,9 @@ namespace AMC {
 		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 
 		void registerCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType);
+
+		bool readThumbnail (std::vector<uint8_t>& thumbnailBuffer, std::string & sMimeType);
+
 	};
 
 	

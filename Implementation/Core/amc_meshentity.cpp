@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 
 #include "amc_geometryutils.hpp"
+#include "amc_constants.hpp"
 
 #define MESHENTITY_ZEROEPSILON 1E-6
 
@@ -145,6 +146,12 @@ namespace AMC {
 
 		size_t nVertexCount = vertices.size();
 		size_t nTriangleCount = triangles.size();
+
+		if (nVertexCount > MESHENTITY_MAXVERTEXCOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYVERTICES, std::to_string(nVertexCount));
+		if (nTriangleCount > MESHENTITY_MAXTRIANGLECOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYTRIANGLES, std::to_string(nTriangleCount));
+
 		m_Nodes.resize(nVertexCount);
 		m_Faces.resize(nTriangleCount);
 
@@ -353,6 +360,9 @@ namespace AMC {
 		if (pVertexIDsNeededCount)
 			*pVertexIDsNeededCount = nNodeCount;
 
+		if (nNodeCount > MESHENTITY_MAXVERTEXCOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYVERTICES, std::to_string(nNodeCount));
+
 		if ((nNodeCount > 0) && (pVertexIDsBuffer != nullptr)) {
 			if (nVertexIDsBufferSize < nNodeCount)
 				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
@@ -371,13 +381,16 @@ namespace AMC {
 		if (pVerticesNeededCount)
 			*pVerticesNeededCount = nNodeCount;
 
+		if (nNodeCount > MESHENTITY_MAXVERTEXCOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYVERTICES, std::to_string(nNodeCount));
+
 		if ((nNodeCount > 0) && (pVerticesBuffer != nullptr)) {
 			if (nVerticesBufferSize < nNodeCount)
 				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
 
 			LibMCEnv::sMeshVertex3D* pPtr = pVerticesBuffer;
 			for (size_t nVertexID = 1; nVertexID <= nNodeCount; nVertexID++) {
-				pPtr->m_VertexID = nVertexID;
+				pPtr->m_VertexID = (uint32_t) nVertexID;
 				auto& node = getNode(nVertexID);
 				for (uint32_t nCoordinateIndex = 0; nCoordinateIndex < 3; nCoordinateIndex++)
 					pPtr->m_Coordinates[nCoordinateIndex] = node.m_fCoordinates[nCoordinateIndex];
@@ -423,6 +436,9 @@ namespace AMC {
 		if (pTriangleIDsNeededCount)
 			*pTriangleIDsNeededCount = nFaceCount;
 
+		if (nFaceCount > MESHENTITY_MAXTRIANGLECOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYTRIANGLES, std::to_string(nFaceCount));
+
 		if ((nFaceCount > 0) && (pTriangleIDsBuffer != nullptr)) {
 			if (nTriangleIDsBufferSize < nFaceCount)
 				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
@@ -442,13 +458,16 @@ namespace AMC {
 		if (pTrianglesNeededCount)
 			*pTrianglesNeededCount = nFaceCount;
 
+		if (nFaceCount > MESHENTITY_MAXTRIANGLECOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYTRIANGLES, std::to_string (nFaceCount));
+
 		if ((nFaceCount > 0) && (pTrianglesBuffer != nullptr)) {
 			if (nTrianglesBufferSize < nFaceCount)
 				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
 
 			LibMCEnv::sMeshTriangle3D* pPtr = pTrianglesBuffer;
 			for (size_t nTriangleID = 1; nTriangleID <= nFaceCount; nTriangleID++) {
-				pPtr->m_TriangleID = nTriangleID;
+				pPtr->m_TriangleID = (uint32_t) nTriangleID;
 				auto& face = getFace(nTriangleID);
 				for (uint32_t nCornerIndex = 0; nCornerIndex < 3; nCornerIndex++)
 					pPtr->m_Vertices[nCornerIndex] = face.m_nNodeIDs[nCornerIndex];

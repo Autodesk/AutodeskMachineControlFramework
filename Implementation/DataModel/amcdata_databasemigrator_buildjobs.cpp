@@ -143,6 +143,14 @@ namespace AMCData {
 			break;
 		}
 
+		case 14: 
+		{
+			std::string sIdentifierAddQuery = "ALTER TABLE `buildjobs` ADD `thumbnailuuid` varchar ( 256 ) DEFAULT `00000000-0000-0000-0000-000000000000`";
+			pTransaction->executeStatement(sIdentifierAddQuery);
+			break;
+
+		}
+
 		}
 
 		

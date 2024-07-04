@@ -623,6 +623,8 @@
 		<error name="BUILDHASNOTOOLPATH" code="597" description="Build has not toolpath" />
 		<error name="MISSINGUPLOADCONTEXT" code="598" description="Missing upload context" />
 		<error name="INVALIDUPLOADCONTEXT" code="599" description="Build has not toolpath" />
+		<error name="MESHHASTOOMANYVERTICES" code="600" description="Mesh has too many vertices" />
+		<error name="MESHHASTOOMANYTRIANGLES" code="601" description="Mesh has too many triangles" />
 
 
 	</errors>

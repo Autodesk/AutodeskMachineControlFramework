@@ -169,28 +169,12 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	auto sMimeType = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_MIMETYPE, LIBMC_ERROR_INVALIDMIMETYPE);
 	auto nSize = jsonRequest.getUint64(AMC_API_KEY_UPLOAD_SIZE, 1, pStorage->GetMaxStreamSize(), LIBMC_ERROR_INVALIDSTREAMSIZE);
 
-	/*std::string sContextIdentifier;
-	if (sContext == "build") {
-		//sContextUUID = createNewBuild(sName, sUUID, pAuth);
-		sContextIdentifier = "builddata";
-	}
-	else if (sContext == "image") {
-		sContextIdentifier = "imagedata";
-	}
-	else {
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCONTEXTUUID);
-	} */
-
 	if (!pStorage->ContentTypeIsAccepted(sMimeType))
 		throw ELibMCInterfaceException(LIBMC_ERROR_CONTENTTYPENOTACCEPTED);
-	
-	/*if (!pAuth->contextUUIDIsAuthorized(sContextUUID))
-		throw ELibMCInterfaceException(LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED); */
 
 	pStorage->BeginPartialStream (sUUID, sName, sMimeType, nSize, pAuth->getUserUUID (), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
 	writer.addString(AMC_API_KEY_UPLOAD_STREAMUUID, sUUID);
-	//writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sContextUUID);
 
 }
 
@@ -239,8 +223,23 @@ void CAPIHandler_Upload::handleFinishUploadRequest(CJSONWriter& writer, const ui
 		
 		pBuildJob->StartValidating();
 		CToolpathEntity toolpathEntity(pDataModel, pStreamObject->GetUUID(), pToolpathHandler->getLib3MFWrapper(), pBuildJob->GetName(), true);
+
 		pBuildJob->FinishValidating(toolpathEntity.getLayerCount());
+
 		pBuildJob->AddJobData(pStreamObject->GetContextIdentifier(), pStreamObject->GetName(), pStreamObject, LibMCData::eCustomDataType::Toolpath, pAuth->getUserUUID (), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+		std::vector<uint8_t> thumbNailBuffer;
+		std::string thumbNailMimeType;
+		if (toolpathEntity.readThumbnail(thumbNailBuffer, thumbNailMimeType)) {
+			std::string sThumbnailUUID = AMCCommon::CUtils::createUUID();
+			pStorage->StoreNewStream(sThumbnailUUID, "thumbnail", thumbNailMimeType, thumbNailBuffer, pAuth->getUserUUID(), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+			auto pThumbnailStream = pStorage->RetrieveStream (sThumbnailUUID);
+
+			pBuildJob->AddJobData("thumbnail", "thumbnail", pThumbnailStream, LibMCData::eCustomDataType::Thumbnail, pAuth->getUserUUID(), pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+			pBuildJob->SetThumbnailStreamUUID(sThumbnailUUID);
+		}
+
 
 		writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sBuildUUID);
 	}

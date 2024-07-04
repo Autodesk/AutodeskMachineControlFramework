@@ -51,6 +51,7 @@ namespace AMC {
 		std::string m_sUUID;
 		std::string m_sMeshUUID;
 		std::string m_sName;		
+		std::string m_sPartNumber;
 		
 		Lib3MF::PModel m_p3MFModel;
 		Lib3MF::PBuildItem m_pBuildItem;
@@ -64,6 +65,7 @@ namespace AMC {
 		std::string getUUID ();
 		std::string getMeshUUID ();
 		std::string getName ();
+		std::string getPartNumber ();
 
 	};
 

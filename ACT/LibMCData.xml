@@ -1164,6 +1164,18 @@
 			<param name="UserUUID" type="string" pass="return" description="User UUID" />	
 		</method>
 
+		<method name="HasThumbnailStream" description="returns if the build has an attached thumbnail.">
+			<param name="HasThumbnail" type="bool" pass="return" description="Returns true, if the build has an attached thumbnail." />	
+		</method>
+
+		<method name="GetThumbnailStreamUUID" description="returns the UUID of the thumbnail stream of the job.">
+			<param name="UUID" type="string" pass="return" description="Thumbnail UUID. 00000000-0000-0000-0000-000000000000, if no thumbnail is assigned..." />	
+		</method>
+		
+		<method name="SetThumbnailStreamUUID" description="Sets the UUID of the thumbnail stream of the job.">
+			<param name="StreamUUID" type="string" pass="in" description="Thumbnail UUID. Stream MUST exist and of MIME Type png. If empty or 00000000-0000-0000-0000-000000000000, no thumbnail will be assigned..." />	
+		</method>
+
 		<method name="GetCreatorName" description="returns the current name of the user that created the job.">
 			<param name="UserName" type="string" pass="return" description="User UUID" />	
 		</method>
