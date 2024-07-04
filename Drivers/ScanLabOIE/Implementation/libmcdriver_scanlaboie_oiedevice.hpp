@@ -187,9 +187,13 @@ public:
 
 	void ClearCurrentRecording();
 
-	PDataRecordingInstance LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID);
-
 	void SetRTC6IPAddress (const std::string & sRTC6IPAddress);
+
+	bool isLoggedIn();
+
+	bool isStreaming();
+
+	bool rtcIsBusy();
 
 };
 
@@ -266,7 +270,12 @@ public:
 
 	void ClearCurrentRecording() override;
 
-	IDataRecording* LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID) override;
+	bool IsLoggedIn() override;
+
+	bool IsStreaming() override;
+
+	bool RTCIsBusy() override;
+
 
 
 };

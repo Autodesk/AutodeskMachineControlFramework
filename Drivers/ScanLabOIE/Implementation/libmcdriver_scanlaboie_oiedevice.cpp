@@ -767,17 +767,44 @@ void COIEDeviceInstance::ClearCurrentRecording()
 	}
 }
 
-PDataRecordingInstance COIEDeviceInstance::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)
-{
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
-}
 
 void COIEDeviceInstance::SetRTC6IPAddress(const std::string& sRTC6IPAddress)
 {
 	m_sRTC6IPAddress = sRTC6IPAddress;
 }
 
+bool COIEDeviceInstance::isLoggedIn()
+{
+	oie_device_state state = 0;
+	m_pOIESDK->oie_get_device_state(m_pDevice, state);
 
+	if (state < 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE);
+
+	return ((((uint32_t)state) & OIE_DEVICESTATE_LOGGEDIN) != 0);
+}
+
+bool COIEDeviceInstance::isStreaming()
+{
+	oie_device_state state = 0;
+	m_pOIESDK->oie_get_device_state(m_pDevice, state);
+
+	if (state < 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE);
+
+	return ((((uint32_t)state) & OIE_DEVICESTATE_STREAMING) != 0);
+}
+
+bool COIEDeviceInstance::rtcIsBusy()
+{
+	oie_device_state state = 0;
+	m_pOIESDK->oie_get_device_state(m_pDevice, state);
+
+	if (state < 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE);
+
+	return ((((uint32_t)state) & OIE_DEVICESTATE_RTCBUSY) != 0);
+}
 
 COIEDevice::COIEDevice(POIEDeviceInstance pDeviceInstance)
 {
@@ -954,9 +981,20 @@ void COIEDevice::ClearCurrentRecording()
 	lockInstance()->ClearCurrentRecording();
 }
 
-IDataRecording* COIEDevice::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)
+
+bool COIEDevice::IsLoggedIn()
 {
-	auto pRecordingInstance = lockInstance()->LoadRecordingFromBuild(pBuild, sDataUUID);
-	return new CDataRecording(pRecordingInstance);
+	return lockInstance()->isLoggedIn();
 }
 
+bool COIEDevice::IsStreaming()
+{
+	return lockInstance()->isStreaming();
+
+}
+
+bool COIEDevice::RTCIsBusy()
+{
+	return lockInstance()->rtcIsBusy();
+
+}

@@ -1522,6 +1522,9 @@ public:
 	inline LibMCData_uint32 GetExecutionCount();
 	inline std::string GetTimeStamp();
 	inline std::string GetCreatorUUID();
+	inline bool HasThumbnailStream();
+	inline std::string GetThumbnailStreamUUID();
+	inline void SetThumbnailStreamUUID(const std::string & sStreamUUID);
 	inline std::string GetCreatorName();
 	inline PStorageStream GetStorageStream();
 	inline std::string GetStorageStreamUUID();
@@ -1945,6 +1948,9 @@ public:
 		pWrapperTable->m_BuildJob_GetExecutionCount = nullptr;
 		pWrapperTable->m_BuildJob_GetTimeStamp = nullptr;
 		pWrapperTable->m_BuildJob_GetCreatorUUID = nullptr;
+		pWrapperTable->m_BuildJob_HasThumbnailStream = nullptr;
+		pWrapperTable->m_BuildJob_GetThumbnailStreamUUID = nullptr;
+		pWrapperTable->m_BuildJob_SetThumbnailStreamUUID = nullptr;
 		pWrapperTable->m_BuildJob_GetCreatorName = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStream = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStreamUUID = nullptr;
@@ -3188,6 +3194,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJob_GetCreatorUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_HasThumbnailStream = (PLibMCDataBuildJob_HasThumbnailStreamPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_hasthumbnailstream");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_HasThumbnailStream = (PLibMCDataBuildJob_HasThumbnailStreamPtr) dlsym(hLibrary, "libmcdata_buildjob_hasthumbnailstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_HasThumbnailStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_GetThumbnailStreamUUID = (PLibMCDataBuildJob_GetThumbnailStreamUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getthumbnailstreamuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_GetThumbnailStreamUUID = (PLibMCDataBuildJob_GetThumbnailStreamUUIDPtr) dlsym(hLibrary, "libmcdata_buildjob_getthumbnailstreamuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_GetThumbnailStreamUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_SetThumbnailStreamUUID = (PLibMCDataBuildJob_SetThumbnailStreamUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_setthumbnailstreamuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_SetThumbnailStreamUUID = (PLibMCDataBuildJob_SetThumbnailStreamUUIDPtr) dlsym(hLibrary, "libmcdata_buildjob_setthumbnailstreamuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_SetThumbnailStreamUUID == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4565,6 +4598,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getcreatoruuid", (void**)&(pWrapperTable->m_BuildJob_GetCreatorUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetCreatorUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_hasthumbnailstream", (void**)&(pWrapperTable->m_BuildJob_HasThumbnailStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_HasThumbnailStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_getthumbnailstreamuuid", (void**)&(pWrapperTable->m_BuildJob_GetThumbnailStreamUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetThumbnailStreamUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_setthumbnailstreamuuid", (void**)&(pWrapperTable->m_BuildJob_SetThumbnailStreamUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_SetThumbnailStreamUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getcreatorname", (void**)&(pWrapperTable->m_BuildJob_GetCreatorName));
@@ -6754,6 +6799,42 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetCreatorUUID(m_pHandle, bytesNeededUserUUID, &bytesWrittenUserUUID, &bufferUserUUID[0]));
 		
 		return std::string(&bufferUserUUID[0]);
+	}
+	
+	/**
+	* CBuildJob::HasThumbnailStream - returns if the build has an attached thumbnail.
+	* @return Returns true, if the build has an attached thumbnail.
+	*/
+	bool CBuildJob::HasThumbnailStream()
+	{
+		bool resultHasThumbnail = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_HasThumbnailStream(m_pHandle, &resultHasThumbnail));
+		
+		return resultHasThumbnail;
+	}
+	
+	/**
+	* CBuildJob::GetThumbnailStreamUUID - returns the UUID of the thumbnail stream of the job.
+	* @return Thumbnail UUID. 00000000-0000-0000-0000-000000000000, if no thumbnail is assigned...
+	*/
+	std::string CBuildJob::GetThumbnailStreamUUID()
+	{
+		LibMCData_uint32 bytesNeededUUID = 0;
+		LibMCData_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetThumbnailStreamUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetThumbnailStreamUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CBuildJob::SetThumbnailStreamUUID - Sets the UUID of the thumbnail stream of the job.
+	* @param[in] sStreamUUID - Thumbnail UUID. Stream MUST exist and of MIME Type png. If empty or 00000000-0000-0000-0000-000000000000, no thumbnail will be assigned...
+	*/
+	void CBuildJob::SetThumbnailStreamUUID(const std::string & sStreamUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_SetThumbnailStreamUUID(m_pHandle, sStreamUUID.c_str()));
 	}
 	
 	/**

@@ -651,7 +651,7 @@ public:
 	virtual LibMCDriver_ScanLabOIE_uint32 GetPort() = 0;
 
 	/**
-	* IOIEDevice::IsConnected - Returns if the device is connected and logged in.
+	* IOIEDevice::IsConnected - Returns if the device is connected.
 	* @return Flag if the device is connected.
 	*/
 	virtual bool IsConnected() = 0;
@@ -804,12 +804,22 @@ public:
 	virtual void ClearCurrentRecording() = 0;
 
 	/**
-	* IOIEDevice::LoadRecordingFromBuild - Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.
-	* @param[in] pBuild - Build that contains the data.
-	* @param[in] sDataUUID - Data UUID of the build data.
-	* @return Recording instance
+	* IOIEDevice::IsLoggedIn - Returns if the device is logged in.
+	* @return Flag if the device is logged in.
 	*/
-	virtual IDataRecording * LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string & sDataUUID) = 0;
+	virtual bool IsLoggedIn() = 0;
+
+	/**
+	* IOIEDevice::IsStreaming - Returns if the device is streaming.
+	* @return Flag if the device is streaming.
+	*/
+	virtual bool IsStreaming() = 0;
+
+	/**
+	* IOIEDevice::RTCIsBusy - Returns if the connected RTC is busy.
+	* @return Flag if the connected RTC is busy.
+	*/
+	virtual bool RTCIsBusy() = 0;
 
 };
 

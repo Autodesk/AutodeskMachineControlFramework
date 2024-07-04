@@ -1337,6 +1337,24 @@ public:
 	virtual std::string GetCreatorUUID() = 0;
 
 	/**
+	* IBuildJob::HasThumbnailStream - returns if the build has an attached thumbnail.
+	* @return Returns true, if the build has an attached thumbnail.
+	*/
+	virtual bool HasThumbnailStream() = 0;
+
+	/**
+	* IBuildJob::GetThumbnailStreamUUID - returns the UUID of the thumbnail stream of the job.
+	* @return Thumbnail UUID. 00000000-0000-0000-0000-000000000000, if no thumbnail is assigned...
+	*/
+	virtual std::string GetThumbnailStreamUUID() = 0;
+
+	/**
+	* IBuildJob::SetThumbnailStreamUUID - Sets the UUID of the thumbnail stream of the job.
+	* @param[in] sStreamUUID - Thumbnail UUID. Stream MUST exist and of MIME Type png. If empty or 00000000-0000-0000-0000-000000000000, no thumbnail will be assigned...
+	*/
+	virtual void SetThumbnailStreamUUID(const std::string & sStreamUUID) = 0;
+
+	/**
 	* IBuildJob::GetCreatorName - returns the current name of the user that created the job.
 	* @return User UUID
 	*/
