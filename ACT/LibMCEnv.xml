@@ -360,7 +360,7 @@
 	</struct>
 
 
-	<struct name="ToolpathPartTransform">
+	<struct name="ModelDataTransform">
 		<member name="Matrix" type="double" rows="3" columns="3"/>
 		<member name="Translation" type="double" rows="3"/>
 	</struct>
@@ -1081,7 +1081,7 @@
 
 
 
-	<class name="MeshObject" parent="Base">
+	<class name="MeshObject" parent="Base" description="A mesh object is an in memory representation of a 3D mesh model.">
 	
 		<method name="GetName" description="Returns the name of the Mesh Object.">
 			<param name="Name" type="string" pass="return" description="Returns the name of the mesh object." />
@@ -1161,6 +1161,92 @@
 			<param name="Triangles" type="structarray" class="MeshTriangle3D" pass="out" description="Triangle array." />
 		</method>
 
+		<method name="IsPersistent" description="Returns if the mesh object is persisted in memory.">
+			<param name="Value" type="bool" pass="return" description="If true, the mesh object is persisted in memory and can be retrieved by FindPersistentMeshObject." />
+		</method>
+
+		<method name="MakePersistent" description="Makes the mesh persistent in memory. It will not be released when the MeshObject instances is released. Should be handled with great care!">
+			<param name="BoundToLoginSession" type="bool" pass="in" description="If true, the mesh will be freed once the client login session expires." />
+			<param name="PersistentMesh" type="class" class="PersistentMeshObject" pass="return" description="Returns a persistent instance to the same mesh data." />
+		</method>
+
+	</class>
+
+	<class name="PersistentMeshObject" parent="Base" description="A persistent mesh object is a globally stored object that stays in memory. Should be handled with great care!">
+
+		<method name="IsBoundToLoginSession" description="Returns if the mesh object is bound to a specific login session.">
+			<param name="Value" type="bool" pass="return" description="If true, the mesh will be freed once the client login session expires." />
+		</method>
+
+	</class>
+
+
+	<class name="ModelDataMeshInstance" parent="Base" description="A mesh of a 3D Model Data.">
+	
+		<method name="GetName" description="Returns Mesh Name.">
+			<param name="Name" type="string" pass="return" description="Returns mesh instance name." />
+		</method>
+	
+		<method name="GetUUID" description="Returns Mesh UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns mesh instance uuid." />
+		</method>
+
+		<method name="GetTransform" description="Returns Transform of the Mesh.">
+			<param name="Transform" type="struct" class="ModelDataTransform" pass="return" description="Returns the transform matrix of the mesh." />		
+		</method>
+
+		<method name="CreateCopiedMesh" description="Loads a copy of the mesh geometry into memory. Might be inefficient to use for many identical copies of the mesh in the scene.">
+			<param name="MeshObjectCopy" type="class" class="MeshObject" pass="return" description="Returns the mesh object instance." />		
+		</method>
+
+		<method name="CreatePersistentMesh" description="Creates a persistent mesh of the geometry. Will not create a duplicate if the instance was already persisted before. The release of the memory should be handled with great care! ">
+			<param name="BoundToLoginSession" type="bool" pass="in" description="If true, the mesh will be freed once the client login session expires." />
+			<param name="PersistentMesh" type="class" class="PersistentMeshObject" pass="return" description="Returns a persistent instance to the same mesh data." />
+		</method>
+
+	</class>
+
+
+	<class name="ModelDataComponentInstance" parent="Base" description="A Component of a 3D Model Data.">
+	
+		<method name="GetName" description="Returns Component Name.">
+			<param name="Name" type="string" pass="return" description="Returns toolpath part name." />
+		</method>
+	
+		<method name="GetUUID" description="Returns Component UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns toolpath part uuid." />
+		</method>
+
+		<method name="GetTransform" description="Returns Transform of the Component.">
+			<param name="Transform" type="struct" class="ModelDataTransform" pass="return" description="Returns the transform matrix of the part." />		
+		</method>
+
+		<method name="GetSolidCount" description="Returns the number of solid meshes in the component.">
+			<param name="Count" type="uint32" pass="return" description="Model Count." />
+		</method>
+
+		<method name="GetSolidMesh" description="Returns a solid mesh of the component.">
+			<param name="Index" type="uint32" pass="in" description="Index of Solid Mesh. MUST be between 0 and SolidCount - 1." />
+			<param name="MeshInstance" type="class" class="ModelDataMeshInstance" pass="return" description="Solid Mesh. MUST be between 0 and ModelCount - 1." />
+		</method>
+
+		<method name="GetSupportCount" description="Returns the number of support meshes in the component.">
+			<param name="Count" type="uint32" pass="return" description="Support Count." />
+		</method>
+
+		<method name="GetSupportMesh" description="Returns a support mesh of the component.">
+			<param name="Index" type="uint32" pass="in" description="Index of Support Mesh. MUST be between 0 and SupportCount - 1." />
+			<param name="MeshInstance" type="class" class="ModelDataMeshInstance" pass="return" description="Support Mesh. MUST be between 0 and ModelCount - 1." />
+		</method>
+
+		<method name="GetSubComponentCount" description="Returns the number of subcomponents of the component.">
+			<param name="Count" type="uint32" pass="return" description="Subcomponent Count." />
+		</method>
+
+		<method name="GetSubComponent" description="Returns a subcomponent of the component.">
+			<param name="Index" type="uint32" pass="in" description="Index of Subcomponent. MUST be between 0 and SubComponentCount - 1." />
+			<param name="SubComponentInstance" type="class" class="ModelDataComponentInstance" pass="return" description="SubComponent. MUST be between 0 and ModelCount - 1." />
+		</method>
 
 	</class>
 
@@ -1175,12 +1261,8 @@
 			<param name="UUID" type="string" pass="return" description="Returns toolpath part uuid." />
 		</method>
 
-		<method name="GetMeshUUID" description="Returns Mesh UUID of the part.">
-			<param name="MeshUUID" type="string" pass="return" description="Returns toolpath part mesh uuid." />
-		</method>
-
-		<method name="GetTransform" description="Returns Mesh Transform of the part.">
-			<param name="MeshUUID" type="struct" class="ToolpathPartTransform" pass="return" description="Returns the mesh transform of the toolpath." />		
+		<method name="GetRootComponent" description="Returns the Root Component of the part.">
+			<param name="RootComponent" type="class" class="ModelDataComponentInstance" pass="return" description="Returns root component instance." />
 		</method>
 	
 	</class>
@@ -3863,19 +3945,19 @@
 			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
 		</method>	
 						
-		<method name="RegisterMeshFrom3MFResource" description="Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.">
+		<method name="Load3MFFromResource" description="Loads a 3MF Resource into memory.">
 			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
-			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
-		</method>	
-
-		<method name="MeshIsRegistered" description="Checks if a mesh uuid is registered.">
+			<param name="ModelData" type="class" class="ModelDataComponentInstance" pass="return" description="Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed." />
+		</method>
+		
+		<method name="MeshIsPersistent" description="Checks if a mesh uuid is registered.">
 			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
 			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
 		</method>	
 
-		<method name="FindRegisteredMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
+		<method name="FindPersistentMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
 			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
-			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+			<param name="MeshObjectInstance" type="class" class="PersistentMeshObject" pass="return" description="Mesh Object instance." />
 		</method>	
 				
 		<method name="CreateDataSeries" description="Creates a new empty data series object.">
@@ -4274,20 +4356,19 @@
 			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
 		</method>	
 
-		<method name="RegisterMeshFrom3MFResource" description="Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.">
+		<method name="Load3MFFromResource" description="Loads a 3MF Resource into memory.">
 			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
-			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
-			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
-		</method>	
-
-		<method name="MeshIsRegistered" description="Checks if a mesh uuid is registered.">
+			<param name="ModelData" type="class" class="ModelDataComponentInstance" pass="return" description="Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed." />
+		</method>
+		
+		<method name="MeshIsPersistent" description="Checks if a mesh uuid is registered.">
 			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
 			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
 		</method>	
 
-		<method name="FindRegisteredMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
+		<method name="FindPersistentMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
 			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
-			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+			<param name="MeshObjectInstance" type="class" class="PersistentMeshObject" pass="return" description="Mesh Object instance." />
 		</method>	
 
 		<method name="CreateDataSeries" description="Creates a new empty data series object.">

@@ -61,24 +61,3 @@ std::string CToolpathPart::GetUUID()
 	return m_pPart->getUUID();
 }
 
-std::string CToolpathPart::GetMeshUUID()
-{
-	return m_pPart->getMeshUUID();
-}
-
-LibMCEnv::sToolpathPartTransform CToolpathPart::GetTransform()
-{
-	LibMCEnv::sToolpathPartTransform transform;
-	// TODO
-
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			transform.m_Matrix[i][j] = (i == j) ? 1.0 : 0.0;
-
-	transform.m_Translation[0] = 0.0;
-	transform.m_Translation[1] = 0.0;
-	transform.m_Translation[2] = 0.0;
-
-	return transform;
-
-}

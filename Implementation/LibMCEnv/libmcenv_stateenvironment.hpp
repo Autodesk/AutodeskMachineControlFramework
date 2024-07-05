@@ -185,11 +185,11 @@ public:
 
 	IJournalHandler* GetCurrentJournal() override;
 
-	IMeshObject* RegisterMeshFrom3MFResource(const std::string& sResourceName) override;
+	IModelDataComponentInstance* Load3MFFromResource(const std::string& sResourceName) override;
 
-	bool MeshIsRegistered(const std::string& sMeshUUID) override;
+	bool MeshIsPersistent(const std::string& sMeshUUID) override;
 
-	IMeshObject* FindRegisteredMesh(const std::string& sMeshUUID) override;
+	IPersistentMeshObject* FindPersistentMesh(const std::string& sMeshUUID) override;
 
 	IDataSeries* CreateDataSeries(const std::string& sName) override;
 

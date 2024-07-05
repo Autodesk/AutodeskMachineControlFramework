@@ -68,9 +68,7 @@ public:
 
 	std::string GetUUID() override;
 
-	std::string GetMeshUUID() override;
-	
-	LibMCEnv::sToolpathPartTransform GetTransform() override;
+	IModelDataComponentInstance* GetRootComponent() override;
 
 };
 
