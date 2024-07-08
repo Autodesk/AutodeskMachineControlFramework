@@ -625,6 +625,10 @@
 		<error name="INVALIDUPLOADCONTEXT" code="599" description="Build has not toolpath" />
 		<error name="MESHHASTOOMANYVERTICES" code="600" description="Mesh has too many vertices" />
 		<error name="MESHHASTOOMANYTRIANGLES" code="601" description="Mesh has too many triangles" />
+		<error name="INVALIDXMLNODEORATTRIBUTENAME" code="602" description="Invalid XML node or attribute name" />
+		<error name="XMLNAMESPACENOTREGISTERED" code="603" description="XML Namespace not registered" />
+		
+		
 
 
 	</errors>
