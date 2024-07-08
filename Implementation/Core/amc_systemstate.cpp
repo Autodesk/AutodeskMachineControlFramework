@@ -77,12 +77,12 @@ namespace AMC {
 		m_pAccessControl = std::make_shared<CAccessControl> ();
 		m_pStringResourceHandler = std::make_shared<CStringResourceHandler> ();
 
+		m_pMeshHandler = std::make_shared<CMeshHandler>();
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pDataModel);
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger, m_pDataModel, m_pGlobalChrono, m_pStateJournal);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pMeshHandler, m_pLogger, m_pDataModel, m_pGlobalChrono, m_pStateJournal);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
 		m_pLanguageHandler = std::make_shared<CLanguageHandler>();
-		m_pMeshHandler = std::make_shared<CMeshHandler>();
 		m_pDataSeriesHandler = std::make_shared<CDataSeriesHandler>();
 		m_pAlertHandler = std::make_shared<CAlertHandler>();
 

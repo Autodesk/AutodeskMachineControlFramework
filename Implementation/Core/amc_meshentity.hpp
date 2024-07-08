@@ -91,10 +91,6 @@ namespace AMC {
 
 		std::string getName();
 
-		void IncRef();
-
-		bool DecRef();
-
 		void loadFrom3MF(Lib3MF::CLib3MFMeshObject * pMeshObject);
 
 		void loadFrom3MFResource(Lib3MF::CWrapper * p3MFWrapper, AMC::CResourcePackage* pResourcePackage, const std::string sResourceName);

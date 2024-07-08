@@ -40,6 +40,8 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_meshobject.hpp"
+#include "libmcenv_modeldatacomponentinstance.hpp"
+#include "libmcenv_persistentmeshobject.hpp"
 #include "libmcenv_alert.hpp"
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
@@ -535,7 +537,7 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getGlobalChronoInstance ());
+    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler (), m_pUISystemState->getGlobalChronoInstance ());
 }
 
 bool CUIEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
@@ -561,7 +563,7 @@ IBuildExecution* CUIEnvironment::GetBuildExecution(const std::string& sExecution
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
     auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
-    return new CBuildExecution (pBuildExecution, pDataModel, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getGlobalChronoInstance());
+    return new CBuildExecution (pBuildExecution, pDataModel, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler(), m_pUISystemState->getGlobalChronoInstance());
 
 }
 
@@ -647,7 +649,40 @@ IJournalHandler* CUIEnvironment::GetCurrentJournal()
     return new CJournalHandler(m_pUISystemState->getStateJournal());
 }
 
-IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
+IModelDataComponentInstance* CUIEnvironment::Load3MFFromResource(const std::string& sResourceName)
+{
+    if (m_pUIHandler == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    pResourcePackage->findEntryByName(sResourceName, true);
+
+    auto pLib3MFWrapper = m_pUISystemState->getToolpathHandler()->getLib3MFWrapper();
+
+    return new CModelDataComponentInstance(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName, m_pUISystemState->getMeshHandler ());
+}
+
+bool CUIEnvironment::MeshIsPersistent(const std::string& sMeshUUID)
+{
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    return pMeshHandler->hasMeshEntity(sMeshUUID);
+}
+
+IPersistentMeshObject* CUIEnvironment::FindPersistentMesh(const std::string& sMeshUUID)
+{
+    auto pMeshHandler = m_pUISystemState->getMeshHandler();
+    auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
+
+    if (pMeshEntity.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
+
+    return new CPersistentMeshObject(pMeshHandler, pMeshEntity->getUUID());
+}
+
+/*IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
 {
 
     auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
@@ -662,24 +697,7 @@ IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sRes
     auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName);
 
     return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
-}
-
-bool CUIEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
-{
-    auto pMeshHandler = m_pUISystemState->getMeshHandler();
-    return pMeshHandler->hasMeshEntity(sMeshUUID);
-}
-
-IMeshObject* CUIEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
-{
-    auto pMeshHandler = m_pUISystemState->getMeshHandler();
-    auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
-
-    if (pMeshEntity.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
-
-    return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
-}
+}*/
 
 IDataSeries* CUIEnvironment::CreateDataSeries(const std::string& sName, const bool bBoundToLogin)
 {    

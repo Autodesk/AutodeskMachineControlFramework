@@ -223,6 +223,9 @@
 		<error name="EMPTYDATATABLEIDENTIFIER" code="10183" description="Empty datatable identifier" />
 		<error name="INVALIDDATATABLEIDENTIFIER" code="10184" description="Invalid datatable identifier" />
 		<error name="INVALIDDATATABLESIGNATURE" code="10185" description="Invalid datatable signature" />		
+		<error name="INVALIDSUPPORTINDEX" code="10186" description="Invalid support index" />		
+		<error name="INVALIDSOLIDINDEX" code="10187" description="Invalid solid index" />		
+		<error name="INVALIDCOMPONENTINDEX" code="10188" description="Invalid component index" />		
 
 		
 	</errors>
@@ -1172,7 +1175,7 @@
 
 	</class>
 
-	<class name="PersistentMeshObject" parent="Base" description="A persistent mesh object is a globally stored object that stays in memory. Should be handled with great care!">
+	<class name="PersistentMeshObject" parent="MeshObject" description="A persistent mesh object is a globally stored object that stays in memory. Should be handled with great care!">
 
 		<method name="IsBoundToLoginSession" description="Returns if the mesh object is bound to a specific login session.">
 			<param name="Value" type="bool" pass="return" description="If true, the mesh will be freed once the client login session expires." />

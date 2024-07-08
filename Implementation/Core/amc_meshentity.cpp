@@ -62,16 +62,6 @@ namespace AMC {
 		return m_sName;
 	}
 
-	void CMeshEntity::IncRef()
-	{
-
-	}
-
-	bool CMeshEntity::DecRef()
-	{
-		return false;
-	}
-
 	size_t CMeshEntity::getNodeCount()
 	{
 		return m_Nodes.size();	
@@ -257,7 +247,7 @@ namespace AMC {
 		return CVectorUtils::vectorNormalize(vCrossProduct, MESHENTITY_ZEROEPSILON);
 	}
 
-	void CMeshEntity::loadFrom3MFResource(Lib3MF::CWrapper* p3MFWrapper, AMC::CResourcePackage* pResourcePackage, const std::string sResourceName)
+	/*void CMeshEntity::loadFrom3MFResource(Lib3MF::CWrapper* p3MFWrapper, AMC::CResourcePackage* pResourcePackage, const std::string sResourceName)
 	{
 		if (pResourcePackage == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -283,7 +273,7 @@ namespace AMC {
 		}
 
 
-	}
+	} */
 
 
 	bool CMeshEntity::isManifold()

@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 // Include custom headers here.
-
+#include "amc_meshhandler.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -61,11 +61,11 @@ protected:
 	std::string m_sStorageUUID;
 	std::string m_sBuildUUID;
 	AMC::PToolpathHandler m_pToolpathHandler;
-	double m_dDefaultJumpSpeed;
-
+	AMC::PMeshHandler m_pMeshHandler;
 
 public:
-	CToolpathAccessor(const std::string& sStorageUUID, const std::string& sBuildUUID, AMC::PToolpathHandler pToolpathHandler);
+	CToolpathAccessor(const std::string& sStorageUUID, const std::string& sBuildUUID, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler);
+
 	virtual ~CToolpathAccessor();
 
 	std::string GetStorageUUID() override;

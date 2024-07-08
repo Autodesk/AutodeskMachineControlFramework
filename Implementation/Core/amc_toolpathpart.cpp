@@ -87,6 +87,17 @@ namespace AMC {
 	{
 		return m_sPartNumber;
 	}
+
+	Lib3MF::PModel CToolpathPart::getModel()
+	{
+		return m_p3MFModel;
+	}
+
+	Lib3MF::PBuildItem CToolpathPart::getBuildItem()
+	{
+		return m_pBuildItem;
+	}
+
 }
 
 

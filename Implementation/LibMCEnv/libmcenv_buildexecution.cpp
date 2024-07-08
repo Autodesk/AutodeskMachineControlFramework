@@ -50,10 +50,11 @@ using namespace LibMCEnv::Impl;
 /*************************************************************************************************************************
  Class definition of CBuildExecution 
 **************************************************************************************************************************/
-CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMCCommon::PChrono pGlobalChrono)
+CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono)
 	: m_pExecution (pExecution), 
 	m_pDataModel (pDataModel), 
 	m_pToolpathHandler (pToolpathHandler), 
+	m_pMeshHandler (pMeshHandler),
 	m_pGlobalChrono (pGlobalChrono)
 {
 	if (pExecution.get() == nullptr)
@@ -61,6 +62,8 @@ CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMC
 	if (pDataModel.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pToolpathHandler.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pMeshHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 	// Cache Execution UUID
@@ -79,7 +82,7 @@ CBuildExecution* CBuildExecution::makeFrom(CBuildExecution* pBuildExecution)
 	if (pBuildExecution == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	return new CBuildExecution(pBuildExecution->m_pExecution, pBuildExecution->m_pDataModel, pBuildExecution->m_pToolpathHandler, pBuildExecution->m_pGlobalChrono);
+	return new CBuildExecution(pBuildExecution->m_pExecution, pBuildExecution->m_pDataModel, pBuildExecution->m_pToolpathHandler, pBuildExecution->m_pMeshHandler, pBuildExecution->m_pGlobalChrono);
 }
 
 std::shared_ptr<CBuildExecution> CBuildExecution::makeSharedFrom(CBuildExecution* pBuildExecution)
@@ -103,7 +106,7 @@ std::string CBuildExecution::GetBuildUUID()
 IBuild * CBuildExecution::GetBuild()
 {
 	std::string sBuildUUID = GetBuildUUID();
-	return new CBuild(m_pDataModel, sBuildUUID, m_pToolpathHandler, m_pGlobalChrono);
+	return new CBuild(m_pDataModel, sBuildUUID, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
 }
 
 LibMCEnv::eBuildExecutionStatus CBuildExecution::GetExecutionStatus()

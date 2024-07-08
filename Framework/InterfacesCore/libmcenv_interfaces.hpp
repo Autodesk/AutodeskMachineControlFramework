@@ -70,6 +70,9 @@ class IDataSeries;
 class IDateTimeDifference;
 class IDateTime;
 class IMeshObject;
+class IPersistentMeshObject;
+class IModelDataMeshInstance;
+class IModelDataComponentInstance;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
@@ -1573,9 +1576,149 @@ public:
 	*/
 	virtual void GetAllTriangles(LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D * pTrianglesBuffer) = 0;
 
+	/**
+	* IMeshObject::IsPersistent - Returns if the mesh object is persisted in memory.
+	* @return If true, the mesh object is persisted in memory and can be retrieved by FindPersistentMeshObject.
+	*/
+	virtual bool IsPersistent() = 0;
+
+	/**
+	* IMeshObject::MakePersistent - Makes the mesh persistent in memory. It will not be released when the MeshObject instances is released. Should be handled with great care!
+	* @param[in] bBoundToLoginSession - If true, the mesh will be freed once the client login session expires.
+	* @return Returns a persistent instance to the same mesh data.
+	*/
+	virtual IPersistentMeshObject * MakePersistent(const bool bBoundToLoginSession) = 0;
+
 };
 
 typedef IBaseSharedPtr<IMeshObject> PIMeshObject;
+
+
+/*************************************************************************************************************************
+ Class interface for PersistentMeshObject 
+**************************************************************************************************************************/
+
+class IPersistentMeshObject : public virtual IMeshObject {
+public:
+	/**
+	* IPersistentMeshObject::IsBoundToLoginSession - Returns if the mesh object is bound to a specific login session.
+	* @return If true, the mesh will be freed once the client login session expires.
+	*/
+	virtual bool IsBoundToLoginSession() = 0;
+
+};
+
+typedef IBaseSharedPtr<IPersistentMeshObject> PIPersistentMeshObject;
+
+
+/*************************************************************************************************************************
+ Class interface for ModelDataMeshInstance 
+**************************************************************************************************************************/
+
+class IModelDataMeshInstance : public virtual IBase {
+public:
+	/**
+	* IModelDataMeshInstance::GetName - Returns Mesh Name.
+	* @return Returns mesh instance name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IModelDataMeshInstance::GetUUID - Returns Mesh UUID.
+	* @return Returns mesh instance uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IModelDataMeshInstance::GetTransform - Returns Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetTransform() = 0;
+
+	/**
+	* IModelDataMeshInstance::CreateCopiedMesh - Loads a copy of the mesh geometry into memory. Might be inefficient to use for many identical copies of the mesh in the scene.
+	* @return Returns the mesh object instance.
+	*/
+	virtual IMeshObject * CreateCopiedMesh() = 0;
+
+	/**
+	* IModelDataMeshInstance::CreatePersistentMesh - Creates a persistent mesh of the geometry. Will not create a duplicate if the instance was already persisted before. The release of the memory should be handled with great care! 
+	* @param[in] bBoundToLoginSession - If true, the mesh will be freed once the client login session expires.
+	* @return Returns a persistent instance to the same mesh data.
+	*/
+	virtual IPersistentMeshObject * CreatePersistentMesh(const bool bBoundToLoginSession) = 0;
+
+};
+
+typedef IBaseSharedPtr<IModelDataMeshInstance> PIModelDataMeshInstance;
+
+
+/*************************************************************************************************************************
+ Class interface for ModelDataComponentInstance 
+**************************************************************************************************************************/
+
+class IModelDataComponentInstance : public virtual IBase {
+public:
+	/**
+	* IModelDataComponentInstance::GetName - Returns Component Name.
+	* @return Returns toolpath part name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetUUID - Returns Component UUID.
+	* @return Returns toolpath part uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetTransform - Returns Transform of the Component.
+	* @return Returns the transform matrix of the part.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetTransform() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSolidCount - Returns the number of solid meshes in the component.
+	* @return Model Count.
+	*/
+	virtual LibMCEnv_uint32 GetSolidCount() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSolidMesh - Returns a solid mesh of the component.
+	* @param[in] nIndex - Index of Solid Mesh. MUST be between 0 and SolidCount - 1.
+	* @return Solid Mesh. MUST be between 0 and ModelCount - 1.
+	*/
+	virtual IModelDataMeshInstance * GetSolidMesh(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSupportCount - Returns the number of support meshes in the component.
+	* @return Support Count.
+	*/
+	virtual LibMCEnv_uint32 GetSupportCount() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSupportMesh - Returns a support mesh of the component.
+	* @param[in] nIndex - Index of Support Mesh. MUST be between 0 and SupportCount - 1.
+	* @return Support Mesh. MUST be between 0 and ModelCount - 1.
+	*/
+	virtual IModelDataMeshInstance * GetSupportMesh(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSubComponentCount - Returns the number of subcomponents of the component.
+	* @return Subcomponent Count.
+	*/
+	virtual LibMCEnv_uint32 GetSubComponentCount() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSubComponent - Returns a subcomponent of the component.
+	* @param[in] nIndex - Index of Subcomponent. MUST be between 0 and SubComponentCount - 1.
+	* @return SubComponent. MUST be between 0 and ModelCount - 1.
+	*/
+	virtual IModelDataComponentInstance * GetSubComponent(const LibMCEnv_uint32 nIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<IModelDataComponentInstance> PIModelDataComponentInstance;
 
 
 /*************************************************************************************************************************
@@ -1597,16 +1740,10 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* IToolpathPart::GetMeshUUID - Returns Mesh UUID of the part.
-	* @return Returns toolpath part mesh uuid.
+	* IToolpathPart::GetRootComponent - Returns the Root Component of the part.
+	* @return Returns root component instance.
 	*/
-	virtual std::string GetMeshUUID() = 0;
-
-	/**
-	* IToolpathPart::GetTransform - Returns Mesh Transform of the part.
-	* @return Returns the mesh transform of the toolpath.
-	*/
-	virtual LibMCEnv::sToolpathPartTransform GetTransform() = 0;
+	virtual IModelDataComponentInstance * GetRootComponent() = 0;
 
 };
 
@@ -5521,25 +5658,25 @@ public:
 	virtual IJournalHandler * GetCurrentJournal() = 0;
 
 	/**
-	* IStateEnvironment::RegisterMeshFrom3MFResource - Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
+	* IStateEnvironment::Load3MFFromResource - Loads a 3MF Resource into memory.
 	* @param[in] sResourceName - Resource name to load.
-	* @return Mesh Object instance.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
 	*/
-	virtual IMeshObject * RegisterMeshFrom3MFResource(const std::string & sResourceName) = 0;
+	virtual IModelDataComponentInstance * Load3MFFromResource(const std::string & sResourceName) = 0;
 
 	/**
-	* IStateEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* IStateEnvironment::MeshIsPersistent - Checks if a mesh uuid is registered.
 	* @param[in] sMeshUUID - Mesh UUID to load.
 	* @return Flag is registered.
 	*/
-	virtual bool MeshIsRegistered(const std::string & sMeshUUID) = 0;
+	virtual bool MeshIsPersistent(const std::string & sMeshUUID) = 0;
 
 	/**
-	* IStateEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* IStateEnvironment::FindPersistentMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
 	* @param[in] sMeshUUID - Mesh UUID to load.
 	* @return Mesh Object instance.
 	*/
-	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+	virtual IPersistentMeshObject * FindPersistentMesh(const std::string & sMeshUUID) = 0;
 
 	/**
 	* IStateEnvironment::CreateDataSeries - Creates a new empty data series object.
@@ -6092,26 +6229,25 @@ public:
 	virtual IJournalHandler * GetCurrentJournal() = 0;
 
 	/**
-	* IUIEnvironment::RegisterMeshFrom3MFResource - Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
+	* IUIEnvironment::Load3MFFromResource - Loads a 3MF Resource into memory.
 	* @param[in] sResourceName - Resource name to load.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
 	*/
-	virtual IMeshObject * RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID) = 0;
+	virtual IModelDataComponentInstance * Load3MFFromResource(const std::string & sResourceName) = 0;
 
 	/**
-	* IUIEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
+	* IUIEnvironment::MeshIsPersistent - Checks if a mesh uuid is registered.
 	* @param[in] sMeshUUID - Mesh UUID to load.
 	* @return Flag is registered.
 	*/
-	virtual bool MeshIsRegistered(const std::string & sMeshUUID) = 0;
+	virtual bool MeshIsPersistent(const std::string & sMeshUUID) = 0;
 
 	/**
-	* IUIEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* IUIEnvironment::FindPersistentMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
 	* @param[in] sMeshUUID - Mesh UUID to load.
 	* @return Mesh Object instance.
 	*/
-	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+	virtual IPersistentMeshObject * FindPersistentMesh(const std::string & sMeshUUID) = 0;
 
 	/**
 	* IUIEnvironment::CreateDataSeries - Creates a new empty data series object.

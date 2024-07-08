@@ -63,9 +63,11 @@ namespace AMC {
 		void unloadMeshEntity (const std::string& sEntityUUID);
 		void unloadAllEntities();
 
-		PMeshEntity register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject);
+		void registerEntity(PMeshEntity pMeshEntity);
 
-		PMeshEntity register3MFResource(Lib3MF::CLib3MFWrapper * pWrapper, AMC::CResourcePackage * pResourcePackage, const std::string & sResourceName);
+		//PMeshEntity register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject);
+
+		//PMeshEntity register3MFResource(Lib3MF::CLib3MFWrapper * pWrapper, AMC::CResourcePackage * pResourcePackage, const std::string & sResourceName);
 		
 	};
 

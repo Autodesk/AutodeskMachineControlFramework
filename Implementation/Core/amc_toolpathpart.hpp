@@ -67,6 +67,9 @@ namespace AMC {
 		std::string getName ();
 		std::string getPartNumber ();
 
+		Lib3MF::PModel getModel();
+		Lib3MF::PBuildItem getBuildItem();
+
 	};
 
 	

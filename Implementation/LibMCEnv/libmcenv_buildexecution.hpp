@@ -37,6 +37,7 @@ Abstract: This is the class declaration of CBuildExecution
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_toolpathhandler.hpp"
+#include "amc_meshhandler.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -65,6 +66,7 @@ private:
 	LibMCData::PBuildJobExecution m_pExecution;
 	LibMCData::PDataModel m_pDataModel;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	AMC::PMeshHandler m_pMeshHandler;
 	AMCCommon::PChrono m_pGlobalChrono;
 	std::mutex m_Mutex;
 
@@ -74,7 +76,7 @@ public:
 
 	static std::shared_ptr<CBuildExecution> makeSharedFrom(CBuildExecution* pBuildExecution);
 
-	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMCCommon::PChrono pGlobalChrono);
+	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CBuildExecution();
 

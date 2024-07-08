@@ -1718,6 +1718,184 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_meshobject_gettriangleids(LibMCEnv_Mes
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_meshobject_getalltriangles(LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D * pTrianglesBuffer);
 
+/**
+* Returns if the mesh object is persisted in memory.
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[out] pValue - If true, the mesh object is persisted in memory and can be retrieved by FindPersistentMeshObject.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_meshobject_ispersistent(LibMCEnv_MeshObject pMeshObject, bool * pValue);
+
+/**
+* Makes the mesh persistent in memory. It will not be released when the MeshObject instances is released. Should be handled with great care!
+*
+* @param[in] pMeshObject - MeshObject instance.
+* @param[in] bBoundToLoginSession - If true, the mesh will be freed once the client login session expires.
+* @param[out] pPersistentMesh - Returns a persistent instance to the same mesh data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_meshobject_makepersistent(LibMCEnv_MeshObject pMeshObject, bool bBoundToLoginSession, LibMCEnv_PersistentMeshObject * pPersistentMesh);
+
+/*************************************************************************************************************************
+ Class definition for PersistentMeshObject
+**************************************************************************************************************************/
+
+/**
+* Returns if the mesh object is bound to a specific login session.
+*
+* @param[in] pPersistentMeshObject - PersistentMeshObject instance.
+* @param[out] pValue - If true, the mesh will be freed once the client login session expires.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_persistentmeshobject_isboundtologinsession(LibMCEnv_PersistentMeshObject pPersistentMeshObject, bool * pValue);
+
+/*************************************************************************************************************************
+ Class definition for ModelDataMeshInstance
+**************************************************************************************************************************/
+
+/**
+* Returns Mesh Name.
+*
+* @param[in] pModelDataMeshInstance - ModelDataMeshInstance instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns mesh instance name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatameshinstance_getname(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns Mesh UUID.
+*
+* @param[in] pModelDataMeshInstance - ModelDataMeshInstance instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns mesh instance uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatameshinstance_getuuid(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns Transform of the Mesh.
+*
+* @param[in] pModelDataMeshInstance - ModelDataMeshInstance instance.
+* @param[out] pTransform - Returns the transform matrix of the mesh.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatameshinstance_gettransform(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, LibMCEnv::sModelDataTransform * pTransform);
+
+/**
+* Loads a copy of the mesh geometry into memory. Might be inefficient to use for many identical copies of the mesh in the scene.
+*
+* @param[in] pModelDataMeshInstance - ModelDataMeshInstance instance.
+* @param[out] pMeshObjectCopy - Returns the mesh object instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatameshinstance_createcopiedmesh(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, LibMCEnv_MeshObject * pMeshObjectCopy);
+
+/**
+* Creates a persistent mesh of the geometry. Will not create a duplicate if the instance was already persisted before. The release of the memory should be handled with great care! 
+*
+* @param[in] pModelDataMeshInstance - ModelDataMeshInstance instance.
+* @param[in] bBoundToLoginSession - If true, the mesh will be freed once the client login session expires.
+* @param[out] pPersistentMesh - Returns a persistent instance to the same mesh data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatameshinstance_createpersistentmesh(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, bool bBoundToLoginSession, LibMCEnv_PersistentMeshObject * pPersistentMesh);
+
+/*************************************************************************************************************************
+ Class definition for ModelDataComponentInstance
+**************************************************************************************************************************/
+
+/**
+* Returns Component Name.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns toolpath part name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_getname(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns Component UUID.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns toolpath part uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_getuuid(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns Transform of the Component.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[out] pTransform - Returns the transform matrix of the part.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_gettransform(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv::sModelDataTransform * pTransform);
+
+/**
+* Returns the number of solid meshes in the component.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[out] pCount - Model Count.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_getsolidcount(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns a solid mesh of the component.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[in] nIndex - Index of Solid Mesh. MUST be between 0 and SolidCount - 1.
+* @param[out] pMeshInstance - Solid Mesh. MUST be between 0 and ModelCount - 1.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_getsolidmesh(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 nIndex, LibMCEnv_ModelDataMeshInstance * pMeshInstance);
+
+/**
+* Returns the number of support meshes in the component.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[out] pCount - Support Count.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_getsupportcount(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns a support mesh of the component.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[in] nIndex - Index of Support Mesh. MUST be between 0 and SupportCount - 1.
+* @param[out] pMeshInstance - Support Mesh. MUST be between 0 and ModelCount - 1.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_getsupportmesh(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 nIndex, LibMCEnv_ModelDataMeshInstance * pMeshInstance);
+
+/**
+* Returns the number of subcomponents of the component.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[out] pCount - Subcomponent Count.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_getsubcomponentcount(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns a subcomponent of the component.
+*
+* @param[in] pModelDataComponentInstance - ModelDataComponentInstance instance.
+* @param[in] nIndex - Index of Subcomponent. MUST be between 0 and SubComponentCount - 1.
+* @param[out] pSubComponentInstance - SubComponent. MUST be between 0 and ModelCount - 1.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modeldatacomponentinstance_getsubcomponent(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 nIndex, LibMCEnv_ModelDataComponentInstance * pSubComponentInstance);
+
 /*************************************************************************************************************************
  Class definition for ToolpathPart
 **************************************************************************************************************************/
@@ -1745,24 +1923,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getname(LibMCEnv_Toolpath
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
-* Returns Mesh UUID of the part.
+* Returns the Root Component of the part.
 *
 * @param[in] pToolpathPart - ToolpathPart instance.
-* @param[in] nMeshUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pMeshUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pMeshUUIDBuffer -  buffer of Returns toolpath part mesh uuid., may be NULL
+* @param[out] pRootComponent - Returns root component instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getmeshuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nMeshUUIDBufferSize, LibMCEnv_uint32* pMeshUUIDNeededChars, char * pMeshUUIDBuffer);
-
-/**
-* Returns Mesh Transform of the part.
-*
-* @param[in] pToolpathPart - ToolpathPart instance.
-* @param[out] pMeshUUID - Returns the mesh transform of the toolpath.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_gettransform(LibMCEnv_ToolpathPart pToolpathPart, LibMCEnv::sToolpathPartTransform * pMeshUUID);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getrootcomponent(LibMCEnv_ToolpathPart pToolpathPart, LibMCEnv_ModelDataComponentInstance * pRootComponent);
 
 /*************************************************************************************************************************
  Class definition for ToolpathLayer
@@ -7131,14 +7298,14 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createusermanagement(
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getcurrentjournal(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_JournalHandler * pJournalHandler);
 
 /**
-* Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
+* Loads a 3MF Resource into memory.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pResourceName - Resource name to load.
-* @param[out] pMeshObject - Mesh Object instance.
+* @param[out] pModelData - Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_registermeshfrom3mfresource(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, LibMCEnv_MeshObject * pMeshObject);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_load3mffromresource(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, LibMCEnv_ModelDataComponentInstance * pModelData);
 
 /**
 * Checks if a mesh uuid is registered.
@@ -7148,17 +7315,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_registermeshfrom3mfre
 * @param[out] pMeshIsRegistered - Flag is registered.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_meshisregistered(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_meshispersistent(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered);
 
 /**
 * Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pMeshUUID - Mesh UUID to load.
-* @param[out] pMeshObject - Mesh Object instance.
+* @param[out] pMeshObjectInstance - Mesh Object instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findregisteredmesh(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findpersistentmesh(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, LibMCEnv_PersistentMeshObject * pMeshObjectInstance);
 
 /**
 * Creates a new empty data series object.
@@ -7947,15 +8114,14 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createusermanagement(Lib
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getcurrentjournal(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JournalHandler * pJournalHandler);
 
 /**
-* Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
+* Loads a 3MF Resource into memory.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pResourceName - Resource name to load.
-* @param[in] pMeshUUID - Mesh UUID to load.
-* @param[out] pMeshObject - Mesh Object instance.
+* @param[out] pModelData - Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_registermeshfrom3mfresource(LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_load3mffromresource(LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, LibMCEnv_ModelDataComponentInstance * pModelData);
 
 /**
 * Checks if a mesh uuid is registered.
@@ -7965,17 +8131,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_registermeshfrom3mfresou
 * @param[out] pMeshIsRegistered - Flag is registered.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_meshisregistered(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_meshispersistent(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered);
 
 /**
 * Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pMeshUUID - Mesh UUID to load.
-* @param[out] pMeshObject - Mesh Object instance.
+* @param[out] pMeshObjectInstance - Mesh Object instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findregisteredmesh(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findpersistentmesh(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, LibMCEnv_PersistentMeshObject * pMeshObjectInstance);
 
 /**
 * Creates a new empty data series object.

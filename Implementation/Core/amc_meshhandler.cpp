@@ -70,9 +70,7 @@ namespace AMC {
 	void CMeshHandler::unloadMeshEntity (const std::string& sEntityUUID)
 	{
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sEntityUUID);
-		auto pToolpathEntity = findMeshEntity(sNormalizedUUID, true);
-		if (pToolpathEntity->DecRef())
-			m_Entities.erase(sNormalizedUUID);
+		m_Entities.erase(sNormalizedUUID);
 	}
 	
 	void CMeshHandler::unloadAllEntities()
@@ -80,7 +78,22 @@ namespace AMC {
 		m_Entities.clear();
 	}
 
-	PMeshEntity CMeshHandler::register3MFResource(Lib3MF::CLib3MFWrapper* pWrapper, AMC::CResourcePackage* pResourcePackage, const std::string& sResourceName)
+	void CMeshHandler::registerEntity(PMeshEntity pMeshEntity)
+	{
+		if (pMeshEntity == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		std::string sMeshEntityUUID = pMeshEntity->getUUID();
+		auto iIter = m_Entities.find(sMeshEntityUUID);
+		if (iIter != m_Entities.end())
+			throw ELibMCCustomException(LIBMC_ERROR_MESHENTITYALREADYLOADED, sMeshEntityUUID);
+
+		m_Entities.insert(std::make_pair(sMeshEntityUUID, pMeshEntity));
+
+	}
+
+
+	/*PMeshEntity CMeshHandler::register3MFResource(Lib3MF::CLib3MFWrapper* pWrapper, AMC::CResourcePackage* pResourcePackage, const std::string& sResourceName)
 	{
 		if (pWrapper == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -116,7 +129,7 @@ namespace AMC {
 		m_Entities.insert(std::make_pair (sNormalizedUUID, pMeshEntity));
 
 		return pMeshEntity;
-	}
+	} */
 
 }
 

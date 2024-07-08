@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CMeshObject
 
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_persistentmeshobject.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -52,6 +53,18 @@ CMeshObject::CMeshObject(AMC::PMeshHandler pMeshHandler, const std::string& sMes
     if (!pMeshHandler->hasMeshEntity (sMeshUUID))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
 
+}
+
+
+CMeshObject::CMeshObject(AMC::PMeshHandler pMeshHandler, AMC::PMeshEntity pNonPersistentMeshEntity)
+    : m_pMeshHandler(pMeshHandler), m_pNonPersistentMeshEntity (pNonPersistentMeshEntity)
+{
+    if (pMeshHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pNonPersistentMeshEntity.get () == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    m_sMeshUUID = pNonPersistentMeshEntity->getUUID();
 }
 
 
@@ -84,6 +97,9 @@ LibMCEnv_uint32 CMeshObject::GetVertexCount()
 
 AMC::PMeshEntity CMeshObject::getMeshEntity()
 {
+    if (m_pNonPersistentMeshEntity.get() != nullptr)
+        return m_pNonPersistentMeshEntity;
+
     auto pMeshEntity = m_pMeshHandler->findMeshEntity(m_sMeshUUID, false);
     if (pMeshEntity.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + m_sMeshUUID);
@@ -157,4 +173,24 @@ void CMeshObject::GetTriangleIDs(LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEn
 void CMeshObject::GetAllTriangles(LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D* pTrianglesBuffer)
 {
     getMeshEntity()->getAllTriangles(nTrianglesBufferSize, pTrianglesNeededCount, pTrianglesBuffer);
+}
+
+bool CMeshObject::IsPersistent()
+{
+    return (m_pNonPersistentMeshEntity.get() == nullptr);
+}
+
+IPersistentMeshObject* CMeshObject::MakePersistent(const bool bBoundToLoginSession)
+{
+    if (m_pNonPersistentMeshEntity.get() != nullptr) {
+        auto pMeshEntityToRegister = m_pNonPersistentMeshEntity;
+        m_pNonPersistentMeshEntity = nullptr;
+
+        m_pMeshHandler->registerEntity(pMeshEntityToRegister);
+
+        return new CPersistentMeshObject(m_pMeshHandler, m_sMeshUUID);
+    }
+    else {
+        return new CPersistentMeshObject(m_pMeshHandler, m_sMeshUUID);
+    }
 }

@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 // Include custom headers here.
-
+#include "amc_meshhandler.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -59,9 +59,10 @@ private:
 protected:
 
 	AMC::PToolpathPart m_pPart;
+	AMC::PMeshHandler m_pMeshHandler;
 
 public:
-	CToolpathPart(AMC::PToolpathPart pPart);
+	CToolpathPart(AMC::PToolpathPart pPart, AMC::PMeshHandler pMeshHandler);
 	virtual ~CToolpathPart();
 
 	std::string GetName() override;

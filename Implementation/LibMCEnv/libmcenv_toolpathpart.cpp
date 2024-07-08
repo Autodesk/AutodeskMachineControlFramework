@@ -33,15 +33,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "libmcenv_modeldatacomponentinstance.hpp"
 
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
  Class definition of CToolpathPart
 **************************************************************************************************************************/
-CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart)
-	: m_pPart (pPart)
+CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart, AMC::PMeshHandler pMeshHandler)
+	: m_pPart (pPart), m_pMeshHandler (pMeshHandler)
 {
+	if (pMeshHandler.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pPart.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
@@ -59,5 +62,15 @@ std::string CToolpathPart::GetName()
 std::string CToolpathPart::GetUUID()
 {
 	return m_pPart->getUUID();
+}
+
+IModelDataComponentInstance* CToolpathPart::GetRootComponent()
+{
+	auto pBuildItem = m_pPart->getBuildItem();
+	auto pModel = m_pPart->getModel();
+
+	auto transform = CModelDataComponentInstance::map3MFTransform(pBuildItem->GetObjectTransform());
+
+	return new CModelDataComponentInstance(pModel, pBuildItem->GetObjectResource(), transform, m_pMeshHandler);
 }
 

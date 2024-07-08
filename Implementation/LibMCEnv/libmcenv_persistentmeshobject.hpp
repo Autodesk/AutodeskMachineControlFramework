@@ -27,15 +27,16 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CMeshObject
+Abstract: This is the class declaration of CPersistentMeshObject
 
 */
 
 
-#ifndef __LIBMCENV_MESHOBJECT
-#define __LIBMCENV_MESHOBJECT
+#ifndef __LIBMCENV_PERSISTENTMESHOBJECT
+#define __LIBMCENV_PERSISTENTMESHOBJECT
 
 #include "libmcenv_interfaces.hpp"
+#include "libmcenv_meshobject.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -45,71 +46,28 @@ Abstract: This is the class declaration of CMeshObject
 #endif
 
 // Include custom headers here.
-#include "amc_meshhandler.hpp"
+
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CMeshObject 
+ Class declaration of CPersistentMeshObject 
 **************************************************************************************************************************/
 
-class CMeshObject : public virtual IMeshObject, public virtual CBase {
+class CPersistentMeshObject : public virtual IPersistentMeshObject, public virtual CMeshObject {
 private:
 
-    AMC::PMeshHandler m_pMeshHandler;
-    std::string m_sMeshUUID;
-
-	AMC::PMeshEntity m_pNonPersistentMeshEntity;
-
-    AMC::PMeshEntity getMeshEntity();
+    bool m_bBoundToLoginSession;
 
 public:
+    CPersistentMeshObject(AMC::PMeshHandler pMeshHandler, const std::string& sMeshUUID);
 
-    CMeshObject(AMC::PMeshHandler pMeshHandler, const std::string & sMeshUUID);
+    virtual ~CPersistentMeshObject();
 
-	CMeshObject(AMC::PMeshHandler pMeshHandler, AMC::PMeshEntity pNonPersistentMeshEntity);
+	bool IsBoundToLoginSession() override;
 
-    virtual ~CMeshObject();
-
-	std::string GetName() override;
-
-	std::string GetUUID() override;
-
-	LibMCEnv_uint32 GetTriangleCount() override;
-
-	LibMCEnv_uint32 GetVertexCount() override;
-
-	bool IsManifold() override;
-
-	bool IsOriented() override;
-
-	bool IsWatertight() override;
-
-	LibMCEnv_uint32 GetMaxVertexID() override;
-
-	bool VertexExists(const LibMCEnv_uint32 nVertexID) override;
-
-	bool GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double& dX, LibMCEnv_double& dY, LibMCEnv_double& dZ) override;
-
-	void GetVertexIDs(LibMCEnv_uint64 nVertexIDsBufferSize, LibMCEnv_uint64* pVertexIDsNeededCount, LibMCEnv_uint32* pVertexIDsBuffer) override;
-
-	void GetAllVertices(LibMCEnv_uint64 nVerticesBufferSize, LibMCEnv_uint64* pVerticesNeededCount, LibMCEnv::sMeshVertex3D* pVerticesBuffer) override;
-
-	LibMCEnv_uint32 GetMaxTriangleID() override;
-
-	bool TriangeExists(const LibMCEnv_uint32 nTriangleID) override;
-
-	bool GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32& nVertex1ID, LibMCEnv_uint32& nVertex2ID, LibMCEnv_uint32& nVertex3ID) override;
-
-	void GetTriangleIDs(LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEnv_uint64* pTriangleIDsNeededCount, LibMCEnv_uint32* pTriangleIDsBuffer) override;
-
-	void GetAllTriangles(LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D* pTrianglesBuffer) override;
-	
-	bool IsPersistent() override;
-
-	IPersistentMeshObject* MakePersistent(const bool bBoundToLoginSession) override;
 };
 
 } // namespace Impl
@@ -118,4 +76,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_MESHOBJECT
+#endif // __LIBMCENV_PERSISTENTMESHOBJECT

@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CMeshObject
+Abstract: This is the class declaration of CModelDataMeshInstance
 
 */
 
 
-#ifndef __LIBMCENV_MESHOBJECT
-#define __LIBMCENV_MESHOBJECT
+#ifndef __LIBMCENV_MODELDATAMESHINSTANCE
+#define __LIBMCENV_MODELDATAMESHINSTANCE
 
 #include "libmcenv_interfaces.hpp"
 
@@ -45,6 +45,7 @@ Abstract: This is the class declaration of CMeshObject
 #endif
 
 // Include custom headers here.
+#include "lib3mf/lib3mf_dynamic.hpp"
 #include "amc_meshhandler.hpp"
 
 namespace LibMCEnv {
@@ -52,64 +53,34 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CMeshObject 
+ Class declaration of CModelDataMeshInstance 
 **************************************************************************************************************************/
 
-class CMeshObject : public virtual IMeshObject, public virtual CBase {
+class CModelDataMeshInstance : public virtual IModelDataMeshInstance, public virtual CBase {
 private:
+    std::string m_sName;
+    std::string m_sUUID;
 
+    LibMCEnv::sModelDataTransform m_Transform;
     AMC::PMeshHandler m_pMeshHandler;
-    std::string m_sMeshUUID;
 
-	AMC::PMeshEntity m_pNonPersistentMeshEntity;
-
-    AMC::PMeshEntity getMeshEntity();
 
 public:
 
-    CMeshObject(AMC::PMeshHandler pMeshHandler, const std::string & sMeshUUID);
+    CModelDataMeshInstance(Lib3MF::PModel pModel, Lib3MF::PMeshObject p3MFObject, LibMCEnv::sModelDataTransform transform, AMC::PMeshHandler pMeshHandler);
 
-	CMeshObject(AMC::PMeshHandler pMeshHandler, AMC::PMeshEntity pNonPersistentMeshEntity);
-
-    virtual ~CMeshObject();
+    virtual ~CModelDataMeshInstance();
 
 	std::string GetName() override;
 
 	std::string GetUUID() override;
 
-	LibMCEnv_uint32 GetTriangleCount() override;
+	LibMCEnv::sModelDataTransform GetTransform() override;
 
-	LibMCEnv_uint32 GetVertexCount() override;
+	IMeshObject * CreateCopiedMesh() override;
 
-	bool IsManifold() override;
+	IPersistentMeshObject * CreatePersistentMesh(const bool bBoundToLoginSession) override;
 
-	bool IsOriented() override;
-
-	bool IsWatertight() override;
-
-	LibMCEnv_uint32 GetMaxVertexID() override;
-
-	bool VertexExists(const LibMCEnv_uint32 nVertexID) override;
-
-	bool GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double& dX, LibMCEnv_double& dY, LibMCEnv_double& dZ) override;
-
-	void GetVertexIDs(LibMCEnv_uint64 nVertexIDsBufferSize, LibMCEnv_uint64* pVertexIDsNeededCount, LibMCEnv_uint32* pVertexIDsBuffer) override;
-
-	void GetAllVertices(LibMCEnv_uint64 nVerticesBufferSize, LibMCEnv_uint64* pVerticesNeededCount, LibMCEnv::sMeshVertex3D* pVerticesBuffer) override;
-
-	LibMCEnv_uint32 GetMaxTriangleID() override;
-
-	bool TriangeExists(const LibMCEnv_uint32 nTriangleID) override;
-
-	bool GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32& nVertex1ID, LibMCEnv_uint32& nVertex2ID, LibMCEnv_uint32& nVertex3ID) override;
-
-	void GetTriangleIDs(LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEnv_uint64* pTriangleIDsNeededCount, LibMCEnv_uint32* pTriangleIDsBuffer) override;
-
-	void GetAllTriangles(LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D* pTrianglesBuffer) override;
-	
-	bool IsPersistent() override;
-
-	IPersistentMeshObject* MakePersistent(const bool bBoundToLoginSession) override;
 };
 
 } // namespace Impl
@@ -118,4 +89,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_MESHOBJECT
+#endif // __LIBMCENV_MODELDATAMESHINSTANCE
