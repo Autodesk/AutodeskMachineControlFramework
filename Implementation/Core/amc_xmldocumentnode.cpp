@@ -211,10 +211,14 @@ void CXMLDocumentNodeInstance::RemoveAttribute(CXMLDocumentNameSpace* pNameSpace
 
 	auto iIter = m_AttributeMap.find(std::make_pair(pNameSpace, sName));
 	if (iIter != m_AttributeMap.end()) {
-		std::vector<PXMLDocumentAttributeInstance>::iterator lastElement;
-		lastElement = std::remove_if(m_Attributes.begin(), m_Attributes.end(), [this, pNameSpace, sName](PXMLDocumentAttributeInstance pAttribute) {
-			return (pAttribute->getNameSpace().get() == pNameSpace) && (pAttribute->getAttributeName () == sName);
+
+		auto lastIterator =std::remove_if(m_Attributes.begin(), m_Attributes.end(), [this, pNameSpace, sName](PXMLDocumentAttributeInstance pAttribute) {
+			auto pAttributeCopy = pAttribute;
+			bool bDelete = ((pAttributeCopy->getNameSpace().get() == pNameSpace) && (pAttributeCopy->getAttributeName() == sName));
+			return bDelete;
 		});
+
+		m_Attributes.erase(lastIterator, m_Attributes.end());
 
 		m_AttributeMap.erase(std::make_pair(pNameSpace, sName));
 	}
