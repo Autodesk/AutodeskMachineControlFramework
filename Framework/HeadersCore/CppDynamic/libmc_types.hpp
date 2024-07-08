@@ -616,6 +616,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDUPLOADCONTEXT 599 /** Build has not toolpath */
 #define LIBMC_ERROR_MESHHASTOOMANYVERTICES 600 /** Mesh has too many vertices */
 #define LIBMC_ERROR_MESHHASTOOMANYTRIANGLES 601 /** Mesh has too many triangles */
+#define LIBMC_ERROR_INVALIDXMLNODEORATTRIBUTENAME 602 /** Invalid XML node or attribute name */
+#define LIBMC_ERROR_XMLNAMESPACENOTREGISTERED 603 /** XML Namespace not registered */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1144,6 +1146,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDUPLOADCONTEXT: return "Build has not toolpath";
     case LIBMC_ERROR_MESHHASTOOMANYVERTICES: return "Mesh has too many vertices";
     case LIBMC_ERROR_MESHHASTOOMANYTRIANGLES: return "Mesh has too many triangles";
+    case LIBMC_ERROR_INVALIDXMLNODEORATTRIBUTENAME: return "Invalid XML node or attribute name";
+    case LIBMC_ERROR_XMLNAMESPACENOTREGISTERED: return "XML Namespace not registered";
     default: return "unknown error";
   }
 }

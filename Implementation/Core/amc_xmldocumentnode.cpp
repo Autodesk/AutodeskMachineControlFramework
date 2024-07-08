@@ -59,27 +59,59 @@ bool CXMLDocumentNodeInstance::checkXMLNodeName(const std::string& sNodeName)
 	return true;
 }
 
-void CXMLDocumentNodeInstance::extractFromPugiNode(pugi::xml_document* pXMLDocument, pugi::xml_node* pXMLNode)
+void CXMLDocumentNodeInstance::extractFromPugiNode(pugi::xml_document* pXMLDocument, pugi::xml_node* pXMLNode, bool bIsRoot)
 {
 	if (pXMLDocument == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pXMLNode == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto pDefaultNameSpace = m_pDocument->GetDefaultNamespace();
-
 	auto attributes = pXMLNode->attributes();
 	for (auto attribute : attributes) {
-		AddAttribute (pDefaultNameSpace, attribute.name (), attribute.as_string ());
+
+		std::string sAttributeName;
+		std::string sNameSpacePrefix;		
+		splitNameSpaceName (attribute.name(), sAttributeName, sNameSpacePrefix);
+
+		PXMLDocumentNameSpace pNameSpace;
+		if (sNameSpacePrefix.empty()) {
+			pNameSpace = m_pNameSpace;
+		}
+		else {
+			pNameSpace = m_pDocument->FindNamespaceByPrefix(sNameSpacePrefix, true);
+		}
+
+		std::string sAttributeValue = attribute.as_string();
+
+		bool bIsValidAttribute = true;
+		if (bIsRoot) {
+			if (sAttributeName == "xmlns")
+				bIsValidAttribute = false;
+		}
+
+		if (bIsValidAttribute)
+			AddAttribute (m_pNameSpace, sAttributeName, sAttributeValue);
 	}
 
 	auto children = pXMLNode->children();
 	for (auto child : children) {
-		auto pChildNode = std::make_shared<CXMLDocumentNodeInstance> (m_pDocument, this, pDefaultNameSpace, child.name ());
+		std::string sChildName;
+		std::string sNameSpacePrefix;
+		splitNameSpaceName(child.name(), sChildName, sNameSpacePrefix);
+
+		PXMLDocumentNameSpace pNameSpace;
+		if (sNameSpacePrefix.empty()) {
+			pNameSpace = m_pNameSpace;
+		}
+		else {
+			pNameSpace = m_pDocument->FindNamespaceByPrefix(sNameSpacePrefix, true);
+		}
+
+		auto pChildNode = std::make_shared<CXMLDocumentNodeInstance> (m_pDocument, this, pNameSpace, sChildName);
 
 		addChildEx(pChildNode);
 
-		pChildNode->extractFromPugiNode(pXMLDocument, &child);
+		pChildNode->extractFromPugiNode(pXMLDocument, &child, false);
 	}
 
 }
@@ -324,6 +356,27 @@ PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(PXMLDocumentNameSpac
 
 	return pNode;
 }
+
+void CXMLDocumentNodeInstance::splitNameSpaceName(const std::string& sPrefixedName, std::string& sUnprefixedName, std::string& sNameSpacePrefix)
+{
+	auto pos = sPrefixedName.find(":");
+	if (pos != std::string::npos) {
+		sNameSpacePrefix = sPrefixedName.substr(0, pos);
+		sUnprefixedName = sPrefixedName.substr(pos + 1);
+		
+		auto nextpos = sUnprefixedName.find(":");
+		if (pos != std::string::npos) {
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLNODEORATTRIBUTENAME, sPrefixedName);
+		}
+
+	}
+	else {
+		sUnprefixedName = sPrefixedName;
+		sNameSpacePrefix = "";
+	}
+
+}
+
 
 void CXMLDocumentNodeInstance::addChildEx (PXMLDocumentNodeInstance pNode)
 {

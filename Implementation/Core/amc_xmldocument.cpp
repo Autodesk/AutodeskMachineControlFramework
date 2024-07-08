@@ -89,7 +89,7 @@ void CXMLDocumentInstance::extractPugiDocument(std::shared_ptr<pugi::xml_documen
 	m_pDefaultNameSpace = registerNamespaceEx(sDefaultNamespace, "");
 	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, nullptr, m_pDefaultNameSpace, rootNode.name ());
 
-	m_pRootNodeInstance->extractFromPugiNode (pXMLDocument.get(), &rootNode);
+	m_pRootNodeInstance->extractFromPugiNode (pXMLDocument.get(), &rootNode, true);
 }
 
 PXMLDocumentNameSpace CXMLDocumentInstance::registerNamespaceEx(const std::string& sNamespace, const std::string& sPrefix)
@@ -178,6 +178,24 @@ PXMLDocumentNameSpace CXMLDocumentInstance::FindNamespace(const std::string& sNa
 	else {
 		if (bMustExist)
 			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDXMLNAMESPACE, sNamespace);
+
+		return nullptr;
+	}
+
+}
+
+PXMLDocumentNameSpace CXMLDocumentInstance::FindNamespaceByPrefix(const std::string& sNameSpacePrefix, bool bMustExist)
+{
+	if (sNameSpacePrefix.empty())
+		return m_pDefaultNameSpace;
+
+	auto iNamespaceIter = m_PrefixToNamespaceMap.find(sNameSpacePrefix);
+	if (iNamespaceIter != m_PrefixToNamespaceMap.end()) {
+		return iNamespaceIter->second;
+	}
+	else {
+		if (bMustExist)
+			throw ELibMCCustomException(LIBMC_ERROR_XMLNAMESPACENOTREGISTERED, sNameSpacePrefix);
 
 		return nullptr;
 	}
