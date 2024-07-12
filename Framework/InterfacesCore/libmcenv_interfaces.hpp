@@ -73,6 +73,9 @@ class IMeshObject;
 class IPersistentMeshObject;
 class IModelDataMeshInstance;
 class IModelDataComponentInstance;
+class IMeshSceneItem;
+class IMeshScene;
+class ISceneHandler;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
@@ -1630,10 +1633,16 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* IModelDataMeshInstance::GetTransform - Returns Transform of the Mesh.
-	* @return Returns the transform matrix of the mesh.
+	* IModelDataMeshInstance::GetLocalTransform - Returns Local Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in its component coordinate system.
 	*/
-	virtual LibMCEnv::sModelDataTransform GetTransform() = 0;
+	virtual LibMCEnv::sModelDataTransform GetLocalTransform() = 0;
+
+	/**
+	* IModelDataMeshInstance::GetAbsoluteTransform - Returns Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetAbsoluteTransform() = 0;
 
 	/**
 	* IModelDataMeshInstance::CreateCopiedMesh - Loads a copy of the mesh geometry into memory. Might be inefficient to use for many identical copies of the mesh in the scene.
@@ -1672,10 +1681,16 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* IModelDataComponentInstance::GetTransform - Returns Transform of the Component.
-	* @return Returns the transform matrix of the part.
+	* IModelDataComponentInstance::GetLocalTransform - Returns Local Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in its component coordinate system.
 	*/
-	virtual LibMCEnv::sModelDataTransform GetTransform() = 0;
+	virtual LibMCEnv::sModelDataTransform GetLocalTransform() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetAbsoluteTransform - Returns Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetAbsoluteTransform() = 0;
 
 	/**
 	* IModelDataComponentInstance::GetSolidCount - Returns the number of solid meshes in the component.
@@ -1719,6 +1734,180 @@ public:
 };
 
 typedef IBaseSharedPtr<IModelDataComponentInstance> PIModelDataComponentInstance;
+
+
+/*************************************************************************************************************************
+ Class interface for MeshSceneItem 
+**************************************************************************************************************************/
+
+class IMeshSceneItem : public virtual IBase {
+public:
+	/**
+	* IMeshSceneItem::GetItemUUID - Returns the UUID of the scene item.
+	* @return Returns scene item uuid.
+	*/
+	virtual std::string GetItemUUID() = 0;
+
+	/**
+	* IMeshSceneItem::GetTransform - Returns the transform of the scene item.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetTransform() = 0;
+
+	/**
+	* IMeshSceneItem::UpdateTransform - Updates the transform of the scene item.
+	* @param[in] AbsoluteTransform - The new transform matrix of the mesh in the global world coordinate system.
+	*/
+	virtual void UpdateTransform(const LibMCEnv::sModelDataTransform AbsoluteTransform) = 0;
+
+	/**
+	* IMeshSceneItem::GetMeshObject - Returns persistent mesh object.
+	* @return Returns a persistent mesh object of this scene.
+	*/
+	virtual IPersistentMeshObject * GetMeshObject() = 0;
+
+	/**
+	* IMeshSceneItem::ReferenceIsValid - Returns if the underlying mesh object exists.
+	* @return Returns a persistent mesh object of this scene.
+	*/
+	virtual bool ReferenceIsValid() = 0;
+
+};
+
+typedef IBaseSharedPtr<IMeshSceneItem> PIMeshSceneItem;
+
+
+/*************************************************************************************************************************
+ Class interface for MeshScene 
+**************************************************************************************************************************/
+
+class IMeshScene : public virtual IBase {
+public:
+	/**
+	* IMeshScene::GetSceneUUID - Returns the UUID of the scene.
+	* @return Returns scene uuid.
+	*/
+	virtual std::string GetSceneUUID() = 0;
+
+	/**
+	* IMeshScene::IsBoundToLoginSession - Returns if the scene object is bound to a specific login session.
+	* @return If true, the scene will be freed once the client login session expires.
+	*/
+	virtual bool IsBoundToLoginSession() = 0;
+
+	/**
+	* IMeshScene::AddSceneItem - Adds a persistent mesh to the scene.
+	* @param[in] pMesh - Mesh to add to the scene.
+	* @param[in] AbsoluteTransform - Transform matrix of the mesh in the global world coordinate system.
+	* @return The returned scene item.
+	*/
+	virtual IMeshSceneItem * AddSceneItem(IPersistentMeshObject* pMesh, const LibMCEnv::sModelDataTransform AbsoluteTransform) = 0;
+
+	/**
+	* IMeshScene::AddModelDataMeshAsSceneItem - Adds an instance from a ModelData component. Reuses underlying mesh data, if mesh has been persisted already. Registers new Persistent Mesh if necessary.
+	* @param[in] pModelDataMesh - Adds a mesh to the scene.
+	* @return The returned scene item.
+	*/
+	virtual IMeshSceneItem * AddModelDataMeshAsSceneItem(IModelDataMeshInstance* pModelDataMesh) = 0;
+
+	/**
+	* IMeshScene::GetSceneItemCount - Returns the number of scene items.
+	* @return Returns the number of scene items.
+	*/
+	virtual LibMCEnv_uint32 GetSceneItemCount() = 0;
+
+	/**
+	* IMeshScene::GetSceneItem - Returns a scene item by index.
+	* @param[in] nIndex - Index to retrieve. MUST be between 0 and SceneItemCount - 1
+	* @return The returned scene item.
+	*/
+	virtual IMeshSceneItem * GetSceneItem(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IMeshScene::FindSceneItem - Finds a scene item by UUID.
+	* @param[in] sUUID - UUID to retrieve.
+	* @param[in] bMustExist - If true, the call fails, if the UUID does not exist.
+	* @return The returned scene item. NULL, if MustExist is false and UUID does not exist.
+	*/
+	virtual IMeshSceneItem * FindSceneItem(const std::string & sUUID, const bool bMustExist) = 0;
+
+	/**
+	* IMeshScene::HasSceneItem - Checks if a scene item exists.
+	* @param[in] sUUID - UUID to retrieve.
+	* @return Returns true, if scene item UUID exists.
+	*/
+	virtual bool HasSceneItem(const std::string & sUUID) = 0;
+
+	/**
+	* IMeshScene::RemoveSceneItem - Removes a scene item from the scene.
+	* @param[in] pSceneItem - Scene Item to remove.
+	*/
+	virtual void RemoveSceneItem(IMeshSceneItem* pSceneItem) = 0;
+
+};
+
+typedef IBaseSharedPtr<IMeshScene> PIMeshScene;
+
+
+/*************************************************************************************************************************
+ Class interface for SceneHandler 
+**************************************************************************************************************************/
+
+class ISceneHandler : public virtual IBase {
+public:
+	/**
+	* ISceneHandler::MeshIsPersistent - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	virtual bool MeshIsPersistent(const std::string & sMeshUUID) = 0;
+
+	/**
+	* ISceneHandler::FindPersistentMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IPersistentMeshObject * FindPersistentMesh(const std::string & sMeshUUID) = 0;
+
+	/**
+	* ISceneHandler::CreateEmptyMeshScene - Creates an empty mesh scene object.
+	* @param[in] sUUID - Mesh Scene UUID
+	* @param[in] bBoundToLoginSession - Scene shall be freed when the current login session expires. Parameter is ignored, if not executed in a UIEnvironment context.
+	* @return Returns and register a scene instance.
+	*/
+	virtual IMeshScene * CreateEmptyMeshScene(const std::string & sUUID, const bool bBoundToLoginSession) = 0;
+
+	/**
+	* ISceneHandler::ReleaseMeshScene - Removes a mesh scene and removes all memory.
+	* @return Returns and register a scene instance.
+	*/
+	virtual IMeshScene * ReleaseMeshScene() = 0;
+
+	/**
+	* ISceneHandler::Load3MFFromResource - Loads a 3MF Resource into memory.
+	* @param[in] sResourceName - Resource name to load.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	virtual IModelDataComponentInstance * Load3MFFromResource(const std::string & sResourceName) = 0;
+
+	/**
+	* ISceneHandler::Load3MFFromMemory - Loads a 3MF from memory.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[in] pDataBuffer - Binary data to load.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	virtual IModelDataComponentInstance * Load3MFFromMemory(const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer) = 0;
+
+	/**
+	* ISceneHandler::Load3MFFromStream - Loads a 3MF from a StreamReader.
+	* @param[in] pReaderInstance - Stream reader instance.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	virtual IModelDataComponentInstance * Load3MFFromStream(IStreamReader* pReaderInstance) = 0;
+
+};
+
+typedef IBaseSharedPtr<ISceneHandler> PISceneHandler;
 
 
 /*************************************************************************************************************************
@@ -5658,25 +5847,10 @@ public:
 	virtual IJournalHandler * GetCurrentJournal() = 0;
 
 	/**
-	* IStateEnvironment::Load3MFFromResource - Loads a 3MF Resource into memory.
-	* @param[in] sResourceName - Resource name to load.
-	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	* IStateEnvironment::CreateSceneHandler - Creates a new 3D scene handler instance.
+	* @return Scene Handler instance.
 	*/
-	virtual IModelDataComponentInstance * Load3MFFromResource(const std::string & sResourceName) = 0;
-
-	/**
-	* IStateEnvironment::MeshIsPersistent - Checks if a mesh uuid is registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Flag is registered.
-	*/
-	virtual bool MeshIsPersistent(const std::string & sMeshUUID) = 0;
-
-	/**
-	* IStateEnvironment::FindPersistentMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
-	*/
-	virtual IPersistentMeshObject * FindPersistentMesh(const std::string & sMeshUUID) = 0;
+	virtual ISceneHandler * CreateSceneHandler() = 0;
 
 	/**
 	* IStateEnvironment::CreateDataSeries - Creates a new empty data series object.
@@ -6229,25 +6403,10 @@ public:
 	virtual IJournalHandler * GetCurrentJournal() = 0;
 
 	/**
-	* IUIEnvironment::Load3MFFromResource - Loads a 3MF Resource into memory.
-	* @param[in] sResourceName - Resource name to load.
-	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	* IUIEnvironment::CreateSceneHandler - Creates a new 3D scene handler instance.
+	* @return Scene Handler instance.
 	*/
-	virtual IModelDataComponentInstance * Load3MFFromResource(const std::string & sResourceName) = 0;
-
-	/**
-	* IUIEnvironment::MeshIsPersistent - Checks if a mesh uuid is registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Flag is registered.
-	*/
-	virtual bool MeshIsPersistent(const std::string & sMeshUUID) = 0;
-
-	/**
-	* IUIEnvironment::FindPersistentMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
-	*/
-	virtual IPersistentMeshObject * FindPersistentMesh(const std::string & sMeshUUID) = 0;
+	virtual ISceneHandler * CreateSceneHandler() = 0;
 
 	/**
 	* IUIEnvironment::CreateDataSeries - Creates a new empty data series object.

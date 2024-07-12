@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CModelDataMeshInstance
+Abstract: This is the class declaration of CSceneHandler
 
 */
 
 
-#ifndef __LIBMCENV_MODELDATAMESHINSTANCE
-#define __LIBMCENV_MODELDATAMESHINSTANCE
+#ifndef __LIBMCENV_SCENEHANDLER
+#define __LIBMCENV_SCENEHANDLER
 
 #include "libmcenv_interfaces.hpp"
 
@@ -45,46 +45,45 @@ Abstract: This is the class declaration of CModelDataMeshInstance
 #endif
 
 // Include custom headers here.
-#include "lib3mf/lib3mf_dynamic.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_resourcepackage.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CModelDataMeshInstance 
+ Class declaration of CSceneHandler 
 **************************************************************************************************************************/
 
-class CModelDataMeshInstance : public virtual IModelDataMeshInstance, public virtual CBase {
+class CSceneHandler : public virtual ISceneHandler, public virtual CBase {
 private:
-    std::string m_sName;
-    std::string m_sUUID;
 
-    LibMCEnv::sModelDataTransform m_LocalTransform;
-    LibMCEnv::sModelDataTransform m_ParentTransform;
-    AMC::PMeshHandler m_pMeshHandler;
-    Lib3MF::PModel m_pModel;
-    Lib3MF::PMeshObject m_pMeshObject;
+
+	AMC::PMeshHandler m_pMeshHandler;
+	Lib3MF::PWrapper m_pLib3MFWrapper;
+	AMC::PResourcePackage m_pCoreResourcePackage;
 
 
 public:
 
-    CModelDataMeshInstance(Lib3MF::PModel pModel, Lib3MF::PMeshObject p3MFObject, LibMCEnv::sModelDataTransform transform, AMC::PMeshHandler pMeshHandler);
+	CSceneHandler(AMC::PMeshHandler pMeshHandler, Lib3MF::PWrapper pLib3MFWrapper, AMC::PResourcePackage pCoreResourcePackage);
 
-    virtual ~CModelDataMeshInstance();
+	virtual ~CSceneHandler();
 
-	std::string GetName() override;
+	bool MeshIsPersistent(const std::string & sMeshUUID) override;
 
-	std::string GetUUID() override;
+	IPersistentMeshObject * FindPersistentMesh(const std::string & sMeshUUID) override;
 
-	LibMCEnv::sModelDataTransform GetLocalTransform() override;
+	IMeshScene * CreateEmptyMeshScene(const std::string & sUUID, const bool bBoundToLoginSession) override;
 
-    LibMCEnv::sModelDataTransform GetAbsoluteTransform() override;
+	IMeshScene * ReleaseMeshScene() override;
 
-	IMeshObject * CreateCopiedMesh() override;
+	IModelDataComponentInstance * Load3MFFromResource(const std::string & sResourceName) override;
 
-	IPersistentMeshObject * CreatePersistentMesh(const bool bBoundToLoginSession) override;
+	IModelDataComponentInstance * Load3MFFromMemory(const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer) override;
+
+	IModelDataComponentInstance * Load3MFFromStream(IStreamReader* pReaderInstance) override;
 
 };
 
@@ -94,4 +93,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_MODELDATAMESHINSTANCE
+#endif // __LIBMCENV_SCENEHANDLER

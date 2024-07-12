@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,50 +29,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "libmcenv_toolpathpart.hpp"
-#include "libmcenv_interfaceexception.hpp"
+#ifndef __AMC_MESHSCENE
+#define __AMC_MESHSCENE
 
-// Include custom headers here.
-#include "libmcenv_modeldatacomponentinstance.hpp"
+#include <memory>
+#include <map>
+#include <string>
+#include <cstdint>
+#include <vector>
 
-#include "amc_meshutils.hpp"
+#include "amc_meshsceneitem.hpp"
 
-using namespace LibMCEnv::Impl;
+namespace AMC {
 
-/*************************************************************************************************************************
- Class definition of CToolpathPart
-**************************************************************************************************************************/
-CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart, AMC::PMeshHandler pMeshHandler)
-	: m_pPart (pPart), m_pMeshHandler (pMeshHandler)
-{
-	if (pMeshHandler.get() == nullptr)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-	if (pPart.get() == nullptr)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	class CMeshScene {
+	private:
+
+		std::string m_sSceneUUID;
+		
+	public:
+
+		CMeshScene(const std::string & sSceneUUID);
+
+		virtual ~CMeshScene();
+
+		std::string getSceneUUID();
+		
+ 
+	};
+	
+	typedef std::shared_ptr<CMeshScene> PMeshScene;
+
+	
 }
 
-CToolpathPart::~CToolpathPart()
-{
 
-}
-
-std::string CToolpathPart::GetName()
-{
-	return m_pPart->getName();
-}
-
-std::string CToolpathPart::GetUUID()
-{
-	return m_pPart->getUUID();
-}
-
-IModelDataComponentInstance* CToolpathPart::GetRootComponent()
-{
-	auto pBuildItem = m_pPart->getBuildItem();
-	auto pModel = m_pPart->getModel();
-
-	auto transform = AMC::CMeshUtils::map3MFTransform(pBuildItem->GetObjectTransform());
-
-	return new CModelDataComponentInstance(pModel, pBuildItem->GetObjectResource(), transform, m_pMeshHandler);
-}
+#endif //__AMC_MESHSCENE
 

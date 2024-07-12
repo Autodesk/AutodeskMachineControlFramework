@@ -225,11 +225,7 @@ public:
 
 	bool HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive) override;
 
-	IModelDataComponentInstance* Load3MFFromResource(const std::string& sResourceName) override;
-
-	bool MeshIsPersistent(const std::string& sMeshUUID) override;
-
-	IPersistentMeshObject* FindPersistentMesh(const std::string& sMeshUUID) override;
+	ISceneHandler* CreateSceneHandler() override;
 
 	ICryptoContext* CreateCryptoContext() override;
 

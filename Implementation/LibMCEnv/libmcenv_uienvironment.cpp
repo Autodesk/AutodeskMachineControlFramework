@@ -39,6 +39,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_journalhandler.hpp"
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_datetime.hpp"
+#include "libmcenv_scenehandler.hpp"
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_modeldatacomponentinstance.hpp"
 #include "libmcenv_persistentmeshobject.hpp"
@@ -649,37 +650,25 @@ IJournalHandler* CUIEnvironment::GetCurrentJournal()
     return new CJournalHandler(m_pUISystemState->getStateJournal());
 }
 
-IModelDataComponentInstance* CUIEnvironment::Load3MFFromResource(const std::string& sResourceName)
+ISceneHandler* CUIEnvironment::CreateSceneHandler() 
 {
-    if (m_pUIHandler == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+	auto pToolpathHandler = m_pUISystemState->getToolpathHandler();
+	if (pToolpathHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
-    if (pResourcePackage.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+	auto pLib3MFWrapper = pToolpathHandler->getLib3MFWrapper();
+	if (pLib3MFWrapper == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-    pResourcePackage->findEntryByName(sResourceName, true);
+	auto pMeshHandler = m_pUISystemState->getMeshHandler();
+	if (pMeshHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-    auto pLib3MFWrapper = m_pUISystemState->getToolpathHandler()->getLib3MFWrapper();
+	auto pCoreResourcePackage = m_pUIHandler->getCoreResourcePackage();
+	if (pCoreResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-    return new CModelDataComponentInstance(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName, m_pUISystemState->getMeshHandler ());
-}
-
-bool CUIEnvironment::MeshIsPersistent(const std::string& sMeshUUID)
-{
-    auto pMeshHandler = m_pUISystemState->getMeshHandler();
-    return pMeshHandler->hasMeshEntity(sMeshUUID);
-}
-
-IPersistentMeshObject* CUIEnvironment::FindPersistentMesh(const std::string& sMeshUUID)
-{
-    auto pMeshHandler = m_pUISystemState->getMeshHandler();
-    auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
-
-    if (pMeshEntity.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
-
-    return new CPersistentMeshObject(pMeshHandler, pMeshEntity->getUUID());
+	return new CSceneHandler(pMeshHandler, pLib3MFWrapper, pCoreResourcePackage);
 }
 
 /*IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
@@ -864,7 +853,7 @@ ICryptoContext* CUIEnvironment::CreateCryptoContext()
 
 ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType)
 {
-    if (sName.empty())
+    if (sName.empty()) 
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
     if (sMIMEType.empty())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE);

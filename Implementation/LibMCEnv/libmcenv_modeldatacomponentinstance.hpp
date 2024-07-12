@@ -63,7 +63,8 @@ private:
 
 	std::string m_sUUID;
 	std::string m_sName;
-	LibMCEnv::sModelDataTransform m_Transform;
+	LibMCEnv::sModelDataTransform m_LocalTransform;
+	LibMCEnv::sModelDataTransform m_ParentTransform;
 	Lib3MF::PModel m_pModel;
 	AMC::PMeshHandler m_pMeshHandler;
 
@@ -94,7 +95,9 @@ public:
 
 	std::string GetUUID() override;
 
-	LibMCEnv::sModelDataTransform GetTransform() override;
+	LibMCEnv::sModelDataTransform GetLocalTransform() override;
+
+	LibMCEnv::sModelDataTransform GetAbsoluteTransform() override;
 
 	LibMCEnv_uint32 GetSolidCount() override;
 
@@ -108,9 +111,6 @@ public:
 
 	IModelDataComponentInstance * GetSubComponent(const LibMCEnv_uint32 nIndex) override;
 
-	static LibMCEnv::sModelDataTransform map3MFTransform(const Lib3MF::sTransform transform3MF);
-
-	static LibMCEnv::sModelDataTransform createIdentityTransform();
 };
 
 } // namespace Impl

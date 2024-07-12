@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_signalhandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
+#include "libmcenv_scenehandler.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_buildexecution.hpp"
@@ -693,40 +694,31 @@ IJournalHandler* CStateEnvironment::GetCurrentJournal()
 */
 
 
-IModelDataComponentInstance* CStateEnvironment::Load3MFFromResource(const std::string& sResourceName)
+ISceneHandler* CStateEnvironment::CreateSceneHandler()
 {
+	auto pToolpathHandler = m_pSystemState->getToolpathHandlerInstance();
+	if (pToolpathHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pLib3MFWrapper = pToolpathHandler->getLib3MFWrapper();
+	if (pLib3MFWrapper == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
+	if (pMeshHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
 	auto pUIHandler = m_pSystemState->uiHandler();
 	if (pUIHandler == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
-	if (pResourcePackage.get() == nullptr)
+	auto pCoreResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pCoreResourcePackage.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-	pResourcePackage->findEntryByName(sResourceName, true);
-
-	auto pLib3MFWrapper = m_pSystemState->getToolpathHandlerInstance()->getLib3MFWrapper();
-	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
-
-	return new CModelDataComponentInstance (pLib3MFWrapper.get (), pResourcePackage.get (), sResourceName, pMeshHandler);
+	return new CSceneHandler(pMeshHandler, pLib3MFWrapper, pCoreResourcePackage);
 }
 
-bool CStateEnvironment::MeshIsPersistent(const std::string& sMeshUUID)
-{
-	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
-	return pMeshHandler->hasMeshEntity(sMeshUUID);
-}
-
-IPersistentMeshObject* CStateEnvironment::FindPersistentMesh(const std::string& sMeshUUID)
-{
-	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
-	auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
-
-	if (pMeshEntity.get() == nullptr)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
-
-	return new CPersistentMeshObject(pMeshHandler, pMeshEntity->getUUID());
-}
 
 IDataSeries* CStateEnvironment::CreateDataSeries(const std::string& sName)
 {

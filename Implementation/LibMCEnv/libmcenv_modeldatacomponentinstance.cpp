@@ -36,7 +36,10 @@ Abstract: This is a stub class definition of CModelDataComponentInstance
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
+
 #include "common_utils.hpp"
+
+#include "amc_meshutils.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -45,7 +48,7 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 CModelDataComponentInstance::CModelDataComponentInstance(Lib3MF::PModel pModel, Lib3MF::PObject p3MFObject, LibMCEnv::sModelDataTransform transform, AMC::PMeshHandler pMeshHandler)
-	: m_Transform (transform), m_pModel (pModel), m_pMeshHandler (pMeshHandler)
+	: m_LocalTransform (transform), m_pModel (pModel), m_pMeshHandler (pMeshHandler)
 {
 	if (pMeshHandler == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -75,7 +78,7 @@ CModelDataComponentInstance::CModelDataComponentInstance(Lib3MF::PModel pModel, 
 			auto pComponent = pComponentsObject->GetComponent(nIndex);
 			auto pSubObject = pComponent->GetObjectResource();
 
-			sModelDataTransform transform = map3MFTransform (pComponent->GetTransform());
+			sModelDataTransform transform = AMC::CMeshUtils::map3MFTransform (pComponent->GetTransform());
 			addSubObjectWithTransform(pSubObject, transform);
 
 		}
@@ -84,7 +87,7 @@ CModelDataComponentInstance::CModelDataComponentInstance(Lib3MF::PModel pModel, 
 
 	if (p3MFObject->IsMeshObject())
 	{
-		sModelDataTransform transform = createIdentityTransform ();
+		sModelDataTransform transform = AMC::CMeshUtils::createIdentityTransform ();
 		addSubObjectWithTransform(p3MFObject, transform);
 	}
 }
@@ -111,7 +114,7 @@ CModelDataComponentInstance::CModelDataComponentInstance(Lib3MF::PModel pModel, 
 		m_sUUID = AMCCommon::CUtils::createUUID();
 	}
 
-	m_Transform = createIdentityTransform();
+	m_LocalTransform = AMC::CMeshUtils::createIdentityTransform();
 
 	addBuildItem(p3MFBuildItem);
 }
@@ -128,7 +131,7 @@ CModelDataComponentInstance::CModelDataComponentInstance(Lib3MF::PModel pModel, 
 	m_sName = "";
 	m_sUUID = AMCCommon::CUtils::createUUID();
 
-	m_Transform = createIdentityTransform();
+	m_LocalTransform = AMC::CMeshUtils::createIdentityTransform();
 
 	auto pBuildItemIterator = m_pModel->GetBuildItems();
 	while (pBuildItemIterator->MoveNext()) {
@@ -151,7 +154,7 @@ CModelDataComponentInstance::CModelDataComponentInstance(Lib3MF::CWrapper* p3MFW
 	m_sName = "";
 	m_sUUID = AMCCommon::CUtils::createUUID();
 
-	m_Transform = createIdentityTransform();
+	m_LocalTransform = AMC::CMeshUtils::createIdentityTransform();
 	m_pModel = p3MFWrapper->CreateModel();
 
 	std::vector<uint8_t> Buffer;
@@ -180,7 +183,7 @@ void CModelDataComponentInstance::addBuildItem(Lib3MF::PBuildItem pBuildItem)
 	if (pBuildItem.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	auto transform = map3MFTransform(pBuildItem->GetObjectTransform());
+	auto transform = AMC::CMeshUtils::map3MFTransform(pBuildItem->GetObjectTransform());
 	addSubObjectWithTransform(pBuildItem->GetObjectResource(), transform);
 }
 
@@ -217,32 +220,6 @@ void CModelDataComponentInstance::addSubObjectWithTransform(Lib3MF::PObject pSub
 }
 
 
-LibMCEnv::sModelDataTransform CModelDataComponentInstance::map3MFTransform(const Lib3MF::sTransform transform3MF)
-{
-	LibMCEnv::sModelDataTransform transform;
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			transform.m_Matrix[j][i] = transform3MF.m_Fields[j][i];
-		}
-
-		transform.m_Translation[i] = transform3MF.m_Fields[3][i];
-	}
-
-	return transform;
-
-}
-
-LibMCEnv::sModelDataTransform CModelDataComponentInstance::createIdentityTransform()
-{
-	// Create identity transform
-	sModelDataTransform transform;
-	memset((void*)&transform, 0, sizeof(transform));
-	for (uint32_t i = 0; i < 3; i++)
-		transform.m_Matrix[i][i] = 1.0;
-
-	return transform;
-}
 
 
 std::string CModelDataComponentInstance::GetName()
@@ -255,9 +232,14 @@ std::string CModelDataComponentInstance::GetUUID()
 	return m_sUUID;
 }
 
-LibMCEnv::sModelDataTransform CModelDataComponentInstance::GetTransform()
+LibMCEnv::sModelDataTransform CModelDataComponentInstance::GetLocalTransform()
 {
-	return m_Transform;
+	return m_LocalTransform;
+}
+
+LibMCEnv::sModelDataTransform CModelDataComponentInstance::GetAbsoluteTransform()
+{
+	return AMC::CMeshUtils::multiplyTransforms (m_ParentTransform, m_LocalTransform);
 }
 
 LibMCEnv_uint32 CModelDataComponentInstance::GetSolidCount()

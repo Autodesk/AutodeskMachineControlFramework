@@ -39,6 +39,8 @@ Abstract: This is a stub class definition of CModelDataMeshInstance
 // Include custom headers here.
 #include "common_utils.hpp"
 
+#include "amc_meshutils.hpp"
+
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
@@ -46,7 +48,7 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 CModelDataMeshInstance::CModelDataMeshInstance(Lib3MF::PModel pModel, Lib3MF::PMeshObject p3MFObject, LibMCEnv::sModelDataTransform transform, AMC::PMeshHandler pMeshHandler)
-    : m_pMeshHandler (pMeshHandler)
+    : m_pMeshHandler (pMeshHandler), m_pModel (pModel), m_LocalTransform (transform), m_ParentTransform (transform)
 {
     if (pModel.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -65,11 +67,13 @@ CModelDataMeshInstance::CModelDataMeshInstance(Lib3MF::PModel pModel, Lib3MF::PM
         m_sUUID = AMCCommon::CUtils::createUUID();
     }
 
+    m_pMeshObject = p3MFObject;
 }
 
 CModelDataMeshInstance::~CModelDataMeshInstance()
 {
-
+    m_pMeshObject = nullptr;
+    m_pModel = nullptr;
 }
 
 
@@ -84,16 +88,24 @@ std::string CModelDataMeshInstance::GetUUID()
     return m_sUUID;
 }
 
-LibMCEnv::sModelDataTransform CModelDataMeshInstance::GetTransform()
+LibMCEnv::sModelDataTransform CModelDataMeshInstance::GetLocalTransform()
 {
-    return m_Transform;
+    return m_LocalTransform;
 }
+
+LibMCEnv::sModelDataTransform CModelDataMeshInstance::GetAbsoluteTransform()
+{
+    return AMC::CMeshUtils::multiplyTransforms(m_ParentTransform, m_LocalTransform);
+}
+
 
 IMeshObject * CModelDataMeshInstance::CreateCopiedMesh()
 {
     std::string sUUID = AMCCommon::CUtils::createUUID();
 
     auto pMeshEntity = std::make_shared<AMC::CMeshEntity>(sUUID, m_sName);
+
+    pMeshEntity->loadFrom3MF(m_pMeshObject.get());
 
     return new CMeshObject(m_pMeshHandler, pMeshEntity);
 }
@@ -103,6 +115,9 @@ IPersistentMeshObject * CModelDataMeshInstance::CreatePersistentMesh(const bool 
     std::string sUUID = AMCCommon::CUtils::createUUID();
 
     auto pMeshEntity = std::make_shared<AMC::CMeshEntity>(sUUID, m_sName);
+
+    pMeshEntity->loadFrom3MF(m_pMeshObject.get());
+
     m_pMeshHandler->registerEntity(pMeshEntity);
 
     return new CPersistentMeshObject(m_pMeshHandler, pMeshEntity->getUUID ());

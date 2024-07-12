@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CModelDataMeshInstance
+Abstract: This is the class declaration of CMeshScene
 
 */
 
 
-#ifndef __LIBMCENV_MODELDATAMESHINSTANCE
-#define __LIBMCENV_MODELDATAMESHINSTANCE
+#ifndef __LIBMCENV_MESHSCENE
+#define __LIBMCENV_MESHSCENE
 
 #include "libmcenv_interfaces.hpp"
 
@@ -45,46 +45,44 @@ Abstract: This is the class declaration of CModelDataMeshInstance
 #endif
 
 // Include custom headers here.
-#include "lib3mf/lib3mf_dynamic.hpp"
-#include "amc_meshhandler.hpp"
+#include "amc_meshscene.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CModelDataMeshInstance 
+ Class declaration of CMeshScene 
 **************************************************************************************************************************/
 
-class CModelDataMeshInstance : public virtual IModelDataMeshInstance, public virtual CBase {
+class CMeshScene : public virtual IMeshScene, public virtual CBase {
 private:
-    std::string m_sName;
-    std::string m_sUUID;
 
-    LibMCEnv::sModelDataTransform m_LocalTransform;
-    LibMCEnv::sModelDataTransform m_ParentTransform;
-    AMC::PMeshHandler m_pMeshHandler;
-    Lib3MF::PModel m_pModel;
-    Lib3MF::PMeshObject m_pMeshObject;
-
+	AMC::PMeshScene m_pMeshScene;
 
 public:
 
-    CModelDataMeshInstance(Lib3MF::PModel pModel, Lib3MF::PMeshObject p3MFObject, LibMCEnv::sModelDataTransform transform, AMC::PMeshHandler pMeshHandler);
+	CMeshScene(AMC::PMeshScene pMeshScene);
 
-    virtual ~CModelDataMeshInstance();
+	virtual ~CMeshScene();
 
-	std::string GetName() override;
+	std::string GetSceneUUID() override;
 
-	std::string GetUUID() override;
+	bool IsBoundToLoginSession() override;
 
-	LibMCEnv::sModelDataTransform GetLocalTransform() override;
+	IMeshSceneItem * AddSceneItem(IPersistentMeshObject* pMesh, const LibMCEnv::sModelDataTransform AbsoluteTransform) override;
 
-    LibMCEnv::sModelDataTransform GetAbsoluteTransform() override;
+	IMeshSceneItem * AddModelDataMeshAsSceneItem(IModelDataMeshInstance* pModelDataMesh) override;
 
-	IMeshObject * CreateCopiedMesh() override;
+	LibMCEnv_uint32 GetSceneItemCount() override;
 
-	IPersistentMeshObject * CreatePersistentMesh(const bool bBoundToLoginSession) override;
+	IMeshSceneItem * GetSceneItem(const LibMCEnv_uint32 nIndex) override;
+
+	IMeshSceneItem * FindSceneItem(const std::string & sUUID, const bool bMustExist) override;
+
+	bool HasSceneItem(const std::string & sUUID) override;
+
+	void RemoveSceneItem(IMeshSceneItem* pSceneItem) override;
 
 };
 
@@ -94,4 +92,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_MODELDATAMESHINSTANCE
+#endif // __LIBMCENV_MESHSCENE
