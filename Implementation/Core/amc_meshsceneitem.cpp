@@ -32,12 +32,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_meshsceneitem.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
-
+#include "amc_meshutils.hpp"
 
 namespace AMC {
 
 
+	CMeshSceneItem::CMeshSceneItem(const std::string& sUUID, const std::string& sMeshEntityUUID)
+		: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), 
+		m_sMeshEntityUUID (AMCCommon::CUtils::normalizeUUIDString (sMeshEntityUUID))
+	{
+		m_Transform = CMeshUtils::createIdentityTransform();
 
+	}
+
+	CMeshSceneItem::~CMeshSceneItem()
+	{
+
+	}
+
+	std::string CMeshSceneItem::getUUID()
+	{
+		return m_sUUID;
+	}
+
+	std::string CMeshSceneItem::getMeshEntityUUID()
+	{
+		return m_sMeshEntityUUID;
+	}
+
+	LibMCEnv::sModelDataTransform CMeshSceneItem::getTransform()
+	{
+		return m_Transform;
+	}
+
+	void CMeshSceneItem::updateTransform(const LibMCEnv::sModelDataTransform newTransform)
+	{
+		m_Transform = newTransform;
+	}
 
 }
 

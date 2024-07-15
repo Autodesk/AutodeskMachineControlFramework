@@ -49,6 +49,8 @@ namespace AMC {
 
 		std::string m_sMeshEntityUUID;
 		
+		LibMCEnv::sModelDataTransform m_Transform;
+
 	public:
 
 		CMeshSceneItem(const std::string & sUUID, const std::string & sMeshEntityUUID);
@@ -58,9 +60,14 @@ namespace AMC {
 		std::string getUUID();
 
 		std::string getMeshEntityUUID();
-		
+
+		LibMCEnv::sModelDataTransform getTransform();
+
+		void updateTransform(const LibMCEnv::sModelDataTransform newTransform);
 
 	};
+
+	typedef std::shared_ptr<CMeshSceneItem> PMeshSceneItem;
 
 	
 }

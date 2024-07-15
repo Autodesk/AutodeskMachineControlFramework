@@ -45,7 +45,9 @@ Abstract: This is the class declaration of CMeshSceneItem
 #endif
 
 // Include custom headers here.
-
+#include "amc_meshhandler.hpp"
+#include "amc_meshscene.hpp"
+#include "amc_meshsceneitem.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -58,30 +60,22 @@ namespace Impl {
 class CMeshSceneItem : public virtual IMeshSceneItem, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
+    std::string m_sSceneUUID;
+    std::string m_sItemUUID;
 
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+    AMC::PMeshHandler m_pMeshHandler;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+    CMeshSceneItem(AMC::PMeshHandler pMeshHandler, const std::string & sSceneUUID, const std::string & sItemUUID);
 
-
-	/**
-	* Public member functions to implement.
-	*/
+    virtual ~CMeshSceneItem();
 
 	std::string GetItemUUID() override;
 
-	LibMCEnv::sModelDataTransform GetTransform() override;
+    std::string GetSceneUUID() override;
+
+    LibMCEnv::sModelDataTransform GetTransform() override;
 
 	void UpdateTransform(const LibMCEnv::sModelDataTransform AbsoluteTransform) override;
 

@@ -51,6 +51,35 @@ namespace AMC {
 		return m_sSceneUUID;
 	}
 
+	PMeshSceneItem CMeshScene::findItem(const std::string& sItemUUID, bool bFailIfNotExistent)
+	{
+		std::string sNormalizedItemUUID = AMCCommon::CUtils::normalizeUUIDString(sItemUUID);
+		auto iIter = m_ItemMap.find(sNormalizedItemUUID);
+
+		if (iIter != m_ItemMap.end())
+			return iIter->second;
+
+		if (bFailIfNotExistent)
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDMESHSCENEITEM, sNormalizedItemUUID);
+
+		return nullptr;
+
+	}
+
+	size_t CMeshScene::getItemCount()
+	{
+		return m_Items.size();
+	}
+
+	PMeshSceneItem CMeshScene::getItem(const size_t nIndex)
+	{
+		if (nIndex >= m_Items.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDMESHSCENEITEMINDEX, std::to_string (nIndex));
+
+		return m_Items.at(nIndex);
+	}
+
+
 }
 
 

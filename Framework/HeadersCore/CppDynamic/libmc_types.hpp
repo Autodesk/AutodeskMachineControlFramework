@@ -618,6 +618,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MESHHASTOOMANYTRIANGLES 601 /** Mesh has too many triangles */
 #define LIBMC_ERROR_INVALIDXMLNODEORATTRIBUTENAME 602 /** Invalid XML node or attribute name */
 #define LIBMC_ERROR_XMLNAMESPACENOTREGISTERED 603 /** XML Namespace not registered */
+#define LIBMC_ERROR_COULDNOTFINDMESHSCENE 604 /** Could not find mesh scene */
+#define LIBMC_ERROR_COULDNOTFINDMESHSCENEITEM 605 /** Could not find mesh scene item */
+#define LIBMC_ERROR_INVALIDMESHSCENEITEMINDEX 606 /** Invalid Mesh Scene Item Index */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1148,6 +1151,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MESHHASTOOMANYTRIANGLES: return "Mesh has too many triangles";
     case LIBMC_ERROR_INVALIDXMLNODEORATTRIBUTENAME: return "Invalid XML node or attribute name";
     case LIBMC_ERROR_XMLNAMESPACENOTREGISTERED: return "XML Namespace not registered";
+    case LIBMC_ERROR_COULDNOTFINDMESHSCENE: return "Could not find mesh scene";
+    case LIBMC_ERROR_COULDNOTFINDMESHSCENEITEM: return "Could not find mesh scene item";
+    case LIBMC_ERROR_INVALIDMESHSCENEITEMINDEX: return "Invalid Mesh Scene Item Index";
     default: return "unknown error";
   }
 }

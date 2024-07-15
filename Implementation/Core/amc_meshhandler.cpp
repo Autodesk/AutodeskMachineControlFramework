@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_meshhandler.hpp"
+#include "amc_meshscene.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
 
@@ -92,6 +93,19 @@ namespace AMC {
 
 	}
 
+	PMeshScene CMeshHandler::findScene(const std::string& sSceneUUID, bool bFailIfNotExistent)
+	{
+		std::string sNormalizedSceneUUID = AMCCommon::CUtils::normalizeUUIDString(sSceneUUID);
+
+		auto iIter = m_Scenes.find(sNormalizedSceneUUID);
+		if (iIter != m_Scenes.end())
+			return iIter->second;
+
+		if (bFailIfNotExistent)
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDMESHSCENE, sNormalizedSceneUUID);
+
+		return nullptr;
+	}
 
 	/*PMeshEntity CMeshHandler::register3MFResource(Lib3MF::CLib3MFWrapper* pWrapper, AMC::CResourcePackage* pResourcePackage, const std::string& sResourceName)
 	{

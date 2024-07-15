@@ -627,6 +627,11 @@
 		<error name="MESHHASTOOMANYTRIANGLES" code="601" description="Mesh has too many triangles" />
 		<error name="INVALIDXMLNODEORATTRIBUTENAME" code="602" description="Invalid XML node or attribute name" />
 		<error name="XMLNAMESPACENOTREGISTERED" code="603" description="XML Namespace not registered" />
+		<error name="COULDNOTFINDMESHSCENE" code="604" description="Could not find mesh scene" />
+		<error name="COULDNOTFINDMESHSCENEITEM" code="605" description="Could not find mesh scene item" />
+		<error name="INVALIDMESHSCENEITEMINDEX" code="606" description="Invalid Mesh Scene Item Index" />
+		
+		
 		
 		
 

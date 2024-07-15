@@ -47,6 +47,9 @@ namespace AMC {
 	private:
 
 		std::string m_sSceneUUID;
+
+		std::map<std::string, PMeshSceneItem> m_ItemMap;
+		std::vector <PMeshSceneItem> m_Items;
 		
 	public:
 
@@ -55,7 +58,12 @@ namespace AMC {
 		virtual ~CMeshScene();
 
 		std::string getSceneUUID();
-		
+
+		PMeshSceneItem findItem(const std::string& sItemUUID, bool bFailIfNotExistent);
+
+		size_t getItemCount();
+
+		PMeshSceneItem getItem(const size_t nIndex);		
  
 	};
 	

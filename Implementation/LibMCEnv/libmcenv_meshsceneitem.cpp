@@ -33,9 +33,10 @@ Abstract: This is a stub class definition of CMeshSceneItem
 
 #include "libmcenv_meshsceneitem.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_persistentmeshobject.hpp"
 
 // Include custom headers here.
-
+#include "common_utils.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -43,28 +44,69 @@ using namespace LibMCEnv::Impl;
  Class definition of CMeshSceneItem 
 **************************************************************************************************************************/
 
+CMeshSceneItem::CMeshSceneItem(AMC::PMeshHandler pMeshHandler, const std::string& sSceneUUID, const std::string& sItemUUID)
+    : m_pMeshHandler(pMeshHandler),
+    m_sSceneUUID(AMCCommon::CUtils::normalizeUUIDString(sSceneUUID)),
+    m_sItemUUID(AMCCommon::CUtils::normalizeUUIDString(sItemUUID))
+{
+
+}
+
+CMeshSceneItem::~CMeshSceneItem()
+{
+
+}
+
+
 std::string CMeshSceneItem::GetItemUUID()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_sItemUUID;
 }
+
+std::string CMeshSceneItem::GetSceneUUID()
+{
+    return m_sSceneUUID;
+}
+
 
 LibMCEnv::sModelDataTransform CMeshSceneItem::GetTransform()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    auto pScene = m_pMeshHandler->findScene(m_sSceneUUID, true);
+    auto pItem = pScene->findItem(m_sItemUUID, true);
+
+    return pItem->getTransform();
 }
 
 void CMeshSceneItem::UpdateTransform(const LibMCEnv::sModelDataTransform AbsoluteTransform)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    auto pScene = m_pMeshHandler->findScene(m_sSceneUUID, true);
+    auto pItem = pScene->findItem(m_sItemUUID, true);
+
+    pItem->updateTransform(AbsoluteTransform);
 }
 
 IPersistentMeshObject * CMeshSceneItem::GetMeshObject()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    auto pScene = m_pMeshHandler->findScene(m_sSceneUUID, true);
+    auto pItem = pScene->findItem(m_sItemUUID, true);
+
+    std::string sMeshEntityUUID = pItem->getMeshEntityUUID();
+    auto pMeshEntity = m_pMeshHandler->findMeshEntity(sMeshEntityUUID, true);
+
+    return new CPersistentMeshObject(m_pMeshHandler, pMeshEntity->getUUID());
 }
 
 bool CMeshSceneItem::ReferenceIsValid()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    auto pScene = m_pMeshHandler->findScene(m_sSceneUUID, false);
+    if (pScene == nullptr)
+        return false;
+
+    auto pItem = pScene->findItem(m_sItemUUID, true);
+    if (pItem == nullptr)
+        return false;
+
+    std::string sMeshEntityUUID = pItem->getMeshEntityUUID();
+    return m_pMeshHandler->hasMeshEntity(sMeshEntityUUID);
 }
 

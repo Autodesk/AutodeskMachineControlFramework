@@ -1749,6 +1749,12 @@ public:
 	virtual std::string GetItemUUID() = 0;
 
 	/**
+	* IMeshSceneItem::GetSceneUUID - Returns the UUID of the scene.
+	* @return Returns scene uuid.
+	*/
+	virtual std::string GetSceneUUID() = 0;
+
+	/**
 	* IMeshSceneItem::GetTransform - Returns the transform of the scene item.
 	* @return Returns the transform matrix of the mesh in the global world coordinate system.
 	*/

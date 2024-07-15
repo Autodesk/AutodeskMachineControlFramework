@@ -47,10 +47,15 @@ namespace AMC {
 	class CMeshHandler;
 	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
 
+	class CMeshScene;
+	typedef std::shared_ptr<CMeshScene> PMeshScene;
+
 	class CMeshHandler {
 	private:
 	
 		std::map<std::string, PMeshEntity> m_Entities;
+
+		std::map<std::string, PMeshScene> m_Scenes;
 
 	public:
 
@@ -64,6 +69,8 @@ namespace AMC {
 		void unloadAllEntities();
 
 		void registerEntity(PMeshEntity pMeshEntity);
+
+		PMeshScene findScene(const std::string & sSceneUUID, bool bFailIfNotExistent);
 
 		//PMeshEntity register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject);
 

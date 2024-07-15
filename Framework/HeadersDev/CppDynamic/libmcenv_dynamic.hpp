@@ -1494,6 +1494,7 @@ public:
 	}
 	
 	inline std::string GetItemUUID();
+	inline std::string GetSceneUUID();
 	inline sModelDataTransform GetTransform();
 	inline void UpdateTransform(const sModelDataTransform & AbsoluteTransform);
 	inline PPersistentMeshObject GetMeshObject();
@@ -3004,6 +3005,7 @@ public:
 		pWrapperTable->m_ModelDataComponentInstance_GetSubComponentCount = nullptr;
 		pWrapperTable->m_ModelDataComponentInstance_GetSubComponent = nullptr;
 		pWrapperTable->m_MeshSceneItem_GetItemUUID = nullptr;
+		pWrapperTable->m_MeshSceneItem_GetSceneUUID = nullptr;
 		pWrapperTable->m_MeshSceneItem_GetTransform = nullptr;
 		pWrapperTable->m_MeshSceneItem_UpdateTransform = nullptr;
 		pWrapperTable->m_MeshSceneItem_GetMeshObject = nullptr;
@@ -5292,6 +5294,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MeshSceneItem_GetItemUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshSceneItem_GetSceneUUID = (PLibMCEnvMeshSceneItem_GetSceneUUIDPtr) GetProcAddress(hLibrary, "libmcenv_meshsceneitem_getsceneuuid");
+		#else // _WIN32
+		pWrapperTable->m_MeshSceneItem_GetSceneUUID = (PLibMCEnvMeshSceneItem_GetSceneUUIDPtr) dlsym(hLibrary, "libmcenv_meshsceneitem_getsceneuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshSceneItem_GetSceneUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11533,6 +11544,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_GetItemUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_meshsceneitem_getsceneuuid", (void**)&(pWrapperTable->m_MeshSceneItem_GetSceneUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_GetSceneUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_meshsceneitem_gettransform", (void**)&(pWrapperTable->m_MeshSceneItem_GetTransform));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_GetTransform == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -16206,6 +16221,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetItemUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
 		std::vector<char> bufferUUID(bytesNeededUUID);
 		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetItemUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CMeshSceneItem::GetSceneUUID - Returns the UUID of the scene.
+	* @return Returns scene uuid.
+	*/
+	std::string CMeshSceneItem::GetSceneUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetSceneUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetSceneUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
 		
 		return std::string(&bufferUUID[0]);
 	}

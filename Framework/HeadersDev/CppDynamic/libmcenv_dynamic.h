@@ -1917,6 +1917,17 @@ typedef LibMCEnvResult (*PLibMCEnvModelDataComponentInstance_GetSubComponentPtr)
 typedef LibMCEnvResult (*PLibMCEnvMeshSceneItem_GetItemUUIDPtr) (LibMCEnv_MeshSceneItem pMeshSceneItem, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
+* Returns the UUID of the scene.
+*
+* @param[in] pMeshSceneItem - MeshSceneItem instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns scene uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvMeshSceneItem_GetSceneUUIDPtr) (LibMCEnv_MeshSceneItem pMeshSceneItem, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
 * Returns the transform of the scene item.
 *
 * @param[in] pMeshSceneItem - MeshSceneItem instance.
@@ -8751,6 +8762,7 @@ typedef struct {
 	PLibMCEnvModelDataComponentInstance_GetSubComponentCountPtr m_ModelDataComponentInstance_GetSubComponentCount;
 	PLibMCEnvModelDataComponentInstance_GetSubComponentPtr m_ModelDataComponentInstance_GetSubComponent;
 	PLibMCEnvMeshSceneItem_GetItemUUIDPtr m_MeshSceneItem_GetItemUUID;
+	PLibMCEnvMeshSceneItem_GetSceneUUIDPtr m_MeshSceneItem_GetSceneUUID;
 	PLibMCEnvMeshSceneItem_GetTransformPtr m_MeshSceneItem_GetTransform;
 	PLibMCEnvMeshSceneItem_UpdateTransformPtr m_MeshSceneItem_UpdateTransform;
 	PLibMCEnvMeshSceneItem_GetMeshObjectPtr m_MeshSceneItem_GetMeshObject;

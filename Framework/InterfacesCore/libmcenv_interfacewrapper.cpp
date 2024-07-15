@@ -5428,6 +5428,54 @@ LibMCEnvResult libmcenv_meshsceneitem_getitemuuid(LibMCEnv_MeshSceneItem pMeshSc
 	}
 }
 
+LibMCEnvResult libmcenv_meshsceneitem_getsceneuuid(LibMCEnv_MeshSceneItem pMeshSceneItem, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMeshSceneItem;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		IMeshSceneItem* pIMeshSceneItem = dynamic_cast<IMeshSceneItem*>(pIBaseClass);
+		if (!pIMeshSceneItem)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIMeshSceneItem->GetSceneUUID();
+
+			pIMeshSceneItem->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMeshSceneItem->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIMeshSceneItem->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_meshsceneitem_gettransform(LibMCEnv_MeshSceneItem pMeshSceneItem, sLibMCEnvModelDataTransform * pAbsoluteTransform)
 {
 	IBase* pIBaseClass = (IBase *)pMeshSceneItem;
@@ -26085,6 +26133,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getsubcomponent;
 	if (sProcName == "libmcenv_meshsceneitem_getitemuuid") 
 		*ppProcAddress = (void*) &libmcenv_meshsceneitem_getitemuuid;
+	if (sProcName == "libmcenv_meshsceneitem_getsceneuuid") 
+		*ppProcAddress = (void*) &libmcenv_meshsceneitem_getsceneuuid;
 	if (sProcName == "libmcenv_meshsceneitem_gettransform") 
 		*ppProcAddress = (void*) &libmcenv_meshsceneitem_gettransform;
 	if (sProcName == "libmcenv_meshsceneitem_updatetransform") 

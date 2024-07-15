@@ -1268,6 +1268,10 @@
 			<param name="UUID" type="string" pass="return" description="Returns scene item uuid." />
 		</method>	
 
+		<method name="GetSceneUUID" description="Returns the UUID of the scene.">
+			<param name="UUID" type="string" pass="return" description="Returns scene uuid." />
+		</method>	
+
 		<method name="GetTransform" description="Returns the transform of the scene item.">
 			<param name="AbsoluteTransform" type="struct" class="ModelDataTransform" pass="return" description="Returns the transform matrix of the mesh in the global world coordinate system." />		
 		</method>	
