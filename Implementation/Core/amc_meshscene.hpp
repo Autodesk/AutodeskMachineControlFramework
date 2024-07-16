@@ -59,11 +59,17 @@ namespace AMC {
 
 		std::string getSceneUUID();
 
+		bool isBoundToLoginSession();
+
 		PMeshSceneItem findItem(const std::string& sItemUUID, bool bFailIfNotExistent);
 
 		size_t getItemCount();
 
 		PMeshSceneItem getItem(const size_t nIndex);		
+
+		PMeshSceneItem addItem(const std::string& sMeshEntityUUID, LibMCEnv::sModelDataTransform transform);
+
+		void removeItem (const std::string & sUUID);
  
 	};
 	

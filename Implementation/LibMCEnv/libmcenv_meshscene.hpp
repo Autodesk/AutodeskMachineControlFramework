@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CMeshScene
 
 // Include custom headers here.
 #include "amc_meshscene.hpp"
+#include "amc_meshhandler.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -59,10 +60,11 @@ class CMeshScene : public virtual IMeshScene, public virtual CBase {
 private:
 
 	AMC::PMeshScene m_pMeshScene;
+	AMC::PMeshHandler m_pMeshHandler;
 
 public:
 
-	CMeshScene(AMC::PMeshScene pMeshScene);
+	CMeshScene(AMC::PMeshScene pMeshScene, AMC::PMeshHandler pMeshHandler);
 
 	virtual ~CMeshScene();
 

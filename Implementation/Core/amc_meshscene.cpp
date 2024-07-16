@@ -51,6 +51,13 @@ namespace AMC {
 		return m_sSceneUUID;
 	}
 
+	bool CMeshScene::isBoundToLoginSession()
+	{
+		// TODO
+		return false;
+	}
+
+
 	PMeshSceneItem CMeshScene::findItem(const std::string& sItemUUID, bool bFailIfNotExistent)
 	{
 		std::string sNormalizedItemUUID = AMCCommon::CUtils::normalizeUUIDString(sItemUUID);
@@ -77,6 +84,35 @@ namespace AMC {
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDMESHSCENEITEMINDEX, std::to_string (nIndex));
 
 		return m_Items.at(nIndex);
+	}
+
+	PMeshSceneItem CMeshScene::addItem(const std::string& sMeshEntityUUID, LibMCEnv::sModelDataTransform transform)
+	{
+		std::string sNormalizedMeshEntityUUID = AMCCommon::CUtils::normalizeUUIDString(sMeshEntityUUID);
+
+		std::string sNewUUID = AMCCommon::CUtils::createUUID();
+
+		auto pResultItem = std::make_shared<CMeshSceneItem>(sNewUUID, sNormalizedMeshEntityUUID);
+		pResultItem->updateTransform(transform);
+
+		m_Items.push_back(pResultItem);
+		m_ItemMap.insert(std::make_pair (pResultItem->getUUID (), pResultItem));
+
+		return pResultItem;
+		
+
+	}
+
+	void CMeshScene::removeItem(const std::string& sUUID)
+	{
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+		m_ItemMap.erase(sNormalizedUUID);
+		for (auto iIter = m_Items.begin(); iIter != m_Items.end(); iIter++) {
+			if ((*iIter)->getUUID() == sNormalizedUUID) {
+				m_Items.erase(iIter);
+				break;
+			}
+		}
 	}
 
 

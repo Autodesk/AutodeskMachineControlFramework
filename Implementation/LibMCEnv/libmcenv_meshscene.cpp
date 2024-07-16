@@ -32,10 +32,8 @@ Abstract: This is a stub class definition of CMeshScene
 */
 
 #include "libmcenv_meshscene.hpp"
+#include "libmcenv_meshsceneitem.hpp"
 #include "libmcenv_interfaceexception.hpp"
-
-// Include custom headers here.
-
 
 using namespace LibMCEnv::Impl;
 
@@ -43,10 +41,12 @@ using namespace LibMCEnv::Impl;
  Class definition of CMeshScene 
 **************************************************************************************************************************/
 
-CMeshScene::CMeshScene(AMC::PMeshScene pMeshScene)
-	: m_pMeshScene (pMeshScene)
+CMeshScene::CMeshScene(AMC::PMeshScene pMeshScene, AMC::PMeshHandler pMeshHandler)
+	: m_pMeshScene (pMeshScene), m_pMeshHandler (pMeshHandler)
 {
 	if (pMeshScene.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pMeshHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
@@ -64,41 +64,62 @@ std::string CMeshScene::GetSceneUUID()
 
 bool CMeshScene::IsBoundToLoginSession()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_pMeshScene->isBoundToLoginSession();
 }
 
 IMeshSceneItem * CMeshScene::AddSceneItem(IPersistentMeshObject* pMesh, const LibMCEnv::sModelDataTransform AbsoluteTransform)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pMesh == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	auto pNewItem = m_pMeshScene->addItem(pMesh->GetUUID(), AbsoluteTransform);
+	return new CMeshSceneItem(m_pMeshHandler, m_pMeshScene->getSceneUUID(), pNewItem->getUUID());
 }
 
 IMeshSceneItem * CMeshScene::AddModelDataMeshAsSceneItem(IModelDataMeshInstance* pModelDataMesh)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pModelDataMesh == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	std::unique_ptr<IPersistentMeshObject> pPersistentMesh (pModelDataMesh->CreatePersistentMesh(m_pMeshScene->isBoundToLoginSession()));
+
+	auto pNewItem = m_pMeshScene->addItem(pPersistentMesh->GetUUID(), pModelDataMesh->GetAbsoluteTransform ());
+	return new CMeshSceneItem(m_pMeshHandler, m_pMeshScene->getSceneUUID(), pNewItem->getUUID());
 }
 
 LibMCEnv_uint32 CMeshScene::GetSceneItemCount()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return (uint32_t) m_pMeshScene->getItemCount();
 }
 
 IMeshSceneItem * CMeshScene::GetSceneItem(const LibMCEnv_uint32 nIndex)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pMeshSceneItem = m_pMeshScene->getItem(nIndex);
+
+	return new CMeshSceneItem(m_pMeshHandler, m_pMeshScene->getSceneUUID(), pMeshSceneItem->getUUID());
 }
 
 IMeshSceneItem * CMeshScene::FindSceneItem(const std::string & sUUID, const bool bMustExist)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pMeshSceneItem = m_pMeshScene->findItem (sUUID, bMustExist);
+	if (pMeshSceneItem.get () != nullptr)
+		return new CMeshSceneItem(m_pMeshHandler, m_pMeshScene->getSceneUUID(), pMeshSceneItem->getUUID());
+
+	return nullptr;
+	
 }
 
 bool CMeshScene::HasSceneItem(const std::string & sUUID)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	auto pMeshSceneItem = m_pMeshScene->findItem(sUUID, false);
+	return (pMeshSceneItem.get() != nullptr);
 }
 
 void CMeshScene::RemoveSceneItem(IMeshSceneItem* pSceneItem)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (pSceneItem == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	m_pMeshScene->removeItem(pSceneItem->GetItemUUID());
 }
+
 
