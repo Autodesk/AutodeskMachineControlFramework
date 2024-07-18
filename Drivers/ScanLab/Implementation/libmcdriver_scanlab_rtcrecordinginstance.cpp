@@ -36,7 +36,7 @@ Abstract: This is a stub class definition of CRTCRecording
 
 using namespace LibMCDriver_ScanLab::Impl;
 
-
+#include <thread>
 
 CRTCRecordingChunk::CRTCRecordingChunk(uint64_t nStartEntryIndex, size_t nChunkSize)
 	: m_nStartEntryIndex (nStartEntryIndex), m_nWriteOffset (0)
@@ -614,7 +614,7 @@ void CRTCRecordingInstance::readRecordedDataBlockFromRTC(uint32_t DataStart, uin
 		
 		for (auto pChannel : m_Channels) {
 
-			if (pChannel.get() > 0) {
+			if (pChannel.get() != nullptr) {
 
 				uint32_t nEntriesLeft = nDataLength;
 				uint32_t nDataAddress = DataStart;
