@@ -570,6 +570,7 @@ else()
 	endif()
 
 	target_link_libraries(amc_server dl)
+	target_link_libraries(amc_server ${LIBUUID_PATH})
 
 endif(WIN32)
 
