@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_meshutils.hpp"
 
 #include <string>
+#include <cstring>
 
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
