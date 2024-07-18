@@ -43,6 +43,7 @@ Abstract: This is a stub class definition of CDataTable
 #include <algorithm>
 #include <cstring>
 #include <sstream>
+#include <cmath>
 
 #include "amc_constants.hpp"
 
