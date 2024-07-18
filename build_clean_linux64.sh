@@ -7,6 +7,7 @@ export GO111MODULE="off"
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 PLATFORMNAME="linux64"
+OVERRIDE_BUILDRESOURCES="linux64"
 
 for var in "$@"
 do
@@ -14,6 +15,7 @@ echo "command line parameter: $var"
 if test $var = "--buildrpi"
 then
 	PLATFORMNAME="rpi"	
+	OVERRIDE_BUILDRESOURCES="arm"
 fi	
 if test $var = "--buildwin64"
 then
@@ -137,7 +139,7 @@ if test $PLATFORMNAME = "win64"
 then
 cmake -DOVERRIDE_BUILDRESOURCES=linux64 -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
 else
-cmake ..
+cmake -DOVERRIDE_BUILDRESOURCES=$OVERRIDE_BUILDRESOURCES ..
 fi
 
 cmake --build . --config Release
@@ -146,7 +148,6 @@ cd $builddir
 echo "Building Package XML"
 
 "$builddir/DevPackage/Framework/create_package_xml" --config "$builddir/Output/${GITHASH}_config.xml" --devpackage ${GITHASH} --output "$builddir/Output/${GITHASH}_package.xml" --serveroutput "$builddir/Output/amc_server.xml"
-
 
 echo "Building Developer Package"
 cd "$builddir/DevPackage"
