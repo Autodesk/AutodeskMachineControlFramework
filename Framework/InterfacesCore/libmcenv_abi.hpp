@@ -2851,35 +2851,23 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_finduniquemetadata(Li
 * Checks if a binary metadata exists in the build file with a certain path.
 *
 * @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pPath - Path of the binary metadata
+* @param[in] pIdentifier - Identifier of the binary metadata
 * @param[out] pHasMetaData - Returns if the metadata exists.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_hasbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, bool * pHasMetaData);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_hasbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pIdentifier, bool * pHasMetaData);
 
 /**
 * Returns a binary metadata of the build file. Fails if binary metadata does not exist.
 *
 * @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pPath - Path of the binary metadata
+* @param[in] pIdentifier - Identifier of the binary metadata
 * @param[in] nMetaDataBufferSize - Number of elements in buffer
 * @param[out] pMetaDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pMetaDataBuffer - uint8  buffer of Returns the content of the binary binary data.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, const LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer);
-
-/**
-* Returns the relationship type of a binary metadata of the build file. Fails if binary metadata does not exist.
-*
-* @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] pPath - Path of the binary metadata
-* @param[in] nRelationshipBufferSize - size of the buffer (including trailing 0)
-* @param[out] pRelationshipNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pRelationshipBuffer -  buffer of Returns the relationship of the binary binary data., may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadatarelationship(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, const LibMCEnv_uint32 nRelationshipBufferSize, LibMCEnv_uint32* pRelationshipNeededChars, char * pRelationshipBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pIdentifier, const LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer);
 
 /*************************************************************************************************************************
  Class definition for BuildExecution

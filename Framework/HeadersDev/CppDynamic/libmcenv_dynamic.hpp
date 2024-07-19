@@ -1658,9 +1658,8 @@ public:
 	inline PXMLDocumentNode GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex);
 	inline bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName);
 	inline PXMLDocumentNode FindUniqueMetaData(const std::string & sNamespace, const std::string & sName);
-	inline bool HasBinaryMetaData(const std::string & sPath);
-	inline void GetBinaryMetaData(const std::string & sPath, std::vector<LibMCEnv_uint8> & MetaDataBuffer);
-	inline std::string GetBinaryMetaDataRelationship(const std::string & sPath);
+	inline bool HasBinaryMetaData(const std::string & sIdentifier);
+	inline void GetBinaryMetaData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & MetaDataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -3094,7 +3093,6 @@ public:
 		pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathAccessor_HasBinaryMetaData = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData = nullptr;
-		pWrapperTable->m_ToolpathAccessor_GetBinaryMetaDataRelationship = nullptr;
 		pWrapperTable->m_BuildExecution_GetUUID = nullptr;
 		pWrapperTable->m_BuildExecution_GetBuildUUID = nullptr;
 		pWrapperTable->m_BuildExecution_GetBuild = nullptr;
@@ -6074,15 +6072,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathAccessor_GetBinaryMetaDataRelationship = (PLibMCEnvToolpathAccessor_GetBinaryMetaDataRelationshipPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getbinarymetadatarelationship");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathAccessor_GetBinaryMetaDataRelationship = (PLibMCEnvToolpathAccessor_GetBinaryMetaDataRelationshipPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getbinarymetadatarelationship");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathAccessor_GetBinaryMetaDataRelationship == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11921,10 +11910,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getbinarymetadatarelationship", (void**)&(pWrapperTable->m_ToolpathAccessor_GetBinaryMetaDataRelationship));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBinaryMetaDataRelationship == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_getuuid", (void**)&(pWrapperTable->m_BuildExecution_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecution_GetUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17488,45 +17473,29 @@ public:
 	
 	/**
 	* CToolpathAccessor::HasBinaryMetaData - Checks if a binary metadata exists in the build file with a certain path.
-	* @param[in] sPath - Path of the binary metadata
+	* @param[in] sIdentifier - Identifier of the binary metadata
 	* @return Returns if the metadata exists.
 	*/
-	bool CToolpathAccessor::HasBinaryMetaData(const std::string & sPath)
+	bool CToolpathAccessor::HasBinaryMetaData(const std::string & sIdentifier)
 	{
 		bool resultHasMetaData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_HasBinaryMetaData(m_pHandle, sPath.c_str(), &resultHasMetaData));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_HasBinaryMetaData(m_pHandle, sIdentifier.c_str(), &resultHasMetaData));
 		
 		return resultHasMetaData;
 	}
 	
 	/**
 	* CToolpathAccessor::GetBinaryMetaData - Returns a binary metadata of the build file. Fails if binary metadata does not exist.
-	* @param[in] sPath - Path of the binary metadata
+	* @param[in] sIdentifier - Identifier of the binary metadata
 	* @param[out] MetaDataBuffer - Returns the content of the binary binary data.
 	*/
-	void CToolpathAccessor::GetBinaryMetaData(const std::string & sPath, std::vector<LibMCEnv_uint8> & MetaDataBuffer)
+	void CToolpathAccessor::GetBinaryMetaData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & MetaDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededMetaData = 0;
 		LibMCEnv_uint64 elementsWrittenMetaData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBinaryMetaData(m_pHandle, sPath.c_str(), 0, &elementsNeededMetaData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBinaryMetaData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededMetaData, nullptr));
 		MetaDataBuffer.resize((size_t) elementsNeededMetaData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBinaryMetaData(m_pHandle, sPath.c_str(), elementsNeededMetaData, &elementsWrittenMetaData, MetaDataBuffer.data()));
-	}
-	
-	/**
-	* CToolpathAccessor::GetBinaryMetaDataRelationship - Returns the relationship type of a binary metadata of the build file. Fails if binary metadata does not exist.
-	* @param[in] sPath - Path of the binary metadata
-	* @return Returns the relationship of the binary binary data.
-	*/
-	std::string CToolpathAccessor::GetBinaryMetaDataRelationship(const std::string & sPath)
-	{
-		LibMCEnv_uint32 bytesNeededRelationship = 0;
-		LibMCEnv_uint32 bytesWrittenRelationship = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBinaryMetaDataRelationship(m_pHandle, sPath.c_str(), 0, &bytesNeededRelationship, nullptr));
-		std::vector<char> bufferRelationship(bytesNeededRelationship);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBinaryMetaDataRelationship(m_pHandle, sPath.c_str(), bytesNeededRelationship, &bytesWrittenRelationship, &bufferRelationship[0]));
-		
-		return std::string(&bufferRelationship[0]);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBinaryMetaData(m_pHandle, sIdentifier.c_str(), elementsNeededMetaData, &elementsWrittenMetaData, MetaDataBuffer.data()));
 	}
 	
 	/**

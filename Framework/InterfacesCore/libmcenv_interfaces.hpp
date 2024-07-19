@@ -2421,26 +2421,19 @@ public:
 
 	/**
 	* IToolpathAccessor::HasBinaryMetaData - Checks if a binary metadata exists in the build file with a certain path.
-	* @param[in] sPath - Path of the binary metadata
+	* @param[in] sIdentifier - Identifier of the binary metadata
 	* @return Returns if the metadata exists.
 	*/
-	virtual bool HasBinaryMetaData(const std::string & sPath) = 0;
+	virtual bool HasBinaryMetaData(const std::string & sIdentifier) = 0;
 
 	/**
 	* IToolpathAccessor::GetBinaryMetaData - Returns a binary metadata of the build file. Fails if binary metadata does not exist.
-	* @param[in] sPath - Path of the binary metadata
+	* @param[in] sIdentifier - Identifier of the binary metadata
 	* @param[in] nMetaDataBufferSize - Number of elements in buffer
 	* @param[out] pMetaDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pMetaDataBuffer - uint8 buffer of Returns the content of the binary binary data.
 	*/
-	virtual void GetBinaryMetaData(const std::string & sPath, LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer) = 0;
-
-	/**
-	* IToolpathAccessor::GetBinaryMetaDataRelationship - Returns the relationship type of a binary metadata of the build file. Fails if binary metadata does not exist.
-	* @param[in] sPath - Path of the binary metadata
-	* @return Returns the relationship of the binary binary data.
-	*/
-	virtual std::string GetBinaryMetaDataRelationship(const std::string & sPath) = 0;
+	virtual void GetBinaryMetaData(const std::string & sIdentifier, LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer) = 0;
 
 };
 

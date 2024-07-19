@@ -8142,21 +8142,21 @@ LibMCEnvResult libmcenv_toolpathaccessor_finduniquemetadata(LibMCEnv_ToolpathAcc
 	}
 }
 
-LibMCEnvResult libmcenv_toolpathaccessor_hasbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, bool * pHasMetaData)
+LibMCEnvResult libmcenv_toolpathaccessor_hasbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pIdentifier, bool * pHasMetaData)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
 
 	try {
-		if (pPath == nullptr)
+		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pHasMetaData == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sPath(pPath);
+		std::string sIdentifier(pIdentifier);
 		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
 		if (!pIToolpathAccessor)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pHasMetaData = pIToolpathAccessor->HasBinaryMetaData(sPath);
+		*pHasMetaData = pIToolpathAccessor->HasBinaryMetaData(sIdentifier);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -8171,73 +8171,22 @@ LibMCEnvResult libmcenv_toolpathaccessor_hasbinarymetadata(LibMCEnv_ToolpathAcce
 	}
 }
 
-LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, const LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer)
+LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pIdentifier, const LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
 
 	try {
-		if (pPath == nullptr)
+		if (pIdentifier == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ((!pMetaDataBuffer) && !(pMetaDataNeededCount))
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sPath(pPath);
+		std::string sIdentifier(pIdentifier);
 		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
 		if (!pIToolpathAccessor)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIToolpathAccessor->GetBinaryMetaData(sPath, nMetaDataBufferSize, pMetaDataNeededCount, pMetaDataBuffer);
+		pIToolpathAccessor->GetBinaryMetaData(sIdentifier, nMetaDataBufferSize, pMetaDataNeededCount, pMetaDataBuffer);
 
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadatarelationship(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, const LibMCEnv_uint32 nRelationshipBufferSize, LibMCEnv_uint32* pRelationshipNeededChars, char * pRelationshipBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
-
-	try {
-		if (pPath == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pRelationshipBuffer) && !(pRelationshipNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sPath(pPath);
-		std::string sRelationship("");
-		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
-		if (!pIToolpathAccessor)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pRelationshipBuffer == nullptr);
-		if (isCacheCall) {
-			sRelationship = pIToolpathAccessor->GetBinaryMetaDataRelationship(sPath);
-
-			pIToolpathAccessor->_setCache (new ParameterCache_1<std::string> (sRelationship));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIToolpathAccessor->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sRelationship);
-			pIToolpathAccessor->_setCache (nullptr);
-		}
-		
-		if (pRelationshipNeededChars)
-			*pRelationshipNeededChars = (LibMCEnv_uint32) (sRelationship.size()+1);
-		if (pRelationshipBuffer) {
-			if (sRelationship.size() >= nRelationshipBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iRelationship = 0; iRelationship < sRelationship.size(); iRelationship++)
-				pRelationshipBuffer[iRelationship] = sRelationship[iRelationship];
-			pRelationshipBuffer[sRelationship.size()] = 0;
-		}
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -26412,8 +26361,6 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_hasbinarymetadata;
 	if (sProcName == "libmcenv_toolpathaccessor_getbinarymetadata") 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getbinarymetadata;
-	if (sProcName == "libmcenv_toolpathaccessor_getbinarymetadatarelationship") 
-		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getbinarymetadatarelationship;
 	if (sProcName == "libmcenv_buildexecution_getuuid") 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_getuuid;
 	if (sProcName == "libmcenv_buildexecution_getbuilduuid") 
