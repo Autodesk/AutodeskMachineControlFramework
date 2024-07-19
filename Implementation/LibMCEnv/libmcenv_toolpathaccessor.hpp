@@ -104,6 +104,10 @@ public:
 
 	IXMLDocumentNode* FindUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
 
+	bool HasBinaryMetaData(const std::string& sPath) override;
+
+	void GetBinaryMetaData(const std::string& sPath, LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8* pMetaDataBuffer) override;
+
 };
 
 } // namespace Impl

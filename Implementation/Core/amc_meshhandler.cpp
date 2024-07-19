@@ -107,6 +107,24 @@ namespace AMC {
 		return nullptr;
 	}
 
+	PMeshScene CMeshHandler::createEmptyScene(bool bBoundToLoginSession)
+	{
+		std::string sSceneUUID = AMCCommon::CUtils::createUUID();
+		auto pMeshScene = std::make_shared<CMeshScene>(sSceneUUID);
+
+		m_Scenes.insert(std::make_pair (sSceneUUID, pMeshScene));
+
+		return pMeshScene;
+	}
+
+	void CMeshHandler::releaseScene(const std::string& sSceneUUID)
+	{
+		std::string sNormalizedSceneUUID = AMCCommon::CUtils::normalizeUUIDString(sSceneUUID);
+		m_Scenes.erase(sNormalizedSceneUUID);
+	}
+
+
+
 	/*PMeshEntity CMeshHandler::register3MFResource(Lib3MF::CLib3MFWrapper* pWrapper, AMC::CResourcePackage* pResourcePackage, const std::string& sResourceName)
 	{
 		if (pWrapper == nullptr)

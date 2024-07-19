@@ -230,3 +230,25 @@ IXMLDocumentNode* CToolpathAccessor::FindUniqueMetaData(const std::string& sName
 	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
 }
 
+bool CToolpathAccessor::HasBinaryMetaData(const std::string& sPath)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	return pToolpathEntity->hasBinaryMetaData(sPath);
+
+}
+
+void CToolpathAccessor::GetBinaryMetaData(const std::string& sPath, LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8* pMetaDataBuffer)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	pToolpathEntity->getBinaryMetaData(sPath, nMetaDataBufferSize, pMetaDataNeededCount, pMetaDataBuffer);
+
+}
+
+
+

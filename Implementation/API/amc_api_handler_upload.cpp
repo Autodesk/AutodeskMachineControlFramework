@@ -222,7 +222,9 @@ void CAPIHandler_Upload::handleFinishUploadRequest(CJSONWriter& writer, const ui
 		auto pGlobalChrono = m_pSystemState->getGlobalChronoInstance();
 		
 		pBuildJob->StartValidating();
-		CToolpathEntity toolpathEntity(pDataModel, pStreamObject->GetUUID(), pToolpathHandler->getLib3MFWrapper(), pBuildJob->GetName(), true);
+
+		std::set<std::string> attachmentRelationsToRead;
+		CToolpathEntity toolpathEntity(pDataModel, pStreamObject->GetUUID(), pToolpathHandler->getLib3MFWrapper(), pBuildJob->GetName(), true, attachmentRelationsToRead);
 
 		pBuildJob->FinishValidating(toolpathEntity.getLayerCount());
 

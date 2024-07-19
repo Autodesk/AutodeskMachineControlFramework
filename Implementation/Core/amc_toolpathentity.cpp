@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName, bool bAllowEmptyToolpath)
+	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName, bool bAllowEmptyToolpath, const std::set<std::string>& attachmentRelationsToRead)
 		: m_ReferenceCount (0), m_sDebugName (sDebugName)
 	{
 		LibMCAssertNotNull(pDataModel.get());
@@ -60,6 +60,9 @@ namespace AMC {
 		m_pPersistentSource = m_p3MFModel->CreatePersistentSourceFromCallback((Lib3MF::ReadCallback)pReadCallback, nStreamSize, (Lib3MF::SeekCallback)pSeekCallback, pUserData);
 
 		m_p3MFReader = m_p3MFModel->QueryReader("3mf");
+		for (std::string sRelationToRead : attachmentRelationsToRead)
+			m_p3MFReader->AddRelationToRead(sRelationToRead);
+
 		m_p3MFReader->ReadFromPersistentSource(m_pPersistentSource.get ());
 
 		auto pToolpathIterator = m_p3MFModel->GetToolpaths();
@@ -80,11 +83,19 @@ namespace AMC {
 			m_PartMap.insert(std::make_pair (pPart->getUUID (), pPart));
 		}
 
+		uint32_t nAttachmentCount = m_p3MFModel->GetAttachmentCount();
+		for (uint32_t nAttachmentIndex = 0; nAttachmentIndex < nAttachmentCount; nAttachmentIndex++) {
+			auto pAttachment = m_p3MFModel->GetAttachment(nAttachmentIndex);
+			std::string sPathWithoutLeadingSlash = AMCCommon::CUtils::removeLeadingPathDelimiter (pAttachment->GetPath());
+			m_Attachments.insert(std::make_pair(AMCCommon::CUtils::toLowerString (sPathWithoutLeadingSlash), pAttachment));
+		}
 
 	}
 
 	CToolpathEntity::~CToolpathEntity()
 	{
+		m_Attachments.clear();
+
 		m_pToolpath = nullptr;
 		m_p3MFReader = nullptr;
 		m_pPersistentSource = nullptr;
@@ -341,6 +352,71 @@ namespace AMC {
 		m_CustomSegmentAttributeMap.insert(std::make_pair (key, pSegmentAttribute));
 		
 	}
+
+	Lib3MF::PAttachment CToolpathEntity::findBinaryMetaData(const std::string& sPath, bool bMustExist)
+	{
+		std::string sPathWithoutLeadingSlash = AMCCommon::CUtils::removeLeadingPathDelimiter(sPath);
+		std::string sLowerPath = AMCCommon::CUtils::toLowerString(sPathWithoutLeadingSlash);
+		if (sLowerPath.empty())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDBINARYMETADATAPATH);
+
+		auto iIter = m_Attachments.find(sLowerPath);
+		if (iIter != m_Attachments.end())
+			return iIter->second;
+
+		if (bMustExist)
+			throw ELibMCCustomException(LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND, sPath);
+
+		return nullptr;
+	}
+
+	bool CToolpathEntity::hasBinaryMetaData(const std::string& sPath)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		return (findBinaryMetaData(sPath, false) != nullptr);
+	}
+
+	void CToolpathEntity::getBinaryMetaData(const std::string& sPath, uint64_t nMetaDataBufferSize, uint64_t* pMetaDataNeededCount, uint8_t* pMetaDataBuffer)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto pMetaData = findBinaryMetaData(sPath, true);
+
+		uint64_t nStreamSize = pMetaData->GetStreamSize();
+
+		if (pMetaDataNeededCount != nullptr)
+			*pMetaDataNeededCount = nStreamSize;
+
+		if (pMetaDataBuffer != nullptr) {
+			if (nMetaDataBufferSize < nStreamSize)
+				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
+
+			// TODO: Improve efficiency...
+			std::vector<uint8_t> tempBuffer;
+			pMetaData->WriteToBuffer(tempBuffer);
+
+			if (tempBuffer.size () != nStreamSize)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALMETADATAERROR);
+
+			if (nStreamSize > 0) {
+
+				uint8_t *pSource = tempBuffer.data();
+				uint8_t* pTarget = pMetaDataBuffer;
+				for (uint64_t nIndex = 0; nIndex < nStreamSize; nIndex++) {
+					*pTarget = *pSource;
+					pTarget++; pSource++;
+				}
+			}
+		}
+
+	}
+
+	std::string CToolpathEntity::getBinaryMetaDataRelationship(const std::string& sPath)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto pMetaData = findBinaryMetaData(sPath, true);
+		return pMetaData->GetRelationShipType();
+	}
+
 
 	bool CToolpathEntity::readThumbnail(std::vector<uint8_t>& thumbnailBuffer, std::string& sMimeType)
 	{

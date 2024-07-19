@@ -32,6 +32,7 @@ Abstract: This is a stub class definition of CSceneHandler
 */
 
 #include "libmcenv_scenehandler.hpp"
+#include "libmcenv_meshscene.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_persistentmeshobject.hpp"
 #include "libmcenv_modeldatacomponentinstance.hpp"
@@ -73,14 +74,18 @@ IPersistentMeshObject * CSceneHandler::FindPersistentMesh(const std::string & sM
     return new CPersistentMeshObject(m_pMeshHandler, pMeshEntity->getUUID());
 }
 
-IMeshScene * CSceneHandler::CreateEmptyMeshScene(const std::string & sUUID, const bool bBoundToLoginSession)
+IMeshScene * CSceneHandler::CreateEmptyMeshScene(const bool bBoundToLoginSession)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    auto pScene = m_pMeshHandler->createEmptyScene(bBoundToLoginSession);
+    return new CMeshScene(pScene, m_pMeshHandler);
 }
 
-IMeshScene * CSceneHandler::ReleaseMeshScene()
+void CSceneHandler::ReleaseMeshScene(IMeshScene* pSceneInstance)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    if (pSceneInstance == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    m_pMeshHandler->releaseScene(pSceneInstance->GetSceneUUID());
 }
 
 IModelDataComponentInstance * CSceneHandler::Load3MFFromResource(const std::string & sResourceName)

@@ -75,9 +75,9 @@ public:
 
 	IPersistentMeshObject * FindPersistentMesh(const std::string & sMeshUUID) override;
 
-	IMeshScene * CreateEmptyMeshScene(const std::string & sUUID, const bool bBoundToLoginSession) override;
+	IMeshScene * CreateEmptyMeshScene(const bool bBoundToLoginSession) override;
 
-	IMeshScene * ReleaseMeshScene() override;
+	void ReleaseMeshScene(IMeshScene* pSceneInstance) override;
 
 	IModelDataComponentInstance * Load3MFFromResource(const std::string & sResourceName) override;
 

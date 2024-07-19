@@ -72,6 +72,10 @@ namespace AMC {
 
 		PMeshScene findScene(const std::string & sSceneUUID, bool bFailIfNotExistent);
 
+		PMeshScene createEmptyScene(bool bBoundToLoginSession);
+
+		void releaseScene(const std::string & sSceneUUID);
+
 		//PMeshEntity register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject);
 
 		//PMeshEntity register3MFResource(Lib3MF::CLib3MFWrapper * pWrapper, AMC::CResourcePackage * pResourcePackage, const std::string & sResourceName);
