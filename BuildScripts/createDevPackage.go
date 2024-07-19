@@ -152,7 +152,7 @@ func main() {
 
 	} else if (systemprefix == "rpi") {
 	
-		err = addFile (zipWriter, DevPackageDir + "buildresources.arm", "buildresources.arm");
+		err = addFile (zipWriter, DevPackageDir + "buildresources.rpi", "buildresources.rpi");
 		if err != nil {
 			log.Fatal(err)
 		}
