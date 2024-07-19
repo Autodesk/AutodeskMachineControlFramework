@@ -2098,21 +2098,20 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scenehandler_findpersistentmesh(LibMCE
 * Creates an empty mesh scene object.
 *
 * @param[in] pSceneHandler - SceneHandler instance.
-* @param[in] pUUID - Mesh Scene UUID
 * @param[in] bBoundToLoginSession - Scene shall be freed when the current login session expires. Parameter is ignored, if not executed in a UIEnvironment context.
 * @param[out] pSceneInstance - Returns and register a scene instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scenehandler_createemptymeshscene(LibMCEnv_SceneHandler pSceneHandler, const char * pUUID, bool bBoundToLoginSession, LibMCEnv_MeshScene * pSceneInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scenehandler_createemptymeshscene(LibMCEnv_SceneHandler pSceneHandler, bool bBoundToLoginSession, LibMCEnv_MeshScene * pSceneInstance);
 
 /**
 * Removes a mesh scene and removes all memory.
 *
 * @param[in] pSceneHandler - SceneHandler instance.
-* @param[out] pSceneInstance - Returns and register a scene instance.
+* @param[in] pSceneInstance - Returns and register a scene instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scenehandler_releasemeshscene(LibMCEnv_SceneHandler pSceneHandler, LibMCEnv_MeshScene * pSceneInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scenehandler_releasemeshscene(LibMCEnv_SceneHandler pSceneHandler, LibMCEnv_MeshScene pSceneInstance);
 
 /**
 * Loads a 3MF Resource into memory.
@@ -2848,6 +2847,40 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_hasuniquemetadata(Lib
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_finduniquemetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNamespace, const char * pName, LibMCEnv_XMLDocumentNode * pXMLNode);
 
+/**
+* Checks if a binary metadata exists in the build file with a certain path.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pPath - Path of the binary metadata
+* @param[out] pHasMetaData - Returns if the metadata exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_hasbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, bool * pHasMetaData);
+
+/**
+* Returns a binary metadata of the build file. Fails if binary metadata does not exist.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pPath - Path of the binary metadata
+* @param[in] nMetaDataBufferSize - Number of elements in buffer
+* @param[out] pMetaDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pMetaDataBuffer - uint8  buffer of Returns the content of the binary binary data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, const LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer);
+
+/**
+* Returns the relationship type of a binary metadata of the build file. Fails if binary metadata does not exist.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pPath - Path of the binary metadata
+* @param[in] nRelationshipBufferSize - size of the buffer (including trailing 0)
+* @param[out] pRelationshipNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pRelationshipBuffer -  buffer of Returns the relationship of the binary binary data., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadatarelationship(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPath, const LibMCEnv_uint32 nRelationshipBufferSize, LibMCEnv_uint32* pRelationshipNeededChars, char * pRelationshipBuffer);
+
 /*************************************************************************************************************************
  Class definition for BuildExecution
 **************************************************************************************************************************/
@@ -3357,7 +3390,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getbuildheightinmm(LibMCEnv_Buil
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getzvalueinmm(LibMCEnv_Build pBuild, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue);
 
 /**
-* loads the a toolpath into memory
+* loads the a toolpath into memory. Does nothing if toolpath has already been loaded.
 *
 * @param[in] pBuild - Build instance.
 * @return error code or 0 (success)

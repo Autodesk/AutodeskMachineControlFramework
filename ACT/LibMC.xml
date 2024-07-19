@@ -629,13 +629,12 @@
 		<error name="XMLNAMESPACENOTREGISTERED" code="603" description="XML Namespace not registered" />
 		<error name="COULDNOTFINDMESHSCENE" code="604" description="Could not find mesh scene" />
 		<error name="COULDNOTFINDMESHSCENEITEM" code="605" description="Could not find mesh scene item" />
-		<error name="INVALIDMESHSCENEITEMINDEX" code="606" description="Invalid Mesh Scene Item Index" />
+		<error name="INVALIDMESHSCENEITEMINDEX" code="606" description="Invalid Mesh Scene Item Index" />		
+		<error name="INTERNALMETADATAERROR" code="607" description="Internal metadata error" />
+		<error name="INVALIDBINARYMETADATAPATH" code="608" description="Invalid Binary metadata path" />
+		<error name="BINARYMETADATAPATHNOTFOUND" code="609" description="Binary metadata path not found" />
 		
 		
-		
-		
-
-
 	</errors>
 	
 	

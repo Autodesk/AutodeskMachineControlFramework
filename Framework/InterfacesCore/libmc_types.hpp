@@ -621,6 +621,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_COULDNOTFINDMESHSCENE 604 /** Could not find mesh scene */
 #define LIBMC_ERROR_COULDNOTFINDMESHSCENEITEM 605 /** Could not find mesh scene item */
 #define LIBMC_ERROR_INVALIDMESHSCENEITEMINDEX 606 /** Invalid Mesh Scene Item Index */
+#define LIBMC_ERROR_INTERNALMETADATAERROR 607 /** Internal metadata error */
+#define LIBMC_ERROR_INVALIDBINARYMETADATAPATH 608 /** Invalid Binary metadata path */
+#define LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND 609 /** Binary metadata path not found */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1154,6 +1157,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_COULDNOTFINDMESHSCENE: return "Could not find mesh scene";
     case LIBMC_ERROR_COULDNOTFINDMESHSCENEITEM: return "Could not find mesh scene item";
     case LIBMC_ERROR_INVALIDMESHSCENEITEMINDEX: return "Invalid Mesh Scene Item Index";
+    case LIBMC_ERROR_INTERNALMETADATAERROR: return "Internal metadata error";
+    case LIBMC_ERROR_INVALIDBINARYMETADATAPATH: return "Invalid Binary metadata path";
+    case LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND: return "Binary metadata path not found";
     default: return "unknown error";
   }
 }

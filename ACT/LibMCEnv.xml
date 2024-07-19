@@ -1354,13 +1354,12 @@
 		</method>	
 
 		<method name="CreateEmptyMeshScene" description="Creates an empty mesh scene object.">
-			<param name="UUID" type="string" pass="in" description="Mesh Scene UUID" />
 			<param name="BoundToLoginSession" type="bool" pass="in" description="Scene shall be freed when the current login session expires. Parameter is ignored, if not executed in a UIEnvironment context." />
 			<param name="SceneInstance" type="class" class="MeshScene" pass="return" description="Returns and register a scene instance." />		
 		</method>	
 
 		<method name="ReleaseMeshScene" description="Removes a mesh scene and removes all memory.">
-			<param name="SceneInstance" type="class" class="MeshScene" pass="return" description="Returns and register a scene instance." />		
+			<param name="SceneInstance" type="class" class="MeshScene" pass="in" description="Returns and register a scene instance." />		
 		</method>	
 
 		<method name="Load3MFFromResource" description="Loads a 3MF Resource into memory.">
@@ -1740,6 +1739,16 @@
 		</method>		
 
 
+		<method name="HasBinaryMetaData" description="Checks if a binary metadata exists in the build file with a certain path.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the binary metadata" />
+			<param name="HasMetaData" type="bool" pass="return" description="Returns if the metadata exists." />
+		</method>
+
+		<method name="GetBinaryMetaData" description="Returns a binary metadata of the build file. Fails if binary metadata does not exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the binary metadata" />
+			<param name="MetaData" type="basicarray" class="uint8" pass="out" description="Returns the content of the binary binary data." />
+		</method>
+		
 	</class>
 
 
@@ -1984,7 +1993,7 @@
 			<param name="ZValue" type="double" pass="return" description="Z Value of the layer in mm." />
 		</method>
 
-		<method name="LoadToolpath" description="loads the a toolpath into memory">
+		<method name="LoadToolpath" description="loads the a toolpath into memory. Does nothing if toolpath has already been loaded.">
 		</method>
 
 		<method name="UnloadToolpath" description="unloads the a toolpath from memory, if it has been loaded before.">

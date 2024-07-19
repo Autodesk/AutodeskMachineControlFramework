@@ -1877,17 +1877,16 @@ public:
 
 	/**
 	* ISceneHandler::CreateEmptyMeshScene - Creates an empty mesh scene object.
-	* @param[in] sUUID - Mesh Scene UUID
 	* @param[in] bBoundToLoginSession - Scene shall be freed when the current login session expires. Parameter is ignored, if not executed in a UIEnvironment context.
 	* @return Returns and register a scene instance.
 	*/
-	virtual IMeshScene * CreateEmptyMeshScene(const std::string & sUUID, const bool bBoundToLoginSession) = 0;
+	virtual IMeshScene * CreateEmptyMeshScene(const bool bBoundToLoginSession) = 0;
 
 	/**
 	* ISceneHandler::ReleaseMeshScene - Removes a mesh scene and removes all memory.
-	* @return Returns and register a scene instance.
+	* @param[in] pSceneInstance - Returns and register a scene instance.
 	*/
-	virtual IMeshScene * ReleaseMeshScene() = 0;
+	virtual void ReleaseMeshScene(IMeshScene* pSceneInstance) = 0;
 
 	/**
 	* ISceneHandler::Load3MFFromResource - Loads a 3MF Resource into memory.
@@ -2420,6 +2419,29 @@ public:
 	*/
 	virtual IXMLDocumentNode * FindUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
 
+	/**
+	* IToolpathAccessor::HasBinaryMetaData - Checks if a binary metadata exists in the build file with a certain path.
+	* @param[in] sPath - Path of the binary metadata
+	* @return Returns if the metadata exists.
+	*/
+	virtual bool HasBinaryMetaData(const std::string & sPath) = 0;
+
+	/**
+	* IToolpathAccessor::GetBinaryMetaData - Returns a binary metadata of the build file. Fails if binary metadata does not exist.
+	* @param[in] sPath - Path of the binary metadata
+	* @param[in] nMetaDataBufferSize - Number of elements in buffer
+	* @param[out] pMetaDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pMetaDataBuffer - uint8 buffer of Returns the content of the binary binary data.
+	*/
+	virtual void GetBinaryMetaData(const std::string & sPath, LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer) = 0;
+
+	/**
+	* IToolpathAccessor::GetBinaryMetaDataRelationship - Returns the relationship type of a binary metadata of the build file. Fails if binary metadata does not exist.
+	* @param[in] sPath - Path of the binary metadata
+	* @return Returns the relationship of the binary binary data.
+	*/
+	virtual std::string GetBinaryMetaDataRelationship(const std::string & sPath) = 0;
+
 };
 
 typedef IBaseSharedPtr<IToolpathAccessor> PIToolpathAccessor;
@@ -2779,7 +2801,7 @@ public:
 	virtual LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) = 0;
 
 	/**
-	* IBuild::LoadToolpath - loads the a toolpath into memory
+	* IBuild::LoadToolpath - loads the a toolpath into memory. Does nothing if toolpath has already been loaded.
 	*/
 	virtual void LoadToolpath() = 0;
 
