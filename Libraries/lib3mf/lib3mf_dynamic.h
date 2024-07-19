@@ -58,15 +58,26 @@ typedef Lib3MFResult (*PLib3MFBase_ClassTypeIdPtr) (Lib3MF_Base pBase, Lib3MF_ui
 **************************************************************************************************************************/
 
 /**
-* Retrieves an binary streams package path.
+* Retrieves an binary streams package path for the binary data.
 *
 * @param[in] pBinaryStream - BinaryStream instance.
 * @param[in] nPathBufferSize - size of the buffer (including trailing 0)
 * @param[out] pPathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pPathBuffer -  buffer of binary streams package path., may be NULL
+* @param[out] pPathBuffer -  buffer of binary streams package binary path., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBinaryStream_GetPathPtr) (Lib3MF_BinaryStream pBinaryStream, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
+typedef Lib3MFResult (*PLib3MFBinaryStream_GetBinaryPathPtr) (Lib3MF_BinaryStream pBinaryStream, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
+
+/**
+* Retrieves an binary streams package path for the index data.
+*
+* @param[in] pBinaryStream - BinaryStream instance.
+* @param[in] nPathBufferSize - size of the buffer (including trailing 0)
+* @param[out] pPathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pPathBuffer -  buffer of binary streams package index path., may be NULL
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFBinaryStream_GetIndexPathPtr) (Lib3MF_BinaryStream pBinaryStream, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
 
 /**
 * Retrieves an binary streams uuid.
@@ -78,6 +89,41 @@ typedef Lib3MFResult (*PLib3MFBinaryStream_GetPathPtr) (Lib3MF_BinaryStream pBin
 * @return error code or 0 (success)
 */
 typedef Lib3MFResult (*PLib3MFBinaryStream_GetUUIDPtr) (Lib3MF_BinaryStream pBinaryStream, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Sets the float compression mode to raw. All subsequent writes will adhere to this mode.
+*
+* @param[in] pBinaryStream - BinaryStream instance.
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFBinaryStream_DisableDiscretizedArrayCompressionPtr) (Lib3MF_BinaryStream pBinaryStream);
+
+/**
+* Sets the compression mode to a quantized array. All subsequent writes will adhere to this mode.
+*
+* @param[in] pBinaryStream - BinaryStream instance.
+* @param[in] dUnits - Unit factor to use for quantization.
+* @param[in] ePredictionType - Prediction type to use for arrays.
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFBinaryStream_EnableDiscretizedArrayCompressionPtr) (Lib3MF_BinaryStream pBinaryStream, Lib3MF_double dUnits, Lib3MF::eBinaryStreamPredictionType ePredictionType);
+
+/**
+* Enables LZMA mode.
+*
+* @param[in] pBinaryStream - BinaryStream instance.
+* @param[in] nLZMALevel - LZMA Level (0-9)
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFBinaryStream_EnableLZMAPtr) (Lib3MF_BinaryStream pBinaryStream, Lib3MF_uint32 nLZMALevel);
+
+/**
+* Disables LZMA mode.
+*
+* @param[in] pBinaryStream - BinaryStream instance.
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFBinaryStream_DisableLZMAPtr) (Lib3MF_BinaryStream pBinaryStream);
 
 /*************************************************************************************************************************
  Class definition for Writer
@@ -216,14 +262,15 @@ typedef Lib3MFResult (*PLib3MFWriter_SetContentEncryptionCallbackPtr) (Lib3MF_Wr
 * Creates a binary stream object. Only applicable for 3MF Writers.
 *
 * @param[in] pWriter - Writer instance.
-* @param[in] pPath - Package path to write into
+* @param[in] pIndexPath - Package path to write the index into
+* @param[in] pBinaryPath - Package path to write raw binary data into
 * @param[out] pBinaryStream - Returns a package path.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_CreateBinaryStreamPtr) (Lib3MF_Writer pWriter, const char * pPath, Lib3MF_BinaryStream * pBinaryStream);
+typedef Lib3MFResult (*PLib3MFWriter_CreateBinaryStreamPtr) (Lib3MF_Writer pWriter, const char * pIndexPath, const char * pBinaryPath, Lib3MF_BinaryStream * pBinaryStream);
 
 /**
-* Sets a binary stream for a mesh object. Currently supported objects are Meshes and Toolpath layers.
+* Sets a binary stream for an object. Currently supported objects are Meshes and Toolpath layers.
 *
 * @param[in] pWriter - Writer instance.
 * @param[in] pInstance - Object instance to assign Binary stream to.
@@ -5111,8 +5158,13 @@ typedef Lib3MFResult (*PLib3MFGetTranslationTransformPtr) (Lib3MF_single fVector
 typedef struct {
 	void * m_LibraryHandle;
 	PLib3MFBase_ClassTypeIdPtr m_Base_ClassTypeId;
-	PLib3MFBinaryStream_GetPathPtr m_BinaryStream_GetPath;
+	PLib3MFBinaryStream_GetBinaryPathPtr m_BinaryStream_GetBinaryPath;
+	PLib3MFBinaryStream_GetIndexPathPtr m_BinaryStream_GetIndexPath;
 	PLib3MFBinaryStream_GetUUIDPtr m_BinaryStream_GetUUID;
+	PLib3MFBinaryStream_DisableDiscretizedArrayCompressionPtr m_BinaryStream_DisableDiscretizedArrayCompression;
+	PLib3MFBinaryStream_EnableDiscretizedArrayCompressionPtr m_BinaryStream_EnableDiscretizedArrayCompression;
+	PLib3MFBinaryStream_EnableLZMAPtr m_BinaryStream_EnableLZMA;
+	PLib3MFBinaryStream_DisableLZMAPtr m_BinaryStream_DisableLZMA;
 	PLib3MFWriter_WriteToFilePtr m_Writer_WriteToFile;
 	PLib3MFWriter_GetStreamSizePtr m_Writer_GetStreamSize;
 	PLib3MFWriter_WriteToBufferPtr m_Writer_WriteToBuffer;
