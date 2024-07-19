@@ -11,7 +11,7 @@ del ..\Artifacts\lib3mf\lib3mf_win64.dll
 del ..\Artifacts\lib3mf\_githash_lib3mf.txt
 
 cmake ..\submodules\lib3mf -DLIB3MF_TESTS=OFF
-cmake -DLIB3MF_TESTS=OFF  --build . --config Release
+cmake --build . --config Release
 copy Release\lib3mf.dll ..\Artifacts\lib3mf\lib3mf_win64.dll /Y
 
 cd ..\submodules\lib3mf
