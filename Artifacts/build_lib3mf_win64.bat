@@ -16,7 +16,7 @@ copy Release\lib3mf.dll ..\Artifacts\lib3mf\lib3mf_win64.dll /Y
 
 cd ..\submodules\lib3mf
 
-git rev-parse --verify HEAD >"..\Artifacts\lib3mf\_githash_lib3mf.txt"
+git rev-parse --verify HEAD >"..\..\Artifacts\lib3mf\_githash_lib3mf.txt"
 
 cd ..\..
 

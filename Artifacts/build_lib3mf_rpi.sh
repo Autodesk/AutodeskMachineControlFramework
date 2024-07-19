@@ -16,6 +16,6 @@ cmake --build . --config Release
 cp -L lib3mf.so ../Artifacts/lib3mf/lib3mf_rpi.so
 
 cd ../submodules/lib3mf
-git rev-parse --verify HEAD >"../Artifacts/lib3mf/_githash_rpi_lib3mf.txt"
+git rev-parse --verify HEAD >"../../Artifacts/lib3mf/_githash_rpi_lib3mf.txt"
 
 cd ../..
