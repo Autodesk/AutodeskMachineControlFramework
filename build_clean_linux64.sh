@@ -7,7 +7,6 @@ export GO111MODULE="off"
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 PLATFORMNAME="linux64"
-OVERRIDE_BUILDRESOURCES="linux64"
 
 for var in "$@"
 do
@@ -15,7 +14,6 @@ echo "command line parameter: $var"
 if test $var = "--buildrpi"
 then
 	PLATFORMNAME="rpi"	
-	OVERRIDE_BUILDRESOURCES="arm"
 fi	
 if test $var = "--buildwin64"
 then
@@ -102,7 +100,7 @@ then
 	export GOARCH=arm
 	export GOOS=linux
 	export GOARM=5
-	go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+	go build -o "$builddir/DevPackage/Framework/buildresources.rpi" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
 else
 
@@ -137,9 +135,9 @@ cd "$builddir"
 echo "Building Core Modules"
 if test $PLATFORMNAME = "win64"
 then
-cmake -DOVERRIDE_BUILDRESOURCES=linux64 -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
+cmake -DOVERRIDE_PLATFORM=linux64 -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
 else
-cmake -DOVERRIDE_BUILDRESOURCES=$OVERRIDE_BUILDRESOURCES ..
+cmake -DOVERRIDE_PLATFORM=$PLATFORMNAME ..
 fi
 
 cmake --build . --config Release
