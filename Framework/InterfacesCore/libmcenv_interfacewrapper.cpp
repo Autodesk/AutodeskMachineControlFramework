@@ -7137,6 +7137,32 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentpartuuid(LibMCEnv_ToolpathLayer 
 	}
 }
 
+LibMCEnvResult libmcenv_toolpathlayer_getsegmentlocalpartid(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pLocalPartID)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pLocalPartID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pLocalPartID = pIToolpathLayer->GetSegmentLocalPartID(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointdata(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, sLibMCEnvPosition2D * pPointDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
@@ -26293,6 +26319,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentprofiletypedvaluedef;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentpartuuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpartuuid;
+	if (sProcName == "libmcenv_toolpathlayer_getsegmentlocalpartid") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentlocalpartid;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentpointdata") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpointdata;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmenthatchdata") 

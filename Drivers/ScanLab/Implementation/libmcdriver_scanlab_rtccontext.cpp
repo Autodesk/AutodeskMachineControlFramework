@@ -2158,6 +2158,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 		m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = (uint32_t) (nSegmentIndex + 1);
 		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = (uint32_t) pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "measurementid", 0);
+		m_CurrentMeasurementTagInfo.m_nCurrentPartID = (uint32_t)pLayer->GetSegmentLocalPartID(nSegmentIndex);
 
 		LibMCEnv::eToolpathSegmentType eSegmentType;
 		uint32_t nPointCount;

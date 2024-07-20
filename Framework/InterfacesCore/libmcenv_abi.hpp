@@ -2505,6 +2505,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedva
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentpartuuid(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nPartUUIDBufferSize, LibMCEnv_uint32* pPartUUIDNeededChars, char * pPartUUIDBuffer);
 
 /**
+* Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pLocalPartID - Local Part ID of the segment
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentlocalpartid(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pLocalPartID);
+
+/**
 * Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.

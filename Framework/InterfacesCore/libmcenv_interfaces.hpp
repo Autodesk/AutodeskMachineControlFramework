@@ -2178,6 +2178,13 @@ public:
 	virtual std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
+	* IToolpathLayer::GetSegmentLocalPartID - Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Local Part ID of the segment
+	*/
+	virtual LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
 	* IToolpathLayer::GetSegmentPointData - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] nPointDataBufferSize - Number of elements in buffer

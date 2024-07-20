@@ -1610,6 +1610,7 @@ public:
 	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
 	inline LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue);
 	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex);
 	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 	inline void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer);
 	inline void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer);
@@ -3059,6 +3060,7 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValueDef = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = nullptr;
@@ -5766,6 +5768,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID = (PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentlocalpartid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID = (PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentlocalpartid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11774,6 +11785,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentlocalpartid", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointdata", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17015,6 +17030,19 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nIndex, bytesNeededPartUUID, &bytesWrittenPartUUID, &bufferPartUUID[0]));
 		
 		return std::string(&bufferPartUUID[0]);
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentLocalPartID - Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Local Part ID of the segment
+	*/
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 resultLocalPartID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentLocalPartID(m_pHandle, nIndex, &resultLocalPartID));
+		
+		return resultLocalPartID;
 	}
 	
 	/**
