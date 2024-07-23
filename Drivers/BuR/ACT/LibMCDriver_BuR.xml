@@ -140,8 +140,28 @@
 		<error name="NOTCPPROTOCOLNODE" code="1084" description="No TCP Protocol Node." />						
 		<error name="NOPACKETSIGNATURE" code="1085" description="No Packet Signature." />						
 		<error name="INVALIDPACKETSIGNATURE" code="1086" description="Invalid Packet Signature." />						
-		
-		
+		<error name="COULDNOTPARSEBURSCHEMAJSON" code="1087" description="Could not parse schema json." />						
+		<error name="COULDNOTPARSEJOURNALSCHEMA" code="1088" description="Could not parse journal schema." />						
+		<error name="JOURNALSCHEMAHASNOVERSIONIDENTIFIER" code="1089" description="Journal schema has no version identifier." />						
+		<error name="JOURNALSCHEMAHASINVALIDVERSIONIDENTIFIER" code="1090" description="Journal schema has invalid version identifier." />						
+		<error name="JOURNALSCHEMAHASNOGROUPINFORMATION" code="1091" description="Journal schema has no group information." />						
+		<error name="JOURNALSCHEMAHASINVALIDGROUPINFORMATION" code="1092" description="Journal schema has invalid group information." />						
+		<error name="JOURNALSCHEMAMISSESGROUPNAME" code="1093" description="Journal schema misses group name." />						
+		<error name="JOURNALSCHEMAHASINVALIDGROUPNAME" code="1094" description="Journal schema has invalid group name." />						
+		<error name="JOURNALSCHEMAMISSESGROUPID" code="1095" description="Journal schema misses group id." />						
+		<error name="JOURNALSCHEMAMISSESGROUPVALUES" code="1096" description="Journal schema misses group values." />						
+		<error name="JOURNALSCHEMAHASINVALIDGROUPID" code="1097" description="Journal schema has invalid group id." />
+		<error name="JOURNALSCHEMAHASINVALIDGROUPVALUES" code="1098" description="Journal schema has invalid group values." />						
+		<error name="JOURNALSCHEMAMISSESVALUETYPE" code="1099" description="Journal schema misses value type." />						
+		<error name="JOURNALSCHEMAMISSESVALUENAME" code="1100" description="Journal schema misses value name." />						
+		<error name="JOURNALSCHEMAMISSESVALUEID" code="1101" description="Journal schema misses value id." />						
+		<error name="JOURNALSCHEMAMISSESVALUESIZE" code="1102" description="Journal schema misses value size." />						
+		<error name="JOURNALSCHEMAHASINVALIDVALUETYPE" code="1103" description="Journal schema misses value type." />						
+		<error name="JOURNALSCHEMAHASINVALIDVALUENAME" code="1104" description="Journal schema misses value name." />						
+		<error name="JOURNALSCHEMAHASINVALIDVALUEID" code="1105" description="Journal schema misses value id." />						
+		<error name="JOURNALSCHEMAHASINVALIDVALUESIZE" code="1106" description="Journal schema misses value size." />						
+			
+
 	</errors>
 
 	
