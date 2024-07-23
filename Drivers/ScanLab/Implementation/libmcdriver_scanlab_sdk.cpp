@@ -318,9 +318,9 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_rs232_write_data = (PScanLabPtr_n_rs232_write_data)_loadScanLabAddress(hLibrary, "n_rs232_write_data");
 	this->ptr_n_rs232_read_data = (PScanLabPtr_n_rs232_read_data)_loadScanLabAddress(hLibrary, "n_rs232_read_data");
 
-	this->ptr_n_set_mcbsp_out_oie_ctrl = (PScanLabPtr_n_set_mcbsp_out_oie_ctrl)_loadScanLabAddress(hLibrary, "n_set_mcbsp_out_oie_ctrl");
-	this->ptr_n_eth_config_waveform_streaming_ctrl = (PScanLabPtr_n_eth_config_waveform_streaming_ctrl)_loadScanLabAddress(hLibrary, "n_eth_config_waveform_streaming_ctrl");
-	this->ptr_n_eth_set_high_performance_mode = (PScanLabPtr_n_eth_set_high_performance_mode)_loadScanLabAddress(hLibrary, "n_eth_set_high_performance_mode");
+	this->ptr_n_set_mcbsp_out_oie_ctrl = (PScanLabPtr_n_set_mcbsp_out_oie_ctrl)_loadScanLabAddress(hLibrary, "n_set_mcbsp_out_oie_ctrl", false);
+	this->ptr_n_eth_config_waveform_streaming_ctrl = (PScanLabPtr_n_eth_config_waveform_streaming_ctrl)_loadScanLabAddress(hLibrary, "n_eth_config_waveform_streaming_ctrl", false);
+	this->ptr_n_eth_set_high_performance_mode = (PScanLabPtr_n_eth_set_high_performance_mode)_loadScanLabAddress(hLibrary, "n_eth_set_high_performance_mode", false);
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -1667,7 +1667,8 @@ void CScanLabSDK::n_set_mcbsp_out_oie_ctrl(uint32_t nCardNo, uint32_t nSignalID1
 	if (m_pLogJournal.get() != nullptr)
 		m_pLogJournal->logCall("n_set_mcbsp_out_oie_ctrl", std::to_string(nCardNo) + ", " + std::to_string (nSignalID1) + ", " + std::to_string (nSignalID2));
 
-	ptr_n_set_mcbsp_out_oie_ctrl(nCardNo, nSignalID1, nSignalID2);
+	if (ptr_n_set_mcbsp_out_oie_ctrl != nullptr)
+		ptr_n_set_mcbsp_out_oie_ctrl(nCardNo, nSignalID1, nSignalID2);
 }
 
 void CScanLabSDK::n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_t nSize, uint32_t nFlags)
@@ -1675,7 +1676,8 @@ void CScanLabSDK::n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_
 	if (m_pLogJournal.get() != nullptr)
 		m_pLogJournal->logCall("n_eth_config_waveform_streaming_ctrl", std::to_string(nCardNo) + ", " + std::to_string(nSize) + ", " + std::to_string(nFlags));
 
-	ptr_n_eth_config_waveform_streaming_ctrl(nCardNo, nSize, nFlags);
+	if (ptr_n_eth_config_waveform_streaming_ctrl != nullptr)
+		ptr_n_eth_config_waveform_streaming_ctrl(nCardNo, nSize, nFlags);
 
 }
 
@@ -1684,7 +1686,8 @@ void CScanLabSDK::n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMo
 	if (m_pLogJournal.get() != nullptr)
 		m_pLogJournal->logCall("n_eth_set_high_performance_mode", std::to_string(nCardNo) + ", " + std::to_string(nMode));
 
-	ptr_n_eth_set_high_performance_mode(nCardNo, nMode);
+	if (ptr_n_eth_set_high_performance_mode != nullptr)
+		ptr_n_eth_set_high_performance_mode(nCardNo, nMode);
 
 }
 
