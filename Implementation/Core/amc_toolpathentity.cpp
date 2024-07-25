@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <common_utils.hpp>
 
+#define SCHEMA_PROPRIETARYTOOLPATHATTACHMENT "http://schemas.microsoft.com/3dmanufacturing/2019/05/proprietarytoolpath"
+
 namespace AMC {
 
 	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName, bool bAllowEmptyToolpath, const std::set<std::string>& attachmentRelationsToRead)
@@ -62,6 +64,7 @@ namespace AMC {
 		m_p3MFReader = m_p3MFModel->QueryReader("3mf");
 		for (std::string sRelationToRead : attachmentRelationsToRead)
 			m_p3MFReader->AddRelationToRead(sRelationToRead);
+		m_p3MFReader->AddRelationToRead(SCHEMA_PROPRIETARYTOOLPATHATTACHMENT);
 
 		m_p3MFReader->ReadFromPersistentSource(m_pPersistentSource.get ());
 
