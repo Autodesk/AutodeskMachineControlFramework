@@ -261,12 +261,12 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 
 			pLogger->logMessage("registering 3D resource " + sModelResourceName + " as " + sModelName, LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
 
-			auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sModelResourceName);
+			/*auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sModelResourceName);
 
 			auto pModel = std::make_shared<CUIModule_GLSceneModel>(sModelUUID, sModelName, sModelResourceName, pMeshEntity->getUUID ());
 			m_ModelNameMap.insert(std::make_pair (sModelName, pModel));
 			m_ModelUUIDMap.insert(std::make_pair (sModelUUID, pModel));
-
+			 */
 		}
 
 	}

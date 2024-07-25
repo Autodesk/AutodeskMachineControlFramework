@@ -1444,6 +1444,35 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_gettimestamp(LibMCData_Bui
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getcreatoruuid(LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
 
 /**
+* returns if the build has an attached thumbnail.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[out] pHasThumbnail - Returns true, if the build has an attached thumbnail.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_hasthumbnailstream(LibMCData_BuildJob pBuildJob, bool * pHasThumbnail);
+
+/**
+* returns the UUID of the thumbnail stream of the job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Thumbnail UUID. 00000000-0000-0000-0000-000000000000, if no thumbnail is assigned..., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getthumbnailstreamuuid(LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Sets the UUID of the thumbnail stream of the job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pStreamUUID - Thumbnail UUID. Stream MUST exist and of MIME Type png. If empty or 00000000-0000-0000-0000-000000000000, no thumbnail will be assigned...
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_setthumbnailstreamuuid(LibMCData_BuildJob pBuildJob, const char * pStreamUUID);
+
+/**
 * returns the current name of the user that created the job.
 *
 * @param[in] pBuildJob - BuildJob instance.

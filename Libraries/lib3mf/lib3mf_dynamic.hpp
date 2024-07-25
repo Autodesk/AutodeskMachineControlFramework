@@ -745,8 +745,13 @@ public:
 	{
 	}
 	
-	inline std::string GetPath();
+	inline std::string GetBinaryPath();
+	inline std::string GetIndexPath();
 	inline std::string GetUUID();
+	inline void DisableDiscretizedArrayCompression();
+	inline void EnableDiscretizedArrayCompression(const Lib3MF_double dUnits, const eBinaryStreamPredictionType ePredictionType);
+	inline void EnableLZMA(const Lib3MF_uint32 nLZMALevel);
+	inline void DisableLZMA();
 };
 	
 /*************************************************************************************************************************
@@ -776,7 +781,7 @@ public:
 	inline Lib3MF_uint32 GetWarningCount();
 	inline void AddKeyWrappingCallback(const std::string & sConsumerID, const KeyWrappingCallback pTheCallback, const Lib3MF_pvoid pUserData);
 	inline void SetContentEncryptionCallback(const ContentEncryptionCallback pTheCallback, const Lib3MF_pvoid pUserData);
-	inline PBinaryStream CreateBinaryStream(const std::string & sPath);
+	inline PBinaryStream CreateBinaryStream(const std::string & sIndexPath, const std::string & sBinaryPath);
 	inline void AssignBinaryStream(classParam<CBase> pInstance, classParam<CBinaryStream> pBinaryStream);
 	inline void RegisterCustomNamespace(const std::string & sPrefix, const std::string & sNameSpace);
 };
@@ -1694,6 +1699,8 @@ public:
 	inline std::string GetSegmentProfileUUID(const Lib3MF_uint32 nIndex);
 	inline PBuildItem GetSegmentPart(const Lib3MF_uint32 nIndex);
 	inline std::string GetSegmentPartUUID(const Lib3MF_uint32 nIndex);
+	inline Lib3MF_uint32 GetSegmentLocalPartID(const Lib3MF_uint32 nIndex);
+	inline std::string GetPartUUIDByLocalPartID(const Lib3MF_uint32 nLocalPartID);
 	inline void GetSegmentPointData(const Lib3MF_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 	inline void FindAttributeInfoByName(const std::string & sNameSpace, const std::string & sAttributeName, Lib3MF_uint32 & nID, eToolpathAttributeType & eAttributeType);
 	inline Lib3MF_uint32 FindAttributeIDByName(const std::string & sNameSpace, const std::string & sAttributeName);
@@ -2387,8 +2394,13 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
 		pWrapperTable->m_Base_ClassTypeId = nullptr;
-		pWrapperTable->m_BinaryStream_GetPath = nullptr;
+		pWrapperTable->m_BinaryStream_GetBinaryPath = nullptr;
+		pWrapperTable->m_BinaryStream_GetIndexPath = nullptr;
 		pWrapperTable->m_BinaryStream_GetUUID = nullptr;
+		pWrapperTable->m_BinaryStream_DisableDiscretizedArrayCompression = nullptr;
+		pWrapperTable->m_BinaryStream_EnableDiscretizedArrayCompression = nullptr;
+		pWrapperTable->m_BinaryStream_EnableLZMA = nullptr;
+		pWrapperTable->m_BinaryStream_DisableLZMA = nullptr;
 		pWrapperTable->m_Writer_WriteToFile = nullptr;
 		pWrapperTable->m_Writer_GetStreamSize = nullptr;
 		pWrapperTable->m_Writer_WriteToBuffer = nullptr;
@@ -2696,6 +2708,8 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentProfileUUID = nullptr;
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentPart = nullptr;
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentPartUUID = nullptr;
+		pWrapperTable->m_ToolpathLayerReader_GetSegmentLocalPartID = nullptr;
+		pWrapperTable->m_ToolpathLayerReader_GetPartUUIDByLocalPartID = nullptr;
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentPointData = nullptr;
 		pWrapperTable->m_ToolpathLayerReader_FindAttributeInfoByName = nullptr;
 		pWrapperTable->m_ToolpathLayerReader_FindAttributeIDByName = nullptr;
@@ -2934,12 +2948,21 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_BinaryStream_GetPath = (PLib3MFBinaryStream_GetPathPtr) GetProcAddress(hLibrary, "lib3mf_binarystream_getpath");
+		pWrapperTable->m_BinaryStream_GetBinaryPath = (PLib3MFBinaryStream_GetBinaryPathPtr) GetProcAddress(hLibrary, "lib3mf_binarystream_getbinarypath");
 		#else // _WIN32
-		pWrapperTable->m_BinaryStream_GetPath = (PLib3MFBinaryStream_GetPathPtr) dlsym(hLibrary, "lib3mf_binarystream_getpath");
+		pWrapperTable->m_BinaryStream_GetBinaryPath = (PLib3MFBinaryStream_GetBinaryPathPtr) dlsym(hLibrary, "lib3mf_binarystream_getbinarypath");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_BinaryStream_GetPath == nullptr)
+		if (pWrapperTable->m_BinaryStream_GetBinaryPath == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BinaryStream_GetIndexPath = (PLib3MFBinaryStream_GetIndexPathPtr) GetProcAddress(hLibrary, "lib3mf_binarystream_getindexpath");
+		#else // _WIN32
+		pWrapperTable->m_BinaryStream_GetIndexPath = (PLib3MFBinaryStream_GetIndexPathPtr) dlsym(hLibrary, "lib3mf_binarystream_getindexpath");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BinaryStream_GetIndexPath == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2949,6 +2972,42 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BinaryStream_GetUUID == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BinaryStream_DisableDiscretizedArrayCompression = (PLib3MFBinaryStream_DisableDiscretizedArrayCompressionPtr) GetProcAddress(hLibrary, "lib3mf_binarystream_disablediscretizedarraycompression");
+		#else // _WIN32
+		pWrapperTable->m_BinaryStream_DisableDiscretizedArrayCompression = (PLib3MFBinaryStream_DisableDiscretizedArrayCompressionPtr) dlsym(hLibrary, "lib3mf_binarystream_disablediscretizedarraycompression");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BinaryStream_DisableDiscretizedArrayCompression == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BinaryStream_EnableDiscretizedArrayCompression = (PLib3MFBinaryStream_EnableDiscretizedArrayCompressionPtr) GetProcAddress(hLibrary, "lib3mf_binarystream_enablediscretizedarraycompression");
+		#else // _WIN32
+		pWrapperTable->m_BinaryStream_EnableDiscretizedArrayCompression = (PLib3MFBinaryStream_EnableDiscretizedArrayCompressionPtr) dlsym(hLibrary, "lib3mf_binarystream_enablediscretizedarraycompression");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BinaryStream_EnableDiscretizedArrayCompression == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BinaryStream_EnableLZMA = (PLib3MFBinaryStream_EnableLZMAPtr) GetProcAddress(hLibrary, "lib3mf_binarystream_enablelzma");
+		#else // _WIN32
+		pWrapperTable->m_BinaryStream_EnableLZMA = (PLib3MFBinaryStream_EnableLZMAPtr) dlsym(hLibrary, "lib3mf_binarystream_enablelzma");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BinaryStream_EnableLZMA == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BinaryStream_DisableLZMA = (PLib3MFBinaryStream_DisableLZMAPtr) GetProcAddress(hLibrary, "lib3mf_binarystream_disablelzma");
+		#else // _WIN32
+		pWrapperTable->m_BinaryStream_DisableLZMA = (PLib3MFBinaryStream_DisableLZMAPtr) dlsym(hLibrary, "lib3mf_binarystream_disablelzma");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BinaryStream_DisableLZMA == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5715,6 +5774,24 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayerReader_GetSegmentLocalPartID = (PLib3MFToolpathLayerReader_GetSegmentLocalPartIDPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getsegmentlocalpartid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayerReader_GetSegmentLocalPartID = (PLib3MFToolpathLayerReader_GetSegmentLocalPartIDPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getsegmentlocalpartid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayerReader_GetSegmentLocalPartID == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayerReader_GetPartUUIDByLocalPartID = (PLib3MFToolpathLayerReader_GetPartUUIDByLocalPartIDPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getpartuuidbylocalpartid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayerReader_GetPartUUIDByLocalPartID = (PLib3MFToolpathLayerReader_GetPartUUIDByLocalPartIDPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getpartuuidbylocalpartid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayerReader_GetPartUUIDByLocalPartID == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentPointData = (PLib3MFToolpathLayerReader_GetSegmentPointDataPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerreader_getsegmentpointdata");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentPointData = (PLib3MFToolpathLayerReader_GetSegmentPointDataPtr) dlsym(hLibrary, "lib3mf_toolpathlayerreader_getsegmentpointdata");
@@ -7336,12 +7413,32 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		if ( (eLookupError != 0) || (pWrapperTable->m_Base_ClassTypeId == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("lib3mf_binarystream_getpath", (void**)&(pWrapperTable->m_BinaryStream_GetPath));
-		if ( (eLookupError != 0) || (pWrapperTable->m_BinaryStream_GetPath == nullptr) )
+		eLookupError = (*pLookup)("lib3mf_binarystream_getbinarypath", (void**)&(pWrapperTable->m_BinaryStream_GetBinaryPath));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BinaryStream_GetBinaryPath == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("lib3mf_binarystream_getindexpath", (void**)&(pWrapperTable->m_BinaryStream_GetIndexPath));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BinaryStream_GetIndexPath == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("lib3mf_binarystream_getuuid", (void**)&(pWrapperTable->m_BinaryStream_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BinaryStream_GetUUID == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("lib3mf_binarystream_disablediscretizedarraycompression", (void**)&(pWrapperTable->m_BinaryStream_DisableDiscretizedArrayCompression));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BinaryStream_DisableDiscretizedArrayCompression == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("lib3mf_binarystream_enablediscretizedarraycompression", (void**)&(pWrapperTable->m_BinaryStream_EnableDiscretizedArrayCompression));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BinaryStream_EnableDiscretizedArrayCompression == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("lib3mf_binarystream_enablelzma", (void**)&(pWrapperTable->m_BinaryStream_EnableLZMA));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BinaryStream_EnableLZMA == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("lib3mf_binarystream_disablelzma", (void**)&(pWrapperTable->m_BinaryStream_DisableLZMA));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BinaryStream_DisableLZMA == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("lib3mf_writer_writetofile", (void**)&(pWrapperTable->m_Writer_WriteToFile));
@@ -8572,6 +8669,14 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerReader_GetSegmentPartUUID == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("lib3mf_toolpathlayerreader_getsegmentlocalpartid", (void**)&(pWrapperTable->m_ToolpathLayerReader_GetSegmentLocalPartID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerReader_GetSegmentLocalPartID == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("lib3mf_toolpathlayerreader_getpartuuidbylocalpartid", (void**)&(pWrapperTable->m_ToolpathLayerReader_GetPartUUIDByLocalPartID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerReader_GetPartUUIDByLocalPartID == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("lib3mf_toolpathlayerreader_getsegmentpointdata", (void**)&(pWrapperTable->m_ToolpathLayerReader_GetSegmentPointData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerReader_GetSegmentPointData == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -9310,16 +9415,31 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	 */
 	
 	/**
-	* CBinaryStream::GetPath - Retrieves an binary streams package path.
-	* @return binary streams package path.
+	* CBinaryStream::GetBinaryPath - Retrieves an binary streams package path for the binary data.
+	* @return binary streams package binary path.
 	*/
-	std::string CBinaryStream::GetPath()
+	std::string CBinaryStream::GetBinaryPath()
 	{
 		Lib3MF_uint32 bytesNeededPath = 0;
 		Lib3MF_uint32 bytesWrittenPath = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_GetPath(m_pHandle, 0, &bytesNeededPath, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_GetBinaryPath(m_pHandle, 0, &bytesNeededPath, nullptr));
 		std::vector<char> bufferPath(bytesNeededPath);
-		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_GetPath(m_pHandle, bytesNeededPath, &bytesWrittenPath, &bufferPath[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_GetBinaryPath(m_pHandle, bytesNeededPath, &bytesWrittenPath, &bufferPath[0]));
+		
+		return std::string(&bufferPath[0]);
+	}
+	
+	/**
+	* CBinaryStream::GetIndexPath - Retrieves an binary streams package path for the index data.
+	* @return binary streams package index path.
+	*/
+	std::string CBinaryStream::GetIndexPath()
+	{
+		Lib3MF_uint32 bytesNeededPath = 0;
+		Lib3MF_uint32 bytesWrittenPath = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_GetIndexPath(m_pHandle, 0, &bytesNeededPath, nullptr));
+		std::vector<char> bufferPath(bytesNeededPath);
+		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_GetIndexPath(m_pHandle, bytesNeededPath, &bytesWrittenPath, &bufferPath[0]));
 		
 		return std::string(&bufferPath[0]);
 	}
@@ -9337,6 +9457,41 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
 		
 		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CBinaryStream::DisableDiscretizedArrayCompression - Sets the float compression mode to raw. All subsequent writes will adhere to this mode.
+	*/
+	void CBinaryStream::DisableDiscretizedArrayCompression()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_DisableDiscretizedArrayCompression(m_pHandle));
+	}
+	
+	/**
+	* CBinaryStream::EnableDiscretizedArrayCompression - Sets the compression mode to a quantized array. All subsequent writes will adhere to this mode.
+	* @param[in] dUnits - Unit factor to use for quantization.
+	* @param[in] ePredictionType - Prediction type to use for arrays.
+	*/
+	void CBinaryStream::EnableDiscretizedArrayCompression(const Lib3MF_double dUnits, const eBinaryStreamPredictionType ePredictionType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_EnableDiscretizedArrayCompression(m_pHandle, dUnits, ePredictionType));
+	}
+	
+	/**
+	* CBinaryStream::EnableLZMA - Enables LZMA mode.
+	* @param[in] nLZMALevel - LZMA Level (0-9)
+	*/
+	void CBinaryStream::EnableLZMA(const Lib3MF_uint32 nLZMALevel)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_EnableLZMA(m_pHandle, nLZMALevel));
+	}
+	
+	/**
+	* CBinaryStream::DisableLZMA - Disables LZMA mode.
+	*/
+	void CBinaryStream::DisableLZMA()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BinaryStream_DisableLZMA(m_pHandle));
 	}
 	
 	/**
@@ -9492,13 +9647,14 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	
 	/**
 	* CWriter::CreateBinaryStream - Creates a binary stream object. Only applicable for 3MF Writers.
-	* @param[in] sPath - Package path to write into
+	* @param[in] sIndexPath - Package path to write the index into
+	* @param[in] sBinaryPath - Package path to write raw binary data into
 	* @return Returns a package path.
 	*/
-	PBinaryStream CWriter::CreateBinaryStream(const std::string & sPath)
+	PBinaryStream CWriter::CreateBinaryStream(const std::string & sIndexPath, const std::string & sBinaryPath)
 	{
 		Lib3MFHandle hBinaryStream = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Writer_CreateBinaryStream(m_pHandle, sPath.c_str(), &hBinaryStream));
+		CheckError(m_pWrapper->m_WrapperTable.m_Writer_CreateBinaryStream(m_pHandle, sIndexPath.c_str(), sBinaryPath.c_str(), &hBinaryStream));
 		
 		if (!hBinaryStream) {
 			CheckError(LIB3MF_ERROR_INVALIDPARAM);
@@ -9507,7 +9663,7 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 	}
 	
 	/**
-	* CWriter::AssignBinaryStream - Sets a binary stream for a mesh object. Currently supported objects are Meshes and Toolpath layers.
+	* CWriter::AssignBinaryStream - Sets a binary stream for an object. Currently supported objects are Meshes and Toolpath layers.
 	* @param[in] pInstance - Object instance to assign Binary stream to.
 	* @param[in] pBinaryStream - Binary stream object to use for this layer.
 	*/
@@ -13289,6 +13445,35 @@ inline CBase* CWrapper::polymorphicFactory(Lib3MFHandle pHandle)
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetSegmentPartUUID(m_pHandle, nIndex, 0, &bytesNeededPartUUID, nullptr));
 		std::vector<char> bufferPartUUID(bytesNeededPartUUID);
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetSegmentPartUUID(m_pHandle, nIndex, bytesNeededPartUUID, &bytesWrittenPartUUID, &bufferPartUUID[0]));
+		
+		return std::string(&bufferPartUUID[0]);
+	}
+	
+	/**
+	* CToolpathLayerReader::GetSegmentLocalPartID - Retrieves the assigned segment part id. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Local Segment Part ID
+	*/
+	Lib3MF_uint32 CToolpathLayerReader::GetSegmentLocalPartID(const Lib3MF_uint32 nIndex)
+	{
+		Lib3MF_uint32 resultLocalPartID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetSegmentLocalPartID(m_pHandle, nIndex, &resultLocalPartID));
+		
+		return resultLocalPartID;
+	}
+	
+	/**
+	* CToolpathLayerReader::GetPartUUIDByLocalPartID - Retrieves the global part UUID by the local part ID. Fails if part ID does not exist in this layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+	* @param[in] nLocalPartID - Local Segment Part ID
+	* @return Segment Part UUID
+	*/
+	std::string CToolpathLayerReader::GetPartUUIDByLocalPartID(const Lib3MF_uint32 nLocalPartID)
+	{
+		Lib3MF_uint32 bytesNeededPartUUID = 0;
+		Lib3MF_uint32 bytesWrittenPartUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetPartUUIDByLocalPartID(m_pHandle, nLocalPartID, 0, &bytesNeededPartUUID, nullptr));
+		std::vector<char> bufferPartUUID(bytesNeededPartUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetPartUUIDByLocalPartID(m_pHandle, nLocalPartID, bytesNeededPartUUID, &bytesWrittenPartUUID, &bufferPartUUID[0]));
 		
 		return std::string(&bufferPartUUID[0]);
 	}

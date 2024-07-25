@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 // Include custom headers here.
-
+#include "amc_meshhandler.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -61,11 +61,11 @@ protected:
 	std::string m_sStorageUUID;
 	std::string m_sBuildUUID;
 	AMC::PToolpathHandler m_pToolpathHandler;
-	double m_dDefaultJumpSpeed;
-
+	AMC::PMeshHandler m_pMeshHandler;
 
 public:
-	CToolpathAccessor(const std::string& sStorageUUID, const std::string& sBuildUUID, AMC::PToolpathHandler pToolpathHandler);
+	CToolpathAccessor(const std::string& sStorageUUID, const std::string& sBuildUUID, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler);
+
 	virtual ~CToolpathAccessor();
 
 	std::string GetStorageUUID() override;
@@ -103,6 +103,10 @@ public:
 	bool HasUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
 
 	IXMLDocumentNode* FindUniqueMetaData(const std::string& sNamespace, const std::string& sName) override;
+
+	bool HasBinaryMetaData(const std::string& sPath) override;
+
+	void GetBinaryMetaData(const std::string& sPath, LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8* pMetaDataBuffer) override;
 
 };
 

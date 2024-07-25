@@ -130,12 +130,32 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 	m_nSensorSignalCount = pDeviceConfiguration->GetSensorSignalCount();
 	m_nAdditionalSignalCount = pDeviceConfiguration->GetAdditionalSignalCount();
 
+	auto deviceDriverType = m_pOIESDK->getDeviceDriverType();
 
 	if (m_pConfigurationFile == nullptr)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTCREATEDEVICECONFIGURATION);
 	std::string sConfigurationFileName = m_pConfigurationFile->GetAbsoluteFileName();
 
-	switch (m_pOIESDK->getDeviceDriverType()) {
+	uint32_t nExecutionMode = 0;
+	m_pOIESDK->checkError(m_pOIESDK->oie_get_execution_mode(sConfigurationFileName.c_str(), &nExecutionMode));
+
+	switch (nExecutionMode) {
+		case 0: // Compatibility Mode
+			if ((deviceDriverType != LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion2) && (deviceDriverType != LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3Compatibility))
+				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE);
+			break;
+
+		case 1: // 100kHz Mode
+			if (deviceDriverType != LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3)
+				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTIN100KHZMODE);
+			break;
+
+		default:
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEEXECUTIONMODE);
+
+	}
+
+	switch (deviceDriverType) {
 	case LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion2:
 		m_pDevice = m_pOIESDK->oie_add_device_VERSION2(m_pInstance);
 		break;
@@ -440,6 +460,10 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 
 	try {
 		//std::cout << "Starting app call..." << std::endl;
+		if (m_pOIESDK->getDeviceDriverType() == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3) {
+			m_pOIESDK->oie_set_rtc6eth_ip_address(m_pDevice, m_sRTC6IPAddress.c_str ());
+		}
+
 		m_pOIESDK->checkError(m_pOIESDK->oie_device_start_app_ver(m_pDevice, sName.c_str(), nMajorVersion, nMinorVersion, sDeviceConfigFileName.c_str()));
 		//std::cout << "Starting app call finished..." << std::endl;
 	}
@@ -743,11 +767,44 @@ void COIEDeviceInstance::ClearCurrentRecording()
 	}
 }
 
-PDataRecordingInstance COIEDeviceInstance::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)
+
+void COIEDeviceInstance::SetRTC6IPAddress(const std::string& sRTC6IPAddress)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	m_sRTC6IPAddress = sRTC6IPAddress;
 }
 
+bool COIEDeviceInstance::isLoggedIn()
+{
+	oie_device_state state = 0;
+	m_pOIESDK->oie_get_device_state(m_pDevice, state);
+
+	if (state < 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE);
+
+	return ((((uint32_t)state) & OIE_DEVICESTATE_LOGGEDIN) != 0);
+}
+
+bool COIEDeviceInstance::isStreaming()
+{
+	oie_device_state state = 0;
+	m_pOIESDK->oie_get_device_state(m_pDevice, state);
+
+	if (state < 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE);
+
+	return ((((uint32_t)state) & OIE_DEVICESTATE_STREAMING) != 0);
+}
+
+bool COIEDeviceInstance::rtcIsBusy()
+{
+	oie_device_state state = 0;
+	m_pOIESDK->oie_get_device_state(m_pDevice, state);
+
+	if (state < 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE);
+
+	return ((((uint32_t)state) & OIE_DEVICESTATE_RTCBUSY) != 0);
+}
 
 COIEDevice::COIEDevice(POIEDeviceInstance pDeviceInstance)
 {
@@ -786,6 +843,12 @@ std::string COIEDevice::GetHostName()
 {
 	return lockInstance()->GetHostName();
 }
+
+void COIEDevice::SetRTC6IPAddress(const std::string& sRTC6IPAddress)
+{
+	lockInstance()->SetRTC6IPAddress(sRTC6IPAddress);
+}
+
 
 void COIEDevice::SetPort(const LibMCDriver_ScanLabOIE_uint32 nPort)
 {
@@ -918,8 +981,20 @@ void COIEDevice::ClearCurrentRecording()
 	lockInstance()->ClearCurrentRecording();
 }
 
-IDataRecording* COIEDevice::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)
+
+bool COIEDevice::IsLoggedIn()
 {
-	auto pRecordingInstance = lockInstance()->LoadRecordingFromBuild(pBuild, sDataUUID);
-	return new CDataRecording(pRecordingInstance);
+	return lockInstance()->isLoggedIn();
+}
+
+bool COIEDevice::IsStreaming()
+{
+	return lockInstance()->isStreaming();
+
+}
+
+bool COIEDevice::RTCIsBusy()
+{
+	return lockInstance()->rtcIsBusy();
+
 }

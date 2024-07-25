@@ -182,6 +182,26 @@ typedef void * LibMCDriver_BuR_pvoid;
 #define LIBMCDRIVER_BUR_ERROR_NOTCPPROTOCOLNODE 1084 /** No TCP Protocol Node. */
 #define LIBMCDRIVER_BUR_ERROR_NOPACKETSIGNATURE 1085 /** No Packet Signature. */
 #define LIBMCDRIVER_BUR_ERROR_INVALIDPACKETSIGNATURE 1086 /** Invalid Packet Signature. */
+#define LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEBURSCHEMAJSON 1087 /** Could not parse schema json. */
+#define LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEJOURNALSCHEMA 1088 /** Could not parse journal schema. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASNOVERSIONIDENTIFIER 1089 /** Journal schema has no version identifier. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVERSIONIDENTIFIER 1090 /** Journal schema has invalid version identifier. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASNOGROUPINFORMATION 1091 /** Journal schema has no group information. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPINFORMATION 1092 /** Journal schema has invalid group information. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPNAME 1093 /** Journal schema misses group name. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPNAME 1094 /** Journal schema has invalid group name. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPID 1095 /** Journal schema misses group id. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPVALUES 1096 /** Journal schema misses group values. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPID 1097 /** Journal schema has invalid group id. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPVALUES 1098 /** Journal schema has invalid group values. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUETYPE 1099 /** Journal schema misses value type. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUENAME 1100 /** Journal schema misses value name. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUEID 1101 /** Journal schema misses value id. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUESIZE 1102 /** Journal schema misses value size. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUETYPE 1103 /** Journal schema misses value type. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUENAME 1104 /** Journal schema misses value name. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUEID 1105 /** Journal schema misses value id. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUESIZE 1106 /** Journal schema misses value size. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_BuR
@@ -276,6 +296,26 @@ inline const char * LIBMCDRIVER_BUR_GETERRORSTRING (LibMCDriver_BuRResult nError
     case LIBMCDRIVER_BUR_ERROR_NOTCPPROTOCOLNODE: return "No TCP Protocol Node.";
     case LIBMCDRIVER_BUR_ERROR_NOPACKETSIGNATURE: return "No Packet Signature.";
     case LIBMCDRIVER_BUR_ERROR_INVALIDPACKETSIGNATURE: return "Invalid Packet Signature.";
+    case LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEBURSCHEMAJSON: return "Could not parse schema json.";
+    case LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEJOURNALSCHEMA: return "Could not parse journal schema.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASNOVERSIONIDENTIFIER: return "Journal schema has no version identifier.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVERSIONIDENTIFIER: return "Journal schema has invalid version identifier.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASNOGROUPINFORMATION: return "Journal schema has no group information.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPINFORMATION: return "Journal schema has invalid group information.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPNAME: return "Journal schema misses group name.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPNAME: return "Journal schema has invalid group name.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPID: return "Journal schema misses group id.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPVALUES: return "Journal schema misses group values.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPID: return "Journal schema has invalid group id.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPVALUES: return "Journal schema has invalid group values.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUETYPE: return "Journal schema misses value type.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUENAME: return "Journal schema misses value name.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUEID: return "Journal schema misses value id.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUESIZE: return "Journal schema misses value size.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUETYPE: return "Journal schema misses value type.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUENAME: return "Journal schema misses value name.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUEID: return "Journal schema misses value id.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUESIZE: return "Journal schema misses value size.";
     default: return "unknown error";
   }
 }

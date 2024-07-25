@@ -57,14 +57,17 @@ using namespace LibMCEnv::Impl;
  Class definition of CBuild 
 **************************************************************************************************************************/
 
-CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, AMCCommon::PChrono pGlobalChrono)
+CBuild::CBuild(LibMCData::PDataModel pDataModel, const std::string& sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono)
 	: m_pDataModel(pDataModel),
 	m_sBuildJobUUID(AMCCommon::CUtils::normalizeUUIDString(sBuildJobUUID)),
 	m_pToolpathHandler(pToolpathHandler),
+	m_pMeshHandler (pMeshHandler),
 	m_pGlobalChrono (pGlobalChrono)
 {
 	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pMeshHandler.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);	
 	if (pDataModel.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pGlobalChrono.get () == nullptr)
@@ -155,7 +158,7 @@ IToolpathAccessor * CBuild::CreateToolpathAccessor()
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 
 	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
-	return new CToolpathAccessor(sStreamUUID, pBuildJob->GetUUID(), m_pToolpathHandler);
+	return new CToolpathAccessor(sStreamUUID, pBuildJob->GetUUID(), m_pToolpathHandler, m_pMeshHandler);
 }
 
 
@@ -478,7 +481,7 @@ IBuildExecution* CBuild::StartExecution(const std::string& sDescription, const s
 
 	auto pExecutionData = pBuildJob->CreateBuildJobExecution(sDescription, sNormalizedUserUUID, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
-	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono);
+	return new CBuildExecution (pExecutionData, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
 
 }
 
@@ -504,7 +507,7 @@ IBuildExecution* CBuild::FindExecution(const std::string& sExecutionUUID)
 
 	auto pExecutionData = pBuildJob->RetrieveBuildJobExecution(sNormalizedExecutionUUID);
 
-	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono);
+	return new CBuildExecution(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
 }
 
 IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSession)
@@ -523,7 +526,7 @@ IBuildExecutionIterator* CBuild::ListExecutions(const bool bOnlyCurrentJournalSe
 	auto pIterator = pBuildJob->RetrieveBuildJobExecutions (sJournalUUIDFilter);
 	while (pIterator->MoveNext()) {
 		auto pExecutionData = pIterator->GetCurrentJobExecution();
-		pResult->AddBuildExecution (std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono));
+		pResult->AddBuildExecution (std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono));
 	}
 
 	return pResult.release();
@@ -554,7 +557,7 @@ IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildEx
 	auto pIterator = pBuildJob->RetrieveBuildJobExecutionsByStatus(eLibMCDataStatus, sJournalUUIDFilter);
 	while (pIterator->MoveNext()) {
 		auto pExecutionData = pIterator->GetCurrentJobExecution();
-		pResult->AddBuildExecution(std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono));
+		pResult->AddBuildExecution(std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono));
 	}
 
 	return pResult.release();

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,91 +29,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "amc_service.hpp"
-#include "amc_servicehandler.hpp"
+#ifndef __AMC_MESHSCENEITEM
+#define __AMC_MESHSCENEITEM
 
-#include "common_utils.hpp"
-#include "libmc_exceptiontypes.hpp"
-
-
+#include <memory>
+#include <map>
+#include <string>
+#include <cstdint>
+#include <vector>
+#include "libmcenv_types.hpp"
 
 namespace AMC {
+
+
+	class CMeshSceneItem {
+	private:
+
+		std::string m_sUUID;
+
+		std::string m_sMeshEntityUUID;
+		
+		LibMCEnv::sModelDataTransform m_Transform;
+
+	public:
+
+		CMeshSceneItem(const std::string & sUUID, const std::string & sMeshEntityUUID);
+
+		virtual ~CMeshSceneItem();
+
+		std::string getUUID();
+
+		std::string getMeshEntityUUID();
+
+		LibMCEnv::sModelDataTransform getTransform();
+
+		void updateTransform(const LibMCEnv::sModelDataTransform newTransform);
+
+	};
+
+	typedef std::shared_ptr<CMeshSceneItem> PMeshSceneItem;
+
 	
-	CService::CService(CServiceHandler* pServiceHandler)
-		: m_pServiceHandler (pServiceHandler), m_bHasBeenExecuted (false), m_bIsRunning (false)
-	{
-		LibMCAssertNotNull(pServiceHandler);
-
-	}
-
-	CService::~CService()
-	{
-	}
-
-
-	void serviceRunners(CService* pService)
-	{
-		if (pService)
-			pService->executeThreadedEx();
-	}
-
-	void CService::executeThreaded()
-	{
-		setIsRunning(true);
-
-
-		executeThreadedEx();
-
-		//std::thread Thread (serviceRunners, this);
-	}
-
-	void CService::executeThreadedEx()
-	{
-		try {
-			executeBlocking();
-
-			setIsRunning(false);
-
-		}
-		catch (std::exception & E) {
-			setIsRunning(false);
-			m_pServiceHandler->logMessage(E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);
-		}
-
-		m_pServiceHandler->handleQueue();
-	}
-
-	void CService::setHasBeenExecuted(bool bValue)
-	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		m_bHasBeenExecuted = bValue;
-	}
-
-	void CService::setIsRunning(bool bValue)
-	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		m_bIsRunning = bValue;
-	}
-
-	bool CService::getHasBeenExecuted()
-	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		return m_bHasBeenExecuted;
-	}
-
-	bool CService::getIsRunning()
-	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		return m_bIsRunning;
-	}
-
-	CServiceHandler* CService::getServiceHandler()
-	{
-		return m_pServiceHandler;
-	}
-
-
-
 }
 
+
+#endif //__AMC_MESHSCENEITEM
 

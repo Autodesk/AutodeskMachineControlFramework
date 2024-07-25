@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,60 +29,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_SERVICEHANDLER
-#define __AMC_SERVICEHANDLER
+#ifndef __AMC_MESHUTILS
+#define __AMC_MESHUTILS
 
-#include "amc_service.hpp"
-#include "amc_logger.hpp"
-
-#include <memory>
-#include <string>
-#include <set>
-#include <queue>
-
-#define SERVICETHREADCOUNT_MIN 2
-#define SERVICETHREADCOUNT_MAX 128
-#define SERVICETHREADCOUNT_DEFAULT 8
+#include "libmcenv_types.hpp"
+#include "lib3mf/lib3mf_types.hpp"
 
 namespace AMC {
 
-	class CServiceHandler;
-	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
-
-	class CService;
-	typedef std::shared_ptr<CService> PService;
-
-	class CServiceHandler {
-	private:
-
-		uint32_t m_nMaxThreadCount;
-		std::mutex m_Mutex;
-		std::queue<PService> m_QueuedServices;
-		std::set<PService> m_RunningServices;
-		std::set<PService> m_FinishedServices;
-
-		PLogger m_pLogger;
-
+	class CMeshUtils {
 
 	public:
 
-		CServiceHandler(PLogger pLogger);
-		virtual ~CServiceHandler();
+		static LibMCEnv::sModelDataTransform map3MFTransform(const Lib3MF::sTransform transform3MF);
 
-		void addServiceToQueue (PService pService);
+		static LibMCEnv::sModelDataTransform createIdentityTransform();
 
-		void handleQueue();
-
-		void clearGarbage();
-
-		void logMessage(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel);
-
-		void setMaxThreadCount(uint32_t nMaxThreadCount);
-
+		static LibMCEnv::sModelDataTransform multiplyTransforms(const LibMCEnv::sModelDataTransform& transform1, const LibMCEnv::sModelDataTransform& transform2);
 	};
+
 
 }
 
-
-#endif //__AMC_SERVICEHANDLER
+#endif //__AMC_MESHUTILS
 

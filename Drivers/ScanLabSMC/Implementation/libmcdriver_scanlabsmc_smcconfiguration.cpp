@@ -248,6 +248,10 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
 
     newCorrectionFile = pWorkingDirectory->StoreCustomDataInTempFile("ct5", m_CorrectionFileData);
 
+    pWorkingDirectory->StoreCustomData("RTC6RBF.rbf", m_FPGAData);
+    pWorkingDirectory->StoreCustomData("RTC6ETH.out", m_FirmwareData);
+    pWorkingDirectory->StoreCustomData("RTC6DAT.dat", m_AuxiliaryData);
+
     std::string sBaseDirectoryPath = pWorkingDirectory->GetAbsoluteFilePath();
     std::string sCorrectionFilePath = newCorrectionFile->GetAbsoluteFileName();
     std::string sLogFilePath = pWorkingDirectory->GetAbsoluteFilePath() + "/log.txt";
@@ -258,8 +262,8 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     pXMLDocument->RegisterNamespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
 
     auto pConfigurationNode = pXMLDocument->GetRootNode();
-    pConfigurationNode->AddAttribute("", "Version", "0.6");
-    pConfigurationNode->AddAttribute("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation", "cfg SCANmotionControl_0_6.xsd");
+    pConfigurationNode->AddAttribute("", "Version", "0.8");
+    pConfigurationNode->AddAttribute("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation", "cfg SCANmotionControl_0_8.xsd");
 
     auto pGeneralConfigNode = pConfigurationNode->AddChild("", "GeneralConfig");
     auto pDynamicViolationReaction = pGeneralConfigNode->AddChildText("", "DynamicViolationReaction", "WarningOnly");
@@ -275,7 +279,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     pGeneralConfigNode->AddChildText("", "BaseDirectoryPath", sBaseDirectoryPath);
 
     auto pSimulationConfigNode = pGeneralConfigNode->AddChild("", "SimulationConfig");
-    pSimulationConfigNode->AddChildText("", "SimulationMode", "true");
+    pSimulationConfigNode->AddChildText("", "SimulationMode", "false");
     pSimulationConfigNode->AddChildText("", "SimOutputFileDirectory", "[BaseDirectoryPath]/Simulate/");
     pSimulationConfigNode->AddChildText("", "BinaryOutput", "false");
     pSimulationConfigNode->AddChildText("", "DisableFileOutput", "false");
@@ -343,7 +347,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
 
     auto pCorrectionFileListNode = pScanDeviceNode->AddChild("", "CorrectionFileList");
     auto pCorrectionFilePathNode = pCorrectionFileListNode->AddChildText("", "CorrectionFilePath", sCorrectionFilePath);
-    pCorrectionFilePathNode->AddAttribute("", "CalibrationFactor", "-1");
+    pCorrectionFilePathNode->AddAttribute("", "CalibrationFactor", "10000");
 
     auto pAlignmentNode = pScanDeviceNode->AddChild("", "Alignment");
     auto pAlignmentMatrixNode = pAlignmentNode->AddChild("", "Matrix");
@@ -446,7 +450,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
 
     auto pIOConfigNode = pConfigurationNode->AddChild("", "IOConfig");
 
-    auto pDefaultOutputsNode = pIOConfigNode->AddChild("", "DefaultOutputs");
+    auto pDefaultOutputsNode = pIOConfigNode->AddChild("", "PortDefaults");
     auto pDefaultOutputsLaserPinOutNode = pDefaultOutputsNode->AddChild("", "LaserPinOut");
     pDefaultOutputsLaserPinOutNode->AddAttribute("", "Format", "Bitpattern");
     pDefaultOutputsLaserPinOutNode->AddAttribute("", "Value", "1");
@@ -458,24 +462,24 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     pDefaultOutputsAnalogOut2Node->AddAttribute("", "Value", "0.5"); 
 
     auto pLaserInitSequenceNode = pIOConfigNode->AddChild("", "LaserInitSequence");
-    auto pLaserInitSequenceAnalogOut1Node = pLaserInitSequenceNode->AddChild("", "SetAnalogOut1");
+    auto pLaserInitSequenceAnalogOut1Node = pLaserInitSequenceNode->AddChild("", "AnalogOut1");
     pLaserInitSequenceAnalogOut1Node->AddAttribute("", "Format", "Factor");
     pLaserInitSequenceAnalogOut1Node->AddAttribute("", "Value", "0.5");
-    auto pLaserInitSequenceAnalogOut2Node = pLaserInitSequenceNode->AddChild("", "SetAnalogOut2");
+    auto pLaserInitSequenceAnalogOut2Node = pLaserInitSequenceNode->AddChild("", "AnalogOut2");
     pLaserInitSequenceAnalogOut2Node->AddAttribute("", "Format", "Factor");
     pLaserInitSequenceAnalogOut2Node->AddAttribute("", "Value", "0.5");
-    auto pLaserInitSequencePinOutNode = pLaserInitSequenceNode->AddChild("", "SetLaserPinOut");
+    auto pLaserInitSequencePinOutNode = pLaserInitSequenceNode->AddChild("", "LaserPinOut");
     pLaserInitSequencePinOutNode->AddAttribute("", "Format", "Bitpattern");
     pLaserInitSequencePinOutNode->AddAttribute("", "Value", "1");
 
     auto pLaserShutdownSequenceNode = pIOConfigNode->AddChild("", "LaserShutdownSequence");
-    auto pLaserShutdownSequencePinOutNode = pLaserShutdownSequenceNode->AddChild("", "SetLaserPinOut");
+    auto pLaserShutdownSequencePinOutNode = pLaserShutdownSequenceNode->AddChild("", "LaserPinOut");
     pLaserShutdownSequencePinOutNode->AddAttribute("", "Format", "Bitpattern");
     pLaserShutdownSequencePinOutNode->AddAttribute("", "Value", "0");
-    auto pLaserShutdownSequenceAnalogOut2Node = pLaserShutdownSequenceNode->AddChild("", "SetAnalogOut2");
+    auto pLaserShutdownSequenceAnalogOut2Node = pLaserShutdownSequenceNode->AddChild("", "AnalogOut2");
     pLaserShutdownSequenceAnalogOut2Node->AddAttribute("", "Format", "Factor");
     pLaserShutdownSequenceAnalogOut2Node->AddAttribute("", "Value", "0");
-    auto pLaserShutdownSequenceAnalogOut1Node = pLaserShutdownSequenceNode->AddChild("", "SetAnalogOut1");
+    auto pLaserShutdownSequenceAnalogOut1Node = pLaserShutdownSequenceNode->AddChild("", "AnalogOut1");
     pLaserShutdownSequenceAnalogOut1Node->AddAttribute("", "Format", "Factor");
     pLaserShutdownSequenceAnalogOut1Node->AddAttribute("", "Value", "0");
 

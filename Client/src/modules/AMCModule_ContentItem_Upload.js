@@ -50,6 +50,15 @@ export default class AMCApplicationItem_Content_Upload extends Common.AMCApplica
 		this.uploadfilename = "";
 		this.uploadisinitial = 1;
 		this.uploadissaving = 0;
+		this.acceptedtypes = "";
+				
+		if (this.uploadclass == "build") {
+			this.acceptedtypes = ".3mf";
+		}
+
+		if (this.uploadclass == "image") {
+			this.acceptedtypes = ".png,.jpg";
+		}
 				
 		this.state = new AMCUploadState (this.uuid);
 		

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <thread>
 #include <mutex>
+#include <set>
 
 #include "amc_toolpathlayerdata.hpp"
 #include "amc_toolpathpart.hpp"
@@ -72,13 +73,17 @@ namespace AMC {
 		std::map<std::pair<std::string, std::string>, PToolpathCustomSegmentAttribute> m_CustomSegmentAttributeMap;
 		std::vector<PToolpathCustomSegmentAttribute> m_CustomSegmentAttributes;
 
+		std::map<std::string, Lib3MF::PAttachment> m_Attachments;
+
 		std::string m_sDebugName;
 
 		void copyMetaDataNode (AMC::PXMLDocumentNodeInstance pTargetNodeInstance, Lib3MF::PCustomXMLNode pSourceNodeInstance);
 
+		Lib3MF::PAttachment findBinaryMetaData(const std::string& sPath, bool bMustExist);
+
 	public:
 
-		CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string & sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
+		CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string & sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName, bool bAllowEmptyToolpath, const std::set<std::string> & attachmentRelationsToRead);
 		virtual ~CToolpathEntity();		
 
 		void IncRef();
@@ -105,6 +110,16 @@ namespace AMC {
 		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 
 		void registerCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, const LibMCEnv::eToolpathAttributeType eAttributeType);
+
+		bool readThumbnail (std::vector<uint8_t>& thumbnailBuffer, std::string & sMimeType);
+
+		bool hasBinaryMetaData(const std::string& sPath);
+
+		void getBinaryMetaData(const std::string& sPath, uint64_t nMetaDataBufferSize, uint64_t* pMetaDataNeededCount, uint8_t* pMetaDataBuffer);
+
+		std::string getBinaryMetaDataRelationship(const std::string& sPath);
+
+
 	};
 
 	

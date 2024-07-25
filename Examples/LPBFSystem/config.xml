@@ -205,8 +205,8 @@
 
 		<parametergroup name="cardconfig" description="Scanner Card Config">
 			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlab" type="string"/>
-			<parameter name="serial" description="Serial" default="341731" type="int"/>
-			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.0.1" type="string"/>
+			<parameter name="serial" description="Serial" default="332663" type="int"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.1.200" type="string"/>
 			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string"/>
 			<parameter name="port" description="Port" default="49374" type="int"/>
 			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
@@ -220,7 +220,7 @@
 		</parametergroup>
 
 		<parametergroup name="correction" description="Scanlab Correction Data">
-			<parameter name="resourcename" description="Correction resource name" default="d2_1238" type="string"/>
+			<parameter name="resourcename" description="Correction resource name" default="D3_3326" type="string"/>
 			<parameter name="tableindex" description="Correction table index" default="1" type="int"/>
 			<parameter name="dimension" description="Correction file dimension" default="3" type="int"/>
 			<parameter name="tablenumbera" description="Table number head A" default="1" type="int"/>
@@ -449,7 +449,7 @@
 				
         <buildlist loadingtext="Loading builds" entriesperpage="20" selectevent="onselectbuild" thumbnail="thumbnail_default">
           <button name="selectbuild" caption="Select" event="onselectbuild"/>
-          <button name="view3d" caption="View in 3D" event=""/>
+          <button name="view3d" caption="View in 3D" event="onviewin3d"/>
           <button name="viewhistory" caption="Show History" event=""/>
           <button name="fakejob" caption="Run Fake Job" event="onfakejob"/>
         </buildlist>
@@ -638,7 +638,7 @@
       <glscene name="glscene1">
 
         <models>
-          <model name="platform" resource="bptest" />
+
         </models>
 
         <lights>
@@ -655,13 +655,13 @@
 
         <scene>
           
-          <instance name="platform_view" model="platform" visible="1">
+<!--          <instance name="platform_view" model="platform" visible="1">
             <color red="0.8" green="0.9" blue="0.5" shininess="50" specular_red="0.1" specular_green="0.1" specular_blue="0.1" />
             
             <position x="100" y="20" z="30" />
             <transform m11="1.0" m12="0.0" m13="0.0" m21="0.0" m22="1.0" m23="0.0" m31="0.0" m32="0.0" m33="0.0" />
             
-          </instance>
+          </instance> -->
 
 
         </scene>

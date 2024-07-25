@@ -611,6 +611,19 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_EXECUTIONLISTNAMEMISSING 594 /** Execution list name missing */
 #define LIBMC_ERROR_BUILDLISTBUTTONNAMEMISSING 595 /** Build list button name missing */
 #define LIBMC_ERROR_EXECUTIONLISTBUTTONNAMEMISSING 596 /** Build execution button name missing */
+#define LIBMC_ERROR_BUILDHASNOTOOLPATH 597 /** Build has not toolpath */
+#define LIBMC_ERROR_MISSINGUPLOADCONTEXT 598 /** Missing upload context */
+#define LIBMC_ERROR_INVALIDUPLOADCONTEXT 599 /** Build has not toolpath */
+#define LIBMC_ERROR_MESHHASTOOMANYVERTICES 600 /** Mesh has too many vertices */
+#define LIBMC_ERROR_MESHHASTOOMANYTRIANGLES 601 /** Mesh has too many triangles */
+#define LIBMC_ERROR_INVALIDXMLNODEORATTRIBUTENAME 602 /** Invalid XML node or attribute name */
+#define LIBMC_ERROR_XMLNAMESPACENOTREGISTERED 603 /** XML Namespace not registered */
+#define LIBMC_ERROR_COULDNOTFINDMESHSCENE 604 /** Could not find mesh scene */
+#define LIBMC_ERROR_COULDNOTFINDMESHSCENEITEM 605 /** Could not find mesh scene item */
+#define LIBMC_ERROR_INVALIDMESHSCENEITEMINDEX 606 /** Invalid Mesh Scene Item Index */
+#define LIBMC_ERROR_INTERNALMETADATAERROR 607 /** Internal metadata error */
+#define LIBMC_ERROR_INVALIDBINARYMETADATAPATH 608 /** Invalid Binary metadata path */
+#define LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND 609 /** Binary metadata path not found */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1134,6 +1147,19 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_EXECUTIONLISTNAMEMISSING: return "Execution list name missing";
     case LIBMC_ERROR_BUILDLISTBUTTONNAMEMISSING: return "Build list button name missing";
     case LIBMC_ERROR_EXECUTIONLISTBUTTONNAMEMISSING: return "Build execution button name missing";
+    case LIBMC_ERROR_BUILDHASNOTOOLPATH: return "Build has not toolpath";
+    case LIBMC_ERROR_MISSINGUPLOADCONTEXT: return "Missing upload context";
+    case LIBMC_ERROR_INVALIDUPLOADCONTEXT: return "Build has not toolpath";
+    case LIBMC_ERROR_MESHHASTOOMANYVERTICES: return "Mesh has too many vertices";
+    case LIBMC_ERROR_MESHHASTOOMANYTRIANGLES: return "Mesh has too many triangles";
+    case LIBMC_ERROR_INVALIDXMLNODEORATTRIBUTENAME: return "Invalid XML node or attribute name";
+    case LIBMC_ERROR_XMLNAMESPACENOTREGISTERED: return "XML Namespace not registered";
+    case LIBMC_ERROR_COULDNOTFINDMESHSCENE: return "Could not find mesh scene";
+    case LIBMC_ERROR_COULDNOTFINDMESHSCENEITEM: return "Could not find mesh scene item";
+    case LIBMC_ERROR_INVALIDMESHSCENEITEMINDEX: return "Invalid Mesh Scene Item Index";
+    case LIBMC_ERROR_INTERNALMETADATAERROR: return "Internal metadata error";
+    case LIBMC_ERROR_INVALIDBINARYMETADATAPATH: return "Invalid Binary metadata path";
+    case LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND: return "Binary metadata path not found";
     default: return "unknown error";
   }
 }
@@ -1143,6 +1169,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCHandle LibMC_Base;
+typedef LibMCHandle LibMC_StreamData;
+typedef LibMCHandle LibMC_StreamConnection;
 typedef LibMCHandle LibMC_APIRequestHandler;
 typedef LibMCHandle LibMC_MCContext;
 

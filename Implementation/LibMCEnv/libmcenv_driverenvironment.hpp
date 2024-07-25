@@ -40,6 +40,7 @@ Abstract: This is the class declaration of CDriverEnvironment
 #include "amc_parametergroup.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_toolpathhandler.hpp"
+#include "amc_meshhandler.hpp"
 #include "common_chrono.hpp"
 #include "amc_logger.hpp"
 
@@ -76,6 +77,7 @@ protected:
 	AMC::PResourcePackage m_pDriverResourcePackage;
 	AMC::PResourcePackage m_pMachineResourcePackage;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	AMC::PMeshHandler m_pMeshHandler;
 	LibMCData::PDataModel m_pDataModel;
 	AMC::PLogger m_pLogger;
 
@@ -83,7 +85,7 @@ protected:
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName);
 
 	virtual ~CDriverEnvironment();
 

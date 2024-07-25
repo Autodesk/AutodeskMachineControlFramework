@@ -59,6 +59,31 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
+		auto pXMLDocument = pUIEnvironment->CreateXMLDocument("rootnode", "http://test.com/namespace");
+
+		auto pRootNode = pXMLDocument->GetRootNode();
+		auto pTestNode = pRootNode->AddChild("", "testNode");
+		pTestNode->AddAttribute("", "myattribute", "1234");
+		pTestNode->AddAttribute("", "myattribute2", "123532454");
+
+		auto sXMLString = pXMLDocument->SaveToString(true);
+
+		pUIEnvironment->LogMessage(sXMLString);
+
+		auto pNewDocument = pUIEnvironment->ParseXMLString(sXMLString);
+		auto pNewRootNode = pNewDocument->GetRootNode();
+
+		auto pNewSubNode = pNewRootNode->FindChild("", "testNode", true);
+		pNewSubNode->AddAttribute("", "newattribute", "abc");
+
+		pNewSubNode->RemoveAttribute("", "myattribute");
+		pNewSubNode->RemoveAttribute("", "myattribute2");
+
+		auto sNewXMLString = pNewDocument->SaveToString(true);
+
+		pUIEnvironment->LogMessage(sNewXMLString);
+
+
 		/*auto pBuildJob = pUIEnvironment->GetBuildJob("12345");
 
 		auto pBuildFile = pUIEnvironment->FindStream (pBuildJob->GetStorageUUID());
@@ -80,7 +105,7 @@ public:
 		pUIEnvironment->StartStreamDownload(pZIPStream->GetUUID()); */
 
 
-		pUIEnvironment->LogMessage("Clicked on Logout: " + pUIEnvironment->GetCurrentUserLogin ());
+		/*pUIEnvironment->LogMessage("Clicked on Logout: " + pUIEnvironment->GetCurrentUserLogin());
 		pUIEnvironment->LogMessage("User Role: " + pUIEnvironment->GetCurrentUserRole());
 		pUIEnvironment->LogMessage("User Language: " + pUIEnvironment->GetCurrentUserLanguage());
 		pUIEnvironment->LogMessage("User UUID: " + pUIEnvironment->GetCurrentUserUUID());
@@ -89,7 +114,7 @@ public:
 		pUIEnvironment->LogMessage("User Permission for permission_that_nobody_has: " + std::to_string(pUIEnvironment->CheckPermission("permission_that_nobody_has")));
 		pUIEnvironment->LogMessage("User Permission for permission_view_builds: " + std::to_string(pUIEnvironment->CheckPermission("permission_view_builds")));
 		pUIEnvironment->LogMessage("User Permission for permission_invalid: " + std::to_string(pUIEnvironment->CheckPermission("permission_invalid")));
-		pUIEnvironment->LogOut();
+		pUIEnvironment->LogOut();  */
 
 	}
 
@@ -415,6 +440,73 @@ public:
 };
 
 
+class CEvent_OnViewIn3D : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onviewin3d";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		auto sSender = pUIEnvironment->RetrieveEventSender();
+		pUIEnvironment->LogMessage("Build item selected from " + sSender);
+
+		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
+		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
+
+		auto sButtonUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "buttonuuid");
+		pUIEnvironment->LogMessage("Button UUID " + sButtonUUID);
+
+		auto pBuildJob = pUIEnvironment->GetBuildJob(sBuildUUID);
+		pUIEnvironment->LogMessage("View in 3D");
+		pBuildJob->LoadToolpath();
+
+		std::string sBinaryMetaDataName = "layer0_headA";
+		auto pToolpathAccessor = pBuildJob->CreateToolpathAccessor();
+
+		if (pToolpathAccessor->HasBinaryMetaData(sBinaryMetaDataName)) {
+
+			std::vector<uint8_t> buffer;
+			pToolpathAccessor->GetBinaryMetaData(sBinaryMetaDataName, buffer);
+
+			pUIEnvironment->LogMessage("Binary metadata size of " + sBinaryMetaDataName + ": " + std::to_string(buffer.size()));
+		}
+
+		auto pSceneHandler = pUIEnvironment->CreateSceneHandler();
+		auto pMeshScene = pSceneHandler->CreateEmptyMeshScene(true);
+
+		auto pToolpath = pBuildJob->CreateToolpathAccessor();
+		uint32_t nPartCount = pToolpath->GetPartCount();
+
+		for (uint32_t nPartIndex = 0; nPartIndex < nPartCount; nPartIndex++) {
+			auto pPart = pToolpath->GetPart(nPartIndex);
+			pUIEnvironment->LogMessage("Part: " + pPart->GetName ());
+
+			auto pComponent = pPart->GetRootComponent();
+			uint32_t nSolidCount = pComponent->GetSolidCount();
+			pUIEnvironment->LogMessage("Solids: " + std::to_string (nSolidCount));
+
+			for (uint32_t nIndex = 0; nIndex < nSolidCount; nIndex++) {
+				auto pMesh = pComponent->GetSolidMesh(nIndex);
+				auto pMeshData = pMesh->CreatePersistentMesh (false);
+				pUIEnvironment->LogMessage ("triangle count:" + std::to_string (pMeshData->GetTriangleCount()));
+				pUIEnvironment->LogMessage("persistent mesh uuid: " + pMeshData->GetUUID ());
+
+				pMeshScene->AddSceneItem(pMeshData, pMesh->GetAbsoluteTransform());
+			}
+
+
+		}
+
+	}
+
+};
+
+
+
 class CEvent_OnFakeJob : public virtual CEvent {
 
 public:
@@ -432,19 +524,21 @@ public:
 		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
 		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
 
-		auto sButtonUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "buttonuuid");
+		auto sButtonUUID = pUIEnvironment
+			->GetUIPropertyAsUUID(sSender, "buttonuuid");
 		pUIEnvironment->LogMessage("Button UUID " + sButtonUUID);
 
 		auto pBuildJob = pUIEnvironment->GetBuildJob(sBuildUUID);
 		auto pExecution = pBuildJob->StartExecution("This is a test description", pUIEnvironment->GetCurrentUserUUID());
 
-		std::this_thread::sleep_for(std::chrono::milliseconds (5000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
 		pExecution->SetStatusToFinished();
 
 	}
 
 };
+
 
 class CEvent_OnChangeSimulationParameterEvent : public virtual CEvent {
 
@@ -646,6 +740,8 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 	if (createEventInstanceByName<CEvent_TestJournal>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnFakeJob>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnViewIn3D>(sEventName, pEventInstance))
 		return pEventInstance;
 	
 

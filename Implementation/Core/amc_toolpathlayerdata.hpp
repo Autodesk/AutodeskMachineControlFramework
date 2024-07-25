@@ -50,8 +50,9 @@ namespace AMC {
 		LibMCEnv::eToolpathSegmentType m_Type;
 		uint32_t m_PointStartIndex;
 		uint32_t m_PointCount;
-		uint32_t m_ProfileID;
-		uint32_t m_PartID;
+		uint32_t m_ProfileUUID;
+		uint32_t m_PartUUID;
+		uint32_t m_LocalPartID;
 		int64_t* m_AttributeData;
 	} sToolpathLayerSegment;
 
@@ -146,6 +147,7 @@ namespace AMC {
 
 		std::string getSegmentProfileUUID(const uint32_t nSegmentIndex);
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);
+		uint32_t getSegmentLocalPartID(const uint32_t nSegmentIndex);
 		PToolpathLayerProfile getSegmentProfile(const uint32_t nSegmentIndex);
 
 		bool findCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sName, uint32_t& nAttributeID, LibMCEnv::eToolpathAttributeType & attributeType);

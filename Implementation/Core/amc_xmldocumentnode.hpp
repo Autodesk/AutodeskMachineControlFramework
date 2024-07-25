@@ -70,13 +70,15 @@ namespace AMC {
 
 		void addChildEx(PXMLDocumentNodeInstance pNode);
 
+		void splitNameSpaceName(const std::string & sPrefixedName, std::string & sUnprefixedName, std::string & sNameSpacePrefix);
+
 	public:
 
 		CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, CXMLDocumentNodeInstance * pParentNode, PXMLDocumentNameSpace pNameSpace, const std::string& sNodeName);
 		
 		virtual ~CXMLDocumentNodeInstance();
 
-		void extractFromPugiNode (pugi::xml_document * pXMLDocument, pugi::xml_node * pXMLNode);
+		void extractFromPugiNode (pugi::xml_document * pXMLDocument, pugi::xml_node * pXMLNode, bool bIsRoot);
 
 		void storeToPugiNode(pugi::xml_document* pXMLDocument, pugi::xml_node* pXMLNode);
 

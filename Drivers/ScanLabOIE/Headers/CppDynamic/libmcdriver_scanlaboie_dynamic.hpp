@@ -240,6 +240,11 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE: return "NOSENSORVALUESAVAILABLE";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE: return "NOADDITIONALVALUESAVAILABLE";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX: return "INVALIDADDITIONALINDEX";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE: return "OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTIN100KHZMODE: return "OIEDRIVERTYPEISNOTIN100KHZMODE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEEXECUTIONMODE: return "INVALIDOIEEXECUTIONMODE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_POSITIONMISSINGINOIERTCIDLIST: return "POSITIONMISSINGINOIERTCIDLIST";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE: return "INVALIDOIEDEVICESTATE";
 		}
 		return "UNKNOWN";
 	}
@@ -310,6 +315,11 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE: return "No Sensor values available.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE: return "No Additional values available.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX: return "Invalid additional index.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE: return "OIE Driver Type is not in compatibility mode.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTIN100KHZMODE: return "OIE Driver Type is not in 100kHz mode.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEEXECUTIONMODE: return "Invalid OIE Execution mode.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_POSITIONMISSINGINOIERTCIDLIST: return "Position missing in OIE RTC ID List.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE: return "Invalid OIE device state.";
 		}
 		return "unknown error";
 	}
@@ -602,6 +612,7 @@ public:
 	inline std::string GetDeviceName();
 	inline void SetHostName(const std::string & sHostName);
 	inline std::string GetHostName();
+	inline void SetRTC6IPAddress(const std::string & sRTC6IPAddress);
 	inline void SetPort(const LibMCDriver_ScanLabOIE_uint32 nPort);
 	inline LibMCDriver_ScanLabOIE_uint32 GetPort();
 	inline bool IsConnected();
@@ -627,7 +638,9 @@ public:
 	inline void UninstallAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
 	inline PDataRecording RetrieveCurrentRecording();
 	inline void ClearCurrentRecording();
-	inline PDataRecording LoadRecordingFromBuild(classParam<LibMCEnv::CBuild> pBuild, const std::string & sDataUUID);
+	inline bool IsLoggedIn();
+	inline bool IsStreaming();
+	inline bool RTCIsBusy();
 };
 	
 /*************************************************************************************************************************
@@ -822,6 +835,7 @@ public:
 		pWrapperTable->m_OIEDevice_GetDeviceName = nullptr;
 		pWrapperTable->m_OIEDevice_SetHostName = nullptr;
 		pWrapperTable->m_OIEDevice_GetHostName = nullptr;
+		pWrapperTable->m_OIEDevice_SetRTC6IPAddress = nullptr;
 		pWrapperTable->m_OIEDevice_SetPort = nullptr;
 		pWrapperTable->m_OIEDevice_GetPort = nullptr;
 		pWrapperTable->m_OIEDevice_IsConnected = nullptr;
@@ -847,7 +861,9 @@ public:
 		pWrapperTable->m_OIEDevice_UninstallAppByMinorVersion = nullptr;
 		pWrapperTable->m_OIEDevice_RetrieveCurrentRecording = nullptr;
 		pWrapperTable->m_OIEDevice_ClearCurrentRecording = nullptr;
-		pWrapperTable->m_OIEDevice_LoadRecordingFromBuild = nullptr;
+		pWrapperTable->m_OIEDevice_IsLoggedIn = nullptr;
+		pWrapperTable->m_OIEDevice_IsStreaming = nullptr;
+		pWrapperTable->m_OIEDevice_RTCIsBusy = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_SetOIE3ResourceNames = nullptr;
@@ -1304,6 +1320,15 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_OIEDevice_SetRTC6IPAddress = (PLibMCDriver_ScanLabOIEOIEDevice_SetRTC6IPAddressPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_setrtc6ipaddress");
+		#else // _WIN32
+		pWrapperTable->m_OIEDevice_SetRTC6IPAddress = (PLibMCDriver_ScanLabOIEOIEDevice_SetRTC6IPAddressPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_setrtc6ipaddress");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OIEDevice_SetRTC6IPAddress == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_OIEDevice_SetPort = (PLibMCDriver_ScanLabOIEOIEDevice_SetPortPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_setport");
 		#else // _WIN32
 		pWrapperTable->m_OIEDevice_SetPort = (PLibMCDriver_ScanLabOIEOIEDevice_SetPortPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_setport");
@@ -1529,12 +1554,30 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_OIEDevice_LoadRecordingFromBuild = (PLibMCDriver_ScanLabOIEOIEDevice_LoadRecordingFromBuildPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_loadrecordingfrombuild");
+		pWrapperTable->m_OIEDevice_IsLoggedIn = (PLibMCDriver_ScanLabOIEOIEDevice_IsLoggedInPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_isloggedin");
 		#else // _WIN32
-		pWrapperTable->m_OIEDevice_LoadRecordingFromBuild = (PLibMCDriver_ScanLabOIEOIEDevice_LoadRecordingFromBuildPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_loadrecordingfrombuild");
+		pWrapperTable->m_OIEDevice_IsLoggedIn = (PLibMCDriver_ScanLabOIEOIEDevice_IsLoggedInPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_isloggedin");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_OIEDevice_LoadRecordingFromBuild == nullptr)
+		if (pWrapperTable->m_OIEDevice_IsLoggedIn == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_OIEDevice_IsStreaming = (PLibMCDriver_ScanLabOIEOIEDevice_IsStreamingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_isstreaming");
+		#else // _WIN32
+		pWrapperTable->m_OIEDevice_IsStreaming = (PLibMCDriver_ScanLabOIEOIEDevice_IsStreamingPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_isstreaming");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OIEDevice_IsStreaming == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_OIEDevice_RTCIsBusy = (PLibMCDriver_ScanLabOIEOIEDevice_RTCIsBusyPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_rtcisbusy");
+		#else // _WIN32
+		pWrapperTable->m_OIEDevice_RTCIsBusy = (PLibMCDriver_ScanLabOIEOIEDevice_RTCIsBusyPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_rtcisbusy");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OIEDevice_RTCIsBusy == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1887,6 +1930,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_GetHostName == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_setrtc6ipaddress", (void**)&(pWrapperTable->m_OIEDevice_SetRTC6IPAddress));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_SetRTC6IPAddress == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_setport", (void**)&(pWrapperTable->m_OIEDevice_SetPort));
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_SetPort == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1987,8 +2034,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_ClearCurrentRecording == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_loadrecordingfrombuild", (void**)&(pWrapperTable->m_OIEDevice_LoadRecordingFromBuild));
-		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_LoadRecordingFromBuild == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_isloggedin", (void**)&(pWrapperTable->m_OIEDevice_IsLoggedIn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_IsLoggedIn == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_isstreaming", (void**)&(pWrapperTable->m_OIEDevice_IsStreaming));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_IsStreaming == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_rtcisbusy", (void**)&(pWrapperTable->m_OIEDevice_RTCIsBusy));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_RTCIsBusy == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType));
@@ -2652,6 +2707,15 @@ public:
 	}
 	
 	/**
+	* COIEDevice::SetRTC6IPAddress - Sets the RTC 6 IP Address for data streaming (100kHz mode).
+	* @param[in] sRTC6IPAddress - New RTC6 IP Address. Will only be effective in a StartApp call.
+	*/
+	void COIEDevice::SetRTC6IPAddress(const std::string & sRTC6IPAddress)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_SetRTC6IPAddress(m_pHandle, sRTC6IPAddress.c_str()));
+	}
+	
+	/**
 	* COIEDevice::SetPort - Sets the port of the device. Fails if device is already connected.
 	* @param[in] nPort - New port of device.
 	*/
@@ -2673,7 +2737,7 @@ public:
 	}
 	
 	/**
-	* COIEDevice::IsConnected - Returns if the device is connected and logged in.
+	* COIEDevice::IsConnected - Returns if the device is connected.
 	* @return Flag if the device is connected.
 	*/
 	bool COIEDevice::IsConnected()
@@ -2928,21 +2992,39 @@ public:
 	}
 	
 	/**
-	* COIEDevice::LoadRecordingFromBuild - Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.
-	* @param[in] pBuild - Build that contains the data.
-	* @param[in] sDataUUID - Data UUID of the build data.
-	* @return Recording instance
+	* COIEDevice::IsLoggedIn - Returns if the device is logged in.
+	* @return Flag if the device is logged in.
 	*/
-	PDataRecording COIEDevice::LoadRecordingFromBuild(classParam<LibMCEnv::CBuild> pBuild, const std::string & sDataUUID)
+	bool COIEDevice::IsLoggedIn()
 	{
-		LibMCEnvHandle hBuild = pBuild.GetHandle();
-		LibMCDriver_ScanLabOIEHandle hRecordingInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_LoadRecordingFromBuild(m_pHandle, hBuild, sDataUUID.c_str(), &hRecordingInstance));
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_IsLoggedIn(m_pHandle, &resultValue));
 		
-		if (!hRecordingInstance) {
-			CheckError(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CDataRecording>(m_pWrapper, hRecordingInstance);
+		return resultValue;
+	}
+	
+	/**
+	* COIEDevice::IsStreaming - Returns if the device is streaming.
+	* @return Flag if the device is streaming.
+	*/
+	bool COIEDevice::IsStreaming()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_IsStreaming(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* COIEDevice::RTCIsBusy - Returns if the connected RTC is busy.
+	* @return Flag if the connected RTC is busy.
+	*/
+	bool COIEDevice::RTCIsBusy()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_RTCIsBusy(m_pHandle, &resultValue));
+		
+		return resultValue;
 	}
 	
 	/**

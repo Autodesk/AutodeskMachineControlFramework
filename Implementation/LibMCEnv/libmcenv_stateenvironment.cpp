@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_signalhandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
+#include "libmcenv_scenehandler.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_buildexecution.hpp"
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_journalhandler.hpp"
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_meshobject.hpp"
+#include "libmcenv_persistentmeshobject.hpp"
 #include "libmcenv_alert.hpp"
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
@@ -53,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_zipstreamwriter.hpp"
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
+#include "libmcenv_modeldatacomponentinstance.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -191,7 +194,7 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getGlobalChronoInstance ());
+	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getMeshHandlerInstance(), m_pSystemState->getGlobalChronoInstance ());
 }
 
 bool CStateEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
@@ -217,7 +220,7 @@ IBuildExecution* CStateEnvironment::GetBuildExecution(const std::string& sExecut
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
-	return new CBuildExecution(pBuildExecution, pDataModel, m_pSystemState->getToolpathHandlerInstance(), m_pSystemState->getGlobalChronoInstance());
+	return new CBuildExecution(pBuildExecution, pDataModel, m_pSystemState->getToolpathHandlerInstance(), m_pSystemState->getMeshHandlerInstance (), m_pSystemState->getGlobalChronoInstance());
 
 }
 
@@ -668,7 +671,7 @@ IJournalHandler* CStateEnvironment::GetCurrentJournal()
 	return new CJournalHandler(m_pSystemState->getStateJournalInstance());
 }
 
-IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName)
+/*IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName)
 {
 	auto pUIHandler = m_pSystemState->uiHandler();
 	if (pUIHandler == nullptr)
@@ -688,22 +691,34 @@ IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& s
 	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
 }
 
-bool CStateEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
+*/
+
+
+ISceneHandler* CStateEnvironment::CreateSceneHandler()
 {
+	auto pToolpathHandler = m_pSystemState->getToolpathHandlerInstance();
+	if (pToolpathHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pLib3MFWrapper = pToolpathHandler->getLib3MFWrapper();
+	if (pLib3MFWrapper == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
 	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
-	return pMeshHandler->hasMeshEntity(sMeshUUID);
+	if (pMeshHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pCoreResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pCoreResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	return new CSceneHandler(pMeshHandler, pLib3MFWrapper, pCoreResourcePackage);
 }
 
-IMeshObject* CStateEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
-{
-	auto pMeshHandler = m_pSystemState->getMeshHandlerInstance();
-	auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
-
-	if (pMeshEntity.get() == nullptr)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
-
-	return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
-}
 
 IDataSeries* CStateEnvironment::CreateDataSeries(const std::string& sName)
 {

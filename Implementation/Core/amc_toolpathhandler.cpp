@@ -74,7 +74,7 @@ namespace AMC {
 			auto pStorage = m_pDataModel->CreateStorage();
 			auto pStorageStream = pStorage->RetrieveStream(sStreamUUID);
 
-			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(m_pDataModel, sStreamUUID, getLib3MFWrapper(), pStorageStream->GetName ());
+			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(m_pDataModel, sStreamUUID, getLib3MFWrapper(), pStorageStream->GetName (), true, m_AttachmentRelationsToRead);
 			pNewToolpathEntity->IncRef();
 			m_Entities.insert(std::make_pair(sStreamUUID, pNewToolpathEntity));
 			return pNewToolpathEntity.get();
@@ -121,6 +121,16 @@ namespace AMC {
 
 	}
 
+	void CToolpathHandler::registerAttachmentRelationsToRead(const std::string& sRelationShip)
+	{
+		m_AttachmentRelationsToRead.insert(sRelationShip);
+	}
+
+	void CToolpathHandler::unregisterAttachmentRelationsToRead(const std::string& sRelationShip)
+	{
+		m_AttachmentRelationsToRead.erase(sRelationShip);
+
+	}
 
 }
 

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 
 #include "amc_geometryutils.hpp"
+#include "amc_constants.hpp"
 
 #define MESHENTITY_ZEROEPSILON 1E-6
 
@@ -59,16 +60,6 @@ namespace AMC {
 	std::string CMeshEntity::getName()
 	{
 		return m_sName;
-	}
-
-	void CMeshEntity::IncRef()
-	{
-
-	}
-
-	bool CMeshEntity::DecRef()
-	{
-		return false;
 	}
 
 	size_t CMeshEntity::getNodeCount()
@@ -145,6 +136,12 @@ namespace AMC {
 
 		size_t nVertexCount = vertices.size();
 		size_t nTriangleCount = triangles.size();
+
+		if (nVertexCount > MESHENTITY_MAXVERTEXCOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYVERTICES, std::to_string(nVertexCount));
+		if (nTriangleCount > MESHENTITY_MAXTRIANGLECOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYTRIANGLES, std::to_string(nTriangleCount));
+
 		m_Nodes.resize(nVertexCount);
 		m_Faces.resize(nTriangleCount);
 
@@ -192,11 +189,13 @@ namespace AMC {
 						newEdge.m_nNodeIDs[1] = key.second;
 						newEdge.m_nFaceIDs[0] = target.m_nFaceID;
 						newEdge.m_nFaceIDs[1] = 0;
+						newEdge.m_nValence = 1;
 					
 						edgeMap.insert(std::make_pair(key, newEdge));
 					}
 					else {
 						iIter->second.m_nFaceIDs[1] = target.m_nFaceID;
+						iIter->second.m_nValence++;
 					}
 				}
 				
@@ -248,7 +247,7 @@ namespace AMC {
 		return CVectorUtils::vectorNormalize(vCrossProduct, MESHENTITY_ZEROEPSILON);
 	}
 
-	void CMeshEntity::loadFrom3MFResource(Lib3MF::CWrapper* p3MFWrapper, AMC::CResourcePackage* pResourcePackage, const std::string sResourceName)
+	/*void CMeshEntity::loadFrom3MFResource(Lib3MF::CWrapper* p3MFWrapper, AMC::CResourcePackage* pResourcePackage, const std::string sResourceName)
 	{
 		if (pResourcePackage == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -273,6 +272,246 @@ namespace AMC {
 			throw ELibMCInterfaceException(LIBMC_ERROR_MESH3MFRESOURCEISEMPTY, "3mf resource is empty: " + sResourceName);
 		}
 
+
+	} */
+
+
+	bool CMeshEntity::isManifold()
+	{
+		if (m_Edges.size() == 0)
+			return false;
+
+		for (auto& edge : m_Edges)
+			if (edge.m_nValence != 2)
+				return false;
+
+		return true;
+	}
+
+	bool CMeshEntity::isOriented()
+	{
+		if (m_Edges.size() == 0)
+			return false;
+
+		for (auto& edge : m_Edges) {
+			// Valence 0 should not exist..
+			if (edge.m_nValence == 0)
+				return false;
+
+			// Too many neighbors
+			if (edge.m_nValence > 2)
+				return false;
+
+			// Check for consistent orientations
+			if (edge.m_nValence == 2) {
+				if (!adjacentFacesAreConsistentlyOriented (edge)) {
+					return false;
+				}
+			}
+
+			// Valence 1 is a mesh border, which has always a unique orientation
+		}
+
+		return true;
+
+	}
+
+	uint32_t CMeshEntity::getMaxVertexID()
+	{
+		return (uint32_t) m_Nodes.size();
+	}
+
+	bool CMeshEntity::vertexExists(const uint32_t nVertexID)
+	{
+		return (nVertexID > 0) && (nVertexID <= m_Nodes.size());
+	}
+
+	bool CMeshEntity::getVertex(const uint32_t nVertexID, double& dX, double& dY, double& dZ)
+	{
+		if ((nVertexID > 0) && (nVertexID <= m_Nodes.size()))
+		{
+			auto & node = getNode(nVertexID);
+			dX = node.m_fCoordinates[0];
+			dY = node.m_fCoordinates[1];
+			dZ = node.m_fCoordinates[2];
+			return true;
+		}
+		else {
+			dX = 0.0;
+			dY = 0.0;
+			dZ = 0.0;
+			return false;
+		}
+	}
+
+	void CMeshEntity::getVertexIDs(uint64_t nVertexIDsBufferSize, uint64_t* pVertexIDsNeededCount, uint32_t* pVertexIDsBuffer)
+	{
+		size_t nNodeCount = m_Nodes.size();
+		if (pVertexIDsNeededCount)
+			*pVertexIDsNeededCount = nNodeCount;
+
+		if (nNodeCount > MESHENTITY_MAXVERTEXCOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYVERTICES, std::to_string(nNodeCount));
+
+		if ((nNodeCount > 0) && (pVertexIDsBuffer != nullptr)) {
+			if (nVertexIDsBufferSize < nNodeCount)
+				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
+
+			uint32_t* pPtr = pVertexIDsBuffer;
+			for (size_t nVertexID = 1; nVertexID <= nNodeCount; nVertexID++) {
+				*pPtr = (uint32_t)nVertexID;
+				pPtr++;
+			}
+		}
+	}
+
+	void CMeshEntity::getAllVertices(uint64_t nVerticesBufferSize, uint64_t* pVerticesNeededCount, LibMCEnv::sMeshVertex3D* pVerticesBuffer)
+	{
+		size_t nNodeCount = m_Nodes.size();
+		if (pVerticesNeededCount)
+			*pVerticesNeededCount = nNodeCount;
+
+		if (nNodeCount > MESHENTITY_MAXVERTEXCOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYVERTICES, std::to_string(nNodeCount));
+
+		if ((nNodeCount > 0) && (pVerticesBuffer != nullptr)) {
+			if (nVerticesBufferSize < nNodeCount)
+				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
+
+			LibMCEnv::sMeshVertex3D* pPtr = pVerticesBuffer;
+			for (size_t nVertexID = 1; nVertexID <= nNodeCount; nVertexID++) {
+				pPtr->m_VertexID = (uint32_t) nVertexID;
+				auto& node = getNode(nVertexID);
+				for (uint32_t nCoordinateIndex = 0; nCoordinateIndex < 3; nCoordinateIndex++)
+					pPtr->m_Coordinates[nCoordinateIndex] = node.m_fCoordinates[nCoordinateIndex];
+
+				pPtr++;
+			}
+		}
+
+	}
+
+	uint32_t CMeshEntity::getMaxTriangleID()
+	{
+		return (uint32_t)m_Faces.size();
+	}
+
+	bool CMeshEntity::triangeExists(const uint32_t nTriangleID)
+	{
+		return (nTriangleID > 0) && (nTriangleID <= m_Faces.size());
+	}
+
+	bool CMeshEntity::getTriangle(const uint32_t nTriangleID, uint32_t& nVertex1ID, uint32_t& nVertex2ID, uint32_t& nVertex3ID)
+	{
+		if ((nTriangleID > 0) && (nTriangleID <= m_Faces.size()))
+		{
+			auto &face = getFace (nTriangleID);
+			nVertex1ID = face.m_nNodeIDs[0];
+			nVertex2ID = face.m_nNodeIDs[1];
+			nVertex3ID = face.m_nNodeIDs[2];
+			return true;
+		}
+		else {
+			nVertex1ID = 0;
+			nVertex2ID = 0;
+			nVertex3ID = 0;
+			return false;
+		}
+
+	}
+
+	void CMeshEntity::getTriangleIDs(uint64_t nTriangleIDsBufferSize, uint64_t* pTriangleIDsNeededCount, uint32_t* pTriangleIDsBuffer)
+	{
+		size_t nFaceCount = m_Faces.size();
+		if (pTriangleIDsNeededCount)
+			*pTriangleIDsNeededCount = nFaceCount;
+
+		if (nFaceCount > MESHENTITY_MAXTRIANGLECOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYTRIANGLES, std::to_string(nFaceCount));
+
+		if ((nFaceCount > 0) && (pTriangleIDsBuffer != nullptr)) {
+			if (nTriangleIDsBufferSize < nFaceCount)
+				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
+
+			uint32_t* pPtr = pTriangleIDsBuffer;
+			for (size_t nFaceID = 1; nFaceID <= nFaceCount; nFaceID++) {
+				*pPtr = (uint32_t)nFaceID;
+				pPtr++;
+			}
+		}
+
+	}
+
+	void CMeshEntity::getAllTriangles(uint64_t nTrianglesBufferSize, uint64_t* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D* pTrianglesBuffer)
+	{
+		size_t nFaceCount = m_Faces.size();
+		if (pTrianglesNeededCount)
+			*pTrianglesNeededCount = nFaceCount;
+
+		if (nFaceCount > MESHENTITY_MAXTRIANGLECOUNT)
+			throw ELibMCCustomException(LIBMC_ERROR_MESHHASTOOMANYTRIANGLES, std::to_string (nFaceCount));
+
+		if ((nFaceCount > 0) && (pTrianglesBuffer != nullptr)) {
+			if (nTrianglesBufferSize < nFaceCount)
+				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
+
+			LibMCEnv::sMeshTriangle3D* pPtr = pTrianglesBuffer;
+			for (size_t nTriangleID = 1; nTriangleID <= nFaceCount; nTriangleID++) {
+				pPtr->m_TriangleID = (uint32_t) nTriangleID;
+				auto& face = getFace(nTriangleID);
+				for (uint32_t nCornerIndex = 0; nCornerIndex < 3; nCornerIndex++)
+					pPtr->m_Vertices[nCornerIndex] = face.m_nNodeIDs[nCornerIndex];
+
+				pPtr++;
+			}
+		}
+
+	}
+
+
+	bool CMeshEntity::checkEdgeOrientationWithFace(const sMeshEntityEdge& edge, const sMeshEntityFace& face, bool bEdgeIsOrientedAlongFace)
+	{
+		uint32_t nNodeID1 = edge.m_nNodeIDs[0];
+		uint32_t nNodeID2 = edge.m_nNodeIDs[1];
+
+		for (uint32_t nCornerIndex = 0; nCornerIndex < 3; nCornerIndex++) {
+			if (face.m_nNodeIDs[nCornerIndex] == nNodeID1) {
+				if (face.m_nNodeIDs[(nCornerIndex + 1) % 3] == nNodeID2) {
+					// Edge and face are oriented the same way.
+					bEdgeIsOrientedAlongFace = true;
+					return true;
+				}
+
+				if (face.m_nNodeIDs[(nCornerIndex + 2) % 3] == nNodeID2) {
+					// Edge and face are oriented the opposite way.
+					bEdgeIsOrientedAlongFace = false;
+					return true;
+				}
+
+			}
+		}
+
+		// False means, edge is not part of face!
+		bEdgeIsOrientedAlongFace = false;
+		return false;
+
+	}
+
+	bool CMeshEntity::adjacentFacesAreConsistentlyOriented(const sMeshEntityEdge& edge)
+	{
+		sMeshEntityFace & face1 = getFace(edge.m_nFaceIDs[0]);
+		sMeshEntityFace& face2 = getFace(edge.m_nFaceIDs[1]);
+
+		bool bEdgeIsAlignedWithFace1 = false;
+		bool bEdgeIsAlignedWithFace2 = false;
+
+		if (!checkEdgeOrientationWithFace (edge, face1, bEdgeIsAlignedWithFace1))
+			return false;
+		if (!checkEdgeOrientationWithFace(edge, face2, bEdgeIsAlignedWithFace2))
+			return false;
+
+		// Orientation must be the exact opposite.
+		return (bEdgeIsAlignedWithFace1 != bEdgeIsAlignedWithFace2);
 
 	}
 

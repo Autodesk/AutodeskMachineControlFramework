@@ -57,10 +57,12 @@ Abstract: This is the class declaration of CDriver_BuR
 #define BUR_COMMAND_DIRECT_ABORTLIST 106
 #define BUR_COMMAND_DIRECT_RESUMELIST 107
 #define BUR_COMMAND_DIRECT_MACHINESTATUS 108
-#define BUR_COMMAND_DIRECT_JOURNALSTART 109
-#define BUR_COMMAND_DIRECT_JOURNALSTOP 110
-#define BUR_COMMAND_DIRECT_JOURNALRETRIEVE 111
 #define BUR_COMMAND_DIRECT_DELETELIST 112
+
+#define BUR_COMMAND_DIRECT_CURRENTJOURNALSTATUS 120
+#define BUR_COMMAND_DIRECT_CURRENTJOURNALSCHEMA 121
+#define BUR_COMMAND_DIRECT_RETRIEVEJOURNALVARIABLE 122
+#define BUR_COMMAND_DIRECT_RETRIEVEJOURNALHISTORY 123
 
 #define PACKET_SIGNATURE_LEGACY 0xAB
 
@@ -93,6 +95,7 @@ public:
     uint32_t getCommandID();
     uint32_t getStatusCode();
 
+    uint64_t readUInt64(uint32_t nAddress);
     uint32_t readUInt32(uint32_t nAddress);
     uint16_t readUInt16(uint32_t nAddress);
     uint8_t readUInt8(uint32_t nAddress);
@@ -175,6 +178,8 @@ public:
     sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, BurPacketCallback callback);
     sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, uint32_t nParameter4, BurPacketCallback callback);
     sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, BurPacketCallback callback);
+
+    void retrieveJournalSchema();
 
 };
 

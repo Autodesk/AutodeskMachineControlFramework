@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,45 +29,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_SERVICE_BUILDFILEPARSING
-#define __AMC_SERVICE_BUILDFILEPARSING
-
-#include "amc_servicehandler.hpp"
-#include "amc_service.hpp"
-
-#include "libmcdata_dynamic.hpp"
-#include "lib3mf/lib3mf_dynamic.hpp"
-#include "common_chrono.hpp"
+#ifndef __AMC_MESHSCENE
+#define __AMC_MESHSCENE
 
 #include <memory>
+#include <map>
+#include <string>
+#include <cstdint>
+#include <vector>
+
+#include "amc_meshsceneitem.hpp"
 
 namespace AMC {
 
 
-	class CService_BuildFileParsing : public CService {
+	class CMeshScene {
 	private:
-		LibMCData::PDataModel m_pDataModel;
-		AMCCommon::PChrono m_pGlobalChrono;
-		std::string m_sBuildJobUUID;
-		
-		Lib3MF::PWrapper m_p3MFWrapper;
-		Lib3MF::PModel m_p3MFModel;
-		std::string m_sUserUUID;
 
-	protected:
+		std::string m_sSceneUUID;
+
+		std::map<std::string, PMeshSceneItem> m_ItemMap;
+		std::vector <PMeshSceneItem> m_Items;
+		
 	public:
 
-		CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, Lib3MF::PWrapper p3MFWrapper, const std::string & sUserUUID, AMCCommon::PChrono pGlobalChrono);
-		virtual ~CService_BuildFileParsing();
+		CMeshScene(const std::string & sSceneUUID);
 
-		virtual void executeBlocking() override;
+		virtual ~CMeshScene();
 
-		virtual std::string getName() override;
+		std::string getSceneUUID();
+
+		bool isBoundToLoginSession();
+
+		PMeshSceneItem findItem(const std::string& sItemUUID, bool bFailIfNotExistent);
+
+		size_t getItemCount();
+
+		PMeshSceneItem getItem(const size_t nIndex);		
+
+		PMeshSceneItem addItem(const std::string& sMeshEntityUUID, LibMCEnv::sModelDataTransform transform);
+
+		void removeItem (const std::string & sUUID);
+ 
 	};
+	
+	typedef std::shared_ptr<CMeshScene> PMeshScene;
 
 	
 }
 
 
-#endif //__AMC_SERVICE_BUILDFILEPARSING
+#endif //__AMC_MESHSCENE
 

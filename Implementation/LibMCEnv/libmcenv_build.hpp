@@ -61,13 +61,14 @@ private:
 
 	AMCCommon::PChrono m_pGlobalChrono;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	AMC::PMeshHandler m_pMeshHandler;
 	LibMCData::PDataModel m_pDataModel;
 	std::string m_sBuildJobUUID;
 
 
 public:
 
-	CBuild(LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, AMCCommon::PChrono pGlobalChrono);
+	CBuild(LibMCData::PDataModel pDataModel, const std::string & sBuildJobUUID, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CBuild();
 

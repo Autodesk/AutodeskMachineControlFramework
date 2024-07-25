@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
+#include <mutex>
 
 #ifdef _WIN32
 
@@ -75,14 +76,13 @@ namespace LibMCDriver_ScanLabSMC {
 			slsc_PolylineProfile ProfileType;
 		};
 
-		enum slsc_ExecState
+		enum class slsc_ExecState : int32_t
 		{
 			slsc_ExecState_Idle = 0, 
 			slsc_ExecState_ReadyForExecution = 1, //!< The RTC6 board is ready to execute jobs.
 			slsc_ExecState_Executing = 2,         //!< The RTC6 board is executing a job.
 			slsc_ExecState_NotInitOrError = 3,    //!< The RTC6 board is not initialized or an error is present.
 		};
-		typedef enum slsc_ExecState slsc_ExecState;
 
 		typedef struct _slsc_PolylineOptions slsc_PolylineOptions;
 
@@ -99,6 +99,9 @@ namespace LibMCDriver_ScanLabSMC {
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_stop) (size_t Handle);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_stop_controlled) (size_t Handle);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_get_exec_state) (size_t Handle, slsc_ExecState * execState);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_get_error) (size_t Handle, size_t ErrorNr, uint64_t & nErrorCode, char * pErrorMsg, size_t nBufSize);
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_get_error_count) (size_t Handle, size_t & nErrorCount);
+
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_set_jump_speed) (size_t Handle, double dJumpSpeed);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_set_mark_speed) (size_t Handle, double dMarkSpeed);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_set_min_mark_speed) (size_t Handle, double dMinimalMarkSpeed);
@@ -122,6 +125,8 @@ namespace LibMCDriver_ScanLabSMC {
 		private:
 			bool m_bIsInitialized;
 			std::wstring m_sDLLDirectoryW;
+
+			std::mutex m_ListErrorMutex;
 
 			void* m_LibraryHandle;
 			void resetFunctionPtrs ();
@@ -147,12 +152,14 @@ namespace LibMCDriver_ScanLabSMC {
 			PScanLabSMCPtr_slsc_job_set_min_mark_speed slsc_job_set_min_mark_speed = nullptr;
 			PScanLabSMCPtr_slsc_job_jump_min_time slsc_job_jump_min_time = nullptr;
 			PScanLabSMCPtr_slsc_job_set_corner_tolerance slsc_job_set_corner_tolerance = nullptr;		
+			PScanLabSMCPtr_slsc_ctrl_get_error slsc_ctrl_get_error = nullptr;
+			PScanLabSMCPtr_slsc_ctrl_get_error_count slsc_ctrl_get_error_count = nullptr;
 
 			CScanLabSMCSDK(const std::string & sDLLNameUTF8, const std::string& sDLLDirectoryUTF8);
 			~CScanLabSMCSDK();
 
 			void initDLL();
-			void checkError(uint32_t nSMCError);
+			void checkError(size_t hHandle, uint32_t nSMCError);
 
 		};
 

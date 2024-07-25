@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	enum APIHandler_BuildType {
+	enum class APIHandler_BuildType : uint32_t {
 		btUnknown = 0,
-		btStartPrepareJob = 1,
+		//btStartPrepareJob = 1, DEPRECIATED!
 		btListJobs = 2,
 		btToolpath = 3,
 		btListBuildData = 4,
@@ -57,7 +57,6 @@ namespace AMC {
 
 		APIHandler_BuildType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& paramUUID);
 
-		void handlePrepareJobRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 		void handleToolpathRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 		void handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth);

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,60 +29,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_SERVICE
-#define __AMC_SERVICE
-
-#include <memory>
-#include <string>
-#include <map>
-#include <list>
-#include <thread>
-#include <mutex>
+#include "amc_meshsceneitem.hpp"
+#include "libmc_exceptiontypes.hpp"
+#include "common_utils.hpp"
+#include "amc_meshutils.hpp"
 
 namespace AMC {
 
-	class CServiceHandler;
-	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 
-	class CService;
-	typedef std::shared_ptr<CService> PService;
+	CMeshSceneItem::CMeshSceneItem(const std::string& sUUID, const std::string& sMeshEntityUUID)
+		: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), 
+		m_sMeshEntityUUID (AMCCommon::CUtils::normalizeUUIDString (sMeshEntityUUID))
+	{
+		m_Transform = CMeshUtils::createIdentityTransform();
 
+	}
 
-	class CService {
-	private:
-		bool m_bHasBeenExecuted;
-		bool m_bIsRunning;
-		std::mutex m_Mutex;
+	CMeshSceneItem::~CMeshSceneItem()
+	{
 
-		void setHasBeenExecuted(bool bValue);
-		void setIsRunning(bool bValue);
-		
-	protected:
-		CServiceHandler * m_pServiceHandler;
+	}
 
-	public:
+	std::string CMeshSceneItem::getUUID()
+	{
+		return m_sUUID;
+	}
 
-		CService (CServiceHandler* pServiceHandler);
-		virtual ~CService();
+	std::string CMeshSceneItem::getMeshEntityUUID()
+	{
+		return m_sMeshEntityUUID;
+	}
 
-		void executeThreaded();
+	LibMCEnv::sModelDataTransform CMeshSceneItem::getTransform()
+	{
+		return m_Transform;
+	}
 
-		bool getHasBeenExecuted();
-		bool getIsRunning();
+	void CMeshSceneItem::updateTransform(const LibMCEnv::sModelDataTransform newTransform)
+	{
+		m_Transform = newTransform;
+	}
 
-		CServiceHandler* getServiceHandler ();
-
-		void executeThreadedEx();
-
-		virtual void executeBlocking() = 0;
-
-		virtual std::string getName() = 0;
-
-	};
-
-	
 }
 
-
-#endif //__AMC_SERVICE
 
