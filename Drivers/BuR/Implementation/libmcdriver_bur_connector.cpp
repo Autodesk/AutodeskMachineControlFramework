@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "crcpp/CRC.h"
 #include <random>
 
+#include "RapidJSON/rapidjson.h"
+#include "RapidJSON/document.h"
+
 using namespace LibMCDriver_BuR::Impl;
 
 
@@ -122,6 +125,15 @@ uint32_t CDriver_BuRPacket::getCommandID()
 uint32_t CDriver_BuRPacket::getStatusCode()
 {
     return m_nStatusCode;
+}
+
+uint64_t CDriver_BuRPacket::readUInt64(uint32_t nAddress)
+{
+    if (((size_t)nAddress) + 8 > m_Data.size())
+        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAMETERADDRESS);
+
+    return *((uint64_t*)&m_Data[nAddress]);
+
 }
 
 
@@ -660,6 +672,8 @@ void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t
         std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
         m_pCurrentConnection = pConnection;
     }
+
+    retrieveJournalSchema();
     
 /*    std::thread connectionThread([this, sIPAddress, nPort] {
 
@@ -704,4 +718,100 @@ void CDriver_BuRConnector::refreshJournal()
 
 }
 
+void CDriver_BuRConnector::retrieveJournalSchema()
+{
+    if (m_ProtocolVersion != eDriver_BurProtocolVersion::Version3)
+        return;
+
+    bool bSuccessfulParsedJournalSchema = false;
+
+    sendCommandToPLC(BUR_COMMAND_DIRECT_CURRENTJOURNALSCHEMA, [&bSuccessfulParsedJournalSchema](CDriver_BuRPacket* pPacket) {
+
+            auto schemaBuffer = pPacket->getDataBuffer();
+
+            std::string schemaString(schemaBuffer.begin(), schemaBuffer.end());
+
+            rapidjson::Document document;
+            document.Parse(schemaString.c_str());
+
+            if (!document.IsObject())
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEBURSCHEMAJSON);
+
+            if (!document.HasMember("schema"))
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASNOVERSIONIDENTIFIER);
+
+            if (!document["schema"].IsString ())
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVERSIONIDENTIFIER);
+
+            std::string sSchemaVersion = document["schema"].GetString();
+
+            if (!document.HasMember("groups"))
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASNOGROUPINFORMATION);
+
+            if (!document["groups"].IsArray ())
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPINFORMATION);
+
+            auto groupArray = document["groups"].GetArray();
+            for (auto groupIter = groupArray.Begin(); groupIter != groupArray.End(); groupIter++) {
+
+                auto& group = *groupIter;
+                if (!group.HasMember ("groupname"))
+                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPNAME);
+                if (!group.HasMember("groupid"))
+                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPID);
+                if (!group.HasMember("values"))
+                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPVALUES);
+
+                auto& groupNameMember = group["groupname"];
+                auto& groupIDMember = group["groupid"];
+                auto& groupValuesMember = group["values"];
+
+                if (!(groupNameMember.IsString()))
+                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPNAME);
+                if (!(groupIDMember.IsInt()))
+                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPID);
+                if (!(groupValuesMember.IsArray()))
+                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPVALUES);
+
+                std::string sGroupName = groupNameMember.GetString();
+                int32_t nGroupID = groupIDMember.GetInt ();
+
+                auto groupValues = groupValuesMember.GetArray();
+                for (auto valueIter = groupValues.Begin(); valueIter != groupValues.End(); valueIter++) {
+                    auto& value = *valueIter;
+                    if (!value.HasMember("type"))
+                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUETYPE);
+                    if (!value.HasMember("name"))
+                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUENAME);
+                    if (!value.HasMember("id"))
+                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUEID);
+                    if (!value.HasMember("size"))
+                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUESIZE);
+
+                    auto& valueTypeMember = value["type"];
+                    auto& valueNameMember = value["name"];
+                    auto& valueIDMember = value["id"];
+                    auto& valueSizeMember = value["size"];
+
+                    if (!(valueTypeMember.IsString()))
+                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUETYPE);
+                    if (!(valueNameMember.IsString()))
+                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUENAME);
+                    if (!(valueIDMember.IsInt()))
+                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUEID);
+                    if (!(valueSizeMember.IsInt()))
+                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUESIZE);
+                }
+
+            }
+
+
+            bSuccessfulParsedJournalSchema = true;
+
+        });
+
+    if (!bSuccessfulParsedJournalSchema)
+        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEJOURNALSCHEMA);
+
+}
 

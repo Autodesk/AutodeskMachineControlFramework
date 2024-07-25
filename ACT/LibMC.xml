@@ -620,9 +620,19 @@
 		<error name="EXECUTIONLISTNAMEMISSING" code="594" description="Execution list name missing" />
 		<error name="BUILDLISTBUTTONNAMEMISSING" code="595" description="Build list button name missing" />
 		<error name="EXECUTIONLISTBUTTONNAMEMISSING" code="596" description="Build execution button name missing" />
-		
-		
-		
+		<error name="BUILDHASNOTOOLPATH" code="597" description="Build has not toolpath" />
+		<error name="MISSINGUPLOADCONTEXT" code="598" description="Missing upload context" />
+		<error name="INVALIDUPLOADCONTEXT" code="599" description="Build has not toolpath" />
+		<error name="MESHHASTOOMANYVERTICES" code="600" description="Mesh has too many vertices" />
+		<error name="MESHHASTOOMANYTRIANGLES" code="601" description="Mesh has too many triangles" />
+		<error name="INVALIDXMLNODEORATTRIBUTENAME" code="602" description="Invalid XML node or attribute name" />
+		<error name="XMLNAMESPACENOTREGISTERED" code="603" description="XML Namespace not registered" />
+		<error name="COULDNOTFINDMESHSCENE" code="604" description="Could not find mesh scene" />
+		<error name="COULDNOTFINDMESHSCENEITEM" code="605" description="Could not find mesh scene item" />
+		<error name="INVALIDMESHSCENEITEMINDEX" code="606" description="Invalid Mesh Scene Item Index" />		
+		<error name="INTERNALMETADATAERROR" code="607" description="Internal metadata error" />
+		<error name="INVALIDBINARYMETADATAPATH" code="608" description="Invalid Binary metadata path" />
+		<error name="BINARYMETADATAPATHNOTFOUND" code="609" description="Binary metadata path not found" />
 		
 		
 	</errors>
@@ -649,7 +659,36 @@
 	<class name="Base">
 	
 	</class>
+
+	<!-- StreamData is NOT thread safe! Do not call any method from separate threads. -->
+	<class name="StreamData" parent="Base" description="API Stream Data">
+
+		<method name="GetData" description="returns the data to return.">
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Binary stream data" />	
+		</method>
+
+		<method name="GetMIMEType" description="returns the content type of the data.">
+			<param name="MIMEType" type="string" pass="return" description="Content type of the return data." />	
+		</method>
+
+	</class>
+
+
+	<!-- StreamConnection is thread safe and can be called from any request ! -->
+	<class name="StreamConnection" parent="Base" description="API Stream Connection">
+		
+		<method name="GetNewContent" description="Returns new content for the stream or null, if no new content is available.">
+			<param name="NewContent" type="optionalclass" class="StreamData" pass="return" description="Stream Data Instance." />	
+		</method>
+
+		<method name="GetIdleDelay" description="Returns the number of milliseconds, that the caller should wait before checking for another content.">
+			<param name="IdleDelay" type="uint32" pass="return" description="Idle Delay." />	
+		</method>
+
+	</class>
+
 	
+	<!-- APIRequestHandler is NOT thread safe! Do not call any method from separate threads. -->
 	<class name="APIRequestHandler" parent="Base" description="API Request Handler">
 
 		<method name="ExpectsRawBody" description="checks if the raw body is needed to handle the request.">
@@ -697,6 +736,7 @@
 	</class>
 
 
+	<!-- MCContext is thread safe! -->
 	<class name="MCContext" parent="Base" description="MC Context">
 
 		<method name="RegisterLibraryPath" description="registers a library for a given name.">
@@ -727,11 +767,6 @@
 			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to terminate." />
 		</method>
 
-		<method name="GetInstanceThreadState" description="returns current state of a instance thread.">
-			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
-			<param name="StateName" type="string" pass="return" description="State of state machine." />
-		</method>
-
 		<method name="InstanceStateIsSuccessful" description="returns if an instance thread is in success state.">
 			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
 			<param name="IsSuccessful" type="bool" pass="return" description="State of state machine is in success state." />
@@ -760,6 +795,12 @@
 			<param name="Authorization" type="string" pass="in" description="Authorization Header String" />
 			<param name="HandlerInstance" type="class" class="APIRequestHandler" pass="return" description="Request Handler instance." />
 		</method>
+		
+		<method name="CreateStreamConnection" description="creates an API stream connection instance. Fails if stream does not exist.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of stream to serve." />
+			<param name="StreamConnectionInstance" type="class" class="StreamConnection" pass="return" description="StreamConnection Handler instance." />
+		</method>
+		
 						
 	</class>
 

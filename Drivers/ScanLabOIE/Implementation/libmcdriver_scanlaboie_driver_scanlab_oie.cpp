@@ -170,7 +170,8 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 		std::string sLibQT5CoreFileNameOnDisk;
 		std::string sLibQT5NetworkFileNameOnDisk;
 		std::string sOIECalibrationLibraryFileNameOnDisk;
-		std::string sRTCStreamParserFileNameOnDisk;
+		std::string sRTCStreamParserFileNameOnDiskOld;
+		std::string sRTCStreamParserFileNameOnDiskNew;
 #ifdef _WIN32
 		sFileName = "liboie.dll";		
 		sLibQT5CoreFileNameOnDisk = "Qt5Core.dll";
@@ -183,7 +184,8 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 
 			if (bForVersion3) {
 				sOIECalibrationLibraryFileNameOnDisk = "CalibrationLibrary32.dll";
-				sRTCStreamParserFileNameOnDisk = "RTCStreamParser.dll";
+				sRTCStreamParserFileNameOnDiskOld = "RTCStreamParser.dll";
+				sRTCStreamParserFileNameOnDiskNew = "StreamParser.dll";
 			}
 
 		}
@@ -193,7 +195,8 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 
 			if (bForVersion3) {
 				sOIECalibrationLibraryFileNameOnDisk = "CalibrationLibrary64.dll";
-				sRTCStreamParserFileNameOnDisk = "RTCStreamParser_x64.dll";
+				sRTCStreamParserFileNameOnDiskNew = "StreamParser_x64.dll";
+				sRTCStreamParserFileNameOnDiskOld = "RTCStreamParser_x64.dll";
 			}
 
 		}
@@ -205,7 +208,8 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 		sLibQT5CoreFileNameOnDisk = "Qt5Core.so";
 		sLibQT5NetworkFileNameOnDisk = "Qt5Network.so";
 		sOIECalibrationLibraryFileNameOnDisk = "CalibrationLibrary64.so";
-		sRTCStreamParserFileNameOnDisk = "RTCStreamParser_x64.so";
+		sRTCStreamParserFileNameOnDiskOld = "RTCStreamParser_x64.so";
+		sRTCStreamParserFileNameOnDiskNew = "StreamParser_x64.so";
 
 #endif
 
@@ -275,7 +279,7 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 			m_pOIECalibrationLibraryResourceFile = m_pWorkingDirectory->StoreCustomData(sOIECalibrationLibraryFileNameOnDisk, CalibrationLibraryBuffer);
 		}
 
-		if (!sRTCStreamParserFileNameOnDisk.empty()) {
+		if (!sRTCStreamParserFileNameOnDiskNew.empty()) {
 			std::vector<uint8_t> RTCStreamParserBuffer;
 			if (m_pDriverEnvironment->MachineHasResourceData(m_sRTCStreamParserResourceName)) {
 				m_pDriverEnvironment->RetrieveMachineResourceData(m_sRTCStreamParserResourceName, RTCStreamParserBuffer);
@@ -285,7 +289,8 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 			}
 			if (RTCStreamParserBuffer.size() == 0)
 				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORERTCSTREAMPARSERBUFFER);
-			m_pRTCStreamParserResourceFile = m_pWorkingDirectory->StoreCustomData(sRTCStreamParserFileNameOnDisk, RTCStreamParserBuffer);
+			m_pRTCStreamParserResourceFile = m_pWorkingDirectory->StoreCustomData(sRTCStreamParserFileNameOnDiskOld, RTCStreamParserBuffer);
+			m_pRTCStreamParserResourceFile = m_pWorkingDirectory->StoreCustomData(sRTCStreamParserFileNameOnDiskNew, RTCStreamParserBuffer);
 		}
 
 		m_pOIESDK = std::make_shared<CScanLabOIESDK>(m_pSDKLibraryFile->GetAbsoluteFileName(), m_pWorkingDirectory->GetAbsoluteFilePath (), m_DeviceDriverType);

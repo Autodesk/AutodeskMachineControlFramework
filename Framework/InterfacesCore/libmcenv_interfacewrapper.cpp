@@ -2384,6 +2384,62 @@ LibMCEnvResult libmcenv_datatable_setuint64columnvalues(LibMCEnv_DataTable pData
 	}
 }
 
+LibMCEnvResult libmcenv_datatable_createwriteoptions(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableWriteOptions * pOptions)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		if (pOptions == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseOptions(nullptr);
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseOptions = pIDataTable->CreateWriteOptions();
+
+		*pOptions = (IBase*)(pBaseOptions);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatable_createcsvwriteoptions(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableCSVWriteOptions * pOptions)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		if (pOptions == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseOptions(nullptr);
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseOptions = pIDataTable->CreateCSVWriteOptions();
+
+		*pOptions = (IBase*)(pBaseOptions);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_datatable_writecsvtostream(LibMCEnv_DataTable pDataTable, LibMCEnv_TempStreamWriter pWriter, LibMCEnv_DataTableCSVWriteOptions pOptions)
 {
 	IBase* pIBaseClass = (IBase *)pDataTable;
@@ -4364,6 +4420,1668 @@ LibMCEnvResult libmcenv_meshobject_getvertexcount(LibMCEnv_MeshObject pMeshObjec
 	}
 }
 
+LibMCEnvResult libmcenv_meshobject_ismanifold(LibMCEnv_MeshObject pMeshObject, bool * pManifoldResult)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pManifoldResult == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pManifoldResult = pIMeshObject->IsManifold();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_isoriented(LibMCEnv_MeshObject pMeshObject, bool * pOrientedResult)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pOrientedResult == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pOrientedResult = pIMeshObject->IsOriented();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_iswatertight(LibMCEnv_MeshObject pMeshObject, bool * pWatertightResult)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pWatertightResult == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pWatertightResult = pIMeshObject->IsWatertight();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_getmaxvertexid(LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pMaxVertexID)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pMaxVertexID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMaxVertexID = pIMeshObject->GetMaxVertexID();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_vertexexists(LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 nVertexID, bool * pVertexExists)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pVertexExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pVertexExists = pIMeshObject->VertexExists(nVertexID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_getvertex(LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 nVertexID, LibMCEnv_double * pX, LibMCEnv_double * pY, LibMCEnv_double * pZ, bool * pVertexExists)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (!pX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pZ)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pVertexExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pVertexExists = pIMeshObject->GetVertex(nVertexID, *pX, *pY, *pZ);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_getvertexids(LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nVertexIDsBufferSize, LibMCEnv_uint64* pVertexIDsNeededCount, LibMCEnv_uint32 * pVertexIDsBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if ((!pVertexIDsBuffer) && !(pVertexIDsNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMeshObject->GetVertexIDs(nVertexIDsBufferSize, pVertexIDsNeededCount, pVertexIDsBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_getallvertices(LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nVerticesBufferSize, LibMCEnv_uint64* pVerticesNeededCount, sLibMCEnvMeshVertex3D * pVerticesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if ((!pVerticesBuffer) && !(pVerticesNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMeshObject->GetAllVertices(nVerticesBufferSize, pVerticesNeededCount, pVerticesBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_getmaxtriangleid(LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 * pMaxTriangleID)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pMaxTriangleID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMaxTriangleID = pIMeshObject->GetMaxTriangleID();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_triangeexists(LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 nTriangleID, bool * pTriangleExists)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pTriangleExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTriangleExists = pIMeshObject->TriangeExists(nTriangleID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_gettriangle(LibMCEnv_MeshObject pMeshObject, LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32 * pVertex1ID, LibMCEnv_uint32 * pVertex2ID, LibMCEnv_uint32 * pVertex3ID, bool * pVertexExists)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (!pVertex1ID)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pVertex2ID)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pVertex3ID)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pVertexExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pVertexExists = pIMeshObject->GetTriangle(nTriangleID, *pVertex1ID, *pVertex2ID, *pVertex3ID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_gettriangleids(LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEnv_uint64* pTriangleIDsNeededCount, LibMCEnv_uint32 * pTriangleIDsBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if ((!pTriangleIDsBuffer) && !(pTriangleIDsNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMeshObject->GetTriangleIDs(nTriangleIDsBufferSize, pTriangleIDsNeededCount, pTriangleIDsBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_getalltriangles(LibMCEnv_MeshObject pMeshObject, const LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, sLibMCEnvMeshTriangle3D * pTrianglesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if ((!pTrianglesBuffer) && !(pTrianglesNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMeshObject->GetAllTriangles(nTrianglesBufferSize, pTrianglesNeededCount, pTrianglesBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_ispersistent(LibMCEnv_MeshObject pMeshObject, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIMeshObject->IsPersistent();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshobject_makepersistent(LibMCEnv_MeshObject pMeshObject, bool bBoundToLoginSession, LibMCEnv_PersistentMeshObject * pPersistentMesh)
+{
+	IBase* pIBaseClass = (IBase *)pMeshObject;
+
+	try {
+		if (pPersistentMesh == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBasePersistentMesh(nullptr);
+		IMeshObject* pIMeshObject = dynamic_cast<IMeshObject*>(pIBaseClass);
+		if (!pIMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBasePersistentMesh = pIMeshObject->MakePersistent(bBoundToLoginSession);
+
+		*pPersistentMesh = (IBase*)(pBasePersistentMesh);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for PersistentMeshObject
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_persistentmeshobject_isboundtologinsession(LibMCEnv_PersistentMeshObject pPersistentMeshObject, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistentMeshObject;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IPersistentMeshObject* pIPersistentMeshObject = dynamic_cast<IPersistentMeshObject*>(pIBaseClass);
+		if (!pIPersistentMeshObject)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIPersistentMeshObject->IsBoundToLoginSession();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for ModelDataMeshInstance
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_modeldatameshinstance_getname(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataMeshInstance;
+
+	try {
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sName("");
+		IModelDataMeshInstance* pIModelDataMeshInstance = dynamic_cast<IModelDataMeshInstance*>(pIBaseClass);
+		if (!pIModelDataMeshInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			sName = pIModelDataMeshInstance->GetName();
+
+			pIModelDataMeshInstance->_setCache (new ParameterCache_1<std::string> (sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIModelDataMeshInstance->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sName);
+			pIModelDataMeshInstance->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCEnv_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatameshinstance_getuuid(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataMeshInstance;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		IModelDataMeshInstance* pIModelDataMeshInstance = dynamic_cast<IModelDataMeshInstance*>(pIBaseClass);
+		if (!pIModelDataMeshInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIModelDataMeshInstance->GetUUID();
+
+			pIModelDataMeshInstance->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIModelDataMeshInstance->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIModelDataMeshInstance->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatameshinstance_getlocaltransform(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, sLibMCEnvModelDataTransform * pLocalTransform)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataMeshInstance;
+
+	try {
+		if (pLocalTransform == nullptr)
+		throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModelDataMeshInstance* pIModelDataMeshInstance = dynamic_cast<IModelDataMeshInstance*>(pIBaseClass);
+		if (!pIModelDataMeshInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pLocalTransform = pIModelDataMeshInstance->GetLocalTransform();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatameshinstance_getabsolutetransform(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, sLibMCEnvModelDataTransform * pAbsoluteTransform)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataMeshInstance;
+
+	try {
+		if (pAbsoluteTransform == nullptr)
+		throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModelDataMeshInstance* pIModelDataMeshInstance = dynamic_cast<IModelDataMeshInstance*>(pIBaseClass);
+		if (!pIModelDataMeshInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAbsoluteTransform = pIModelDataMeshInstance->GetAbsoluteTransform();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatameshinstance_createcopiedmesh(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, LibMCEnv_MeshObject * pMeshObjectCopy)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataMeshInstance;
+
+	try {
+		if (pMeshObjectCopy == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseMeshObjectCopy(nullptr);
+		IModelDataMeshInstance* pIModelDataMeshInstance = dynamic_cast<IModelDataMeshInstance*>(pIBaseClass);
+		if (!pIModelDataMeshInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseMeshObjectCopy = pIModelDataMeshInstance->CreateCopiedMesh();
+
+		*pMeshObjectCopy = (IBase*)(pBaseMeshObjectCopy);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatameshinstance_createpersistentmesh(LibMCEnv_ModelDataMeshInstance pModelDataMeshInstance, bool bBoundToLoginSession, LibMCEnv_PersistentMeshObject * pPersistentMesh)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataMeshInstance;
+
+	try {
+		if (pPersistentMesh == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBasePersistentMesh(nullptr);
+		IModelDataMeshInstance* pIModelDataMeshInstance = dynamic_cast<IModelDataMeshInstance*>(pIBaseClass);
+		if (!pIModelDataMeshInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBasePersistentMesh = pIModelDataMeshInstance->CreatePersistentMesh(bBoundToLoginSession);
+
+		*pPersistentMesh = (IBase*)(pBasePersistentMesh);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for ModelDataComponentInstance
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getname(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sName("");
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			sName = pIModelDataComponentInstance->GetName();
+
+			pIModelDataComponentInstance->_setCache (new ParameterCache_1<std::string> (sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIModelDataComponentInstance->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sName);
+			pIModelDataComponentInstance->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCEnv_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getuuid(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIModelDataComponentInstance->GetUUID();
+
+			pIModelDataComponentInstance->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIModelDataComponentInstance->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIModelDataComponentInstance->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getlocaltransform(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, sLibMCEnvModelDataTransform * pLocalTransform)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if (pLocalTransform == nullptr)
+		throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pLocalTransform = pIModelDataComponentInstance->GetLocalTransform();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getabsolutetransform(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, sLibMCEnvModelDataTransform * pAbsoluteTransform)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if (pAbsoluteTransform == nullptr)
+		throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAbsoluteTransform = pIModelDataComponentInstance->GetAbsoluteTransform();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getsolidcount(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pIModelDataComponentInstance->GetSolidCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getsolidmesh(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 nIndex, LibMCEnv_ModelDataMeshInstance * pMeshInstance)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if (pMeshInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseMeshInstance(nullptr);
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseMeshInstance = pIModelDataComponentInstance->GetSolidMesh(nIndex);
+
+		*pMeshInstance = (IBase*)(pBaseMeshInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getsupportcount(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pIModelDataComponentInstance->GetSupportCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getsupportmesh(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 nIndex, LibMCEnv_ModelDataMeshInstance * pMeshInstance)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if (pMeshInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseMeshInstance(nullptr);
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseMeshInstance = pIModelDataComponentInstance->GetSupportMesh(nIndex);
+
+		*pMeshInstance = (IBase*)(pBaseMeshInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getsubcomponentcount(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pIModelDataComponentInstance->GetSubComponentCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modeldatacomponentinstance_getsubcomponent(LibMCEnv_ModelDataComponentInstance pModelDataComponentInstance, LibMCEnv_uint32 nIndex, LibMCEnv_ModelDataComponentInstance * pSubComponentInstance)
+{
+	IBase* pIBaseClass = (IBase *)pModelDataComponentInstance;
+
+	try {
+		if (pSubComponentInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseSubComponentInstance(nullptr);
+		IModelDataComponentInstance* pIModelDataComponentInstance = dynamic_cast<IModelDataComponentInstance*>(pIBaseClass);
+		if (!pIModelDataComponentInstance)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseSubComponentInstance = pIModelDataComponentInstance->GetSubComponent(nIndex);
+
+		*pSubComponentInstance = (IBase*)(pBaseSubComponentInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for MeshSceneItem
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_meshsceneitem_getitemuuid(LibMCEnv_MeshSceneItem pMeshSceneItem, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMeshSceneItem;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		IMeshSceneItem* pIMeshSceneItem = dynamic_cast<IMeshSceneItem*>(pIBaseClass);
+		if (!pIMeshSceneItem)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIMeshSceneItem->GetItemUUID();
+
+			pIMeshSceneItem->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMeshSceneItem->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIMeshSceneItem->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshsceneitem_getsceneuuid(LibMCEnv_MeshSceneItem pMeshSceneItem, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMeshSceneItem;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		IMeshSceneItem* pIMeshSceneItem = dynamic_cast<IMeshSceneItem*>(pIBaseClass);
+		if (!pIMeshSceneItem)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIMeshSceneItem->GetSceneUUID();
+
+			pIMeshSceneItem->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMeshSceneItem->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIMeshSceneItem->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshsceneitem_gettransform(LibMCEnv_MeshSceneItem pMeshSceneItem, sLibMCEnvModelDataTransform * pAbsoluteTransform)
+{
+	IBase* pIBaseClass = (IBase *)pMeshSceneItem;
+
+	try {
+		if (pAbsoluteTransform == nullptr)
+		throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshSceneItem* pIMeshSceneItem = dynamic_cast<IMeshSceneItem*>(pIBaseClass);
+		if (!pIMeshSceneItem)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAbsoluteTransform = pIMeshSceneItem->GetTransform();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshsceneitem_updatetransform(LibMCEnv_MeshSceneItem pMeshSceneItem, const sLibMCEnvModelDataTransform * pAbsoluteTransform)
+{
+	IBase* pIBaseClass = (IBase *)pMeshSceneItem;
+
+	try {
+		IMeshSceneItem* pIMeshSceneItem = dynamic_cast<IMeshSceneItem*>(pIBaseClass);
+		if (!pIMeshSceneItem)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMeshSceneItem->UpdateTransform(*pAbsoluteTransform);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshsceneitem_getmeshobject(LibMCEnv_MeshSceneItem pMeshSceneItem, LibMCEnv_PersistentMeshObject * pPersistentMesh)
+{
+	IBase* pIBaseClass = (IBase *)pMeshSceneItem;
+
+	try {
+		if (pPersistentMesh == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBasePersistentMesh(nullptr);
+		IMeshSceneItem* pIMeshSceneItem = dynamic_cast<IMeshSceneItem*>(pIBaseClass);
+		if (!pIMeshSceneItem)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBasePersistentMesh = pIMeshSceneItem->GetMeshObject();
+
+		*pPersistentMesh = (IBase*)(pBasePersistentMesh);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshsceneitem_referenceisvalid(LibMCEnv_MeshSceneItem pMeshSceneItem, bool * pIsValid)
+{
+	IBase* pIBaseClass = (IBase *)pMeshSceneItem;
+
+	try {
+		if (pIsValid == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshSceneItem* pIMeshSceneItem = dynamic_cast<IMeshSceneItem*>(pIBaseClass);
+		if (!pIMeshSceneItem)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsValid = pIMeshSceneItem->ReferenceIsValid();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for MeshScene
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_meshscene_getsceneuuid(LibMCEnv_MeshScene pMeshScene, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIMeshScene->GetSceneUUID();
+
+			pIMeshScene->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMeshScene->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIMeshScene->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshscene_isboundtologinsession(LibMCEnv_MeshScene pMeshScene, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIMeshScene->IsBoundToLoginSession();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshscene_addsceneitem(LibMCEnv_MeshScene pMeshScene, LibMCEnv_PersistentMeshObject pMesh, const sLibMCEnvModelDataTransform * pAbsoluteTransform, LibMCEnv_MeshSceneItem * pSceneItem)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		if (pSceneItem == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassMesh = (IBase *)pMesh;
+		IPersistentMeshObject* pIMesh = dynamic_cast<IPersistentMeshObject*>(pIBaseClassMesh);
+		if (!pIMesh)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pBaseSceneItem(nullptr);
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseSceneItem = pIMeshScene->AddSceneItem(pIMesh, *pAbsoluteTransform);
+
+		*pSceneItem = (IBase*)(pBaseSceneItem);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshscene_addmodeldatameshassceneitem(LibMCEnv_MeshScene pMeshScene, LibMCEnv_ModelDataMeshInstance pModelDataMesh, LibMCEnv_MeshSceneItem * pSceneItem)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		if (pSceneItem == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassModelDataMesh = (IBase *)pModelDataMesh;
+		IModelDataMeshInstance* pIModelDataMesh = dynamic_cast<IModelDataMeshInstance*>(pIBaseClassModelDataMesh);
+		if (!pIModelDataMesh)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pBaseSceneItem(nullptr);
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseSceneItem = pIMeshScene->AddModelDataMeshAsSceneItem(pIModelDataMesh);
+
+		*pSceneItem = (IBase*)(pBaseSceneItem);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshscene_getsceneitemcount(LibMCEnv_MeshScene pMeshScene, LibMCEnv_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pIMeshScene->GetSceneItemCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshscene_getsceneitem(LibMCEnv_MeshScene pMeshScene, LibMCEnv_uint32 nIndex, LibMCEnv_MeshSceneItem * pSceneItem)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		if (pSceneItem == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseSceneItem(nullptr);
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseSceneItem = pIMeshScene->GetSceneItem(nIndex);
+
+		*pSceneItem = (IBase*)(pBaseSceneItem);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshscene_findsceneitem(LibMCEnv_MeshScene pMeshScene, const char * pUUID, bool bMustExist, LibMCEnv_MeshSceneItem * pSceneItem)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pSceneItem == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IBase* pBaseSceneItem(nullptr);
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseSceneItem = pIMeshScene->FindSceneItem(sUUID, bMustExist);
+
+		*pSceneItem = (IBase*)(pBaseSceneItem);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshscene_hassceneitem(LibMCEnv_MeshScene pMeshScene, const char * pUUID, bool * pSceneItemExists)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pSceneItemExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pSceneItemExists = pIMeshScene->HasSceneItem(sUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_meshscene_removesceneitem(LibMCEnv_MeshScene pMeshScene, LibMCEnv_MeshSceneItem pSceneItem)
+{
+	IBase* pIBaseClass = (IBase *)pMeshScene;
+
+	try {
+		IBase* pIBaseClassSceneItem = (IBase *)pSceneItem;
+		IMeshSceneItem* pISceneItem = dynamic_cast<IMeshSceneItem*>(pIBaseClassSceneItem);
+		if (!pISceneItem)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IMeshScene* pIMeshScene = dynamic_cast<IMeshScene*>(pIBaseClass);
+		if (!pIMeshScene)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMeshScene->RemoveSceneItem(pISceneItem);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for SceneHandler
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_scenehandler_meshispersistent(LibMCEnv_SceneHandler pSceneHandler, const char * pMeshUUID, bool * pMeshIsRegistered)
+{
+	IBase* pIBaseClass = (IBase *)pSceneHandler;
+
+	try {
+		if (pMeshUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMeshIsRegistered == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sMeshUUID(pMeshUUID);
+		ISceneHandler* pISceneHandler = dynamic_cast<ISceneHandler*>(pIBaseClass);
+		if (!pISceneHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMeshIsRegistered = pISceneHandler->MeshIsPersistent(sMeshUUID);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scenehandler_findpersistentmesh(LibMCEnv_SceneHandler pSceneHandler, const char * pMeshUUID, LibMCEnv_PersistentMeshObject * pMeshObjectInstance)
+{
+	IBase* pIBaseClass = (IBase *)pSceneHandler;
+
+	try {
+		if (pMeshUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pMeshObjectInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sMeshUUID(pMeshUUID);
+		IBase* pBaseMeshObjectInstance(nullptr);
+		ISceneHandler* pISceneHandler = dynamic_cast<ISceneHandler*>(pIBaseClass);
+		if (!pISceneHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseMeshObjectInstance = pISceneHandler->FindPersistentMesh(sMeshUUID);
+
+		*pMeshObjectInstance = (IBase*)(pBaseMeshObjectInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scenehandler_createemptymeshscene(LibMCEnv_SceneHandler pSceneHandler, bool bBoundToLoginSession, LibMCEnv_MeshScene * pSceneInstance)
+{
+	IBase* pIBaseClass = (IBase *)pSceneHandler;
+
+	try {
+		if (pSceneInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseSceneInstance(nullptr);
+		ISceneHandler* pISceneHandler = dynamic_cast<ISceneHandler*>(pIBaseClass);
+		if (!pISceneHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseSceneInstance = pISceneHandler->CreateEmptyMeshScene(bBoundToLoginSession);
+
+		*pSceneInstance = (IBase*)(pBaseSceneInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scenehandler_releasemeshscene(LibMCEnv_SceneHandler pSceneHandler, LibMCEnv_MeshScene pSceneInstance)
+{
+	IBase* pIBaseClass = (IBase *)pSceneHandler;
+
+	try {
+		IBase* pIBaseClassSceneInstance = (IBase *)pSceneInstance;
+		IMeshScene* pISceneInstance = dynamic_cast<IMeshScene*>(pIBaseClassSceneInstance);
+		if (!pISceneInstance)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		ISceneHandler* pISceneHandler = dynamic_cast<ISceneHandler*>(pIBaseClass);
+		if (!pISceneHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pISceneHandler->ReleaseMeshScene(pISceneInstance);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scenehandler_load3mffromresource(LibMCEnv_SceneHandler pSceneHandler, const char * pResourceName, LibMCEnv_ModelDataComponentInstance * pModelData)
+{
+	IBase* pIBaseClass = (IBase *)pSceneHandler;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pModelData == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		IBase* pBaseModelData(nullptr);
+		ISceneHandler* pISceneHandler = dynamic_cast<ISceneHandler*>(pIBaseClass);
+		if (!pISceneHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseModelData = pISceneHandler->Load3MFFromResource(sResourceName);
+
+		*pModelData = (IBase*)(pBaseModelData);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scenehandler_load3mffrommemory(LibMCEnv_SceneHandler pSceneHandler, LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer, LibMCEnv_ModelDataComponentInstance * pModelData)
+{
+	IBase* pIBaseClass = (IBase *)pSceneHandler;
+
+	try {
+		if ( (!pDataBuffer) && (nDataBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pModelData == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseModelData(nullptr);
+		ISceneHandler* pISceneHandler = dynamic_cast<ISceneHandler*>(pIBaseClass);
+		if (!pISceneHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseModelData = pISceneHandler->Load3MFFromMemory(nDataBufferSize, pDataBuffer);
+
+		*pModelData = (IBase*)(pBaseModelData);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scenehandler_load3mffromstream(LibMCEnv_SceneHandler pSceneHandler, LibMCEnv_StreamReader pReaderInstance, LibMCEnv_ModelDataComponentInstance * pModelData)
+{
+	IBase* pIBaseClass = (IBase *)pSceneHandler;
+
+	try {
+		if (pModelData == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassReaderInstance = (IBase *)pReaderInstance;
+		IStreamReader* pIReaderInstance = dynamic_cast<IStreamReader*>(pIBaseClassReaderInstance);
+		if (!pIReaderInstance)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pBaseModelData(nullptr);
+		ISceneHandler* pISceneHandler = dynamic_cast<ISceneHandler*>(pIBaseClass);
+		if (!pISceneHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseModelData = pISceneHandler->Load3MFFromStream(pIReaderInstance);
+
+		*pModelData = (IBase*)(pBaseModelData);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for ToolpathPart
@@ -4464,67 +6182,21 @@ LibMCEnvResult libmcenv_toolpathpart_getuuid(LibMCEnv_ToolpathPart pToolpathPart
 	}
 }
 
-LibMCEnvResult libmcenv_toolpathpart_getmeshuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nMeshUUIDBufferSize, LibMCEnv_uint32* pMeshUUIDNeededChars, char * pMeshUUIDBuffer)
+LibMCEnvResult libmcenv_toolpathpart_getrootcomponent(LibMCEnv_ToolpathPart pToolpathPart, LibMCEnv_ModelDataComponentInstance * pRootComponent)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathPart;
 
 	try {
-		if ( (!pMeshUUIDBuffer) && !(pMeshUUIDNeededChars) )
+		if (pRootComponent == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMeshUUID("");
+		IBase* pBaseRootComponent(nullptr);
 		IToolpathPart* pIToolpathPart = dynamic_cast<IToolpathPart*>(pIBaseClass);
 		if (!pIToolpathPart)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pMeshUUIDBuffer == nullptr);
-		if (isCacheCall) {
-			sMeshUUID = pIToolpathPart->GetMeshUUID();
+		pBaseRootComponent = pIToolpathPart->GetRootComponent();
 
-			pIToolpathPart->_setCache (new ParameterCache_1<std::string> (sMeshUUID));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIToolpathPart->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sMeshUUID);
-			pIToolpathPart->_setCache (nullptr);
-		}
-		
-		if (pMeshUUIDNeededChars)
-			*pMeshUUIDNeededChars = (LibMCEnv_uint32) (sMeshUUID.size()+1);
-		if (pMeshUUIDBuffer) {
-			if (sMeshUUID.size() >= nMeshUUIDBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iMeshUUID = 0; iMeshUUID < sMeshUUID.size(); iMeshUUID++)
-				pMeshUUIDBuffer[iMeshUUID] = sMeshUUID[iMeshUUID];
-			pMeshUUIDBuffer[sMeshUUID.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_toolpathpart_gettransform(LibMCEnv_ToolpathPart pToolpathPart, sLibMCEnvToolpathPartTransform * pMeshUUID)
-{
-	IBase* pIBaseClass = (IBase *)pToolpathPart;
-
-	try {
-		if (pMeshUUID == nullptr)
-		throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		IToolpathPart* pIToolpathPart = dynamic_cast<IToolpathPart*>(pIBaseClass);
-		if (!pIToolpathPart)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pMeshUUID = pIToolpathPart->GetTransform();
-
+		*pRootComponent = (IBase*)(pBaseRootComponent);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -5452,6 +7124,32 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentpartuuid(LibMCEnv_ToolpathLayer 
 				pPartUUIDBuffer[iPartUUID] = sPartUUID[iPartUUID];
 			pPartUUIDBuffer[sPartUUID.size()] = 0;
 		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_getsegmentlocalpartid(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pLocalPartID)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pLocalPartID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pLocalPartID = pIToolpathLayer->GetSegmentLocalPartID(nIndex);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -6457,6 +8155,64 @@ LibMCEnvResult libmcenv_toolpathaccessor_finduniquemetadata(LibMCEnv_ToolpathAcc
 		pBaseXMLNode = pIToolpathAccessor->FindUniqueMetaData(sNamespace, sName);
 
 		*pXMLNode = (IBase*)(pBaseXMLNode);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_hasbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pIdentifier, bool * pHasMetaData)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pHasMetaData == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasMetaData = pIToolpathAccessor->HasBinaryMetaData(sIdentifier);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_getbinarymetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pIdentifier, const LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ((!pMetaDataBuffer) && !(pMetaDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIToolpathAccessor->GetBinaryMetaData(sIdentifier, nMetaDataBufferSize, pMetaDataNeededCount, pMetaDataBuffer);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -20989,84 +22745,21 @@ LibMCEnvResult libmcenv_stateenvironment_getcurrentjournal(LibMCEnv_StateEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_stateenvironment_registermeshfrom3mfresource(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, LibMCEnv_MeshObject * pMeshObject)
+LibMCEnvResult libmcenv_stateenvironment_createscenehandler(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_SceneHandler * pInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
 
 	try {
-		if (pResourceName == nullptr)
+		if (pInstance == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMeshObject == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sResourceName(pResourceName);
-		IBase* pBaseMeshObject(nullptr);
+		IBase* pBaseInstance(nullptr);
 		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
 		if (!pIStateEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseMeshObject = pIStateEnvironment->RegisterMeshFrom3MFResource(sResourceName);
+		pBaseInstance = pIStateEnvironment->CreateSceneHandler();
 
-		*pMeshObject = (IBase*)(pBaseMeshObject);
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_meshisregistered(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pMeshUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMeshIsRegistered == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMeshUUID(pMeshUUID);
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pMeshIsRegistered = pIStateEnvironment->MeshIsRegistered(sMeshUUID);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_stateenvironment_findregisteredmesh(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject)
-{
-	IBase* pIBaseClass = (IBase *)pStateEnvironment;
-
-	try {
-		if (pMeshUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMeshObject == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMeshUUID(pMeshUUID);
-		IBase* pBaseMeshObject(nullptr);
-		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
-		if (!pIStateEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pBaseMeshObject = pIStateEnvironment->FindRegisteredMesh(sMeshUUID);
-
-		*pMeshObject = (IBase*)(pBaseMeshObject);
+		*pInstance = (IBase*)(pBaseInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -23585,87 +25278,21 @@ LibMCEnvResult libmcenv_uienvironment_getcurrentjournal(LibMCEnv_UIEnvironment p
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_registermeshfrom3mfresource(LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject)
+LibMCEnvResult libmcenv_uienvironment_createscenehandler(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_SceneHandler * pInstance)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pResourceName == nullptr)
+		if (pInstance == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMeshUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMeshObject == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sResourceName(pResourceName);
-		std::string sMeshUUID(pMeshUUID);
-		IBase* pBaseMeshObject(nullptr);
+		IBase* pBaseInstance(nullptr);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseMeshObject = pIUIEnvironment->RegisterMeshFrom3MFResource(sResourceName, sMeshUUID);
+		pBaseInstance = pIUIEnvironment->CreateSceneHandler();
 
-		*pMeshObject = (IBase*)(pBaseMeshObject);
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_meshisregistered(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, bool * pMeshIsRegistered)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pMeshUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMeshIsRegistered == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMeshUUID(pMeshUUID);
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pMeshIsRegistered = pIUIEnvironment->MeshIsRegistered(sMeshUUID);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_findregisteredmesh(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMeshUUID, LibMCEnv_MeshObject * pMeshObject)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pMeshUUID == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pMeshObject == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sMeshUUID(pMeshUUID);
-		IBase* pBaseMeshObject(nullptr);
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pBaseMeshObject = pIUIEnvironment->FindRegisteredMesh(sMeshUUID);
-
-		*pMeshObject = (IBase*)(pBaseMeshObject);
+		*pInstance = (IBase*)(pBaseInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -24378,6 +26005,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_datatable_setuint32columnvalues;
 	if (sProcName == "libmcenv_datatable_setuint64columnvalues") 
 		*ppProcAddress = (void*) &libmcenv_datatable_setuint64columnvalues;
+	if (sProcName == "libmcenv_datatable_createwriteoptions") 
+		*ppProcAddress = (void*) &libmcenv_datatable_createwriteoptions;
+	if (sProcName == "libmcenv_datatable_createcsvwriteoptions") 
+		*ppProcAddress = (void*) &libmcenv_datatable_createcsvwriteoptions;
 	if (sProcName == "libmcenv_datatable_writecsvtostream") 
 		*ppProcAddress = (void*) &libmcenv_datatable_writecsvtostream;
 	if (sProcName == "libmcenv_datatable_writedatatostream") 
@@ -24518,14 +26149,120 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_meshobject_gettrianglecount;
 	if (sProcName == "libmcenv_meshobject_getvertexcount") 
 		*ppProcAddress = (void*) &libmcenv_meshobject_getvertexcount;
+	if (sProcName == "libmcenv_meshobject_ismanifold") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_ismanifold;
+	if (sProcName == "libmcenv_meshobject_isoriented") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_isoriented;
+	if (sProcName == "libmcenv_meshobject_iswatertight") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_iswatertight;
+	if (sProcName == "libmcenv_meshobject_getmaxvertexid") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_getmaxvertexid;
+	if (sProcName == "libmcenv_meshobject_vertexexists") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_vertexexists;
+	if (sProcName == "libmcenv_meshobject_getvertex") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_getvertex;
+	if (sProcName == "libmcenv_meshobject_getvertexids") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_getvertexids;
+	if (sProcName == "libmcenv_meshobject_getallvertices") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_getallvertices;
+	if (sProcName == "libmcenv_meshobject_getmaxtriangleid") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_getmaxtriangleid;
+	if (sProcName == "libmcenv_meshobject_triangeexists") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_triangeexists;
+	if (sProcName == "libmcenv_meshobject_gettriangle") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_gettriangle;
+	if (sProcName == "libmcenv_meshobject_gettriangleids") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_gettriangleids;
+	if (sProcName == "libmcenv_meshobject_getalltriangles") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_getalltriangles;
+	if (sProcName == "libmcenv_meshobject_ispersistent") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_ispersistent;
+	if (sProcName == "libmcenv_meshobject_makepersistent") 
+		*ppProcAddress = (void*) &libmcenv_meshobject_makepersistent;
+	if (sProcName == "libmcenv_persistentmeshobject_isboundtologinsession") 
+		*ppProcAddress = (void*) &libmcenv_persistentmeshobject_isboundtologinsession;
+	if (sProcName == "libmcenv_modeldatameshinstance_getname") 
+		*ppProcAddress = (void*) &libmcenv_modeldatameshinstance_getname;
+	if (sProcName == "libmcenv_modeldatameshinstance_getuuid") 
+		*ppProcAddress = (void*) &libmcenv_modeldatameshinstance_getuuid;
+	if (sProcName == "libmcenv_modeldatameshinstance_getlocaltransform") 
+		*ppProcAddress = (void*) &libmcenv_modeldatameshinstance_getlocaltransform;
+	if (sProcName == "libmcenv_modeldatameshinstance_getabsolutetransform") 
+		*ppProcAddress = (void*) &libmcenv_modeldatameshinstance_getabsolutetransform;
+	if (sProcName == "libmcenv_modeldatameshinstance_createcopiedmesh") 
+		*ppProcAddress = (void*) &libmcenv_modeldatameshinstance_createcopiedmesh;
+	if (sProcName == "libmcenv_modeldatameshinstance_createpersistentmesh") 
+		*ppProcAddress = (void*) &libmcenv_modeldatameshinstance_createpersistentmesh;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getname") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getname;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getuuid") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getuuid;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getlocaltransform") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getlocaltransform;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getabsolutetransform") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getabsolutetransform;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getsolidcount") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getsolidcount;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getsolidmesh") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getsolidmesh;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getsupportcount") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getsupportcount;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getsupportmesh") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getsupportmesh;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getsubcomponentcount") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getsubcomponentcount;
+	if (sProcName == "libmcenv_modeldatacomponentinstance_getsubcomponent") 
+		*ppProcAddress = (void*) &libmcenv_modeldatacomponentinstance_getsubcomponent;
+	if (sProcName == "libmcenv_meshsceneitem_getitemuuid") 
+		*ppProcAddress = (void*) &libmcenv_meshsceneitem_getitemuuid;
+	if (sProcName == "libmcenv_meshsceneitem_getsceneuuid") 
+		*ppProcAddress = (void*) &libmcenv_meshsceneitem_getsceneuuid;
+	if (sProcName == "libmcenv_meshsceneitem_gettransform") 
+		*ppProcAddress = (void*) &libmcenv_meshsceneitem_gettransform;
+	if (sProcName == "libmcenv_meshsceneitem_updatetransform") 
+		*ppProcAddress = (void*) &libmcenv_meshsceneitem_updatetransform;
+	if (sProcName == "libmcenv_meshsceneitem_getmeshobject") 
+		*ppProcAddress = (void*) &libmcenv_meshsceneitem_getmeshobject;
+	if (sProcName == "libmcenv_meshsceneitem_referenceisvalid") 
+		*ppProcAddress = (void*) &libmcenv_meshsceneitem_referenceisvalid;
+	if (sProcName == "libmcenv_meshscene_getsceneuuid") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_getsceneuuid;
+	if (sProcName == "libmcenv_meshscene_isboundtologinsession") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_isboundtologinsession;
+	if (sProcName == "libmcenv_meshscene_addsceneitem") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_addsceneitem;
+	if (sProcName == "libmcenv_meshscene_addmodeldatameshassceneitem") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_addmodeldatameshassceneitem;
+	if (sProcName == "libmcenv_meshscene_getsceneitemcount") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_getsceneitemcount;
+	if (sProcName == "libmcenv_meshscene_getsceneitem") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_getsceneitem;
+	if (sProcName == "libmcenv_meshscene_findsceneitem") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_findsceneitem;
+	if (sProcName == "libmcenv_meshscene_hassceneitem") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_hassceneitem;
+	if (sProcName == "libmcenv_meshscene_removesceneitem") 
+		*ppProcAddress = (void*) &libmcenv_meshscene_removesceneitem;
+	if (sProcName == "libmcenv_scenehandler_meshispersistent") 
+		*ppProcAddress = (void*) &libmcenv_scenehandler_meshispersistent;
+	if (sProcName == "libmcenv_scenehandler_findpersistentmesh") 
+		*ppProcAddress = (void*) &libmcenv_scenehandler_findpersistentmesh;
+	if (sProcName == "libmcenv_scenehandler_createemptymeshscene") 
+		*ppProcAddress = (void*) &libmcenv_scenehandler_createemptymeshscene;
+	if (sProcName == "libmcenv_scenehandler_releasemeshscene") 
+		*ppProcAddress = (void*) &libmcenv_scenehandler_releasemeshscene;
+	if (sProcName == "libmcenv_scenehandler_load3mffromresource") 
+		*ppProcAddress = (void*) &libmcenv_scenehandler_load3mffromresource;
+	if (sProcName == "libmcenv_scenehandler_load3mffrommemory") 
+		*ppProcAddress = (void*) &libmcenv_scenehandler_load3mffrommemory;
+	if (sProcName == "libmcenv_scenehandler_load3mffromstream") 
+		*ppProcAddress = (void*) &libmcenv_scenehandler_load3mffromstream;
 	if (sProcName == "libmcenv_toolpathpart_getname") 
 		*ppProcAddress = (void*) &libmcenv_toolpathpart_getname;
 	if (sProcName == "libmcenv_toolpathpart_getuuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathpart_getuuid;
-	if (sProcName == "libmcenv_toolpathpart_getmeshuuid") 
-		*ppProcAddress = (void*) &libmcenv_toolpathpart_getmeshuuid;
-	if (sProcName == "libmcenv_toolpathpart_gettransform") 
-		*ppProcAddress = (void*) &libmcenv_toolpathpart_gettransform;
+	if (sProcName == "libmcenv_toolpathpart_getrootcomponent") 
+		*ppProcAddress = (void*) &libmcenv_toolpathpart_getrootcomponent;
 	if (sProcName == "libmcenv_toolpathlayer_getlayerdatauuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getlayerdatauuid;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentcount") 
@@ -24582,6 +26319,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentprofiletypedvaluedef;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentpartuuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpartuuid;
+	if (sProcName == "libmcenv_toolpathlayer_getsegmentlocalpartid") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentlocalpartid;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentpointdata") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpointdata;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmenthatchdata") 
@@ -24646,6 +26385,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_hasuniquemetadata;
 	if (sProcName == "libmcenv_toolpathaccessor_finduniquemetadata") 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_finduniquemetadata;
+	if (sProcName == "libmcenv_toolpathaccessor_hasbinarymetadata") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_hasbinarymetadata;
+	if (sProcName == "libmcenv_toolpathaccessor_getbinarymetadata") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getbinarymetadata;
 	if (sProcName == "libmcenv_buildexecution_getuuid") 
 		*ppProcAddress = (void*) &libmcenv_buildexecution_getuuid;
 	if (sProcName == "libmcenv_buildexecution_getbuilduuid") 
@@ -25508,12 +27251,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createusermanagement;
 	if (sProcName == "libmcenv_stateenvironment_getcurrentjournal") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getcurrentjournal;
-	if (sProcName == "libmcenv_stateenvironment_registermeshfrom3mfresource") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_registermeshfrom3mfresource;
-	if (sProcName == "libmcenv_stateenvironment_meshisregistered") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_meshisregistered;
-	if (sProcName == "libmcenv_stateenvironment_findregisteredmesh") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_findregisteredmesh;
+	if (sProcName == "libmcenv_stateenvironment_createscenehandler") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_createscenehandler;
 	if (sProcName == "libmcenv_stateenvironment_createdataseries") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createdataseries;
 	if (sProcName == "libmcenv_stateenvironment_hasdataseries") 
@@ -25658,12 +27397,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_createusermanagement;
 	if (sProcName == "libmcenv_uienvironment_getcurrentjournal") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getcurrentjournal;
-	if (sProcName == "libmcenv_uienvironment_registermeshfrom3mfresource") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_registermeshfrom3mfresource;
-	if (sProcName == "libmcenv_uienvironment_meshisregistered") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_meshisregistered;
-	if (sProcName == "libmcenv_uienvironment_findregisteredmesh") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_findregisteredmesh;
+	if (sProcName == "libmcenv_uienvironment_createscenehandler") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_createscenehandler;
 	if (sProcName == "libmcenv_uienvironment_createdataseries") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_createdataseries;
 	if (sProcName == "libmcenv_uienvironment_hasdataseries") 

@@ -75,6 +75,12 @@ class CDataSeries;
 class CDateTimeDifference;
 class CDateTime;
 class CMeshObject;
+class CPersistentMeshObject;
+class CModelDataMeshInstance;
+class CModelDataComponentInstance;
+class CMeshSceneItem;
+class CMeshScene;
+class CSceneHandler;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
@@ -134,6 +140,12 @@ typedef CDataSeries CLibMCEnvDataSeries;
 typedef CDateTimeDifference CLibMCEnvDateTimeDifference;
 typedef CDateTime CLibMCEnvDateTime;
 typedef CMeshObject CLibMCEnvMeshObject;
+typedef CPersistentMeshObject CLibMCEnvPersistentMeshObject;
+typedef CModelDataMeshInstance CLibMCEnvModelDataMeshInstance;
+typedef CModelDataComponentInstance CLibMCEnvModelDataComponentInstance;
+typedef CMeshSceneItem CLibMCEnvMeshSceneItem;
+typedef CMeshScene CLibMCEnvMeshScene;
+typedef CSceneHandler CLibMCEnvSceneHandler;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
@@ -193,6 +205,12 @@ typedef std::shared_ptr<CDataSeries> PDataSeries;
 typedef std::shared_ptr<CDateTimeDifference> PDateTimeDifference;
 typedef std::shared_ptr<CDateTime> PDateTime;
 typedef std::shared_ptr<CMeshObject> PMeshObject;
+typedef std::shared_ptr<CPersistentMeshObject> PPersistentMeshObject;
+typedef std::shared_ptr<CModelDataMeshInstance> PModelDataMeshInstance;
+typedef std::shared_ptr<CModelDataComponentInstance> PModelDataComponentInstance;
+typedef std::shared_ptr<CMeshSceneItem> PMeshSceneItem;
+typedef std::shared_ptr<CMeshScene> PMeshScene;
+typedef std::shared_ptr<CSceneHandler> PSceneHandler;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
@@ -252,6 +270,12 @@ typedef PDataSeries PLibMCEnvDataSeries;
 typedef PDateTimeDifference PLibMCEnvDateTimeDifference;
 typedef PDateTime PLibMCEnvDateTime;
 typedef PMeshObject PLibMCEnvMeshObject;
+typedef PPersistentMeshObject PLibMCEnvPersistentMeshObject;
+typedef PModelDataMeshInstance PLibMCEnvModelDataMeshInstance;
+typedef PModelDataComponentInstance PLibMCEnvModelDataComponentInstance;
+typedef PMeshSceneItem PLibMCEnvMeshSceneItem;
+typedef PMeshScene PLibMCEnvMeshScene;
+typedef PSceneHandler PLibMCEnvSceneHandler;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
@@ -553,6 +577,9 @@ public:
 			case LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER: return "EMPTYDATATABLEIDENTIFIER";
 			case LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER: return "INVALIDDATATABLEIDENTIFIER";
 			case LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE: return "INVALIDDATATABLESIGNATURE";
+			case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "INVALIDSUPPORTINDEX";
+			case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "INVALIDSOLIDINDEX";
+			case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "INVALIDCOMPONENTINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -745,6 +772,9 @@ public:
 			case LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER: return "Empty datatable identifier";
 			case LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER: return "Invalid datatable identifier";
 			case LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE: return "Invalid datatable signature";
+			case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "Invalid support index";
+			case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "Invalid solid index";
+			case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "Invalid component index";
 		}
 		return "unknown error";
 	}
@@ -877,6 +907,12 @@ private:
 	friend class CDateTimeDifference;
 	friend class CDateTime;
 	friend class CMeshObject;
+	friend class CPersistentMeshObject;
+	friend class CModelDataMeshInstance;
+	friend class CModelDataComponentInstance;
+	friend class CMeshSceneItem;
+	friend class CMeshScene;
+	friend class CSceneHandler;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
@@ -1225,6 +1261,8 @@ public:
 	inline void SetInt64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_int64> & ValuesBuffer);
 	inline void SetUint32ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint32> & ValuesBuffer);
 	inline void SetUint64ColumnValues(const std::string & sIdentifier, const CInputVector<LibMCEnv_uint64> & ValuesBuffer);
+	inline PDataTableWriteOptions CreateWriteOptions();
+	inline PDataTableCSVWriteOptions CreateCSVWriteOptions();
 	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions);
 	inline void WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions);
 	inline void LoadFromStream(classParam<CStreamReader> pStream);
@@ -1359,6 +1397,156 @@ public:
 	inline std::string GetUUID();
 	inline LibMCEnv_uint32 GetTriangleCount();
 	inline LibMCEnv_uint32 GetVertexCount();
+	inline bool IsManifold();
+	inline bool IsOriented();
+	inline bool IsWatertight();
+	inline LibMCEnv_uint32 GetMaxVertexID();
+	inline bool VertexExists(const LibMCEnv_uint32 nVertexID);
+	inline bool GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double & dX, LibMCEnv_double & dY, LibMCEnv_double & dZ);
+	inline void GetVertexIDs(std::vector<LibMCEnv_uint32> & VertexIDsBuffer);
+	inline void GetAllVertices(std::vector<sMeshVertex3D> & VerticesBuffer);
+	inline LibMCEnv_uint32 GetMaxTriangleID();
+	inline bool TriangeExists(const LibMCEnv_uint32 nTriangleID);
+	inline bool GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32 & nVertex1ID, LibMCEnv_uint32 & nVertex2ID, LibMCEnv_uint32 & nVertex3ID);
+	inline void GetTriangleIDs(std::vector<LibMCEnv_uint32> & TriangleIDsBuffer);
+	inline void GetAllTriangles(std::vector<sMeshTriangle3D> & TrianglesBuffer);
+	inline bool IsPersistent();
+	inline PPersistentMeshObject MakePersistent(const bool bBoundToLoginSession);
+};
+	
+/*************************************************************************************************************************
+ Class CPersistentMeshObject 
+**************************************************************************************************************************/
+class CPersistentMeshObject : public CMeshObject {
+public:
+	
+	/**
+	* CPersistentMeshObject::CPersistentMeshObject - Constructor for PersistentMeshObject class.
+	*/
+	CPersistentMeshObject(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CMeshObject(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool IsBoundToLoginSession();
+};
+	
+/*************************************************************************************************************************
+ Class CModelDataMeshInstance 
+**************************************************************************************************************************/
+class CModelDataMeshInstance : public CBase {
+public:
+	
+	/**
+	* CModelDataMeshInstance::CModelDataMeshInstance - Constructor for ModelDataMeshInstance class.
+	*/
+	CModelDataMeshInstance(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetUUID();
+	inline sModelDataTransform GetLocalTransform();
+	inline sModelDataTransform GetAbsoluteTransform();
+	inline PMeshObject CreateCopiedMesh();
+	inline PPersistentMeshObject CreatePersistentMesh(const bool bBoundToLoginSession);
+};
+	
+/*************************************************************************************************************************
+ Class CModelDataComponentInstance 
+**************************************************************************************************************************/
+class CModelDataComponentInstance : public CBase {
+public:
+	
+	/**
+	* CModelDataComponentInstance::CModelDataComponentInstance - Constructor for ModelDataComponentInstance class.
+	*/
+	CModelDataComponentInstance(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetUUID();
+	inline sModelDataTransform GetLocalTransform();
+	inline sModelDataTransform GetAbsoluteTransform();
+	inline LibMCEnv_uint32 GetSolidCount();
+	inline PModelDataMeshInstance GetSolidMesh(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_uint32 GetSupportCount();
+	inline PModelDataMeshInstance GetSupportMesh(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_uint32 GetSubComponentCount();
+	inline PModelDataComponentInstance GetSubComponent(const LibMCEnv_uint32 nIndex);
+};
+	
+/*************************************************************************************************************************
+ Class CMeshSceneItem 
+**************************************************************************************************************************/
+class CMeshSceneItem : public CBase {
+public:
+	
+	/**
+	* CMeshSceneItem::CMeshSceneItem - Constructor for MeshSceneItem class.
+	*/
+	CMeshSceneItem(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetItemUUID();
+	inline std::string GetSceneUUID();
+	inline sModelDataTransform GetTransform();
+	inline void UpdateTransform(const sModelDataTransform & AbsoluteTransform);
+	inline PPersistentMeshObject GetMeshObject();
+	inline bool ReferenceIsValid();
+};
+	
+/*************************************************************************************************************************
+ Class CMeshScene 
+**************************************************************************************************************************/
+class CMeshScene : public CBase {
+public:
+	
+	/**
+	* CMeshScene::CMeshScene - Constructor for MeshScene class.
+	*/
+	CMeshScene(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetSceneUUID();
+	inline bool IsBoundToLoginSession();
+	inline PMeshSceneItem AddSceneItem(classParam<CPersistentMeshObject> pMesh, const sModelDataTransform & AbsoluteTransform);
+	inline PMeshSceneItem AddModelDataMeshAsSceneItem(classParam<CModelDataMeshInstance> pModelDataMesh);
+	inline LibMCEnv_uint32 GetSceneItemCount();
+	inline PMeshSceneItem GetSceneItem(const LibMCEnv_uint32 nIndex);
+	inline PMeshSceneItem FindSceneItem(const std::string & sUUID, const bool bMustExist);
+	inline bool HasSceneItem(const std::string & sUUID);
+	inline void RemoveSceneItem(classParam<CMeshSceneItem> pSceneItem);
+};
+	
+/*************************************************************************************************************************
+ Class CSceneHandler 
+**************************************************************************************************************************/
+class CSceneHandler : public CBase {
+public:
+	
+	/**
+	* CSceneHandler::CSceneHandler - Constructor for SceneHandler class.
+	*/
+	CSceneHandler(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool MeshIsPersistent(const std::string & sMeshUUID);
+	inline PPersistentMeshObject FindPersistentMesh(const std::string & sMeshUUID);
+	inline PMeshScene CreateEmptyMeshScene(const bool bBoundToLoginSession);
+	inline void ReleaseMeshScene(classParam<CMeshScene> pSceneInstance);
+	inline PModelDataComponentInstance Load3MFFromResource(const std::string & sResourceName);
+	inline PModelDataComponentInstance Load3MFFromMemory(const CInputVector<LibMCEnv_uint8> & DataBuffer);
+	inline PModelDataComponentInstance Load3MFFromStream(classParam<CStreamReader> pReaderInstance);
 };
 	
 /*************************************************************************************************************************
@@ -1377,8 +1565,7 @@ public:
 	
 	inline std::string GetName();
 	inline std::string GetUUID();
-	inline std::string GetMeshUUID();
-	inline sToolpathPartTransform GetTransform();
+	inline PModelDataComponentInstance GetRootComponent();
 };
 	
 /*************************************************************************************************************************
@@ -1423,6 +1610,7 @@ public:
 	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
 	inline LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue);
 	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex);
 	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 	inline void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer);
 	inline void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer);
@@ -1471,6 +1659,8 @@ public:
 	inline PXMLDocumentNode GetMetaDataContent(const LibMCEnv_uint32 nMetaDataIndex);
 	inline bool HasUniqueMetaData(const std::string & sNamespace, const std::string & sName);
 	inline PXMLDocumentNode FindUniqueMetaData(const std::string & sNamespace, const std::string & sName);
+	inline bool HasBinaryMetaData(const std::string & sIdentifier);
+	inline void GetBinaryMetaData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & MetaDataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -2430,9 +2620,7 @@ public:
 	inline bool CheckUserPermission(const std::string & sUserLogin, const std::string & sPermissionIdentifier);
 	inline PUserManagementHandler CreateUserManagement();
 	inline PJournalHandler GetCurrentJournal();
-	inline PMeshObject RegisterMeshFrom3MFResource(const std::string & sResourceName);
-	inline bool MeshIsRegistered(const std::string & sMeshUUID);
-	inline PMeshObject FindRegisteredMesh(const std::string & sMeshUUID);
+	inline PSceneHandler CreateSceneHandler();
 	inline PDataSeries CreateDataSeries(const std::string & sName);
 	inline bool HasDataSeries(const std::string & sDataSeriesUUID);
 	inline PDataSeries FindDataSeries(const std::string & sDataSeriesUUID);
@@ -2537,9 +2725,7 @@ public:
 	inline std::string GetCurrentUserUUID();
 	inline PUserManagementHandler CreateUserManagement();
 	inline PJournalHandler GetCurrentJournal();
-	inline PMeshObject RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID);
-	inline bool MeshIsRegistered(const std::string & sMeshUUID);
-	inline PMeshObject FindRegisteredMesh(const std::string & sMeshUUID);
+	inline PSceneHandler CreateSceneHandler();
 	inline PDataSeries CreateDataSeries(const std::string & sName, const bool bBoundToLogin);
 	inline bool HasDataSeries(const std::string & sDataSeriesUUID);
 	inline PDataSeries FindDataSeries(const std::string & sDataSeriesUUID);
@@ -2717,6 +2903,8 @@ public:
 		pWrapperTable->m_DataTable_SetInt64ColumnValues = nullptr;
 		pWrapperTable->m_DataTable_SetUint32ColumnValues = nullptr;
 		pWrapperTable->m_DataTable_SetUint64ColumnValues = nullptr;
+		pWrapperTable->m_DataTable_CreateWriteOptions = nullptr;
+		pWrapperTable->m_DataTable_CreateCSVWriteOptions = nullptr;
 		pWrapperTable->m_DataTable_WriteCSVToStream = nullptr;
 		pWrapperTable->m_DataTable_WriteDataToStream = nullptr;
 		pWrapperTable->m_DataTable_LoadFromStream = nullptr;
@@ -2787,10 +2975,63 @@ public:
 		pWrapperTable->m_MeshObject_GetUUID = nullptr;
 		pWrapperTable->m_MeshObject_GetTriangleCount = nullptr;
 		pWrapperTable->m_MeshObject_GetVertexCount = nullptr;
+		pWrapperTable->m_MeshObject_IsManifold = nullptr;
+		pWrapperTable->m_MeshObject_IsOriented = nullptr;
+		pWrapperTable->m_MeshObject_IsWatertight = nullptr;
+		pWrapperTable->m_MeshObject_GetMaxVertexID = nullptr;
+		pWrapperTable->m_MeshObject_VertexExists = nullptr;
+		pWrapperTable->m_MeshObject_GetVertex = nullptr;
+		pWrapperTable->m_MeshObject_GetVertexIDs = nullptr;
+		pWrapperTable->m_MeshObject_GetAllVertices = nullptr;
+		pWrapperTable->m_MeshObject_GetMaxTriangleID = nullptr;
+		pWrapperTable->m_MeshObject_TriangeExists = nullptr;
+		pWrapperTable->m_MeshObject_GetTriangle = nullptr;
+		pWrapperTable->m_MeshObject_GetTriangleIDs = nullptr;
+		pWrapperTable->m_MeshObject_GetAllTriangles = nullptr;
+		pWrapperTable->m_MeshObject_IsPersistent = nullptr;
+		pWrapperTable->m_MeshObject_MakePersistent = nullptr;
+		pWrapperTable->m_PersistentMeshObject_IsBoundToLoginSession = nullptr;
+		pWrapperTable->m_ModelDataMeshInstance_GetName = nullptr;
+		pWrapperTable->m_ModelDataMeshInstance_GetUUID = nullptr;
+		pWrapperTable->m_ModelDataMeshInstance_GetLocalTransform = nullptr;
+		pWrapperTable->m_ModelDataMeshInstance_GetAbsoluteTransform = nullptr;
+		pWrapperTable->m_ModelDataMeshInstance_CreateCopiedMesh = nullptr;
+		pWrapperTable->m_ModelDataMeshInstance_CreatePersistentMesh = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetName = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetUUID = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetLocalTransform = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetAbsoluteTransform = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetSolidCount = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetSolidMesh = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetSupportCount = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetSupportMesh = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetSubComponentCount = nullptr;
+		pWrapperTable->m_ModelDataComponentInstance_GetSubComponent = nullptr;
+		pWrapperTable->m_MeshSceneItem_GetItemUUID = nullptr;
+		pWrapperTable->m_MeshSceneItem_GetSceneUUID = nullptr;
+		pWrapperTable->m_MeshSceneItem_GetTransform = nullptr;
+		pWrapperTable->m_MeshSceneItem_UpdateTransform = nullptr;
+		pWrapperTable->m_MeshSceneItem_GetMeshObject = nullptr;
+		pWrapperTable->m_MeshSceneItem_ReferenceIsValid = nullptr;
+		pWrapperTable->m_MeshScene_GetSceneUUID = nullptr;
+		pWrapperTable->m_MeshScene_IsBoundToLoginSession = nullptr;
+		pWrapperTable->m_MeshScene_AddSceneItem = nullptr;
+		pWrapperTable->m_MeshScene_AddModelDataMeshAsSceneItem = nullptr;
+		pWrapperTable->m_MeshScene_GetSceneItemCount = nullptr;
+		pWrapperTable->m_MeshScene_GetSceneItem = nullptr;
+		pWrapperTable->m_MeshScene_FindSceneItem = nullptr;
+		pWrapperTable->m_MeshScene_HasSceneItem = nullptr;
+		pWrapperTable->m_MeshScene_RemoveSceneItem = nullptr;
+		pWrapperTable->m_SceneHandler_MeshIsPersistent = nullptr;
+		pWrapperTable->m_SceneHandler_FindPersistentMesh = nullptr;
+		pWrapperTable->m_SceneHandler_CreateEmptyMeshScene = nullptr;
+		pWrapperTable->m_SceneHandler_ReleaseMeshScene = nullptr;
+		pWrapperTable->m_SceneHandler_Load3MFFromResource = nullptr;
+		pWrapperTable->m_SceneHandler_Load3MFFromMemory = nullptr;
+		pWrapperTable->m_SceneHandler_Load3MFFromStream = nullptr;
 		pWrapperTable->m_ToolpathPart_GetName = nullptr;
 		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
-		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
-		pWrapperTable->m_ToolpathPart_GetTransform = nullptr;
+		pWrapperTable->m_ToolpathPart_GetRootComponent = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
@@ -2819,6 +3060,7 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValueDef = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = nullptr;
@@ -2851,6 +3093,8 @@ public:
 		pWrapperTable->m_ToolpathAccessor_GetMetaDataContent = nullptr;
 		pWrapperTable->m_ToolpathAccessor_HasUniqueMetaData = nullptr;
 		pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData = nullptr;
+		pWrapperTable->m_ToolpathAccessor_HasBinaryMetaData = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData = nullptr;
 		pWrapperTable->m_BuildExecution_GetUUID = nullptr;
 		pWrapperTable->m_BuildExecution_GetBuildUUID = nullptr;
 		pWrapperTable->m_BuildExecution_GetBuild = nullptr;
@@ -3282,9 +3526,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CheckUserPermission = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateUserManagement = nullptr;
 		pWrapperTable->m_StateEnvironment_GetCurrentJournal = nullptr;
-		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = nullptr;
-		pWrapperTable->m_StateEnvironment_MeshIsRegistered = nullptr;
-		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateSceneHandler = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDataSeries = nullptr;
 		pWrapperTable->m_StateEnvironment_HasDataSeries = nullptr;
 		pWrapperTable->m_StateEnvironment_FindDataSeries = nullptr;
@@ -3357,9 +3599,7 @@ public:
 		pWrapperTable->m_UIEnvironment_GetCurrentUserUUID = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateUserManagement = nullptr;
 		pWrapperTable->m_UIEnvironment_GetCurrentJournal = nullptr;
-		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = nullptr;
-		pWrapperTable->m_UIEnvironment_MeshIsRegistered = nullptr;
-		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateSceneHandler = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDataSeries = nullptr;
 		pWrapperTable->m_UIEnvironment_HasDataSeries = nullptr;
 		pWrapperTable->m_UIEnvironment_FindDataSeries = nullptr;
@@ -4118,6 +4358,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataTable_CreateWriteOptions = (PLibMCEnvDataTable_CreateWriteOptionsPtr) GetProcAddress(hLibrary, "libmcenv_datatable_createwriteoptions");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_CreateWriteOptions = (PLibMCEnvDataTable_CreateWriteOptionsPtr) dlsym(hLibrary, "libmcenv_datatable_createwriteoptions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_CreateWriteOptions == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_CreateCSVWriteOptions = (PLibMCEnvDataTable_CreateCSVWriteOptionsPtr) GetProcAddress(hLibrary, "libmcenv_datatable_createcsvwriteoptions");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_CreateCSVWriteOptions = (PLibMCEnvDataTable_CreateCSVWriteOptionsPtr) dlsym(hLibrary, "libmcenv_datatable_createcsvwriteoptions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_CreateCSVWriteOptions == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataTable_WriteCSVToStream = (PLibMCEnvDataTable_WriteCSVToStreamPtr) GetProcAddress(hLibrary, "libmcenv_datatable_writecsvtostream");
 		#else // _WIN32
 		pWrapperTable->m_DataTable_WriteCSVToStream = (PLibMCEnvDataTable_WriteCSVToStreamPtr) dlsym(hLibrary, "libmcenv_datatable_writecsvtostream");
@@ -4748,6 +5006,492 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_IsManifold = (PLibMCEnvMeshObject_IsManifoldPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_ismanifold");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_IsManifold = (PLibMCEnvMeshObject_IsManifoldPtr) dlsym(hLibrary, "libmcenv_meshobject_ismanifold");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_IsManifold == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_IsOriented = (PLibMCEnvMeshObject_IsOrientedPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_isoriented");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_IsOriented = (PLibMCEnvMeshObject_IsOrientedPtr) dlsym(hLibrary, "libmcenv_meshobject_isoriented");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_IsOriented == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_IsWatertight = (PLibMCEnvMeshObject_IsWatertightPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_iswatertight");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_IsWatertight = (PLibMCEnvMeshObject_IsWatertightPtr) dlsym(hLibrary, "libmcenv_meshobject_iswatertight");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_IsWatertight == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetMaxVertexID = (PLibMCEnvMeshObject_GetMaxVertexIDPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getmaxvertexid");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetMaxVertexID = (PLibMCEnvMeshObject_GetMaxVertexIDPtr) dlsym(hLibrary, "libmcenv_meshobject_getmaxvertexid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetMaxVertexID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_VertexExists = (PLibMCEnvMeshObject_VertexExistsPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_vertexexists");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_VertexExists = (PLibMCEnvMeshObject_VertexExistsPtr) dlsym(hLibrary, "libmcenv_meshobject_vertexexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_VertexExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetVertex = (PLibMCEnvMeshObject_GetVertexPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getvertex");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetVertex = (PLibMCEnvMeshObject_GetVertexPtr) dlsym(hLibrary, "libmcenv_meshobject_getvertex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetVertex == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetVertexIDs = (PLibMCEnvMeshObject_GetVertexIDsPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getvertexids");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetVertexIDs = (PLibMCEnvMeshObject_GetVertexIDsPtr) dlsym(hLibrary, "libmcenv_meshobject_getvertexids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetVertexIDs == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetAllVertices = (PLibMCEnvMeshObject_GetAllVerticesPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getallvertices");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetAllVertices = (PLibMCEnvMeshObject_GetAllVerticesPtr) dlsym(hLibrary, "libmcenv_meshobject_getallvertices");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetAllVertices == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetMaxTriangleID = (PLibMCEnvMeshObject_GetMaxTriangleIDPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getmaxtriangleid");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetMaxTriangleID = (PLibMCEnvMeshObject_GetMaxTriangleIDPtr) dlsym(hLibrary, "libmcenv_meshobject_getmaxtriangleid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetMaxTriangleID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_TriangeExists = (PLibMCEnvMeshObject_TriangeExistsPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_triangeexists");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_TriangeExists = (PLibMCEnvMeshObject_TriangeExistsPtr) dlsym(hLibrary, "libmcenv_meshobject_triangeexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_TriangeExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetTriangle = (PLibMCEnvMeshObject_GetTrianglePtr) GetProcAddress(hLibrary, "libmcenv_meshobject_gettriangle");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetTriangle = (PLibMCEnvMeshObject_GetTrianglePtr) dlsym(hLibrary, "libmcenv_meshobject_gettriangle");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetTriangle == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetTriangleIDs = (PLibMCEnvMeshObject_GetTriangleIDsPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_gettriangleids");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetTriangleIDs = (PLibMCEnvMeshObject_GetTriangleIDsPtr) dlsym(hLibrary, "libmcenv_meshobject_gettriangleids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetTriangleIDs == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_GetAllTriangles = (PLibMCEnvMeshObject_GetAllTrianglesPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_getalltriangles");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_GetAllTriangles = (PLibMCEnvMeshObject_GetAllTrianglesPtr) dlsym(hLibrary, "libmcenv_meshobject_getalltriangles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_GetAllTriangles == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_IsPersistent = (PLibMCEnvMeshObject_IsPersistentPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_ispersistent");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_IsPersistent = (PLibMCEnvMeshObject_IsPersistentPtr) dlsym(hLibrary, "libmcenv_meshobject_ispersistent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_IsPersistent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshObject_MakePersistent = (PLibMCEnvMeshObject_MakePersistentPtr) GetProcAddress(hLibrary, "libmcenv_meshobject_makepersistent");
+		#else // _WIN32
+		pWrapperTable->m_MeshObject_MakePersistent = (PLibMCEnvMeshObject_MakePersistentPtr) dlsym(hLibrary, "libmcenv_meshobject_makepersistent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshObject_MakePersistent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PersistentMeshObject_IsBoundToLoginSession = (PLibMCEnvPersistentMeshObject_IsBoundToLoginSessionPtr) GetProcAddress(hLibrary, "libmcenv_persistentmeshobject_isboundtologinsession");
+		#else // _WIN32
+		pWrapperTable->m_PersistentMeshObject_IsBoundToLoginSession = (PLibMCEnvPersistentMeshObject_IsBoundToLoginSessionPtr) dlsym(hLibrary, "libmcenv_persistentmeshobject_isboundtologinsession");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PersistentMeshObject_IsBoundToLoginSession == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_GetName = (PLibMCEnvModelDataMeshInstance_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_modeldatameshinstance_getname");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_GetName = (PLibMCEnvModelDataMeshInstance_GetNamePtr) dlsym(hLibrary, "libmcenv_modeldatameshinstance_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataMeshInstance_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_GetUUID = (PLibMCEnvModelDataMeshInstance_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_modeldatameshinstance_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_GetUUID = (PLibMCEnvModelDataMeshInstance_GetUUIDPtr) dlsym(hLibrary, "libmcenv_modeldatameshinstance_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataMeshInstance_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_GetLocalTransform = (PLibMCEnvModelDataMeshInstance_GetLocalTransformPtr) GetProcAddress(hLibrary, "libmcenv_modeldatameshinstance_getlocaltransform");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_GetLocalTransform = (PLibMCEnvModelDataMeshInstance_GetLocalTransformPtr) dlsym(hLibrary, "libmcenv_modeldatameshinstance_getlocaltransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataMeshInstance_GetLocalTransform == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_GetAbsoluteTransform = (PLibMCEnvModelDataMeshInstance_GetAbsoluteTransformPtr) GetProcAddress(hLibrary, "libmcenv_modeldatameshinstance_getabsolutetransform");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_GetAbsoluteTransform = (PLibMCEnvModelDataMeshInstance_GetAbsoluteTransformPtr) dlsym(hLibrary, "libmcenv_modeldatameshinstance_getabsolutetransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataMeshInstance_GetAbsoluteTransform == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_CreateCopiedMesh = (PLibMCEnvModelDataMeshInstance_CreateCopiedMeshPtr) GetProcAddress(hLibrary, "libmcenv_modeldatameshinstance_createcopiedmesh");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_CreateCopiedMesh = (PLibMCEnvModelDataMeshInstance_CreateCopiedMeshPtr) dlsym(hLibrary, "libmcenv_modeldatameshinstance_createcopiedmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataMeshInstance_CreateCopiedMesh == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_CreatePersistentMesh = (PLibMCEnvModelDataMeshInstance_CreatePersistentMeshPtr) GetProcAddress(hLibrary, "libmcenv_modeldatameshinstance_createpersistentmesh");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataMeshInstance_CreatePersistentMesh = (PLibMCEnvModelDataMeshInstance_CreatePersistentMeshPtr) dlsym(hLibrary, "libmcenv_modeldatameshinstance_createpersistentmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataMeshInstance_CreatePersistentMesh == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetName = (PLibMCEnvModelDataComponentInstance_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getname");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetName = (PLibMCEnvModelDataComponentInstance_GetNamePtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetUUID = (PLibMCEnvModelDataComponentInstance_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetUUID = (PLibMCEnvModelDataComponentInstance_GetUUIDPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetLocalTransform = (PLibMCEnvModelDataComponentInstance_GetLocalTransformPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getlocaltransform");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetLocalTransform = (PLibMCEnvModelDataComponentInstance_GetLocalTransformPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getlocaltransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetLocalTransform == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetAbsoluteTransform = (PLibMCEnvModelDataComponentInstance_GetAbsoluteTransformPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getabsolutetransform");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetAbsoluteTransform = (PLibMCEnvModelDataComponentInstance_GetAbsoluteTransformPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getabsolutetransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetAbsoluteTransform == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSolidCount = (PLibMCEnvModelDataComponentInstance_GetSolidCountPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getsolidcount");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSolidCount = (PLibMCEnvModelDataComponentInstance_GetSolidCountPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getsolidcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetSolidCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSolidMesh = (PLibMCEnvModelDataComponentInstance_GetSolidMeshPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getsolidmesh");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSolidMesh = (PLibMCEnvModelDataComponentInstance_GetSolidMeshPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getsolidmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetSolidMesh == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSupportCount = (PLibMCEnvModelDataComponentInstance_GetSupportCountPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getsupportcount");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSupportCount = (PLibMCEnvModelDataComponentInstance_GetSupportCountPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getsupportcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetSupportCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSupportMesh = (PLibMCEnvModelDataComponentInstance_GetSupportMeshPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getsupportmesh");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSupportMesh = (PLibMCEnvModelDataComponentInstance_GetSupportMeshPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getsupportmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetSupportMesh == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSubComponentCount = (PLibMCEnvModelDataComponentInstance_GetSubComponentCountPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getsubcomponentcount");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSubComponentCount = (PLibMCEnvModelDataComponentInstance_GetSubComponentCountPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getsubcomponentcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetSubComponentCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSubComponent = (PLibMCEnvModelDataComponentInstance_GetSubComponentPtr) GetProcAddress(hLibrary, "libmcenv_modeldatacomponentinstance_getsubcomponent");
+		#else // _WIN32
+		pWrapperTable->m_ModelDataComponentInstance_GetSubComponent = (PLibMCEnvModelDataComponentInstance_GetSubComponentPtr) dlsym(hLibrary, "libmcenv_modeldatacomponentinstance_getsubcomponent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModelDataComponentInstance_GetSubComponent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshSceneItem_GetItemUUID = (PLibMCEnvMeshSceneItem_GetItemUUIDPtr) GetProcAddress(hLibrary, "libmcenv_meshsceneitem_getitemuuid");
+		#else // _WIN32
+		pWrapperTable->m_MeshSceneItem_GetItemUUID = (PLibMCEnvMeshSceneItem_GetItemUUIDPtr) dlsym(hLibrary, "libmcenv_meshsceneitem_getitemuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshSceneItem_GetItemUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshSceneItem_GetSceneUUID = (PLibMCEnvMeshSceneItem_GetSceneUUIDPtr) GetProcAddress(hLibrary, "libmcenv_meshsceneitem_getsceneuuid");
+		#else // _WIN32
+		pWrapperTable->m_MeshSceneItem_GetSceneUUID = (PLibMCEnvMeshSceneItem_GetSceneUUIDPtr) dlsym(hLibrary, "libmcenv_meshsceneitem_getsceneuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshSceneItem_GetSceneUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshSceneItem_GetTransform = (PLibMCEnvMeshSceneItem_GetTransformPtr) GetProcAddress(hLibrary, "libmcenv_meshsceneitem_gettransform");
+		#else // _WIN32
+		pWrapperTable->m_MeshSceneItem_GetTransform = (PLibMCEnvMeshSceneItem_GetTransformPtr) dlsym(hLibrary, "libmcenv_meshsceneitem_gettransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshSceneItem_GetTransform == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshSceneItem_UpdateTransform = (PLibMCEnvMeshSceneItem_UpdateTransformPtr) GetProcAddress(hLibrary, "libmcenv_meshsceneitem_updatetransform");
+		#else // _WIN32
+		pWrapperTable->m_MeshSceneItem_UpdateTransform = (PLibMCEnvMeshSceneItem_UpdateTransformPtr) dlsym(hLibrary, "libmcenv_meshsceneitem_updatetransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshSceneItem_UpdateTransform == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshSceneItem_GetMeshObject = (PLibMCEnvMeshSceneItem_GetMeshObjectPtr) GetProcAddress(hLibrary, "libmcenv_meshsceneitem_getmeshobject");
+		#else // _WIN32
+		pWrapperTable->m_MeshSceneItem_GetMeshObject = (PLibMCEnvMeshSceneItem_GetMeshObjectPtr) dlsym(hLibrary, "libmcenv_meshsceneitem_getmeshobject");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshSceneItem_GetMeshObject == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshSceneItem_ReferenceIsValid = (PLibMCEnvMeshSceneItem_ReferenceIsValidPtr) GetProcAddress(hLibrary, "libmcenv_meshsceneitem_referenceisvalid");
+		#else // _WIN32
+		pWrapperTable->m_MeshSceneItem_ReferenceIsValid = (PLibMCEnvMeshSceneItem_ReferenceIsValidPtr) dlsym(hLibrary, "libmcenv_meshsceneitem_referenceisvalid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshSceneItem_ReferenceIsValid == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_GetSceneUUID = (PLibMCEnvMeshScene_GetSceneUUIDPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_getsceneuuid");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_GetSceneUUID = (PLibMCEnvMeshScene_GetSceneUUIDPtr) dlsym(hLibrary, "libmcenv_meshscene_getsceneuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_GetSceneUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_IsBoundToLoginSession = (PLibMCEnvMeshScene_IsBoundToLoginSessionPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_isboundtologinsession");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_IsBoundToLoginSession = (PLibMCEnvMeshScene_IsBoundToLoginSessionPtr) dlsym(hLibrary, "libmcenv_meshscene_isboundtologinsession");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_IsBoundToLoginSession == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_AddSceneItem = (PLibMCEnvMeshScene_AddSceneItemPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_addsceneitem");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_AddSceneItem = (PLibMCEnvMeshScene_AddSceneItemPtr) dlsym(hLibrary, "libmcenv_meshscene_addsceneitem");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_AddSceneItem == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_AddModelDataMeshAsSceneItem = (PLibMCEnvMeshScene_AddModelDataMeshAsSceneItemPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_addmodeldatameshassceneitem");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_AddModelDataMeshAsSceneItem = (PLibMCEnvMeshScene_AddModelDataMeshAsSceneItemPtr) dlsym(hLibrary, "libmcenv_meshscene_addmodeldatameshassceneitem");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_AddModelDataMeshAsSceneItem == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_GetSceneItemCount = (PLibMCEnvMeshScene_GetSceneItemCountPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_getsceneitemcount");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_GetSceneItemCount = (PLibMCEnvMeshScene_GetSceneItemCountPtr) dlsym(hLibrary, "libmcenv_meshscene_getsceneitemcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_GetSceneItemCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_GetSceneItem = (PLibMCEnvMeshScene_GetSceneItemPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_getsceneitem");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_GetSceneItem = (PLibMCEnvMeshScene_GetSceneItemPtr) dlsym(hLibrary, "libmcenv_meshscene_getsceneitem");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_GetSceneItem == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_FindSceneItem = (PLibMCEnvMeshScene_FindSceneItemPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_findsceneitem");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_FindSceneItem = (PLibMCEnvMeshScene_FindSceneItemPtr) dlsym(hLibrary, "libmcenv_meshscene_findsceneitem");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_FindSceneItem == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_HasSceneItem = (PLibMCEnvMeshScene_HasSceneItemPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_hassceneitem");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_HasSceneItem = (PLibMCEnvMeshScene_HasSceneItemPtr) dlsym(hLibrary, "libmcenv_meshscene_hassceneitem");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_HasSceneItem == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MeshScene_RemoveSceneItem = (PLibMCEnvMeshScene_RemoveSceneItemPtr) GetProcAddress(hLibrary, "libmcenv_meshscene_removesceneitem");
+		#else // _WIN32
+		pWrapperTable->m_MeshScene_RemoveSceneItem = (PLibMCEnvMeshScene_RemoveSceneItemPtr) dlsym(hLibrary, "libmcenv_meshscene_removesceneitem");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MeshScene_RemoveSceneItem == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SceneHandler_MeshIsPersistent = (PLibMCEnvSceneHandler_MeshIsPersistentPtr) GetProcAddress(hLibrary, "libmcenv_scenehandler_meshispersistent");
+		#else // _WIN32
+		pWrapperTable->m_SceneHandler_MeshIsPersistent = (PLibMCEnvSceneHandler_MeshIsPersistentPtr) dlsym(hLibrary, "libmcenv_scenehandler_meshispersistent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SceneHandler_MeshIsPersistent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SceneHandler_FindPersistentMesh = (PLibMCEnvSceneHandler_FindPersistentMeshPtr) GetProcAddress(hLibrary, "libmcenv_scenehandler_findpersistentmesh");
+		#else // _WIN32
+		pWrapperTable->m_SceneHandler_FindPersistentMesh = (PLibMCEnvSceneHandler_FindPersistentMeshPtr) dlsym(hLibrary, "libmcenv_scenehandler_findpersistentmesh");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SceneHandler_FindPersistentMesh == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SceneHandler_CreateEmptyMeshScene = (PLibMCEnvSceneHandler_CreateEmptyMeshScenePtr) GetProcAddress(hLibrary, "libmcenv_scenehandler_createemptymeshscene");
+		#else // _WIN32
+		pWrapperTable->m_SceneHandler_CreateEmptyMeshScene = (PLibMCEnvSceneHandler_CreateEmptyMeshScenePtr) dlsym(hLibrary, "libmcenv_scenehandler_createemptymeshscene");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SceneHandler_CreateEmptyMeshScene == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SceneHandler_ReleaseMeshScene = (PLibMCEnvSceneHandler_ReleaseMeshScenePtr) GetProcAddress(hLibrary, "libmcenv_scenehandler_releasemeshscene");
+		#else // _WIN32
+		pWrapperTable->m_SceneHandler_ReleaseMeshScene = (PLibMCEnvSceneHandler_ReleaseMeshScenePtr) dlsym(hLibrary, "libmcenv_scenehandler_releasemeshscene");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SceneHandler_ReleaseMeshScene == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SceneHandler_Load3MFFromResource = (PLibMCEnvSceneHandler_Load3MFFromResourcePtr) GetProcAddress(hLibrary, "libmcenv_scenehandler_load3mffromresource");
+		#else // _WIN32
+		pWrapperTable->m_SceneHandler_Load3MFFromResource = (PLibMCEnvSceneHandler_Load3MFFromResourcePtr) dlsym(hLibrary, "libmcenv_scenehandler_load3mffromresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SceneHandler_Load3MFFromResource == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SceneHandler_Load3MFFromMemory = (PLibMCEnvSceneHandler_Load3MFFromMemoryPtr) GetProcAddress(hLibrary, "libmcenv_scenehandler_load3mffrommemory");
+		#else // _WIN32
+		pWrapperTable->m_SceneHandler_Load3MFFromMemory = (PLibMCEnvSceneHandler_Load3MFFromMemoryPtr) dlsym(hLibrary, "libmcenv_scenehandler_load3mffrommemory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SceneHandler_Load3MFFromMemory == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SceneHandler_Load3MFFromStream = (PLibMCEnvSceneHandler_Load3MFFromStreamPtr) GetProcAddress(hLibrary, "libmcenv_scenehandler_load3mffromstream");
+		#else // _WIN32
+		pWrapperTable->m_SceneHandler_Load3MFFromStream = (PLibMCEnvSceneHandler_Load3MFFromStreamPtr) dlsym(hLibrary, "libmcenv_scenehandler_load3mffromstream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SceneHandler_Load3MFFromStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathPart_GetName = (PLibMCEnvToolpathPart_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_getname");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathPart_GetName = (PLibMCEnvToolpathPart_GetNamePtr) dlsym(hLibrary, "libmcenv_toolpathpart_getname");
@@ -4766,21 +5510,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ToolpathPart_GetMeshUUID = (PLibMCEnvToolpathPart_GetMeshUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_getmeshuuid");
+		pWrapperTable->m_ToolpathPart_GetRootComponent = (PLibMCEnvToolpathPart_GetRootComponentPtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_getrootcomponent");
 		#else // _WIN32
-		pWrapperTable->m_ToolpathPart_GetMeshUUID = (PLibMCEnvToolpathPart_GetMeshUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathpart_getmeshuuid");
+		pWrapperTable->m_ToolpathPart_GetRootComponent = (PLibMCEnvToolpathPart_GetRootComponentPtr) dlsym(hLibrary, "libmcenv_toolpathpart_getrootcomponent");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathPart_GetMeshUUID == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathPart_GetTransform = (PLibMCEnvToolpathPart_GetTransformPtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_gettransform");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathPart_GetTransform = (PLibMCEnvToolpathPart_GetTransformPtr) dlsym(hLibrary, "libmcenv_toolpathpart_gettransform");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathPart_GetTransform == nullptr)
+		if (pWrapperTable->m_ToolpathPart_GetRootComponent == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5033,6 +5768,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID = (PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentlocalpartid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID = (PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentlocalpartid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5321,6 +6065,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_HasBinaryMetaData = (PLibMCEnvToolpathAccessor_HasBinaryMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_hasbinarymetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_HasBinaryMetaData = (PLibMCEnvToolpathAccessor_HasBinaryMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_hasbinarymetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_HasBinaryMetaData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData = (PLibMCEnvToolpathAccessor_GetBinaryMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getbinarymetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData = (PLibMCEnvToolpathAccessor_GetBinaryMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getbinarymetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9203,30 +9965,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_registermeshfrom3mfresource");
+		pWrapperTable->m_StateEnvironment_CreateSceneHandler = (PLibMCEnvStateEnvironment_CreateSceneHandlerPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createscenehandler");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvStateEnvironment_RegisterMeshFrom3MFResourcePtr) dlsym(hLibrary, "libmcenv_stateenvironment_registermeshfrom3mfresource");
+		pWrapperTable->m_StateEnvironment_CreateSceneHandler = (PLibMCEnvStateEnvironment_CreateSceneHandlerPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createscenehandler");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_MeshIsRegistered = (PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_meshisregistered");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_MeshIsRegistered = (PLibMCEnvStateEnvironment_MeshIsRegisteredPtr) dlsym(hLibrary, "libmcenv_stateenvironment_meshisregistered");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_MeshIsRegistered == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = (PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findregisteredmesh");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_FindRegisteredMesh = (PLibMCEnvStateEnvironment_FindRegisteredMeshPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findregisteredmesh");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_FindRegisteredMesh == nullptr)
+		if (pWrapperTable->m_StateEnvironment_CreateSceneHandler == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9878,30 +10622,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_registermeshfrom3mfresource");
+		pWrapperTable->m_UIEnvironment_CreateSceneHandler = (PLibMCEnvUIEnvironment_CreateSceneHandlerPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createscenehandler");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource = (PLibMCEnvUIEnvironment_RegisterMeshFrom3MFResourcePtr) dlsym(hLibrary, "libmcenv_uienvironment_registermeshfrom3mfresource");
+		pWrapperTable->m_UIEnvironment_CreateSceneHandler = (PLibMCEnvUIEnvironment_CreateSceneHandlerPtr) dlsym(hLibrary, "libmcenv_uienvironment_createscenehandler");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_MeshIsRegistered = (PLibMCEnvUIEnvironment_MeshIsRegisteredPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_meshisregistered");
-		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_MeshIsRegistered = (PLibMCEnvUIEnvironment_MeshIsRegisteredPtr) dlsym(hLibrary, "libmcenv_uienvironment_meshisregistered");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_MeshIsRegistered == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = (PLibMCEnvUIEnvironment_FindRegisteredMeshPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findregisteredmesh");
-		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_FindRegisteredMesh = (PLibMCEnvUIEnvironment_FindRegisteredMeshPtr) dlsym(hLibrary, "libmcenv_uienvironment_findregisteredmesh");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_FindRegisteredMesh == nullptr)
+		if (pWrapperTable->m_UIEnvironment_CreateSceneHandler == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10431,6 +11157,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_SetUint64ColumnValues == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datatable_createwriteoptions", (void**)&(pWrapperTable->m_DataTable_CreateWriteOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_CreateWriteOptions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_createcsvwriteoptions", (void**)&(pWrapperTable->m_DataTable_CreateCSVWriteOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_CreateCSVWriteOptions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_datatable_writecsvtostream", (void**)&(pWrapperTable->m_DataTable_WriteCSVToStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_WriteCSVToStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10711,6 +11445,222 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetVertexCount == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_meshobject_ismanifold", (void**)&(pWrapperTable->m_MeshObject_IsManifold));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_IsManifold == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_isoriented", (void**)&(pWrapperTable->m_MeshObject_IsOriented));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_IsOriented == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_iswatertight", (void**)&(pWrapperTable->m_MeshObject_IsWatertight));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_IsWatertight == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getmaxvertexid", (void**)&(pWrapperTable->m_MeshObject_GetMaxVertexID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetMaxVertexID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_vertexexists", (void**)&(pWrapperTable->m_MeshObject_VertexExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_VertexExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getvertex", (void**)&(pWrapperTable->m_MeshObject_GetVertex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetVertex == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getvertexids", (void**)&(pWrapperTable->m_MeshObject_GetVertexIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetVertexIDs == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getallvertices", (void**)&(pWrapperTable->m_MeshObject_GetAllVertices));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetAllVertices == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getmaxtriangleid", (void**)&(pWrapperTable->m_MeshObject_GetMaxTriangleID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetMaxTriangleID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_triangeexists", (void**)&(pWrapperTable->m_MeshObject_TriangeExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_TriangeExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_gettriangle", (void**)&(pWrapperTable->m_MeshObject_GetTriangle));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetTriangle == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_gettriangleids", (void**)&(pWrapperTable->m_MeshObject_GetTriangleIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetTriangleIDs == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_getalltriangles", (void**)&(pWrapperTable->m_MeshObject_GetAllTriangles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_GetAllTriangles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_ispersistent", (void**)&(pWrapperTable->m_MeshObject_IsPersistent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_IsPersistent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshobject_makepersistent", (void**)&(pWrapperTable->m_MeshObject_MakePersistent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshObject_MakePersistent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_persistentmeshobject_isboundtologinsession", (void**)&(pWrapperTable->m_PersistentMeshObject_IsBoundToLoginSession));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PersistentMeshObject_IsBoundToLoginSession == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatameshinstance_getname", (void**)&(pWrapperTable->m_ModelDataMeshInstance_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataMeshInstance_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatameshinstance_getuuid", (void**)&(pWrapperTable->m_ModelDataMeshInstance_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataMeshInstance_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatameshinstance_getlocaltransform", (void**)&(pWrapperTable->m_ModelDataMeshInstance_GetLocalTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataMeshInstance_GetLocalTransform == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatameshinstance_getabsolutetransform", (void**)&(pWrapperTable->m_ModelDataMeshInstance_GetAbsoluteTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataMeshInstance_GetAbsoluteTransform == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatameshinstance_createcopiedmesh", (void**)&(pWrapperTable->m_ModelDataMeshInstance_CreateCopiedMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataMeshInstance_CreateCopiedMesh == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatameshinstance_createpersistentmesh", (void**)&(pWrapperTable->m_ModelDataMeshInstance_CreatePersistentMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataMeshInstance_CreatePersistentMesh == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getname", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getuuid", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getlocaltransform", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetLocalTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetLocalTransform == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getabsolutetransform", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetAbsoluteTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetAbsoluteTransform == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getsolidcount", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetSolidCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetSolidCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getsolidmesh", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetSolidMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetSolidMesh == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getsupportcount", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetSupportCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetSupportCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getsupportmesh", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetSupportMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetSupportMesh == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getsubcomponentcount", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetSubComponentCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetSubComponentCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modeldatacomponentinstance_getsubcomponent", (void**)&(pWrapperTable->m_ModelDataComponentInstance_GetSubComponent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModelDataComponentInstance_GetSubComponent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshsceneitem_getitemuuid", (void**)&(pWrapperTable->m_MeshSceneItem_GetItemUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_GetItemUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshsceneitem_getsceneuuid", (void**)&(pWrapperTable->m_MeshSceneItem_GetSceneUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_GetSceneUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshsceneitem_gettransform", (void**)&(pWrapperTable->m_MeshSceneItem_GetTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_GetTransform == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshsceneitem_updatetransform", (void**)&(pWrapperTable->m_MeshSceneItem_UpdateTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_UpdateTransform == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshsceneitem_getmeshobject", (void**)&(pWrapperTable->m_MeshSceneItem_GetMeshObject));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_GetMeshObject == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshsceneitem_referenceisvalid", (void**)&(pWrapperTable->m_MeshSceneItem_ReferenceIsValid));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshSceneItem_ReferenceIsValid == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_getsceneuuid", (void**)&(pWrapperTable->m_MeshScene_GetSceneUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_GetSceneUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_isboundtologinsession", (void**)&(pWrapperTable->m_MeshScene_IsBoundToLoginSession));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_IsBoundToLoginSession == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_addsceneitem", (void**)&(pWrapperTable->m_MeshScene_AddSceneItem));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_AddSceneItem == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_addmodeldatameshassceneitem", (void**)&(pWrapperTable->m_MeshScene_AddModelDataMeshAsSceneItem));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_AddModelDataMeshAsSceneItem == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_getsceneitemcount", (void**)&(pWrapperTable->m_MeshScene_GetSceneItemCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_GetSceneItemCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_getsceneitem", (void**)&(pWrapperTable->m_MeshScene_GetSceneItem));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_GetSceneItem == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_findsceneitem", (void**)&(pWrapperTable->m_MeshScene_FindSceneItem));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_FindSceneItem == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_hassceneitem", (void**)&(pWrapperTable->m_MeshScene_HasSceneItem));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_HasSceneItem == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_meshscene_removesceneitem", (void**)&(pWrapperTable->m_MeshScene_RemoveSceneItem));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MeshScene_RemoveSceneItem == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scenehandler_meshispersistent", (void**)&(pWrapperTable->m_SceneHandler_MeshIsPersistent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SceneHandler_MeshIsPersistent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scenehandler_findpersistentmesh", (void**)&(pWrapperTable->m_SceneHandler_FindPersistentMesh));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SceneHandler_FindPersistentMesh == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scenehandler_createemptymeshscene", (void**)&(pWrapperTable->m_SceneHandler_CreateEmptyMeshScene));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SceneHandler_CreateEmptyMeshScene == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scenehandler_releasemeshscene", (void**)&(pWrapperTable->m_SceneHandler_ReleaseMeshScene));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SceneHandler_ReleaseMeshScene == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scenehandler_load3mffromresource", (void**)&(pWrapperTable->m_SceneHandler_Load3MFFromResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SceneHandler_Load3MFFromResource == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scenehandler_load3mffrommemory", (void**)&(pWrapperTable->m_SceneHandler_Load3MFFromMemory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SceneHandler_Load3MFFromMemory == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scenehandler_load3mffromstream", (void**)&(pWrapperTable->m_SceneHandler_Load3MFFromStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SceneHandler_Load3MFFromStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -10719,12 +11669,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_toolpathpart_getmeshuuid", (void**)&(pWrapperTable->m_ToolpathPart_GetMeshUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetMeshUUID == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_toolpathpart_gettransform", (void**)&(pWrapperTable->m_ToolpathPart_GetTransform));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetTransform == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_toolpathpart_getrootcomponent", (void**)&(pWrapperTable->m_ToolpathPart_GetRootComponent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetRootComponent == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getlayerdatauuid", (void**)&(pWrapperTable->m_ToolpathLayer_GetLayerDataUUID));
@@ -10837,6 +11783,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpartuuid", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentlocalpartid", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentLocalPartID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointdata", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointData));
@@ -10965,6 +11915,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_finduniquemetadata", (void**)&(pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_FindUniqueMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_hasbinarymetadata", (void**)&(pWrapperTable->m_ToolpathAccessor_HasBinaryMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_HasBinaryMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getbinarymetadata", (void**)&(pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBinaryMetaData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_buildexecution_getuuid", (void**)&(pWrapperTable->m_BuildExecution_GetUUID));
@@ -12691,16 +13649,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetCurrentJournal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_registermeshfrom3mfresource", (void**)&(pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RegisterMeshFrom3MFResource == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_meshisregistered", (void**)&(pWrapperTable->m_StateEnvironment_MeshIsRegistered));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_MeshIsRegistered == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_findregisteredmesh", (void**)&(pWrapperTable->m_StateEnvironment_FindRegisteredMesh));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindRegisteredMesh == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createscenehandler", (void**)&(pWrapperTable->m_StateEnvironment_CreateSceneHandler));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateSceneHandler == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createdataseries", (void**)&(pWrapperTable->m_StateEnvironment_CreateDataSeries));
@@ -12991,16 +13941,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetCurrentJournal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_registermeshfrom3mfresource", (void**)&(pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RegisterMeshFrom3MFResource == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_meshisregistered", (void**)&(pWrapperTable->m_UIEnvironment_MeshIsRegistered));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_MeshIsRegistered == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_findregisteredmesh", (void**)&(pWrapperTable->m_UIEnvironment_FindRegisteredMesh));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindRegisteredMesh == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createscenehandler", (void**)&(pWrapperTable->m_UIEnvironment_CreateSceneHandler));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateSceneHandler == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_createdataseries", (void**)&(pWrapperTable->m_UIEnvironment_CreateDataSeries));
@@ -14078,6 +15020,36 @@ public:
 	}
 	
 	/**
+	* CDataTable::CreateWriteOptions - Creates a Write Option.
+	* @return Writer Options Instance to pass on to WriteDataToStream.
+	*/
+	PDataTableWriteOptions CDataTable::CreateWriteOptions()
+	{
+		LibMCEnvHandle hOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_CreateWriteOptions(m_pHandle, &hOptions));
+		
+		if (!hOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTableWriteOptions>(m_pWrapper, hOptions);
+	}
+	
+	/**
+	* CDataTable::CreateCSVWriteOptions - Creates a CSV Write Option.
+	* @return Writer Options Instance to pass on to WriteCSVToStream.
+	*/
+	PDataTableCSVWriteOptions CDataTable::CreateCSVWriteOptions()
+	{
+		LibMCEnvHandle hOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_CreateCSVWriteOptions(m_pHandle, &hOptions));
+		
+		if (!hOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTableCSVWriteOptions>(m_pWrapper, hOptions);
+	}
+	
+	/**
 	* CDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
 	* @param[in] pWriter - Stream writer to use.
 	* @param[in] pOptions - Optional CSV writer options to use.
@@ -14811,7 +15783,7 @@ public:
 	}
 	
 	/**
-	* CMeshObject::GetTriangleCount - Returns the number of triangles.
+	* CMeshObject::GetTriangleCount - Returns the number of triangles in the mesh.
 	* @return Number of triangles.
 	*/
 	LibMCEnv_uint32 CMeshObject::GetTriangleCount()
@@ -14823,7 +15795,7 @@ public:
 	}
 	
 	/**
-	* CMeshObject::GetVertexCount - Returns the number of vertices.
+	* CMeshObject::GetVertexCount - Returns the number of vertices in the mesh.
 	* @return Number of vertices.
 	*/
 	LibMCEnv_uint32 CMeshObject::GetVertexCount()
@@ -14832,6 +15804,775 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertexCount(m_pHandle, &resultVertexCount));
 		
 		return resultVertexCount;
+	}
+	
+	/**
+	* CMeshObject::IsManifold - Checks if the mesh topology is closed and every edge has two adjacent faces.
+	* @return Returns true if the mesh is manifold.
+	*/
+	bool CMeshObject::IsManifold()
+	{
+		bool resultManifoldResult = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_IsManifold(m_pHandle, &resultManifoldResult));
+		
+		return resultManifoldResult;
+	}
+	
+	/**
+	* CMeshObject::IsOriented - Checks if the mesh topology is oriented, so no Mobius strip or Klein bottle for example.
+	* @return Returns true if the mesh is oriented.
+	*/
+	bool CMeshObject::IsOriented()
+	{
+		bool resultOrientedResult = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_IsOriented(m_pHandle, &resultOrientedResult));
+		
+		return resultOrientedResult;
+	}
+	
+	/**
+	* CMeshObject::IsWatertight - Checks if the mesh topology is oriented and manifold, e.g is describing a 3D volume.
+	* @return Returns true if the mesh is watertight.
+	*/
+	bool CMeshObject::IsWatertight()
+	{
+		bool resultWatertightResult = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_IsWatertight(m_pHandle, &resultWatertightResult));
+		
+		return resultWatertightResult;
+	}
+	
+	/**
+	* CMeshObject::GetMaxVertexID - Returns the maximum vertex ID occuring in the mesh.
+	* @return All vertices will have an ID smaller or equal this ID.
+	*/
+	LibMCEnv_uint32 CMeshObject::GetMaxVertexID()
+	{
+		LibMCEnv_uint32 resultMaxVertexID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetMaxVertexID(m_pHandle, &resultMaxVertexID));
+		
+		return resultMaxVertexID;
+	}
+	
+	/**
+	* CMeshObject::VertexExists - Returns if a vertex with an ID exists.
+	* @param[in] nVertexID - Vertex ID to check.
+	* @return Returns true if the vertex exists.
+	*/
+	bool CMeshObject::VertexExists(const LibMCEnv_uint32 nVertexID)
+	{
+		bool resultVertexExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_VertexExists(m_pHandle, nVertexID, &resultVertexExists));
+		
+		return resultVertexExists;
+	}
+	
+	/**
+	* CMeshObject::GetVertex - Returns position of a vertex. Will return 0 if vertex does not exist.
+	* @param[in] nVertexID - Vertex ID to retrieve.
+	* @param[out] dX - Returns the X coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @param[out] dY - Returns the Y coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @param[out] dZ - Returns the Z coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @return Returns true if the vertex exists.
+	*/
+	bool CMeshObject::GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double & dX, LibMCEnv_double & dY, LibMCEnv_double & dZ)
+	{
+		bool resultVertexExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertex(m_pHandle, nVertexID, &dX, &dY, &dZ, &resultVertexExists));
+		
+		return resultVertexExists;
+	}
+	
+	/**
+	* CMeshObject::GetVertexIDs - Returns all IDs of the vertices. Ordered sequentially.
+	* @param[out] VertexIDsBuffer - Vertex ID array.
+	*/
+	void CMeshObject::GetVertexIDs(std::vector<LibMCEnv_uint32> & VertexIDsBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededVertexIDs = 0;
+		LibMCEnv_uint64 elementsWrittenVertexIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertexIDs(m_pHandle, 0, &elementsNeededVertexIDs, nullptr));
+		VertexIDsBuffer.resize((size_t) elementsNeededVertexIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetVertexIDs(m_pHandle, elementsNeededVertexIDs, &elementsWrittenVertexIDs, VertexIDsBuffer.data()));
+	}
+	
+	/**
+	* CMeshObject::GetAllVertices - Returns all the vertex information. Ordered sequentially by ID.
+	* @param[out] VerticesBuffer - Vertex array.
+	*/
+	void CMeshObject::GetAllVertices(std::vector<sMeshVertex3D> & VerticesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededVertices = 0;
+		LibMCEnv_uint64 elementsWrittenVertices = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetAllVertices(m_pHandle, 0, &elementsNeededVertices, nullptr));
+		VerticesBuffer.resize((size_t) elementsNeededVertices);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetAllVertices(m_pHandle, elementsNeededVertices, &elementsWrittenVertices, VerticesBuffer.data()));
+	}
+	
+	/**
+	* CMeshObject::GetMaxTriangleID - Returns the maximum triangle ID occuring in the mesh.
+	* @return All triangles will have an ID smaller or equal this ID.
+	*/
+	LibMCEnv_uint32 CMeshObject::GetMaxTriangleID()
+	{
+		LibMCEnv_uint32 resultMaxTriangleID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetMaxTriangleID(m_pHandle, &resultMaxTriangleID));
+		
+		return resultMaxTriangleID;
+	}
+	
+	/**
+	* CMeshObject::TriangeExists - Returns if a triangle with an ID exists.
+	* @param[in] nTriangleID - Triangle ID to check.
+	* @return Returns true if the triangle exists.
+	*/
+	bool CMeshObject::TriangeExists(const LibMCEnv_uint32 nTriangleID)
+	{
+		bool resultTriangleExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_TriangeExists(m_pHandle, nTriangleID, &resultTriangleExists));
+		
+		return resultTriangleExists;
+	}
+	
+	/**
+	* CMeshObject::GetTriangle - Returns vertex IDs of a triangle. Will return 0 if triangle does not exist.
+	* @param[in] nTriangleID - Triangle ID to retrieve.
+	* @param[out] nVertex1ID - Returns the vertex ID of the first corner. Returns 0 if triangle does not exist.
+	* @param[out] nVertex2ID - Returns the vertex ID of the second corner. Returns 0 if triangle does not exist.
+	* @param[out] nVertex3ID - Returns the vertex ID of the third corner. Returns 0 if triangle does not exist.
+	* @return Returns true if the triangle exists.
+	*/
+	bool CMeshObject::GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32 & nVertex1ID, LibMCEnv_uint32 & nVertex2ID, LibMCEnv_uint32 & nVertex3ID)
+	{
+		bool resultVertexExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetTriangle(m_pHandle, nTriangleID, &nVertex1ID, &nVertex2ID, &nVertex3ID, &resultVertexExists));
+		
+		return resultVertexExists;
+	}
+	
+	/**
+	* CMeshObject::GetTriangleIDs - Returns all IDs of the triangles. Ordered sequentially.
+	* @param[out] TriangleIDsBuffer - Triangle ID array.
+	*/
+	void CMeshObject::GetTriangleIDs(std::vector<LibMCEnv_uint32> & TriangleIDsBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededTriangleIDs = 0;
+		LibMCEnv_uint64 elementsWrittenTriangleIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetTriangleIDs(m_pHandle, 0, &elementsNeededTriangleIDs, nullptr));
+		TriangleIDsBuffer.resize((size_t) elementsNeededTriangleIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetTriangleIDs(m_pHandle, elementsNeededTriangleIDs, &elementsWrittenTriangleIDs, TriangleIDsBuffer.data()));
+	}
+	
+	/**
+	* CMeshObject::GetAllTriangles - Returns all the triangle information. Ordered sequentially by ID.
+	* @param[out] TrianglesBuffer - Triangle array.
+	*/
+	void CMeshObject::GetAllTriangles(std::vector<sMeshTriangle3D> & TrianglesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededTriangles = 0;
+		LibMCEnv_uint64 elementsWrittenTriangles = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetAllTriangles(m_pHandle, 0, &elementsNeededTriangles, nullptr));
+		TrianglesBuffer.resize((size_t) elementsNeededTriangles);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_GetAllTriangles(m_pHandle, elementsNeededTriangles, &elementsWrittenTriangles, TrianglesBuffer.data()));
+	}
+	
+	/**
+	* CMeshObject::IsPersistent - Returns if the mesh object is persisted in memory.
+	* @return If true, the mesh object is persisted in memory and can be retrieved by FindPersistentMeshObject.
+	*/
+	bool CMeshObject::IsPersistent()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_IsPersistent(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMeshObject::MakePersistent - Makes the mesh persistent in memory. It will not be released when the MeshObject instances is released. Should be handled with great care!
+	* @param[in] bBoundToLoginSession - If true, the mesh will be freed once the client login session expires.
+	* @return Returns a persistent instance to the same mesh data.
+	*/
+	PPersistentMeshObject CMeshObject::MakePersistent(const bool bBoundToLoginSession)
+	{
+		LibMCEnvHandle hPersistentMesh = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshObject_MakePersistent(m_pHandle, bBoundToLoginSession, &hPersistentMesh));
+		
+		if (!hPersistentMesh) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPersistentMeshObject>(m_pWrapper, hPersistentMesh);
+	}
+	
+	/**
+	 * Method definitions for class CPersistentMeshObject
+	 */
+	
+	/**
+	* CPersistentMeshObject::IsBoundToLoginSession - Returns if the mesh object is bound to a specific login session.
+	* @return If true, the mesh will be freed once the client login session expires.
+	*/
+	bool CPersistentMeshObject::IsBoundToLoginSession()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PersistentMeshObject_IsBoundToLoginSession(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	 * Method definitions for class CModelDataMeshInstance
+	 */
+	
+	/**
+	* CModelDataMeshInstance::GetName - Returns Mesh Name.
+	* @return Returns mesh instance name.
+	*/
+	std::string CModelDataMeshInstance::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataMeshInstance_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataMeshInstance_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CModelDataMeshInstance::GetUUID - Returns Mesh UUID.
+	* @return Returns mesh instance uuid.
+	*/
+	std::string CModelDataMeshInstance::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataMeshInstance_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataMeshInstance_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CModelDataMeshInstance::GetLocalTransform - Returns Local Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in its component coordinate system.
+	*/
+	sModelDataTransform CModelDataMeshInstance::GetLocalTransform()
+	{
+		sModelDataTransform resultLocalTransform;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataMeshInstance_GetLocalTransform(m_pHandle, &resultLocalTransform));
+		
+		return resultLocalTransform;
+	}
+	
+	/**
+	* CModelDataMeshInstance::GetAbsoluteTransform - Returns Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	sModelDataTransform CModelDataMeshInstance::GetAbsoluteTransform()
+	{
+		sModelDataTransform resultAbsoluteTransform;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataMeshInstance_GetAbsoluteTransform(m_pHandle, &resultAbsoluteTransform));
+		
+		return resultAbsoluteTransform;
+	}
+	
+	/**
+	* CModelDataMeshInstance::CreateCopiedMesh - Loads a copy of the mesh geometry into memory. Might be inefficient to use for many identical copies of the mesh in the scene.
+	* @return Returns the mesh object instance.
+	*/
+	PMeshObject CModelDataMeshInstance::CreateCopiedMesh()
+	{
+		LibMCEnvHandle hMeshObjectCopy = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataMeshInstance_CreateCopiedMesh(m_pHandle, &hMeshObjectCopy));
+		
+		if (!hMeshObjectCopy) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObjectCopy);
+	}
+	
+	/**
+	* CModelDataMeshInstance::CreatePersistentMesh - Creates a persistent mesh of the geometry. Will not create a duplicate if the instance was already persisted before. The release of the memory should be handled with great care! 
+	* @param[in] bBoundToLoginSession - If true, the mesh will be freed once the client login session expires.
+	* @return Returns a persistent instance to the same mesh data.
+	*/
+	PPersistentMeshObject CModelDataMeshInstance::CreatePersistentMesh(const bool bBoundToLoginSession)
+	{
+		LibMCEnvHandle hPersistentMesh = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataMeshInstance_CreatePersistentMesh(m_pHandle, bBoundToLoginSession, &hPersistentMesh));
+		
+		if (!hPersistentMesh) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPersistentMeshObject>(m_pWrapper, hPersistentMesh);
+	}
+	
+	/**
+	 * Method definitions for class CModelDataComponentInstance
+	 */
+	
+	/**
+	* CModelDataComponentInstance::GetName - Returns Component Name.
+	* @return Returns toolpath part name.
+	*/
+	std::string CModelDataComponentInstance::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetUUID - Returns Component UUID.
+	* @return Returns toolpath part uuid.
+	*/
+	std::string CModelDataComponentInstance::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetLocalTransform - Returns Local Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in its component coordinate system.
+	*/
+	sModelDataTransform CModelDataComponentInstance::GetLocalTransform()
+	{
+		sModelDataTransform resultLocalTransform;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetLocalTransform(m_pHandle, &resultLocalTransform));
+		
+		return resultLocalTransform;
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetAbsoluteTransform - Returns Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	sModelDataTransform CModelDataComponentInstance::GetAbsoluteTransform()
+	{
+		sModelDataTransform resultAbsoluteTransform;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetAbsoluteTransform(m_pHandle, &resultAbsoluteTransform));
+		
+		return resultAbsoluteTransform;
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetSolidCount - Returns the number of solid meshes in the component.
+	* @return Model Count.
+	*/
+	LibMCEnv_uint32 CModelDataComponentInstance::GetSolidCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetSolidCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetSolidMesh - Returns a solid mesh of the component.
+	* @param[in] nIndex - Index of Solid Mesh. MUST be between 0 and SolidCount - 1.
+	* @return Solid Mesh. MUST be between 0 and ModelCount - 1.
+	*/
+	PModelDataMeshInstance CModelDataComponentInstance::GetSolidMesh(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnvHandle hMeshInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetSolidMesh(m_pHandle, nIndex, &hMeshInstance));
+		
+		if (!hMeshInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModelDataMeshInstance>(m_pWrapper, hMeshInstance);
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetSupportCount - Returns the number of support meshes in the component.
+	* @return Support Count.
+	*/
+	LibMCEnv_uint32 CModelDataComponentInstance::GetSupportCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetSupportCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetSupportMesh - Returns a support mesh of the component.
+	* @param[in] nIndex - Index of Support Mesh. MUST be between 0 and SupportCount - 1.
+	* @return Support Mesh. MUST be between 0 and ModelCount - 1.
+	*/
+	PModelDataMeshInstance CModelDataComponentInstance::GetSupportMesh(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnvHandle hMeshInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetSupportMesh(m_pHandle, nIndex, &hMeshInstance));
+		
+		if (!hMeshInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModelDataMeshInstance>(m_pWrapper, hMeshInstance);
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetSubComponentCount - Returns the number of subcomponents of the component.
+	* @return Subcomponent Count.
+	*/
+	LibMCEnv_uint32 CModelDataComponentInstance::GetSubComponentCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetSubComponentCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CModelDataComponentInstance::GetSubComponent - Returns a subcomponent of the component.
+	* @param[in] nIndex - Index of Subcomponent. MUST be between 0 and SubComponentCount - 1.
+	* @return SubComponent. MUST be between 0 and ModelCount - 1.
+	*/
+	PModelDataComponentInstance CModelDataComponentInstance::GetSubComponent(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnvHandle hSubComponentInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModelDataComponentInstance_GetSubComponent(m_pHandle, nIndex, &hSubComponentInstance));
+		
+		if (!hSubComponentInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModelDataComponentInstance>(m_pWrapper, hSubComponentInstance);
+	}
+	
+	/**
+	 * Method definitions for class CMeshSceneItem
+	 */
+	
+	/**
+	* CMeshSceneItem::GetItemUUID - Returns the UUID of the scene item.
+	* @return Returns scene item uuid.
+	*/
+	std::string CMeshSceneItem::GetItemUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetItemUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetItemUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CMeshSceneItem::GetSceneUUID - Returns the UUID of the scene.
+	* @return Returns scene uuid.
+	*/
+	std::string CMeshSceneItem::GetSceneUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetSceneUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetSceneUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CMeshSceneItem::GetTransform - Returns the transform of the scene item.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	sModelDataTransform CMeshSceneItem::GetTransform()
+	{
+		sModelDataTransform resultAbsoluteTransform;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetTransform(m_pHandle, &resultAbsoluteTransform));
+		
+		return resultAbsoluteTransform;
+	}
+	
+	/**
+	* CMeshSceneItem::UpdateTransform - Updates the transform of the scene item.
+	* @param[in] AbsoluteTransform - The new transform matrix of the mesh in the global world coordinate system.
+	*/
+	void CMeshSceneItem::UpdateTransform(const sModelDataTransform & AbsoluteTransform)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_UpdateTransform(m_pHandle, &AbsoluteTransform));
+	}
+	
+	/**
+	* CMeshSceneItem::GetMeshObject - Returns persistent mesh object.
+	* @return Returns a persistent mesh object of this scene.
+	*/
+	PPersistentMeshObject CMeshSceneItem::GetMeshObject()
+	{
+		LibMCEnvHandle hPersistentMesh = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_GetMeshObject(m_pHandle, &hPersistentMesh));
+		
+		if (!hPersistentMesh) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPersistentMeshObject>(m_pWrapper, hPersistentMesh);
+	}
+	
+	/**
+	* CMeshSceneItem::ReferenceIsValid - Returns if the underlying mesh object exists.
+	* @return Returns a persistent mesh object of this scene.
+	*/
+	bool CMeshSceneItem::ReferenceIsValid()
+	{
+		bool resultIsValid = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshSceneItem_ReferenceIsValid(m_pHandle, &resultIsValid));
+		
+		return resultIsValid;
+	}
+	
+	/**
+	 * Method definitions for class CMeshScene
+	 */
+	
+	/**
+	* CMeshScene::GetSceneUUID - Returns the UUID of the scene.
+	* @return Returns scene uuid.
+	*/
+	std::string CMeshScene::GetSceneUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_GetSceneUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_GetSceneUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CMeshScene::IsBoundToLoginSession - Returns if the scene object is bound to a specific login session.
+	* @return If true, the scene will be freed once the client login session expires.
+	*/
+	bool CMeshScene::IsBoundToLoginSession()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_IsBoundToLoginSession(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMeshScene::AddSceneItem - Adds a persistent mesh to the scene.
+	* @param[in] pMesh - Mesh to add to the scene.
+	* @param[in] AbsoluteTransform - Transform matrix of the mesh in the global world coordinate system.
+	* @return The returned scene item.
+	*/
+	PMeshSceneItem CMeshScene::AddSceneItem(classParam<CPersistentMeshObject> pMesh, const sModelDataTransform & AbsoluteTransform)
+	{
+		LibMCEnvHandle hMesh = pMesh.GetHandle();
+		LibMCEnvHandle hSceneItem = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_AddSceneItem(m_pHandle, hMesh, &AbsoluteTransform, &hSceneItem));
+		
+		if (!hSceneItem) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshSceneItem>(m_pWrapper, hSceneItem);
+	}
+	
+	/**
+	* CMeshScene::AddModelDataMeshAsSceneItem - Adds an instance from a ModelData component. Reuses underlying mesh data, if mesh has been persisted already. Registers new Persistent Mesh if necessary.
+	* @param[in] pModelDataMesh - Adds a mesh to the scene.
+	* @return The returned scene item.
+	*/
+	PMeshSceneItem CMeshScene::AddModelDataMeshAsSceneItem(classParam<CModelDataMeshInstance> pModelDataMesh)
+	{
+		LibMCEnvHandle hModelDataMesh = pModelDataMesh.GetHandle();
+		LibMCEnvHandle hSceneItem = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_AddModelDataMeshAsSceneItem(m_pHandle, hModelDataMesh, &hSceneItem));
+		
+		if (!hSceneItem) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshSceneItem>(m_pWrapper, hSceneItem);
+	}
+	
+	/**
+	* CMeshScene::GetSceneItemCount - Returns the number of scene items.
+	* @return Returns the number of scene items.
+	*/
+	LibMCEnv_uint32 CMeshScene::GetSceneItemCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_GetSceneItemCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CMeshScene::GetSceneItem - Returns a scene item by index.
+	* @param[in] nIndex - Index to retrieve. MUST be between 0 and SceneItemCount - 1
+	* @return The returned scene item.
+	*/
+	PMeshSceneItem CMeshScene::GetSceneItem(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnvHandle hSceneItem = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_GetSceneItem(m_pHandle, nIndex, &hSceneItem));
+		
+		if (!hSceneItem) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshSceneItem>(m_pWrapper, hSceneItem);
+	}
+	
+	/**
+	* CMeshScene::FindSceneItem - Finds a scene item by UUID.
+	* @param[in] sUUID - UUID to retrieve.
+	* @param[in] bMustExist - If true, the call fails, if the UUID does not exist.
+	* @return The returned scene item. NULL, if MustExist is false and UUID does not exist.
+	*/
+	PMeshSceneItem CMeshScene::FindSceneItem(const std::string & sUUID, const bool bMustExist)
+	{
+		LibMCEnvHandle hSceneItem = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_FindSceneItem(m_pHandle, sUUID.c_str(), bMustExist, &hSceneItem));
+		
+		if (!hSceneItem) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshSceneItem>(m_pWrapper, hSceneItem);
+	}
+	
+	/**
+	* CMeshScene::HasSceneItem - Checks if a scene item exists.
+	* @param[in] sUUID - UUID to retrieve.
+	* @return Returns true, if scene item UUID exists.
+	*/
+	bool CMeshScene::HasSceneItem(const std::string & sUUID)
+	{
+		bool resultSceneItemExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_HasSceneItem(m_pHandle, sUUID.c_str(), &resultSceneItemExists));
+		
+		return resultSceneItemExists;
+	}
+	
+	/**
+	* CMeshScene::RemoveSceneItem - Removes a scene item from the scene.
+	* @param[in] pSceneItem - Scene Item to remove.
+	*/
+	void CMeshScene::RemoveSceneItem(classParam<CMeshSceneItem> pSceneItem)
+	{
+		LibMCEnvHandle hSceneItem = pSceneItem.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_MeshScene_RemoveSceneItem(m_pHandle, hSceneItem));
+	}
+	
+	/**
+	 * Method definitions for class CSceneHandler
+	 */
+	
+	/**
+	* CSceneHandler::MeshIsPersistent - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	bool CSceneHandler::MeshIsPersistent(const std::string & sMeshUUID)
+	{
+		bool resultMeshIsRegistered = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_SceneHandler_MeshIsPersistent(m_pHandle, sMeshUUID.c_str(), &resultMeshIsRegistered));
+		
+		return resultMeshIsRegistered;
+	}
+	
+	/**
+	* CSceneHandler::FindPersistentMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	PPersistentMeshObject CSceneHandler::FindPersistentMesh(const std::string & sMeshUUID)
+	{
+		LibMCEnvHandle hMeshObjectInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_SceneHandler_FindPersistentMesh(m_pHandle, sMeshUUID.c_str(), &hMeshObjectInstance));
+		
+		if (!hMeshObjectInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPersistentMeshObject>(m_pWrapper, hMeshObjectInstance);
+	}
+	
+	/**
+	* CSceneHandler::CreateEmptyMeshScene - Creates an empty mesh scene object.
+	* @param[in] bBoundToLoginSession - Scene shall be freed when the current login session expires. Parameter is ignored, if not executed in a UIEnvironment context.
+	* @return Returns and register a scene instance.
+	*/
+	PMeshScene CSceneHandler::CreateEmptyMeshScene(const bool bBoundToLoginSession)
+	{
+		LibMCEnvHandle hSceneInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_SceneHandler_CreateEmptyMeshScene(m_pHandle, bBoundToLoginSession, &hSceneInstance));
+		
+		if (!hSceneInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMeshScene>(m_pWrapper, hSceneInstance);
+	}
+	
+	/**
+	* CSceneHandler::ReleaseMeshScene - Removes a mesh scene and removes all memory.
+	* @param[in] pSceneInstance - Returns and register a scene instance.
+	*/
+	void CSceneHandler::ReleaseMeshScene(classParam<CMeshScene> pSceneInstance)
+	{
+		LibMCEnvHandle hSceneInstance = pSceneInstance.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_SceneHandler_ReleaseMeshScene(m_pHandle, hSceneInstance));
+	}
+	
+	/**
+	* CSceneHandler::Load3MFFromResource - Loads a 3MF Resource into memory.
+	* @param[in] sResourceName - Resource name to load.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	PModelDataComponentInstance CSceneHandler::Load3MFFromResource(const std::string & sResourceName)
+	{
+		LibMCEnvHandle hModelData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_SceneHandler_Load3MFFromResource(m_pHandle, sResourceName.c_str(), &hModelData));
+		
+		if (!hModelData) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModelDataComponentInstance>(m_pWrapper, hModelData);
+	}
+	
+	/**
+	* CSceneHandler::Load3MFFromMemory - Loads a 3MF from memory.
+	* @param[in] DataBuffer - Binary data to load.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	PModelDataComponentInstance CSceneHandler::Load3MFFromMemory(const CInputVector<LibMCEnv_uint8> & DataBuffer)
+	{
+		LibMCEnvHandle hModelData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_SceneHandler_Load3MFFromMemory(m_pHandle, (LibMCEnv_uint64)DataBuffer.size(), DataBuffer.data(), &hModelData));
+		
+		if (!hModelData) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModelDataComponentInstance>(m_pWrapper, hModelData);
+	}
+	
+	/**
+	* CSceneHandler::Load3MFFromStream - Loads a 3MF from a StreamReader.
+	* @param[in] pReaderInstance - Stream reader instance.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	PModelDataComponentInstance CSceneHandler::Load3MFFromStream(classParam<CStreamReader> pReaderInstance)
+	{
+		LibMCEnvHandle hReaderInstance = pReaderInstance.GetHandle();
+		LibMCEnvHandle hModelData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_SceneHandler_Load3MFFromStream(m_pHandle, hReaderInstance, &hModelData));
+		
+		if (!hModelData) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModelDataComponentInstance>(m_pWrapper, hModelData);
 	}
 	
 	/**
@@ -14869,30 +16610,18 @@ public:
 	}
 	
 	/**
-	* CToolpathPart::GetMeshUUID - Returns Mesh UUID of the part.
-	* @return Returns toolpath part mesh uuid.
+	* CToolpathPart::GetRootComponent - Returns the Root Component of the part.
+	* @return Returns root component instance.
 	*/
-	std::string CToolpathPart::GetMeshUUID()
+	PModelDataComponentInstance CToolpathPart::GetRootComponent()
 	{
-		LibMCEnv_uint32 bytesNeededMeshUUID = 0;
-		LibMCEnv_uint32 bytesWrittenMeshUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetMeshUUID(m_pHandle, 0, &bytesNeededMeshUUID, nullptr));
-		std::vector<char> bufferMeshUUID(bytesNeededMeshUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetMeshUUID(m_pHandle, bytesNeededMeshUUID, &bytesWrittenMeshUUID, &bufferMeshUUID[0]));
+		LibMCEnvHandle hRootComponent = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetRootComponent(m_pHandle, &hRootComponent));
 		
-		return std::string(&bufferMeshUUID[0]);
-	}
-	
-	/**
-	* CToolpathPart::GetTransform - Returns Mesh Transform of the part.
-	* @return Returns the mesh transform of the toolpath.
-	*/
-	sToolpathPartTransform CToolpathPart::GetTransform()
-	{
-		sToolpathPartTransform resultMeshUUID;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetTransform(m_pHandle, &resultMeshUUID));
-		
-		return resultMeshUUID;
+		if (!hRootComponent) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModelDataComponentInstance>(m_pWrapper, hRootComponent);
 	}
 	
 	/**
@@ -15301,6 +17030,19 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nIndex, bytesNeededPartUUID, &bytesWrittenPartUUID, &bufferPartUUID[0]));
 		
 		return std::string(&bufferPartUUID[0]);
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentLocalPartID - Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Local Part ID of the segment
+	*/
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 resultLocalPartID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentLocalPartID(m_pHandle, nIndex, &resultLocalPartID));
+		
+		return resultLocalPartID;
 	}
 	
 	/**
@@ -15755,6 +17497,33 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CXMLDocumentNode>(m_pWrapper, hXMLNode);
+	}
+	
+	/**
+	* CToolpathAccessor::HasBinaryMetaData - Checks if a binary metadata exists in the build file with a certain path.
+	* @param[in] sIdentifier - Identifier of the binary metadata
+	* @return Returns if the metadata exists.
+	*/
+	bool CToolpathAccessor::HasBinaryMetaData(const std::string & sIdentifier)
+	{
+		bool resultHasMetaData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_HasBinaryMetaData(m_pHandle, sIdentifier.c_str(), &resultHasMetaData));
+		
+		return resultHasMetaData;
+	}
+	
+	/**
+	* CToolpathAccessor::GetBinaryMetaData - Returns a binary metadata of the build file. Fails if binary metadata does not exist.
+	* @param[in] sIdentifier - Identifier of the binary metadata
+	* @param[out] MetaDataBuffer - Returns the content of the binary binary data.
+	*/
+	void CToolpathAccessor::GetBinaryMetaData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & MetaDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededMetaData = 0;
+		LibMCEnv_uint64 elementsWrittenMetaData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBinaryMetaData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededMetaData, nullptr));
+		MetaDataBuffer.resize((size_t) elementsNeededMetaData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBinaryMetaData(m_pHandle, sIdentifier.c_str(), elementsNeededMetaData, &elementsWrittenMetaData, MetaDataBuffer.data()));
 	}
 	
 	/**
@@ -16449,7 +18218,7 @@ public:
 	}
 	
 	/**
-	* CBuild::LoadToolpath - loads the a toolpath into memory
+	* CBuild::LoadToolpath - loads the a toolpath into memory. Does nothing if toolpath has already been loaded.
 	*/
 	void CBuild::LoadToolpath()
 	{
@@ -21875,48 +23644,18 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::RegisterMeshFrom3MFResource - Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
-	* @param[in] sResourceName - Resource name to load.
-	* @return Mesh Object instance.
+	* CStateEnvironment::CreateSceneHandler - Creates a new 3D scene handler instance.
+	* @return Scene Handler instance.
 	*/
-	PMeshObject CStateEnvironment::RegisterMeshFrom3MFResource(const std::string & sResourceName)
+	PSceneHandler CStateEnvironment::CreateSceneHandler()
 	{
-		LibMCEnvHandle hMeshObject = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RegisterMeshFrom3MFResource(m_pHandle, sResourceName.c_str(), &hMeshObject));
+		LibMCEnvHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateSceneHandler(m_pHandle, &hInstance));
 		
-		if (!hMeshObject) {
+		if (!hInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
-	}
-	
-	/**
-	* CStateEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Flag is registered.
-	*/
-	bool CStateEnvironment::MeshIsRegistered(const std::string & sMeshUUID)
-	{
-		bool resultMeshIsRegistered = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_MeshIsRegistered(m_pHandle, sMeshUUID.c_str(), &resultMeshIsRegistered));
-		
-		return resultMeshIsRegistered;
-	}
-	
-	/**
-	* CStateEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
-	*/
-	PMeshObject CStateEnvironment::FindRegisteredMesh(const std::string & sMeshUUID)
-	{
-		LibMCEnvHandle hMeshObject = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindRegisteredMesh(m_pHandle, sMeshUUID.c_str(), &hMeshObject));
-		
-		if (!hMeshObject) {
-			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
+		return std::make_shared<CSceneHandler>(m_pWrapper, hInstance);
 	}
 	
 	/**
@@ -22960,49 +24699,18 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::RegisterMeshFrom3MFResource - Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
-	* @param[in] sResourceName - Resource name to load.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
+	* CUIEnvironment::CreateSceneHandler - Creates a new 3D scene handler instance.
+	* @return Scene Handler instance.
 	*/
-	PMeshObject CUIEnvironment::RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID)
+	PSceneHandler CUIEnvironment::CreateSceneHandler()
 	{
-		LibMCEnvHandle hMeshObject = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RegisterMeshFrom3MFResource(m_pHandle, sResourceName.c_str(), sMeshUUID.c_str(), &hMeshObject));
+		LibMCEnvHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateSceneHandler(m_pHandle, &hInstance));
 		
-		if (!hMeshObject) {
+		if (!hInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
-	}
-	
-	/**
-	* CUIEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Flag is registered.
-	*/
-	bool CUIEnvironment::MeshIsRegistered(const std::string & sMeshUUID)
-	{
-		bool resultMeshIsRegistered = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_MeshIsRegistered(m_pHandle, sMeshUUID.c_str(), &resultMeshIsRegistered));
-		
-		return resultMeshIsRegistered;
-	}
-	
-	/**
-	* CUIEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
-	*/
-	PMeshObject CUIEnvironment::FindRegisteredMesh(const std::string & sMeshUUID)
-	{
-		LibMCEnvHandle hMeshObject = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindRegisteredMesh(m_pHandle, sMeshUUID.c_str(), &hMeshObject));
-		
-		if (!hMeshObject) {
-			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CMeshObject>(m_pWrapper, hMeshObject);
+		return std::make_shared<CSceneHandler>(m_pWrapper, hInstance);
 	}
 	
 	/**

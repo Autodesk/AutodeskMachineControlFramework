@@ -155,6 +155,10 @@ public:
 
 	void SetUint64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer) override;
 
+	IDataTableWriteOptions* CreateWriteOptions() override;
+
+	IDataTableCSVWriteOptions* CreateCSVWriteOptions() override;
+
 	void WriteCSVToStream(ITempStreamWriter* pWriter, IDataTableCSVWriteOptions* pOptions) override;
 
 	void WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions) override;

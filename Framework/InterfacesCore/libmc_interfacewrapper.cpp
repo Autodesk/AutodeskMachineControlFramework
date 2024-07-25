@@ -81,6 +81,142 @@ LibMCResult handleUnhandledException(IBase * pIBaseClass)
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class implementation for StreamData
+**************************************************************************************************************************/
+LibMCResult libmc_streamdata_getdata(LibMC_StreamData pStreamData, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStreamData;
+
+	try {
+		if ((!pDataBuffer) && !(pDataNeededCount))
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		IStreamData* pIStreamData = dynamic_cast<IStreamData*>(pIBaseClass);
+		if (!pIStreamData)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIStreamData->GetData(nDataBufferSize, pDataNeededCount, pDataBuffer);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_streamdata_getmimetype(LibMC_StreamData pStreamData, const LibMC_uint32 nMIMETypeBufferSize, LibMC_uint32* pMIMETypeNeededChars, char * pMIMETypeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStreamData;
+
+	try {
+		if ( (!pMIMETypeBuffer) && !(pMIMETypeNeededChars) )
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sMIMEType("");
+		IStreamData* pIStreamData = dynamic_cast<IStreamData*>(pIBaseClass);
+		if (!pIStreamData)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pMIMETypeBuffer == nullptr);
+		if (isCacheCall) {
+			sMIMEType = pIStreamData->GetMIMEType();
+
+			pIStreamData->_setCache (new ParameterCache_1<std::string> (sMIMEType));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStreamData->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+			cache->retrieveData (sMIMEType);
+			pIStreamData->_setCache (nullptr);
+		}
+		
+		if (pMIMETypeNeededChars)
+			*pMIMETypeNeededChars = (LibMC_uint32) (sMIMEType.size()+1);
+		if (pMIMETypeBuffer) {
+			if (sMIMEType.size() >= nMIMETypeBufferSize)
+				throw ELibMCInterfaceException (LIBMC_ERROR_BUFFERTOOSMALL);
+			for (size_t iMIMEType = 0; iMIMEType < sMIMEType.size(); iMIMEType++)
+				pMIMETypeBuffer[iMIMEType] = sMIMEType[iMIMEType];
+			pMIMETypeBuffer[sMIMEType.size()] = 0;
+		}
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for StreamConnection
+**************************************************************************************************************************/
+LibMCResult libmc_streamconnection_getnewcontent(LibMC_StreamConnection pStreamConnection, LibMC_StreamData * pNewContent)
+{
+	IBase* pIBaseClass = (IBase *)pStreamConnection;
+
+	try {
+		if (pNewContent == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		IBase* pBaseNewContent(nullptr);
+		IStreamConnection* pIStreamConnection = dynamic_cast<IStreamConnection*>(pIBaseClass);
+		if (!pIStreamConnection)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pBaseNewContent = pIStreamConnection->GetNewContent();
+
+		*pNewContent = (IBase*)(pBaseNewContent);
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_streamconnection_getidledelay(LibMC_StreamConnection pStreamConnection, LibMC_uint32 * pIdleDelay)
+{
+	IBase* pIBaseClass = (IBase *)pStreamConnection;
+
+	try {
+		if (pIdleDelay == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		IStreamConnection* pIStreamConnection = dynamic_cast<IStreamConnection*>(pIBaseClass);
+		if (!pIStreamConnection)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		*pIdleDelay = pIStreamConnection->GetIdleDelay();
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for APIRequestHandler
 **************************************************************************************************************************/
 LibMCResult libmc_apirequesthandler_expectsrawbody(LibMC_APIRequestHandler pAPIRequestHandler, bool * pValue)
@@ -567,57 +703,6 @@ LibMCResult libmc_mccontext_terminateinstancethread(LibMC_MCContext pMCContext, 
 	}
 }
 
-LibMCResult libmc_mccontext_getinstancethreadstate(LibMC_MCContext pMCContext, const char * pInstanceName, const LibMC_uint32 nStateNameBufferSize, LibMC_uint32* pStateNameNeededChars, char * pStateNameBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pMCContext;
-
-	try {
-		if (pInstanceName == nullptr)
-			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
-		if ( (!pStateNameBuffer) && !(pStateNameNeededChars) )
-			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
-		std::string sInstanceName(pInstanceName);
-		std::string sStateName("");
-		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
-		if (!pIMCContext)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pStateNameBuffer == nullptr);
-		if (isCacheCall) {
-			sStateName = pIMCContext->GetInstanceThreadState(sInstanceName);
-
-			pIMCContext->_setCache (new ParameterCache_1<std::string> (sStateName));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMCContext->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
-			cache->retrieveData (sStateName);
-			pIMCContext->_setCache (nullptr);
-		}
-		
-		if (pStateNameNeededChars)
-			*pStateNameNeededChars = (LibMC_uint32) (sStateName.size()+1);
-		if (pStateNameBuffer) {
-			if (sStateName.size() >= nStateNameBufferSize)
-				throw ELibMCInterfaceException (LIBMC_ERROR_BUFFERTOOSMALL);
-			for (size_t iStateName = 0; iStateName < sStateName.size(); iStateName++)
-				pStateNameBuffer[iStateName] = sStateName[iStateName];
-			pStateNameBuffer[sStateName.size()] = 0;
-		}
-		return LIBMC_SUCCESS;
-	}
-	catch (ELibMCInterfaceException & Exception) {
-		return handleLibMCException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCResult libmc_mccontext_instancestateissuccessful(LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
@@ -767,6 +852,37 @@ LibMCResult libmc_mccontext_createapirequesthandler(LibMC_MCContext pMCContext, 
 	}
 }
 
+LibMCResult libmc_mccontext_createstreamconnection(LibMC_MCContext pMCContext, const char * pStreamUUID, LibMC_StreamConnection * pStreamConnectionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pStreamConnectionInstance == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		IBase* pBaseStreamConnectionInstance(nullptr);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pBaseStreamConnectionInstance = pIMCContext->CreateStreamConnection(sStreamUUID);
+
+		*pStreamConnectionInstance = (IBase*)(pBaseStreamConnectionInstance);
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -782,6 +898,14 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmc_streamdata_getdata") 
+		*ppProcAddress = (void*) &libmc_streamdata_getdata;
+	if (sProcName == "libmc_streamdata_getmimetype") 
+		*ppProcAddress = (void*) &libmc_streamdata_getmimetype;
+	if (sProcName == "libmc_streamconnection_getnewcontent") 
+		*ppProcAddress = (void*) &libmc_streamconnection_getnewcontent;
+	if (sProcName == "libmc_streamconnection_getidledelay") 
+		*ppProcAddress = (void*) &libmc_streamconnection_getidledelay;
 	if (sProcName == "libmc_apirequesthandler_expectsrawbody") 
 		*ppProcAddress = (void*) &libmc_apirequesthandler_expectsrawbody;
 	if (sProcName == "libmc_apirequesthandler_expectsformdata") 
@@ -812,8 +936,6 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_mccontext_startinstancethread;
 	if (sProcName == "libmc_mccontext_terminateinstancethread") 
 		*ppProcAddress = (void*) &libmc_mccontext_terminateinstancethread;
-	if (sProcName == "libmc_mccontext_getinstancethreadstate") 
-		*ppProcAddress = (void*) &libmc_mccontext_getinstancethreadstate;
 	if (sProcName == "libmc_mccontext_instancestateissuccessful") 
 		*ppProcAddress = (void*) &libmc_mccontext_instancestateissuccessful;
 	if (sProcName == "libmc_mccontext_instancestatehasfailed") 
@@ -824,6 +946,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_mccontext_log;
 	if (sProcName == "libmc_mccontext_createapirequesthandler") 
 		*ppProcAddress = (void*) &libmc_mccontext_createapirequesthandler;
+	if (sProcName == "libmc_mccontext_createstreamconnection") 
+		*ppProcAddress = (void*) &libmc_mccontext_createstreamconnection;
 	if (sProcName == "libmc_getversion") 
 		*ppProcAddress = (void*) &libmc_getversion;
 	if (sProcName == "libmc_getlasterror") 

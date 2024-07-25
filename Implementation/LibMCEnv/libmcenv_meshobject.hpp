@@ -61,11 +61,15 @@ private:
     AMC::PMeshHandler m_pMeshHandler;
     std::string m_sMeshUUID;
 
+	AMC::PMeshEntity m_pNonPersistentMeshEntity;
+
     AMC::PMeshEntity getMeshEntity();
 
 public:
 
     CMeshObject(AMC::PMeshHandler pMeshHandler, const std::string & sMeshUUID);
+
+	CMeshObject(AMC::PMeshHandler pMeshHandler, AMC::PMeshEntity pNonPersistentMeshEntity);
 
     virtual ~CMeshObject();
 
@@ -77,6 +81,35 @@ public:
 
 	LibMCEnv_uint32 GetVertexCount() override;
 
+	bool IsManifold() override;
+
+	bool IsOriented() override;
+
+	bool IsWatertight() override;
+
+	LibMCEnv_uint32 GetMaxVertexID() override;
+
+	bool VertexExists(const LibMCEnv_uint32 nVertexID) override;
+
+	bool GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double& dX, LibMCEnv_double& dY, LibMCEnv_double& dZ) override;
+
+	void GetVertexIDs(LibMCEnv_uint64 nVertexIDsBufferSize, LibMCEnv_uint64* pVertexIDsNeededCount, LibMCEnv_uint32* pVertexIDsBuffer) override;
+
+	void GetAllVertices(LibMCEnv_uint64 nVerticesBufferSize, LibMCEnv_uint64* pVerticesNeededCount, LibMCEnv::sMeshVertex3D* pVerticesBuffer) override;
+
+	LibMCEnv_uint32 GetMaxTriangleID() override;
+
+	bool TriangeExists(const LibMCEnv_uint32 nTriangleID) override;
+
+	bool GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32& nVertex1ID, LibMCEnv_uint32& nVertex2ID, LibMCEnv_uint32& nVertex3ID) override;
+
+	void GetTriangleIDs(LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEnv_uint64* pTriangleIDsNeededCount, LibMCEnv_uint32* pTriangleIDsBuffer) override;
+
+	void GetAllTriangles(LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D* pTrianglesBuffer) override;
+	
+	bool IsPersistent() override;
+
+	IPersistentMeshObject* MakePersistent(const bool bBoundToLoginSession) override;
 };
 
 } // namespace Impl

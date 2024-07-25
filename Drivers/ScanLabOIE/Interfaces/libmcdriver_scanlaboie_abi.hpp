@@ -552,6 +552,15 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_gethostname(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const LibMCDriver_ScanLabOIE_uint32 nHostNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pHostNameNeededChars, char * pHostNameBuffer);
 
 /**
+* Sets the RTC 6 IP Address for data streaming (100kHz mode).
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[in] pRTC6IPAddress - New RTC6 IP Address. Will only be effective in a StartApp call.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_setrtc6ipaddress(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pRTC6IPAddress);
+
+/**
 * Sets the port of the device. Fails if device is already connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
@@ -570,7 +579,7 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_getport(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 * pPort);
 
 /**
-* Returns if the device is connected and logged in.
+* Returns if the device is connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
 * @param[out] pValue - Flag if the device is connected.
@@ -798,15 +807,31 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_clearcurrentrecording(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice);
 
 /**
-* Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.
+* Returns if the device is logged in.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
-* @param[in] pBuild - Build that contains the data.
-* @param[in] pDataUUID - Data UUID of the build data.
-* @param[out] pRecordingInstance - Recording instance
+* @param[out] pValue - Flag if the device is logged in.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_loadrecordingfrombuild(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCEnv_Build pBuild, const char * pDataUUID, LibMCDriver_ScanLabOIE_DataRecording * pRecordingInstance);
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_isloggedin(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue);
+
+/**
+* Returns if the device is streaming.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[out] pValue - Flag if the device is streaming.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_isstreaming(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue);
+
+/**
+* Returns if the connected RTC is busy.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[out] pValue - Flag if the connected RTC is busy.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_rtcisbusy(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue);
 
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_OIE

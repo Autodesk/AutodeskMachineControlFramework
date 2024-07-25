@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_meshhandler.hpp"
+#include "amc_meshscene.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
 
@@ -70,9 +71,7 @@ namespace AMC {
 	void CMeshHandler::unloadMeshEntity (const std::string& sEntityUUID)
 	{
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sEntityUUID);
-		auto pToolpathEntity = findMeshEntity(sNormalizedUUID, true);
-		if (pToolpathEntity->DecRef())
-			m_Entities.erase(sNormalizedUUID);
+		m_Entities.erase(sNormalizedUUID);
 	}
 	
 	void CMeshHandler::unloadAllEntities()
@@ -80,7 +79,53 @@ namespace AMC {
 		m_Entities.clear();
 	}
 
-	PMeshEntity CMeshHandler::register3MFResource(Lib3MF::CLib3MFWrapper* pWrapper, AMC::CResourcePackage* pResourcePackage, const std::string& sResourceName)
+	void CMeshHandler::registerEntity(PMeshEntity pMeshEntity)
+	{
+		if (pMeshEntity == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		std::string sMeshEntityUUID = pMeshEntity->getUUID();
+		auto iIter = m_Entities.find(sMeshEntityUUID);
+		if (iIter != m_Entities.end())
+			throw ELibMCCustomException(LIBMC_ERROR_MESHENTITYALREADYLOADED, sMeshEntityUUID);
+
+		m_Entities.insert(std::make_pair(sMeshEntityUUID, pMeshEntity));
+
+	}
+
+	PMeshScene CMeshHandler::findScene(const std::string& sSceneUUID, bool bFailIfNotExistent)
+	{
+		std::string sNormalizedSceneUUID = AMCCommon::CUtils::normalizeUUIDString(sSceneUUID);
+
+		auto iIter = m_Scenes.find(sNormalizedSceneUUID);
+		if (iIter != m_Scenes.end())
+			return iIter->second;
+
+		if (bFailIfNotExistent)
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDMESHSCENE, sNormalizedSceneUUID);
+
+		return nullptr;
+	}
+
+	PMeshScene CMeshHandler::createEmptyScene(bool bBoundToLoginSession)
+	{
+		std::string sSceneUUID = AMCCommon::CUtils::createUUID();
+		auto pMeshScene = std::make_shared<CMeshScene>(sSceneUUID);
+
+		m_Scenes.insert(std::make_pair (sSceneUUID, pMeshScene));
+
+		return pMeshScene;
+	}
+
+	void CMeshHandler::releaseScene(const std::string& sSceneUUID)
+	{
+		std::string sNormalizedSceneUUID = AMCCommon::CUtils::normalizeUUIDString(sSceneUUID);
+		m_Scenes.erase(sNormalizedSceneUUID);
+	}
+
+
+
+	/*PMeshEntity CMeshHandler::register3MFResource(Lib3MF::CLib3MFWrapper* pWrapper, AMC::CResourcePackage* pResourcePackage, const std::string& sResourceName)
 	{
 		if (pWrapper == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -116,7 +161,7 @@ namespace AMC {
 		m_Entities.insert(std::make_pair (sNormalizedUUID, pMeshEntity));
 
 		return pMeshEntity;
-	}
+	} */
 
 }
 

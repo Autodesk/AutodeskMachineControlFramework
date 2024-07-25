@@ -205,12 +205,6 @@ public:
 
 	IJournalHandler* GetCurrentJournal() override;
 
-	IMeshObject* RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID) override;
-
-	bool MeshIsRegistered(const std::string& sMeshUUID) override;
-
-	IMeshObject* FindRegisteredMesh(const std::string& sMeshUUID) override;
-
 	IDataSeries* CreateDataSeries(const std::string& sName, const bool bBoundToLogin) override;
 
 	bool HasDataSeries(const std::string& sDataSeriesUUID) override;
@@ -230,6 +224,8 @@ public:
 	IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
 
 	bool HasAlertOfType(const std::string& sIdentifier, const bool bOnlyActive) override;
+
+	ISceneHandler* CreateSceneHandler() override;
 
 	ICryptoContext* CreateCryptoContext() override;
 

@@ -511,13 +511,154 @@ export default class AMCApplication extends Common.AMCObject {
 					
                     application.axiosPostRequest("/upload/finish", {
                         "streamuuid": uploadObject.streamuuid,
+						"context": "build",
                         "sha256": checkSum
                     })
                     .then(resultUploadFinish => {
 
-                        resultUploadFinish;
+						uploadObject.clearUploadState ();
 
-						uploadObject.setStateMessageToPreparing ();
+						if (uploadObject.hasSuccessEvent ()) {
+							
+							let contextuuid = Assert.UUIDValue (resultUploadFinish.data.contextuuid);
+							
+							let itemuuid = uploadObject.getItemUUID ();
+							let eventValues = {}
+							eventValues[itemuuid] = contextuuid;
+
+							application.triggerUIEvent(uploadObject.getSuccessEvent (), itemuuid, eventValues); 
+						}
+
+						/*uploadObject.setStateMessageToPreparing ();
+
+                        application.axiosPostRequest("/build/prepare", {
+                            "builduuid": uploadObject.contextuuid,
+                        })
+                        .then(resultBuildPrepare => {
+							
+							if (!uploadObject.checkIfUploadIsActive())
+								return;
+							
+                            resultBuildPrepare;
+							uploadObject.clearUploadState ();
+							
+                            if (uploadObject.hasSuccessEvent ()) {
+																
+								let itemuuid = uploadObject.getItemUUID ();
+								let eventValues = {}
+								eventValues[itemuuid] = contextuuid;
+
+								application.triggerUIEvent(uploadObject.getSuccessEvent (), itemuuid, eventValues); 
+                            } 
+
+                        })
+                        .catch(err => {
+                            err;
+//                            if (failureevent)
+                                //this.triggerUIEvent(failureevent, itemuuid, {});
+                        }); */
+                    })					
+					
+					
+				}
+			})
+            .catch(err => {
+                err;
+            });
+		
+		
+	}
+	
+
+    performJobUpload(itemState, successEventName, failureEventName) {
+		
+		Assert.ObjectInstance (itemState, "amcUploadState");
+		
+		let chosenfile = itemState.getChosenFile ();	
+							
+		this.axiosPostRequest("/upload/", {
+			"context": "build",
+            "name": chosenfile.name,
+            "size": chosenfile.size,
+            "mimetype": itemState.getMimeType (),
+        })
+
+            .then(resultUploadInit => {
+				
+				Assert.ObjectValue (resultUploadInit);
+				Assert.ObjectValue (resultUploadInit.data);				
+                let streamuuid = Assert.UUIDValue (resultUploadInit.data.streamuuid);
+												
+				let currentUpload = new AMCUpload (itemState, streamuuid);
+				currentUpload.setSuccessEvent (successEventName);
+				currentUpload.setFailureEvent (failureEventName);
+				
+				currentUpload.readChunk (this, this.onJobUploadChunkSuccess);
+				
+				
+			})
+            .catch(err => {
+                err;
+/*                if (failureeventname)
+                    this.triggerUIEvent(failureeventname, itemuuid, {}); */
+            });
+		
+    }
+
+
+	onImageUploadChunkSuccess (application, uploadObject, chunkData, uploadOffset) {
+		
+		Assert.ObjectInstance (application, "amcApplication");
+		Assert.ObjectInstance (uploadObject, "amcUpload");
+		Assert.IntegerValue (uploadOffset);
+				
+		if (!uploadObject.checkIfUploadIsActive())
+			return;
+		
+		uploadObject.setStateMessageToProgress ();
+		
+		const formData = new FormData();
+		formData.append("size", chunkData.byteLength);
+		formData.append("offset", uploadOffset);
+		formData.append("data", new Blob([chunkData], {
+                        type: "application/3mf"
+                    }), uploadObject.getFileName ());
+
+		application.axiosPostFormData("/upload/" + uploadObject.streamuuid, formData)
+			.then(resultUploadHandle => {
+				
+				if (!uploadObject.checkIfUploadIsActive())
+					return;
+				
+				resultUploadHandle;
+				if (!uploadObject.readChunk (application, application.onImageUploadChunkSuccess)) {
+					
+					let checkSum = uploadObject.calculateChecksum ();
+					
+					uploadObject.setStateMessageToWaiting ();
+					
+                    application.axiosPostRequest("/upload/finish", {
+                        "streamuuid": uploadObject.streamuuid,
+						"context": "image",
+                        "sha256": checkSum
+                    })
+                    .then(resultUploadFinish => {
+                        
+						uploadObject.clearUploadState ();
+
+						if (uploadObject.hasSuccessEvent ()) {
+							
+							let contextuuid = Assert.UUIDValue (resultUploadFinish.data.contextuuid);
+							
+							let itemuuid = uploadObject.getItemUUID ();
+							let eventValues = {}
+							eventValues[itemuuid] = contextuuid;
+
+							application.triggerUIEvent(uploadObject.getSuccessEvent (), itemuuid, eventValues); 
+						}
+
+
+						/*uploadObject.setStateMessageToPreparing ();
 
                         application.axiosPostRequest("/build/prepare", {
                             "builduuid": uploadObject.contextuuid,
@@ -544,7 +685,7 @@ export default class AMCApplication extends Common.AMCObject {
                             err;
 //                            if (failureevent)
                                 //this.triggerUIEvent(failureevent, itemuuid, {});
-                        });
+                        }); */
                     })					
 					
 					
@@ -558,7 +699,8 @@ export default class AMCApplication extends Common.AMCObject {
 	}
 	
 
-    performJobUpload(itemState, successEventName, failureEventName) {
+
+    performImageUpload(itemState, successEventName, failureEventName) {
 		
 		Assert.ObjectInstance (itemState, "amcUploadState");
 		
@@ -568,7 +710,7 @@ export default class AMCApplication extends Common.AMCObject {
 			"context": "build",
             "name": chosenfile.name,
             "size": chosenfile.size,
-            "mimetype": "application/3mf",
+            "mimetype": itemState.getMimeType (),
         })
 
             .then(resultUploadInit => {
@@ -576,14 +718,13 @@ export default class AMCApplication extends Common.AMCObject {
 				Assert.ObjectValue (resultUploadInit);
 				Assert.ObjectValue (resultUploadInit.data);				
                 let streamuuid = Assert.UUIDValue (resultUploadInit.data.streamuuid);
-                let contextuuid = Assert.UUIDValue (resultUploadInit.data.contextuuid);
 												
-				let currentUpload = new AMCUpload (itemState, streamuuid, contextuuid);
+				let currentUpload = new AMCUpload (itemState, streamuuid);
 				currentUpload.setSuccessEvent (successEventName);
 				currentUpload.setFailureEvent (failureEventName);
 				
 				//let reader = new FileReader();
-				currentUpload.readChunk (this, this.onJobUploadChunkSuccess);
+				currentUpload.readChunk (this, this.onImageUploadChunkSuccess);
 				
 				
 			})
@@ -595,6 +736,7 @@ export default class AMCApplication extends Common.AMCObject {
 		
 
     }
+
 
     changePage(page) {
 

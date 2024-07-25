@@ -63,13 +63,14 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName)
     : m_bIsInitializing(false), 
     m_pParameterGroup(pParameterGroup), 
     m_pDriverResourcePackage (pDriverResourcePackage), 
     m_pMachineResourcePackage (pMachineResourcePackage),
     m_sBaseTempPath(sBaseTempPath), 
     m_pToolpathHandler (pToolpathHandler), 
+    m_pMeshHandler (pMeshHandler),
     m_pLogger (pLogger), 
     m_sDriverName (sDriverName), 
     m_pDataModel (pDataModel), 
@@ -81,6 +82,8 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pToolpathHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pMeshHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
     if (pDataModel.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pLogger.get() == nullptr)
@@ -194,7 +197,7 @@ void CDriverEnvironment::RetrieveMachineResourceData(const std::string& sIdentif
 
 IToolpathAccessor* CDriverEnvironment::CreateToolpathAccessor(const std::string& sStreamUUID)
 {
-    return new CToolpathAccessor (sStreamUUID, AMCCommon::CUtils::createEmptyUUID(), m_pToolpathHandler);
+    return new CToolpathAccessor (sStreamUUID, AMCCommon::CUtils::createEmptyUUID(), m_pToolpathHandler, m_pMeshHandler);
 }
 
 bool CDriverEnvironment::ParameterNameIsValid(const std::string& sParameterName)
@@ -429,7 +432,7 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_pGlobalChrono);
+    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
 }
 
 bool CDriverEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
@@ -453,7 +456,7 @@ IBuildExecution* CDriverEnvironment::GetBuildExecution(const std::string& sExecu
     std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
-    return new CBuildExecution(pBuildExecution, m_pDataModel, m_pToolpathHandler, m_pGlobalChrono);
+    return new CBuildExecution(pBuildExecution, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
 
 }
 

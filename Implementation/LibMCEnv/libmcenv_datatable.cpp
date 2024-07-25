@@ -34,12 +34,16 @@ Abstract: This is a stub class definition of CDataTable
 #include "libmcenv_datatable.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
+#include "libmcenv_datatablewriteoptions.hpp"
+#include "libmcenv_datatablecsvwriteoptions.hpp"
+
 // Include custom headers here.
 #include "common_utils.hpp"
 #include <vector>
 #include <algorithm>
 #include <cstring>
 #include <sstream>
+#include <cmath>
 
 #include "amc_constants.hpp"
 
@@ -1073,6 +1077,17 @@ void CDataTable::updateMaxRowCount()
 	}
 }
 
+IDataTableWriteOptions* CDataTable::CreateWriteOptions()
+{
+	return new CDataTableWriteOptions ();
+}
+
+IDataTableCSVWriteOptions* CDataTable::CreateCSVWriteOptions()
+{
+	return new CDataTableCSVWriteOptions();
+}
+
+
 void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, IDataTableCSVWriteOptions* pOptions) 
 {
 	if (pWriter == nullptr)
@@ -1121,7 +1136,7 @@ void CDataTable::WriteCSVToStream(ITempStreamWriter* pWriter, IDataTableCSVWrite
 			size_t nRowIndex = nChunkIndex * nChunkSize + nRowIndexInChunk;
 			if (nRowIndex >= m_nMaxRowCount)
 				break;
-
+   
 			auto iIter = m_Columns.begin();
 			while (iIter != m_Columns.end()) {
 

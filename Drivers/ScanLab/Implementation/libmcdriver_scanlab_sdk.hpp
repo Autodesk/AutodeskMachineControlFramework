@@ -66,6 +66,7 @@ namespace LibMCDriver_ScanLab {
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_count_cards) ();
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_found_cards) ();
 		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_assign_card) (const uint32_t nSearchNo, const uint32_t nCardNo);		
+		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_remove_card) (const uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_acquire_rtc) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_release_rtc) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_serial_number) (uint32_t nCardNo);
@@ -132,6 +133,7 @@ namespace LibMCDriver_ScanLab {
 		
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_trigger) (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_trigger4) (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_trigger8) (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4, uint32_t nSignal5, uint32_t nSignal6, uint32_t nSignal7, uint32_t nSignal8);
 
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_control_mode) (uint32_t nCardNo, uint32_t nMode);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_pulses_ctrl) (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
@@ -195,6 +197,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y_pos) (uint32_t nCardNo, const double ScaleY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_x) (uint32_t nCardNo, const double ScaleX);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_fly_y) (uint32_t nCardNo, const double ScaleY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_fly_return) (uint32_t nCardNo, int32_t sX, int32_t nY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_encoder) (uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_marking_info) (uint32_t nCardNo);		
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_wait_for_encoder) (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo);
@@ -207,6 +210,10 @@ namespace LibMCDriver_ScanLab {
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_uart_config) (uint32_t nCardNo, uint32_t nBaudRate);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_rs232_write_data) (uint32_t nCardNo, uint32_t nData);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_rs232_read_data) (uint32_t nCardNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_mcbsp_out_oie_ctrl) (uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_config_waveform_streaming_ctrl) (uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
+			
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_set_high_performance_mode) (uint32_t nCardNo, uint32_t nMode);
 
 		class CScanLabSDKJournal {
 		private:
@@ -252,6 +259,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_eth_count_cards ptr_eth_count_cards = nullptr;
 			PScanLabPtr_eth_found_cards ptr_eth_found_cards = nullptr;
 			PScanLabPtr_eth_assign_card ptr_eth_assign_card = nullptr;
+			PScanLabPtr_eth_remove_card ptr_eth_remove_card = nullptr;
 			PScanLabPtr_acquire_rtc ptr_acquire_rtc = nullptr;
 			PScanLabPtr_release_rtc ptr_release_rtc = nullptr;
 			PScanLabPtr_n_get_serial_number ptr_n_get_serial_number = nullptr;
@@ -312,6 +320,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_get_free_variable ptr_n_get_free_variable = nullptr;
 			PScanLabPtr_n_set_trigger ptr_n_set_trigger = nullptr;
 			PScanLabPtr_n_set_trigger4 ptr_n_set_trigger4 = nullptr;
+			PScanLabPtr_n_set_trigger8 ptr_n_set_trigger8 = nullptr;
 			PScanLabPtr_n_set_control_mode ptr_n_set_control_mode = nullptr;
 			PScanLabPtr_n_set_laser_pulses_ctrl ptr_n_set_laser_pulses_ctrl = nullptr;
 			PScanLabPtr_n_set_mark_speed_ctrl ptr_n_set_mark_speed_ctrl = nullptr;
@@ -368,6 +377,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_fly_y_pos ptr_n_set_fly_y_pos = nullptr;
 			PScanLabPtr_n_set_fly_x ptr_n_set_fly_x = nullptr;
 			PScanLabPtr_n_set_fly_y ptr_n_set_fly_y = nullptr;
+			PScanLabPtr_n_fly_return ptr_n_fly_return = nullptr;
 			PScanLabPtr_n_get_encoder ptr_n_get_encoder = nullptr;
 			PScanLabPtr_n_get_marking_info ptr_n_get_marking_info = nullptr;
 			PScanLabPtr_n_wait_for_encoder ptr_n_wait_for_encoder = nullptr;
@@ -380,6 +390,9 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_uart_config ptr_n_uart_config = nullptr;
 			PScanLabPtr_n_rs232_write_data ptr_n_rs232_write_data = nullptr;
 			PScanLabPtr_n_rs232_read_data ptr_n_rs232_read_data = nullptr;
+			PScanLabPtr_n_set_mcbsp_out_oie_ctrl ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
+			PScanLabPtr_n_eth_config_waveform_streaming_ctrl ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
+			PScanLabPtr_n_eth_set_high_performance_mode ptr_n_eth_set_high_performance_mode = nullptr;
 
 			void resetFunctionPtrs ();
 		public:
@@ -390,6 +403,8 @@ namespace LibMCDriver_ScanLab {
 			void setJournal(PScanLabSDKJournal pLogJournal);
 
 			void initDLL();
+			void reinitDLL();
+
 			void checkError(uint32_t nRTCError);
 			void checkLastErrorOfCard(uint32_t nCardNo);
 			void checkGlobalErrorOfCard(uint32_t nCardNo);
@@ -403,6 +418,7 @@ namespace LibMCDriver_ScanLab {
 			uint32_t eth_count_cards ();
 			uint32_t eth_found_cards ();
 			int32_t eth_assign_card (const uint32_t nSearchNo, const uint32_t nCardNo);
+			int32_t eth_remove_card(const uint32_t nCardNo);
 			uint32_t acquire_rtc (uint32_t nCardNo);
 			uint32_t release_rtc (uint32_t nCardNo);
 			uint32_t n_get_serial_number (uint32_t nCardNo);
@@ -469,6 +485,7 @@ namespace LibMCDriver_ScanLab {
 
 			void n_set_trigger (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2);
 			void n_set_trigger4 (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4);
+			void n_set_trigger8 (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4, uint32_t nSignal5, uint32_t nSignal6, uint32_t nSignal7, uint32_t nSignal8);
 
 			void n_set_control_mode (uint32_t nCardNo, uint32_t nMode);
 			void n_set_laser_pulses_ctrl (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
@@ -532,6 +549,7 @@ namespace LibMCDriver_ScanLab {
 			void n_set_fly_y_pos (uint32_t nCardNo, const double ScaleY);
 			void n_set_fly_x (uint32_t nCardNo, const double ScaleX);
 			void n_set_fly_y (uint32_t nCardNo, const double ScaleY);
+			void n_fly_return (uint32_t nCardNo, int32_t sX, int32_t nY);
 			void n_get_encoder (uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY);
 			uint32_t n_get_marking_info (uint32_t nCardNo);
 			void n_wait_for_encoder (uint32_t nCardNo, int32_t nValue, uint32_t nEncoderNo);
@@ -544,6 +562,9 @@ namespace LibMCDriver_ScanLab {
 			uint32_t n_uart_config(uint32_t nCardNo, uint32_t nBaudRate);
 			void n_rs232_write_data(uint32_t nCardNo, uint32_t nData);
 			uint32_t n_rs232_read_data(uint32_t nCardNo);
+			void n_set_mcbsp_out_oie_ctrl (uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2);
+			void n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
+			void n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMode);
 
 		};
 

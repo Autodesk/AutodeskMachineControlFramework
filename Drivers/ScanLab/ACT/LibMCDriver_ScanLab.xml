@@ -128,10 +128,44 @@
 		<error name="SCANAHEADSCALINGERROR" code="1076" description="Scanahead scaling error." />		
 		<error name="SCANAHEADMISSINGRTCRESPONSE" code="1077" description="Scanahead missing rtc response." />		
 		<error name="SCANAHEADPCIERROR" code="1078" description="Scanahead PCI error." />		
-		<error name="SCANAHEADUNKNOWNERROR" code="1079" description="Scanahead unknown error." />		
-		<error name="PORTNUMBERISNOTDIGITAL" code="1080" description="Port number is not digital." />		
-		<error name="PORTNUMBERISNOTANALOG" code="1081" description="Port number is not analog." />		
-										
+		<error name="SCANAHEADUNKNOWNERROR" code="1079" description="Scanahead unknown error." />												
+		<error name="PORTNUMBERISNOTDIGITAL" code="1082" description="Port number is not digital." />		
+		<error name="PORTNUMBERISNOTANALOG" code="1083" description="Port number is not analog." />		
+		<error name="INVALIDOIECHANNELSIZE" code="1084" description="Invalid OIE Channel size." />
+		<error name="INTERNALACQUISITIONERROR" code="1085" description="Internal Acquisition Error." />
+		<error name="COULDNOTDETERMINESERIALNUMBER" code="1086" description="Could not determine serial number." />
+		
+		<error name="COULDNOTASSIGNETHERNETCARD" code="1087" description="Could not assign ethernet card." />
+		<error name="MISSINGFIRMWAREDATA" code="1088" description="Missing Firmware Data." />
+		<error name="MISSINGFPGADATA" code="1089" description="Missing FPGA Data." />
+		<error name="MISSINGAUXILIARYDATA" code="1090" description="Missing Auxiliary Data." />
+		<error name="MISSINGFIRMWAREINITIZATIONDATA" code="1091" description="Missing Firmware Initialisation Data." />
+		<error name="NOCARDFOUNDATIPADDRESS" code="1092" description="No Card found at IP Address." />		
+		<error name="NOCARDFOUNDATINIPRANGE" code="1093" description="No Card found in IP Range." />		
+		<error name="COULDNOTINITIALISERTCCARD" code="1094" description="Could not initialize RTC Card." />		
+		
+		<error name="INVALIDCHANNELNAME" code="1095" description="Invalid Channel Name." />
+		<error name="EMPTYCHANNELNAME" code="1096" description="Empty Channel Name." />
+		<error name="CANNOTADDCHANNELDURINGRECORDING" code="1097" description="Cannot add channel during recording." />
+		<error name="DUPLICATECHANNELNAME" code="1098" description="Duplicate channel name." />
+		<error name="NORECORDINGCHANNELAVAILABLE" code="1099" description="No recording channel available." />
+		<error name="INVALIDCHANNELID" code="1100" description="Invalid Channel ID." />
+		<error name="CHANNELTYPECANNOTBEUNDEFINED" code="1101" description="Channel Type cannot be undefined." />
+		<error name="INVALIDCHUNKSIZE" code="1102" description="Invalid Chunk Size" />
+		<error name="CHANNELNOTFOUND" code="1103" description="Channel not found" />
+		<error name="INVALIDRECORDINDEX" code="1104" description="Invalid record index" />		
+		<error name="INVALIDCHUNKINDEX" code="1105" description="Invalid chunk index" />		
+		<error name="CHUNKENTRYINDEXOUTOFBOUNDS" code="1106" description="Chunk entry index out of bounds" />		
+		<error name="INVALIDDATARECORDINGINTERVAL" code="1107" description="Invalid data recording interval" />		
+		<error name="DATARECORDINGOVERFLOW" code="1108" description="Data recording overflow" />		
+		<error name="DATARECORDINGUNDERFLOW" code="1109" description="Data recording underflow" />				
+		<error name="DATABUFFERISFULL" code="1110" description="Data buffer is full" />		
+		<error name="DATABUFFERREADEMPTY" code="1111" description="Data buffer read empty" />		
+		<error name="COULDNOTFINDRECORDING" code="1112" description="Could not find recording." />		
+		<error name="INVALIDCHANNELTYPE" code="1113" description="Invalid channel type." />	
+		<error name="INVALIDRTCRECORDINGFREQUENCY" code="1114" description="Invalid RTC recording frequency." />	
+
+
 	</errors>
 
 
@@ -160,7 +194,67 @@
 	   <option name="OIEVersion3Compatibility" value="2" />
 	   <option name="OIEVersion3" value="3" />
 	</enum>
+
+	<enum name="RTCChannelType" description="Channel type to record. See RTC Documentation set_trigger for details.">
+	   <option name="ChannelUndefined" value="0" description="Undefined or invalid channel" />	   
+	   <option name="ChannelCurrentXRaw" value="1" description="Raw X Value of the Scan Head (RTC Channel 1, StatusAX)"  />
+	   <option name="ChannelCurrentYRaw" value="2" description="Raw Y Value of the Scan Head (RTC Channel 2, StatusAY)" />
+	   <option name="ChannelCurrentZRaw" value="4" description="Raw Z Value of the Scan Head (RTC Channel 4, StatusBX)" />
+	   <option name="ChannelTargetXRaw" value="7" description="Target X Value of the Scan Head (RTC Channel 7, SampleX)" />
+	   <option name="ChannelTargetYRaw" value="8" description="Target Y Value of the Scan Head (RTC Channel 8, SampleY)" />
+	   <option name="ChannelTargetZRaw" value="9" description="Target Z Value of the Scan Head (RTC Channel 9, SampleZ)" />
+	   <option name="ChannelAutoLaserControlMode" value="24" description="Control Parameter of AutoLaserControl (RTC Channel 24)" />
+	   <option name="ChannelVectorControlMode" value="31" description="Control Parameter of VectorControl (RTC Channel 31)" />
+	   <option name="ChannelDefocus" value="32" description="Defocus setting (RTC Channel 32)" />
+	   <option name="ChannelAnalogOut1" value="33" description="Analog Out 1 Signal (RTC Channel 33)" />
+	   <option name="ChannelAnalogOut2" value="34" description="Analog Out 2 Signal (RTC Channel 34)" />
+	   <option name="ChannelDigitalOut16Bit" value="35" description="16 Bit Digital Out Signal (RTC Channel 35)" />
+	   <option name="ChannelDigitalOut8Bit" value="36" description="8 Bit Digital Out Signal (RTC Channel 36)" />
+	   <option name="ChannelPulseLength" value="37" description="Pulse length of laser control (RTC Channel 37)" />
+	   <option name="ChannelHalfPeriod" value="38"  description="Half period of laser control (RTC Channel 38)" />
+	   <option name="ChannelFreeVariable0" value="39" description="Free Variable 0 (RTC Channel 39)" />
+	   <option name="ChannelFreeVariable1" value="40" description="Free Variable 1 (RTC Channel 40)" />
+	   <option name="ChannelFreeVariable2" value="41" description="Free Variable 2 (RTC Channel 41)"/>
+	   <option name="ChannelFreeVariable3" value="42" description="Free Variable 3 (RTC Channel 42)"/>
+	   <option name="ChannelEncoder0" value="43" description="Counter value of Encoder 0 (RTC Channel 43)" />
+	   <option name="ChannelEncoder1" value="44" description="Counter value of Encoder 1 (RTC Channel 44)" />
+	   <option name="ChannelMarkSpeed" value="45" description="Laser Mark Speed in Bits/ms (RTC Channel 45)" />
+	   <option name="ChannelDigitalIn16Bit" value="46" description="16bit Digital In Channel of EXTENSION 1 (RTC Channel 46)" />
+	   <option name="ChannelFreeVariable4" value="48" description="Free Variable 4 (RTC Channel 48)"/>
+	   <option name="ChannelFreeVariable5" value="49" description="Free Variable 5 (RTC Channel 49)"/>
+	   <option name="ChannelFreeVariable6" value="50" description="Free Variable 6 (RTC Channel 50)"/>
+	   <option name="ChannelFreeVariable7" value="51" description="Free Variable 7 (RTC Channel 51)"/>
+	   <option name="ChannelTimeStamp" value="52" description="RTC Time Stamp (RTC Channel 52)" />
+	   <option name="ChannelWobbleAmplitude" value="53" description="Wobble Amplitude (RTC Channel 53)" />
+	   <option name="ChannelAnalogIn" value="54" description="Analog Input Value (RTC Channel 54)" />
+	   <option name="ChannelScaledEncoderX" value="55" description="Scaled Encoder Value for X Axis (RTC Channel 55)" />
+	   <option name="ChannelScaledEncoderY" value="56" description="Scaled Encoder Value for Y Axis (RTC Channel 56)" />
+	   <option name="ChannelScaledEncoderZ" value="57" description="Scaled Encoder Value for Z Axis (RTC Channel 57)" />
+	   <option name="ChannelRS232" value="58" description="RS232 Channel Value (RTC Channel 58)" />	   
+	   <option name="ChannelLaserOn" value="100" description="Laser On Value (RTC Channel 0, LASERON)" />
+	   <option name="ChannelCurrentXBacktransformed" value="101" description="Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX)"  />
+	   <option name="ChannelCurrentYBacktransformed" value="102" description="Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY)" />
+	   <option name="ChannelCurrentZBacktransformed" value="104" description="Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX)" />
+	   <option name="ChannelTargetXBacktransformed" value="107" description="Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX)" />
+	   <option name="ChannelTargetYBacktransformed" value="108" description="Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY)" />
+	   <option name="ChannelTargetZBacktransformed" value="109" description="Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ)" />
+
+	</enum>
 	
+	
+	<enum name="RTCRecordingFrequency" description="Frequency to record RTC values.">
+	   <option name="InvalidFrequency" value="0" description="Invalid Frequency" />	   
+	   <option name="Record100kHz" value="1" description="Record with 100.000 entries per second (1:1)" />	   
+	   <option name="Record50kHz" value="2" description="Record with 50.000 entries per second (1:2)" />	   
+	   <option name="Record25kHz" value="4" description="Record with 25.000 entries per second (1:4)" />	   
+	   <option name="Record20kHz" value="5" description="Record with 20.000 entries per second (1:5)" />	   
+	   <option name="Record10kHz" value="10" description="Record with 10.000 entries per second (1:10)" />	   
+	   <option name="Record5kHz" value="20" description="Record with 5.000 entries per second (1:20)" />	   
+	   <option name="Record4kHz" value="25" description="Record with 4.000 entries per second (1:25)" />	   
+	   <option name="Record2kHz" value="50" description="Record with 2.000 entries per second (1:50)" />	   
+	   <option name="Record1kHz" value="100" description="Record with 1.000 entries per second (1:100)" />	   
+	
+	</enum>
 	
 	<enum name="OIERecordingMode">
 	   <option name="OIERecordingDisabled" value="0" description="OIE shall not record anything." />
@@ -292,6 +386,161 @@ Custom implementation
 		
 	</class>
 
+
+	<class name="RTCJob" parent="Base" description="An in memory representation of an RTC Job..">
+	
+		<method name="DrawPolyline" description="Writes a polyline into the open list">
+			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+		</method>
+		
+		<method name="DrawPolylineOIE" description="Writes a polyline into the open list with OIE Enabled.">
+			<param name="Points" type="structarray" class="Point2D" pass="in" description="Points of polyline to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+			<param name="OIEPIDControlIndex" type="uint32" pass="in" description="OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63." />
+		</method>
+
+		<method name="DrawHatches" description="Writes a list of hatches into the open list">
+			<param name="Hatches" type="structarray" class="Hatch2D" pass="in" description="Hatches to draw." />
+			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
+			<param name="JumpSpeed" type="single" pass="in" description="Jump speed in mm/s" />
+			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
+		</method>
+		
+		<method name="AddSetPower" description="adds a power change to the open list. MUST NOT be used for PID control.">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+
+		<method name="AddSetAnalogOut" description="Adds changing an analog port to the open list. Should not interfere with laser power control.">
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser port to set. MUST not be an analog port or the call fails." />
+			<param name="OutputValue" type="single" pass="in" description="New Normalized output value. Value is clipped between 0 and 1." />
+		</method>
+		
+		<method name="AddSetDigitalOut" description="Adds changing an digital port to the open list. Should not interfere with laser power control.">
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser port to set. MUST not be an digital port or the call fails." />
+			<param name="OutputValue" type="single" pass="in" description="New Normalized output value. Value is clipped between 0 and 1." />
+		</method>		
+
+		<method name="AddSetPowerForPIDControl" description="adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.">
+			<param name="PowerInPercent" type="single" pass="in" description="Laser power in percent" />
+		</method>
+		
+		<method name="AddSetJumpSpeed" description="adds a jump speed change to the open list">
+			<param name="JumpSpeedInMMPerSecond" type="single" pass="in" description="Jump speed in mm/s" />
+		</method>
+
+		<method name="AddSetMarkSpeed" description="adds a mark speed change to the open list">
+			<param name="MarkSpeedInMMPerSecond" type="single" pass="in" description="Mark speed in mm/s" />
+		</method>
+
+		<method name="AddJumpMovement" description="Adds a Jump movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddMarkMovement" description="Adds a Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+		</method>		
+
+		<method name="AddTimedMarkMovement" description="Adds a timed Mark movement to the open list">
+			<param name="TargetX" type="double" pass="in" description="X Position." />
+			<param name="TargetY" type="double" pass="in" description="Y Position." />
+			<param name="DurationInMicroseconds" type="double" pass="in" description="Duration of mark movement in Microseconds." />
+		</method>		
+
+		<method name="AddFreeVariable" description="Adds a free variable set to the open list">
+			<param name="VariableNo" type="uint32" pass="in" description="Number of the variable (0-7)." />
+			<param name="Value" type="uint32" pass="in" description="Value to set." />
+		</method>	
+	
+	</class>
+
+	<class name="RTCRecording" parent="Base" description="A recording instance for an RTC Job..">
+
+		<method name="ScanheadConnectionCheckIsEnabled" description="Returns if the scan head connection is checked when recording">
+			<param name="Value" type="bool" pass="return" description="If true, the Scanhead connection will be checked for an error when recording." />
+		</method>	
+		
+		<method name="EnableScanheadConnectionCheck" description="Enables the Scanhead connection check. The check is enabled by default.">
+		</method>	
+
+		<method name="DisableScanheadConnectionCheck" description="Disables the Scanhead connection check.">
+		</method>	
+		
+		<method name="Clear" description="Clears all recording data and channels.">
+		</method>	
+		
+		<method name="AddChannel" description="Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique." />
+			<param name="ChannelType" type="enum" class="RTCChannelType" pass="in" description="Channel type enum. MUST NOT be Undefined." />
+		</method>	
+
+		<method name="RemoveChannel" description="Removes a new channel from the recording and all recorded data of that channel. Does nothing if channel does not exist. ">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+		</method>	
+
+		<method name="HasChannel" description="Returns if a channel name exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="ChannelExists" type="bool" pass="return" description="Returns true if channel exists." />
+		</method>	
+
+		<method name="GetChannelType" description="Returns the type of a channel. Returns Undefined if channel does not exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="ChannelType" type="enum" class="RTCChannelType" pass="return" description="Channel type enum." />
+		</method>	
+
+		<method name="GetRecordCount" description="Returns how many record entries have been recorded.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="RecordCount" type="uint64" pass="return" description="The number of record entries." />
+		</method>	
+
+		<method name="GetRecordEntry" description="Returns a specific record entry. Fails if Channel does not exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="RecordIndex" type="uint64" pass="in" description="Index of Record entry. MUST be between 0 and RecordCount - 1." />
+			<param name="Value" type="int32" pass="return" description="Value of record entry." />
+		</method>	
+		
+		<method name="GetAllRecordEntries" description="Returns all record entries of a channel. Fails if Channel does not exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="Values" type="basicarray" class="int32" pass="out" description="Array of all record entries." />
+		</method>	
+		
+		<method name="EnableRecording" description="Enables recording of position data of the RTC Card. This is a list command.">
+			<param name="Frequency" type="enum" class="RTCRecordingFrequency" pass="in" description="Recording frequency." />			
+		</method>
+
+		<method name="DisableRecording" description="Disables recording of position data of the RTC Card. This is a list command.">
+		</method>
+
+		<method name="ExecuteListWithRecording" description="Executes the list with recording the position data from the RTC card. DEPRECIATED!">
+		</method>
+		
+		<method name="AddRecordsToDataTable" description="Writes a certain channel to a data table as int32 columns. Fails if Channel does not exist">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+		</method>	
+		
+		<method name="AddScaledRecordsToDataTable" description="Writes a certain channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset. Fails if Channel does not exist.">
+			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
+			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
+			<param name="ScaleFactor" type="double" pass="in" description="Factor that the raw value is scaled with." />
+			<param name="Offset" type="double" pass="in" description="Offset that the raw value is scaled with." />
+		</method>	
+		
+		
+	</class>
 
 	<class name="RTCContext" parent="Base" description="Context of the RTC Controller Card">
 
@@ -603,7 +852,7 @@ Custom implementation
 			<param name="BIOSVersion" type="uint32" pass="out" description="RTC BIOS Version" />
 		</method>
 		
-		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts for a specific connection. The Driver defaults will not be changed.">
 			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
@@ -732,17 +981,18 @@ Custom implementation
 		</method>
 
 		<method name="PrepareRecording" description="Prepares recording of position data of the RTC Card. This needs to be called before any list is started.">
+			<param name="KeepInMemory" type="bool" pass="in" description="If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance." />
+			<param name="RecordingInstance" type="class" class="RTCRecording" pass="return" description="Recording instance." />		
 		</method>
 
-		<method name="EnableRecording" description="Enables recording of position data of the RTC Card. This is a list command.">
+		<method name="HasRecording" description="Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.">
+			<param name="UUID" type="string" pass="in" description="UUID of the recording to find." />		
+			<param name="RecordingExists" type="bool" pass="return" description="Returns if the recording exists." />		
 		</method>
 
-		<method name="DisableRecording" description="Disables recording of position data of the RTC Card. This is a list command.">
-		</method>
-
-		<method name="ExecuteListWithRecording" description="Executes the list with recording the position data from the RTC card.">
-			<param name="ListIndex" type="uint32" pass="in" description="Index of List (1 or 2)." />
-			<param name="Position" type="uint32" pass="in" description="Relative Position in List." />
+		<method name="FindRecording" description="Find a recording in the driver memory. Recording MUST have been created with KeepInMemory set to true. Fails if recording does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the recording to find." />		
+			<param name="RecordingInstance" type="class" class="RTCRecording" pass="return" description="Recording instance." />		
 		</method>
 
 		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
@@ -928,6 +1178,18 @@ Custom implementation
 		<method name="EnableJournaling" description="Enables journaling of the SDK. MUST be called before LoadSDK or LoadCustomSDK.">
 		</method>
 
+		<method name="SetFirmware" description="Sets the default firmware from the driver resources. If given, Initialise will upload this firmware before acquiring the RTC card.">
+			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
+			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
+			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+		</method>		
+
+		<method name="SetCustomFirmware" description="Sets the default firmware from a binary array. If given, Initialise will upload this firmware before acquiring the RTC card.">
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
+		</method>		
+
 	</class>
 
 
@@ -955,7 +1217,7 @@ Custom implementation
 			<param name="PresetName" type="string" pass="in" description="Name of the configuration preset." />
 		</method>
 
-		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts. The given values will be defaults for all subsequent connections.">
 			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
@@ -981,13 +1243,13 @@ Custom implementation
 			<param name="SelectorInstance" type="class" class="RTCSelector" pass="return" description="RTC Selector Instance." />
 		</method>
 
-		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
+		<method name="LoadFirmware" description="Loads the firmware from the driver resources. DEPRECIATED. Use SetFirmare before calling Initialise..">
 			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
 			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
 			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
 		</method>		
 
-		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources.">
+		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources. DEPRECIATED. Use SetCustomFirmare before calling Initialise..">
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
 			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
 			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
@@ -1043,12 +1305,18 @@ Custom implementation
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 		</method>
 						
-		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+		<method name="GetCommunicationTimeouts" description="Returns the current RTC Ethernet communication timeouts. Fails, if no RTC card has been acquired yet.">
 			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
-						
+
+		<method name="GetDefaultCommunicationTimeouts" description="Returns the RTC Ethernet communication timeouts that will be used for a subsequent connection.">
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+
 		<method name="EnableTimelagCompensation" description="Enables timelag compensation.">
 			<param name="TimeLagXYInMicroseconds" type="uint32" pass="in" description="Time lag of XY axes (in microseconds). MUST be a multiple of 10." />
 			<param name="TimeLagZInMicroseconds" type="uint32" pass="in" description="Time lag of Z axis (in microseconds). MUST be a multiple of 10." />
@@ -1127,14 +1395,14 @@ Custom implementation
 			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
 		</method>
 				
-		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
+		<method name="LoadFirmware" description="Loads the firmware from the driver resources and for a specific scanner. DEPRECIATED. Use SetFirmare before calling Initialise..">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
 			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
 			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
 			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
 		</method>		
 
-		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources.">
+		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources and for a specific scanner. DEPRECIATED. Use SetCustomFirmare before calling Initialise..">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
 			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
@@ -1195,15 +1463,27 @@ Custom implementation
 			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card." />
 		</method>
 
-		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+		<method name="SetAllCommunicationTimeouts" description="Set RTC Ethernet communication timeouts for all existing and future connections.">
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
+
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts for a specific scanner. The given values will be defaults for all subsequent connections.">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
 			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
 		</method>		
 						
-		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts. Fails if the RTC Card is not connected.">
 			<param name="ScannerIndex" type="uint32" pass="in" description="Index of the scanner (0-based). MUST be smaller than ScannerCount" />
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+						
+		<method name="GetDefaultCommunicationTimeouts" description="Returns the RTC Ethernet communication timeouts that will be used for any subsequent connection.">
 			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />

@@ -60,7 +60,6 @@ namespace AMC {
 	class CStateSignalHandler;
 	class CDriverHandler;
 	class CToolpathHandler;
-	class CServiceHandler;
 	class CStateJournal;
 	class CUIHandler;
 	class CParameterHandler;
@@ -76,7 +75,6 @@ namespace AMC {
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
 	typedef std::shared_ptr<CDriverHandler> PDriverHandler;
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
-	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
 	typedef std::shared_ptr<CStateJournal> PStateJournal;
 	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
@@ -94,7 +92,6 @@ namespace AMC {
 		AMC::PStateSignalHandler m_pSignalHandler;
 		AMC::PDriverHandler m_pDriverHandler;
 		AMC::PToolpathHandler m_pToolpathHandler;
-		AMC::PServiceHandler m_pServiceHandler;
 		AMC::PUIHandler m_pUIHandler;
 		AMC::PStateJournal m_pStateJournal;
 		AMC::PStateMachineData m_pStateMachineData;
@@ -125,7 +122,6 @@ namespace AMC {
 		CStateSignalHandler* stateSignalHandler();
 		CDriverHandler* driverHandler();
 		CToolpathHandler* toolpathHandler();
-		CServiceHandler* serviceHandler();
 		CUIHandler* uiHandler();
 		CStateMachineData* stateMachineData();
 		CAccessControl * accessControl ();

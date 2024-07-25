@@ -1431,6 +1431,35 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_GetTimeStampPtr) (LibMCData_BuildJo
 typedef LibMCDataResult (*PLibMCDataBuildJob_GetCreatorUUIDPtr) (LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nUserUUIDBufferSize, LibMCData_uint32* pUserUUIDNeededChars, char * pUserUUIDBuffer);
 
 /**
+* returns if the build has an attached thumbnail.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[out] pHasThumbnail - Returns true, if the build has an attached thumbnail.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJob_HasThumbnailStreamPtr) (LibMCData_BuildJob pBuildJob, bool * pHasThumbnail);
+
+/**
+* returns the UUID of the thumbnail stream of the job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Thumbnail UUID. 00000000-0000-0000-0000-000000000000, if no thumbnail is assigned..., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJob_GetThumbnailStreamUUIDPtr) (LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Sets the UUID of the thumbnail stream of the job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pStreamUUID - Thumbnail UUID. Stream MUST exist and of MIME Type png. If empty or 00000000-0000-0000-0000-000000000000, no thumbnail will be assigned...
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJob_SetThumbnailStreamUUIDPtr) (LibMCData_BuildJob pBuildJob, const char * pStreamUUID);
+
+/**
 * returns the current name of the user that created the job.
 *
 * @param[in] pBuildJob - BuildJob instance.
@@ -2645,6 +2674,9 @@ typedef struct {
 	PLibMCDataBuildJob_GetExecutionCountPtr m_BuildJob_GetExecutionCount;
 	PLibMCDataBuildJob_GetTimeStampPtr m_BuildJob_GetTimeStamp;
 	PLibMCDataBuildJob_GetCreatorUUIDPtr m_BuildJob_GetCreatorUUID;
+	PLibMCDataBuildJob_HasThumbnailStreamPtr m_BuildJob_HasThumbnailStream;
+	PLibMCDataBuildJob_GetThumbnailStreamUUIDPtr m_BuildJob_GetThumbnailStreamUUID;
+	PLibMCDataBuildJob_SetThumbnailStreamUUIDPtr m_BuildJob_SetThumbnailStreamUUID;
 	PLibMCDataBuildJob_GetCreatorNamePtr m_BuildJob_GetCreatorName;
 	PLibMCDataBuildJob_GetStorageStreamPtr m_BuildJob_GetStorageStream;
 	PLibMCDataBuildJob_GetStorageStreamUUIDPtr m_BuildJob_GetStorageStreamUUID;

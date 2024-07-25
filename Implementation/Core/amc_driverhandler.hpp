@@ -69,12 +69,16 @@ namespace AMC {
 	class CToolpathHandler;
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
 
+	class CMeshHandler;
+	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
+
 	class CDriverHandler {
 	private:
 
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 		std::string m_sTempBasePath;
 		PToolpathHandler m_pToolpathHandler;
+		PMeshHandler m_pMeshHandler;
 		PLogger m_pLogger;
 		LibMCData::PDataModel m_pDataModel;
 		AMCCommon::PChrono m_pGlobalChrono;
@@ -94,7 +98,7 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, PStateJournal pStateJournal);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PMeshHandler pMeshHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, PStateJournal pStateJournal);
 
 		virtual ~CDriverHandler();
 

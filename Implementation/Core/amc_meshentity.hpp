@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "amc_resourcepackage.hpp"
 #include "amc_geometryutils.hpp"
+#include "libmcenv_types.hpp"
 
 #include "lib3mf/lib3mf_dynamic.hpp"
 
@@ -54,6 +55,7 @@ namespace AMC {
 		uint32_t m_nNodeIDs[2];		
 		uint32_t m_nFaceIDs[2];
 		uint32_t m_nAngleInDegrees;
+		uint32_t m_nValence;
 		uint32_t m_nFlags;
 	} sMeshEntityEdge;
 
@@ -76,6 +78,9 @@ namespace AMC {
 		std::vector<sMeshEntityEdge> m_Edges;
 		std::vector<sMeshEntityFace> m_Faces;		
 
+		bool checkEdgeOrientationWithFace(const sMeshEntityEdge& edge, const sMeshEntityFace& face, bool bEdgeIsOrientedAlongFace);
+		bool adjacentFacesAreConsistentlyOriented(const sMeshEntityEdge & edge);
+
 	public:
 
 		CMeshEntity(const std::string & sUUID, const std::string & sName);
@@ -85,10 +90,6 @@ namespace AMC {
 		std::string getUUID();
 
 		std::string getName();
-
-		void IncRef();
-
-		bool DecRef();
 
 		void loadFrom3MF(Lib3MF::CLib3MFMeshObject * pMeshObject);
 
@@ -107,6 +108,30 @@ namespace AMC {
 
 		double calcFaceAngleInDegree (size_t nFaceID1, size_t nFaceID2);
 		sMeshVector3D calcFaceNormal(size_t nFaceID);
+
+		bool isManifold();
+
+		bool isOriented();
+
+		uint32_t getMaxVertexID();
+
+		bool vertexExists(const uint32_t nVertexID);
+
+		bool getVertex(const uint32_t nVertexID, double& dX, double& dY, double& dZ);
+
+		void getVertexIDs(uint64_t nVertexIDsBufferSize, uint64_t* pVertexIDsNeededCount, uint32_t* pVertexIDsBuffer);
+
+		void getAllVertices(uint64_t nVerticesBufferSize, uint64_t* pVerticesNeededCount, LibMCEnv::sMeshVertex3D* pVerticesBuffer);
+
+		uint32_t getMaxTriangleID();
+
+		bool triangeExists(const uint32_t nTriangleID);
+
+		bool getTriangle(const uint32_t nTriangleID, uint32_t& nVertex1ID, uint32_t& nVertex2ID, uint32_t& nVertex3ID);
+
+		void getTriangleIDs(uint64_t nTriangleIDsBufferSize, uint64_t* pTriangleIDsNeededCount, uint32_t* pTriangleIDsBuffer);
+
+		void getAllTriangles(uint64_t nTrianglesBufferSize, uint64_t* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D* pTrianglesBuffer);
 
 
 	};

@@ -184,8 +184,39 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE 1077 /** Scanahead missing rtc response. */
 #define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR 1078 /** Scanahead PCI error. */
 #define LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR 1079 /** Scanahead unknown error. */
-#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL 1080 /** Port number is not digital. */
-#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG 1081 /** Port number is not analog. */
+#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL 1082 /** Port number is not digital. */
+#define LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG 1083 /** Port number is not analog. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE 1084 /** Invalid OIE Channel size. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR 1085 /** Internal Acquisition Error. */
+#define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER 1086 /** Could not determine serial number. */
+#define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD 1087 /** Could not assign ethernet card. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA 1088 /** Missing Firmware Data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA 1089 /** Missing FPGA Data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA 1090 /** Missing Auxiliary Data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA 1091 /** Missing Firmware Initialisation Data. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS 1092 /** No Card found at IP Address. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE 1093 /** No Card found in IP Range. */
+#define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD 1094 /** Could not initialize RTC Card. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELNAME 1095 /** Invalid Channel Name. */
+#define LIBMCDRIVER_SCANLAB_ERROR_EMPTYCHANNELNAME 1096 /** Empty Channel Name. */
+#define LIBMCDRIVER_SCANLAB_ERROR_CANNOTADDCHANNELDURINGRECORDING 1097 /** Cannot add channel during recording. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECHANNELNAME 1098 /** Duplicate channel name. */
+#define LIBMCDRIVER_SCANLAB_ERROR_NORECORDINGCHANNELAVAILABLE 1099 /** No recording channel available. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELID 1100 /** Invalid Channel ID. */
+#define LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPECANNOTBEUNDEFINED 1101 /** Channel Type cannot be undefined. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKSIZE 1102 /** Invalid Chunk Size */
+#define LIBMCDRIVER_SCANLAB_ERROR_CHANNELNOTFOUND 1103 /** Channel not found */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDRECORDINDEX 1104 /** Invalid record index */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKINDEX 1105 /** Invalid chunk index */
+#define LIBMCDRIVER_SCANLAB_ERROR_CHUNKENTRYINDEXOUTOFBOUNDS 1106 /** Chunk entry index out of bounds */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDDATARECORDINGINTERVAL 1107 /** Invalid data recording interval */
+#define LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW 1108 /** Data recording overflow */
+#define LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW 1109 /** Data recording underflow */
+#define LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL 1110 /** Data buffer is full */
+#define LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY 1111 /** Data buffer read empty */
+#define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING 1112 /** Could not find recording. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE 1113 /** Invalid channel type. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY 1114 /** Invalid RTC recording frequency. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -284,6 +315,37 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "Scanahead unknown error.";
     case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
     case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE: return "Invalid OIE Channel size.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR: return "Internal Acquisition Error.";
+    case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER: return "Could not determine serial number.";
+    case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD: return "Could not assign ethernet card.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA: return "Missing Firmware Data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA: return "Missing FPGA Data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA: return "Missing Auxiliary Data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA: return "Missing Firmware Initialisation Data.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS: return "No Card found at IP Address.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE: return "No Card found in IP Range.";
+    case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD: return "Could not initialize RTC Card.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELNAME: return "Invalid Channel Name.";
+    case LIBMCDRIVER_SCANLAB_ERROR_EMPTYCHANNELNAME: return "Empty Channel Name.";
+    case LIBMCDRIVER_SCANLAB_ERROR_CANNOTADDCHANNELDURINGRECORDING: return "Cannot add channel during recording.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECHANNELNAME: return "Duplicate channel name.";
+    case LIBMCDRIVER_SCANLAB_ERROR_NORECORDINGCHANNELAVAILABLE: return "No recording channel available.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELID: return "Invalid Channel ID.";
+    case LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPECANNOTBEUNDEFINED: return "Channel Type cannot be undefined.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKSIZE: return "Invalid Chunk Size";
+    case LIBMCDRIVER_SCANLAB_ERROR_CHANNELNOTFOUND: return "Channel not found";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRECORDINDEX: return "Invalid record index";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKINDEX: return "Invalid chunk index";
+    case LIBMCDRIVER_SCANLAB_ERROR_CHUNKENTRYINDEXOUTOFBOUNDS: return "Chunk entry index out of bounds";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDATARECORDINGINTERVAL: return "Invalid data recording interval";
+    case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW: return "Data recording overflow";
+    case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW: return "Data recording underflow";
+    case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL: return "Data buffer is full";
+    case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "Data buffer read empty";
+    case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "Could not find recording.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "Invalid channel type.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "Invalid RTC recording frequency.";
     default: return "unknown error";
   }
 }
@@ -295,6 +357,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Base;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_UARTConnection;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCJob;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCRecording;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCContext;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCSelector;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab;
@@ -330,6 +394,70 @@ namespace LibMCDriver_ScanLab {
     OIEVersion2 = 1,
     OIEVersion3Compatibility = 2,
     OIEVersion3 = 3
+  };
+  
+  /**
+  * enum class eRTCChannelType - Channel type to record. See RTC Documentation set_trigger for details.
+  */
+  enum class eRTCChannelType : LibMCDriver_ScanLab_int32 {
+    ChannelUndefined = 0, /** Undefined or invalid channel */
+    ChannelCurrentXRaw = 1, /** Raw X Value of the Scan Head (RTC Channel 1, StatusAX) */
+    ChannelCurrentYRaw = 2, /** Raw Y Value of the Scan Head (RTC Channel 2, StatusAY) */
+    ChannelCurrentZRaw = 4, /** Raw Z Value of the Scan Head (RTC Channel 4, StatusBX) */
+    ChannelTargetXRaw = 7, /** Target X Value of the Scan Head (RTC Channel 7, SampleX) */
+    ChannelTargetYRaw = 8, /** Target Y Value of the Scan Head (RTC Channel 8, SampleY) */
+    ChannelTargetZRaw = 9, /** Target Z Value of the Scan Head (RTC Channel 9, SampleZ) */
+    ChannelAutoLaserControlMode = 24, /** Control Parameter of AutoLaserControl (RTC Channel 24) */
+    ChannelVectorControlMode = 31, /** Control Parameter of VectorControl (RTC Channel 31) */
+    ChannelDefocus = 32, /** Defocus setting (RTC Channel 32) */
+    ChannelAnalogOut1 = 33, /** Analog Out 1 Signal (RTC Channel 33) */
+    ChannelAnalogOut2 = 34, /** Analog Out 2 Signal (RTC Channel 34) */
+    ChannelDigitalOut16Bit = 35, /** 16 Bit Digital Out Signal (RTC Channel 35) */
+    ChannelDigitalOut8Bit = 36, /** 8 Bit Digital Out Signal (RTC Channel 36) */
+    ChannelPulseLength = 37, /** Pulse length of laser control (RTC Channel 37) */
+    ChannelHalfPeriod = 38, /** Half period of laser control (RTC Channel 38) */
+    ChannelFreeVariable0 = 39, /** Free Variable 0 (RTC Channel 39) */
+    ChannelFreeVariable1 = 40, /** Free Variable 1 (RTC Channel 40) */
+    ChannelFreeVariable2 = 41, /** Free Variable 2 (RTC Channel 41) */
+    ChannelFreeVariable3 = 42, /** Free Variable 3 (RTC Channel 42) */
+    ChannelEncoder0 = 43, /** Counter value of Encoder 0 (RTC Channel 43) */
+    ChannelEncoder1 = 44, /** Counter value of Encoder 1 (RTC Channel 44) */
+    ChannelMarkSpeed = 45, /** Laser Mark Speed in Bits/ms (RTC Channel 45) */
+    ChannelDigitalIn16Bit = 46, /** 16bit Digital In Channel of EXTENSION 1 (RTC Channel 46) */
+    ChannelFreeVariable4 = 48, /** Free Variable 4 (RTC Channel 48) */
+    ChannelFreeVariable5 = 49, /** Free Variable 5 (RTC Channel 49) */
+    ChannelFreeVariable6 = 50, /** Free Variable 6 (RTC Channel 50) */
+    ChannelFreeVariable7 = 51, /** Free Variable 7 (RTC Channel 51) */
+    ChannelTimeStamp = 52, /** RTC Time Stamp (RTC Channel 52) */
+    ChannelWobbleAmplitude = 53, /** Wobble Amplitude (RTC Channel 53) */
+    ChannelAnalogIn = 54, /** Analog Input Value (RTC Channel 54) */
+    ChannelScaledEncoderX = 55, /** Scaled Encoder Value for X Axis (RTC Channel 55) */
+    ChannelScaledEncoderY = 56, /** Scaled Encoder Value for Y Axis (RTC Channel 56) */
+    ChannelScaledEncoderZ = 57, /** Scaled Encoder Value for Z Axis (RTC Channel 57) */
+    ChannelRS232 = 58, /** RS232 Channel Value (RTC Channel 58) */
+    ChannelLaserOn = 100, /** Laser On Value (RTC Channel 0, LASERON) */
+    ChannelCurrentXBacktransformed = 101, /** Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX) */
+    ChannelCurrentYBacktransformed = 102, /** Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY) */
+    ChannelCurrentZBacktransformed = 104, /** Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX) */
+    ChannelTargetXBacktransformed = 107, /** Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX) */
+    ChannelTargetYBacktransformed = 108, /** Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY) */
+    ChannelTargetZBacktransformed = 109 /** Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ) */
+  };
+  
+  /**
+  * enum class eRTCRecordingFrequency - Frequency to record RTC values.
+  */
+  enum class eRTCRecordingFrequency : LibMCDriver_ScanLab_int32 {
+    InvalidFrequency = 0, /** Invalid Frequency */
+    Record100kHz = 1, /** Record with 100.000 entries per second (1:1) */
+    Record50kHz = 2, /** Record with 50.000 entries per second (1:2) */
+    Record25kHz = 4, /** Record with 25.000 entries per second (1:4) */
+    Record20kHz = 5, /** Record with 20.000 entries per second (1:5) */
+    Record10kHz = 10, /** Record with 10.000 entries per second (1:10) */
+    Record5kHz = 20, /** Record with 5.000 entries per second (1:20) */
+    Record4kHz = 25, /** Record with 4.000 entries per second (1:25) */
+    Record2kHz = 50, /** Record with 2.000 entries per second (1:50) */
+    Record1kHz = 100 /** Record with 1.000 entries per second (1:100) */
   };
   
   enum class eOIERecordingMode : LibMCDriver_ScanLab_int32 {
@@ -390,6 +518,8 @@ namespace LibMCDriver_ScanLab {
 typedef LibMCDriver_ScanLab::eLaserMode eLibMCDriver_ScanLabLaserMode;
 typedef LibMCDriver_ScanLab::eLaserPort eLibMCDriver_ScanLabLaserPort;
 typedef LibMCDriver_ScanLab::eOIEOperationMode eLibMCDriver_ScanLabOIEOperationMode;
+typedef LibMCDriver_ScanLab::eRTCChannelType eLibMCDriver_ScanLabRTCChannelType;
+typedef LibMCDriver_ScanLab::eRTCRecordingFrequency eLibMCDriver_ScanLabRTCRecordingFrequency;
 typedef LibMCDriver_ScanLab::eOIERecordingMode eLibMCDriver_ScanLabOIERecordingMode;
 typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;

@@ -183,6 +183,8 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::strin
 	this->oie_device_get_board_version = (PScanLabOIEPtr_oie_device_get_board_version)_loadScanLabOIEAddress(hLibrary, "oie_device_get_board_version");
 	this->oie_set_packet_listener = (PScanLabOIEPtr_oie_set_packet_listener)_loadScanLabOIEAddress(hLibrary, "oie_set_packet_listener");
 	this->oie_set_runtime_error_listener = (PScanLabOIEPtr_oie_set_runtime_error_listener)_loadScanLabOIEAddress(hLibrary, "oie_set_runtime_error_listener");
+	this->oie_set_rtc6eth_ip_address = (PScanLabOIEPtr_oie_set_rtc6eth_ip_address)_loadScanLabOIEAddress(hLibrary, "oie_set_rtc6eth_ip_address");
+	this->oie_get_device_state = (PScanLabOIEPtr_oie_get_device_state)_loadScanLabOIEAddress(hLibrary, "oie_get_device_state");
 
 	this->oie_pkt_get_rtc_signal_count = (PScanLabOIEPtr_oie_pkt_get_rtc_signal_count)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_rtc_signal_count");
 	this->oie_pkt_get_sensor_signal_count = (PScanLabOIEPtr_oie_pkt_get_sensor_signal_count)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_sensor_signal_count");
@@ -197,6 +199,7 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::strin
 	this->oie_get_sensor_signals = (PScanLabOIEPtr_oie_get_sensor_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_sensor_signals");
 	this->oie_get_additional_app_data_signals = (PScanLabOIEPtr_oie_get_additional_app_data_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_additional_app_data_signals");
 	this->oie_get_measurement_tag_usage = (PScanLabOIEPtr_oie_get_measurement_tag_usage)_loadScanLabOIEAddress(hLibrary, "oie_get_measurement_tag_usage");
+	this->oie_get_execution_mode = (PScanLabOIEPtr_oie_get_execution_mode)_loadScanLabOIEAddress(hLibrary, "oie_get_execution_mode");
 
 	// Interface has incompatible version signatures.
 	if ((m_deviceDriverType == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3) || (m_deviceDriverType == LibMCDriver_ScanLabOIE::eOIEDeviceDriverType::OIEVersion3Compatibility)) {
@@ -291,6 +294,7 @@ void CScanLabOIESDK::resetFunctionPtrs()
 	oie_device_is_unlocked = nullptr;
 	oie_device_get_log = nullptr;
 	oie_device_get_board_version = nullptr;
+	oie_get_device_state = nullptr;
 	oie_set_packet_listener = nullptr;
 	oie_set_runtime_error_listener = nullptr;
 	this->oie_pkt_get_rtc_signal_count = nullptr;
@@ -306,6 +310,8 @@ void CScanLabOIESDK::resetFunctionPtrs()
 	this->oie_get_sensor_signals = nullptr;
 	this->oie_get_additional_app_data_signals = nullptr;
 	this->oie_get_measurement_tag_usage = nullptr;
+	this->oie_get_execution_mode = nullptr;
+	this->oie_set_rtc6eth_ip_address = nullptr;
 
 }
 

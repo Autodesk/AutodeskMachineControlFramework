@@ -164,9 +164,15 @@ std::string CToolpathLayer::GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex)
 	return m_pToolpathLayerData->getSegmentProfileUUID(nIndex);
 }
 
+
 std::string CToolpathLayer::GetSegmentPartUUID(const LibMCEnv_uint32 nIndex)
 {
 	return m_pToolpathLayerData->getSegmentPartUUID(nIndex);
+}
+
+LibMCEnv_uint32 CToolpathLayer::GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex)
+{
+	return m_pToolpathLayerData->getSegmentLocalPartID(nIndex);
 }
 
 bool CToolpathLayer::SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName) 

@@ -51,6 +51,7 @@ export default class AMCUploadState extends Common.AMCObject {
 		this.progressMessage = "Uploading...";
 		this.waitMessage = "Waiting for upload to finish..";
 		this.buildMessage = "Processing build..";
+		this.mimeType = "application/binary";
 	}
 	
 	generateUploadID ()
@@ -102,6 +103,11 @@ export default class AMCUploadState extends Common.AMCObject {
 	getItemUUID ()
 	{
 		return Assert.UUIDValue (this.itemUUID);
+	}
+	
+	getMimeType ()
+	{		
+		return this.mimeType;
 	}
 	
 }

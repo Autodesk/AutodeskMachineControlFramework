@@ -223,6 +223,9 @@
 		<error name="EMPTYDATATABLEIDENTIFIER" code="10183" description="Empty datatable identifier" />
 		<error name="INVALIDDATATABLEIDENTIFIER" code="10184" description="Invalid datatable identifier" />
 		<error name="INVALIDDATATABLESIGNATURE" code="10185" description="Invalid datatable signature" />		
+		<error name="INVALIDSUPPORTINDEX" code="10186" description="Invalid support index" />		
+		<error name="INVALIDSOLIDINDEX" code="10187" description="Invalid solid index" />		
+		<error name="INVALIDCOMPONENTINDEX" code="10188" description="Invalid component index" />		
 
 		
 	</errors>
@@ -328,6 +331,16 @@
 		<member name="Y2" type="int32" />
 	</struct>
 
+	<struct name="MeshVertex3D">
+		<member name="VertexID" type="uint32" />
+		<member name="Coordinates" type="double" rows="3"/>
+	</struct>	
+	
+	<struct name="MeshTriangle3D">
+		<member name="TriangleID" type="uint32" />
+		<member name="Vertices" type="uint32" rows="3"/>
+	</struct>	
+
 	<struct name="FloatPosition2D">
 		<member name="Coordinates" type="double" rows="2"/>
 	</struct>
@@ -350,7 +363,7 @@
 	</struct>
 
 
-	<struct name="ToolpathPartTransform">
+	<struct name="ModelDataTransform">
 		<member name="Matrix" type="double" rows="3" columns="3"/>
 		<member name="Translation" type="double" rows="3"/>
 	</struct>
@@ -791,6 +804,14 @@
 			<param name="Values" type="basicarray" class="uint64" pass="in" description="New Value array of a column. Array length should match RowCount. Values will be filled up with 0, if length is less than RowCount. RowCount will be extended if length is larger than RowCount." />
 		</method>
 		
+		<method name="CreateWriteOptions" description="Creates a Write Option.">
+			<param name="Options" type="class" class="DataTableWriteOptions" pass="return" description="Writer Options Instance to pass on to WriteDataToStream." />
+		</method>
+
+		<method name="CreateCSVWriteOptions" description="Creates a CSV Write Option.">
+			<param name="Options" type="class" class="DataTableCSVWriteOptions" pass="return" description="Writer Options Instance to pass on to WriteCSVToStream." />
+		</method>
+
 		<method name="WriteCSVToStream" description="Writes the data as CSV to a temporary stream.">
 			<param name="Writer" type="class" class="TempStreamWriter" pass="in" description="Stream writer to use." />
 			<param name="Options" type="optionalclass" class="DataTableCSVWriteOptions" pass="in" description="Optional CSV writer options to use." />
@@ -1063,7 +1084,7 @@
 
 
 
-	<class name="MeshObject" parent="Base">
+	<class name="MeshObject" parent="Base" description="A mesh object is an in memory representation of a 3D mesh model.">
 	
 		<method name="GetName" description="Returns the name of the Mesh Object.">
 			<param name="Name" type="string" pass="return" description="Returns the name of the mesh object." />
@@ -1073,15 +1094,292 @@
 			<param name="UUID" type="string" pass="return" description="Returns mesh uuid." />
 		</method>
 
-		<method name="GetTriangleCount" description="Returns the number of triangles.">
+		<method name="GetTriangleCount" description="Returns the number of triangles in the mesh.">
 			<param name="TriangleCount" type="uint32" pass="return" description="Number of triangles." />
 		</method>
 	
-		<method name="GetVertexCount" description="Returns the number of vertices.">
+		<method name="GetVertexCount" description="Returns the number of vertices in the mesh.">
 			<param name="VertexCount" type="uint32" pass="return" description="Number of vertices." />
 		</method>
 
+		<method name="IsManifold" description="Checks if the mesh topology is closed and every edge has two adjacent faces.">
+			<param name="ManifoldResult" type="bool" pass="return" description="Returns true if the mesh is manifold." />
+		</method>
+
+		<method name="IsOriented" description="Checks if the mesh topology is oriented, so no Mobius strip or Klein bottle for example.">
+			<param name="OrientedResult" type="bool" pass="return" description="Returns true if the mesh is oriented." />
+		</method>
+
+		<method name="IsWatertight" description="Checks if the mesh topology is oriented and manifold, e.g is describing a 3D volume.">
+			<param name="WatertightResult" type="bool" pass="return" description="Returns true if the mesh is watertight." />
+		</method>
+
+		<method name="GetMaxVertexID" description="Returns the maximum vertex ID occuring in the mesh.">
+			<param name="MaxVertexID" type="uint32" pass="return" description="All vertices will have an ID smaller or equal this ID." />
+		</method>
+
+		<method name="VertexExists" description="Returns if a vertex with an ID exists.">
+			<param name="VertexID" type="uint32" pass="in" description="Vertex ID to check." />
+			<param name="VertexExists" type="bool" pass="return" description="Returns true if the vertex exists." />
+		</method>
+
+		<method name="GetVertex" description="Returns position of a vertex. Will return 0 if vertex does not exist.">
+			<param name="VertexID" type="uint32" pass="in" description="Vertex ID to retrieve." />
+			<param name="X" type="double" pass="out" description="Returns the X coordinate of the vertex. Returns 0 if vertex does not exist." />
+			<param name="Y" type="double" pass="out" description="Returns the Y coordinate of the vertex. Returns 0 if vertex does not exist." />
+			<param name="Z" type="double" pass="out" description="Returns the Z coordinate of the vertex. Returns 0 if vertex does not exist." />
+			<param name="VertexExists" type="bool" pass="return" description="Returns true if the vertex exists." />
+		</method>
+
+		<method name="GetVertexIDs" description="Returns all IDs of the vertices. Ordered sequentially.">
+			<param name="VertexIDs" type="basicarray" class="uint32" pass="out" description="Vertex ID array." />
+		</method>
+
+		<method name="GetAllVertices" description="Returns all the vertex information. Ordered sequentially by ID.">
+			<param name="Vertices" type="structarray" class="MeshVertex3D" pass="out" description="Vertex array." />
+		</method>
+
+		<method name="GetMaxTriangleID" description="Returns the maximum triangle ID occuring in the mesh.">
+			<param name="MaxTriangleID" type="uint32" pass="return" description="All triangles will have an ID smaller or equal this ID." />
+		</method>
+
+		<method name="TriangeExists" description="Returns if a triangle with an ID exists.">
+			<param name="TriangleID" type="uint32" pass="in" description="Triangle ID to check." />
+			<param name="TriangleExists" type="bool" pass="return" description="Returns true if the triangle exists." />
+		</method>
+
+		<method name="GetTriangle" description="Returns vertex IDs of a triangle. Will return 0 if triangle does not exist.">
+			<param name="TriangleID" type="uint32" pass="in" description="Triangle ID to retrieve." />
+			<param name="Vertex1ID" type="uint32" pass="out" description="Returns the vertex ID of the first corner. Returns 0 if triangle does not exist." />
+			<param name="Vertex2ID" type="uint32" pass="out" description="Returns the vertex ID of the second corner. Returns 0 if triangle does not exist." />
+			<param name="Vertex3ID" type="uint32" pass="out" description="Returns the vertex ID of the third corner. Returns 0 if triangle does not exist." />
+			<param name="VertexExists" type="bool" pass="return" description="Returns true if the triangle exists." />
+		</method>
+
+		<method name="GetTriangleIDs" description="Returns all IDs of the triangles. Ordered sequentially.">
+			<param name="TriangleIDs" type="basicarray" class="uint32" pass="out" description="Triangle ID array." />
+		</method>
+
+		<method name="GetAllTriangles" description="Returns all the triangle information. Ordered sequentially by ID.">
+			<param name="Triangles" type="structarray" class="MeshTriangle3D" pass="out" description="Triangle array." />
+		</method>
+
+		<method name="IsPersistent" description="Returns if the mesh object is persisted in memory.">
+			<param name="Value" type="bool" pass="return" description="If true, the mesh object is persisted in memory and can be retrieved by FindPersistentMeshObject." />
+		</method>
+
+		<method name="MakePersistent" description="Makes the mesh persistent in memory. It will not be released when the MeshObject instances is released. Should be handled with great care!">
+			<param name="BoundToLoginSession" type="bool" pass="in" description="If true, the mesh will be freed once the client login session expires." />
+			<param name="PersistentMesh" type="class" class="PersistentMeshObject" pass="return" description="Returns a persistent instance to the same mesh data." />
+		</method>
+
 	</class>
+
+	<class name="PersistentMeshObject" parent="MeshObject" description="A persistent mesh object is a globally stored object that stays in memory. Should be handled with great care!">
+
+		<method name="IsBoundToLoginSession" description="Returns if the mesh object is bound to a specific login session.">
+			<param name="Value" type="bool" pass="return" description="If true, the mesh will be freed once the client login session expires." />
+		</method>
+
+	</class>
+
+
+	<class name="ModelDataMeshInstance" parent="Base" description="An instance of a 3D Model Data.">
+	
+		<method name="GetName" description="Returns Mesh Name.">
+			<param name="Name" type="string" pass="return" description="Returns mesh instance name." />
+		</method>
+	
+		<method name="GetUUID" description="Returns Mesh UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns mesh instance uuid." />
+		</method>
+
+		<method name="GetLocalTransform" description="Returns Local Transform of the Mesh.">
+			<param name="LocalTransform" type="struct" class="ModelDataTransform" pass="return" description="Returns the transform matrix of the mesh in its component coordinate system." />		
+		</method>
+
+		<method name="GetAbsoluteTransform" description="Returns Transform of the Mesh.">
+			<param name="AbsoluteTransform" type="struct" class="ModelDataTransform" pass="return" description="Returns the transform matrix of the mesh in the global world coordinate system." />		
+		</method>
+
+		<method name="CreateCopiedMesh" description="Loads a copy of the mesh geometry into memory. Might be inefficient to use for many identical copies of the mesh in the scene.">
+			<param name="MeshObjectCopy" type="class" class="MeshObject" pass="return" description="Returns the mesh object instance." />		
+		</method>
+
+		<method name="CreatePersistentMesh" description="Creates a persistent mesh of the geometry. Will not create a duplicate if the instance was already persisted before. The release of the memory should be handled with great care! ">
+			<param name="BoundToLoginSession" type="bool" pass="in" description="If true, the mesh will be freed once the client login session expires." />
+			<param name="PersistentMesh" type="class" class="PersistentMeshObject" pass="return" description="Returns a persistent instance to the same mesh data." />
+		</method>
+
+	</class>
+
+
+	<class name="ModelDataComponentInstance" parent="Base" description="A Component of a 3D Model Data.">
+	
+		<method name="GetName" description="Returns Component Name.">
+			<param name="Name" type="string" pass="return" description="Returns toolpath part name." />
+		</method>
+	
+		<method name="GetUUID" description="Returns Component UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns toolpath part uuid." />
+		</method>
+
+		<method name="GetLocalTransform" description="Returns Local Transform of the Mesh.">
+			<param name="LocalTransform" type="struct" class="ModelDataTransform" pass="return" description="Returns the transform matrix of the mesh in its component coordinate system." />		
+		</method>
+
+		<method name="GetAbsoluteTransform" description="Returns Transform of the Mesh.">
+			<param name="AbsoluteTransform" type="struct" class="ModelDataTransform" pass="return" description="Returns the transform matrix of the mesh in the global world coordinate system." />		
+		</method>
+
+		<method name="GetSolidCount" description="Returns the number of solid meshes in the component.">
+			<param name="Count" type="uint32" pass="return" description="Model Count." />
+		</method>
+
+		<method name="GetSolidMesh" description="Returns a solid mesh of the component.">
+			<param name="Index" type="uint32" pass="in" description="Index of Solid Mesh. MUST be between 0 and SolidCount - 1." />
+			<param name="MeshInstance" type="class" class="ModelDataMeshInstance" pass="return" description="Solid Mesh. MUST be between 0 and ModelCount - 1." />
+		</method>
+
+		<method name="GetSupportCount" description="Returns the number of support meshes in the component.">
+			<param name="Count" type="uint32" pass="return" description="Support Count." />
+		</method>
+
+		<method name="GetSupportMesh" description="Returns a support mesh of the component.">
+			<param name="Index" type="uint32" pass="in" description="Index of Support Mesh. MUST be between 0 and SupportCount - 1." />
+			<param name="MeshInstance" type="class" class="ModelDataMeshInstance" pass="return" description="Support Mesh. MUST be between 0 and ModelCount - 1." />
+		</method>
+
+		<method name="GetSubComponentCount" description="Returns the number of subcomponents of the component.">
+			<param name="Count" type="uint32" pass="return" description="Subcomponent Count." />
+		</method>
+
+		<method name="GetSubComponent" description="Returns a subcomponent of the component.">
+			<param name="Index" type="uint32" pass="in" description="Index of Subcomponent. MUST be between 0 and SubComponentCount - 1." />
+			<param name="SubComponentInstance" type="class" class="ModelDataComponentInstance" pass="return" description="SubComponent. MUST be between 0 and ModelCount - 1." />
+		</method>
+
+	</class>
+
+
+	<class name="MeshSceneItem" parent="Base" description="A class for handling a 3D Scene Item. A scene refers to instances of persistent meshes that can be displayed.">
+
+		<method name="GetItemUUID" description="Returns the UUID of the scene item.">
+			<param name="UUID" type="string" pass="return" description="Returns scene item uuid." />
+		</method>	
+
+		<method name="GetSceneUUID" description="Returns the UUID of the scene.">
+			<param name="UUID" type="string" pass="return" description="Returns scene uuid." />
+		</method>	
+
+		<method name="GetTransform" description="Returns the transform of the scene item.">
+			<param name="AbsoluteTransform" type="struct" class="ModelDataTransform" pass="return" description="Returns the transform matrix of the mesh in the global world coordinate system." />		
+		</method>	
+
+		<method name="UpdateTransform" description="Updates the transform of the scene item.">
+			<param name="AbsoluteTransform" type="struct" class="ModelDataTransform" pass="in" description="The new transform matrix of the mesh in the global world coordinate system." />		
+		</method>	
+
+		<method name="GetMeshObject" description="Returns persistent mesh object.">
+			<param name="PersistentMesh" type="class" class="PersistentMeshObject" pass="return" description="Returns a persistent mesh object of this scene." />
+		</method>
+
+		<method name="ReferenceIsValid" description="Returns if the underlying mesh object exists.">
+			<param name="IsValid" type="bool" class="PersistentMeshObject" pass="return" description="Returns a persistent mesh object of this scene." />
+		</method>
+
+	</class>
+
+
+
+	<class name="MeshScene" parent="Base" description="A class for handling a 3D Scene and displaying it on the user interface. Handle Memory management with care!">
+	
+		<method name="GetSceneUUID" description="Returns the UUID of the scene.">
+			<param name="UUID" type="string" pass="return" description="Returns scene uuid." />
+		</method>	
+
+		<method name="IsBoundToLoginSession" description="Returns if the scene object is bound to a specific login session.">
+			<param name="Value" type="bool" pass="return" description="If true, the scene will be freed once the client login session expires." />
+		</method>
+
+		<method name="AddSceneItem" description="Adds a persistent mesh to the scene.">
+			<param name="Mesh" type="class" class="PersistentMeshObject" pass="in" description="Mesh to add to the scene." />
+			<param name="AbsoluteTransform" type="struct" class="ModelDataTransform" pass="in" description="Transform matrix of the mesh in the global world coordinate system." />		
+			<param name="SceneItem" type="class" class="MeshSceneItem" pass="return" description="The returned scene item." />
+		
+		</method>	
+
+		<method name="AddModelDataMeshAsSceneItem" description="Adds an instance from a ModelData component. Reuses underlying mesh data, if mesh has been persisted already. Registers new Persistent Mesh if necessary.">
+			<param name="ModelDataMesh" type="class" class="ModelDataMeshInstance" pass="in" description="Adds a mesh to the scene." />
+			<param name="SceneItem" type="class" class="MeshSceneItem" pass="return" description="The returned scene item." />
+		</method>	
+
+		<method name="GetSceneItemCount" description="Returns the number of scene items.">
+			<param name="Count" type="uint32" pass="return" description="Returns the number of scene items." />
+		</method>	
+
+		<method name="GetSceneItem" description="Returns a scene item by index.">
+			<param name="Index" type="uint32" pass="in" description="Index to retrieve. MUST be between 0 and SceneItemCount - 1" />
+			<param name="SceneItem" type="class" class="MeshSceneItem" pass="return" description="The returned scene item." />
+		</method>	
+
+		<method name="FindSceneItem" description="Finds a scene item by UUID.">
+			<param name="UUID" type="string" pass="in" description="UUID to retrieve." />
+			<param name="MustExist" type="bool" pass="in" description="If true, the call fails, if the UUID does not exist." />
+			<param name="SceneItem" type="class" class="MeshSceneItem" pass="return" description="The returned scene item. NULL, if MustExist is false and UUID does not exist." />
+		</method>	
+
+		<method name="HasSceneItem" description="Checks if a scene item exists.">
+			<param name="UUID" type="string" pass="in" description="UUID to retrieve." />
+			<param name="SceneItemExists" type="bool" pass="return" description="Returns true, if scene item UUID exists." />
+		</method>	
+
+		<method name="RemoveSceneItem" description="Removes a scene item from the scene.">
+			<param name="SceneItem" type="class" class="MeshSceneItem" pass="in" description="Scene Item to remove." />
+		</method>	
+
+	</class>
+
+
+	<class name="SceneHandler" parent="Base" description="Handler class for managing 3D Scenes. Handle Memory management with care!">
+
+		<method name="MeshIsPersistent" description="Checks if a mesh uuid is registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
+		</method>	
+
+		<method name="FindPersistentMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
+			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
+			<param name="MeshObjectInstance" type="class" class="PersistentMeshObject" pass="return" description="Mesh Object instance." />
+		</method>	
+
+		<method name="CreateEmptyMeshScene" description="Creates an empty mesh scene object.">
+			<param name="BoundToLoginSession" type="bool" pass="in" description="Scene shall be freed when the current login session expires. Parameter is ignored, if not executed in a UIEnvironment context." />
+			<param name="SceneInstance" type="class" class="MeshScene" pass="return" description="Returns and register a scene instance." />		
+		</method>	
+
+		<method name="ReleaseMeshScene" description="Removes a mesh scene and removes all memory.">
+			<param name="SceneInstance" type="class" class="MeshScene" pass="in" description="Returns and register a scene instance." />		
+		</method>	
+
+		<method name="Load3MFFromResource" description="Loads a 3MF Resource into memory.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+			<param name="ModelData" type="class" class="ModelDataComponentInstance" pass="return" description="Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed." />
+		</method>
+
+		<method name="Load3MFFromMemory" description="Loads a 3MF from memory.">
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Binary data to load." />
+			<param name="ModelData" type="class" class="ModelDataComponentInstance" pass="return" description="Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed." />
+		</method>
+
+		<method name="Load3MFFromStream" description="Loads a 3MF from a StreamReader.">
+			<param name="ReaderInstance" type="class" class="StreamReader" pass="in" description="Stream reader instance." />
+			<param name="ModelData" type="class" class="ModelDataComponentInstance" pass="return" description="Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed." />
+		</method>
+		
+	</class>
+				
+
 
 
 	<class name="ToolpathPart" parent="Base">
@@ -1094,12 +1392,8 @@
 			<param name="UUID" type="string" pass="return" description="Returns toolpath part uuid." />
 		</method>
 
-		<method name="GetMeshUUID" description="Returns Mesh UUID of the part.">
-			<param name="MeshUUID" type="string" pass="return" description="Returns toolpath part mesh uuid." />
-		</method>
-
-		<method name="GetTransform" description="Returns Mesh Transform of the part.">
-			<param name="MeshUUID" type="struct" class="ToolpathPartTransform" pass="return" description="Returns the mesh transform of the toolpath." />		
+		<method name="GetRootComponent" description="Returns the Root Component of the part.">
+			<param name="RootComponent" type="class" class="ModelDataComponentInstance" pass="return" description="Returns root component instance." />
 		</method>
 	
 	</class>
@@ -1279,6 +1573,11 @@
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PartUUID" type="string" pass="return" description="Segment Part UUID" />
 		</method>
+
+		<method name="GetSegmentLocalPartID" description="Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="LocalPartID" type="uint32" pass="return" description="Local Part ID of the segment" />
+		</method>
 	
 		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
@@ -1445,6 +1744,16 @@
 		</method>		
 
 
+		<method name="HasBinaryMetaData" description="Checks if a binary metadata exists in the build file with a certain path.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the binary metadata" />
+			<param name="HasMetaData" type="bool" pass="return" description="Returns if the metadata exists." />
+		</method>
+
+		<method name="GetBinaryMetaData" description="Returns a binary metadata of the build file. Fails if binary metadata does not exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the binary metadata" />
+			<param name="MetaData" type="basicarray" class="uint8" pass="out" description="Returns the content of the binary binary data." />
+		</method>
+		
 	</class>
 
 
@@ -1689,7 +1998,7 @@
 			<param name="ZValue" type="double" pass="return" description="Z Value of the layer in mm." />
 		</method>
 
-		<method name="LoadToolpath" description="loads the a toolpath into memory">
+		<method name="LoadToolpath" description="loads the a toolpath into memory. Does nothing if toolpath has already been loaded.">
 		</method>
 
 		<method name="UnloadToolpath" description="unloads the a toolpath from memory, if it has been loaded before.">
@@ -3782,19 +4091,9 @@
 			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
 		</method>	
 						
-		<method name="RegisterMeshFrom3MFResource" description="Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.">
-			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
-			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
-		</method>	
-
-		<method name="MeshIsRegistered" description="Checks if a mesh uuid is registered.">
-			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
-			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
-		</method>	
-
-		<method name="FindRegisteredMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
-			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
-			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		
+		<method name="CreateSceneHandler" description="Creates a new 3D scene handler instance.">
+			<param name="Instance" type="class" class="SceneHandler" pass="return" description="Scene Handler instance." />
 		</method>	
 				
 		<method name="CreateDataSeries" description="Creates a new empty data series object.">
@@ -4193,22 +4492,11 @@
 			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
 		</method>	
 
-		<method name="RegisterMeshFrom3MFResource" description="Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.">
-			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
-			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
-			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
+		
+		<method name="CreateSceneHandler" description="Creates a new 3D scene handler instance.">
+			<param name="Instance" type="class" class="SceneHandler" pass="return" description="Scene Handler instance." />
 		</method>	
-
-		<method name="MeshIsRegistered" description="Checks if a mesh uuid is registered.">
-			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
-			<param name="MeshIsRegistered" type="bool" pass="return" description="Flag is registered." />
-		</method>	
-
-		<method name="FindRegisteredMesh" description="Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.">
-			<param name="MeshUUID" type="string" pass="in" description="Mesh UUID to load." />
-			<param name="MeshObject" type="class" class="MeshObject" pass="return" description="Mesh Object instance." />
-		</method>	
-
+				
 		<method name="CreateDataSeries" description="Creates a new empty data series object.">
 			<param name="Name" type="string" pass="in" description="Name to use for this data series. MUST NOT be an empty string." />
 			<param name="BoundToLogin" type="bool" pass="in" description="If true, the data series is tied to the current user login session. If false, the data series will persist until explicitely released. This can be dangerous for the overall machine stability." />

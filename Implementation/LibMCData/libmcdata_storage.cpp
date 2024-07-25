@@ -154,6 +154,15 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sName
     pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, 0);
     pWriter->finalize(sSHA256, "", sCalculatedSHA256, sCalculatedBlockSHA256);
  
+    std::string sUpdateQuery = "UPDATE storage_streams SET status=?, sha2=?, sha256_block64k=? WHERE uuid=? AND status=?";
+    auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
+    pUpdateStatement->setString(1, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssValidated));
+    pUpdateStatement->setString(2, sCalculatedSHA256);
+    pUpdateStatement->setString(3, sCalculatedBlockSHA256);
+    pUpdateStatement->setString(4, sUUID);
+    pUpdateStatement->setString(5, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
+    pUpdateStatement->execute();
+
 }
 
 void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserUUID, const LibMCData_uint64 nAbsoluteTimeStamp)
