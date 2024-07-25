@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <string>
 
+#include "common_chrono.hpp"
+
 namespace AMC {
 
 	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
@@ -60,11 +62,11 @@ namespace AMC {
 		CAPISessionHandler();
 		virtual ~CAPISessionHandler();
 
-		PAPIAuth createAuthentication(const std::string& sAuthorizationJSON);
+		PAPIAuth createAuthentication(const std::string& sAuthorizationJSON, AMCCommon::PChrono pGlobalChrono);
 
-		PAPIAuth createNewAuthenticationSession();
+		PAPIAuth createNewAuthenticationSession(AMCCommon::PChrono pGlobalChrono);
 
-		PAPIAuth createEmptyAuthenticationSession();
+		PAPIAuth createEmptyAuthenticationSession(AMCCommon::PChrono pGlobalChrono);
 
 		void authorizeSession (const std::string & sSessionUUID, const std::string & sSaltedPassword, const std::string & sClientKey);
 

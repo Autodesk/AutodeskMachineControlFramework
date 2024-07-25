@@ -42,11 +42,14 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_buildexecution.hpp"
+#include "libmcenv_datetime.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_datatable.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 #include "amc_xmldocument.hpp"
 #include "amc_xmldocumentnode.hpp"
 #include "amc_constants.hpp"
@@ -60,17 +63,17 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName)
     : m_bIsInitializing(false), 
     m_pParameterGroup(pParameterGroup), 
     m_pDriverResourcePackage (pDriverResourcePackage), 
     m_pMachineResourcePackage (pMachineResourcePackage),
     m_sBaseTempPath(sBaseTempPath), 
     m_pToolpathHandler (pToolpathHandler), 
+    m_pMeshHandler (pMeshHandler),
     m_pLogger (pLogger), 
     m_sDriverName (sDriverName), 
     m_pDataModel (pDataModel), 
-    m_sSystemUserID (sSystemUserID), 
     m_pGlobalChrono (pGlobalChrono)
 {
     if (pParameterGroup.get() == nullptr)
@@ -79,6 +82,8 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pToolpathHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pMeshHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);    
     if (pDataModel.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pLogger.get() == nullptr)
@@ -104,7 +109,7 @@ CDriverEnvironment::~CDriverEnvironment()
 
 IDriverStatusUpdateSession* CDriverEnvironment::CreateStatusUpdateSession()
 {
-    return new CDriverStatusUpdateSession(m_pParameterGroup, m_pLogger, m_sDriverName);
+    return new CDriverStatusUpdateSession(m_pParameterGroup, m_pLogger, m_sDriverName, m_pGlobalChrono);
 
 }
 
@@ -192,7 +197,7 @@ void CDriverEnvironment::RetrieveMachineResourceData(const std::string& sIdentif
 
 IToolpathAccessor* CDriverEnvironment::CreateToolpathAccessor(const std::string& sStreamUUID)
 {
-    return new CToolpathAccessor (sStreamUUID, AMCCommon::CUtils::createEmptyUUID(), m_pToolpathHandler);
+    return new CToolpathAccessor (sStreamUUID, AMCCommon::CUtils::createEmptyUUID(), m_pToolpathHandler, m_pMeshHandler);
 }
 
 bool CDriverEnvironment::ParameterNameIsValid(const std::string& sParameterName)
@@ -289,12 +294,18 @@ void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_pGlobalChrono->getExistenceTimeInMilliseconds();
+    return GetGlobalTimerInMicroseconds() / 1000ULL;
 }
 
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMicroseconds()
 {
-    return m_pGlobalChrono->getExistenceTimeInMicroseconds();
+    uint64_t nStartTime = m_pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+    uint64_t nCurrentTime = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+    if (nCurrentTime < nStartTime)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+    return nCurrentTime - nStartTime;
 }
 
 void CDriverEnvironment::LogMessage(const std::string& sLogString)
@@ -407,8 +418,8 @@ bool CDriverEnvironment::HasBuildJob(const std::string& sBuildUUID)
 
     try {
         auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
-        pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-        return true;
+        auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
+        return (pBuildJob.get () != nullptr);
     }
     catch (std::exception) {
         return false;
@@ -421,11 +432,52 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_sSystemUserID, m_pGlobalChrono);
+    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
 }
+
+bool CDriverEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
+{
+    std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+    try {
+        auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+        auto pExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
+
+        return (pExecution.get() != nullptr);
+    }
+    catch (std::exception) {
+        return false;
+    }
+
+}
+
+IBuildExecution* CDriverEnvironment::GetBuildExecution(const std::string& sExecutionUUID)
+{
+    std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+    auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+    auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
+    return new CBuildExecution(pBuildExecution, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
+
+}
+
 
 ICryptoContext* CDriverEnvironment::CreateCryptoContext()
 {
     return new CCryptoContext();
+}
+
+IDateTime* CDriverEnvironment::GetCurrentDateTime()
+{
+    return new CDateTime(m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+}
+
+IDateTime* CDriverEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)
+{
+    return new CDateTime(AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond));
+}
+
+IDateTime* CDriverEnvironment::GetStartDateTime()
+{
+    return new CDateTime(m_pGlobalChrono->getStartTimeStampInMicrosecondsSince1970());
 }
 

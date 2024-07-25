@@ -40,14 +40,16 @@ using namespace LibMCEnv::Impl;
  Class definition of CSignalHandler 
 **************************************************************************************************************************/
 
-CSignalHandler::CSignalHandler(AMC::PStateSignalHandler pSignalHandler, std::string& sSignalUUID)
-	: m_pSignalHandler(pSignalHandler), m_sSignalUUID(sSignalUUID)
+CSignalHandler::CSignalHandler(AMC::PStateSignalHandler pSignalHandler, std::string& sSignalUUID, AMCCommon::PChrono pGlobalChrono)
+	: m_pSignalHandler(pSignalHandler), m_sSignalUUID(sSignalUUID), m_pGlobalChrono (pGlobalChrono)
 {
 	if (pSignalHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	m_pParameterGroup = std::make_shared<AMC::CParameterGroup>();
-	m_pResultGroup = std::make_shared<AMC::CParameterGroup>();
+	m_pParameterGroup = std::make_shared<AMC::CParameterGroup>(pGlobalChrono);
+	m_pResultGroup = std::make_shared<AMC::CParameterGroup>(pGlobalChrono);
 
 	std::string sParameterData;
 	if (!m_pSignalHandler->findSignalPropertiesByUUID(m_sSignalUUID, m_sInstanceName, m_sSignalName, sParameterData))
@@ -56,7 +58,7 @@ CSignalHandler::CSignalHandler(AMC::PStateSignalHandler pSignalHandler, std::str
 	m_pSignalHandler->populateParameterGroup(m_sInstanceName, m_sSignalName, m_pParameterGroup.get());
 	m_pSignalHandler->populateResultGroup(m_sInstanceName, m_sSignalName, m_pResultGroup.get());
 
-	m_pParameterGroup->deserializeJSON(sParameterData);
+	m_pParameterGroup->deserializeJSON(sParameterData, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 
 }
 

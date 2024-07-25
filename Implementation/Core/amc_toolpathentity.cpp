@@ -33,9 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_dynamic.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
+#include <common_utils.hpp>
+
 namespace AMC {
 
-	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName)
+	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName, bool bAllowEmptyToolpath, const std::set<std::string>& attachmentRelationsToRead)
 		: m_ReferenceCount (0), m_sDebugName (sDebugName)
 	{
 		LibMCAssertNotNull(pDataModel.get());
@@ -52,39 +54,54 @@ namespace AMC {
 		m_pStorageStream->GetCallbacks(pReadCallback, pSeekCallback, pUserData);
 		uint64_t nStreamSize = m_pStorageStream->GetSize();
 
+		m_p3MFWrapper = p3MFWrapper;
+
 		m_p3MFModel = p3MFWrapper->CreateModel();
 		m_pPersistentSource = m_p3MFModel->CreatePersistentSourceFromCallback((Lib3MF::ReadCallback)pReadCallback, nStreamSize, (Lib3MF::SeekCallback)pSeekCallback, pUserData);
 
 		m_p3MFReader = m_p3MFModel->QueryReader("3mf");
+		for (std::string sRelationToRead : attachmentRelationsToRead)
+			m_p3MFReader->AddRelationToRead(sRelationToRead);
+
 		m_p3MFReader->ReadFromPersistentSource(m_pPersistentSource.get ());
 
-		// Depreciated read from memory 
-		   //m_p3MFReader->AddRelationToRead("http://schemas.microsoft.com/3dmanufacturing/2019/05/toolpath");
-		   //m_p3MFReader->ReadFromCallback((Lib3MF::ReadCallback) pReadCallback, nStreamSize, (Lib3MF::SeekCallback) pSeekCallback, pUserData);
-
 		auto pToolpathIterator = m_p3MFModel->GetToolpaths();
-		if (!pToolpathIterator->MoveNext())
-			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE, m_sDebugName);
+		if (pToolpathIterator->MoveNext()) {
+			m_pToolpath = pToolpathIterator->GetCurrentToolpath();
+		}
+		else {
 
-		m_pToolpath = pToolpathIterator->GetCurrentToolpath();
+			if (!bAllowEmptyToolpath)
+				throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE, m_sDebugName);
+
+		}
 
 		auto pBuildItems = m_p3MFModel->GetBuildItems();
 		while (pBuildItems->MoveNext()) {
-			auto pPart = std::make_shared<CToolpathPart>(m_p3MFModel, pBuildItems->GetCurrent());
+			auto pPart = std::make_shared<CToolpathPart>(m_p3MFModel, pBuildItems->GetCurrent(), m_p3MFWrapper);
 			m_PartList.push_back(pPart);
 			m_PartMap.insert(std::make_pair (pPart->getUUID (), pPart));
 		}
 
+		uint32_t nAttachmentCount = m_p3MFModel->GetAttachmentCount();
+		for (uint32_t nAttachmentIndex = 0; nAttachmentIndex < nAttachmentCount; nAttachmentIndex++) {
+			auto pAttachment = m_p3MFModel->GetAttachment(nAttachmentIndex);
+			std::string sPathWithoutLeadingSlash = AMCCommon::CUtils::removeLeadingPathDelimiter (pAttachment->GetPath());
+			m_Attachments.insert(std::make_pair(AMCCommon::CUtils::toLowerString (sPathWithoutLeadingSlash), pAttachment));
+		}
 
 	}
 
 	CToolpathEntity::~CToolpathEntity()
 	{
+		m_Attachments.clear();
+
 		m_pToolpath = nullptr;
 		m_p3MFReader = nullptr;
 		m_pPersistentSource = nullptr;
 		m_p3MFModel = nullptr;
 		m_pStorageStream = nullptr;
+		m_p3MFWrapper = nullptr;
 	}
 
 	void CToolpathEntity::IncRef()
@@ -108,20 +125,30 @@ namespace AMC {
 	uint32_t CToolpathEntity::getLayerCount()
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);		
-		return m_pToolpath->GetLayerCount ();
+		if (m_pToolpath.get () != nullptr)
+			return m_pToolpath->GetLayerCount ();
+
+		return 0;
 	}
 
 	uint32_t CToolpathEntity::getLayerZInUnits(uint32_t nLayerIndex)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+		if (m_pToolpath.get() != nullptr) {
+			auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
 
-		return nZValue;
+			return nZValue;
+		}
+
+		return 0;
 	}
 
 	PToolpathLayerData CToolpathEntity::readLayer(uint32_t nLayerIndex)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 		double dUnits = m_pToolpath->GetUnits();
 
@@ -135,6 +162,9 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
+
 		return m_pToolpath->GetUnits();
 
 	}
@@ -143,12 +173,18 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
+
 		return m_pToolpath->GetCustomDataCount();
 
 	}
 	void CToolpathEntity::getMetaDataInfo(uint32_t nMetaDataIndex, std::string& sNameSpace, std::string& sName)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
 		if (nMetaDataIndex >= nDataCount)
@@ -161,6 +197,9 @@ namespace AMC {
 	PXMLDocumentInstance CToolpathEntity::getMetaData(uint32_t nMetaDataIndex)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
 		if (nMetaDataIndex >= nDataCount)
@@ -206,6 +245,9 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
+
 		uint32_t nFoundData = 0;
 		uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
 
@@ -225,6 +267,9 @@ namespace AMC {
 
 		{
 			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+			if (m_pToolpath.get() == nullptr)
+				throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
 
 			uint32_t nDataCount = m_pToolpath->GetCustomDataCount();
 
@@ -276,6 +321,9 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
+
 		auto key = std::make_pair(sNameSpace, sAttributeName);
 
 		auto iIter = m_CustomSegmentAttributeMap.find(key);
@@ -303,6 +351,108 @@ namespace AMC {
 
 		m_CustomSegmentAttributeMap.insert(std::make_pair (key, pSegmentAttribute));
 		
+	}
+
+	Lib3MF::PAttachment CToolpathEntity::findBinaryMetaData(const std::string& sPath, bool bMustExist)
+	{
+		std::string sPathWithoutLeadingSlash = AMCCommon::CUtils::removeLeadingPathDelimiter(sPath);
+		std::string sLowerPath = AMCCommon::CUtils::toLowerString(sPathWithoutLeadingSlash);
+		if (sLowerPath.empty())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDBINARYMETADATAPATH);
+
+		auto iIter = m_Attachments.find(sLowerPath);
+		if (iIter != m_Attachments.end())
+			return iIter->second;
+
+		if (bMustExist)
+			throw ELibMCCustomException(LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND, sPath);
+
+		return nullptr;
+	}
+
+	bool CToolpathEntity::hasBinaryMetaData(const std::string& sPath)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		return (findBinaryMetaData(sPath, false) != nullptr);
+	}
+
+	void CToolpathEntity::getBinaryMetaData(const std::string& sPath, uint64_t nMetaDataBufferSize, uint64_t* pMetaDataNeededCount, uint8_t* pMetaDataBuffer)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto pMetaData = findBinaryMetaData(sPath, true);
+
+		uint64_t nStreamSize = pMetaData->GetStreamSize();
+
+		if (pMetaDataNeededCount != nullptr)
+			*pMetaDataNeededCount = nStreamSize;
+
+		if (pMetaDataBuffer != nullptr) {
+			if (nMetaDataBufferSize < nStreamSize)
+				throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
+
+			// TODO: Improve efficiency...
+			std::vector<uint8_t> tempBuffer;
+			pMetaData->WriteToBuffer(tempBuffer);
+
+			if (tempBuffer.size () != nStreamSize)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALMETADATAERROR);
+
+			if (nStreamSize > 0) {
+
+				uint8_t *pSource = tempBuffer.data();
+				uint8_t* pTarget = pMetaDataBuffer;
+				for (uint64_t nIndex = 0; nIndex < nStreamSize; nIndex++) {
+					*pTarget = *pSource;
+					pTarget++; pSource++;
+				}
+			}
+		}
+
+	}
+
+	std::string CToolpathEntity::getBinaryMetaDataRelationship(const std::string& sPath)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto pMetaData = findBinaryMetaData(sPath, true);
+		return pMetaData->GetRelationShipType();
+	}
+
+
+	bool CToolpathEntity::readThumbnail(std::vector<uint8_t>& thumbnailBuffer, std::string& sMimeType)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		if (m_p3MFModel.get() != nullptr) {
+			auto pThumbnailAttachment = m_p3MFModel->GetPackageThumbnailAttachment();
+			if (pThumbnailAttachment.get() != nullptr) {
+
+				std::string sPath = AMCCommon::CUtils::toLowerString (pThumbnailAttachment->GetPath());
+
+				// TODO: Move this function into proper Lib3MF code...
+				size_t nLength = sPath.length();
+				if (nLength >= 4) {
+					std::string sSubstr = sPath.substr(nLength - 4, 4);
+					if (sSubstr == ".png")
+						sMimeType = "image/png";
+					if (sSubstr == ".jpg")
+						sMimeType = "image/jpeg";
+				}
+
+				if (nLength >= 5) {
+					std::string sSubstr = sPath.substr(nLength - 5, 5);
+					if (sSubstr == ".jpeg")
+						sMimeType = "image/jpeg";
+				}
+
+				pThumbnailAttachment->WriteToBuffer(thumbnailBuffer);
+
+
+				return true;
+			}
+
+		}
+
+
+		return false;
 	}
 
 

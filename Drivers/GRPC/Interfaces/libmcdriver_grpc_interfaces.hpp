@@ -326,6 +326,20 @@ public:
 	virtual bool HasField(const std::string & sFieldName) = 0;
 
 	/**
+	* IGRPCMessage::HasMessageField - Returns if the message has a field of a certain name and this field is a submessage field.
+	* @param[in] sFieldName - Name of the field.
+	* @return True if field exists and is of type message.
+	*/
+	virtual bool HasMessageField(const std::string & sFieldName) = 0;
+
+	/**
+	* IGRPCMessage::GetMessageField - Returns the submessage of a field. Fails if the field does not exist or is not a submessage field.
+	* @param[in] sFieldName - Name of the field.
+	* @return Sub message object
+	*/
+	virtual IGRPCMessage * GetMessageField(const std::string & sFieldName) = 0;
+
+	/**
 	* IGRPCMessage::HasStringField - Returns if the message has a field of a certain name and this field is a string field.
 	* @param[in] sFieldName - Name of the field.
 	* @return True if field exists and is of type string.

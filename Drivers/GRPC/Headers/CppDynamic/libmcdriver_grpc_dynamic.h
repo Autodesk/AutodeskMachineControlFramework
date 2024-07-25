@@ -129,6 +129,26 @@ typedef LibMCDriver_GRPCResult (*PLibMCDriver_GRPCDriver_QueryParametersExPtr) (
 typedef LibMCDriver_GRPCResult (*PLibMCDriver_GRPCGRPCMessage_HasFieldPtr) (LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pFieldExists);
 
 /**
+* Returns if the message has a field of a certain name and this field is a submessage field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pMessageFieldExists - True if field exists and is of type message.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_GRPCResult (*PLibMCDriver_GRPCGRPCMessage_HasMessageFieldPtr) (LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, bool * pMessageFieldExists);
+
+/**
+* Returns the submessage of a field. Fails if the field does not exist or is not a submessage field.
+*
+* @param[in] pGRPCMessage - GRPCMessage instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pMessageFieldInstance - Sub message object
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_GRPCResult (*PLibMCDriver_GRPCGRPCMessage_GetMessageFieldPtr) (LibMCDriver_GRPC_GRPCMessage pGRPCMessage, const char * pFieldName, LibMCDriver_GRPC_GRPCMessage * pMessageFieldInstance);
+
+/**
 * Returns if the message has a field of a certain name and this field is a string field.
 *
 * @param[in] pGRPCMessage - GRPCMessage instance.
@@ -513,6 +533,8 @@ typedef struct {
 	PLibMCDriver_GRPCDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_GRPCDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_GRPCGRPCMessage_HasFieldPtr m_GRPCMessage_HasField;
+	PLibMCDriver_GRPCGRPCMessage_HasMessageFieldPtr m_GRPCMessage_HasMessageField;
+	PLibMCDriver_GRPCGRPCMessage_GetMessageFieldPtr m_GRPCMessage_GetMessageField;
 	PLibMCDriver_GRPCGRPCMessage_HasStringFieldPtr m_GRPCMessage_HasStringField;
 	PLibMCDriver_GRPCGRPCMessage_SetStringFieldPtr m_GRPCMessage_SetStringField;
 	PLibMCDriver_GRPCGRPCMessage_GetStringFieldPtr m_GRPCMessage_GetStringField;

@@ -74,7 +74,6 @@ void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName, bool bMandat
 
 CScanLabSDKJournal::CScanLabSDKJournal(const std::string& sDebugFileName)	
 {
-	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	m_CStream.open(sDebugFileName, std::ios::out);
 	if (!m_CStream.is_open())
@@ -184,6 +183,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_eth_count_cards = (PScanLabPtr_eth_count_cards)_loadScanLabAddress(hLibrary, "eth_count_cards");
 	this->ptr_eth_found_cards = (PScanLabPtr_eth_found_cards)_loadScanLabAddress(hLibrary, "eth_found_cards");
 	this->ptr_eth_assign_card = (PScanLabPtr_eth_assign_card)_loadScanLabAddress(hLibrary, "eth_assign_card");
+	this->ptr_eth_remove_card = (PScanLabPtr_eth_remove_card)_loadScanLabAddress(hLibrary, "eth_remove_card");
 	this->ptr_acquire_rtc = (PScanLabPtr_acquire_rtc)_loadScanLabAddress(hLibrary, "acquire_rtc");
 	this->ptr_release_rtc = (PScanLabPtr_release_rtc)_loadScanLabAddress(hLibrary, "release_rtc");
 	this->ptr_n_get_serial_number = (PScanLabPtr_n_get_serial_number)_loadScanLabAddress(hLibrary, "n_get_serial_number");
@@ -245,6 +245,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_get_free_variable = (PScanLabPtr_n_get_free_variable)_loadScanLabAddress(hLibrary, "n_get_free_variable");
 	this->ptr_n_set_trigger = (PScanLabPtr_n_set_trigger)_loadScanLabAddress(hLibrary, "n_set_trigger");
 	this->ptr_n_set_trigger4 = (PScanLabPtr_n_set_trigger4)_loadScanLabAddress(hLibrary, "n_set_trigger4");
+	this->ptr_n_set_trigger8 = (PScanLabPtr_n_set_trigger8)_loadScanLabAddress(hLibrary, "n_set_trigger8");
 	this->ptr_n_set_control_mode = (PScanLabPtr_n_set_control_mode)_loadScanLabAddress(hLibrary, "n_set_control_mode");
 	this->ptr_n_set_laser_pulses_ctrl = (PScanLabPtr_n_set_laser_pulses_ctrl)_loadScanLabAddress(hLibrary, "n_set_laser_pulses_ctrl");
 	this->ptr_n_set_mark_speed_ctrl = (PScanLabPtr_n_set_mark_speed_ctrl)_loadScanLabAddress(hLibrary, "n_set_mark_speed_ctrl");
@@ -256,6 +257,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_write_da_x = (PScanLabPtr_n_write_da_x)_loadScanLabAddress(hLibrary, "n_write_da_x");
 	this->ptr_n_set_laser_pin_out = (PScanLabPtr_n_set_laser_pin_out)_loadScanLabAddress(hLibrary, "n_set_laser_pin_out");
 	this->ptr_n_get_laser_pin_in = (PScanLabPtr_n_get_laser_pin_in)_loadScanLabAddress(hLibrary, "n_get_laser_pin_in");
+	this->ptr_n_set_laser_pin_out_list = (PScanLabPtr_n_set_laser_pin_out_list)_loadScanLabAddress(hLibrary, "n_set_laser_pin_out_list");
 	this->ptr_n_set_sky_writing_para = (PScanLabPtr_n_set_sky_writing_para)_loadScanLabAddress(hLibrary, "n_set_sky_writing_para");
 	this->ptr_n_set_sky_writing_limit = (PScanLabPtr_n_set_sky_writing_limit)_loadScanLabAddress(hLibrary, "n_set_sky_writing_limit");
 	this->ptr_n_set_sky_writing_mode = (PScanLabPtr_n_set_sky_writing_mode)_loadScanLabAddress(hLibrary, "n_set_sky_writing_mode");
@@ -302,6 +304,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_set_fly_y_pos = (PScanLabPtr_n_set_fly_y_pos)_loadScanLabAddress(hLibrary, "n_set_fly_y_pos");
 	this->ptr_n_set_fly_x = (PScanLabPtr_n_set_fly_x)_loadScanLabAddress(hLibrary, "n_set_fly_x");
 	this->ptr_n_set_fly_y = (PScanLabPtr_n_set_fly_y)_loadScanLabAddress(hLibrary, "n_set_fly_y");
+	this->ptr_n_fly_return = (PScanLabPtr_n_fly_return)_loadScanLabAddress(hLibrary, "n_fly_return");
 	this->ptr_n_get_encoder = (PScanLabPtr_n_get_encoder)_loadScanLabAddress(hLibrary, "n_get_encoder");
 	this->ptr_n_get_marking_info = (PScanLabPtr_n_get_marking_info)_loadScanLabAddress(hLibrary, "n_get_marking_info");
 	this->ptr_n_wait_for_encoder = (PScanLabPtr_n_wait_for_encoder)_loadScanLabAddress(hLibrary, "n_wait_for_encoder");
@@ -314,6 +317,10 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_uart_config = (PScanLabPtr_n_uart_config)_loadScanLabAddress(hLibrary, "n_uart_config");
 	this->ptr_n_rs232_write_data = (PScanLabPtr_n_rs232_write_data)_loadScanLabAddress(hLibrary, "n_rs232_write_data");
 	this->ptr_n_rs232_read_data = (PScanLabPtr_n_rs232_read_data)_loadScanLabAddress(hLibrary, "n_rs232_read_data");
+
+	this->ptr_n_set_mcbsp_out_oie_ctrl = (PScanLabPtr_n_set_mcbsp_out_oie_ctrl)_loadScanLabAddress(hLibrary, "n_set_mcbsp_out_oie_ctrl", false);
+	this->ptr_n_eth_config_waveform_streaming_ctrl = (PScanLabPtr_n_eth_config_waveform_streaming_ctrl)_loadScanLabAddress(hLibrary, "n_eth_config_waveform_streaming_ctrl", false);
+	this->ptr_n_eth_set_high_performance_mode = (PScanLabPtr_n_eth_set_high_performance_mode)_loadScanLabAddress(hLibrary, "n_eth_set_high_performance_mode", false);
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -344,9 +351,22 @@ void CScanLabSDK::initDLL()
 
 		ptr_init_rtc6_dll();
 		m_bIsInitialized = true;
-
+	
 	}
 }
+
+void CScanLabSDK::reinitDLL()
+{
+	if (ptr_free_rtc6_dll == nullptr)
+		throw std::runtime_error("RTC DLL not loaded");
+
+	ptr_free_rtc6_dll();
+	m_bIsInitialized = false;
+
+	initDLL();
+
+}
+
 
 void CScanLabSDK::checkError(uint32_t nRTCError)
 {
@@ -377,6 +397,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_eth_count_cards = nullptr;
 	ptr_eth_found_cards = nullptr;
 	ptr_eth_assign_card = nullptr;
+	ptr_eth_remove_card = nullptr;
 	ptr_acquire_rtc = nullptr;
 	ptr_release_rtc = nullptr;
 	ptr_n_get_serial_number = nullptr;
@@ -439,6 +460,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_get_free_variable = nullptr;
 	ptr_n_set_trigger = nullptr;
 	ptr_n_set_trigger4 = nullptr;
+	ptr_n_set_trigger8 = nullptr;
 	ptr_n_set_control_mode = nullptr;
 	ptr_n_set_laser_pulses_ctrl = nullptr;
 	ptr_n_set_mark_speed_ctrl = nullptr;
@@ -450,6 +472,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_write_da_x = nullptr;
 	ptr_n_set_laser_pin_out = nullptr;
 	ptr_n_get_laser_pin_in = nullptr;
+	ptr_n_set_laser_pin_out_list = nullptr;
 	ptr_n_set_sky_writing_para = nullptr;
 	ptr_n_set_sky_writing_limit = nullptr;
 	ptr_n_set_sky_writing_mode = nullptr;
@@ -498,6 +521,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_set_fly_x = nullptr;
 	ptr_n_set_fly_y = nullptr;
 	ptr_n_get_encoder = nullptr;
+	ptr_n_fly_return = nullptr;
 
 	ptr_n_get_marking_info = nullptr;
 	ptr_n_wait_for_encoder = nullptr;
@@ -512,6 +536,10 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_uart_config = nullptr;
 	ptr_n_rs232_write_data = nullptr;
 	ptr_n_rs232_read_data = nullptr;
+
+	ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
+	ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
+	ptr_n_eth_set_high_performance_mode = nullptr;
 
 }
 
@@ -587,6 +615,14 @@ int32_t CScanLabSDK::eth_assign_card(const uint32_t nSearchNo, const uint32_t nC
 		m_pLogJournal->logCall("eth_assign_card", std::to_string (nSearchNo) + ", " + std::to_string (nCardNo));
 
 	return ptr_eth_assign_card(nSearchNo, nCardNo);
+}
+
+int32_t CScanLabSDK::eth_remove_card(const uint32_t nCardNo)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("eth_remove_card", std::to_string(nCardNo));
+
+	return ptr_eth_remove_card(nCardNo);
 }
 
 uint32_t CScanLabSDK::acquire_rtc(uint32_t nCardNo)
@@ -1082,6 +1118,15 @@ void CScanLabSDK::n_set_trigger4(uint32_t nCardNo, uint32_t nPeriod, uint32_t nS
 	ptr_n_set_trigger4(nCardNo, nPeriod, nSignal1, nSignal2, nSignal3, nSignal4);
 }
 
+void CScanLabSDK::n_set_trigger8(uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4, uint32_t nSignal5, uint32_t nSignal6, uint32_t nSignal7, uint32_t nSignal8)
+
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_set_trigger8", std::to_string(nCardNo) + ", " + std::to_string(nPeriod) + ", " + std::to_string(nSignal1) + ", " + std::to_string(nSignal2) + ", " + std::to_string(nSignal3) + ", " + std::to_string(nSignal4) + ", " + std::to_string(nSignal5) + ", " + std::to_string(nSignal6) + ", " + std::to_string(nSignal7) + ", " + std::to_string(nSignal8));
+
+	ptr_n_set_trigger8(nCardNo, nPeriod, nSignal1, nSignal2, nSignal3, nSignal4, nSignal5, nSignal6, nSignal7, nSignal8);
+
+}
 
 void CScanLabSDK::n_set_control_mode(uint32_t nCardNo, uint32_t nMode)
 {
@@ -1162,6 +1207,14 @@ void CScanLabSDK::n_set_laser_pin_out(uint32_t nCardNo, uint32_t nPins)
 		m_pLogJournal->logCall("n_set_laser_pin_out", std::to_string(nCardNo) + ", " + std::to_string(nPins));
 
 	ptr_n_set_laser_pin_out(nCardNo, nPins);
+}
+
+void CScanLabSDK::n_set_laser_pin_out_list(uint32_t nCardNo, uint32_t nPins)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_set_laser_pin_out_list", std::to_string(nCardNo) + ", " + std::to_string(nPins));
+
+	ptr_n_set_laser_pin_out_list(nCardNo, nPins);
 }
 
 uint32_t CScanLabSDK::n_get_laser_pin_in(uint32_t nCardNo)
@@ -1287,12 +1340,12 @@ void CScanLabSDK::n_set_scanahead_line_params_ex(uint32_t nCardNo, uint32_t nCor
 	ptr_n_set_scanahead_line_params_ex(nCardNo, nCornerScale, nEndScale, nAccScale, nJumpScale);
 }
 
-uint32_t CScanLabSDK::n_set_scanahead_params(uint32_t nCardNo, uint32_t nMode, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax)
+uint32_t CScanLabSDK::n_set_scanahead_params(uint32_t nCardNo, uint32_t nMode, uint32_t nHeadNo, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax)
 {
 	if (m_pLogJournal.get() != nullptr)
-		m_pLogJournal->logCall("n_set_scanahead_params", std::to_string(nCardNo) + ", " + std::to_string(nMode) + ", " + std::to_string(nTableNo) + ", " + std::to_string(nPreviewTime) + ", " + std::to_string(nVMax) + ", " + std::to_string(dAmax));
+		m_pLogJournal->logCall("n_set_scanahead_params", std::to_string(nCardNo) + ", " + std::to_string(nMode) + ", " + std::to_string(nHeadNo) + ", " + std::to_string(nTableNo) + ", " + std::to_string(nPreviewTime) + ", " + std::to_string(nVMax) + ", " + std::to_string(dAmax));
 
-	return ptr_n_set_scanahead_params(nCardNo, nMode, nTableNo, nPreviewTime, nVMax, dAmax);
+	return ptr_n_set_scanahead_params(nCardNo, nMode, nHeadNo, nTableNo, nPreviewTime, nVMax, dAmax);
 }
 
 void CScanLabSDK::n_set_scanahead_speed_control(uint32_t nCardNo, uint32_t nMode)
@@ -1501,6 +1554,15 @@ void CScanLabSDK::n_set_fly_y(uint32_t nCardNo, const double ScaleY)
 	ptr_n_set_fly_y(nCardNo, ScaleY);
 }
 
+void CScanLabSDK::n_fly_return(uint32_t nCardNo, int32_t nX, int32_t nY)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_fly_return", std::to_string(nCardNo) + ", " + std::to_string(nX) + ", " + std::to_string(nY));
+
+	ptr_n_fly_return(nCardNo, nX, nY);
+}
+
+
 void CScanLabSDK::n_get_encoder(uint32_t nCardNo, const int32_t* pEncoderX, const int32_t* pEncoderY)
 {
 	if (m_pLogJournal.get() != nullptr)
@@ -1599,8 +1661,38 @@ uint32_t CScanLabSDK::n_rs232_read_data(uint32_t nCardNo)
 	return ptr_n_rs232_read_data(nCardNo);
 }
 
+
+void CScanLabSDK::n_set_mcbsp_out_oie_ctrl(uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_set_mcbsp_out_oie_ctrl", std::to_string(nCardNo) + ", " + std::to_string (nSignalID1) + ", " + std::to_string (nSignalID2));
+
+	if (ptr_n_set_mcbsp_out_oie_ctrl != nullptr)
+		ptr_n_set_mcbsp_out_oie_ctrl(nCardNo, nSignalID1, nSignalID2);
+}
+
+void CScanLabSDK::n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_t nSize, uint32_t nFlags)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_eth_config_waveform_streaming_ctrl", std::to_string(nCardNo) + ", " + std::to_string(nSize) + ", " + std::to_string(nFlags));
+
+	if (ptr_n_eth_config_waveform_streaming_ctrl != nullptr)
+		ptr_n_eth_config_waveform_streaming_ctrl(nCardNo, nSize, nFlags);
+
+}
+
+void CScanLabSDK::n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMode)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_eth_set_high_performance_mode", std::to_string(nCardNo) + ", " + std::to_string(nMode));
+
+	if (ptr_n_eth_set_high_performance_mode != nullptr)
+		ptr_n_eth_set_high_performance_mode(nCardNo, nMode);
+
+}
+
+
 void CScanLabSDK::setJournal(PScanLabSDKJournal pLogJournal)
 {
 	m_pLogJournal = pLogJournal;
 }
-

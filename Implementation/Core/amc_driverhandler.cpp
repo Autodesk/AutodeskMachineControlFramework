@@ -57,9 +57,10 @@ template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_p
 	return pExternalInstance;
 }
 
-CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, PStateJournal pStateJournal)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PMeshHandler pMeshHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono,  PStateJournal pStateJournal)
 	: m_pEnvironmentWrapper (pEnvironmentWrapper), 
 	m_pToolpathHandler (pToolpathHandler), 
+	m_pMeshHandler (pMeshHandler),
 	m_pLogger (pLogger),
 	m_pDataModel (pDataModel),
 	m_pGlobalChrono (pGlobalChrono),
@@ -67,6 +68,7 @@ CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpath
 {
 	LibMCAssertNotNull(pEnvironmentWrapper.get());
 	LibMCAssertNotNull(pToolpathHandler.get());
+	LibMCAssertNotNull(pMeshHandler.get());
 	LibMCAssertNotNull(pLogger.get());
 	LibMCAssertNotNull(pDataModel.get());
 	LibMCAssertNotNull(pGlobalChrono.get());
@@ -103,10 +105,10 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 		pDriverResourcePackage = CResourcePackage::makeEmpty(sResourcePath);
 	}
 
-	auto pParameterGroup = std::make_shared<CParameterGroup>();
+	auto pParameterGroup = std::make_shared<CParameterGroup>(m_pGlobalChrono);
 	pParameterGroup->setJournal(m_pStateJournal, sName);
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, m_sSystemUserID, sName);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_pMeshHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, sName);
 
 	pInternalEnvironment->setIsInitializing(true);
 

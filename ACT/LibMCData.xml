@@ -380,7 +380,19 @@
 		<error name="BUILDJOBEXECUTIONMETADATAKEYEMPTY" code="380" description="Build job execution metadata key is empty." />								
 		<error name="BUILDJOBEXECUTIONMETADATAKEYINVALID" code="381" description="Build job execution metadata key is invalid." />								
 		<error name="BUILDJOBEXECUTIONMETADATAKEYNOTFOUND" code="382" description="Build job execution metadata key not found." />								
-		<error name="BUILDJOBEXECUTIONMETADATAKEYDUPLICATE" code="383" description="Build job execution metadata key is duplicate." />										
+		<error name="BUILDJOBEXECUTIONMETADATAKEYDUPLICATE" code="383" description="Build job execution metadata key is duplicate." />												
+		<error name="EMPTYJOBDATAIDENTIFIER" code="384" description="Empty job data identifier." />								
+		<error name="BUILDJOBEXECUTIONDATANOTFOUND" code="385" description="Build job execution data not found." />								
+		<error name="EMPTYJOBEXECUTIONDATAIDENTIFIER" code="386" description="Empty job execution data identifier." />								
+		<error name="ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE" code="387" description="ZIP Streams to not support async chunk write." />								
+		<error name="ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES" code="388" description="ZIP Stream exceeds maximum number of entries." />								
+		<error name="ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY" code="389" description="Attempted to write to finished ZIP stream entry." />								
+		<error name="INVALIDZIPSTREAMENTRYID" code="390" description="Invalid ZIP Stream entry ID." />								
+		<error name="ZIPSTREAMENTRYIDNOTFOUND" code="391" description="ZIP Stream entry ID not found." />	
+		<error name="ZIPWRITINGALREADYFINISHED" code="392" description="ZIP Writing already finished." />	
+		<error name="INVALIDBUILDJOBLAYERCOUNT" code="393" description="Invalid build job layer count." />	
+		<error name="COULDNOTDETERMINEEXECUTIONCOUNT" code="394" description="Could not determine execution count." />	
+		
 		
 	</errors>
 	
@@ -742,6 +754,46 @@
 	</class>
 
 
+    <!-- The StorageZIPWriter class is thread safe. -->
+	<class name="StorageZIPWriter" parent="Base" description="Storage ZIP Writer Instance">
+	
+		<method name="StartNewEntry" description="Starts a new entry in the ZIP Stream. Finishes any unfinished entry. Fails if entry already exists. Fails if more than 1 billion entries exist in the ZIP file.">
+			<param name="FileName" type="string" pass="in" description="Filename of the entry. MUST be a valid filename." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
+			<param name="EntryID" type="uint32" pass="return" description="Returns the current entry ID." />
+		</method>	
+	
+		<method name="FinishCurrentEntry" description="Finishes the current entry in the ZIP stream. Writing is not possible, after an entry has been finished.">
+		</method>
+		
+		<method name="GetOpenEntryID" description="Returns the entry ID of the current open entry. Or 0, if no writing is possible.">
+			<param name="EntryID" type="uint32" pass="return" description="Returns the current entry ID." />
+		</method>
+
+		<method name="WriteData" description="Writes data into the currently open entry.">
+			<param name="EntryID" type="uint32" pass="in" description="Entry ID to write into. Checks again the current open entry ID and fails if there is a write attempt into any other entry ID." />
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data block to store in stream." />	
+		</method>
+
+		<method name="GetEntrySize" description="Returns the size of an Entry with the corresponding ID. Fails if entry ID does not exist.">
+			<param name="EntryID" type="uint32" pass="in" description="Entry ID to check." />
+			<param name="EntrySize" type="uint64" pass="return" description="Returns the current entry size of the ZIP entry in bytes." />
+		</method>
+
+		<method name="GetZIPStreamSize" description="Returns the current size of the stream.">
+			<param name="Size" type="uint64" pass="return" description="Current size of the stream." />
+		</method>		
+
+		<method name="Finish" description="Finishes the stream writing as a whole, including all open entries. All subsequent write attempts will fail. Starting a new entry will fail. Fails if stream has been finished already.">
+		</method>
+
+		<method name="IsFinished" description="Returns if the stream writing has already been finished.">
+			<param name="Finished" type="bool" pass="return" description="If true, writing into the stream is not possible anymore." />
+		</method>
+		
+	</class>
+
+
     <!-- The Storage class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="Storage" parent="Base" description="Storage Handler Instance">
 
@@ -757,22 +809,20 @@
 
 		<method name="StoreNewStream" description="stores a new stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. Must be unique and newly generated." />	
-			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
-			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name Description of the stream." />
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />
 			<param name="Content" type="basicarray" class="uint8" pass="in" description="Data of stream" />
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
 		<method name="BeginPartialStream" description="starts storing a stream with partial uploads.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
-			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
-			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="Size" type="uint64" pass="in" description="Final size of the stream. MUST NOT be 0." />	
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
 		<method name="StorePartialStream" description="stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.">
@@ -793,11 +843,10 @@
 		
 		<method name="BeginRandomWriteStream" description="starts storing a stream with random write access. Checksums are not required.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
-			<param name="ContextUUID" type="string" pass="in" description="DEPRECIATED and not used anymore. Streams MUST create ownership references manually!" />
-			<param name="ContextIdentifier" type="string" pass="in" description="Identifier of the stream. MUST be unique within the given context." />
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 
 		<method name="StoreRandomWriteStream" description="stores data in a stream with random write access. Writing may be in arbitrary order.">
@@ -817,7 +866,16 @@
 
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
 			<param name="MaxStreamSize" type="uint64" pass="return" description="Maximum Stream Size in Bytes." />	
+		</method>
+
+		<method name="CreateZIPStream" description="starts storing a stream with a streaming ZIP writer. MIME type will be application/zip">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST be unique and newly generated." />	
+			<param name="Name" type="string" pass="in" description="Name of the stream." />	
+			<param name="UserUUID" type="string" pass="in" description="UUID of Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
+			<param name="ZIPWriter" type="class" class="StorageZIPWriter" pass="return" description="ZIP Writer instance" />				
 		</method>	
+
 			
 		<method name="ContentTypeIsAccepted" description="Returns if the given content type is an acceptable value.">
 			<param name="ContentType" type="string" pass="in" description="Content type string (is taken case-insensitive)" />	
@@ -835,11 +893,13 @@
 			<param name="ClientFileName" type="string" pass="in" description="ClientFileName of the ticket. MUST NOT be empty." />	
 			<param name="SessionUUID" type="string" pass="in" description="UUID of user session." />	
 			<param name="UserUUID" type="string" pass="in" description="UUID of user that created the ticket." />	
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>	
 		
 		<method name="RequestDownloadTicket" description="Returns the details of a download ticket and creates an entry in an access log with time stamp.">
 			<param name="TicketUUID" type="string" pass="in" description="UUID of download ticket." />	
 			<param name="IPAddress" type="string" pass="in" description="IP Address where the request came from." />	
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 			<param name="StreamUUID" type="string" pass="out" description="UUID of storage stream." />	
 			<param name="ClientFileName" type="string" pass="out" description="ClientFileName of the ticket." />	
 			<param name="SessionUUID" type="string" pass="out" description="UUID of user session." />	
@@ -950,12 +1010,33 @@
 			<param name="UUID" type="string" pass="return" description="UUID String" />	
 		</method>
 		
+		<method name="GetJobName" description="returns the name of the parent build job.">
+			<param name="Name" type="string" pass="return" description="Build job name" />	
+		</method>
+
+		<method name="GetJobStatus" description="returns the status of the parent build job.">
+			<param name="JobStatus" type="enum" class="BuildJobStatus" pass="return" description="Build job status" />	
+		</method>
+
+		<method name="GetJobStatusString" description="returns the status of the parent build job as string.">
+			<param name="JobStatus" type="string" pass="return" description="Build job status" />	
+		</method>
+
+		<method name="GetJobLayerCount" description="returns the number of layers of the parent build job.">
+			<param name="LayerCount" type="uint32" pass="return" description="Build job layer count" />	
+		</method>
+
 		<method name="GetStatus" description="returns the build job execution status.">
 			<param name="ExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="return" description="Status Value" />	
 		</method>
 
+		<method name="GetStatusString" description="returns the build job execution status as string.">
+			<param name="ExecutionStatus" type="string" pass="return" description="Status Value" />	
+		</method>
+
 		<method name="ChangeStatus" description="sets the new build job execution status. Will fail if current status is not InProcess.">
 			<param name="NewExecutionStatus" type="enum" class="BuildJobExecutionStatus" pass="in" description="Status Value" />	
+			<param name="AbsoluteEndTimeStampInMicrosecondsSince1970" type="uint64" pass="in" description="New End Time of execution in Microseconds since 1970. MUST be larger or equal than start time stamp." />
 		</method>
 
 		<method name="GetDescription" description="returns the build job description.">
@@ -984,12 +1065,53 @@
 			
 		<method name="ComputeElapsedTimeInMicroseconds" description="Computes the relative time of the build execution. If status is Finished or Failed, the full duration is returned. Fails if the journal UUID does not match the current journaling session.">
 			<param name="GlobalTimerInMicroseconds" type="uint64" pass="in" description="The current session global timer." />
+			<param name="ThrowExceptionInFailure" type="bool" pass="in" description="If true, the method will throw exceptions in any error case. If false, it will just return 0 in any error case." />
 			<param name="ElapsedTimeInMicroseconds" type="uint64" pass="return" description="Elapsed time in Microseconds." />
 		</method>
 
-		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
+		<method name="AddJobExecutionData" description="Adds additional data to the Job Execution.">
+			<param name="Identifier" type="string" pass="in" description="Unique identifier for the job data." />
+			<param name="Name" type="string" pass="in" description="Name of the job data" />
+			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
+			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job Execution data" />
+			<param name="UserUUID" type="string" pass="in" description="UUID of Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID" />
+		</method>
+
+		<method name="ListJobExecutionDataByType" description="Retrieves a list of build job execution data objects, filtered by type.">
+			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job Execution data." />	
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionDataIterator" pass="return" description="Build Job Execution Data Iterator Instance." />
+		</method>
+
+		<method name="ListJobExecutionData" description="Retrieves a list of build job execution data objects.">
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionDataIterator" pass="return" description="Build Job Execution Data Iterator Instance." />
+		</method>
+		
+		<method name="RetrieveJobExecutionData" description="Retrieves a build job execution data instance by its uuid.">
+			<param name="DataUUID" type="string" pass="in" description="Job Data UUID." />	
+			<param name="BuildJobExecutionData" type="class" class="BuildJobExecutionData" pass="return" description="Build Job ExecutionData Instance." />
+		</method>
+
+		<method name="RetrieveJobExecutionDataByIdentifier" description="Retrieves a build job execution data instance by its identifier.">
+			<param name="Identifier" type="string" pass="in" description="Job Execution Data Identifier. Fails if identifier does not exist." />	
+			<param name="BuildJobExecutionData" type="class" class="BuildJobExecutionData" pass="return" description="Build Job Execution Data Instance." />
+		</method>
+
+		<method name="HasJobExecutionDataUUID" description="Retrieves if a build job execution data instance with a specific UUID exists in this job execution.">
+			<param name="UUID" type="string" pass="in" description="Job Execution Data UUID. Fails if UUID does not exist." />	
+			<param name="HasJobExecutionData" type="bool" pass="return" description="Returns true, if the job execution data exists." />
+		</method>
+		
+		<method name="HasJobExecutionDataIdentifier" description="Retrieves if a build job execution data instance with a specific identifier exists.">
+			<param name="Identifier" type="string" pass="in" description="Job Execution Data Identifier. Fails if identifier does not exist." />	
+			<param name="HasJobExecutionData" type="bool" pass="return" description="Returns true, if the job execution data exists." />
+		</method>
+
+		<method name="StoreMetaDataString" description="Adds a Metadata String to the build job.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 	
 		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
@@ -1006,7 +1128,7 @@
 
     <!-- The BuildJobExecutionIterator class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="BuildJobExecutionIterator" parent="Iterator">
-		<method name="GetCurrentJobData" description="Returns the build job data the iterator points at.">
+		<method name="GetCurrentJobExecution" description="Returns the build job execution the iterator points at.">
 			<param name="CurrentInstance" type="handle" class="BuildJobExecution" pass="return" description="returns the build job  execution instance."/>
 		</method>
 	</class>
@@ -1030,8 +1152,32 @@
 			<param name="LayerCount" type="uint32" pass="return" description="Layer Count of build job" />	
 		</method>
 
+		<method name="GetExecutionCount" description="returns the number of executions of a build job.">
+			<param name="ExecutionCount" type="uint32" pass="return" description="Number of executions of a build job" />	
+		</method>
+
 		<method name="GetTimeStamp" description="returns the timestamp when the job was created.">
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
+		</method>
+		
+		<method name="GetCreatorUUID" description="returns the UUID of the user that created the job.">
+			<param name="UserUUID" type="string" pass="return" description="User UUID" />	
+		</method>
+
+		<method name="HasThumbnailStream" description="returns if the build has an attached thumbnail.">
+			<param name="HasThumbnail" type="bool" pass="return" description="Returns true, if the build has an attached thumbnail." />	
+		</method>
+
+		<method name="GetThumbnailStreamUUID" description="returns the UUID of the thumbnail stream of the job.">
+			<param name="UUID" type="string" pass="return" description="Thumbnail UUID. 00000000-0000-0000-0000-000000000000, if no thumbnail is assigned..." />	
+		</method>
+		
+		<method name="SetThumbnailStreamUUID" description="Sets the UUID of the thumbnail stream of the job.">
+			<param name="StreamUUID" type="string" pass="in" description="Thumbnail UUID. Stream MUST exist and of MIME Type png. If empty or 00000000-0000-0000-0000-000000000000, no thumbnail will be assigned..." />	
+		</method>
+
+		<method name="GetCreatorName" description="returns the current name of the user that created the job.">
+			<param name="UserName" type="string" pass="return" description="User UUID" />	
 		</method>
 				
 		<method name="GetStorageStream" description="returns the storage stream of the build.">
@@ -1067,7 +1213,9 @@
 			<param name="Name" type="string" pass="in" description="Name of the job data" />
 			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
 			<param name="DataType" type="enum" class="CustomDataType" pass="in" description="Datatype of Job data" />
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970" />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID" />
 		</method>
 
 		<method name="ListJobDataByType" description="Retrieves a list of build job data objects, filtered by type.">
@@ -1083,10 +1231,26 @@
 			<param name="DataUUID" type="string" pass="in" description="Job Data UUID." />	
 			<param name="BuildJobData" type="class" class="BuildJobData" pass="return" description="Build Job Data Instance." />
 		</method>
+
+		<method name="RetrieveJobDataByIdentifier" description="Retrieves a build job data instance by its identifier.">
+			<param name="Identifier" type="string" pass="in" description="Job Data Identifier. Fails if identifier does not exist." />	
+			<param name="BuildJobData" type="class" class="BuildJobData" pass="return" description="Build Job Data Instance." />
+		</method>
+
+		<method name="HasJobDataUUID" description="Retrieves if a build job data instance with a specific UUID exists.">
+			<param name="UUID" type="string" pass="in" description="Job Data UUID. Fails if UUID does not exist." />	
+			<param name="HasJobData" type="bool" pass="return" description="Returns true, if the job data exists." />
+		</method>
 		
-		<method name="AddMetaDataString" description="Adds a Metadata String to the build job.">
+		<method name="HasJobDataIdentifier" description="Retrieves if a build job data instance with a specific identifier exists.">
+			<param name="Identifier" type="string" pass="in" description="Job Data Identifier. Fails if identifier does not exist." />	
+			<param name="HasJobData" type="bool" pass="return" description="Returns true, if the job data exists." />
+		</method>
+
+		<method name="StoreMetaDataString" description="Adds a Metadata String to the build job.">
 			<param name="Key" type="string" pass="in" description="Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists." />
 			<param name="Value" type="string" pass="in" description="Value to store." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 	
 		<method name="HasMetaDataString" description="Checks if a metadata string exists.">
@@ -1102,7 +1266,7 @@
 		<method name="CreateBuildJobExecution" description="Creates a new build job execution with state InProgress.">
 			<param name="Description" type="string" pass="in" description="Description of the execution." />
 			<param name="UserUUID" type="string" pass="in" description="UUID of the user who created it. Use 00000000-0000-0000-0000-000000000000 if no user shall be recorded." />
-			<param name="RelativeStartTimeStampInMicroseconds" type="uint64" pass="in" description="Start Time in Microseconds in relation to the start of the journal." />
+			<param name="AbsoluteStartTimeStampInMicrosecondsSince1970" type="uint64" pass="in" description="Absolute Start Time in Microseconds since 1970." />
 			<param name="ExecutionInstance" type="class" class="BuildJobExecution" pass="return" description="Newly created execution instance." />
 		</method>
 
@@ -1138,8 +1302,9 @@
 		<method name="CreateJob" description="Creates a new build job.">
 			<param name="JobUUID" type="string" pass="in" description="UUID String for the build job. Must be unique and newly generated." />	
 			<param name="Name" type="string" pass="in" description="Name String" />	
-			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+			<param name="UserUUID" type="string" pass="in" description="Currently authenticated user" />
 			<param name="StorageStreamUUID" type="string" pass="in" description="Storage stream uuid for the job. Needs not exist yet." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
 		</method>
 
@@ -1168,6 +1333,17 @@
 			<param name="Status" type="enum" class="BuildJobStatus" pass="return" description="Status Enum." />	
 		</method>
 
+		<method name="RetrieveJobExecution" description="Retrieves a new build job execution by uuid.">
+			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution to retrieve." />
+			<param name="ExecutionInstance" type="optionalclass" class="BuildJobExecution" pass="return" description="If UUID exists, returns execution instance. Otherwise, returns null." />
+		</method>
+
+		<method name="ListJobExecutions" description="Retrieves build executions, filtered by time or journal.">
+			<param name="MinTimestamp" type="string" pass="in" description="Minimum Timestamp in ISO8601 UTC format. May be empty for no filter." />	
+			<param name="MaxTimestamp" type="string" pass="in" description="Maximum Timestamp in ISO8601 UTC format. May be empty for no filter." />	
+			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
+		</method>
 			
 	</class>
 
@@ -1349,36 +1525,42 @@
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="DataType" type="enum" class="ParameterDataType" pass="in" description="Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type." />
 			<param name="Value" type="string" pass="in" description="Value of the parameter. MUST be of appropriate type." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentStringParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="string" pass="in" description="Value of the parameter." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentUUIDParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="string" pass="in" description="Value of the parameter. MUST be of appropriate type." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentDoubleParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="double" pass="in" description="Value of the parameter." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentIntegerParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="int64" pass="in" description="Value of the parameter." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 		<method name="StorePersistentBoolParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
 			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
 			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
 			<param name="Value" type="bool" pass="in" description="Value of the parameter." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
 		</method>
 
 

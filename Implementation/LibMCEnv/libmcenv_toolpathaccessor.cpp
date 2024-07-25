@@ -45,12 +45,15 @@ using namespace LibMCEnv::Impl;
  Class definition of CToolpathAccessor 
 **************************************************************************************************************************/
 
-CToolpathAccessor::CToolpathAccessor(const std::string& sStorageUUID, const std::string& sBuildUUID, AMC::PToolpathHandler pToolpathHandler)
+CToolpathAccessor::CToolpathAccessor(const std::string& sStorageUUID, const std::string& sBuildUUID, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler)
 	: m_sStorageUUID(AMCCommon::CUtils::normalizeUUIDString(sStorageUUID)), 
 	m_sBuildUUID(AMCCommon::CUtils::normalizeUUIDString(sBuildUUID)),	
+	m_pMeshHandler(pMeshHandler),
 	m_pToolpathHandler(pToolpathHandler)
 {
 	if (pToolpathHandler.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pMeshHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
@@ -107,7 +110,7 @@ IToolpathPart* CToolpathAccessor::GetPart(const LibMCEnv_uint32 nPartIndex)
 	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
 	auto pPart = pToolpathEntity->getPart(nPartIndex);
 
-	return new CToolpathPart(pPart);
+	return new CToolpathPart(pPart, m_pMeshHandler);
 }
 
 IToolpathPart* CToolpathAccessor::FindPartByUUID(const std::string& sPartUUID)
@@ -115,7 +118,7 @@ IToolpathPart* CToolpathAccessor::FindPartByUUID(const std::string& sPartUUID)
 	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
 	auto pPart = pToolpathEntity->findPartByUUID(sPartUUID);
 	if (pPart.get() != nullptr)
-		return new CToolpathPart(pPart);
+		return new CToolpathPart(pPart, m_pMeshHandler);
 
 	return nullptr;
 
@@ -226,4 +229,26 @@ IXMLDocumentNode* CToolpathAccessor::FindUniqueMetaData(const std::string& sName
 	auto pXMLDocumentInstance = pToolpathEntity->findUniqueMetaData(sNamespace, sName);
 	return new CXMLDocumentNode(pXMLDocumentInstance, pXMLDocumentInstance->GetRootNode());
 }
+
+bool CToolpathAccessor::HasBinaryMetaData(const std::string& sPath)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	return pToolpathEntity->hasBinaryMetaData(sPath);
+
+}
+
+void CToolpathAccessor::GetBinaryMetaData(const std::string& sPath, LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8* pMetaDataBuffer)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	pToolpathEntity->getBinaryMetaData(sPath, nMetaDataBufferSize, pMetaDataNeededCount, pMetaDataBuffer);
+
+}
+
+
 

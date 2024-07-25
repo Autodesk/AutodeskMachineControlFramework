@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <map>
 #include <string>
+#include <set>
 
 #include "amc_toolpathentity.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -56,6 +57,8 @@ namespace AMC {
 
 		LibMCData::PDataModel m_pDataModel;
 
+		std::set<std::string> m_AttachmentRelationsToRead;
+
 	public:
 
 		CToolpathHandler(LibMCData::PDataModel pDataModel);
@@ -70,7 +73,11 @@ namespace AMC {
 		void setLibraryPath(const std::string& sLibraryName, const std::string sLibraryPath);
 
 		Lib3MF::PWrapper getLib3MFWrapper();
-		
+
+		void registerAttachmentRelationsToRead(const std::string & sRelationShip);
+
+		void unregisterAttachmentRelationsToRead(const std::string& sRelationShip);
+
 	};
 
 	

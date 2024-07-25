@@ -47,7 +47,7 @@ using namespace LibMCEnv::Impl;
 
 CDateTime* CDateTime::makefromUTC(const std::string& sUTCTimeString)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return new CDateTime(AMCCommon::CChrono::parseISO8601TimeUTC(sUTCTimeString));
 }
 
 
@@ -76,24 +76,22 @@ LibMCEnv_uint64 CDateTime::ToUnixTimestamp()
 
 std::string CDateTime::ToUTCDateTime()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return AMCCommon::CChrono::convertToISO8601TimeUTC(m_nMicrosecondsSince1970, AMCCommon::eUTCStringAccuracy::Seconds);
 }
 
 std::string CDateTime::ToUTCDateTimeInMilliseconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return AMCCommon::CChrono::convertToISO8601TimeUTC(m_nMicrosecondsSince1970, AMCCommon::eUTCStringAccuracy::Milliseconds);
 }
 
 std::string CDateTime::ToUTCDateTimeInMicroseconds()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return AMCCommon::CChrono::convertToISO8601TimeUTC(m_nMicrosecondsSince1970, AMCCommon::eUTCStringAccuracy::Microseconds);
 }
 
 void CDateTime::GetDate(LibMCEnv_uint32 & nYear, LibMCEnv_uint32 & nMonth, LibMCEnv_uint32 & nDay)
 {
-	
-	uint32_t nDayOfTheWeek = 0;
-	AMCCommon::CChrono::parseDateFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay, nDayOfTheWeek);
+		AMCCommon::CChrono::parseDateFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay);
 }
 
 void CDateTime::GetTime(LibMCEnv_uint32 & nHour, LibMCEnv_uint32 & nMinute, LibMCEnv_uint32 & nSecond, LibMCEnv_uint32 & nMicrosecond)
@@ -114,7 +112,17 @@ IDateTime * CDateTime::Duplicate()
 
 bool CDateTime::IsLeapYear()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint32_t nYear = 0;
+	uint32_t nMonth = 0;
+	uint32_t nDay = 0;
+	uint32_t nHour = 0;
+	uint32_t nMinute = 0;
+	uint32_t nSecond = 0;
+	uint32_t nMicrosecond = 0;
+
+	AMCCommon::CChrono::parseDateTimeFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+
+	return AMCCommon::CChrono::yearIsLeapYear(nYear);
 }
 
 bool CDateTime::IsLaterThan(IDateTime* pOtherTimeStamp)
@@ -183,7 +191,33 @@ void CDateTime::SubtractDuration(IDateTimeDifference* pDuration)
 
 void CDateTime::ShiftByYears(const LibMCEnv_int64 nDeltaYears)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint32_t nYear = 0;
+	uint32_t nMonth = 0;
+	uint32_t nDay = 0;
+	uint32_t nHour = 0;
+	uint32_t nMinute = 0;
+	uint32_t nSecond = 0;
+	uint32_t nMicrosecond = 0;
+
+	AMCCommon::CChrono::parseDateTimeFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+
+	int64_t nNewYear = nYear + nDeltaYears;
+	if ((nNewYear < 0) || (nNewYear > 1000000))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS);
+
+	if ((nMonth == 2) && (nDay == 29)) {
+		if (!AMCCommon::CChrono::yearIsLeapYear((uint32_t)nNewYear)) {
+			// Leap Year special case!
+			// Move Day to first of March if 29th of February does not exist....
+			nMonth = 3;
+			nDay = 1;
+		}
+	}
+
+
+	m_nMicrosecondsSince1970 = AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime((uint32_t)nNewYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+
+
 }
 
 void CDateTime::ShiftByDays(const LibMCEnv_int64 nDeltaDays)
@@ -225,12 +259,32 @@ void CDateTime::ShiftByMicroseconds(const LibMCEnv_int64 nDeltaMicroseconds)
 
 void CDateTime::RoundDownToYear()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint32_t nYear = 0;
+	uint32_t nMonth = 0;
+	uint32_t nDay = 0;
+	uint32_t nHour = 0;
+	uint32_t nMinute = 0;
+	uint32_t nSecond = 0;
+	uint32_t nMicrosecond = 0;
+
+	AMCCommon::CChrono::parseDateTimeFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+
+	m_nMicrosecondsSince1970 = AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, 1, 1, 0, 0, 0, 0);
 }
 
 void CDateTime::RoundDownToMonth()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint32_t nYear = 0;
+	uint32_t nMonth = 0;
+	uint32_t nDay = 0;
+	uint32_t nHour = 0;
+	uint32_t nMinute = 0;
+	uint32_t nSecond = 0;
+	uint32_t nMicrosecond = 0;
+
+	AMCCommon::CChrono::parseDateTimeFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+
+	m_nMicrosecondsSince1970 = AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, nMonth, 1, 0, 0, 0, 0);
 }
 
 void CDateTime::RoundDownToDay()
@@ -260,12 +314,48 @@ void CDateTime::RoundDownToMilliseconds()
 
 void CDateTime::RoundUpToYear()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint32_t nYear = 0;
+	uint32_t nMonth = 0;
+	uint32_t nDay = 0;
+	uint32_t nHour = 0;
+	uint32_t nMinute = 0;
+	uint32_t nSecond = 0;
+	uint32_t nMicrosecond = 0;
+
+	AMCCommon::CChrono::parseDateTimeFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+
+	uint64_t nDownMicrosecondsSince1970 = AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, 1, 1, 0, 0, 0, 0);
+
+	if (nDownMicrosecondsSince1970 < m_nMicrosecondsSince1970) {
+		m_nMicrosecondsSince1970 = AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear + 1, 1, 1, 0, 0, 0, 0);
+	}
 }
 
 void CDateTime::RoundUpToMonth()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint32_t nYear = 0;
+	uint32_t nMonth = 0;
+	uint32_t nDay = 0;
+	uint32_t nHour = 0;
+	uint32_t nMinute = 0;
+	uint32_t nSecond = 0;
+	uint32_t nMicrosecond = 0;
+
+	AMCCommon::CChrono::parseDateTimeFromMicrosecondsSince1970(m_nMicrosecondsSince1970, nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond);
+
+	uint64_t nDownMicrosecondsSince1970 = AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, nMonth, 1, 0, 0, 0, 0);
+
+	if (nDownMicrosecondsSince1970 < m_nMicrosecondsSince1970) {
+		if (nMonth < 12) {
+			nMonth++;
+		}
+		else {
+			nMonth = 1;
+			nYear++;
+		}
+
+		m_nMicrosecondsSince1970 = AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, nMonth, 1, 0, 0, 0, 0);
+	}
 }
 
 void CDateTime::RoundUpToDay()

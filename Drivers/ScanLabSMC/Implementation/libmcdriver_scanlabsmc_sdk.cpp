@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <vector>
+#include <sstream>
 #include <iostream>
 #include <string>
 
@@ -152,6 +153,8 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8, const std::strin
 	this->slsc_job_set_min_mark_speed = (PScanLabSMCPtr_slsc_job_set_min_mark_speed)_loadScanLabSMCAddress(hLibrary, "slsc_job_set_min_mark_speed");
 	this->slsc_job_jump_min_time = (PScanLabSMCPtr_slsc_job_jump_min_time)_loadScanLabSMCAddress(hLibrary, "slsc_job_jump_min_time");
 	this->slsc_job_set_corner_tolerance = (PScanLabSMCPtr_slsc_job_set_corner_tolerance)_loadScanLabSMCAddress(hLibrary, "slsc_job_set_corner_tolerance");
+	this->slsc_ctrl_get_error = (PScanLabSMCPtr_slsc_ctrl_get_error)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_error");
+	this->slsc_ctrl_get_error_count = (PScanLabSMCPtr_slsc_ctrl_get_error_count)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_error_count");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -185,10 +188,54 @@ void CScanLabSMCSDK::initDLL()
 	}
 }
 
-void CScanLabSMCSDK::checkError(uint32_t nSMCError)
+void CScanLabSMCSDK::checkError(size_t hHandle, uint32_t nSMCError)
 {
-	if (nSMCError != 0)
-		throw std::runtime_error("SMC Error: " + std::to_string (nSMCError));
+
+	if (nSMCError != 0) {
+		if ((hHandle != 0) && (slsc_ctrl_get_error != nullptr) && (slsc_ctrl_get_error_count != nullptr)) {
+
+			std::lock_guard<std::mutex> lockGuard(m_ListErrorMutex);
+
+			size_t nErrorCount = 0;
+			uint32_t nErrorCountReturn = this->slsc_ctrl_get_error_count(hHandle, nErrorCount);
+
+			if (nErrorCountReturn == 0) {
+
+				std::stringstream sErrorStream;
+
+				for (size_t nErrorIndex = 0; nErrorIndex < nErrorCount; nErrorIndex++) {
+
+					if (nErrorIndex > 0)
+						sErrorStream << " | ";
+
+					size_t nBufferSize = 1024;
+					std::vector<char> buffer(nBufferSize + 1);
+					size_t nErrorCode = 0;
+
+					uint32_t nErrorGetReturn = this->slsc_ctrl_get_error(hHandle, nErrorIndex, nErrorCode, buffer.data(), nBufferSize);
+					if (nErrorGetReturn == 0) {
+						buffer.at(nBufferSize) = 0;
+						sErrorStream << "error #" << std::to_string(nErrorCode) << ": " << std::string(buffer.data ());
+					}
+					else {
+						sErrorStream << "<could not get error message for #" << std::to_string(nErrorIndex) << ">";
+					}
+
+				}
+
+				throw std::runtime_error("SMC Error: " + std::to_string(nSMCError) + ", Error Details: " + sErrorStream.str () );
+
+			} else {
+				throw std::runtime_error("Could not get error count for: " + std::to_string(nSMCError));
+
+			}
+
+		}
+		else {
+			throw std::runtime_error("Generic SMC Error: " + std::to_string(nSMCError));
+		}
+		
+	}
 }
 
 
@@ -211,6 +258,8 @@ void CScanLabSMCSDK::resetFunctionPtrs()
 	slsc_job_set_min_mark_speed = nullptr;
 	slsc_job_jump_min_time = nullptr;
 	slsc_job_set_corner_tolerance = nullptr;
+	slsc_ctrl_get_error = nullptr;
+	slsc_ctrl_get_error_count = nullptr;
 
 }
 

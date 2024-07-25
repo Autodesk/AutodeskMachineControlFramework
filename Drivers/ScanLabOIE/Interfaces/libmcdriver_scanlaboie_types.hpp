@@ -158,6 +158,11 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE 1051 /** No Sensor values available. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE 1052 /** No Additional values available. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX 1053 /** Invalid additional index. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE 1054 /** OIE Driver Type is not in compatibility mode. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTIN100KHZMODE 1055 /** OIE Driver Type is not in 100kHz mode. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEEXECUTIONMODE 1056 /** Invalid OIE Execution mode. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_POSITIONMISSINGINOIERTCIDLIST 1057 /** Position missing in OIE RTC ID List. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE 1058 /** Invalid OIE device state. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -228,6 +233,11 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_NOSENSORVALUESAVAILABLE: return "No Sensor values available.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_NOADDITIONALVALUESAVAILABLE: return "No Additional values available.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDADDITIONALINDEX: return "Invalid additional index.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTINCOMPATIBILITYMODE: return "OIE Driver Type is not in compatibility mode.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_OIEDRIVERTYPEISNOTIN100KHZMODE: return "OIE Driver Type is not in 100kHz mode.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEEXECUTIONMODE: return "Invalid OIE Execution mode.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_POSITIONMISSINGINOIERTCIDLIST: return "Position missing in OIE RTC ID List.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDOIEDEVICESTATE: return "Invalid OIE device state.";
     default: return "unknown error";
   }
 }

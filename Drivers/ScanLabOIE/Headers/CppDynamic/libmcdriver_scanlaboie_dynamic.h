@@ -438,6 +438,20 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddM
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddRTCSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
 
 /**
+* Writes a certain RTC channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+* @param[in] dOffset - Offset that the raw value is scaled with.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddScaledRTCSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLabOIE_double dScaleFactor, LibMCDriver_ScanLabOIE_double dOffset);
+
+/**
 * Writes a certain sensor channel to a data table as int32 columns.
 *
 * @param[in] pDataRecording - DataRecording instance.
@@ -475,6 +489,20 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddS
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddAdditionalSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription);
 
+/**
+* Writes a certain RTC channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+*
+* @param[in] pDataRecording - DataRecording instance.
+* @param[in] nAdditionalIndex - Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount.
+* @param[in] pDataTable - Data table instance to write to.
+* @param[in] pColumnIdentifier - Identifier of the Column.
+* @param[in] pColumnDescription - Description of the Column.
+* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+* @param[in] dOffset - Offset that the raw value is scaled with.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDataRecording_AddScaledAdditionalSignalsToDataTablePtr) (LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLabOIE_double dScaleFactor, LibMCDriver_ScanLabOIE_double dOffset);
+
 /*************************************************************************************************************************
  Class definition for OIEDevice
 **************************************************************************************************************************/
@@ -511,6 +539,15 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_SetHostN
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_GetHostNamePtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const LibMCDriver_ScanLabOIE_uint32 nHostNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pHostNameNeededChars, char * pHostNameBuffer);
 
 /**
+* Sets the RTC 6 IP Address for data streaming (100kHz mode).
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[in] pRTC6IPAddress - New RTC6 IP Address. Will only be effective in a StartApp call.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_SetRTC6IPAddressPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pRTC6IPAddress);
+
+/**
 * Sets the port of the device. Fails if device is already connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
@@ -529,7 +566,7 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_SetPortP
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_GetPortPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 * pPort);
 
 /**
-* Returns if the device is connected and logged in.
+* Returns if the device is connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
 * @param[out] pValue - Flag if the device is connected.
@@ -757,15 +794,31 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_Retrieve
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_ClearCurrentRecordingPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice);
 
 /**
-* Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.
+* Returns if the device is logged in.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
-* @param[in] pBuild - Build that contains the data.
-* @param[in] pDataUUID - Data UUID of the build data.
-* @param[out] pRecordingInstance - Recording instance
+* @param[out] pValue - Flag if the device is logged in.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_LoadRecordingFromBuildPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCEnv_Build pBuild, const char * pDataUUID, LibMCDriver_ScanLabOIE_DataRecording * pRecordingInstance);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_IsLoggedInPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue);
+
+/**
+* Returns if the device is streaming.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[out] pValue - Flag if the device is streaming.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_IsStreamingPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue);
+
+/**
+* Returns if the connected RTC is busy.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[out] pValue - Flag if the connected RTC is busy.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_RTCIsBusyPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue);
 
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_OIE
@@ -996,12 +1049,15 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEDataRecording_AddYCoordinatesToDataTablePtr m_DataRecording_AddYCoordinatesToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddMeasurementTagsToDataTablePtr m_DataRecording_AddMeasurementTagsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddRTCSignalsToDataTablePtr m_DataRecording_AddRTCSignalsToDataTable;
+	PLibMCDriver_ScanLabOIEDataRecording_AddScaledRTCSignalsToDataTablePtr m_DataRecording_AddScaledRTCSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddSensorSignalsToDataTablePtr m_DataRecording_AddSensorSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddScaledSensorSignalsToDataTablePtr m_DataRecording_AddScaledSensorSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEDataRecording_AddAdditionalSignalsToDataTablePtr m_DataRecording_AddAdditionalSignalsToDataTable;
+	PLibMCDriver_ScanLabOIEDataRecording_AddScaledAdditionalSignalsToDataTablePtr m_DataRecording_AddScaledAdditionalSignalsToDataTable;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetDeviceNamePtr m_OIEDevice_GetDeviceName;
 	PLibMCDriver_ScanLabOIEOIEDevice_SetHostNamePtr m_OIEDevice_SetHostName;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetHostNamePtr m_OIEDevice_GetHostName;
+	PLibMCDriver_ScanLabOIEOIEDevice_SetRTC6IPAddressPtr m_OIEDevice_SetRTC6IPAddress;
 	PLibMCDriver_ScanLabOIEOIEDevice_SetPortPtr m_OIEDevice_SetPort;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetPortPtr m_OIEDevice_GetPort;
 	PLibMCDriver_ScanLabOIEOIEDevice_IsConnectedPtr m_OIEDevice_IsConnected;
@@ -1027,7 +1083,9 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEOIEDevice_UninstallAppByMinorVersionPtr m_OIEDevice_UninstallAppByMinorVersion;
 	PLibMCDriver_ScanLabOIEOIEDevice_RetrieveCurrentRecordingPtr m_OIEDevice_RetrieveCurrentRecording;
 	PLibMCDriver_ScanLabOIEOIEDevice_ClearCurrentRecordingPtr m_OIEDevice_ClearCurrentRecording;
-	PLibMCDriver_ScanLabOIEOIEDevice_LoadRecordingFromBuildPtr m_OIEDevice_LoadRecordingFromBuild;
+	PLibMCDriver_ScanLabOIEOIEDevice_IsLoggedInPtr m_OIEDevice_IsLoggedIn;
+	PLibMCDriver_ScanLabOIEOIEDevice_IsStreamingPtr m_OIEDevice_IsStreaming;
+	PLibMCDriver_ScanLabOIEOIEDevice_RTCIsBusyPtr m_OIEDevice_RTCIsBusy;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr m_Driver_ScanLab_OIE_GetDriverType;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr m_Driver_ScanLab_OIE_SetDependencyResourceNames;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetOIE3ResourceNamesPtr m_Driver_ScanLab_OIE_SetOIE3ResourceNames;

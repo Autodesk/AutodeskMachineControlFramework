@@ -100,7 +100,7 @@ then
 	export GOARCH=arm
 	export GOOS=linux
 	export GOARM=5
-	go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+	go build -o "$builddir/DevPackage/Framework/buildresources.rpi" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
 else
 
@@ -135,21 +135,17 @@ cd "$builddir"
 echo "Building Core Modules"
 if test $PLATFORMNAME = "win64"
 then
-cmake -DOVERRIDE_BUILDRESOURCES=linux64 -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
+cmake -DOVERRIDE_PLATFORM=linux64 -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
 else
-cmake ..
+cmake -DOVERRIDE_PLATFORM=$PLATFORMNAME ..
 fi
 
 cmake --build . --config Release
-
-echo "Building Core Resources"
-go run ../BuildScripts/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
 
 cd $builddir
 echo "Building Package XML"
 
 "$builddir/DevPackage/Framework/create_package_xml" --config "$builddir/Output/${GITHASH}_config.xml" --devpackage ${GITHASH} --output "$builddir/Output/${GITHASH}_package.xml" --serveroutput "$builddir/Output/amc_server.xml"
-
 
 echo "Building Developer Package"
 cd "$builddir/DevPackage"

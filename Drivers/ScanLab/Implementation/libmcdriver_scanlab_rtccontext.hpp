@@ -14,6 +14,7 @@ Abstract: This is the class declaration of CRTCContext
 
 #include "libmcdriver_scanlab_interfaces.hpp"
 #include "libmcdriver_scanlab_sdk.hpp"
+#include "libmcdriver_scanlab_rtcrecordinginstance.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlab_base.hpp"
@@ -118,6 +119,8 @@ protected:
 
 	double m_dLaserPowerCalibrationUnits;
 	std::vector<sLaserCalibrationPoint> m_LaserPowerCalibrationList;
+
+	std::map<std::string, PRTCRecordingInstance> m_Recordings;
 	
 	void writeJumpSpeed (float jumpSpeed);
 
@@ -147,11 +150,18 @@ protected:
 	void jumpAbsoluteEx (double dTargetXInMM, double dTargetYInMM);
 	void markAbsoluteEx (double dStartXInMM, double dStartYInMM, double dTargetXInMM, double dTargetYInMM, double dLaserPowerInPercent, bool bOIEControlFlag);
 
+	// Calls the SetTriggerX Call that is necessary for the specific OIE board
+	void callSetTriggerOIE(uint32_t nPeriod);
+
 public:
 
 	CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	~CRTCContext();
+
+	static void loadFirmwareEx(PScanLabSDK pSDK, uint32_t nCardID, const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+	static void setCommunicationTimeoutsEx(PScanLabSDK pSDK, uint32_t nCardID, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 
 	std::string GetIPAddress();
 
@@ -242,6 +252,12 @@ public:
 
 	void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer, const LibMCDriver_ScanLab::eOIEOperationMode eOperationMode) override;
 
+	void SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2) override;
+
+	void GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2) override;
+
+	void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2) override;
+
 	void EnableOIE() override;
 
 	void DisableOIE() override;
@@ -284,13 +300,11 @@ public:
 	
 	void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) override;
 
-	void PrepareRecording() override;
+	IRTCRecording* PrepareRecording(const bool bKeepInMemory) override;
 
-	void EnableRecording() override;
+	bool HasRecording(const std::string& sUUID) override;
 
-	void DisableRecording() override;
-
-	void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition) override;
+	IRTCRecording* FindRecording(const std::string& sUUID) override;
 
 	void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds) override;
 
@@ -327,6 +341,10 @@ public:
 	void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue) override;
 
 	void AddSetPower(const LibMCDriver_ScanLab_single fPower) override;
+
+	void AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) override;
+
+	void AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue) override;
 
 	void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent) override;
 
@@ -365,7 +383,23 @@ public:
 
 	LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) override;
 
-	IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) override;
+	IUARTConnection* CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate) override;
+
+	void EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo) override;
+
+	void DisableScanAhead() override;
+
+	void ActivateScanAheadAutoDelays() override;
+
+	void DeactivateScanAheadAutoDelays() override;
+
+	bool ScanAheadAutoDelaysAreActivated() override;
+
+	void SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds) override;
+
+	void SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift) override;
+
+	void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale) override;
 
 };
 

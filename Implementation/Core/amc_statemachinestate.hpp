@@ -62,7 +62,7 @@ namespace AMC {
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
-		uint64_t m_LastExecutionTimeInMilliseconds;
+		uint64_t m_LastExecutionTimeStampInMicroseconds;
 		uint32_t m_nRepeatDelay;
 
 		LibMCPlugin::PState m_pPluginState;
@@ -85,7 +85,7 @@ namespace AMC {
 
 		void setPluginState(LibMCPlugin::PState pPluginState);
 
-		void execute(std::string& sNextState, PSystemState pSystemState, PParameterHandler pParameterHandler, uint64_t nEndTimeOfPreviousStateInMicroseconds, const std::string& sPreviousStateName);
+		void execute(std::string& sNextState, PSystemState pSystemState, PParameterHandler pParameterHandler, uint64_t nAbsoluteEndTimeOfPreviousStateInMicroseconds, const std::string& sPreviousStateName);
 
 	};
 

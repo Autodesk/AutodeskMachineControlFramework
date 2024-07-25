@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
 
-#include "amc_service_buildfileparsing.hpp"
 #include "amc_toolpathhandler.hpp"
 
 #include "common_utils.hpp"
@@ -72,12 +71,8 @@ APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, co
 
 	if (requestType == eAPIRequestType::rtPost) {
 
-		if ((sParameterString == "/prepare") || (sParameterString == "/prepare/")) {
-			return btStartPrepareJob;
-		}
-
 		if ((sParameterString == "/toolpath") || (sParameterString == "/toolpath/")) {
-			return btToolpath;
+			return APIHandler_BuildType::btToolpath;
 		}
 
 	}
@@ -85,23 +80,23 @@ APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, co
 	if (requestType == eAPIRequestType::rtGet) {
 
 		if ((sParameterString == "/") || (sParameterString == "")) {
-			return btListJobs;
+			return APIHandler_BuildType::btListJobs;
 		}
 
 		if (sParameterString.substr(0, 15) == "/listbuilddata/") {
 			paramUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(15));
-			return btListBuildData;
+			return APIHandler_BuildType::btListBuildData;
 		}
 
 		if (sParameterString.substr (0, 6) == "/data/") {
 			paramUUID = AMCCommon::CUtils::normalizeUUIDString (sParameterString.substr(6));
-			return btGetBuildData;
+			return APIHandler_BuildType::btGetBuildData;
 		}
 
 	}
 
 
-	return btUnknown;
+	return APIHandler_BuildType::btUnknown;
 }
 
 
@@ -110,9 +105,7 @@ bool CAPIHandler_Build::expectsRawBody(const std::string& sURI, const eAPIReques
 	std::string jobUUID;
 
 	switch (parseRequest(sURI, requestType, jobUUID)) {
-		case btStartPrepareJob:
-			return true;
-		case btToolpath:
+		case APIHandler_BuildType::btToolpath:
 			return true;
 
 		default:
@@ -129,32 +122,6 @@ uint32_t CAPIHandler_Build::getFormDataFieldCount(const std::string& sURI, const
 CAPIFieldDetails CAPIHandler_Build::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
 {
 	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
-}
-
-void CAPIHandler_Build::handlePrepareJobRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
-{
-	if (pBodyData == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pAuth.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
-
-	auto sBuildUUID = jsonRequest.getUUID(AMC_API_KEY_BUILDUUID, LIBMC_ERROR_INVALIDBUILDUUID);
-
-	auto pDataModel = m_pSystemState->getDataModelInstance();
-	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
-	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
-
-	pBuildJob->StartValidating();
-
-	auto pServiceHandler = m_pSystemState->serviceHandler();
-	auto pLib3MFWrapper = m_pSystemState->toolpathHandler()->getLib3MFWrapper();
-
-	pServiceHandler->addServiceToQueue (std::make_shared <CService_BuildFileParsing> (pServiceHandler, pDataModel, pBuildJob->GetUUID(), pLib3MFWrapper, pAuth->getUserName()));
-
-	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBNAME, pBuildJob->GetName());
-
 }
 
 
@@ -347,21 +314,18 @@ PAPIResponse CAPIHandler_Build::handleRequest(const std::string& sURI, const eAP
 	writeJSONHeader(writer, AMC_API_PROTOCOL_BUILD);
 
 	switch (buildType) {
-	case btStartPrepareJob:
-		handlePrepareJobRequest(writer, pBodyData, nBodyDataSize, pAuth);
-		break;
-	case btListJobs:
+	case APIHandler_BuildType::btListJobs:
 		handleListJobsRequest(writer, pAuth);
 		break;
-	case btToolpath:
+	case APIHandler_BuildType::btToolpath:
 		handleToolpathRequest(writer, pBodyData, nBodyDataSize, pAuth);
 		break;
 
-	case btListBuildData:
+	case APIHandler_BuildType::btListBuildData:
 		handleListBuildDataRequest(writer, pAuth, paramUUID);
 		break;
 
-	case btGetBuildData:
+	case APIHandler_BuildType::btGetBuildData:
 		return handleGetBuildDataRequest(pAuth, paramUUID);
 		break;
 

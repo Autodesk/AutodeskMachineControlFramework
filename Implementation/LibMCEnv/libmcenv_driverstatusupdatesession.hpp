@@ -62,12 +62,13 @@ private:
 	AMC::PParameterGroup m_pParameterGroup;
 	AMC::PLogger m_pLogger;
 	std::string m_sDriverName;
+	AMCCommon::PChrono m_pGlobalChrono;
 
 	AMCCommon::CChrono m_Chrono;
 
 public:
 
-	CDriverStatusUpdateSession(AMC::PParameterGroup pParameterGroup, AMC::PLogger pLogger, std::string sDriverName);
+	CDriverStatusUpdateSession(AMC::PParameterGroup pParameterGroup, AMC::PLogger pLogger, std::string sDriverName, AMCCommon::PChrono pGlobalChrono);
 	
 	virtual ~CDriverStatusUpdateSession();
 

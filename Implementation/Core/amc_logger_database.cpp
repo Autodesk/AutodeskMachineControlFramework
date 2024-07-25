@@ -36,10 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 		
-	CLogger_Database::CLogger_Database(LibMCData::PDataModel pDataModel)
-		: m_MaxLogMessageRequestCount (AMC_MAXLOGMESSAGE_REQUESTCOUNT)
+	CLogger_Database::CLogger_Database(LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono)
+		: CLogger (pGlobalChrono), m_MaxLogMessageRequestCount (AMC_MAXLOGMESSAGE_REQUESTCOUNT), m_pDataModel (pDataModel)
 	{
-		LibMCAssertNotNull(pDataModel.get());
+		if (pDataModel.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pGlobalChrono.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 		m_pLogSession = pDataModel->CreateNewLogSession();
 
@@ -47,9 +50,11 @@ namespace AMC {
 	
 	CLogger_Database::~CLogger_Database()
 	{
+		m_pLogSession = nullptr;
+		m_pDataModel = nullptr;
 	}
 
-	void CLogger_Database::logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp)
+	void CLogger_Database::logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string & sTimeStamp)
 	{
 
 		std::lock_guard<std::mutex> lockGuard(m_DBMutex);

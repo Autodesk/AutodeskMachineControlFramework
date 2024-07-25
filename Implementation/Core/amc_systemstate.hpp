@@ -60,7 +60,6 @@ namespace AMC {
 	class CStateSignalHandler;
 	class CDriverHandler;
 	class CToolpathHandler;
-	class CServiceHandler;
 	class CStateJournal;
 	class CUIHandler;
 	class CParameterHandler;
@@ -76,7 +75,6 @@ namespace AMC {
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
 	typedef std::shared_ptr<CDriverHandler> PDriverHandler;
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
-	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
 	typedef std::shared_ptr<CStateJournal> PStateJournal;
 	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
@@ -94,7 +92,6 @@ namespace AMC {
 		AMC::PStateSignalHandler m_pSignalHandler;
 		AMC::PDriverHandler m_pDriverHandler;
 		AMC::PToolpathHandler m_pToolpathHandler;
-		AMC::PServiceHandler m_pServiceHandler;
 		AMC::PUIHandler m_pUIHandler;
 		AMC::PStateJournal m_pStateJournal;
 		AMC::PStateMachineData m_pStateMachineData;
@@ -117,7 +114,7 @@ namespace AMC {
 
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, PStateJournal pStateJournal, const std::string & sTestEnvironmentPath);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, PStateJournal pStateJournal, const std::string & sTestEnvironmentPath, AMCCommon::PChrono pGlobalChrono);
 
 		virtual ~CSystemState();
 
@@ -125,7 +122,6 @@ namespace AMC {
 		CStateSignalHandler* stateSignalHandler();
 		CDriverHandler* driverHandler();
 		CToolpathHandler* toolpathHandler();
-		CServiceHandler* serviceHandler();
 		CUIHandler* uiHandler();
 		CStateMachineData* stateMachineData();
 		CAccessControl * accessControl ();
@@ -154,13 +150,14 @@ namespace AMC {
 		std::string getLibraryPath(const std::string& sLibraryName);
 		std::string getLibraryResourcePath(const std::string& sLibraryName);
 
-		std::string getSystemUserID();
 		std::string getInstallationUUID(); // Returns a unique UUID of the installation
 		std::string getInstallationSecret(); // Returns a unique Secret SHA256 String of the installation. MUST NOT be shared externally.
 		std::string getGitHash();
 		std::string getClientHash();
 
 		std::string getTestEnvironmentPath();
+
+		uint64_t getAbsoluteTimeStamp();
 
 
 

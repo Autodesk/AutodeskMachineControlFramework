@@ -105,7 +105,7 @@ bool CPersistencyHandler::DeletePersistentParameter(const std::string & sUUID)
 
 }
 
-void CPersistencyHandler::StorePersistentParameter(const std::string& sUUID, const std::string& sName, const LibMCData::eParameterDataType eDataType, const std::string& sValue)
+void CPersistencyHandler::StorePersistentParameter(const std::string& sUUID, const std::string& sName, const LibMCData::eParameterDataType eDataType, const std::string& sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
 
 	// Check parameters
@@ -145,8 +145,7 @@ void CPersistencyHandler::StorePersistentParameter(const std::string& sUUID, con
 
 	}
 
-	AMCCommon::CChrono chrono;
-	std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC();
+	std::string sTimestamp = AMCCommon::CChrono::convertToISO8601TimeUTC(nAbsoluteTimeStamp);
 
 
 	auto pTransaction = m_pSQLHandler->beginTransaction();
@@ -196,31 +195,31 @@ void CPersistencyHandler::StorePersistentParameter(const std::string& sUUID, con
 
 }
 
-void CPersistencyHandler::StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue)
+void CPersistencyHandler::StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
-	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::String, sValue);
+	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::String, sValue, nAbsoluteTimeStamp);
 }
 
-void CPersistencyHandler::StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue)
+void CPersistencyHandler::StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
 	std::string sFormattedUUID = AMCCommon::CUtils::normalizeUUIDString(sValue);
-	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::UUID, sFormattedUUID);
+	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::UUID, sFormattedUUID, nAbsoluteTimeStamp);
 
 }
 
-void CPersistencyHandler::StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue)
+void CPersistencyHandler::StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
-	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::Double, std::to_string (dValue));
+	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::Double, std::to_string (dValue), nAbsoluteTimeStamp);
 }
 
-void CPersistencyHandler::StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue)
+void CPersistencyHandler::StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
-	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::Integer, std::to_string(nValue));
+	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::Integer, std::to_string(nValue), nAbsoluteTimeStamp);
 }
 
-void CPersistencyHandler::StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue)
+void CPersistencyHandler::StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue, const LibMCData_uint64 nAbsoluteTimeStamp)
 {
-	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::Bool, std::to_string((int32_t)bValue));
+	StorePersistentParameter(sUUID, sName, LibMCData::eParameterDataType::Bool, std::to_string((int32_t)bValue), nAbsoluteTimeStamp);
 }
 
 std::string CPersistencyHandler::RetrievePersistentStringParameter(const std::string & sUUID)

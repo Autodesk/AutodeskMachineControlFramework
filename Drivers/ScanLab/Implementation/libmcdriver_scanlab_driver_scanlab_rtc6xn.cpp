@@ -505,15 +505,35 @@ void CDriver_ScanLab_RTC6xN::DrawLayer(const std::string & sStreamUUID, const Li
 	}
 }
 
+void CDriver_ScanLab_RTC6xN::SetAllCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+{
+	for (uint32_t nScannerIndex = 1; nScannerIndex <= m_nScannerCount; nScannerIndex++) {
+		SetCommunicationTimeouts (nScannerIndex, dInitialTimeout, dMaxTimeout, dMultiplier);
+	}
+}
 
 void CDriver_ScanLab_RTC6xN::SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
 {
-	if (!m_SimulationMode) {
-		auto pRTCContext = getRTCContextForScannerIndex(nScannerIndex, true);
+	m_dDefaultInitialTimeout = dInitialTimeout;
+	m_dDefaultMaxTimeout = dMaxTimeout;
+	m_dDefaultMultiplier = dMultiplier;
 
-		pRTCContext->SetCommunicationTimeouts(dInitialTimeout, dMaxTimeout, dMultiplier);
+	if (!m_SimulationMode) {
+		auto pRTCContext = getRTCContextForScannerIndex(nScannerIndex, false);
+
+		if (pRTCContext.get () != nullptr)
+			pRTCContext->SetCommunicationTimeouts(dInitialTimeout, dMaxTimeout, dMultiplier);
 	}
 }
+
+void CDriver_ScanLab_RTC6xN::GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier)
+{
+	dInitialTimeout = m_dDefaultInitialTimeout;
+	dMaxTimeout = m_dDefaultMaxTimeout;
+	dMultiplier = m_dDefaultMultiplier;
+
+}
+
 
 void CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
 {
@@ -524,9 +544,9 @@ void CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts(const LibMCDriver_ScanLab_
 
 	}
 	else {
-		dInitialTimeout = 0.75;
-		dMaxTimeout = 20.0;
-		dMultiplier = 1.3;
+		dInitialTimeout = m_dDefaultInitialTimeout;
+		dMaxTimeout = m_dDefaultMaxTimeout;
+		dMultiplier = m_dDefaultMultiplier;
 	}
 }
 

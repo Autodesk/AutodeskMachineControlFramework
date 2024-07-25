@@ -70,6 +70,12 @@ class IDataSeries;
 class IDateTimeDifference;
 class IDateTime;
 class IMeshObject;
+class IPersistentMeshObject;
+class IModelDataMeshInstance;
+class IModelDataComponentInstance;
+class IMeshSceneItem;
+class IMeshScene;
+class ISceneHandler;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
@@ -93,12 +99,15 @@ class IDriverStatusUpdateSession;
 class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
+class IBaseTempStreamWriter;
 class ITempStreamWriter;
+class IZIPStreamWriter;
 class IStreamReader;
 class IUniformJournalSampling;
 class IJournalVariable;
 class IAlert;
 class IAlertIterator;
+class ILogEntryList;
 class IJournalHandler;
 class IUserDetailList;
 class IUserManagementHandler;
@@ -537,13 +546,6 @@ public:
 	virtual void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
 
 	/**
-	* IImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[in] pPNGDataBuffer - PNG Data stream.
-	*/
-	virtual void LoadPNG(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer) = 0;
-
-	/**
 	* IImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
 	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
 	* @return Image data.
@@ -878,6 +880,11 @@ public:
 	virtual void RemoveColumn(const std::string & sIdentifier) = 0;
 
 	/**
+	* IDataTable::Clear - Clears all data from the data table.
+	*/
+	virtual void Clear() = 0;
+
+	/**
 	* IDataTable::HasColumn - Returns if a column exists in the data field.
 	* @param[in] sIdentifier - Identifier of the column.
 	* @return Returns if the columns exist.
@@ -1011,6 +1018,18 @@ public:
 	virtual void SetUint64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer) = 0;
 
 	/**
+	* IDataTable::CreateWriteOptions - Creates a Write Option.
+	* @return Writer Options Instance to pass on to WriteDataToStream.
+	*/
+	virtual IDataTableWriteOptions * CreateWriteOptions() = 0;
+
+	/**
+	* IDataTable::CreateCSVWriteOptions - Creates a CSV Write Option.
+	* @return Writer Options Instance to pass on to WriteCSVToStream.
+	*/
+	virtual IDataTableCSVWriteOptions * CreateCSVWriteOptions() = 0;
+
+	/**
 	* IDataTable::WriteCSVToStream - Writes the data as CSV to a temporary stream.
 	* @param[in] pWriter - Stream writer to use.
 	* @param[in] pOptions - Optional CSV writer options to use.
@@ -1023,6 +1042,12 @@ public:
 	* @param[in] pOptions - Optional writer options to use.
 	*/
 	virtual void WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions) = 0;
+
+	/**
+	* IDataTable::LoadFromStream - Loads the data table from a stream. Clears all existing data from the data table.
+	* @param[in] pStream - Stream read instance to read from.
+	*/
+	virtual void LoadFromStream(IStreamReader* pStream) = 0;
 
 };
 
@@ -1447,20 +1472,447 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* IMeshObject::GetTriangleCount - Returns the number of triangles.
+	* IMeshObject::GetTriangleCount - Returns the number of triangles in the mesh.
 	* @return Number of triangles.
 	*/
 	virtual LibMCEnv_uint32 GetTriangleCount() = 0;
 
 	/**
-	* IMeshObject::GetVertexCount - Returns the number of vertices.
+	* IMeshObject::GetVertexCount - Returns the number of vertices in the mesh.
 	* @return Number of vertices.
 	*/
 	virtual LibMCEnv_uint32 GetVertexCount() = 0;
 
+	/**
+	* IMeshObject::IsManifold - Checks if the mesh topology is closed and every edge has two adjacent faces.
+	* @return Returns true if the mesh is manifold.
+	*/
+	virtual bool IsManifold() = 0;
+
+	/**
+	* IMeshObject::IsOriented - Checks if the mesh topology is oriented, so no Mobius strip or Klein bottle for example.
+	* @return Returns true if the mesh is oriented.
+	*/
+	virtual bool IsOriented() = 0;
+
+	/**
+	* IMeshObject::IsWatertight - Checks if the mesh topology is oriented and manifold, e.g is describing a 3D volume.
+	* @return Returns true if the mesh is watertight.
+	*/
+	virtual bool IsWatertight() = 0;
+
+	/**
+	* IMeshObject::GetMaxVertexID - Returns the maximum vertex ID occuring in the mesh.
+	* @return All vertices will have an ID smaller or equal this ID.
+	*/
+	virtual LibMCEnv_uint32 GetMaxVertexID() = 0;
+
+	/**
+	* IMeshObject::VertexExists - Returns if a vertex with an ID exists.
+	* @param[in] nVertexID - Vertex ID to check.
+	* @return Returns true if the vertex exists.
+	*/
+	virtual bool VertexExists(const LibMCEnv_uint32 nVertexID) = 0;
+
+	/**
+	* IMeshObject::GetVertex - Returns position of a vertex. Will return 0 if vertex does not exist.
+	* @param[in] nVertexID - Vertex ID to retrieve.
+	* @param[out] dX - Returns the X coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @param[out] dY - Returns the Y coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @param[out] dZ - Returns the Z coordinate of the vertex. Returns 0 if vertex does not exist.
+	* @return Returns true if the vertex exists.
+	*/
+	virtual bool GetVertex(const LibMCEnv_uint32 nVertexID, LibMCEnv_double & dX, LibMCEnv_double & dY, LibMCEnv_double & dZ) = 0;
+
+	/**
+	* IMeshObject::GetVertexIDs - Returns all IDs of the vertices. Ordered sequentially.
+	* @param[in] nVertexIDsBufferSize - Number of elements in buffer
+	* @param[out] pVertexIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pVertexIDsBuffer - uint32 buffer of Vertex ID array.
+	*/
+	virtual void GetVertexIDs(LibMCEnv_uint64 nVertexIDsBufferSize, LibMCEnv_uint64* pVertexIDsNeededCount, LibMCEnv_uint32 * pVertexIDsBuffer) = 0;
+
+	/**
+	* IMeshObject::GetAllVertices - Returns all the vertex information. Ordered sequentially by ID.
+	* @param[in] nVerticesBufferSize - Number of elements in buffer
+	* @param[out] pVerticesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pVerticesBuffer - MeshVertex3D buffer of Vertex array.
+	*/
+	virtual void GetAllVertices(LibMCEnv_uint64 nVerticesBufferSize, LibMCEnv_uint64* pVerticesNeededCount, LibMCEnv::sMeshVertex3D * pVerticesBuffer) = 0;
+
+	/**
+	* IMeshObject::GetMaxTriangleID - Returns the maximum triangle ID occuring in the mesh.
+	* @return All triangles will have an ID smaller or equal this ID.
+	*/
+	virtual LibMCEnv_uint32 GetMaxTriangleID() = 0;
+
+	/**
+	* IMeshObject::TriangeExists - Returns if a triangle with an ID exists.
+	* @param[in] nTriangleID - Triangle ID to check.
+	* @return Returns true if the triangle exists.
+	*/
+	virtual bool TriangeExists(const LibMCEnv_uint32 nTriangleID) = 0;
+
+	/**
+	* IMeshObject::GetTriangle - Returns vertex IDs of a triangle. Will return 0 if triangle does not exist.
+	* @param[in] nTriangleID - Triangle ID to retrieve.
+	* @param[out] nVertex1ID - Returns the vertex ID of the first corner. Returns 0 if triangle does not exist.
+	* @param[out] nVertex2ID - Returns the vertex ID of the second corner. Returns 0 if triangle does not exist.
+	* @param[out] nVertex3ID - Returns the vertex ID of the third corner. Returns 0 if triangle does not exist.
+	* @return Returns true if the triangle exists.
+	*/
+	virtual bool GetTriangle(const LibMCEnv_uint32 nTriangleID, LibMCEnv_uint32 & nVertex1ID, LibMCEnv_uint32 & nVertex2ID, LibMCEnv_uint32 & nVertex3ID) = 0;
+
+	/**
+	* IMeshObject::GetTriangleIDs - Returns all IDs of the triangles. Ordered sequentially.
+	* @param[in] nTriangleIDsBufferSize - Number of elements in buffer
+	* @param[out] pTriangleIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTriangleIDsBuffer - uint32 buffer of Triangle ID array.
+	*/
+	virtual void GetTriangleIDs(LibMCEnv_uint64 nTriangleIDsBufferSize, LibMCEnv_uint64* pTriangleIDsNeededCount, LibMCEnv_uint32 * pTriangleIDsBuffer) = 0;
+
+	/**
+	* IMeshObject::GetAllTriangles - Returns all the triangle information. Ordered sequentially by ID.
+	* @param[in] nTrianglesBufferSize - Number of elements in buffer
+	* @param[out] pTrianglesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTrianglesBuffer - MeshTriangle3D buffer of Triangle array.
+	*/
+	virtual void GetAllTriangles(LibMCEnv_uint64 nTrianglesBufferSize, LibMCEnv_uint64* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D * pTrianglesBuffer) = 0;
+
+	/**
+	* IMeshObject::IsPersistent - Returns if the mesh object is persisted in memory.
+	* @return If true, the mesh object is persisted in memory and can be retrieved by FindPersistentMeshObject.
+	*/
+	virtual bool IsPersistent() = 0;
+
+	/**
+	* IMeshObject::MakePersistent - Makes the mesh persistent in memory. It will not be released when the MeshObject instances is released. Should be handled with great care!
+	* @param[in] bBoundToLoginSession - If true, the mesh will be freed once the client login session expires.
+	* @return Returns a persistent instance to the same mesh data.
+	*/
+	virtual IPersistentMeshObject * MakePersistent(const bool bBoundToLoginSession) = 0;
+
 };
 
 typedef IBaseSharedPtr<IMeshObject> PIMeshObject;
+
+
+/*************************************************************************************************************************
+ Class interface for PersistentMeshObject 
+**************************************************************************************************************************/
+
+class IPersistentMeshObject : public virtual IMeshObject {
+public:
+	/**
+	* IPersistentMeshObject::IsBoundToLoginSession - Returns if the mesh object is bound to a specific login session.
+	* @return If true, the mesh will be freed once the client login session expires.
+	*/
+	virtual bool IsBoundToLoginSession() = 0;
+
+};
+
+typedef IBaseSharedPtr<IPersistentMeshObject> PIPersistentMeshObject;
+
+
+/*************************************************************************************************************************
+ Class interface for ModelDataMeshInstance 
+**************************************************************************************************************************/
+
+class IModelDataMeshInstance : public virtual IBase {
+public:
+	/**
+	* IModelDataMeshInstance::GetName - Returns Mesh Name.
+	* @return Returns mesh instance name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IModelDataMeshInstance::GetUUID - Returns Mesh UUID.
+	* @return Returns mesh instance uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IModelDataMeshInstance::GetLocalTransform - Returns Local Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in its component coordinate system.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetLocalTransform() = 0;
+
+	/**
+	* IModelDataMeshInstance::GetAbsoluteTransform - Returns Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetAbsoluteTransform() = 0;
+
+	/**
+	* IModelDataMeshInstance::CreateCopiedMesh - Loads a copy of the mesh geometry into memory. Might be inefficient to use for many identical copies of the mesh in the scene.
+	* @return Returns the mesh object instance.
+	*/
+	virtual IMeshObject * CreateCopiedMesh() = 0;
+
+	/**
+	* IModelDataMeshInstance::CreatePersistentMesh - Creates a persistent mesh of the geometry. Will not create a duplicate if the instance was already persisted before. The release of the memory should be handled with great care! 
+	* @param[in] bBoundToLoginSession - If true, the mesh will be freed once the client login session expires.
+	* @return Returns a persistent instance to the same mesh data.
+	*/
+	virtual IPersistentMeshObject * CreatePersistentMesh(const bool bBoundToLoginSession) = 0;
+
+};
+
+typedef IBaseSharedPtr<IModelDataMeshInstance> PIModelDataMeshInstance;
+
+
+/*************************************************************************************************************************
+ Class interface for ModelDataComponentInstance 
+**************************************************************************************************************************/
+
+class IModelDataComponentInstance : public virtual IBase {
+public:
+	/**
+	* IModelDataComponentInstance::GetName - Returns Component Name.
+	* @return Returns toolpath part name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetUUID - Returns Component UUID.
+	* @return Returns toolpath part uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetLocalTransform - Returns Local Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in its component coordinate system.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetLocalTransform() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetAbsoluteTransform - Returns Transform of the Mesh.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetAbsoluteTransform() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSolidCount - Returns the number of solid meshes in the component.
+	* @return Model Count.
+	*/
+	virtual LibMCEnv_uint32 GetSolidCount() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSolidMesh - Returns a solid mesh of the component.
+	* @param[in] nIndex - Index of Solid Mesh. MUST be between 0 and SolidCount - 1.
+	* @return Solid Mesh. MUST be between 0 and ModelCount - 1.
+	*/
+	virtual IModelDataMeshInstance * GetSolidMesh(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSupportCount - Returns the number of support meshes in the component.
+	* @return Support Count.
+	*/
+	virtual LibMCEnv_uint32 GetSupportCount() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSupportMesh - Returns a support mesh of the component.
+	* @param[in] nIndex - Index of Support Mesh. MUST be between 0 and SupportCount - 1.
+	* @return Support Mesh. MUST be between 0 and ModelCount - 1.
+	*/
+	virtual IModelDataMeshInstance * GetSupportMesh(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSubComponentCount - Returns the number of subcomponents of the component.
+	* @return Subcomponent Count.
+	*/
+	virtual LibMCEnv_uint32 GetSubComponentCount() = 0;
+
+	/**
+	* IModelDataComponentInstance::GetSubComponent - Returns a subcomponent of the component.
+	* @param[in] nIndex - Index of Subcomponent. MUST be between 0 and SubComponentCount - 1.
+	* @return SubComponent. MUST be between 0 and ModelCount - 1.
+	*/
+	virtual IModelDataComponentInstance * GetSubComponent(const LibMCEnv_uint32 nIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<IModelDataComponentInstance> PIModelDataComponentInstance;
+
+
+/*************************************************************************************************************************
+ Class interface for MeshSceneItem 
+**************************************************************************************************************************/
+
+class IMeshSceneItem : public virtual IBase {
+public:
+	/**
+	* IMeshSceneItem::GetItemUUID - Returns the UUID of the scene item.
+	* @return Returns scene item uuid.
+	*/
+	virtual std::string GetItemUUID() = 0;
+
+	/**
+	* IMeshSceneItem::GetSceneUUID - Returns the UUID of the scene.
+	* @return Returns scene uuid.
+	*/
+	virtual std::string GetSceneUUID() = 0;
+
+	/**
+	* IMeshSceneItem::GetTransform - Returns the transform of the scene item.
+	* @return Returns the transform matrix of the mesh in the global world coordinate system.
+	*/
+	virtual LibMCEnv::sModelDataTransform GetTransform() = 0;
+
+	/**
+	* IMeshSceneItem::UpdateTransform - Updates the transform of the scene item.
+	* @param[in] AbsoluteTransform - The new transform matrix of the mesh in the global world coordinate system.
+	*/
+	virtual void UpdateTransform(const LibMCEnv::sModelDataTransform AbsoluteTransform) = 0;
+
+	/**
+	* IMeshSceneItem::GetMeshObject - Returns persistent mesh object.
+	* @return Returns a persistent mesh object of this scene.
+	*/
+	virtual IPersistentMeshObject * GetMeshObject() = 0;
+
+	/**
+	* IMeshSceneItem::ReferenceIsValid - Returns if the underlying mesh object exists.
+	* @return Returns a persistent mesh object of this scene.
+	*/
+	virtual bool ReferenceIsValid() = 0;
+
+};
+
+typedef IBaseSharedPtr<IMeshSceneItem> PIMeshSceneItem;
+
+
+/*************************************************************************************************************************
+ Class interface for MeshScene 
+**************************************************************************************************************************/
+
+class IMeshScene : public virtual IBase {
+public:
+	/**
+	* IMeshScene::GetSceneUUID - Returns the UUID of the scene.
+	* @return Returns scene uuid.
+	*/
+	virtual std::string GetSceneUUID() = 0;
+
+	/**
+	* IMeshScene::IsBoundToLoginSession - Returns if the scene object is bound to a specific login session.
+	* @return If true, the scene will be freed once the client login session expires.
+	*/
+	virtual bool IsBoundToLoginSession() = 0;
+
+	/**
+	* IMeshScene::AddSceneItem - Adds a persistent mesh to the scene.
+	* @param[in] pMesh - Mesh to add to the scene.
+	* @param[in] AbsoluteTransform - Transform matrix of the mesh in the global world coordinate system.
+	* @return The returned scene item.
+	*/
+	virtual IMeshSceneItem * AddSceneItem(IPersistentMeshObject* pMesh, const LibMCEnv::sModelDataTransform AbsoluteTransform) = 0;
+
+	/**
+	* IMeshScene::AddModelDataMeshAsSceneItem - Adds an instance from a ModelData component. Reuses underlying mesh data, if mesh has been persisted already. Registers new Persistent Mesh if necessary.
+	* @param[in] pModelDataMesh - Adds a mesh to the scene.
+	* @return The returned scene item.
+	*/
+	virtual IMeshSceneItem * AddModelDataMeshAsSceneItem(IModelDataMeshInstance* pModelDataMesh) = 0;
+
+	/**
+	* IMeshScene::GetSceneItemCount - Returns the number of scene items.
+	* @return Returns the number of scene items.
+	*/
+	virtual LibMCEnv_uint32 GetSceneItemCount() = 0;
+
+	/**
+	* IMeshScene::GetSceneItem - Returns a scene item by index.
+	* @param[in] nIndex - Index to retrieve. MUST be between 0 and SceneItemCount - 1
+	* @return The returned scene item.
+	*/
+	virtual IMeshSceneItem * GetSceneItem(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IMeshScene::FindSceneItem - Finds a scene item by UUID.
+	* @param[in] sUUID - UUID to retrieve.
+	* @param[in] bMustExist - If true, the call fails, if the UUID does not exist.
+	* @return The returned scene item. NULL, if MustExist is false and UUID does not exist.
+	*/
+	virtual IMeshSceneItem * FindSceneItem(const std::string & sUUID, const bool bMustExist) = 0;
+
+	/**
+	* IMeshScene::HasSceneItem - Checks if a scene item exists.
+	* @param[in] sUUID - UUID to retrieve.
+	* @return Returns true, if scene item UUID exists.
+	*/
+	virtual bool HasSceneItem(const std::string & sUUID) = 0;
+
+	/**
+	* IMeshScene::RemoveSceneItem - Removes a scene item from the scene.
+	* @param[in] pSceneItem - Scene Item to remove.
+	*/
+	virtual void RemoveSceneItem(IMeshSceneItem* pSceneItem) = 0;
+
+};
+
+typedef IBaseSharedPtr<IMeshScene> PIMeshScene;
+
+
+/*************************************************************************************************************************
+ Class interface for SceneHandler 
+**************************************************************************************************************************/
+
+class ISceneHandler : public virtual IBase {
+public:
+	/**
+	* ISceneHandler::MeshIsPersistent - Checks if a mesh uuid is registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Flag is registered.
+	*/
+	virtual bool MeshIsPersistent(const std::string & sMeshUUID) = 0;
+
+	/**
+	* ISceneHandler::FindPersistentMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
+	* @param[in] sMeshUUID - Mesh UUID to load.
+	* @return Mesh Object instance.
+	*/
+	virtual IPersistentMeshObject * FindPersistentMesh(const std::string & sMeshUUID) = 0;
+
+	/**
+	* ISceneHandler::CreateEmptyMeshScene - Creates an empty mesh scene object.
+	* @param[in] bBoundToLoginSession - Scene shall be freed when the current login session expires. Parameter is ignored, if not executed in a UIEnvironment context.
+	* @return Returns and register a scene instance.
+	*/
+	virtual IMeshScene * CreateEmptyMeshScene(const bool bBoundToLoginSession) = 0;
+
+	/**
+	* ISceneHandler::ReleaseMeshScene - Removes a mesh scene and removes all memory.
+	* @param[in] pSceneInstance - Returns and register a scene instance.
+	*/
+	virtual void ReleaseMeshScene(IMeshScene* pSceneInstance) = 0;
+
+	/**
+	* ISceneHandler::Load3MFFromResource - Loads a 3MF Resource into memory.
+	* @param[in] sResourceName - Resource name to load.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	virtual IModelDataComponentInstance * Load3MFFromResource(const std::string & sResourceName) = 0;
+
+	/**
+	* ISceneHandler::Load3MFFromMemory - Loads a 3MF from memory.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[in] pDataBuffer - Binary data to load.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	virtual IModelDataComponentInstance * Load3MFFromMemory(const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer) = 0;
+
+	/**
+	* ISceneHandler::Load3MFFromStream - Loads a 3MF from a StreamReader.
+	* @param[in] pReaderInstance - Stream reader instance.
+	* @return Contains the component hierarchy of the 3MF mesh. Memory will be freed once this component instance is freed.
+	*/
+	virtual IModelDataComponentInstance * Load3MFFromStream(IStreamReader* pReaderInstance) = 0;
+
+};
+
+typedef IBaseSharedPtr<ISceneHandler> PISceneHandler;
 
 
 /*************************************************************************************************************************
@@ -1482,16 +1934,10 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* IToolpathPart::GetMeshUUID - Returns Mesh UUID of the part.
-	* @return Returns toolpath part mesh uuid.
+	* IToolpathPart::GetRootComponent - Returns the Root Component of the part.
+	* @return Returns root component instance.
 	*/
-	virtual std::string GetMeshUUID() = 0;
-
-	/**
-	* IToolpathPart::GetTransform - Returns Mesh Transform of the part.
-	* @return Returns the mesh transform of the toolpath.
-	*/
-	virtual LibMCEnv::sToolpathPartTransform GetTransform() = 0;
+	virtual IModelDataComponentInstance * GetRootComponent() = 0;
 
 };
 
@@ -1730,6 +2176,13 @@ public:
 	* @return Segment Part UUID
 	*/
 	virtual std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentLocalPartID - Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Local Part ID of the segment
+	*/
+	virtual LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentPointData - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
@@ -1973,6 +2426,22 @@ public:
 	*/
 	virtual IXMLDocumentNode * FindUniqueMetaData(const std::string & sNamespace, const std::string & sName) = 0;
 
+	/**
+	* IToolpathAccessor::HasBinaryMetaData - Checks if a binary metadata exists in the build file with a certain path.
+	* @param[in] sIdentifier - Identifier of the binary metadata
+	* @return Returns if the metadata exists.
+	*/
+	virtual bool HasBinaryMetaData(const std::string & sIdentifier) = 0;
+
+	/**
+	* IToolpathAccessor::GetBinaryMetaData - Returns a binary metadata of the build file. Fails if binary metadata does not exist.
+	* @param[in] sIdentifier - Identifier of the binary metadata
+	* @param[in] nMetaDataBufferSize - Number of elements in buffer
+	* @param[out] pMetaDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pMetaDataBuffer - uint8 buffer of Returns the content of the binary binary data.
+	*/
+	virtual void GetBinaryMetaData(const std::string & sIdentifier, LibMCEnv_uint64 nMetaDataBufferSize, LibMCEnv_uint64* pMetaDataNeededCount, LibMCEnv_uint8 * pMetaDataBuffer) = 0;
+
 };
 
 typedef IBaseSharedPtr<IToolpathAccessor> PIToolpathAccessor;
@@ -2103,70 +2572,142 @@ public:
 	virtual LibMCEnv_uint64 GetElapsedTimeInMicroseconds() = 0;
 
 	/**
-	* IBuildExecution::AddBinaryData - Adds binary data to store with the build.
+	* IBuildExecution::HasAttachment - Returns if the Execution has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachment(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildExecution::HasAttachmentIdentifier - Returns if the Execution has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachmentIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
+	* IBuildExecution::AddBinaryData - Adds binary data to store with the build execution.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
 
 	/**
-	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* IBuildExecution::AttachTempStream - Attaches a temp stream to the build execution.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attached data
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
+	* @param[in] pStreamWriterInstance - Stream to attach to the build.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance) = 0;
+
+	/**
+	* IBuildExecution::LoadStreamByIdentifier - Loads stream of the build execution by attachment identifier.
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist.
+	* @return Reader class to access the stream.
+	*/
+	virtual IStreamReader * LoadStreamByIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
+	* IBuildExecution::LoadStreamByUUID - Loads stream of the build by attachment UUID.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
+	* @return Reader class to access the stream.
+	*/
+	virtual IStreamReader * LoadStreamByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuildExecution::LoadDiscreteField2DByIdentifier - Loads a discrete field by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
-	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier) = 0;
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* IBuildExecution::LoadDiscreteField2DByUUID - Loads a discrete field by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-discretefield2d.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
 	virtual IDiscreteFieldData2D * LoadDiscreteField2DByUUID(const std::string & sDataUUID) = 0;
 
 	/**
-	* IBuildExecution::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* IBuildExecution::StoreDiscreteField2D - Stores a discrete field in the build execution. MIME Type will be application/amcf-discretefield2d.
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if identifier already exists or is invalid.
+	* @param[in] sName - Human Readable name of the attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+	virtual std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
-	* IBuildExecution::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-	* @return Image data instance.
+	* IBuildExecution::LoadDataTableByIdentifier - Loads a data table by attachment identifier which was previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
+	* @param[in] sIdentifier - Unique name of the build execution attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Loaded data table instance.
 	*/
-	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) = 0;
+	virtual IDataTable * LoadDataTableByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuildExecution::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* IBuildExecution::LoadDataTableByUUID - Loads a data table by attachment uuid which previously stored in the build execution. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
-	* @return Image data instance.
+	* @return Loaded data table instance.
 	*/
-	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) = 0;
+	virtual IDataTable * LoadDataTableByUUID(const std::string & sDataUUID) = 0;
 
 	/**
-	* IBuildExecution::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* IBuildExecution::StoreDataTable - Stores a data table in the build execution. MIME Type will be application/amcf-datatable.
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if identifier already exists or is invalid.
+	* @param[in] sName - Human Readable name of the attachment.
+	* @param[in] pFieldDataInstance - Field instance to store.
+	* @param[in] pStoreOptions - Data Table Write Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string & sUserUUID) = 0;
+
+	/**
+	* IBuildExecution::LoadPNGImageByIdentifier - Loads a PNG image by attachment identifier which was previously stored in the build execution. MIME Type MUST be image/png.
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IBuildExecution::LoadPNGImageByUUID - Loads a PNG image by attachment uuid which was previously stored in the build execution. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IBuildExecution::StorePNGImage - Stores a PNG image in the build job. MIME Type will be image/png
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sName - Unique name of the attachment. Fails if name does not exist or has invalid Mime type.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+	virtual std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
-	* IBuildExecution::AddMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* IBuildExecution::StoreMetaDataString - Adds a metadata string to a build execution. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	*/
-	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+	virtual void StoreMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
 
 	/**
 	* IBuildExecution::HasMetaDataString - Checks if a metadata string exists.
@@ -2181,6 +2722,12 @@ public:
 	* @return Return value.
 	*/
 	virtual std::string GetMetaDataString(const std::string & sKey) = 0;
+
+	/**
+	* IBuildExecution::LoadAttachedJournal - Loads the journal that is associated with the build execution and returns an accessor instance.
+	* @return Journal instance.
+	*/
+	virtual IJournalHandler * LoadAttachedJournal() = 0;
 
 };
 
@@ -2254,7 +2801,7 @@ public:
 	virtual LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) = 0;
 
 	/**
-	* IBuild::LoadToolpath - loads the a toolpath into memory
+	* IBuild::LoadToolpath - loads the a toolpath into memory. Does nothing if toolpath has already been loaded.
 	*/
 	virtual void LoadToolpath() = 0;
 
@@ -2276,22 +2823,61 @@ public:
 	virtual IToolpathAccessor * CreateToolpathAccessor() = 0;
 
 	/**
+	* IBuild::HasAttachment - Returns if the Build has an attached data with a certain UUID
+	* @param[in] sDataUUID - Data UUID of the attachment to query. 
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachment(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuild::HasAttachmentIdentifier - Returns if the Build has an attached data with a certain identifier
+	* @param[in] sIdentifier - Identifier of the attachment to query.
+	* @return Returns true if the data exists.
+	*/
+	virtual bool HasAttachmentIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
 	* IBuild::AddBinaryData - Adds binary data to store with the build.
 	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
 	* @param[in] sName - Name of the attache data
 	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @param[in] nContentBufferSize - Number of elements in buffer
 	* @param[in] pContentBuffer - Stream content to store
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+	virtual std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const std::string & sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
 
 	/**
-	* IBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* IBuild::AttachTempStream - Attaches a temp stream to the build.
+	* @param[in] sIdentifier - Unique identifier of the attached data. Fails if ther already exists a binary data with the equal identifier.
+	* @param[in] sName - Name of the attached data
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
+	* @param[in] pStreamWriterInstance - Stream to attach to the build.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string AttachTempStream(const std::string & sIdentifier, const std::string & sName, const std::string & sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance) = 0;
+
+	/**
+	* IBuild::LoadStreamByIdentifier - Loads stream of the build by identifier.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist.
+	* @return Reader class to access the stream.
+	*/
+	virtual IStreamReader * LoadStreamByIdentifier(const std::string & sIdentifier) = 0;
+
+	/**
+	* IBuild::LoadStreamByUUID - Loads stream of the build by attachment UUID.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if uuid does not exist.
+	* @return Reader class to access the stream.
+	*/
+	virtual IStreamReader * LoadStreamByUUID(const std::string & sDataUUID) = 0;
+
+	/**
+	* IBuild::LoadDiscreteField2DByIdentifier - Loads a discrete field by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
 	* @return Loaded field instance.
 	*/
-	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier) = 0;
+	virtual IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
 	* IBuild::LoadDiscreteField2DByUUID - Loads a discrete field by uuid which previously stored in the build job. MIME Type MUST be application/amcf-discretefield2d.
@@ -2302,37 +2888,70 @@ public:
 
 	/**
 	* IBuild::StoreDiscreteField2D - Stores a discrete field in the build job. MIME Type will be application/amcf-discretefield2d.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if identifier already exists or is invalid.
+	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pFieldDataInstance - Field instance to store.
 	* @param[in] pStoreOptions - Field Data Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) = 0;
+	virtual std::string StoreDiscreteField2D(const std::string & sIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
-	* IBuild::LoadPNGImageByIdentifier - Loads a discrete field by context identifier which was previously stored in the build job. MIME Type MUST be image/png.
-	* @param[in] sContextIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
-	* @return Image data instance.
+	* IBuild::LoadDataTableByIdentifier - Loads a data table by identifier which was previously stored in the build job. MIME Type MUST be application/amcf-datatable.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @return Data Table instance.
 	*/
-	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) = 0;
+	virtual IDataTable * LoadDataTableByIdentifier(const std::string & sIdentifier) = 0;
 
 	/**
-	* IBuild::LoadPNGImageByUUID - Loads a discrete field by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* IBuild::LoadDataTableByUUID - Loads a data table by uuid which previously stored in the build job. MIME Type MUST be application/amcf-datatable.
 	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
-	* @return Image data instance.
+	* @return Data Table instance.
 	*/
-	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) = 0;
+	virtual IDataTable * LoadDataTableByUUID(const std::string & sDataUUID) = 0;
 
 	/**
-	* IBuild::StorePNGImage - Stores a discrete field in the build job. MIME Type will be image/png
-	* @param[in] sContextIdentifier - Unique name of the attachment. Fails if name does already exist or has invalid Mime type.
-	* @param[in] sName - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* IBuild::StoreDataTable - Stores a data table in the build job. MIME Type will be application/amcf-datatable.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if identifier already exists or is invalid.
+	* @param[in] sName - Unique name of the build attachment.
+	* @param[in] pDataTableInstance - Data Table instance to store.
+	* @param[in] pStoreOptions - Data Table Write Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string StoreDataTable(const std::string & sIdentifier, const std::string & sName, IDataTable* pDataTableInstance, IDataTableWriteOptions* pStoreOptions, const std::string & sUserUUID) = 0;
+
+	/**
+	* IBuild::LoadPNGImageByIdentifier - Loads a PNG image by identifier which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sIdentifier - Unique name of the build attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByIdentifier(const std::string & sIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IBuild::LoadPNGImageByUUID - Loads a PNG image by uuid which was previously stored in the build job. MIME Type MUST be image/png.
+	* @param[in] sDataUUID - Data UUID of the attachment. Fails if name does not exist or has invalid Mime type.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image data instance.
+	*/
+	virtual IImageData * LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IBuild::StorePNGImage - Stores a PNG Image in the build job. MIME Type will be image/png
+	* @param[in] sIdentifier - Unique name of the attachment. Fails if identifier does already exist or is invalid.
+	* @param[in] sName - Unique name of the build attachment.
 	* @param[in] pImageDataInstance - Image data instance.
 	* @param[in] pStoreOptions - PNG Store Options.
+	* @param[in] sUserUUID - User UUID of the user that this data comes from. Empty string means no user attached.
 	* @return Data UUID of the attachment.
 	*/
-	virtual std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) = 0;
+	virtual std::string StorePNGImage(const std::string & sIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions, const std::string & sUserUUID) = 0;
 
 	/**
 	* IBuild::StartExecution - Starts a build execution. This function does not work in a UIEnvironment context!
@@ -2372,11 +2991,11 @@ public:
 	virtual IBuildExecutionIterator * ListExecutionsByStatus(const LibMCEnv::eBuildExecutionStatus eExecutionStatus, const bool bOnlyCurrentJournalSession) = 0;
 
 	/**
-	* IBuild::AddMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
+	* IBuild::StoreMetaDataString - Adds a metadata string to a build. Meta data can only be added once. Deletion is not supported by purpose and MUST be avoided by the system design.
 	* @param[in] sKey - Unique key of value. MUST NOT be empty. MUST consist of alphanumeric characters or hyphen or underscore. Fails if Key already exists.
 	* @param[in] sValue - Value to store.
 	*/
-	virtual void AddMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
+	virtual void StoreMetaDataString(const std::string & sKey, const std::string & sValue) = 0;
 
 	/**
 	* IBuild::HasMetaDataString - Checks if a metadata string exists.
@@ -3800,10 +4419,49 @@ public:
 	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
+	* IDriverEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	virtual bool HasBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IDriverEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	virtual IBuildExecution * GetBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
 	* IDriverEnvironment::CreateCryptoContext - Creates a crypto context.
 	* @return Cryptographic context instance
 	*/
 	virtual ICryptoContext * CreateCryptoContext() = 0;
+
+	/**
+	* IDriverEnvironment::GetCurrentDateTime - Returns the current time as DateTime object instance.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetCurrentDateTime() = 0;
+
+	/**
+	* IDriverEnvironment::GetCustomDateTime - Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+	* @param[in] nYear - Year. Must be larger or equal than 1970.
+	* @param[in] nMonth - Month. Must be between 1 and 12.
+	* @param[in] nDay - Day. Must be between 1 and 31.
+	* @param[in] nHour - Hour. Must be between 0 and 23.
+	* @param[in] nMinute - Minute. Must be between 0 and 59.
+	* @param[in] nSecond - Second. Must be between 0 and 59.
+	* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond) = 0;
+
+	/**
+	* IDriverEnvironment::GetStartDateTime - Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetStartDateTime() = 0;
 
 };
 
@@ -4032,35 +4690,63 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 
 
 /*************************************************************************************************************************
- Class interface for TempStreamWriter 
+ Class interface for BaseTempStreamWriter 
 **************************************************************************************************************************/
 
-class ITempStreamWriter : public virtual IBase {
+class IBaseTempStreamWriter : public virtual IBase {
 public:
 	/**
-	* ITempStreamWriter::GetUUID - Returns the UUID of the stream.
+	* IBaseTempStreamWriter::GetUUID - Returns the UUID of the stream.
 	* @return Returns stream uuid.
 	*/
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* ITempStreamWriter::GetName - Returns the name of the stream.
+	* IBaseTempStreamWriter::GetName - Returns the name of the stream.
 	* @return Returns stream name.
 	*/
 	virtual std::string GetName() = 0;
 
 	/**
-	* ITempStreamWriter::GetMIMEType - Returns the MIME type of the stream.
+	* IBaseTempStreamWriter::GetMIMEType - Returns the MIME type of the stream.
 	* @return Returns stream MIME Type.
 	*/
 	virtual std::string GetMIMEType() = 0;
 
 	/**
-	* ITempStreamWriter::GetSize - Returns the current size of the stream.
+	* IBaseTempStreamWriter::GetSize - Returns the current size of the stream.
 	* @return Current size of the stream.
 	*/
 	virtual LibMCEnv_uint64 GetSize() = 0;
 
+	/**
+	* IBaseTempStreamWriter::Finish - Finishes the stream writing. All subsequent write attempts will fail. Fails if stream has been finished already.
+	*/
+	virtual void Finish() = 0;
+
+	/**
+	* IBaseTempStreamWriter::IsFinished - Returns if the stream writing has already been finished.
+	* @return If true, writing into the stream is not possible anymore.
+	*/
+	virtual bool IsFinished() = 0;
+
+	/**
+	* IBaseTempStreamWriter::GetStreamReader - Creates a stream reader on this stream. This call will finish the stream writing should it not be finished.
+	* @return Stream reader instance.
+	*/
+	virtual IStreamReader * GetStreamReader() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBaseTempStreamWriter> PIBaseTempStreamWriter;
+
+
+/*************************************************************************************************************************
+ Class interface for TempStreamWriter 
+**************************************************************************************************************************/
+
+class ITempStreamWriter : public virtual IBaseTempStreamWriter {
+public:
 	/**
 	* ITempStreamWriter::GetWritePosition - Returns the current write position of the stream.
 	* @return Current write position of the stream.
@@ -4069,15 +4755,9 @@ public:
 
 	/**
 	* ITempStreamWriter::Seek - Moves the current write position to a certain address. New position MUST be smaller or equal the stream size.
-	* @param[in] nWritePosition - New write position of the stream.
+	* @param[in] nWritePosition - New write position of the stream. If Temp stream is living in a ZIP Writer, seeking is not possible.
 	*/
 	virtual void Seek(const LibMCEnv_uint64 nWritePosition) = 0;
-
-	/**
-	* ITempStreamWriter::IsFinished - Returns if the stream writing has been finished.
-	* @return Returns true if writing is finished.
-	*/
-	virtual bool IsFinished() = 0;
 
 	/**
 	* ITempStreamWriter::WriteData - Writes a data array into the stream. Fails if stream has been finished. Will enlarge stream if writing outside of the current size.
@@ -4099,13 +4779,39 @@ public:
 	virtual void WriteLine(const std::string & sLine) = 0;
 
 	/**
-	* ITempStreamWriter::Finish - Finishes the stream writing. Fails if stream has been finished already.
+	* ITempStreamWriter::CopyFrom - Copies the full content of a StreamReader Instance.
+	* @param[in] pStreamReader - Stream to read from.
 	*/
-	virtual void Finish() = 0;
+	virtual void CopyFrom(IStreamReader* pStreamReader) = 0;
 
 };
 
 typedef IBaseSharedPtr<ITempStreamWriter> PITempStreamWriter;
+
+
+/*************************************************************************************************************************
+ Class interface for ZIPStreamWriter 
+**************************************************************************************************************************/
+
+class IZIPStreamWriter : public virtual IBaseTempStreamWriter {
+public:
+	/**
+	* IZIPStreamWriter::CreateZIPEntry - Creates a new ZIP entry in the ZIP file. All currently open ZIP Entry streams will be finished and closed.
+	* @param[in] sFileName - File Name for the new entry in the ZIP file. Entry MUST not exist yet.
+	* @return Returns temp stream to write into.
+	*/
+	virtual ITempStreamWriter * CreateZIPEntry(const std::string & sFileName) = 0;
+
+	/**
+	* IZIPStreamWriter::CreateZIPEntryFromStream - Adds the full content of a StreamReader Instance.
+	* @param[in] sFileName - File Name for the new entry in the ZIP file. Entry MUST not exist yet.
+	* @param[in] pStreamReader - Stream to read from.
+	*/
+	virtual void CreateZIPEntryFromStream(const std::string & sFileName, IStreamReader* pStreamReader) = 0;
+
+};
+
+typedef IBaseSharedPtr<IZIPStreamWriter> PIZIPStreamWriter;
 
 
 /*************************************************************************************************************************
@@ -4365,20 +5071,20 @@ public:
 	virtual IDateTime * GetAcknowledgementTime() = 0;
 
 	/**
-	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. 
+	* IAlert::AcknowledgeForUser - Acknowledges an alert for a specific user and sets it inactive. Fails if Alert is read from an archived journal.
 	* @param[in] sUserUUID - UUID of the user to acknowledge. Fails if user does not exist.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
 	virtual void AcknowledgeForUser(const std::string & sUserUUID, const std::string & sUserComment) = 0;
 
 	/**
-	* IAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information.
+	* IAlert::AcknowledgeAlertForCurrentUser - Acknowledges an alert for the current user and sets it inactive. Only works if the Alert Instance was created from a UIEnvironment. StateEnvironments do not have login information. Fails if Alert is read from an archived journal.
 	* @param[in] sUserComment - User comment to store. May be empty.
 	*/
 	virtual void AcknowledgeAlertForCurrentUser(const std::string & sUserComment) = 0;
 
 	/**
-	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user.
+	* IAlert::DeactivateAlert - Sets an alert inactive. It will not be marked as acknowledged by a certain user. Fails if Alert is read from an archived journal.
 	*/
 	virtual void DeactivateAlert() = 0;
 
@@ -4402,6 +5108,40 @@ public:
 };
 
 typedef IBaseSharedPtr<IAlertIterator> PIAlertIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for LogEntryList 
+**************************************************************************************************************************/
+
+class ILogEntryList : public virtual IBase {
+public:
+	/**
+	* ILogEntryList::GetCount - Returns the number of log entries in the list.
+	* @return Number of log entries.
+	*/
+	virtual LibMCEnv_uint32 GetCount() = 0;
+
+	/**
+	* ILogEntryList::GetEntry - Returns the a log entry of the list.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @param[out] sMessage - Message of the log entry.
+	* @param[out] sSubSystem - Subsystem of the log entry.
+	* @param[out] nLogID - ID of the log entry.
+	* @param[out] eLogLevel - Level of the log entry.
+	*/
+	virtual void GetEntry(const LibMCEnv_uint32 nIndex, std::string & sMessage, std::string & sSubSystem, LibMCEnv_uint32 & nLogID, LibMCEnv::eLogLevel & eLogLevel) = 0;
+
+	/**
+	* ILogEntryList::GetEntryTime - Returns the time stamp of an entry.
+	* @param[in] nIndex - Index of entry to retrieve. 0-based. Fails if larger or equal to Count.
+	* @return Date Time object of the entry.
+	*/
+	virtual IDateTime * GetEntryTime(const LibMCEnv_uint32 nIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<ILogEntryList> PILogEntryList;
 
 
 /*************************************************************************************************************************
@@ -4432,6 +5172,38 @@ public:
 	* @return DateTime Instance
 	*/
 	virtual IDateTime * GetStartTime() = 0;
+
+	/**
+	* IJournalHandler::RetrieveLogEntries - Retrieves the current log entries of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	virtual ILogEntryList * RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel & eMinLogLevel) = 0;
+
+	/**
+	* IJournalHandler::RetrieveLogEntriesFromTimeInterval - Retrieves the log entries of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[out] eMinLogLevel - Only entries with a log level that is higher than the given one are returned.
+	* @return Log Entry Instance.
+	*/
+	virtual ILogEntryList * RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel & eMinLogLevel) = 0;
+
+	/**
+	* IJournalHandler::RetrieveAlerts - Retrieves the alerts of the journal.
+	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
+	* @return Alert Iterator Instance.
+	*/
+	virtual IAlertIterator * RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) = 0;
+
+	/**
+	* IJournalHandler::RetrieveAlertsFromTimeInterval - Retrieves the alerts of the journal over the given time interval.
+	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
+	* @return Alert Iterator Instance.
+	*/
+	virtual IAlertIterator * RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
 
 };
 
@@ -4758,6 +5530,20 @@ public:
 	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
+	* IStateEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	virtual bool HasBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IStateEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	virtual IBuildExecution * GetBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
 	* IStateEnvironment::UnloadAllToolpathes - unloads all toolpath in memory to clean up
 	*/
 	virtual void UnloadAllToolpathes() = 0;
@@ -4973,40 +5759,65 @@ public:
 	virtual LibMCEnv_uint64 GetGlobalTimerInMicroseconds() = 0;
 
 	/**
-	* IStateEnvironment::GetStartTimeOfStateInMilliseconds - Returns the global start time of the current state in milliseconds.
+	* IStateEnvironment::GetStartTimeOfStateInMilliseconds - Returns the global start timer of the current state in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
 	virtual LibMCEnv_uint64 GetStartTimeOfStateInMilliseconds() = 0;
 
 	/**
-	* IStateEnvironment::GetStartTimeOfStateInMicroseconds - Returns the global start time of the current state in microseconds.
+	* IStateEnvironment::GetStartTimeOfStateInMicroseconds - Returns the global start timer of the current state in microseconds.
 	* @return Timer value in Milliseconds
 	*/
 	virtual LibMCEnv_uint64 GetStartTimeOfStateInMicroseconds() = 0;
 
 	/**
-	* IStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds - Returns the global finish time of the previous state in microseconds.
+	* IStateEnvironment::GetEndTimeOfPreviousStateInMicroseconds - Returns the global finish timer of the previous state in microseconds.
 	* @return Timer value in Microseconds
 	*/
 	virtual LibMCEnv_uint64 GetEndTimeOfPreviousStateInMicroseconds() = 0;
 
 	/**
-	* IStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds - Returns the global finish time of the previous state in milliseconds.
+	* IStateEnvironment::GetEndTimeOfPreviousStateInMilliseconds - Returns the global finish timer of the previous state in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
 	virtual LibMCEnv_uint64 GetEndTimeOfPreviousStateInMilliseconds() = 0;
 
 	/**
-	* IStateEnvironment::GetElapsedTimeInStateInMilliseconds - Returns the global finish time of the previous state in milliseconds.
+	* IStateEnvironment::GetElapsedTimeInStateInMilliseconds - Returns the global finish timer of the previous state in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
 	virtual LibMCEnv_uint64 GetElapsedTimeInStateInMilliseconds() = 0;
 
 	/**
-	* IStateEnvironment::GetElapsedTimeInStateInMicroseconds - Returns the global finish time of the previous state in microseconds.
+	* IStateEnvironment::GetElapsedTimeInStateInMicroseconds - Returns the global finish timer of the previous state in microseconds.
 	* @return Timer value in Microseconds
 	*/
 	virtual LibMCEnv_uint64 GetElapsedTimeInStateInMicroseconds() = 0;
+
+	/**
+	* IStateEnvironment::GetCurrentDateTime - Returns the current time as DateTime object instance.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetCurrentDateTime() = 0;
+
+	/**
+	* IStateEnvironment::GetCustomDateTime - Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+	* @param[in] nYear - Year. Must be larger or equal than 1970.
+	* @param[in] nMonth - Month. Must be between 1 and 12.
+	* @param[in] nDay - Day. Must be between 1 and 31.
+	* @param[in] nHour - Hour. Must be between 0 and 23.
+	* @param[in] nMinute - Minute. Must be between 0 and 59.
+	* @param[in] nSecond - Second. Must be between 0 and 59.
+	* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond) = 0;
+
+	/**
+	* IStateEnvironment::GetStartDateTime - Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetStartDateTime() = 0;
 
 	/**
 	* IStateEnvironment::GetTestEnvironment - Returns a test environment instance.
@@ -5064,25 +5875,10 @@ public:
 	virtual IJournalHandler * GetCurrentJournal() = 0;
 
 	/**
-	* IStateEnvironment::RegisterMeshFrom3MFResource - Loads a from a 3MF Resource File. If 3MF contains multiple objects, it will merge them into one mesh.
-	* @param[in] sResourceName - Resource name to load.
-	* @return Mesh Object instance.
+	* IStateEnvironment::CreateSceneHandler - Creates a new 3D scene handler instance.
+	* @return Scene Handler instance.
 	*/
-	virtual IMeshObject * RegisterMeshFrom3MFResource(const std::string & sResourceName) = 0;
-
-	/**
-	* IStateEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Flag is registered.
-	*/
-	virtual bool MeshIsRegistered(const std::string & sMeshUUID) = 0;
-
-	/**
-	* IStateEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
-	*/
-	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+	virtual ISceneHandler * CreateSceneHandler() = 0;
 
 	/**
 	* IStateEnvironment::CreateDataSeries - Creates a new empty data series object.
@@ -5172,12 +5968,19 @@ public:
 	virtual ITempStreamWriter * CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType) = 0;
 
 	/**
-	* IStateEnvironment::FindStream - Finds a stream in the storage system.
+	* IStateEnvironment::CreateZIPStream - Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip
+	* @param[in] sName - Name of the storage stream.
+	* @return ZIP stream writer instance
+	*/
+	virtual IZIPStreamWriter * CreateZIPStream(const std::string & sName) = 0;
+
+	/**
+	* IStateEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	virtual IStreamReader * FindStream(const std::string & sUUID, const bool bMustExist) = 0;
+	virtual IStreamReader * LoadStream(const std::string & sUUID, const bool bMustExist) = 0;
 
 };
 
@@ -5541,6 +6344,20 @@ public:
 	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
+	* IUIEnvironment::HasBuildExecution - Returns if a build execution exists. Fails if ExecutionUUID is not a valid UUID string.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Returns true if execution exists
+	*/
+	virtual bool HasBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IUIEnvironment::GetBuildExecution - Returns a instance of a build execution object. Fails if build execution uuid does not exist.
+	* @param[in] sExecutionUUID - UUID of the execution entity.
+	* @return Build execution instance
+	*/
+	virtual IBuildExecution * GetBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
 	* IUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
 	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
 	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
@@ -5614,26 +6431,10 @@ public:
 	virtual IJournalHandler * GetCurrentJournal() = 0;
 
 	/**
-	* IUIEnvironment::RegisterMeshFrom3MFResource - Loads a mesh from a 3MF Resource File. Fails if mesh UUID is already registered.
-	* @param[in] sResourceName - Resource name to load.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
+	* IUIEnvironment::CreateSceneHandler - Creates a new 3D scene handler instance.
+	* @return Scene Handler instance.
 	*/
-	virtual IMeshObject * RegisterMeshFrom3MFResource(const std::string & sResourceName, const std::string & sMeshUUID) = 0;
-
-	/**
-	* IUIEnvironment::MeshIsRegistered - Checks if a mesh uuid is registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Flag is registered.
-	*/
-	virtual bool MeshIsRegistered(const std::string & sMeshUUID) = 0;
-
-	/**
-	* IUIEnvironment::FindRegisteredMesh - Finds a registered mesh by its UUID. Fails if mesh UUID is not registered.
-	* @param[in] sMeshUUID - Mesh UUID to load.
-	* @return Mesh Object instance.
-	*/
-	virtual IMeshObject * FindRegisteredMesh(const std::string & sMeshUUID) = 0;
+	virtual ISceneHandler * CreateSceneHandler() = 0;
 
 	/**
 	* IUIEnvironment::CreateDataSeries - Creates a new empty data series object.
@@ -5724,12 +6525,50 @@ public:
 	virtual ITempStreamWriter * CreateTemporaryStream(const std::string & sName, const std::string & sMIMEType) = 0;
 
 	/**
-	* IUIEnvironment::FindStream - Finds a stream in the storage system.
+	* IUIEnvironment::CreateZIPStream - Creates a new ZIP writer to store temporary data. This data will be attached to the current journal. MIME Type will be application/zip
+	* @param[in] sName - Name of the storage stream.
+	* @return ZIP stream writer instance
+	*/
+	virtual IZIPStreamWriter * CreateZIPStream(const std::string & sName) = 0;
+
+	/**
+	* IUIEnvironment::LoadStream - Loads a stream in the storage system.
 	* @param[in] sUUID - UUID of the storage stream.
 	* @param[in] bMustExist - If true, the call fails if the stream does not exist.
 	* @return Stream Instance. Will return null if not found and MustExists is false.
 	*/
-	virtual IStreamReader * FindStream(const std::string & sUUID, const bool bMustExist) = 0;
+	virtual IStreamReader * LoadStream(const std::string & sUUID, const bool bMustExist) = 0;
+
+	/**
+	* IUIEnvironment::GetCurrentDateTime - Returns the current time as DateTime object instance.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetCurrentDateTime() = 0;
+
+	/**
+	* IUIEnvironment::GetCustomDateTime - Returns a custom time as DateTime object instance. Fails if the values are not a valid time from January first 1970 to year 1 million.
+	* @param[in] nYear - Year. Must be larger or equal than 1970.
+	* @param[in] nMonth - Month. Must be between 1 and 12.
+	* @param[in] nDay - Day. Must be between 1 and 31.
+	* @param[in] nHour - Hour. Must be between 0 and 23.
+	* @param[in] nMinute - Minute. Must be between 0 and 59.
+	* @param[in] nSecond - Second. Must be between 0 and 59.
+	* @param[in] nMicrosecond - Microsecond. Must be between 0 and 999999.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond) = 0;
+
+	/**
+	* IUIEnvironment::GetStartDateTime - Returns the startup time of the system as DateTime object instance. All Timer values are counted from there.
+	* @return Date Time Instance.
+	*/
+	virtual IDateTime * GetStartDateTime() = 0;
+
+	/**
+	* IUIEnvironment::Sleep - Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
 
 };
 

@@ -168,22 +168,63 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
         if (m_pRTCSelector.get() != nullptr)
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYINITIALIZED);
 
-        m_pRTCContext = nullptr;
+        bool bSuccess = false;
+        uint32_t nNumberOfRetries = SCANLAB_DEFAULTTIMEOUT_RETRIESPERRTCCARD * 1;
+        while ((!bSuccess) && (nNumberOfRetries > 0)) {
 
-        m_pRTCSelector = act_managed_ptr<IRTCSelector>(CreateRTCSelector());
+            nNumberOfRetries--;
 
-        if (sIP.empty()) {
-            m_pRTCContext = act_managed_ptr<IRTCContext>(m_pRTCSelector->AcquireCardBySerial(nSerialNumber));
+            try {
+
+                m_pRTCContext = nullptr;
+
+                m_pRTCSelector = act_managed_ptr<IRTCSelector>(CreateRTCSelector());
+
+                if (sIP.empty()) {
+                    m_pRTCContext = act_managed_ptr<IRTCContext>(m_pRTCSelector->AcquireCardBySerial(nSerialNumber));
+                    bSuccess = true;
+                }
+                else {
+                    uint32_t nCardCount = m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
+                    if (nCardCount == 0)
+                        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS, "No Card found at IP Address: " + sIP);
+
+                    auto pContext = m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber);
+                    m_pRTCContext = act_managed_ptr<IRTCContext>(pContext);
+
+                    auto pContextInstance = dynamic_cast<CRTCContext*> (pContext);
+                    if (pContextInstance != nullptr)
+                        pContextInstance->setIPAddress(sIP, sNetmask);
+
+                    bSuccess = true;
+                }
+
+            }
+            catch (ELibMCDriver_ScanLabInterfaceException& E) {
+                uint32_t nErrorCode = E.getErrorCode();
+                if ((nErrorCode == LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER) ||
+                    (nErrorCode == LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS) ||
+                    (nErrorCode == LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE)) {
+                    // Only retry if serial numbers could not be determined....
+
+                    m_pDriverEnvironment->LogWarning("RTC Initialization error: " + std::string (E.what ()));
+                    m_pDriverEnvironment->LogWarning("Retrying... " + std::to_string (nNumberOfRetries) + " remaining...");
+                    m_pDriverEnvironment->Sleep(SCANLAB_DEFAULTTIMEOUT_RETRYDELAYINMILLISECONDS);
+
+                    m_pRTCContext = nullptr;
+                    m_pRTCSelector = nullptr;
+
+                    m_pScanLabSDK->reinitDLL();
+                }
+                else {
+                    throw;
+                }
+            }
+
         }
-        else {
-            m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
-            auto pContext = m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber);
-            m_pRTCContext = act_managed_ptr<IRTCContext>(pContext);
-            
-            auto pContextInstance = dynamic_cast<CRTCContext*> (pContext);
-            if (pContextInstance != nullptr)
-                pContextInstance->setIPAddress(sIP, sNetmask);
-        }
+
+        if (!bSuccess)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD);
 
         uint32_t nRTCVersion = 0;
         uint32_t nRTCType = 0;
@@ -514,11 +555,14 @@ void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession
 
 void CDriver_ScanLab_RTC6::SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
 {
-    if (!m_SimulationMode) {
-        if (m_pRTCContext.get() == nullptr)
-            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+    m_dDefaultInitialTimeout = dInitialTimeout;
+    m_dDefaultMaxTimeout = dMaxTimeout;
+    m_dDefaultMultiplier = dMultiplier;
 
-        m_pRTCContext->SetCommunicationTimeouts (dInitialTimeout, dMaxTimeout, dMultiplier);
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() != nullptr) {
+            m_pRTCContext->SetCommunicationTimeouts(dInitialTimeout, dMaxTimeout, dMultiplier);
+        }
     }
 }
 
@@ -532,13 +576,20 @@ void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& 
 
     }
     else {
-        dInitialTimeout = 0.75;
-        dMaxTimeout = 20.0;
-        dMultiplier = 1.3;
+        dInitialTimeout = m_dDefaultInitialTimeout;
+        dMaxTimeout = m_dDefaultMaxTimeout;
+        dMultiplier = m_dDefaultMultiplier;
     }
 
 }
 
+void CDriver_ScanLab_RTC6::GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier)
+{
+    dInitialTimeout = m_dDefaultInitialTimeout;
+    dMaxTimeout = m_dDefaultMaxTimeout;
+    dMultiplier = m_dDefaultMultiplier;
+
+}
 
 void CDriver_ScanLab_RTC6::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
 {

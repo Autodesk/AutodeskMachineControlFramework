@@ -271,6 +271,18 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID 10174 /** Date Time difference is invalid */
 #define LIBMCENV_ERROR_DATETIMEISINVALID 10175 /** Date Time is invalid */
 #define LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS 10176 /** Date Time out of bounds */
+#define LIBMCENV_ERROR_EMPTYPNGBUFFER 10177 /** Empty PNG buffer */
+#define LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM 10178 /** Cannot seek ZIP stream */
+#define LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS 10179 /** Global Timer is not continuous. */
+#define LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED 10180 /** Stream writer is not finished */
+#define LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM 10181 /** Cannot read from ZIP stream */
+#define LIBMCENV_ERROR_EMPTYDATATABLENAME 10182 /** Empty datatable name */
+#define LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER 10183 /** Empty datatable identifier */
+#define LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER 10184 /** Invalid datatable identifier */
+#define LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE 10185 /** Invalid datatable signature */
+#define LIBMCENV_ERROR_INVALIDSUPPORTINDEX 10186 /** Invalid support index */
+#define LIBMCENV_ERROR_INVALIDSOLIDINDEX 10187 /** Invalid solid index */
+#define LIBMCENV_ERROR_INVALIDCOMPONENTINDEX 10188 /** Invalid component index */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -454,6 +466,18 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_DATETIMEDIFFERENCEISINVALID: return "Date Time difference is invalid";
     case LIBMCENV_ERROR_DATETIMEISINVALID: return "Date Time is invalid";
     case LIBMCENV_ERROR_DATETIMEOUTOFBOUNDS: return "Date Time out of bounds";
+    case LIBMCENV_ERROR_EMPTYPNGBUFFER: return "Empty PNG buffer";
+    case LIBMCENV_ERROR_CANNOTSEEKZIPSTREAM: return "Cannot seek ZIP stream";
+    case LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS: return "Global Timer is not continuous.";
+    case LIBMCENV_ERROR_STREAMWRITERISNOTFINISHED: return "Stream writer is not finished";
+    case LIBMCENV_ERROR_CANNOTREADFROMZIPSTREAM: return "Cannot read from ZIP stream";
+    case LIBMCENV_ERROR_EMPTYDATATABLENAME: return "Empty datatable name";
+    case LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER: return "Empty datatable identifier";
+    case LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER: return "Invalid datatable identifier";
+    case LIBMCENV_ERROR_INVALIDDATATABLESIGNATURE: return "Invalid datatable signature";
+    case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "Invalid support index";
+    case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "Invalid solid index";
+    case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "Invalid component index";
     default: return "unknown error";
   }
 }
@@ -478,6 +502,12 @@ typedef LibMCEnvHandle LibMCEnv_DataSeries;
 typedef LibMCEnvHandle LibMCEnv_DateTimeDifference;
 typedef LibMCEnvHandle LibMCEnv_DateTime;
 typedef LibMCEnvHandle LibMCEnv_MeshObject;
+typedef LibMCEnvHandle LibMCEnv_PersistentMeshObject;
+typedef LibMCEnvHandle LibMCEnv_ModelDataMeshInstance;
+typedef LibMCEnvHandle LibMCEnv_ModelDataComponentInstance;
+typedef LibMCEnvHandle LibMCEnv_MeshSceneItem;
+typedef LibMCEnvHandle LibMCEnv_MeshScene;
+typedef LibMCEnvHandle LibMCEnv_SceneHandler;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
@@ -501,12 +531,15 @@ typedef LibMCEnvHandle LibMCEnv_DriverStatusUpdateSession;
 typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
+typedef LibMCEnvHandle LibMCEnv_BaseTempStreamWriter;
 typedef LibMCEnvHandle LibMCEnv_TempStreamWriter;
+typedef LibMCEnvHandle LibMCEnv_ZIPStreamWriter;
 typedef LibMCEnvHandle LibMCEnv_StreamReader;
 typedef LibMCEnvHandle LibMCEnv_UniformJournalSampling;
 typedef LibMCEnvHandle LibMCEnv_JournalVariable;
 typedef LibMCEnvHandle LibMCEnv_Alert;
 typedef LibMCEnvHandle LibMCEnv_AlertIterator;
+typedef LibMCEnvHandle LibMCEnv_LogEntryList;
 typedef LibMCEnvHandle LibMCEnv_JournalHandler;
 typedef LibMCEnvHandle LibMCEnv_UserDetailList;
 typedef LibMCEnvHandle LibMCEnv_UserManagementHandler;
@@ -525,6 +558,16 @@ namespace LibMCEnv {
     CriticalError = 2,
     Warning = 3,
     Message = 4,
+    Unknown = 7
+  };
+  
+  enum class eLogLevel : LibMCEnv_int32 {
+    FatalError = 1,
+    CriticalError = 2,
+    Warning = 3,
+    Message = 4,
+    Info = 5,
+    Debug = 6,
     Unknown = 7
   };
   
@@ -614,6 +657,16 @@ namespace LibMCEnv {
       LibMCEnv_int32 m_Y2;
   } sHatch2D;
   
+  typedef struct sMeshVertex3D {
+      LibMCEnv_uint32 m_VertexID;
+      LibMCEnv_double m_Coordinates[3];
+  } sMeshVertex3D;
+  
+  typedef struct sMeshTriangle3D {
+      LibMCEnv_uint32 m_TriangleID;
+      LibMCEnv_uint32 m_Vertices[3];
+  } sMeshTriangle3D;
+  
   typedef struct sFloatPosition2D {
       LibMCEnv_double m_Coordinates[2];
   } sFloatPosition2D;
@@ -635,10 +688,10 @@ namespace LibMCEnv {
       LibMCEnv_double m_Y2;
   } sFloatHatch2D;
   
-  typedef struct sToolpathPartTransform {
+  typedef struct sModelDataTransform {
       LibMCEnv_double m_Matrix[3][3];
       LibMCEnv_double m_Translation[3];
-  } sToolpathPartTransform;
+  } sModelDataTransform;
   
   typedef struct sColorRGB {
       LibMCEnv_double m_Red;
@@ -657,6 +710,7 @@ namespace LibMCEnv {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCEnv::eAlertLevel eLibMCEnvAlertLevel;
+typedef LibMCEnv::eLogLevel eLibMCEnvLogLevel;
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
@@ -667,11 +721,13 @@ typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
 typedef LibMCEnv::eDataTableColumnType eLibMCEnvDataTableColumnType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
+typedef LibMCEnv::sMeshVertex3D sLibMCEnvMeshVertex3D;
+typedef LibMCEnv::sMeshTriangle3D sLibMCEnvMeshTriangle3D;
 typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;
 typedef LibMCEnv::sFieldData2DPoint sLibMCEnvFieldData2DPoint;
 typedef LibMCEnv::sFieldData3DPoint sLibMCEnvFieldData3DPoint;
 typedef LibMCEnv::sFloatHatch2D sLibMCEnvFloatHatch2D;
-typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
+typedef LibMCEnv::sModelDataTransform sLibMCEnvModelDataTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
 typedef LibMCEnv::sTimeStreamEntry sLibMCEnvTimeStreamEntry;
 

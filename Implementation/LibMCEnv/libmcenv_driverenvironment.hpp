@@ -40,6 +40,7 @@ Abstract: This is the class declaration of CDriverEnvironment
 #include "amc_parametergroup.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_toolpathhandler.hpp"
+#include "amc_meshhandler.hpp"
 #include "common_chrono.hpp"
 #include "amc_logger.hpp"
 
@@ -76,15 +77,15 @@ protected:
 	AMC::PResourcePackage m_pDriverResourcePackage;
 	AMC::PResourcePackage m_pMachineResourcePackage;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	AMC::PMeshHandler m_pMeshHandler;
 	LibMCData::PDataModel m_pDataModel;
-	std::string m_sSystemUserID;
 	AMC::PLogger m_pLogger;
 
 	AMCCommon::PChrono m_pGlobalChrono;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, std::string sSystemUserID, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName);
 
 	virtual ~CDriverEnvironment();
 
@@ -168,7 +169,17 @@ public:
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
+	bool HasBuildExecution(const std::string& sExecutionUUID) override;
+
+	IBuildExecution* GetBuildExecution(const std::string& sExecutionUUID) override;
+
 	ICryptoContext* CreateCryptoContext() override;
+
+	IDateTime* GetCurrentDateTime() override;
+
+	IDateTime* GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)  override;
+
+	IDateTime* GetStartDateTime() override;
 
 };
 

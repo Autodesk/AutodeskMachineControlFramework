@@ -35,6 +35,8 @@ Abstract: This is a stub class definition of CChannel
 #include "libmcdriver_tml_instance.hpp"
 #include "libmcdriver_tml_interfaceexception.hpp"
 
+#include <cmath>
+
 // Include custom headers here.
 #define TML_MAXIDENTIFIERLENGTH 64
 

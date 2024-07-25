@@ -101,6 +101,8 @@ public:
 
 	std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex) override;
 
+	LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex) override;
+
 	bool SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName) override;
 
 	std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName) override;

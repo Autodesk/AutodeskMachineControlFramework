@@ -43,13 +43,16 @@ using namespace LibMCEnv::Impl;
  Class definition of CDriverStatusUpdateSession 
 **************************************************************************************************************************/
 
-CDriverStatusUpdateSession::CDriverStatusUpdateSession(AMC::PParameterGroup pParameterGroup, AMC::PLogger pLogger, std::string sDriverName)
-	: m_pParameterGroup (pParameterGroup), m_pLogger (pLogger), m_sDriverName (sDriverName)
+CDriverStatusUpdateSession::CDriverStatusUpdateSession(AMC::PParameterGroup pParameterGroup, AMC::PLogger pLogger, std::string sDriverName, AMCCommon::PChrono pGlobalChrono)
+	: m_pParameterGroup (pParameterGroup), m_pLogger (pLogger), m_sDriverName (sDriverName), m_pGlobalChrono (pGlobalChrono)
 {
 	if (pParameterGroup.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pLogger.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	
 
 }
 

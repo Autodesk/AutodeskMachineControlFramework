@@ -38,11 +38,16 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_journalhandler.hpp"
 #include "libmcenv_dataseries.hpp"
+#include "libmcenv_datetime.hpp"
+#include "libmcenv_scenehandler.hpp"
 #include "libmcenv_meshobject.hpp"
+#include "libmcenv_modeldatacomponentinstance.hpp"
+#include "libmcenv_persistentmeshobject.hpp"
 #include "libmcenv_alert.hpp"
 #include "libmcenv_alertiterator.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_zipstreamwriter.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -53,6 +58,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_buildexecution.hpp"
 #include "libmcenv_journalvariable.hpp"
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
@@ -165,8 +171,10 @@ void CUIEnvironment::StartStreamDownload(const std::string& sUUID, const std::st
 
     std::string sUserUUID = m_pAPIAuth->getUserUUID();
 
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+
     std::string sTicketUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID, sFilename);
-    pStorage->CreateDownloadTicket (sTicketUUID, sNormalizedUUID, sFilename, m_pAPIAuth->getSessionUUID (), sUserUUID);
+    pStorage->CreateDownloadTicket (sTicketUUID, sNormalizedUUID, sFilename, m_pAPIAuth->getSessionUUID (), sUserUUID, pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
 
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sTicketUUID, sFilename));
 }
@@ -201,7 +209,7 @@ ISignalTrigger * CUIEnvironment::PrepareSignal(const std::string & sMachineInsta
     if (!m_pUISystemState->getSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
 
-    return new CSignalTrigger(m_pUISystemState->getSignalHandler(), sMachineInstance, sSignalName);
+    return new CSignalTrigger(m_pUISystemState->getSignalHandler(), sMachineInstance, sSignalName, m_pUISystemState->getGlobalChronoInstance ());
 }
 
 std::string CUIEnvironment::GetMachineState(const std::string & sMachineInstance)
@@ -381,12 +389,19 @@ IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSiz
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
 {
-    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
+    return GetGlobalTimerInMicroseconds () / 1000ULL;
 }
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMicroseconds()
 {
-    return m_pUISystemState->getGlobalChronoInstance()->getExistenceTimeInMicroseconds();
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+    uint64_t nStartTime = pGlobalChrono->getStartTimeStampInMicrosecondsSince1970();
+    uint64_t nCurrentTime = pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+    
+    if (nCurrentTime < nStartTime)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_GLOBALTIMERNOTCONTINUOUS);
+
+    return nCurrentTime - nStartTime;
 }
 
 void CUIEnvironment::LogOut()
@@ -509,7 +524,7 @@ bool CUIEnvironment::HasBuildJob(const std::string& sBuildUUID)
         auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
         auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
 
-        return true;
+        return (pBuildJob.get () != nullptr);
     }
     catch (std::exception) {
         return false;
@@ -523,7 +538,34 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getSystemUserID(), m_pUISystemState->getGlobalChronoInstance ());
+    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler (), m_pUISystemState->getGlobalChronoInstance ());
+}
+
+bool CUIEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
+{
+    std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+
+    try {
+        auto pDataModel = m_pUISystemState->getDataModel();
+        auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+        auto pExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
+
+        return (pExecution.get () != nullptr);
+    }
+    catch (std::exception) {
+        return false;
+    }
+
+}
+
+IBuildExecution* CUIEnvironment::GetBuildExecution(const std::string& sExecutionUUID)
+{
+    std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+    auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
+    return new CBuildExecution (pBuildExecution, pDataModel, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler(), m_pUISystemState->getGlobalChronoInstance());
+
 }
 
 
@@ -608,7 +650,28 @@ IJournalHandler* CUIEnvironment::GetCurrentJournal()
     return new CJournalHandler(m_pUISystemState->getStateJournal());
 }
 
-IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
+ISceneHandler* CUIEnvironment::CreateSceneHandler() 
+{
+	auto pToolpathHandler = m_pUISystemState->getToolpathHandler();
+	if (pToolpathHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pLib3MFWrapper = pToolpathHandler->getLib3MFWrapper();
+	if (pLib3MFWrapper == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pMeshHandler = m_pUISystemState->getMeshHandler();
+	if (pMeshHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pCoreResourcePackage = m_pUIHandler->getCoreResourcePackage();
+	if (pCoreResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	return new CSceneHandler(pMeshHandler, pLib3MFWrapper, pCoreResourcePackage);
+}
+
+/*IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName, const std::string& sMeshUUID)
 {
 
     auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
@@ -623,24 +686,7 @@ IMeshObject* CUIEnvironment::RegisterMeshFrom3MFResource(const std::string& sRes
     auto pMeshEntity = pMeshHandler->register3MFResource(pLib3MFWrapper.get(), pResourcePackage.get(), sResourceName);
 
     return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
-}
-
-bool CUIEnvironment::MeshIsRegistered(const std::string& sMeshUUID)
-{
-    auto pMeshHandler = m_pUISystemState->getMeshHandler();
-    return pMeshHandler->hasMeshEntity(sMeshUUID);
-}
-
-IMeshObject* CUIEnvironment::FindRegisteredMesh(const std::string& sMeshUUID)
-{
-    auto pMeshHandler = m_pUISystemState->getMeshHandler();
-    auto pMeshEntity = pMeshHandler->findMeshEntity(sMeshUUID, false);
-
-    if (pMeshEntity.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MESHISNOTREGISTERED, "mesh is not registered: " + sMeshUUID);
-
-    return new CMeshObject(pMeshHandler, pMeshEntity->getUUID());
-}
+}*/
 
 IDataSeries* CUIEnvironment::CreateDataSeries(const std::string& sName, const bool bBoundToLogin)
 {    
@@ -683,8 +729,8 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
 
     auto sNewUUID = AMCCommon::CUtils::createUUID();
 
-    AMCCommon::CChrono chrono;
-    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+    auto sTimeStamp = pGlobalChrono->getUTCTimeInISO8601 ();
 
     auto pDefinition = m_pUISystemState->getAlertHandler()->findDefinition(sIdentifier, true);
     auto alertDescription = pDefinition->getDescription();
@@ -722,7 +768,7 @@ IAlert* CUIEnvironment::CreateAlert(const std::string& sIdentifier, const std::s
 
 
     auto pUserInformation = m_pAPIAuth->getUserInformation();
-    return new CAlert(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem);
+    return new CAlert(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem, m_pUISystemState->getGlobalChronoInstance ());
 }
 
 IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
@@ -733,11 +779,11 @@ IAlert* CUIEnvironment::FindAlert(const std::string& sUUID)
     auto pAlertSession = pDataModel->CreateAlertSession();
 
     if (!pAlertSession->HasAlert(sNormalizedUUID))
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID);
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ALERTNOTFOUND, "alert not found: " + sNormalizedUUID + " (in UIEnvironment::FindAlert)");
 
     auto pAlertData = pAlertSession->GetAlertByUUID(sNormalizedUUID);
     auto pUserInformation = m_pAPIAuth->getUserInformation();
-    return new CAlert(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem);
+    return new CAlert(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem, m_pUISystemState->getGlobalChronoInstance ());
 
 }
 
@@ -764,7 +810,7 @@ IAlertIterator* CUIEnvironment::RetrieveAlerts(const bool bOnlyActive)
     while (pAlertIterator->MoveNext()) {
         auto pAlertData = pAlertIterator->GetCurrentAlert();
         auto pUserInformation = m_pAPIAuth->getUserInformation();
-        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem));
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID (), pUserInformation->getUUID (), m_pLogger, m_sLogSubSystem, m_pUISystemState->getGlobalChronoInstance ()));
     }
 
     return returnIterator.release();
@@ -782,7 +828,7 @@ IAlertIterator* CUIEnvironment::RetrieveAlertsByType(const std::string& sIdentif
     while (pAlertIterator->MoveNext()) {
         auto pAlertData = pAlertIterator->GetCurrentAlert();
         auto pUserInformation = m_pAPIAuth->getUserInformation();
-        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem));
+        returnIterator->AddAlert(std::make_shared<CAlert>(pDataModel, pAlertData->GetUUID(), pUserInformation->getUUID(), m_pLogger, m_sLogSubSystem, m_pUISystemState->getGlobalChronoInstance ()));
     }
 
     return returnIterator.release();
@@ -807,7 +853,7 @@ ICryptoContext* CUIEnvironment::CreateCryptoContext()
 
 ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sName, const std::string& sMIMEType)
 {
-    if (sName.empty())
+    if (sName.empty()) 
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
     if (sMIMEType.empty())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMMIMETYPE);
@@ -815,10 +861,30 @@ ITempStreamWriter* CUIEnvironment::CreateTemporaryStream(const std::string& sNam
     auto pUserInformation = m_pAPIAuth->getUserInformation();
     std::string sUserUUID = pUserInformation->getUUID();
     
-    return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType, sUserUUID);
+    return new CTempStreamWriter(m_pUISystemState->getDataModel(), sName, sMIMEType, sUserUUID, m_pUISystemState->getGlobalChronoInstance ());
 }
 
-IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool bMustExist)
+IZIPStreamWriter* CUIEnvironment::CreateZIPStream(const std::string& sName)
+{
+    if (sName.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALSTREAMNAME);
+
+    auto pChrono = m_pUISystemState->getGlobalChronoInstance();
+
+    auto pUserInformation = m_pAPIAuth->getUserInformation();
+    std::string sUserUUID = pUserInformation->getUUID();
+
+    std::string sStreamUUID = AMCCommon::CUtils::createUUID();
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pStorage = pDataModel->CreateStorage();
+    auto pZIPWriter = pStorage->CreateZIPStream(sStreamUUID, sName, sUserUUID, pChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+    return new CZIPStreamWriter(pDataModel, pZIPWriter, sStreamUUID, sName, pChrono);
+}
+
+
+IStreamReader* CUIEnvironment::LoadStream(const std::string& sUUID, const bool bMustExist)
 {
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pStorage = pDataModel->CreateStorage();
@@ -837,4 +903,30 @@ IStreamReader* CUIEnvironment::FindStream(const std::string& sUUID, const bool b
     }
 
     return nullptr;
+}
+
+
+
+IDateTime* CUIEnvironment::GetCurrentDateTime()
+{
+    auto pChrono = m_pUISystemState->getGlobalChronoInstance();
+    return new CDateTime(pChrono->getUTCTimeStampInMicrosecondsSince1970());
+
+}
+
+IDateTime* CUIEnvironment::GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond)
+{
+    return new CDateTime(AMCCommon::CChrono::getMicrosecondsSince1970FromDateTime(nYear, nMonth, nDay, nHour, nMinute, nSecond, nMicrosecond));
+}
+
+IDateTime* CUIEnvironment::GetStartDateTime()
+{
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+    return new CDateTime(pGlobalChrono->getStartTimeStampInMicrosecondsSince1970());
+}
+
+void CUIEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+{
+    AMCCommon::CChrono chrono;
+    chrono.sleepMilliseconds(nDelay);
 }

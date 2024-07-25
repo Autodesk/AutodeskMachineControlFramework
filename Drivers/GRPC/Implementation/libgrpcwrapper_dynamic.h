@@ -72,6 +72,26 @@ typedef LibGRPCWrapperResult (*PLibGRPCWrapperMessage_HasFieldPtr) (LibGRPCWrapp
 typedef LibGRPCWrapperResult (*PLibGRPCWrapperMessage_HasStringFieldPtr) (LibGRPCWrapper_Message pMessage, const char * pFieldName, bool * pStringFieldExists);
 
 /**
+* Returns if the message has a field of a certain name and this field is a submessage field.
+*
+* @param[in] pMessage - Message instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pMessageFieldExists - True if field exists and is of type message.
+* @return error code or 0 (success)
+*/
+typedef LibGRPCWrapperResult (*PLibGRPCWrapperMessage_HasMessageFieldPtr) (LibGRPCWrapper_Message pMessage, const char * pFieldName, bool * pMessageFieldExists);
+
+/**
+* Returns the submessage of a field. Fails if the field does not exist or is not a submessage field.
+*
+* @param[in] pMessage - Message instance.
+* @param[in] pFieldName - Name of the field.
+* @param[out] pMessageFieldInstance - Sub message object
+* @return error code or 0 (success)
+*/
+typedef LibGRPCWrapperResult (*PLibGRPCWrapperMessage_GetMessageFieldPtr) (LibGRPCWrapper_Message pMessage, const char * pFieldName, LibGRPCWrapper_Message * pMessageFieldInstance);
+
+/**
 * Sets a string field of the message. Fails if the field does not exist or is not a string field.
 *
 * @param[in] pMessage - Message instance.
@@ -231,7 +251,7 @@ typedef LibGRPCWrapperResult (*PLibGRPCWrapperMessage_SetDoubleFieldPtr) (LibGRP
 * @param[out] pValue - Current value of the field.
 * @return error code or 0 (success)
 */
-typedef LibGRPCWrapperResult (*PLibGRPCWrapperMessage_GetDoubleFieldPtr) (LibGRPCWrapper_Message pMessage, const char * pFieldName, LibGRPCWrapper_int32 * pValue);
+typedef LibGRPCWrapperResult (*PLibGRPCWrapperMessage_GetDoubleFieldPtr) (LibGRPCWrapper_Message pMessage, const char * pFieldName, LibGRPCWrapper_double * pValue);
 
 /*************************************************************************************************************************
  Class definition for Response
@@ -421,6 +441,8 @@ typedef struct {
 	void * m_LibraryHandle;
 	PLibGRPCWrapperMessage_HasFieldPtr m_Message_HasField;
 	PLibGRPCWrapperMessage_HasStringFieldPtr m_Message_HasStringField;
+	PLibGRPCWrapperMessage_HasMessageFieldPtr m_Message_HasMessageField;
+	PLibGRPCWrapperMessage_GetMessageFieldPtr m_Message_GetMessageField;
 	PLibGRPCWrapperMessage_SetStringFieldPtr m_Message_SetStringField;
 	PLibGRPCWrapperMessage_GetStringFieldPtr m_Message_GetStringField;
 	PLibGRPCWrapperMessage_SetInt32FieldPtr m_Message_SetInt32Field;

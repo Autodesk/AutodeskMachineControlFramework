@@ -408,6 +408,17 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID 381 /** Build job execution metadata key is invalid. */
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND 382 /** Build job execution metadata key not found. */
 #define LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE 383 /** Build job execution metadata key is duplicate. */
+#define LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER 384 /** Empty job data identifier. */
+#define LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND 385 /** Build job execution data not found. */
+#define LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER 386 /** Empty job execution data identifier. */
+#define LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE 387 /** ZIP Streams to not support async chunk write. */
+#define LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES 388 /** ZIP Stream exceeds maximum number of entries. */
+#define LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY 389 /** Attempted to write to finished ZIP stream entry. */
+#define LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID 390 /** Invalid ZIP Stream entry ID. */
+#define LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND 391 /** ZIP Stream entry ID not found. */
+#define LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED 392 /** ZIP Writing already finished. */
+#define LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT 393 /** Invalid build job layer count. */
+#define LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT 394 /** Could not determine execution count. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -728,6 +739,17 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYINVALID: return "Build job execution metadata key is invalid.";
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYNOTFOUND: return "Build job execution metadata key not found.";
     case LIBMCDATA_ERROR_BUILDJOBEXECUTIONMETADATAKEYDUPLICATE: return "Build job execution metadata key is duplicate.";
+    case LIBMCDATA_ERROR_EMPTYJOBDATAIDENTIFIER: return "Empty job data identifier.";
+    case LIBMCDATA_ERROR_BUILDJOBEXECUTIONDATANOTFOUND: return "Build job execution data not found.";
+    case LIBMCDATA_ERROR_EMPTYJOBEXECUTIONDATAIDENTIFIER: return "Empty job execution data identifier.";
+    case LIBMCDATA_ERROR_ZIPSTREAMSDONOTSUPPORTASYNCCHUNKWRITE: return "ZIP Streams to not support async chunk write.";
+    case LIBMCDATA_ERROR_ZIPSTREAMEXCEEDSMAXIMUMNUMBEROFENTRIES: return "ZIP Stream exceeds maximum number of entries.";
+    case LIBMCDATA_ERROR_ATTEMPTEDTOWRITETOFINISHEDZIPSTREAMENTRY: return "Attempted to write to finished ZIP stream entry.";
+    case LIBMCDATA_ERROR_INVALIDZIPSTREAMENTRYID: return "Invalid ZIP Stream entry ID.";
+    case LIBMCDATA_ERROR_ZIPSTREAMENTRYIDNOTFOUND: return "ZIP Stream entry ID not found.";
+    case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIP Writing already finished.";
+    case LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT: return "Invalid build job layer count.";
+    case LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT: return "Could not determine execution count.";
     default: return "unknown error";
   }
 }
@@ -745,6 +767,7 @@ typedef LibMCDataHandle LibMCData_AlertIterator;
 typedef LibMCDataHandle LibMCData_AlertSession;
 typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
+typedef LibMCDataHandle LibMCData_StorageZIPWriter;
 typedef LibMCDataHandle LibMCData_Storage;
 typedef LibMCDataHandle LibMCData_CustomDataStream;
 typedef LibMCDataHandle LibMCData_BuildJobData;

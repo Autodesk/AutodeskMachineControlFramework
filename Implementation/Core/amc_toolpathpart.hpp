@@ -51,18 +51,24 @@ namespace AMC {
 		std::string m_sUUID;
 		std::string m_sMeshUUID;
 		std::string m_sName;		
+		std::string m_sPartNumber;
 		
 		Lib3MF::PModel m_p3MFModel;
 		Lib3MF::PBuildItem m_pBuildItem;
+		Lib3MF::PWrapper m_pWrapper;
 		
 	public:
 	
-		CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem);
+		CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem, Lib3MF::PWrapper pWrapper);
 		virtual ~CToolpathPart();		
 
 		std::string getUUID ();
 		std::string getMeshUUID ();
 		std::string getName ();
+		std::string getPartNumber ();
+
+		Lib3MF::PModel getModel();
+		Lib3MF::PBuildItem getBuildItem();
 
 	};
 

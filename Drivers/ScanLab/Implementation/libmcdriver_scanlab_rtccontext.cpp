@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_rtccontext.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 #include "libmcdriver_scanlab_uartconnection.hpp"
+#include "libmcdriver_scanlab_rtcrecording.hpp"
 
 // Include custom headers here.
 #include <math.h>
@@ -44,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <array>
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -176,6 +178,60 @@ CRTCContext::~CRTCContext()
 	}
 }
 
+void CRTCContext::loadFirmwareEx(PScanLabSDK pSDK, uint32_t nCardNo, const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+{
+	if (pSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+	if (pDriverEnvironment.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	auto pWorkingDirectory = pDriverEnvironment->CreateWorkingDirectory();
+
+	std::string sFirmwareName;
+	if (bIsNetwork) {
+		sFirmwareName = "RTC6ETH.out";
+	}
+	else {
+		sFirmwareName = "RTC6OUT.out";
+	}
+
+	auto pFirmwareFile = pWorkingDirectory->StoreCustomData(sFirmwareName, LibMCEnv::CInputVector<uint8_t>(pFirmwareDataBuffer, nFirmwareDataBufferSize));
+	auto pFPGAFile = pWorkingDirectory->StoreCustomData("RTC6RBF.rbf", LibMCEnv::CInputVector<uint8_t>(pFPGADataBuffer, nFPGADataBufferSize));
+	auto pAuxiliaryFile = pWorkingDirectory->StoreCustomData("RTC6DAT.dat", LibMCEnv::CInputVector<uint8_t>(pAuxiliaryDataBuffer, nAuxiliaryDataBufferSize));
+
+	// TODO: Convert to ANSI
+	uint32_t nErrorCode = pSDK->n_load_program_file(nCardNo, pWorkingDirectory->GetAbsoluteFilePath().c_str());
+
+	pFirmwareFile = nullptr;
+	pFPGAFile = nullptr;
+	pAuxiliaryFile = nullptr;
+
+	pWorkingDirectory->CleanUp();
+
+	if (nErrorCode != 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE, "could not load program file: #" + std::to_string(nErrorCode));
+
+
+}
+
+void CRTCContext::setCommunicationTimeoutsEx(PScanLabSDK pSDK, uint32_t nCardNo, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+{
+	if (pSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	double dOldInitialTimeout = 0.0;
+	double dOldMaxTimeout = 0.0;
+	double dOldMultiplier = 0.0;
+	uint32_t nOldMode = 0;
+
+	// Turn on high performance mode...
+	pSDK->n_eth_set_high_performance_mode(nCardNo, 1);
+
+	// Set Timeouts, but keep old mode
+	pSDK->n_eth_get_com_timeouts_auto(nCardNo, &dOldInitialTimeout, &dOldMaxTimeout, &dOldMultiplier, &nOldMode);
+	pSDK->n_eth_set_com_timeouts_auto(nCardNo, dInitialTimeout, dMaxTimeout, dMultiplier, nOldMode);
+}
+
 
 std::string CRTCContext::GetIPAddress()
 {
@@ -202,36 +258,7 @@ void CRTCContext::setLaserIndex(const uint32_t nLaserIndex)
 
 void CRTCContext::LoadFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer)
 {
-	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-
-	auto pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
-
-	std::string sFirmwareName;
-	if (m_bIsNetwork) {
-		sFirmwareName = "RTC6ETH.out";
-	}
-	else {
-		sFirmwareName = "RTC6OUT.out";
-	}
-
-	auto pFirmwareFile = pWorkingDirectory->StoreCustomData (sFirmwareName, LibMCEnv::CInputVector<uint8_t> (pFirmwareDataBuffer, nFirmwareDataBufferSize));
-	auto pFPGAFile = pWorkingDirectory->StoreCustomData("RTC6RBF.rbf", LibMCEnv::CInputVector<uint8_t>(pFPGADataBuffer, nFPGADataBufferSize));
-	auto pAuxiliaryFile = pWorkingDirectory->StoreCustomData("RTC6DAT.dat", LibMCEnv::CInputVector<uint8_t>(pAuxiliaryDataBuffer, nAuxiliaryDataBufferSize));
-
-	// TODO: Convert to ANSI
-	uint32_t nErrorCode = m_pScanLabSDK->n_load_program_file (m_CardNo, pWorkingDirectory->GetAbsoluteFilePath().c_str ());
-
-	pFirmwareFile = nullptr;
-	pFPGAFile = nullptr;
-	pAuxiliaryFile = nullptr;
-
-	pWorkingDirectory->CleanUp();
-
-	if (nErrorCode != 0)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE, "could not load program file: #" + std::to_string (nErrorCode));
-
-	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-
+	loadFirmwareEx(m_pScanLabSDK, m_CardNo, nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer, m_bIsNetwork, m_pDriverEnvironment);
 }
 
 void CRTCContext::LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
@@ -972,6 +999,90 @@ void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
 	writePower(fPowerInPercent, false);
 }
 
+void CRTCContext::AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+{
+
+	float fClippedValue = fOutputValue;
+	if (fClippedValue < 0.0f)
+		fClippedValue = 0.0f;
+	if (fClippedValue > 1.0f)
+		fClippedValue = 1.0f;
+
+	int32_t nDigitalValue = (int32_t)round(fClippedValue * 4095.0);
+	if (nDigitalValue < 0)
+		nDigitalValue = 0;
+	if (nDigitalValue > 4095)
+		nDigitalValue = 4095;
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	switch (eLaserPort) {		
+		case eLaserPort::Port12BitAnalog1:
+			m_pScanLabSDK->n_write_da_1_list(m_CardNo, nDigitalValue);
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+			break;
+
+		case eLaserPort::Port12BitAnalog2:
+			m_pScanLabSDK->n_write_da_2_list(m_CardNo, nDigitalValue);
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+			break;
+
+		case eLaserPort::Port12BitAnalog1andAnalog2:
+			m_pScanLabSDK->n_write_da_1_list(m_CardNo, nDigitalValue);
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+			m_pScanLabSDK->n_write_da_2_list(m_CardNo, nDigitalValue);
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+			break;
+
+		default:
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG);
+	}
+
+}
+
+void CRTCContext::AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+{
+	float fClippedValue = fOutputValue;
+	if (fClippedValue < 0.0f)
+		fClippedValue = 0.0f;
+	if (fClippedValue > 1.0f)
+		fClippedValue = 1.0f;
+
+	int32_t nDigitalValue;
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	switch (eLaserPort) {
+	case eLaserPort::Port16bitDigital:
+		nDigitalValue = (int32_t)round(fClippedValue * 65535.0);
+		if (nDigitalValue < 0)
+			nDigitalValue = 0;
+		if (nDigitalValue > 65535)
+			nDigitalValue = 65535;
+
+		m_pScanLabSDK->n_write_io_port_list(m_CardNo, nDigitalValue);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		break;
+
+	case eLaserPort::Port8bitDigital:
+		nDigitalValue = (int32_t)round(fClippedValue * 255.0);
+		if (nDigitalValue < 0)
+			nDigitalValue = 0;
+		if (nDigitalValue > 255)
+			nDigitalValue = 255;
+
+		m_pScanLabSDK->n_write_8bit_port_list(m_CardNo, nDigitalValue);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		break;
+
+	default:
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL);
+
+	}
+
+}
+
+
 void CRTCContext::AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent)
 {
 	writePower(fPowerInPercent, true);
@@ -1096,12 +1207,7 @@ void CRTCContext::GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_int32& nP
 
 void CRTCContext::SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
 {
-	double dOldInitialTimeout = 0.0;
-	double dOldMaxTimeout = 0.0;
-	double dOldMultiplier = 0.0;
-	uint32_t nOldMode = 0;
-	m_pScanLabSDK->n_eth_get_com_timeouts_auto(m_CardNo, &dOldInitialTimeout, &dOldMaxTimeout, &dOldMultiplier, &nOldMode);
-	m_pScanLabSDK->n_eth_set_com_timeouts_auto(m_CardNo, dInitialTimeout, dMaxTimeout, dMultiplier, nOldMode);
+	setCommunicationTimeoutsEx(m_pScanLabSDK, m_CardNo, dInitialTimeout, dMaxTimeout, dMultiplier);
 }
 
 void CRTCContext::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier)
@@ -1127,6 +1233,10 @@ void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChann
 
 		case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility:
 			m_OIEOperationMode = LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility;
+			break;
+
+		case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3:
+			m_OIEOperationMode = LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3;
 			break;
 
 		default:
@@ -1160,13 +1270,66 @@ void CRTCContext::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChann
 	m_pScanLabSDK->n_mcbsp_init(m_CardNo, 1, 1);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	// Set signal channels
-	uint32_t nTransferLaserOnFlag = (1UL << 31);
-	m_pScanLabSDK->n_set_mcbsp_out_ptr(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size () | nTransferLaserOnFlag, m_MCBSPSignalChannels.data ());
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	switch (eOperationMode) {
+	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion2:
+	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3Compatibility:
+	{
+		// Set signal channels
+		uint32_t nTransferLaserOnFlag = (1UL << 31);
+		m_pScanLabSDK->n_set_mcbsp_out_ptr(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size() | nTransferLaserOnFlag, m_MCBSPSignalChannels.data());
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+		break;
+	}
+
+	case LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3:
+	{
+		// Set signal channels
+		if (m_MCBSPSignalChannels.size() < 2)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE);
+
+		m_pScanLabSDK->n_set_mcbsp_out_oie_ctrl(m_CardNo, m_MCBSPSignalChannels.at(0), m_MCBSPSignalChannels.at(1));
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+		// See documentation. 8192 is the packet stream size,
+		// The 1 means datastreaming is on
+		m_pScanLabSDK->n_eth_config_waveform_streaming_ctrl(m_CardNo, 8192, 1);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+		break;
+	}
+
+	default:
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_UNSUPPORTEDOIEOPERATIONMODE);
+	}
+
 
 	// No PID control for now
 	m_pScanLabSDK->n_set_multi_mcbsp_in(m_CardNo, 0, 0, 0);
+
+
+	// Workaround: Ensure that MCBSP Mark On The Fly is disabled!
+	SetStartList(1, 0);
+	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 1.0, 1.0);
+	m_pScanLabSDK->n_long_delay(m_CardNo, 10);
+	m_pScanLabSDK->n_fly_return(m_CardNo, 0, 0);
+	SetEndOfList();
+	ExecuteList(1, 0);
+
+	bool Busy = true;
+	uint32_t Pos = 0;
+	uint32_t nMaxRetries = 256;
+
+	for (uint32_t nRetries = 0; nRetries < nMaxRetries; nRetries++) {
+		GetStatus(Busy, Pos);
+		if (!Busy)
+			break;
+
+		m_pDriverEnvironment->Sleep(10);
+	}
+
+	if (Busy)
+		throw std::runtime_error("could not properly intialise MCBSP connection to OIE");
 
 	// Check Error
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
@@ -1182,7 +1345,13 @@ uint32_t CRTCContext::getCurrentFreeVariable0()
 
 void CRTCContext::sendFreeVariable0(uint32_t nValue)
 {
-	m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size());
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3) {
+		m_pScanLabSDK->n_list_nop(m_CardNo);
+	}
+	else {
+		m_pScanLabSDK->n_long_delay(m_CardNo, (uint32_t)m_MCBSPSignalChannels.size());
+	}
+	
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 0, nValue);
@@ -1208,6 +1377,70 @@ void CRTCContext::sendOIEMeasurementTag(uint32_t nCurrentVectorID)
 
 }
 
+void CRTCContext::SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2)
+{
+	uint32_t nPins = 0;
+	if (bLaserOut1)
+		nPins |= 1;
+	if (bLaserOut2)
+		nPins |= 2;
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_laser_pin_out(m_CardNo, nPins);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::GetLaserPinIn(bool& bLaserOut1, bool& bLaserOut2)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	uint32_t nPins = m_pScanLabSDK->n_get_laser_pin_in(m_CardNo);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	bLaserOut1 = (nPins & 1UL) != 0;
+	bLaserOut2 = (nPins & 2UL) != 0;
+}
+
+void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2)
+{
+	uint32_t nPins = 0;
+	if (bLaserOut1)
+		nPins |= 1;
+	if (bLaserOut2)
+		nPins |= 2;
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_laser_pin_out_list(m_CardNo, nPins);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+
+void CRTCContext::callSetTriggerOIE(uint32_t nPeriod)
+{
+
+
+	if (m_OIEOperationMode == LibMCDriver_ScanLab::eOIEOperationMode::OIEVersion3) {
+
+		std::array<uint32_t, 8> channelArray;
+		for (uint32_t nIndex = 0; nIndex < 8; nIndex++) {
+			if (nIndex < m_MCBSPSignalChannels.size())
+				channelArray.at(nIndex) = m_MCBSPSignalChannels.at(nIndex);
+			else
+				channelArray.at(nIndex) = 0;
+		}
+
+		m_pScanLabSDK->n_set_trigger8(m_CardNo, nPeriod, channelArray[0], channelArray[1], channelArray[2], channelArray[3], channelArray[4], channelArray[5], channelArray[6], channelArray[7]);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	}
+	else {
+
+		// Compatibility with Version less than 3 final.
+		m_pScanLabSDK->n_set_trigger4(m_CardNo, nPeriod, 20, 21, 1, 2);
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	}
+}
+
 
 void CRTCContext::EnableOIE()
 {
@@ -1221,8 +1454,8 @@ void CRTCContext::EnableOIE()
 	m_pScanLabSDK->n_set_free_variable_list(m_CardNo, 1, 0);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 20, 21, 1, 2);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	callSetTriggerOIE(1);
+
 
 }
 
@@ -1233,8 +1466,7 @@ void CRTCContext::DisableOIE()
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 20, 21, 1, 2);
-	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+	callSetTriggerOIE(0);
 
 	sendFreeVariable0(0);
 
@@ -1443,34 +1675,74 @@ void CRTCContext::SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11,
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
 
-
-void CRTCContext::PrepareRecording()
+IRTCRecording* CRTCContext::PrepareRecording(const bool bKeepInMemory)
 {
+	auto pCryptoContext = m_pDriverEnvironment->CreateCryptoContext();
+	std::string sUUID = pCryptoContext->CreateUUID();
+	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, RTC_CHUNKSIZE_DEFAULT);
+
+	if (bKeepInMemory)
+		m_Recordings.insert(std::make_pair (pInstance->getUUID(), pInstance));
+
+	return new CRTCRecording(pInstance);
+}
+
+bool CRTCContext::HasRecording(const std::string& sUUID)
+{
+	auto iIter = m_Recordings.find(sUUID);
+	return (iIter != m_Recordings.end());
+}
+
+IRTCRecording* CRTCContext::FindRecording(const std::string& sUUID)
+{
+	auto pCryptoContext = m_pDriverEnvironment->CreateCryptoContext();
+	std::string sNormalizedUUID = pCryptoContext->NormalizeUUIDString(sUUID);
+
+	auto iIter = m_Recordings.find(sNormalizedUUID);
+	if (iIter != m_Recordings.end())
+	{
+		return new CRTCRecording(iIter->second);
+	}
+	else
+	{
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING, "Could not find recording: " + sNormalizedUUID);
+	}
+
+}
+
+/*void CRTCContext::PrepareRecording()
+{
+	bool bCheckIfScanHeadIsConnected = false;
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	m_HeadTransform.resize(528520 * 4);
 	
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_upload_transform(m_CardNo, 1, m_HeadTransform.data()));
 	 
-	double CalibrationFactorXY = 10000;  // get_table_para(1,1)
+	double CalibrationFactorXY = m_dCorrectionFactor; 
 
 	uint32_t nHeadNoXY = 1;
 	uint32_t nHeadNoZ = 2;
 	uint32_t nAxisX = 1;
 	uint32_t nAxisY = 2;
-	uint32_t nAxisZ = 2;
+	uint32_t nAxisZ = 1;
 
 	// check whether scan head is connected
-	uint32_t HeadStatus1 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoXY);
-	if (!HeadStatus1)
-	{
-		throw std::runtime_error("head status 1 invalid");
-	}
+	if (bCheckIfScanHeadIsConnected) {
 
-	uint32_t HeadStatus2 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoZ);
-	if (!HeadStatus2)
-	{
-		throw std::runtime_error("head status 2 invalid");
+		// TODO: Check Head Status bits
+		uint32_t HeadStatus1 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoXY);
+		if (!HeadStatus1)
+		{
+			throw std::runtime_error("head status 1 invalid");
+		}
+
+		uint32_t HeadStatus2 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoZ);
+		if (!HeadStatus2)
+		{
+			throw std::runtime_error("head status 2 invalid");
+		} 
 	}
 
 	uint32_t ControlCommand = 0x0501; // activates actual position recording
@@ -1481,10 +1753,10 @@ void CRTCContext::PrepareRecording()
 	m_pScanLabSDK->n_control_command(m_CardNo, nHeadNoXY, nAxisY, ControlCommand);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_control_command(m_CardNo, 2, 1, ControlCommand);
+	m_pScanLabSDK->n_control_command(m_CardNo, nHeadNoZ, nAxisZ, ControlCommand);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
-	m_pScanLabSDK->n_control_command(m_CardNo, 2, 2, ControlCommand);
+	m_pScanLabSDK->n_control_command(m_CardNo, nHeadNoZ, 2, ControlCommand);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
@@ -1492,8 +1764,8 @@ void CRTCContext::PrepareRecording()
 void CRTCContext::EnableRecording ()
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 1, 2, 4, 32); // record signals: 1=StatusAX (actual x position of first scanhead), 2=StatusAY (actual y position of first scanhead), 0=LaserOn
-	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 7, 8, 9, 0); // 
+	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 1, 2, 4, 32); // record signals: 1=StatusAX (actual x position of first scanhead), 2=StatusAY (actual y position of first scanhead), 0=LaserOn
+	m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 7, 8, 52, 0); // 
 	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 10, 11, 12, 0); // 
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
@@ -1502,10 +1774,8 @@ void CRTCContext::EnableRecording ()
 void CRTCContext::DisableRecording()
 {
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pScanLabSDK->n_long_delay(m_CardNo, 1200); // add long delay ~ tracking error or preview time
+	m_pScanLabSDK->n_long_delay(m_CardNo, 1200); // add long delay ~ TODO: tracking error or preview time
 	m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 1, 2, 4, 32); // deactivates signal recording
-	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 0, 7, 8, 9, 0); // deactivates signal recording
-	//m_pScanLabSDK->n_set_trigger4(m_CardNo, 1, 10, 11, 12, 0); // deactivates signal recording
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
@@ -1517,7 +1787,7 @@ uint32_t CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t Data
 	uint32_t Error = 0;
 	uint32_t nDataLength = DataEnd - DataStart;
 
-	//std::cout << "Saving RTC Data Block (" << nDataLength << " bytes" << std::endl;
+	std::cout << "Saving RTC Data Block FROM " << DataStart << " TO " << DataEnd << std::endl;
 
 	if (nDataLength > 0) {
 
@@ -1578,7 +1848,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 	if (!MyFile.is_open())
 		throw std::runtime_error("could not create file");
 
-	double CalibrationFactorXY = 10000;  // get_table_para(1,1)
+	double CalibrationFactorXY = m_dCorrectionFactor;
 
 	std::cout << "Wait for measurement to start" << std::endl;
 	do // Wait for measurement to start
@@ -1589,6 +1859,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 
 	do   //blockwise data polling
 	{
+
 		m_pScanLabSDK->n_get_status(m_CardNo, &Busy, &Position);
 		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
 		std::cout << "RTC Status busy: " << Busy << " Position: " << Position << " Measure Busy: " << MesBusy << " Measure Position: " << MesPosition << std::endl;
@@ -1596,18 +1867,27 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 		if (MesPosition > LastPosition + Increment)
 		{
 			saveRecordedDataBlock(MyFile, LastPosition, LastPosition + Increment, CalibrationFactorXY);
+			LastPosition += Increment;
 		}
 		else if (MesPosition < LastPosition)
 		{
 			saveRecordedDataBlock(MyFile, LastPosition, MAXMESPOSITION, CalibrationFactorXY);
 			LastPosition = 0;
 		}
+		else {
+			if (!MesBusy) {
+				saveRecordedDataBlock(MyFile, LastPosition, MesPosition, CalibrationFactorXY);
+				LastPosition = MesPosition;
+			}
+		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-	} while (Busy);           // Wait for the job to be finished executing
+		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
 
-}
+	} while (MesBusy || (MesPosition != LastPosition));           // Wait for the job to be finished executing
+
+}  */
 
 void CRTCContext::EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds)
 {
@@ -1797,9 +2077,8 @@ void CRTCContext::DisableMarkOnTheFly2D()
 	m_b2DMarkOnTheFlyEnabled = false;
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 0.0, 0.0);
 
-	m_pScanLabSDK->n_jump_abs(m_CardNo, 0, 0);
+	m_pScanLabSDK->n_fly_return(m_CardNo, 0, 0);
 	m_nCurrentScanPositionX = 0;
 	m_nCurrentScanPositionY = 0;
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
@@ -1877,8 +2156,9 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 	uint32_t nSegmentCount = pLayer->GetSegmentCount();
 	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 
-		m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = nSegmentIndex + 1;
-		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "measurementid", 0);
+		m_CurrentMeasurementTagInfo.m_nCurrentSegmentID = (uint32_t) (nSegmentIndex + 1);
+		m_CurrentMeasurementTagInfo.m_nCurrentProfileID = (uint32_t) pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "measurementid", 0);
+		m_CurrentMeasurementTagInfo.m_nCurrentPartID = (uint32_t)pLayer->GetSegmentLocalPartID(nSegmentIndex);
 
 		LibMCEnv::eToolpathSegmentType eSegmentType;
 		uint32_t nPointCount;
@@ -2131,5 +2411,122 @@ LibMCDriver_ScanLab_int32 CRTCContext::ReadMultiMCBSP(const LibMCDriver_ScanLab_
 
 IUARTConnection* CRTCContext::CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate)
 {
-	return new CUARTConnection(m_pScanLabSDK, nDesiredBaudRate, m_CardNo);
+	return new CUARTConnection(m_pScanLabSDK, nDesiredBaudRate, m_CardNo, m_pDriverEnvironment);
 }
+
+
+void CRTCContext::EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	uint32_t nErrorCode = m_pScanLabSDK->n_set_scanahead_params(m_CardNo, 1, nHeadNo, nTableNo, 0, 0, 0.0);
+	if (nErrorCode) {
+
+		// See RTC documentation for detailed information about the error codes
+		if (nErrorCode == 1)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION);
+		if (nErrorCode == 3)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN);
+		if (nErrorCode == 5)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE);
+		if (nErrorCode == 6)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR);
+		if (nErrorCode == 7)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR);
+		if (nErrorCode == 8)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE);
+		if (nErrorCode == 11)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR);
+
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR, "Scanahead unknown error: " + std::to_string(nErrorCode));
+	}
+
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+
+}
+
+void CRTCContext::DisableScanAhead()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	uint32_t nErrorCode = m_pScanLabSDK->n_set_scanahead_params(m_CardNo, 0, 0, 0, 0, 0, 0.0);
+	if (nErrorCode) {
+
+		// See RTC documentation for detailed information about the error codes
+		if (nErrorCode == 1)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION);
+		if (nErrorCode == 3)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN);
+		if (nErrorCode == 5)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE);
+		if (nErrorCode == 6)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR);
+		if (nErrorCode == 7)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR);
+		if (nErrorCode == 8)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE);
+		if (nErrorCode == 11)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR);
+
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR, "Scanahead unknown error: " + std::to_string(nErrorCode));
+	}
+
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::ActivateScanAheadAutoDelays()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_activate_scanahead_autodelays(m_CardNo, 1);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+void CRTCContext::DeactivateScanAheadAutoDelays()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_activate_scanahead_autodelays(m_CardNo, 0);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+}
+
+bool CRTCContext::ScanAheadAutoDelaysAreActivated()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	int32_t nAutoDelayMode = m_pScanLabSDK->n_activate_scanahead_autodelays(m_CardNo, -1);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	return (nAutoDelayMode == 1);
+
+}
+
+void CRTCContext::SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds)
+{
+	SetScanAheadLaserShiftsInUnits((int32_t)round(dLaserOnShiftInMicroSeconds * 64.0), (int32_t)round(dLaserOffShiftInMicroSeconds * 64.0));
+}
+
+void CRTCContext::SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift)
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_scanahead_laser_shifts (m_CardNo, nLaserOnShift, nLaserOffShift);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale)
+{
+	uint32_t nCappedCornerScale = nCornerScale;
+	if (nCappedCornerScale > 100)
+		nCappedCornerScale = 100;
+	uint32_t nCappedEndScale = nEndScale;
+	if (nCappedEndScale > 100)
+		nCappedEndScale = 100;
+	uint32_t nCappedAccScale = nAccelerationScale;
+	if (nCappedAccScale > 100)
+		nCappedAccScale = 100;
+
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_set_scanahead_line_params(m_CardNo, nCappedCornerScale, nCappedEndScale, nCappedAccScale);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+

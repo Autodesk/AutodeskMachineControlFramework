@@ -144,13 +144,15 @@ namespace AMC {
 			p3MFLayer->GetSegmentInfo(nSegmentIndex, eType, nPointCount);
 			std::string sPartUUID = p3MFLayer->GetSegmentPartUUID(nSegmentIndex);
 			std::string sProfileUUID = p3MFLayer->GetSegmentProfileUUID(nSegmentIndex);
+			uint32_t nLocalPartID = p3MFLayer->GetSegmentLocalPartID(nSegmentIndex);
 
 			auto pSegment = &m_Segments[nSegmentIndex];
 			pSegment->m_PointCount = nPointCount;
 			pSegment->m_PointStartIndex = nTotalPointCount;
 			pSegment->m_Type = (LibMCEnv::eToolpathSegmentType) eType;
-			pSegment->m_ProfileID = registerUUID (sProfileUUID);
-			pSegment->m_PartID = registerUUID(sPartUUID);
+			pSegment->m_ProfileUUID = registerUUID (sProfileUUID);
+			pSegment->m_PartUUID = registerUUID(sPartUUID);
+			pSegment->m_LocalPartID = nLocalPartID;
 			if (m_CustomSegmentAttributes.size() > 0) {
 				pSegment->m_AttributeData = &m_SegmentAttributeData.at((size_t)nSegmentIndex * m_CustomSegmentAttributes.size());
 				int64_t* pAttributeData = pSegment->m_AttributeData;
@@ -376,7 +378,7 @@ namespace AMC {
 		if (nSegmentIndex >= m_Segments.size())
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
-		return getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
+		return getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileUUID);
 	}
 
 	std::string CToolpathLayerData::getSegmentPartUUID(const uint32_t nSegmentIndex)
@@ -384,16 +386,26 @@ namespace AMC {
 		if (nSegmentIndex >= m_Segments.size())
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
-		return getRegisteredUUID(m_Segments[nSegmentIndex].m_PartID);
+		return getRegisteredUUID(m_Segments[nSegmentIndex].m_PartUUID);
 	}
+
+	uint32_t CToolpathLayerData::getSegmentLocalPartID(const uint32_t nSegmentIndex)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
+
+		return m_Segments[nSegmentIndex].m_LocalPartID;
+
+	}
+
 
 	PToolpathLayerProfile CToolpathLayerData::getSegmentProfile(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
 
-		auto sProfileUUID = getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
-		return retrieveProfileData(sProfileUUID);
+		auto sProfileUUID = getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileUUID);
+		return retrieveProfileData(sProfileUUID );
 	}
 
 	bool CToolpathLayerData::findCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sAttributeName, uint32_t& nAttributeID, LibMCEnv::eToolpathAttributeType& attributeType)

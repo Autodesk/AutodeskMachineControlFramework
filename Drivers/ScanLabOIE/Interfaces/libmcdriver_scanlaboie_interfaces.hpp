@@ -553,6 +553,17 @@ public:
 	virtual void AddRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
 
 	/**
+	* IDataRecording::AddScaledRTCSignalsToDataTable - Writes a certain RTC channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+	* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+	* @param[in] dOffset - Offset that the raw value is scaled with.
+	*/
+	virtual void AddScaledRTCSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset) = 0;
+
+	/**
 	* IDataRecording::AddSensorSignalsToDataTable - Writes a certain sensor channel to a data table as int32 columns.
 	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
 	* @param[in] pDataTable - Data table instance to write to.
@@ -580,6 +591,17 @@ public:
 	* @param[in] sColumnDescription - Description of the Column.
 	*/
 	virtual void AddAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) = 0;
+
+	/**
+	* IDataRecording::AddScaledAdditionalSignalsToDataTable - Writes a certain RTC channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset
+	* @param[in] nAdditionalIndex - Index of the signal to return. 0-based. MUST be smaller than AdditionalSignalCount.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+	* @param[in] dOffset - Offset that the raw value is scaled with.
+	*/
+	virtual void AddScaledAdditionalSignalsToDataTable(const LibMCDriver_ScanLabOIE_uint32 nAdditionalIndex, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLabOIE_double dScaleFactor, const LibMCDriver_ScanLabOIE_double dOffset) = 0;
 
 };
 
@@ -611,6 +633,12 @@ public:
 	virtual std::string GetHostName() = 0;
 
 	/**
+	* IOIEDevice::SetRTC6IPAddress - Sets the RTC 6 IP Address for data streaming (100kHz mode).
+	* @param[in] sRTC6IPAddress - New RTC6 IP Address. Will only be effective in a StartApp call.
+	*/
+	virtual void SetRTC6IPAddress(const std::string & sRTC6IPAddress) = 0;
+
+	/**
 	* IOIEDevice::SetPort - Sets the port of the device. Fails if device is already connected.
 	* @param[in] nPort - New port of device.
 	*/
@@ -623,7 +651,7 @@ public:
 	virtual LibMCDriver_ScanLabOIE_uint32 GetPort() = 0;
 
 	/**
-	* IOIEDevice::IsConnected - Returns if the device is connected and logged in.
+	* IOIEDevice::IsConnected - Returns if the device is connected.
 	* @return Flag if the device is connected.
 	*/
 	virtual bool IsConnected() = 0;
@@ -776,12 +804,22 @@ public:
 	virtual void ClearCurrentRecording() = 0;
 
 	/**
-	* IOIEDevice::LoadRecordingFromBuild - Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.
-	* @param[in] pBuild - Build that contains the data.
-	* @param[in] sDataUUID - Data UUID of the build data.
-	* @return Recording instance
+	* IOIEDevice::IsLoggedIn - Returns if the device is logged in.
+	* @return Flag if the device is logged in.
 	*/
-	virtual IDataRecording * LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string & sDataUUID) = 0;
+	virtual bool IsLoggedIn() = 0;
+
+	/**
+	* IOIEDevice::IsStreaming - Returns if the device is streaming.
+	* @return Flag if the device is streaming.
+	*/
+	virtual bool IsStreaming() = 0;
+
+	/**
+	* IOIEDevice::RTCIsBusy - Returns if the connected RTC is busy.
+	* @return Flag if the connected RTC is busy.
+	*/
+	virtual bool RTCIsBusy() = 0;
 
 };
 

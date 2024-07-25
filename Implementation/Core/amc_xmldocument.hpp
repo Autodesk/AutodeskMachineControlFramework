@@ -77,6 +77,7 @@ namespace AMC {
 		bool HasNamespace(const std::string & sNamespace);
 
 		PXMLDocumentNameSpace FindNamespace(const std::string& sNamespace, bool bMustExist);
+		PXMLDocumentNameSpace FindNamespaceByPrefix(const std::string& sNameSpacePrefix, bool bMustExist);
 
 		std::string GetNamespacePrefix(const std::string & sNamespace);
 

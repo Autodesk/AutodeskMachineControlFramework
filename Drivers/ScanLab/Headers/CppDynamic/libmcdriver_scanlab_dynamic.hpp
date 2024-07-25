@@ -63,6 +63,8 @@ class CWrapper;
 class CBase;
 class CDriver;
 class CUARTConnection;
+class CRTCJob;
+class CRTCRecording;
 class CRTCContext;
 class CRTCSelector;
 class CDriver_ScanLab;
@@ -76,6 +78,8 @@ typedef CWrapper CLibMCDriver_ScanLabWrapper;
 typedef CBase CLibMCDriver_ScanLabBase;
 typedef CDriver CLibMCDriver_ScanLabDriver;
 typedef CUARTConnection CLibMCDriver_ScanLabUARTConnection;
+typedef CRTCJob CLibMCDriver_ScanLabRTCJob;
+typedef CRTCRecording CLibMCDriver_ScanLabRTCRecording;
 typedef CRTCContext CLibMCDriver_ScanLabRTCContext;
 typedef CRTCSelector CLibMCDriver_ScanLabRTCSelector;
 typedef CDriver_ScanLab CLibMCDriver_ScanLabDriver_ScanLab;
@@ -89,6 +93,8 @@ typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<CUARTConnection> PUARTConnection;
+typedef std::shared_ptr<CRTCJob> PRTCJob;
+typedef std::shared_ptr<CRTCRecording> PRTCRecording;
 typedef std::shared_ptr<CRTCContext> PRTCContext;
 typedef std::shared_ptr<CRTCSelector> PRTCSelector;
 typedef std::shared_ptr<CDriver_ScanLab> PDriver_ScanLab;
@@ -102,6 +108,8 @@ typedef PWrapper PLibMCDriver_ScanLabWrapper;
 typedef PBase PLibMCDriver_ScanLabBase;
 typedef PDriver PLibMCDriver_ScanLabDriver;
 typedef PUARTConnection PLibMCDriver_ScanLabUARTConnection;
+typedef PRTCJob PLibMCDriver_ScanLabRTCJob;
+typedef PRTCRecording PLibMCDriver_ScanLabRTCRecording;
 typedef PRTCContext PLibMCDriver_ScanLabRTCContext;
 typedef PRTCSelector PLibMCDriver_ScanLabRTCSelector;
 typedef PDriver_ScanLab PLibMCDriver_ScanLabDriver_ScanLab;
@@ -266,6 +274,47 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT: return "RS232READTIMEOUT";
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN: return "RS232READLINEOVERRUN";
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN: return "RS232RINGBUFFEROVERRUN";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION: return "NOSCANAHEADOPTION";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN: return "NOEXCELLISCAN";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE: return "SCANAHEADLISTISACTIVE";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR: return "SCANAHEADPARAMETERERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR: return "SCANAHEADSCALINGERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE: return "SCANAHEADMISSINGRTCRESPONSE";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR: return "SCANAHEADPCIERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "SCANAHEADUNKNOWNERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "PORTNUMBERISNOTDIGITAL";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "PORTNUMBERISNOTANALOG";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE: return "INVALIDOIECHANNELSIZE";
+			case LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR: return "INTERNALACQUISITIONERROR";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER: return "COULDNOTDETERMINESERIALNUMBER";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD: return "COULDNOTASSIGNETHERNETCARD";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA: return "MISSINGFIRMWAREDATA";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA: return "MISSINGFPGADATA";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA: return "MISSINGAUXILIARYDATA";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA: return "MISSINGFIRMWAREINITIZATIONDATA";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS: return "NOCARDFOUNDATIPADDRESS";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE: return "NOCARDFOUNDATINIPRANGE";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD: return "COULDNOTINITIALISERTCCARD";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELNAME: return "INVALIDCHANNELNAME";
+			case LIBMCDRIVER_SCANLAB_ERROR_EMPTYCHANNELNAME: return "EMPTYCHANNELNAME";
+			case LIBMCDRIVER_SCANLAB_ERROR_CANNOTADDCHANNELDURINGRECORDING: return "CANNOTADDCHANNELDURINGRECORDING";
+			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECHANNELNAME: return "DUPLICATECHANNELNAME";
+			case LIBMCDRIVER_SCANLAB_ERROR_NORECORDINGCHANNELAVAILABLE: return "NORECORDINGCHANNELAVAILABLE";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELID: return "INVALIDCHANNELID";
+			case LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPECANNOTBEUNDEFINED: return "CHANNELTYPECANNOTBEUNDEFINED";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKSIZE: return "INVALIDCHUNKSIZE";
+			case LIBMCDRIVER_SCANLAB_ERROR_CHANNELNOTFOUND: return "CHANNELNOTFOUND";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRECORDINDEX: return "INVALIDRECORDINDEX";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKINDEX: return "INVALIDCHUNKINDEX";
+			case LIBMCDRIVER_SCANLAB_ERROR_CHUNKENTRYINDEXOUTOFBOUNDS: return "CHUNKENTRYINDEXOUTOFBOUNDS";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDATARECORDINGINTERVAL: return "INVALIDDATARECORDINGINTERVAL";
+			case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW: return "DATARECORDINGOVERFLOW";
+			case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW: return "DATARECORDINGUNDERFLOW";
+			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL: return "DATABUFFERISFULL";
+			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "DATABUFFERREADEMPTY";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "COULDNOTFINDRECORDING";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "INVALIDCHANNELTYPE";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "INVALIDRTCRECORDINGFREQUENCY";
 		}
 		return "UNKNOWN";
 	}
@@ -354,6 +403,47 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232READTIMEOUT: return "RS232 read timeout.";
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232READLINEOVERRUN: return "RS232 read line overrun.";
 			case LIBMCDRIVER_SCANLAB_ERROR_RS232RINGBUFFEROVERRUN: return "RS232 ring buffer overrun.";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOSCANAHEADOPTION: return "No Scanahead option.";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOEXCELLISCAN: return "No Excelli Scan.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADLISTISACTIVE: return "Scanahead - list is active.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPARAMETERERROR: return "Scanahead parameter error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADSCALINGERROR: return "Scanahead scaling error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADMISSINGRTCRESPONSE: return "Scanahead missing rtc response.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADPCIERROR: return "Scanahead PCI error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANAHEADUNKNOWNERROR: return "Scanahead unknown error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTDIGITAL: return "Port number is not digital.";
+			case LIBMCDRIVER_SCANLAB_ERROR_PORTNUMBERISNOTANALOG: return "Port number is not analog.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIECHANNELSIZE: return "Invalid OIE Channel size.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INTERNALACQUISITIONERROR: return "Internal Acquisition Error.";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTDETERMINESERIALNUMBER: return "Could not determine serial number.";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTASSIGNETHERNETCARD: return "Could not assign ethernet card.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREDATA: return "Missing Firmware Data.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFPGADATA: return "Missing FPGA Data.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGAUXILIARYDATA: return "Missing Auxiliary Data.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MISSINGFIRMWAREINITIZATIONDATA: return "Missing Firmware Initialisation Data.";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATIPADDRESS: return "No Card found at IP Address.";
+			case LIBMCDRIVER_SCANLAB_ERROR_NOCARDFOUNDATINIPRANGE: return "No Card found in IP Range.";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTINITIALISERTCCARD: return "Could not initialize RTC Card.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELNAME: return "Invalid Channel Name.";
+			case LIBMCDRIVER_SCANLAB_ERROR_EMPTYCHANNELNAME: return "Empty Channel Name.";
+			case LIBMCDRIVER_SCANLAB_ERROR_CANNOTADDCHANNELDURINGRECORDING: return "Cannot add channel during recording.";
+			case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECHANNELNAME: return "Duplicate channel name.";
+			case LIBMCDRIVER_SCANLAB_ERROR_NORECORDINGCHANNELAVAILABLE: return "No recording channel available.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELID: return "Invalid Channel ID.";
+			case LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPECANNOTBEUNDEFINED: return "Channel Type cannot be undefined.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKSIZE: return "Invalid Chunk Size";
+			case LIBMCDRIVER_SCANLAB_ERROR_CHANNELNOTFOUND: return "Channel not found";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRECORDINDEX: return "Invalid record index";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHUNKINDEX: return "Invalid chunk index";
+			case LIBMCDRIVER_SCANLAB_ERROR_CHUNKENTRYINDEXOUTOFBOUNDS: return "Chunk entry index out of bounds";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDATARECORDINGINTERVAL: return "Invalid data recording interval";
+			case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW: return "Data recording overflow";
+			case LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW: return "Data recording underflow";
+			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERISFULL: return "Data buffer is full";
+			case LIBMCDRIVER_SCANLAB_ERROR_DATABUFFERREADEMPTY: return "Data buffer read empty";
+			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "Could not find recording.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "Invalid channel type.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "Invalid RTC recording frequency.";
 		}
 		return "unknown error";
 	}
@@ -478,6 +568,8 @@ private:
 	friend class CBase;
 	friend class CDriver;
 	friend class CUARTConnection;
+	friend class CRTCJob;
+	friend class CRTCRecording;
 	friend class CRTCContext;
 	friend class CRTCSelector;
 	friend class CDriver_ScanLab;
@@ -590,6 +682,67 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CRTCJob 
+**************************************************************************************************************************/
+class CRTCJob : public CBase {
+public:
+	
+	/**
+	* CRTCJob::CRTCJob - Constructor for RTCJob class.
+	*/
+	CRTCJob(CWrapper* pWrapper, LibMCDriver_ScanLabHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
+	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
+	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
+	inline void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent);
+	inline void AddSetAnalogOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue);
+	inline void AddSetDigitalOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue);
+	inline void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent);
+	inline void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
+	inline void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
+	inline void AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
+	inline void AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY);
+	inline void AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDurationInMicroseconds);
+	inline void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue);
+};
+	
+/*************************************************************************************************************************
+ Class CRTCRecording 
+**************************************************************************************************************************/
+class CRTCRecording : public CBase {
+public:
+	
+	/**
+	* CRTCRecording::CRTCRecording - Constructor for RTCRecording class.
+	*/
+	CRTCRecording(CWrapper* pWrapper, LibMCDriver_ScanLabHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool ScanheadConnectionCheckIsEnabled();
+	inline void EnableScanheadConnectionCheck();
+	inline void DisableScanheadConnectionCheck();
+	inline void Clear();
+	inline void AddChannel(const std::string & sChannelName, const eRTCChannelType eChannelType);
+	inline void RemoveChannel(const std::string & sChannelName);
+	inline bool HasChannel(const std::string & sChannelName);
+	inline eRTCChannelType GetChannelType(const std::string & sChannelName);
+	inline LibMCDriver_ScanLab_uint64 GetRecordCount(const std::string & sChannelName);
+	inline LibMCDriver_ScanLab_int32 GetRecordEntry(const std::string & sChannelName, const LibMCDriver_ScanLab_uint64 nRecordIndex);
+	inline void GetAllRecordEntries(const std::string & sChannelName, std::vector<LibMCDriver_ScanLab_int32> & ValuesBuffer);
+	inline void EnableRecording(const eRTCRecordingFrequency eFrequency);
+	inline void DisableRecording();
+	inline void ExecuteListWithRecording();
+	inline void AddRecordsToDataTable(const std::string & sChannelName, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
+	inline void AddScaledRecordsToDataTable(const std::string & sChannelName, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset);
+};
+	
+/*************************************************************************************************************************
  Class CRTCContext 
 **************************************************************************************************************************/
 class CRTCContext : public CBase {
@@ -636,6 +789,8 @@ public:
 	inline void DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent);
+	inline void AddSetAnalogOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue);
+	inline void AddSetDigitalOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue);
 	inline void AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent);
 	inline void AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond);
 	inline void AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond);
@@ -652,7 +807,7 @@ public:
 	inline void WaitForEncoderY(const LibMCDriver_ScanLab_double dPositionInMM, const bool bInPositiveHalfPlane);
 	inline void WaitForEncoderXSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane);
 	inline void WaitForEncoderYSteps(const LibMCDriver_ScanLab_int32 nPositionInSteps, const bool bInPositiveHalfPlane);
-	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
+	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelayInMicroseconds);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
 	inline void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK);
@@ -662,6 +817,9 @@ public:
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 	inline void InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer, const eOIEOperationMode eOperationMode);
+	inline void SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2);
+	inline void GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2);
+	inline void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2);
 	inline void EnableOIE();
 	inline void DisableOIE();
 	inline void StartOIEMeasurement();
@@ -683,10 +841,9 @@ public:
 	inline void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor);
 	inline void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY);
 	inline void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22);
-	inline void PrepareRecording();
-	inline void EnableRecording();
-	inline void DisableRecording();
-	inline void ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition);
+	inline PRTCRecording PrepareRecording(const bool bKeepInMemory);
+	inline bool HasRecording(const std::string & sUUID);
+	inline PRTCRecording FindRecording(const std::string & sUUID);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
 	inline void DisableTimelagCompensation();
 	inline void EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXInMMperEncoderStep, const LibMCDriver_ScanLab_double dScaleYInMMperEncoderStep);
@@ -706,6 +863,14 @@ public:
 	inline void DisableLineSubdivision();
 	inline LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo);
 	inline PUARTConnection CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate);
+	inline void EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo);
+	inline void DisableScanAhead();
+	inline void ActivateScanAheadAutoDelays();
+	inline void DeactivateScanAheadAutoDelays();
+	inline bool ScanAheadAutoDelaysAreActivated();
+	inline void SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds);
+	inline void SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift);
+	inline void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale);
 };
 	
 /*************************************************************************************************************************
@@ -750,6 +915,8 @@ public:
 	inline void LoadCustomSDK(const CInputVector<LibMCDriver_ScanLab_uint8> & ScanlabDLLBuffer);
 	inline PRTCSelector CreateRTCSelector();
 	inline void EnableJournaling();
+	inline void SetFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
+	inline void SetCustomFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -788,6 +955,7 @@ public:
 	inline void DisableAttributeFilter();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
+	inline void GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
 	inline void DisableTimelagCompensation();
 };
@@ -829,8 +997,10 @@ public:
 	inline void EnableAttributeFilter(const std::string & sNameSpace, const std::string & sAttributeName, const LibMCDriver_ScanLab_int64 nAttributeValue);
 	inline void DisableAttributeFilter();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists);
+	inline void SetAllCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
+	inline void GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex, const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
 	inline void DisableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nScannerIndex);
 };
@@ -971,6 +1141,35 @@ public:
 		pWrapperTable->m_UARTConnection_WriteData = nullptr;
 		pWrapperTable->m_UARTConnection_ReadData = nullptr;
 		pWrapperTable->m_UARTConnection_ReadLine = nullptr;
+		pWrapperTable->m_RTCJob_DrawPolyline = nullptr;
+		pWrapperTable->m_RTCJob_DrawPolylineOIE = nullptr;
+		pWrapperTable->m_RTCJob_DrawHatches = nullptr;
+		pWrapperTable->m_RTCJob_AddSetPower = nullptr;
+		pWrapperTable->m_RTCJob_AddSetAnalogOut = nullptr;
+		pWrapperTable->m_RTCJob_AddSetDigitalOut = nullptr;
+		pWrapperTable->m_RTCJob_AddSetPowerForPIDControl = nullptr;
+		pWrapperTable->m_RTCJob_AddSetJumpSpeed = nullptr;
+		pWrapperTable->m_RTCJob_AddSetMarkSpeed = nullptr;
+		pWrapperTable->m_RTCJob_AddJumpMovement = nullptr;
+		pWrapperTable->m_RTCJob_AddMarkMovement = nullptr;
+		pWrapperTable->m_RTCJob_AddTimedMarkMovement = nullptr;
+		pWrapperTable->m_RTCJob_AddFreeVariable = nullptr;
+		pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled = nullptr;
+		pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck = nullptr;
+		pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck = nullptr;
+		pWrapperTable->m_RTCRecording_Clear = nullptr;
+		pWrapperTable->m_RTCRecording_AddChannel = nullptr;
+		pWrapperTable->m_RTCRecording_RemoveChannel = nullptr;
+		pWrapperTable->m_RTCRecording_HasChannel = nullptr;
+		pWrapperTable->m_RTCRecording_GetChannelType = nullptr;
+		pWrapperTable->m_RTCRecording_GetRecordCount = nullptr;
+		pWrapperTable->m_RTCRecording_GetRecordEntry = nullptr;
+		pWrapperTable->m_RTCRecording_GetAllRecordEntries = nullptr;
+		pWrapperTable->m_RTCRecording_EnableRecording = nullptr;
+		pWrapperTable->m_RTCRecording_DisableRecording = nullptr;
+		pWrapperTable->m_RTCRecording_ExecuteListWithRecording = nullptr;
+		pWrapperTable->m_RTCRecording_AddRecordsToDataTable = nullptr;
+		pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable = nullptr;
 		pWrapperTable->m_RTCContext_LoadFirmware = nullptr;
 		pWrapperTable->m_RTCContext_LoadCorrectionFile = nullptr;
 		pWrapperTable->m_RTCContext_SelectCorrectionTable = nullptr;
@@ -1004,6 +1203,8 @@ public:
 		pWrapperTable->m_RTCContext_DrawPolylineOIE = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatches = nullptr;
 		pWrapperTable->m_RTCContext_AddSetPower = nullptr;
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = nullptr;
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = nullptr;
 		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = nullptr;
 		pWrapperTable->m_RTCContext_AddSetJumpSpeed = nullptr;
 		pWrapperTable->m_RTCContext_AddSetMarkSpeed = nullptr;
@@ -1030,6 +1231,9 @@ public:
 		pWrapperTable->m_RTCContext_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_RTCContext_GetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_RTCContext_InitializeForOIE = nullptr;
+		pWrapperTable->m_RTCContext_SetLaserPinOut = nullptr;
+		pWrapperTable->m_RTCContext_GetLaserPinIn = nullptr;
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
@@ -1052,9 +1256,8 @@ public:
 		pWrapperTable->m_RTCContext_SetTransformationOffset = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationMatrix = nullptr;
 		pWrapperTable->m_RTCContext_PrepareRecording = nullptr;
-		pWrapperTable->m_RTCContext_EnableRecording = nullptr;
-		pWrapperTable->m_RTCContext_DisableRecording = nullptr;
-		pWrapperTable->m_RTCContext_ExecuteListWithRecording = nullptr;
+		pWrapperTable->m_RTCContext_HasRecording = nullptr;
+		pWrapperTable->m_RTCContext_FindRecording = nullptr;
 		pWrapperTable->m_RTCContext_EnableTimelagCompensation = nullptr;
 		pWrapperTable->m_RTCContext_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_RTCContext_EnableMarkOnTheFly2D = nullptr;
@@ -1074,6 +1277,14 @@ public:
 		pWrapperTable->m_RTCContext_DisableLineSubdivision = nullptr;
 		pWrapperTable->m_RTCContext_ReadMultiMCBSP = nullptr;
 		pWrapperTable->m_RTCContext_CreateUARTConnection = nullptr;
+		pWrapperTable->m_RTCContext_EnableScanAhead = nullptr;
+		pWrapperTable->m_RTCContext_DisableScanAhead = nullptr;
+		pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays = nullptr;
+		pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays = nullptr;
+		pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated = nullptr;
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds = nullptr;
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits = nullptr;
+		pWrapperTable->m_RTCContext_SetScanAheadLineParameters = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -1086,6 +1297,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_LoadCustomSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = nullptr;
 		pWrapperTable->m_Driver_ScanLab_EnableJournaling = nullptr;
+		pWrapperTable->m_Driver_ScanLab_SetFirmware = nullptr;
+		pWrapperTable->m_Driver_ScanLab_SetCustomFirmware = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_IsInitialized = nullptr;
@@ -1108,6 +1321,7 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6_DisableAttributeFilter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetToSimulationMode = nullptr;
@@ -1133,8 +1347,10 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableAttributeFilter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableAttributeFilter = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_DisableTimelagCompensation = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
@@ -1318,6 +1534,267 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UARTConnection_ReadLine == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_DrawPolyline = (PLibMCDriver_ScanLabRTCJob_DrawPolylinePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_drawpolyline");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_DrawPolyline = (PLibMCDriver_ScanLabRTCJob_DrawPolylinePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_drawpolyline");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_DrawPolyline == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_DrawPolylineOIE = (PLibMCDriver_ScanLabRTCJob_DrawPolylineOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_drawpolylineoie");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_DrawPolylineOIE = (PLibMCDriver_ScanLabRTCJob_DrawPolylineOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_drawpolylineoie");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_DrawPolylineOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_DrawHatches = (PLibMCDriver_ScanLabRTCJob_DrawHatchesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_drawhatches");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_DrawHatches = (PLibMCDriver_ScanLabRTCJob_DrawHatchesPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_drawhatches");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_DrawHatches == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddSetPower = (PLibMCDriver_ScanLabRTCJob_AddSetPowerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addsetpower");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddSetPower = (PLibMCDriver_ScanLabRTCJob_AddSetPowerPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addsetpower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddSetPower == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddSetAnalogOut = (PLibMCDriver_ScanLabRTCJob_AddSetAnalogOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addsetanalogout");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddSetAnalogOut = (PLibMCDriver_ScanLabRTCJob_AddSetAnalogOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addsetanalogout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddSetAnalogOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddSetDigitalOut = (PLibMCDriver_ScanLabRTCJob_AddSetDigitalOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addsetdigitalout");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddSetDigitalOut = (PLibMCDriver_ScanLabRTCJob_AddSetDigitalOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addsetdigitalout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddSetDigitalOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddSetPowerForPIDControl = (PLibMCDriver_ScanLabRTCJob_AddSetPowerForPIDControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addsetpowerforpidcontrol");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddSetPowerForPIDControl = (PLibMCDriver_ScanLabRTCJob_AddSetPowerForPIDControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addsetpowerforpidcontrol");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddSetPowerForPIDControl == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddSetJumpSpeed = (PLibMCDriver_ScanLabRTCJob_AddSetJumpSpeedPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addsetjumpspeed");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddSetJumpSpeed = (PLibMCDriver_ScanLabRTCJob_AddSetJumpSpeedPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addsetjumpspeed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddSetJumpSpeed == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddSetMarkSpeed = (PLibMCDriver_ScanLabRTCJob_AddSetMarkSpeedPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addsetmarkspeed");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddSetMarkSpeed = (PLibMCDriver_ScanLabRTCJob_AddSetMarkSpeedPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addsetmarkspeed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddSetMarkSpeed == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddJumpMovement = (PLibMCDriver_ScanLabRTCJob_AddJumpMovementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addjumpmovement");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddJumpMovement = (PLibMCDriver_ScanLabRTCJob_AddJumpMovementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addjumpmovement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddJumpMovement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddMarkMovement = (PLibMCDriver_ScanLabRTCJob_AddMarkMovementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addmarkmovement");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddMarkMovement = (PLibMCDriver_ScanLabRTCJob_AddMarkMovementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addmarkmovement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddMarkMovement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddTimedMarkMovement = (PLibMCDriver_ScanLabRTCJob_AddTimedMarkMovementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addtimedmarkmovement");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddTimedMarkMovement = (PLibMCDriver_ScanLabRTCJob_AddTimedMarkMovementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addtimedmarkmovement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddTimedMarkMovement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCJob_AddFreeVariable = (PLibMCDriver_ScanLabRTCJob_AddFreeVariablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcjob_addfreevariable");
+		#else // _WIN32
+		pWrapperTable->m_RTCJob_AddFreeVariable = (PLibMCDriver_ScanLabRTCJob_AddFreeVariablePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcjob_addfreevariable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCJob_AddFreeVariable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled = (PLibMCDriver_ScanLabRTCRecording_ScanheadConnectionCheckIsEnabledPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled = (PLibMCDriver_ScanLabRTCRecording_ScanheadConnectionCheckIsEnabledPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck = (PLibMCDriver_ScanLabRTCRecording_EnableScanheadConnectionCheckPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck = (PLibMCDriver_ScanLabRTCRecording_EnableScanheadConnectionCheckPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck = (PLibMCDriver_ScanLabRTCRecording_DisableScanheadConnectionCheckPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck = (PLibMCDriver_ScanLabRTCRecording_DisableScanheadConnectionCheckPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_Clear = (PLibMCDriver_ScanLabRTCRecording_ClearPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_clear");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_Clear = (PLibMCDriver_ScanLabRTCRecording_ClearPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_clear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_Clear == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_AddChannel = (PLibMCDriver_ScanLabRTCRecording_AddChannelPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_addchannel");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_AddChannel = (PLibMCDriver_ScanLabRTCRecording_AddChannelPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_addchannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_AddChannel == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_RemoveChannel = (PLibMCDriver_ScanLabRTCRecording_RemoveChannelPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_removechannel");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_RemoveChannel = (PLibMCDriver_ScanLabRTCRecording_RemoveChannelPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_removechannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_RemoveChannel == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_HasChannel = (PLibMCDriver_ScanLabRTCRecording_HasChannelPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_haschannel");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_HasChannel = (PLibMCDriver_ScanLabRTCRecording_HasChannelPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_haschannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_HasChannel == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_GetChannelType = (PLibMCDriver_ScanLabRTCRecording_GetChannelTypePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_getchanneltype");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_GetChannelType = (PLibMCDriver_ScanLabRTCRecording_GetChannelTypePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_getchanneltype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_GetChannelType == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_GetRecordCount = (PLibMCDriver_ScanLabRTCRecording_GetRecordCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_getrecordcount");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_GetRecordCount = (PLibMCDriver_ScanLabRTCRecording_GetRecordCountPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_getrecordcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_GetRecordCount == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_GetRecordEntry = (PLibMCDriver_ScanLabRTCRecording_GetRecordEntryPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_getrecordentry");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_GetRecordEntry = (PLibMCDriver_ScanLabRTCRecording_GetRecordEntryPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_getrecordentry");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_GetRecordEntry == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_GetAllRecordEntries = (PLibMCDriver_ScanLabRTCRecording_GetAllRecordEntriesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_getallrecordentries");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_GetAllRecordEntries = (PLibMCDriver_ScanLabRTCRecording_GetAllRecordEntriesPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_getallrecordentries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_GetAllRecordEntries == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_EnableRecording = (PLibMCDriver_ScanLabRTCRecording_EnableRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_enablerecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_EnableRecording = (PLibMCDriver_ScanLabRTCRecording_EnableRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_enablerecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_EnableRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_DisableRecording = (PLibMCDriver_ScanLabRTCRecording_DisableRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_disablerecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_DisableRecording = (PLibMCDriver_ScanLabRTCRecording_DisableRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_disablerecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_DisableRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_ExecuteListWithRecording = (PLibMCDriver_ScanLabRTCRecording_ExecuteListWithRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_executelistwithrecording");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_ExecuteListWithRecording = (PLibMCDriver_ScanLabRTCRecording_ExecuteListWithRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_executelistwithrecording");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_ExecuteListWithRecording == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_AddRecordsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddRecordsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_addrecordstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_AddRecordsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddRecordsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_addrecordstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_AddRecordsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddScaledRecordsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddScaledRecordsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1618,6 +2095,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = (PLibMCDriver_ScanLabRTCContext_AddSetAnalogOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetanalogout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetAnalogOut = (PLibMCDriver_ScanLabRTCContext_AddSetAnalogOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetanalogout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetAnalogOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = (PLibMCDriver_ScanLabRTCContext_AddSetDigitalOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetdigitalout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddSetDigitalOut = (PLibMCDriver_ScanLabRTCContext_AddSetDigitalOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetdigitalout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddSetDigitalOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = (PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_AddSetPowerForPIDControl = (PLibMCDriver_ScanLabRTCContext_AddSetPowerForPIDControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol");
@@ -1852,6 +2347,33 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetLaserPinOut = (PLibMCDriver_ScanLabRTCContext_SetLaserPinOutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserpinout");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetLaserPinOut = (PLibMCDriver_ScanLabRTCContext_SetLaserPinOutPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlaserpinout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetLaserPinOut == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetLaserPinIn = (PLibMCDriver_ScanLabRTCContext_GetLaserPinInPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserpinin");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetLaserPinIn = (PLibMCDriver_ScanLabRTCContext_GetLaserPinInPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getlaserpinin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetLaserPinIn == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = (PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addlaserpinouttolist");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddLaserPinOutToList = (PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addlaserpinouttolist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddLaserPinOutToList == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_EnableOIE = (PLibMCDriver_ScanLabRTCContext_EnableOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableoie");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_EnableOIE = (PLibMCDriver_ScanLabRTCContext_EnableOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableoie");
@@ -2050,30 +2572,21 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_RTCContext_EnableRecording = (PLibMCDriver_ScanLabRTCContext_EnableRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enablerecording");
+		pWrapperTable->m_RTCContext_HasRecording = (PLibMCDriver_ScanLabRTCContext_HasRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_hasrecording");
 		#else // _WIN32
-		pWrapperTable->m_RTCContext_EnableRecording = (PLibMCDriver_ScanLabRTCContext_EnableRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enablerecording");
+		pWrapperTable->m_RTCContext_HasRecording = (PLibMCDriver_ScanLabRTCContext_HasRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_hasrecording");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_RTCContext_EnableRecording == nullptr)
+		if (pWrapperTable->m_RTCContext_HasRecording == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_RTCContext_DisableRecording = (PLibMCDriver_ScanLabRTCContext_DisableRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disablerecording");
+		pWrapperTable->m_RTCContext_FindRecording = (PLibMCDriver_ScanLabRTCContext_FindRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_findrecording");
 		#else // _WIN32
-		pWrapperTable->m_RTCContext_DisableRecording = (PLibMCDriver_ScanLabRTCContext_DisableRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disablerecording");
+		pWrapperTable->m_RTCContext_FindRecording = (PLibMCDriver_ScanLabRTCContext_FindRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_findrecording");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_RTCContext_DisableRecording == nullptr)
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_RTCContext_ExecuteListWithRecording = (PLibMCDriver_ScanLabRTCContext_ExecuteListWithRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_executelistwithrecording");
-		#else // _WIN32
-		pWrapperTable->m_RTCContext_ExecuteListWithRecording = (PLibMCDriver_ScanLabRTCContext_ExecuteListWithRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_executelistwithrecording");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_RTCContext_ExecuteListWithRecording == nullptr)
+		if (pWrapperTable->m_RTCContext_FindRecording == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2248,6 +2761,78 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableScanAhead = (PLibMCDriver_ScanLabRTCContext_EnableScanAheadPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enablescanahead");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableScanAhead = (PLibMCDriver_ScanLabRTCContext_EnableScanAheadPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enablescanahead");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableScanAhead == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableScanAhead = (PLibMCDriver_ScanLabRTCContext_DisableScanAheadPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disablescanahead");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableScanAhead = (PLibMCDriver_ScanLabRTCContext_DisableScanAheadPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disablescanahead");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableScanAhead == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays = (PLibMCDriver_ScanLabRTCContext_ActivateScanAheadAutoDelaysPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_activatescanaheadautodelays");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays = (PLibMCDriver_ScanLabRTCContext_ActivateScanAheadAutoDelaysPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_activatescanaheadautodelays");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays = (PLibMCDriver_ScanLabRTCContext_DeactivateScanAheadAutoDelaysPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_deactivatescanaheadautodelays");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays = (PLibMCDriver_ScanLabRTCContext_DeactivateScanAheadAutoDelaysPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_deactivatescanaheadautodelays");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated = (PLibMCDriver_ScanLabRTCContext_ScanAheadAutoDelaysAreActivatedPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_scanaheadautodelaysareactivated");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated = (PLibMCDriver_ScanLabRTCContext_ScanAheadAutoDelaysAreActivatedPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_scanaheadautodelaysareactivated");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLaserShiftsInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLaserShiftsInMicrosecondsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLaserShiftsInUnitsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinunits");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLaserShiftsInUnitsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinunits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLineParameters = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLineParametersPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlineparameters");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetScanAheadLineParameters = (PLibMCDriver_ScanLabRTCContext_SetScanAheadLineParametersPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setscanaheadlineparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetScanAheadLineParameters == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
 		#else // _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
@@ -2353,6 +2938,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_EnableJournaling == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_SetFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_SetFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_setfirmware");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_SetFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_SetFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_setfirmware");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_SetFirmware == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_SetCustomFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_SetCustomFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_setcustomfirmware");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_SetCustomFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_SetCustomFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_setcustomfirmware");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_SetCustomFirmware == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2551,6 +3154,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetDefaultCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetDefaultCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2779,6 +3391,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAllCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetAllCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_SetCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts");
@@ -2794,6 +3415,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetDefaultCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6xN_GetDefaultCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2949,6 +3579,122 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UARTConnection_ReadLine == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_drawpolyline", (void**)&(pWrapperTable->m_RTCJob_DrawPolyline));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_DrawPolyline == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_drawpolylineoie", (void**)&(pWrapperTable->m_RTCJob_DrawPolylineOIE));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_DrawPolylineOIE == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_drawhatches", (void**)&(pWrapperTable->m_RTCJob_DrawHatches));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_DrawHatches == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addsetpower", (void**)&(pWrapperTable->m_RTCJob_AddSetPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddSetPower == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addsetanalogout", (void**)&(pWrapperTable->m_RTCJob_AddSetAnalogOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddSetAnalogOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addsetdigitalout", (void**)&(pWrapperTable->m_RTCJob_AddSetDigitalOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddSetDigitalOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addsetpowerforpidcontrol", (void**)&(pWrapperTable->m_RTCJob_AddSetPowerForPIDControl));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddSetPowerForPIDControl == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addsetjumpspeed", (void**)&(pWrapperTable->m_RTCJob_AddSetJumpSpeed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddSetJumpSpeed == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addsetmarkspeed", (void**)&(pWrapperTable->m_RTCJob_AddSetMarkSpeed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddSetMarkSpeed == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addjumpmovement", (void**)&(pWrapperTable->m_RTCJob_AddJumpMovement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddJumpMovement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addmarkmovement", (void**)&(pWrapperTable->m_RTCJob_AddMarkMovement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddMarkMovement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addtimedmarkmovement", (void**)&(pWrapperTable->m_RTCJob_AddTimedMarkMovement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddTimedMarkMovement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcjob_addfreevariable", (void**)&(pWrapperTable->m_RTCJob_AddFreeVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddFreeVariable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled", (void**)&(pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck", (void**)&(pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck", (void**)&(pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_clear", (void**)&(pWrapperTable->m_RTCRecording_Clear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_Clear == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_addchannel", (void**)&(pWrapperTable->m_RTCRecording_AddChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_AddChannel == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_removechannel", (void**)&(pWrapperTable->m_RTCRecording_RemoveChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_RemoveChannel == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_haschannel", (void**)&(pWrapperTable->m_RTCRecording_HasChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_HasChannel == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_getchanneltype", (void**)&(pWrapperTable->m_RTCRecording_GetChannelType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_GetChannelType == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_getrecordcount", (void**)&(pWrapperTable->m_RTCRecording_GetRecordCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_GetRecordCount == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_getrecordentry", (void**)&(pWrapperTable->m_RTCRecording_GetRecordEntry));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_GetRecordEntry == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_getallrecordentries", (void**)&(pWrapperTable->m_RTCRecording_GetAllRecordEntries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_GetAllRecordEntries == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_enablerecording", (void**)&(pWrapperTable->m_RTCRecording_EnableRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_EnableRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_disablerecording", (void**)&(pWrapperTable->m_RTCRecording_DisableRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_DisableRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_executelistwithrecording", (void**)&(pWrapperTable->m_RTCRecording_ExecuteListWithRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_ExecuteListWithRecording == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_addrecordstodatatable", (void**)&(pWrapperTable->m_RTCRecording_AddRecordsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_AddRecordsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable", (void**)&(pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_loadfirmware", (void**)&(pWrapperTable->m_RTCContext_LoadFirmware));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_LoadFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3081,6 +3827,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPower == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetanalogout", (void**)&(pWrapperTable->m_RTCContext_AddSetAnalogOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetAnalogOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetdigitalout", (void**)&(pWrapperTable->m_RTCContext_AddSetDigitalOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetDigitalOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addsetpowerforpidcontrol", (void**)&(pWrapperTable->m_RTCContext_AddSetPowerForPIDControl));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddSetPowerForPIDControl == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3185,6 +3939,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_InitializeForOIE == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlaserpinout", (void**)&(pWrapperTable->m_RTCContext_SetLaserPinOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserPinOut == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getlaserpinin", (void**)&(pWrapperTable->m_RTCContext_GetLaserPinIn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetLaserPinIn == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addlaserpinouttolist", (void**)&(pWrapperTable->m_RTCContext_AddLaserPinOutToList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddLaserPinOutToList == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoie", (void**)&(pWrapperTable->m_RTCContext_EnableOIE));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableOIE == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3273,16 +4039,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_PrepareRecording == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablerecording", (void**)&(pWrapperTable->m_RTCContext_EnableRecording));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableRecording == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_hasrecording", (void**)&(pWrapperTable->m_RTCContext_HasRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_HasRecording == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablerecording", (void**)&(pWrapperTable->m_RTCContext_DisableRecording));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableRecording == nullptr) )
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_executelistwithrecording", (void**)&(pWrapperTable->m_RTCContext_ExecuteListWithRecording));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ExecuteListWithRecording == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_findrecording", (void**)&(pWrapperTable->m_RTCContext_FindRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_FindRecording == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enabletimelagcompensation", (void**)&(pWrapperTable->m_RTCContext_EnableTimelagCompensation));
@@ -3361,6 +4123,38 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_CreateUARTConnection == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablescanahead", (void**)&(pWrapperTable->m_RTCContext_EnableScanAhead));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableScanAhead == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablescanahead", (void**)&(pWrapperTable->m_RTCContext_DisableScanAhead));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableScanAhead == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_activatescanaheadautodelays", (void**)&(pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ActivateScanAheadAutoDelays == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_deactivatescanaheadautodelays", (void**)&(pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DeactivateScanAheadAutoDelays == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_scanaheadautodelaysareactivated", (void**)&(pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ScanAheadAutoDelaysAreActivated == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinmicroseconds", (void**)&(pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInMicroseconds == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setscanaheadlasershiftsinunits", (void**)&(pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetScanAheadLaserShiftsInUnits == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setscanaheadlineparameters", (void**)&(pWrapperTable->m_RTCContext_SetScanAheadLineParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetScanAheadLineParameters == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCSelector_SearchCards == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3407,6 +4201,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_enablejournaling", (void**)&(pWrapperTable->m_Driver_ScanLab_EnableJournaling));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_EnableJournaling == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_setfirmware", (void**)&(pWrapperTable->m_Driver_ScanLab_SetFirmware));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_SetFirmware == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_setcustomfirmware", (void**)&(pWrapperTable->m_Driver_ScanLab_SetCustomFirmware));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_SetCustomFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode));
@@ -3495,6 +4297,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getdefaultcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_enabletimelagcompensation", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_EnableTimelagCompensation));
@@ -3597,12 +4403,20 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_DrawLayer == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_setallcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_setcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_SetCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_getdefaultcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6xn_enabletimelagcompensation", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6xN_EnableTimelagCompensation));
@@ -3825,6 +4639,326 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_UARTConnection_ReadLine(m_pHandle, sSeparator.c_str(), nMaxLineLength, nTimeOutInMS, bytesNeededLine, &bytesWrittenLine, &bufferLine[0]));
 		
 		return std::string(&bufferLine[0]);
+	}
+	
+	/**
+	 * Method definitions for class CRTCJob
+	 */
+	
+	/**
+	* CRTCJob::DrawPolyline - Writes a polyline into the open list
+	* @param[in] PointsBuffer - Points of polyline to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	*/
+	void CRTCJob::DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_DrawPolyline(m_pHandle, (LibMCDriver_ScanLab_uint64)PointsBuffer.size(), PointsBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
+	}
+	
+	/**
+	* CRTCJob::DrawPolylineOIE - Writes a polyline into the open list with OIE Enabled.
+	* @param[in] PointsBuffer - Points of polyline to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	* @param[in] nOIEPIDControlIndex - OIE PID Control Index. 0 disables PID Control, MUST be smaller or equal 63.
+	*/
+	void CRTCJob::DrawPolylineOIE(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_DrawPolylineOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)PointsBuffer.size(), PointsBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue, nOIEPIDControlIndex));
+	}
+	
+	/**
+	* CRTCJob::DrawHatches - Writes a list of hatches into the open list
+	* @param[in] HatchesBuffer - Hatches to draw.
+	* @param[in] fMarkSpeed - Mark speed in mm/s
+	* @param[in] fJumpSpeed - Jump speed in mm/s
+	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
+	*/
+	void CRTCJob::DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_DrawHatches(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
+	}
+	
+	/**
+	* CRTCJob::AddSetPower - adds a power change to the open list. MUST NOT be used for PID control.
+	* @param[in] fPowerInPercent - Laser power in percent
+	*/
+	void CRTCJob::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddSetPower(m_pHandle, fPowerInPercent));
+	}
+	
+	/**
+	* CRTCJob::AddSetAnalogOut - Adds changing an analog port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	void CRTCJob::AddSetAnalogOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddSetAnalogOut(m_pHandle, eLaserPort, fOutputValue));
+	}
+	
+	/**
+	* CRTCJob::AddSetDigitalOut - Adds changing an digital port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	void CRTCJob::AddSetDigitalOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddSetDigitalOut(m_pHandle, eLaserPort, fOutputValue));
+	}
+	
+	/**
+	* CRTCJob::AddSetPowerForPIDControl - adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
+	* @param[in] fPowerInPercent - Laser power in percent
+	*/
+	void CRTCJob::AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddSetPowerForPIDControl(m_pHandle, fPowerInPercent));
+	}
+	
+	/**
+	* CRTCJob::AddSetJumpSpeed - adds a jump speed change to the open list
+	* @param[in] fJumpSpeedInMMPerSecond - Jump speed in mm/s
+	*/
+	void CRTCJob::AddSetJumpSpeed(const LibMCDriver_ScanLab_single fJumpSpeedInMMPerSecond)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddSetJumpSpeed(m_pHandle, fJumpSpeedInMMPerSecond));
+	}
+	
+	/**
+	* CRTCJob::AddSetMarkSpeed - adds a mark speed change to the open list
+	* @param[in] fMarkSpeedInMMPerSecond - Mark speed in mm/s
+	*/
+	void CRTCJob::AddSetMarkSpeed(const LibMCDriver_ScanLab_single fMarkSpeedInMMPerSecond)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddSetMarkSpeed(m_pHandle, fMarkSpeedInMMPerSecond));
+	}
+	
+	/**
+	* CRTCJob::AddJumpMovement - Adds a Jump movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	void CRTCJob::AddJumpMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddJumpMovement(m_pHandle, dTargetX, dTargetY));
+	}
+	
+	/**
+	* CRTCJob::AddMarkMovement - Adds a Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	*/
+	void CRTCJob::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddMarkMovement(m_pHandle, dTargetX, dTargetY));
+	}
+	
+	/**
+	* CRTCJob::AddTimedMarkMovement - Adds a timed Mark movement to the open list
+	* @param[in] dTargetX - X Position.
+	* @param[in] dTargetY - Y Position.
+	* @param[in] dDurationInMicroseconds - Duration of mark movement in Microseconds.
+	*/
+	void CRTCJob::AddTimedMarkMovement(const LibMCDriver_ScanLab_double dTargetX, const LibMCDriver_ScanLab_double dTargetY, const LibMCDriver_ScanLab_double dDurationInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddTimedMarkMovement(m_pHandle, dTargetX, dTargetY, dDurationInMicroseconds));
+	}
+	
+	/**
+	* CRTCJob::AddFreeVariable - Adds a free variable set to the open list
+	* @param[in] nVariableNo - Number of the variable (0-7).
+	* @param[in] nValue - Value to set.
+	*/
+	void CRTCJob::AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCJob_AddFreeVariable(m_pHandle, nVariableNo, nValue));
+	}
+	
+	/**
+	 * Method definitions for class CRTCRecording
+	 */
+	
+	/**
+	* CRTCRecording::ScanheadConnectionCheckIsEnabled - Returns if the scan head connection is checked when recording
+	* @return If true, the Scanhead connection will be checked for an error when recording.
+	*/
+	bool CRTCRecording::ScanheadConnectionCheckIsEnabled()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_ScanheadConnectionCheckIsEnabled(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CRTCRecording::EnableScanheadConnectionCheck - Enables the Scanhead connection check. The check is enabled by default.
+	*/
+	void CRTCRecording::EnableScanheadConnectionCheck()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_EnableScanheadConnectionCheck(m_pHandle));
+	}
+	
+	/**
+	* CRTCRecording::DisableScanheadConnectionCheck - Disables the Scanhead connection check.
+	*/
+	void CRTCRecording::DisableScanheadConnectionCheck()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_DisableScanheadConnectionCheck(m_pHandle));
+	}
+	
+	/**
+	* CRTCRecording::Clear - Clears all recording data and channels.
+	*/
+	void CRTCRecording::Clear()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_Clear(m_pHandle));
+	}
+	
+	/**
+	* CRTCRecording::AddChannel - Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique.
+	* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined.
+	*/
+	void CRTCRecording::AddChannel(const std::string & sChannelName, const eRTCChannelType eChannelType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_AddChannel(m_pHandle, sChannelName.c_str(), eChannelType));
+	}
+	
+	/**
+	* CRTCRecording::RemoveChannel - Removes a new channel from the recording and all recorded data of that channel. Does nothing if channel does not exist. 
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	*/
+	void CRTCRecording::RemoveChannel(const std::string & sChannelName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_RemoveChannel(m_pHandle, sChannelName.c_str()));
+	}
+	
+	/**
+	* CRTCRecording::HasChannel - Returns if a channel name exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @return Returns true if channel exists.
+	*/
+	bool CRTCRecording::HasChannel(const std::string & sChannelName)
+	{
+		bool resultChannelExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_HasChannel(m_pHandle, sChannelName.c_str(), &resultChannelExists));
+		
+		return resultChannelExists;
+	}
+	
+	/**
+	* CRTCRecording::GetChannelType - Returns the type of a channel. Returns Undefined if channel does not exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @return Channel type enum.
+	*/
+	eRTCChannelType CRTCRecording::GetChannelType(const std::string & sChannelName)
+	{
+		eRTCChannelType resultChannelType = (eRTCChannelType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_GetChannelType(m_pHandle, sChannelName.c_str(), &resultChannelType));
+		
+		return resultChannelType;
+	}
+	
+	/**
+	* CRTCRecording::GetRecordCount - Returns how many record entries have been recorded.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @return The number of record entries.
+	*/
+	LibMCDriver_ScanLab_uint64 CRTCRecording::GetRecordCount(const std::string & sChannelName)
+	{
+		LibMCDriver_ScanLab_uint64 resultRecordCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_GetRecordCount(m_pHandle, sChannelName.c_str(), &resultRecordCount));
+		
+		return resultRecordCount;
+	}
+	
+	/**
+	* CRTCRecording::GetRecordEntry - Returns a specific record entry. Fails if Channel does not exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @param[in] nRecordIndex - Index of Record entry. MUST be between 0 and RecordCount - 1.
+	* @return Value of record entry.
+	*/
+	LibMCDriver_ScanLab_int32 CRTCRecording::GetRecordEntry(const std::string & sChannelName, const LibMCDriver_ScanLab_uint64 nRecordIndex)
+	{
+		LibMCDriver_ScanLab_int32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_GetRecordEntry(m_pHandle, sChannelName.c_str(), nRecordIndex, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CRTCRecording::GetAllRecordEntries - Returns all record entries of a channel. Fails if Channel does not exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @param[out] ValuesBuffer - Array of all record entries.
+	*/
+	void CRTCRecording::GetAllRecordEntries(const std::string & sChannelName, std::vector<LibMCDriver_ScanLab_int32> & ValuesBuffer)
+	{
+		LibMCDriver_ScanLab_uint64 elementsNeededValues = 0;
+		LibMCDriver_ScanLab_uint64 elementsWrittenValues = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_GetAllRecordEntries(m_pHandle, sChannelName.c_str(), 0, &elementsNeededValues, nullptr));
+		ValuesBuffer.resize((size_t) elementsNeededValues);
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_GetAllRecordEntries(m_pHandle, sChannelName.c_str(), elementsNeededValues, &elementsWrittenValues, ValuesBuffer.data()));
+	}
+	
+	/**
+	* CRTCRecording::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
+	* @param[in] eFrequency - Recording frequency.
+	*/
+	void CRTCRecording::EnableRecording(const eRTCRecordingFrequency eFrequency)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_EnableRecording(m_pHandle, eFrequency));
+	}
+	
+	/**
+	* CRTCRecording::DisableRecording - Disables recording of position data of the RTC Card. This is a list command.
+	*/
+	void CRTCRecording::DisableRecording()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_DisableRecording(m_pHandle));
+	}
+	
+	/**
+	* CRTCRecording::ExecuteListWithRecording - Executes the list with recording the position data from the RTC card. DEPRECIATED!
+	*/
+	void CRTCRecording::ExecuteListWithRecording()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_ExecuteListWithRecording(m_pHandle));
+	}
+	
+	/**
+	* CRTCRecording::AddRecordsToDataTable - Writes a certain channel to a data table as int32 columns. Fails if Channel does not exist
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	*/
+	void CRTCRecording::AddRecordsToDataTable(const std::string & sChannelName, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_AddRecordsToDataTable(m_pHandle, sChannelName.c_str(), hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str()));
+	}
+	
+	/**
+	* CRTCRecording::AddScaledRecordsToDataTable - Writes a certain channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset. Fails if Channel does not exist.
+	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores.
+	* @param[in] pDataTable - Data table instance to write to.
+	* @param[in] sColumnIdentifier - Identifier of the Column.
+	* @param[in] sColumnDescription - Description of the Column.
+	* @param[in] dScaleFactor - Factor that the raw value is scaled with.
+	* @param[in] dOffset - Offset that the raw value is scaled with.
+	*/
+	void CRTCRecording::AddScaledRecordsToDataTable(const std::string & sChannelName, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_AddScaledRecordsToDataTable(m_pHandle, sChannelName.c_str(), hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str(), dScaleFactor, dOffset));
 	}
 	
 	/**
@@ -4190,6 +5324,26 @@ public:
 	}
 	
 	/**
+	* CRTCContext::AddSetAnalogOut - Adds changing an analog port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an analog port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	void CRTCContext::AddSetAnalogOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetAnalogOut(m_pHandle, eLaserPort, fOutputValue));
+	}
+	
+	/**
+	* CRTCContext::AddSetDigitalOut - Adds changing an digital port to the open list. Should not interfere with laser power control.
+	* @param[in] eLaserPort - Laser port to set. MUST not be an digital port or the call fails.
+	* @param[in] fOutputValue - New Normalized output value. Value is clipped between 0 and 1.
+	*/
+	void CRTCContext::AddSetDigitalOut(const eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddSetDigitalOut(m_pHandle, eLaserPort, fOutputValue));
+	}
+	
+	/**
 	* CRTCContext::AddSetPowerForPIDControl - adds a base power change to the open list. If using PID control, this base power will be used at starting power when the laser is turned on.
 	* @param[in] fPowerInPercent - Laser power in percent
 	*/
@@ -4357,11 +5511,11 @@ public:
 	
 	/**
 	* CRTCContext::AddCustomDelay - Adds a custom delay to the list
-	* @param[in] nDelay - Custom delay value in microseconds (MUST be multiple of 10)
+	* @param[in] nDelayInMicroseconds - Custom delay value in microseconds (MUST be multiple of 10)
 	*/
-	void CRTCContext::AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay)
+	void CRTCContext::AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelayInMicroseconds)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddCustomDelay(m_pHandle, nDelay));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddCustomDelay(m_pHandle, nDelayInMicroseconds));
 	}
 	
 	/**
@@ -4442,7 +5596,7 @@ public:
 	}
 	
 	/**
-	* CRTCContext::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* CRTCContext::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts for a specific connection. The Driver defaults will not be changed.
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
 	* @param[in] dMultiplier - Multiplier
@@ -4471,6 +5625,36 @@ public:
 	void CRTCContext::InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer, const eOIEOperationMode eOperationMode)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_InitializeForOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)SignalChannelsBuffer.size(), SignalChannelsBuffer.data(), eOperationMode));
+	}
+	
+	/**
+	* CRTCContext::SetLaserPinOut - Sets the laser pin outputs to a certain state. Control command, has immediate effect.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	void CRTCContext::SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserPinOut(m_pHandle, bLaserOut1, bLaserOut2));
+	}
+	
+	/**
+	* CRTCContext::GetLaserPinIn - Read the laser pin input values. Control command, has immediate effect.
+	* @param[out] bLaserOut1 - Value for Laser In Pin 1
+	* @param[out] bLaserOut2 - Value for Laser In Pin 2
+	*/
+	void CRTCContext::GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetLaserPinIn(m_pHandle, &bLaserOut1, &bLaserOut2));
+	}
+	
+	/**
+	* CRTCContext::AddLaserPinOutToList - Adds the laser pin command to the current open list.
+	* @param[in] bLaserOut1 - Value for Laser Out Pin 1
+	* @param[in] bLaserOut2 - Value for Laser Out Pin 2
+	*/
+	void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddLaserPinOutToList(m_pHandle, bLaserOut1, bLaserOut2));
 	}
 	
 	/**
@@ -4676,36 +5860,47 @@ public:
 	
 	/**
 	* CRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
+	* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance.
+	* @return Recording instance.
 	*/
-	void CRTCContext::PrepareRecording()
+	PRTCRecording CRTCContext::PrepareRecording(const bool bKeepInMemory)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_PrepareRecording(m_pHandle));
+		LibMCDriver_ScanLabHandle hRecordingInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_PrepareRecording(m_pHandle, bKeepInMemory, &hRecordingInstance));
+		
+		if (!hRecordingInstance) {
+			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CRTCRecording>(m_pWrapper, hRecordingInstance);
 	}
 	
 	/**
-	* CRTCContext::EnableRecording - Enables recording of position data of the RTC Card. This is a list command.
+	* CRTCContext::HasRecording - Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.
+	* @param[in] sUUID - UUID of the recording to find.
+	* @return Returns if the recording exists.
 	*/
-	void CRTCContext::EnableRecording()
+	bool CRTCContext::HasRecording(const std::string & sUUID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableRecording(m_pHandle));
+		bool resultRecordingExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_HasRecording(m_pHandle, sUUID.c_str(), &resultRecordingExists));
+		
+		return resultRecordingExists;
 	}
 	
 	/**
-	* CRTCContext::DisableRecording - Disables recording of position data of the RTC Card. This is a list command.
+	* CRTCContext::FindRecording - Find a recording in the driver memory. Recording MUST have been created with KeepInMemory set to true. Fails if recording does not exist.
+	* @param[in] sUUID - UUID of the recording to find.
+	* @return Recording instance.
 	*/
-	void CRTCContext::DisableRecording()
+	PRTCRecording CRTCContext::FindRecording(const std::string & sUUID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableRecording(m_pHandle));
-	}
-	
-	/**
-	* CRTCContext::ExecuteListWithRecording - Executes the list with recording the position data from the RTC card.
-	* @param[in] nListIndex - Index of List (1 or 2).
-	* @param[in] nPosition - Relative Position in List.
-	*/
-	void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ExecuteListWithRecording(m_pHandle, nListIndex, nPosition));
+		LibMCDriver_ScanLabHandle hRecordingInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_FindRecording(m_pHandle, sUUID.c_str(), &hRecordingInstance));
+		
+		if (!hRecordingInstance) {
+			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CRTCRecording>(m_pWrapper, hRecordingInstance);
 	}
 	
 	/**
@@ -4908,6 +6103,83 @@ public:
 	}
 	
 	/**
+	* CRTCContext::EnableScanAhead - Enables the Scanahead mode of the RTC card.
+	* @param[in] nHeadNo - Head Number
+	* @param[in] nTableNo - Table Number
+	*/
+	void CRTCContext::EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableScanAhead(m_pHandle, nHeadNo, nTableNo));
+	}
+	
+	/**
+	* CRTCContext::DisableScanAhead - Disables the Scanahead mode of the RTC card.
+	*/
+	void CRTCContext::DisableScanAhead()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableScanAhead(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::ActivateScanAheadAutoDelays - Activates the ScanAhead Auto Delays.
+	*/
+	void CRTCContext::ActivateScanAheadAutoDelays()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ActivateScanAheadAutoDelays(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DeactivateScanAheadAutoDelays - Deactivates the ScanAhead Auto Delays.
+	*/
+	void CRTCContext::DeactivateScanAheadAutoDelays()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DeactivateScanAheadAutoDelays(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::ScanAheadAutoDelaysAreActivated - Returns if ScanAhead Auto Delays are activated.
+	* @return Returns true if Auto Delays are activated.
+	*/
+	bool CRTCContext::ScanAheadAutoDelaysAreActivated()
+	{
+		bool resultActivated = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ScanAheadAutoDelaysAreActivated(m_pHandle, &resultActivated));
+		
+		return resultActivated;
+	}
+	
+	/**
+	* CRTCContext::SetScanAheadLaserShiftsInMicroseconds - Enables the Scanahead mode of the RTC card.
+	* @param[in] dLaserOnShiftInMicroSeconds - Laser on shift in Microseconds. Will be rounded to 64th microseconds.
+	* @param[in] dLaserOffShiftInMicroSeconds - Laser off shift in Microseconds. Will be rounded to 64th microseconds.
+	*/
+	void CRTCContext::SetScanAheadLaserShiftsInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnShiftInMicroSeconds, const LibMCDriver_ScanLab_double dLaserOffShiftInMicroSeconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetScanAheadLaserShiftsInMicroseconds(m_pHandle, dLaserOnShiftInMicroSeconds, dLaserOffShiftInMicroSeconds));
+	}
+	
+	/**
+	* CRTCContext::SetScanAheadLaserShiftsInUnits - Enables the Scanahead mode of the RTC card.
+	* @param[in] nLaserOnShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+	* @param[in] nLaserOffShift - Laser on shift in Units, which are 1/64th of a Microsecond.
+	*/
+	void CRTCContext::SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetScanAheadLaserShiftsInUnits(m_pHandle, nLaserOnShift, nLaserOffShift));
+	}
+	
+	/**
+	* CRTCContext::SetScanAheadLineParameters - Controls the Scanahead Line parameters.
+	* @param[in] nCornerScale - Corner sharpness scale in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+	* @param[in] nEndScale - Line end sharpness scale in Percent.. 100 percent means straight line ends. Values above 100 will be clipped to 100.
+	* @param[in] nAccelerationScale - Fraction of active laser time (not path lenght) during acceleration in Percent.. 100 percent means sharp corners. Values above 100 will be clipped to 100.
+	*/
+	void CRTCContext::SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetScanAheadLineParameters(m_pHandle, nCornerScale, nEndScale, nAccelerationScale));
+	}
+	
+	/**
 	 * Method definitions for class CRTCSelector
 	 */
 	
@@ -5075,6 +6347,28 @@ public:
 	}
 	
 	/**
+	* CDriver_ScanLab::SetFirmware - Sets the default firmware from the driver resources. If given, Initialise will upload this firmware before acquiring the RTC card.
+	* @param[in] sFirmwareResource - resource name of the firmware program file.
+	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
+	*/
+	void CDriver_ScanLab::SetFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_SetFirmware(m_pHandle, sFirmwareResource.c_str(), sFPGAResource.c_str(), sAuxiliaryResource.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLab::SetCustomFirmware - Sets the default firmware from a binary array. If given, Initialise will upload this firmware before acquiring the RTC card.
+	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] AuxiliaryDataBuffer - byte array of the binary auxiliary file.
+	*/
+	void CDriver_ScanLab::SetCustomFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_SetCustomFirmware(m_pHandle, (LibMCDriver_ScanLab_uint64)FirmwareDataBuffer.size(), FirmwareDataBuffer.data(), (LibMCDriver_ScanLab_uint64)FPGADataBuffer.size(), FPGADataBuffer.data(), (LibMCDriver_ScanLab_uint64)AuxiliaryDataBuffer.size(), AuxiliaryDataBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CDriver_ScanLab_RTC6
 	 */
 	
@@ -5132,7 +6426,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* CDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts. The given values will be defaults for all subsequent connections.
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
 	* @param[in] dMultiplier - Multiplier
@@ -5215,7 +6509,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::LoadFirmware - Loads the firmware from the driver resources.
+	* CDriver_ScanLab_RTC6::LoadFirmware - Loads the firmware from the driver resources. DEPRECIATED. Use SetFirmare before calling Initialise..
 	* @param[in] sFirmwareResource - resource name of the firmware program file.
 	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
 	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
@@ -5226,7 +6520,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::LoadCustomFirmware - Loads the firmware from custom resources.
+	* CDriver_ScanLab_RTC6::LoadCustomFirmware - Loads the firmware from custom resources. DEPRECIATED. Use SetCustomFirmare before calling Initialise..
 	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
 	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
 	* @param[in] AuxiliaryDataBuffer - byte array of the binary auxiliary file.
@@ -5330,7 +6624,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* CDriver_ScanLab_RTC6::GetCommunicationTimeouts - Returns the current RTC Ethernet communication timeouts. Fails, if no RTC card has been acquired yet.
 	* @param[out] dInitialTimeout - Initial timeout in ms
 	* @param[out] dMaxTimeout - Max timeout in ms
 	* @param[out] dMultiplier - Multiplier
@@ -5338,6 +6632,17 @@ public:
 	void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_GetCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::GetDefaultCommunicationTimeouts - Returns the RTC Ethernet communication timeouts that will be used for a subsequent connection.
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	void CDriver_ScanLab_RTC6::GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_GetDefaultCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
 	}
 	
 	/**
@@ -5533,7 +6838,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::LoadFirmware - Loads the firmware from the driver resources.
+	* CDriver_ScanLab_RTC6xN::LoadFirmware - Loads the firmware from the driver resources and for a specific scanner. DEPRECIATED. Use SetFirmare before calling Initialise..
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] sFirmwareResource - resource name of the firmware program file.
 	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
@@ -5545,7 +6850,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::LoadCustomFirmware - Loads the firmware from custom resources.
+	* CDriver_ScanLab_RTC6xN::LoadCustomFirmware - Loads the firmware from custom resources and for a specific scanner. DEPRECIATED. Use SetCustomFirmare before calling Initialise..
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
 	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
@@ -5654,7 +6959,18 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* CDriver_ScanLab_RTC6xN::SetAllCommunicationTimeouts - Set RTC Ethernet communication timeouts for all existing and future connections.
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	void CDriver_ScanLab_RTC6xN::SetAllCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_SetAllCommunicationTimeouts(m_pHandle, dInitialTimeout, dMaxTimeout, dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts for a specific scanner. The given values will be defaults for all subsequent connections.
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[in] dInitialTimeout - Initial timeout in ms
 	* @param[in] dMaxTimeout - Max timeout in ms
@@ -5666,7 +6982,7 @@ public:
 	}
 	
 	/**
-	* CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts. Fails if the RTC Card is not connected.
 	* @param[in] nScannerIndex - Index of the scanner (0-based). MUST be smaller than ScannerCount
 	* @param[out] dInitialTimeout - Initial timeout in ms
 	* @param[out] dMaxTimeout - Max timeout in ms
@@ -5675,6 +6991,17 @@ public:
 	void CDriver_ScanLab_RTC6xN::GetCommunicationTimeouts(const LibMCDriver_ScanLab_uint32 nScannerIndex, LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_GetCommunicationTimeouts(m_pHandle, nScannerIndex, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6xN::GetDefaultCommunicationTimeouts - Returns the RTC Ethernet communication timeouts that will be used for any subsequent connection.
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	void CDriver_ScanLab_RTC6xN::GetDefaultCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6xN_GetDefaultCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
 	}
 	
 	/**

@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	enum APIHandler_UploadType {
+	enum class APIHandler_UploadType : uint32_t {
 		utUnknown = 0,
 		utInitUpload = 1,
 		utStreamUpload = 2,

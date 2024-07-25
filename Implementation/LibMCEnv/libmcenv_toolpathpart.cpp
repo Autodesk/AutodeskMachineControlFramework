@@ -33,15 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "libmcenv_modeldatacomponentinstance.hpp"
+
+#include "amc_meshutils.hpp"
 
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
  Class definition of CToolpathPart
 **************************************************************************************************************************/
-CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart)
-	: m_pPart (pPart)
+CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart, AMC::PMeshHandler pMeshHandler)
+	: m_pPart (pPart), m_pMeshHandler (pMeshHandler)
 {
+	if (pMeshHandler.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pPart.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
@@ -61,24 +66,13 @@ std::string CToolpathPart::GetUUID()
 	return m_pPart->getUUID();
 }
 
-std::string CToolpathPart::GetMeshUUID()
+IModelDataComponentInstance* CToolpathPart::GetRootComponent()
 {
-	return m_pPart->getMeshUUID();
+	auto pBuildItem = m_pPart->getBuildItem();
+	auto pModel = m_pPart->getModel();
+
+	auto transform = AMC::CMeshUtils::map3MFTransform(pBuildItem->GetObjectTransform());
+
+	return new CModelDataComponentInstance(pModel, pBuildItem->GetObjectResource(), transform, m_pMeshHandler);
 }
 
-LibMCEnv::sToolpathPartTransform CToolpathPart::GetTransform()
-{
-	LibMCEnv::sToolpathPartTransform transform;
-	// TODO
-
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			transform.m_Matrix[i][j] = (i == j) ? 1.0 : 0.0;
-
-	transform.m_Translation[0] = 0.0;
-	transform.m_Translation[1] = 0.0;
-	transform.m_Translation[2] = 0.0;
-
-	return transform;
-
-}

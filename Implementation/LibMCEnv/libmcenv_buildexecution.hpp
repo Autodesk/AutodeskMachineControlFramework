@@ -37,6 +37,7 @@ Abstract: This is the class declaration of CBuildExecution
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_toolpathhandler.hpp"
+#include "amc_meshhandler.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -65,13 +66,17 @@ private:
 	LibMCData::PBuildJobExecution m_pExecution;
 	LibMCData::PDataModel m_pDataModel;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	AMC::PMeshHandler m_pMeshHandler;
 	AMCCommon::PChrono m_pGlobalChrono;
-	std::string m_sSystemUserID;
 	std::mutex m_Mutex;
 
 public:
 
-	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, const std::string & sSystemUserID, AMCCommon::PChrono pGlobalChrono);
+	static CBuildExecution* makeFrom (CBuildExecution * pBuildExecution);
+
+	static std::shared_ptr<CBuildExecution> makeSharedFrom(CBuildExecution* pBuildExecution);
+
+	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono);
 
 	virtual ~CBuildExecution();
 
@@ -115,25 +120,43 @@ public:
 
 	LibMCEnv_uint64 GetElapsedTimeInMicroseconds() override;
 
-	std::string AddBinaryData(const std::string & sIdentifier, const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) override;
+	bool HasAttachment(const std::string& sDataUUID) override;
+
+	bool HasAttachmentIdentifier(const std::string& sIdentifier) override;
+
+	std::string AddBinaryData(const std::string& sIdentifier, const std::string& sName, const std::string& sMIMEType, const std::string& sUserUUID, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8* pContentBuffer) override;
+
+	std::string AttachTempStream(const std::string& sIdentifier, const std::string& sName, const std::string& sUserUUID, IBaseTempStreamWriter* pStreamWriterInstance) override;
+
+	IStreamReader* LoadStreamByIdentifier(const std::string& sIdentifier) override;
+
+	IStreamReader* LoadStreamByUUID(const std::string& sDataUUID) override;
 
 	IDiscreteFieldData2D * LoadDiscreteField2DByIdentifier(const std::string & sContextIdentifier) override;
 
 	IDiscreteFieldData2D * LoadDiscreteField2DByUUID(const std::string & sDataUUID) override;
 
-	std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions) override;
+	std::string StoreDiscreteField2D(const std::string & sContextIdentifier, const std::string & sName, IDiscreteFieldData2D* pFieldDataInstance, IDiscreteFieldData2DStoreOptions* pStoreOptions, const std::string& sUserUUID) override;
 
-	IImageData * LoadPNGImageByIdentifier(const std::string & sContextIdentifier) override;
+	IDataTable* LoadDataTableByIdentifier(const std::string& sIdentifier) override;
 
-	IImageData * LoadPNGImageByUUID(const std::string & sDataUUID) override;
+	IDataTable* LoadDataTableByUUID(const std::string& sDataUUID) override;
 
-	std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions) override;
+	std::string StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string& sUserUUID) override;
 
-	void AddMetaDataString(const std::string & sKey, const std::string & sValue) override;
+	IImageData * LoadPNGImageByIdentifier(const std::string& sContextIdentifier, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+
+	IImageData * LoadPNGImageByUUID(const std::string & sDataUUID, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+
+	std::string StorePNGImage(const std::string & sContextIdentifier, const std::string & sName, IImageData* pImageDataInstance, IPNGImageStoreOptions* pStoreOptions, const std::string& sUserUUID) override;
+
+	void StoreMetaDataString(const std::string & sKey, const std::string & sValue) override;
 
 	bool HasMetaDataString(const std::string & sKey) override;
 
 	std::string GetMetaDataString(const std::string & sKey) override;
+
+	IJournalHandler* LoadAttachedJournal() override;
 
 };
 

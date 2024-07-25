@@ -62,6 +62,11 @@ private:
 	std::string m_sIdentifier;
 	std::string m_sDescription;
 
+protected:
+
+	void writeUint64ToBufferFixedDigits(uint64_t nValue, uint32_t nFixedDigits, std::vector<char>& buffer, size_t& nBufferPosition);
+	void writeUint64ToBuffer(uint64_t nValue, std::vector<char>& buffer, size_t& nBufferPosition);
+
 public:
 
 	CDataTableColumn(const std::string& sIdentifier, const std::string & sDescription);
@@ -82,6 +87,8 @@ public:
 
 	virtual void WriteDataToStream(ITempStreamWriter* pWriter) = 0;
 
+	virtual void ReadDataFromStream(IStreamReader* pReader, uint64_t nEntryCount) = 0;
+
 	virtual size_t getEntrySizeInBytes() = 0;
 };
 
@@ -100,7 +107,11 @@ private:
 
 	CDataTableColumn* findColumn(const std::string& sIdentifier, bool bMustExist);
 
+	PDataTableColumn addColumnEx(const std::string& sIdentifier, const std::string& sDescription, const LibMCEnv::eDataTableColumnType eColumnType);
+
 public:
+
+	static CDataTable* makeFromStream (IStreamReader * pStreamReader);
 
 	CDataTable();
 
@@ -144,10 +155,17 @@ public:
 
 	void SetUint64ColumnValues(const std::string & sIdentifier, const LibMCEnv_uint64 nValuesBufferSize, const LibMCEnv_uint64 * pValuesBuffer) override;
 
+	IDataTableWriteOptions* CreateWriteOptions() override;
+
+	IDataTableCSVWriteOptions* CreateCSVWriteOptions() override;
+
 	void WriteCSVToStream(ITempStreamWriter* pWriter, IDataTableCSVWriteOptions* pOptions) override;
 
 	void WriteDataToStream(ITempStreamWriter* pWriter, IDataTableWriteOptions* pOptions) override;
 
+	void LoadFromStream(IStreamReader* pStream) override;
+
+	void Clear() override;
 };
 
 } // namespace Impl
