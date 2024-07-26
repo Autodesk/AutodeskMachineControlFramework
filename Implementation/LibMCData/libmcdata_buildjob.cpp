@@ -109,6 +109,8 @@ CBuildJob* CBuildJob::makeFromDatabase(const std::string& sJobUUID, AMCData::PSQ
 
     std::string sThumbnailStreamUUID = AMCCommon::CUtils::normalizeUUIDString(pStatement->getColumnString(10));
 
+    pStatement = nullptr;
+
     return make (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserUUID, sUserName, nLayerCount, (uint32_t) nExecutionCount, sThumbnailStreamUUID, pSQLHandler, pStorageState);
 }
 
@@ -211,7 +213,7 @@ void CBuildJob::SetThumbnailStreamUUID(const std::string& sStreamUUID)
 
         if (!pStreamQueryStatement->nextRow())
             throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND, "thumbnail storage stream not found: " + sNormalizedThumbnailUUID);
-
+        pStreamQueryStatement = nullptr;
     }
 
     auto updateUUID = AMCCommon::CUtils::createUUID();
@@ -221,6 +223,7 @@ void CBuildJob::SetThumbnailStreamUUID(const std::string& sStreamUUID)
     pStatement->setString(2, updateUUID);
     pStatement->setString(3, m_sUUID);
     pStatement->execute();
+    pStatement = nullptr;
 
     pTransaction->commit();
 
@@ -259,6 +262,7 @@ void CBuildJob::StartValidating()
     pStatement->setString(3, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Created));
     pStatement->setString(4, m_sUUID);
     pStatement->execute();
+    pStatement = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 }
@@ -275,6 +279,7 @@ void CBuildJob::FinishValidating(const LibMCData_uint32 nLayerCount)
     pStatement->setString(4, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Validating));
     pStatement->setString(5, m_sUUID);
     pStatement->execute();
+    pStatement = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 }
@@ -290,6 +295,7 @@ void CBuildJob::ArchiveJob()
     pStatement->setString(3, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Validated));
     pStatement->setString(4, m_sUUID);
     pStatement->execute();
+    pStatement = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 }
@@ -322,6 +328,7 @@ void CBuildJob::DeleteJob()
     pStatement->setString(3, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Archived));
     pStatement->setString(4, m_sUUID);
     pStatement->execute();
+    pStatement = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 

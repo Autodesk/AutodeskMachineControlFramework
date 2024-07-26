@@ -35,13 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMCData {
 
-	CSQLTransaction::CSQLTransaction(CSQLHandler* pSQLHandler)
-		: m_pSQLHandler (pSQLHandler), m_bIsClosed(false)
+	CSQLTransaction::CSQLTransaction(CSQLHandler* pSQLHandler, PSQLTransactionLock pLock)
+		: m_pSQLHandler (pSQLHandler), m_bIsClosed(false), m_pLock (pLock)
 	{
 		if (!m_pSQLHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-		auto pStatement = m_pSQLHandler->prepareStatement("BEGIN TRANSACTION;");
+		auto pStatement = m_pSQLHandler->prepareStatementLocked("BEGIN TRANSACTION;", m_pLock);
 		pStatement->execute();
 
 	}
@@ -58,7 +58,7 @@ namespace AMCData {
 
 	void CSQLTransaction::commit()
 	{
-		auto pStatement = m_pSQLHandler->prepareStatement("COMMIT;");
+		auto pStatement = m_pSQLHandler->prepareStatementLocked("COMMIT;", m_pLock);
 		pStatement->execute();
 
 		m_bIsClosed = true;
@@ -66,7 +66,7 @@ namespace AMCData {
 	
 	void CSQLTransaction::rollback()
 	{
-		auto pStatement = m_pSQLHandler->prepareStatement("ROLLBACK;");
+		auto pStatement = m_pSQLHandler->prepareStatementLocked("ROLLBACK;", m_pLock);
 		pStatement->execute();
 
 		m_bIsClosed = true;
@@ -75,12 +75,12 @@ namespace AMCData {
 
 	PSQLStatement CSQLTransaction::prepareStatement(const std::string& sSQLString)
 	{
-		return m_pSQLHandler->prepareStatement(sSQLString);
+		return m_pSQLHandler->prepareStatementLocked(sSQLString, m_pLock);
 	}
 
 	void CSQLTransaction::executeStatement(const std::string& sSQLString)
 	{
-		auto pStatement = prepareStatement(sSQLString);
+		auto pStatement = m_pSQLHandler->prepareStatementLocked(sSQLString, m_pLock);
 		pStatement->execute();
 	}
 

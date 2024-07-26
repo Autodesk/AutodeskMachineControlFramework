@@ -148,6 +148,7 @@ CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID,
 	auto nSize = pStatement->getColumnInt64(6);
 	auto sUserID = pStatement->getColumnString(7);
 	auto sTimeStamp = pStatement->getColumnString(8);
+	pStatement = nullptr;
 
 	auto pImportStream = std::make_shared<AMCCommon::CImportStream_Native>(pStorageState->getStreamPath(sParsedStreamUUID));
 	

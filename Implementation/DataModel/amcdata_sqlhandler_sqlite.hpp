@@ -65,7 +65,7 @@ namespace AMCData {
 
 		PSQLTransaction beginTransaction() override;
 
-		PSQLStatement prepareStatement (const std::string & sSQLString) override;
+		virtual PSQLStatement prepareStatementLocked(const std::string& sSQLString, PSQLTransactionLock pLock) override;
 
 		void checkSQLiteError (int nError);		
 

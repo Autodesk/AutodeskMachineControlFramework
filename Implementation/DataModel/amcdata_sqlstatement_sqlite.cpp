@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMCData {
 
-	CSQLStatement_SQLite::CSQLStatement_SQLite(CSQLHandler_SQLite* pHandler, void* pStmtHandle)
-		: m_pHandler (pHandler), m_pStmtHandle (pStmtHandle), m_bAllowNext (true), m_bHasColumn (false), m_bHadRow (false)
+	CSQLStatement_SQLite::CSQLStatement_SQLite(CSQLHandler_SQLite* pHandler, void* pStmtHandle, PSQLTransactionLock pLock)
+		: m_pHandler (pHandler), m_pStmtHandle (pStmtHandle), m_bAllowNext (true), m_bHasColumn (false), m_bHadRow (false), m_pLock (pLock)
 	{
 		if (pHandler == nullptr)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
