@@ -100,6 +100,10 @@ namespace AMCData {
 			return false;
 
 		int nResult = sqlite3_step((sqlite3_stmt*)m_pStmtHandle);
+
+		// Release lock after execution
+		m_pLock = nullptr;
+
 		switch (nResult) {
 		case SQLITE_DONE:
 			m_bAllowNext = false;
@@ -124,6 +128,10 @@ namespace AMCData {
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_TOOMANYRESULTROWS);
 
 		int nResult = sqlite3_step((sqlite3_stmt*)m_pStmtHandle);
+
+		// Release lock after execution
+		m_pLock = nullptr;
+
 		switch (nResult) {
 		case SQLITE_DONE:
 			m_bAllowNext = false;
