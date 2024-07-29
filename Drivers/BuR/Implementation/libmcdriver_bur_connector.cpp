@@ -36,9 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "crcpp/CRC.h"
 #include <random>
 
-#include "RapidJSON/rapidjson.h"
-#include "RapidJSON/document.h"
-
 using namespace LibMCDriver_BuR::Impl;
 
 
@@ -104,6 +101,8 @@ struct sAMCFToPLCPacketSendInfo {
 };
 
 #pragma pack(pop)
+
+
 
 
 
@@ -222,17 +221,55 @@ CDriver_BuRConnector::CDriver_BuRConnector(uint32_t nWorkerThreadCount, uint32_t
 }
 
 
+bool CDriver_BuRConnector::isLegacy()
+{
+    return (m_ProtocolVersion == eDriver_BurProtocolVersion::Legacy);
+}
 
-void CDriver_BuRConnector::queryParameters(BurPacketCallback callback)
+bool CDriver_BuRConnector::isVersion3()
+{
+    return (m_ProtocolVersion == eDriver_BurProtocolVersion::Version3);
+}
+
+
+void CDriver_BuRConnector::queryParametersLegacy(BurPacketCallback callback)
 {    
     std::shared_ptr<CDriver_BuRSocketConnection> pConnection;
     {
-        std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+        std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
         pConnection = m_pCurrentConnection;
     }
 
     if (pConnection.get() != nullptr) {        
-        sendCommandToPLC(BUR_COMMAND_DIRECT_MACHINESTATUS, callback);
+
+        if (m_ProtocolVersion == eDriver_BurProtocolVersion::Legacy) {
+            sendCommandToPLC(BUR_COMMAND_DIRECT_MACHINESTATUSLEGACY, callback);
+        }
+    }
+}
+
+
+void CDriver_BuRConnector::queryParametersVersion3(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+    std::shared_ptr<CDriver_BuRSocketConnection> pConnection;
+    std::shared_ptr<CDriver_BuRJournal> pJournal;
+    {
+        std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
+        pConnection = m_pCurrentConnection;
+        pJournal = m_pJournal;
+    }
+
+    if ((pConnection.get() != nullptr) && (pJournal != nullptr)) {
+
+        if (m_ProtocolVersion == eDriver_BurProtocolVersion::Version3) {
+            sendCommandToPLC(BUR_COMMAND_DIRECT_CURRENTJOURNALSTATUS, 
+                [pDriverUpdateInstance, pJournal](CDriver_BuRPacket* pPacket) {
+
+                    pJournal->parseStatus(pPacket->getDataBuffer(), pDriverUpdateInstance);
+
+                });
+        }
+
     }
 }
 
@@ -661,7 +698,7 @@ void CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, sAMCFToPLCPacke
 void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t nPort, const uint32_t nTimeout)
 {
     {
-        std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+        std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
         m_pCurrentConnection = nullptr;
     }
 
@@ -669,11 +706,10 @@ void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t
     auto pConnection = std::make_shared <CDriver_BuRSocketConnection>(sIPAddress, nPort);
 
     {
-        std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+        std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
         m_pCurrentConnection = pConnection;
     }
 
-    retrieveJournalSchema();
     
 /*    std::thread connectionThread([this, sIPAddress, nPort] {
 
@@ -705,7 +741,7 @@ void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t
 
 void CDriver_BuRConnector::disconnect()
 {
-    std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+    std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
 
     if (m_pCurrentConnection.get() != nullptr) {
         m_pCurrentConnection->disconnect();
@@ -718,100 +754,29 @@ void CDriver_BuRConnector::refreshJournal()
 
 }
 
-void CDriver_BuRConnector::retrieveJournalSchema()
+PDriver_BuRJournal CDriver_BuRConnector::retrieveJournalSchema()
 {
     if (m_ProtocolVersion != eDriver_BurProtocolVersion::Version3)
-        return;
+        return nullptr;
 
-    bool bSuccessfulParsedJournalSchema = false;
+    PDriver_BuRJournal pJournal;
 
-    sendCommandToPLC(BUR_COMMAND_DIRECT_CURRENTJOURNALSCHEMA, [&bSuccessfulParsedJournalSchema](CDriver_BuRPacket* pPacket) {
+    sendCommandToPLC(BUR_COMMAND_DIRECT_CURRENTJOURNALSCHEMA, [&pJournal](CDriver_BuRPacket* pPacket) {
 
             auto schemaBuffer = pPacket->getDataBuffer();
 
             std::string schemaString(schemaBuffer.begin(), schemaBuffer.end());
-
-            rapidjson::Document document;
-            document.Parse(schemaString.c_str());
-
-            if (!document.IsObject())
-                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEBURSCHEMAJSON);
-
-            if (!document.HasMember("schema"))
-                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASNOVERSIONIDENTIFIER);
-
-            if (!document["schema"].IsString ())
-                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVERSIONIDENTIFIER);
-
-            std::string sSchemaVersion = document["schema"].GetString();
-
-            if (!document.HasMember("groups"))
-                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASNOGROUPINFORMATION);
-
-            if (!document["groups"].IsArray ())
-                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPINFORMATION);
-
-            auto groupArray = document["groups"].GetArray();
-            for (auto groupIter = groupArray.Begin(); groupIter != groupArray.End(); groupIter++) {
-
-                auto& group = *groupIter;
-                if (!group.HasMember ("groupname"))
-                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPNAME);
-                if (!group.HasMember("groupid"))
-                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPID);
-                if (!group.HasMember("values"))
-                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESGROUPVALUES);
-
-                auto& groupNameMember = group["groupname"];
-                auto& groupIDMember = group["groupid"];
-                auto& groupValuesMember = group["values"];
-
-                if (!(groupNameMember.IsString()))
-                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPNAME);
-                if (!(groupIDMember.IsInt()))
-                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPID);
-                if (!(groupValuesMember.IsArray()))
-                    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDGROUPVALUES);
-
-                std::string sGroupName = groupNameMember.GetString();
-                int32_t nGroupID = groupIDMember.GetInt ();
-
-                auto groupValues = groupValuesMember.GetArray();
-                for (auto valueIter = groupValues.Begin(); valueIter != groupValues.End(); valueIter++) {
-                    auto& value = *valueIter;
-                    if (!value.HasMember("type"))
-                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUETYPE);
-                    if (!value.HasMember("name"))
-                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUENAME);
-                    if (!value.HasMember("id"))
-                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUEID);
-                    if (!value.HasMember("size"))
-                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAMISSESVALUESIZE);
-
-                    auto& valueTypeMember = value["type"];
-                    auto& valueNameMember = value["name"];
-                    auto& valueIDMember = value["id"];
-                    auto& valueSizeMember = value["size"];
-
-                    if (!(valueTypeMember.IsString()))
-                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUETYPE);
-                    if (!(valueNameMember.IsString()))
-                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUENAME);
-                    if (!(valueIDMember.IsInt()))
-                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUEID);
-                    if (!(valueSizeMember.IsInt()))
-                        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUESIZE);
-                }
-
-            }
-
-
-            bSuccessfulParsedJournalSchema = true;
+            pJournal = std::make_shared<CDriver_BuRJournal>(schemaString);
 
         });
 
-    if (!bSuccessfulParsedJournalSchema)
+    if (pJournal == nullptr)
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEJOURNALSCHEMA);
 
+    std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
+    m_pJournal = pJournal;
+
+    return pJournal;
 }
+
 

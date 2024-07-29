@@ -220,28 +220,74 @@ void CDriver_BuR::Configure(const std::string& sConfigurationString)
     auto statusNodes = machineStatusNode.children();
     for (pugi::xml_node childNode : statusNodes)
     {
-        auto pValue = readParameterFromXMLNode(childNode);
 
-        if (dynamic_cast<CDriver_BuRBoolValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterBoolParameter(pValue->getName (), pValue->getDescription (), false);
+        if (m_ProtocolVersion == eDriver_BurProtocolVersion::Version3) {
+            // Version 3 uses journal variables
+            std::string sChildName = childNode.name();
+            auto nameAttrib = childNode.attribute("name");
+            auto descriptionAttrib = childNode.attribute("description");
+            auto groupAttrib = childNode.attribute("group");
+            auto valueAttrib = childNode.attribute("value");
 
-        if (dynamic_cast<CDriver_BuRStringValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterStringParameter(pValue->getName(), pValue->getDescription(), "");
+            if (nameAttrib.empty())
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NONAMEATTRIBUTE);
+            if (descriptionAttrib.empty())
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NODESCRIPTIONATTRIBUTE);
+            if (groupAttrib.empty())
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOGROUPATTRIBUTE);
+            if (valueAttrib.empty())
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOVALUEATTRIBUTE);
 
-        if (dynamic_cast<CDriver_BuRLRealValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
+            std::string sName(nameAttrib.as_string());
+            std::string sDescription(descriptionAttrib.as_string());
+            std::string sGroupName(groupAttrib.as_string());
+            std::string sValueName(valueAttrib.as_string());
 
-        if (dynamic_cast<CDriver_BuRRealValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
+            auto pJournalParameterValue = std::make_shared<CDriver_BuRJournalParameterValue>(sName, sGroupName, sValueName);
+            if (sChildName == "bool") {
+                m_pDriverEnvironment->RegisterBoolParameter(sName, sDescription, false);
+                m_JournalParameterValues.push_back(pJournalParameterValue);
+            }
 
-        if (dynamic_cast<CDriver_BuRIntValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+            if (sChildName == "integer") {
+                m_pDriverEnvironment->RegisterIntegerParameter(sName, sDescription, false);
+                m_JournalParameterValues.push_back(pJournalParameterValue);
+            }
 
-        if (dynamic_cast<CDriver_BuRDIntValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+            if (sChildName == "double") {
+                m_pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, false);
+                m_JournalParameterValues.push_back(pJournalParameterValue);
+            }
+        }
 
-        m_DriverParameters.push_back(pValue);
-        m_DriverParameterMap.insert(std::make_pair(pValue->getName(), pValue));
+
+        if (m_ProtocolVersion == eDriver_BurProtocolVersion::Legacy) {
+
+            // Legacy mode uses addresses
+
+            auto pValue = readParameterFromXMLNode(childNode);
+
+            if (dynamic_cast<CDriver_BuRBoolValue*> (pValue.get()) != nullptr)
+                m_pDriverEnvironment->RegisterBoolParameter(pValue->getName(), pValue->getDescription(), false);
+
+            if (dynamic_cast<CDriver_BuRStringValue*> (pValue.get()) != nullptr)
+                m_pDriverEnvironment->RegisterStringParameter(pValue->getName(), pValue->getDescription(), "");
+
+            if (dynamic_cast<CDriver_BuRLRealValue*> (pValue.get()) != nullptr)
+                m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
+
+            if (dynamic_cast<CDriver_BuRRealValue*> (pValue.get()) != nullptr)
+                m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
+
+            if (dynamic_cast<CDriver_BuRIntValue*> (pValue.get()) != nullptr)
+                m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+
+            if (dynamic_cast<CDriver_BuRDIntValue*> (pValue.get()) != nullptr)
+                m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+
+            m_LegacyDriverParameters.push_back(pValue);
+            m_LegacyDriverParameterMap.insert(std::make_pair(pValue->getName(), pValue));
+        }
 
     }
 
@@ -335,47 +381,59 @@ void CDriver_BuR::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriver
     if (!m_SimulationMode) {
 
         if (m_pConnector.get() != nullptr) {
-            m_bIsQueryingParameters = true;
 
-            m_pConnector->queryParameters(
-                [this, pDriverUpdateInstance](CDriver_BuRPacket* pPacket) {
+            if (m_pConnector->isVersion3()) {
+                // Version 3 works with journal
+                m_bIsQueryingParameters = true;
+                m_pConnector->queryParametersVersion3(pDriverUpdateInstance);
 
                 m_bIsQueryingParameters = false;
+            }
 
 
-                for (auto driverParameter : m_DriverParameters) {
-                    std::lock_guard<std::mutex> driverLock(m_driverEnvironmentMutex);
-                    auto sName = driverParameter->getName();
+            if (m_pConnector->isLegacy()) {
+                // Legacy mode works with fixed parameter array
+                m_bIsQueryingParameters = true;
 
-                    if (dynamic_cast<CDriver_BuRDIntValue*> (driverParameter.get()) != nullptr) {
-                        pDriverUpdateInstance->SetIntegerParameter(sName, pPacket->readUInt32(driverParameter->getAddress()));
-                    }
+                m_pConnector->queryParametersLegacy(
+                    [this, pDriverUpdateInstance](CDriver_BuRPacket* pPacket) {
 
-                    if (dynamic_cast<CDriver_BuRIntValue*> (driverParameter.get()) != nullptr) {
-                        pDriverUpdateInstance->SetIntegerParameter(sName, pPacket->readUInt16(driverParameter->getAddress()));
-                    }
-
-                    if (dynamic_cast<CDriver_BuRRealValue*> (driverParameter.get()) != nullptr) {
-                        pDriverUpdateInstance->SetDoubleParameter(sName, pPacket->readFloat(driverParameter->getAddress()));
-                    }
-
-                    if (dynamic_cast<CDriver_BuRLRealValue*> (driverParameter.get()) != nullptr) {
-                        pDriverUpdateInstance->SetDoubleParameter(sName, pPacket->readDouble(driverParameter->getAddress()));
-                    }
-
-                    if (dynamic_cast<CDriver_BuRBoolValue*> (driverParameter.get()) != nullptr) {
-                        pDriverUpdateInstance->SetBoolParameter(sName, pPacket->readBool(driverParameter->getAddress()));
-                    }
-
-                    auto pStringValue = dynamic_cast<CDriver_BuRStringValue*> (driverParameter.get());
-                    if (pStringValue != nullptr) {
-                        pDriverUpdateInstance->SetStringParameter(sName, pPacket->readString(driverParameter->getAddress(), pStringValue->getLength()));
-                    }
-
-                }
+                        m_bIsQueryingParameters = false;
 
 
-            });
+                        for (auto driverParameter : m_LegacyDriverParameters) {
+                            std::lock_guard<std::mutex> driverLock(m_driverEnvironmentMutex);
+                            auto sName = driverParameter->getName();
+
+                            if (dynamic_cast<CDriver_BuRDIntValue*> (driverParameter.get()) != nullptr) {
+                                pDriverUpdateInstance->SetIntegerParameter(sName, pPacket->readUInt32(driverParameter->getAddress()));
+                            }
+
+                            if (dynamic_cast<CDriver_BuRIntValue*> (driverParameter.get()) != nullptr) {
+                                pDriverUpdateInstance->SetIntegerParameter(sName, pPacket->readUInt16(driverParameter->getAddress()));
+                            }
+
+                            if (dynamic_cast<CDriver_BuRRealValue*> (driverParameter.get()) != nullptr) {
+                                pDriverUpdateInstance->SetDoubleParameter(sName, pPacket->readFloat(driverParameter->getAddress()));
+                            }
+
+                            if (dynamic_cast<CDriver_BuRLRealValue*> (driverParameter.get()) != nullptr) {
+                                pDriverUpdateInstance->SetDoubleParameter(sName, pPacket->readDouble(driverParameter->getAddress()));
+                            }
+
+                            if (dynamic_cast<CDriver_BuRBoolValue*> (driverParameter.get()) != nullptr) {
+                                pDriverUpdateInstance->SetBoolParameter(sName, pPacket->readBool(driverParameter->getAddress()));
+                            }
+
+                            auto pStringValue = dynamic_cast<CDriver_BuRStringValue*> (driverParameter.get());
+                            if (pStringValue != nullptr) {
+                                pDriverUpdateInstance->SetStringParameter(sName, pPacket->readString(driverParameter->getAddress(), pStringValue->getLength()));
+                            }
+
+                        }
+
+                    });
+            }
         }
     }
 
@@ -387,8 +445,16 @@ void CDriver_BuR::Connect(const std::string& sIPAddress, const LibMCDriver_BuR_u
 {        
     if (!m_SimulationMode) {
 
-        if (m_pConnector.get() != nullptr)
+        if (m_pConnector.get() != nullptr) {
             m_pConnector->connect(sIPAddress, nPort, nTimeout);
+            auto pJournal = m_pConnector->retrieveJournalSchema();
+
+            // Map Registered driver parameters to Journal Schema!
+            if (pJournal.get() != nullptr) {
+                for (auto pParameter : m_JournalParameterValues)
+                    pJournal->registerParameterValue(pParameter.get ());
+            }
+        }
 
     }
 }
