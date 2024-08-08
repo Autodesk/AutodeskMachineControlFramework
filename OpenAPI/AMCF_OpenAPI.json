@@ -1,0 +1,561 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Autodesk Machine Control Framework - External API Documentation",
+    "description": "This is an initial OpenAPI 3.0 specification of the Autodesk Machine control Framework.",
+    "contact": {
+      "email": "alexander.oster@autodesk.com"
+    },
+    "license": {
+      "name": "BSD 3 clause",
+      "url": "https://github.com/Autodesk/AutodeskMachineControlFramework/blob/master/LICENSE.md"
+    },
+    "version": "0.1.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about the Autodesk Machine Control Framework on github",
+    "url": "https://github.com/Autodesk/AutodeskMachineControlFramework/tree/master"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8869/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "general",
+      "description": "General API end points"
+    },
+    {
+      "name": "auth",
+      "description": "Authentication flow"
+    },
+    {
+      "name": "ui",
+      "description": "User Interface"
+    }
+  ],
+  "paths": {
+    "/version": {
+      "get": {
+        "tags": [
+          "general"
+        ],
+        "summary": "Queries the protocol version",
+        "description": "Returns the version of the protocol (to be implemented)",
+        "operationId": "retrieveVersion",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "tags": [
+          "general"
+        ],
+        "summary": "Queries the full state of the system",
+        "description": "Returns a full image of all state variables",
+        "operationId": "retrieveStatus",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Creates a new authentication session",
+        "description": "Creates a new session and starts an authentication flow with the given user name. If user does not exist, the call will not fail but return random values in order to protect the service from a discovery attack.",
+        "operationId": "createAuthSession",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/{sessionUUID}": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Authenticates a session with the proper challenge response mechanism.",
+        "description": "As second step of the authentication process, it uses the return values of a call to '/auth' and sends a computed response back in order to authenticate the session with the user's password.",
+        "operationId": "authenticateSession",
+        "parameters": [
+          {
+            "name": "sessionUUID",
+            "in": "path",
+            "description": "Session uuid to authenticate",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ui/event": {
+      "post": {
+        "tags": [
+          "ui"
+        ],
+        "summary": "Triggers a user interface event",
+        "description": "Triggers an event in the backend.",
+        "operationId": "triggerEvent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Opaque"
+      }
+    },
+    "schemas": {
+      "VersionResponse": {
+        "required": [
+          "protocol",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.version' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.version"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "required": [
+          "protocol",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.error' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.error"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "errorcode": {
+            "type": "integer",
+            "example": 123
+          },
+          "message": {
+            "type": "string",
+            "example": "Error description string"
+          }
+        }
+      },
+      "SessionRequest": {
+        "required": [
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "testuser"
+          }
+        }
+      },
+      "SessionResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "sessionuuid",
+          "sessionkey",
+          "loginsalt",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.auth' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.auth"
+          },
+          "version": {
+            "type": "string",
+            "example": "2.0.0"
+          },
+          "sessionuuid": {
+            "type": "string",
+            "example": "9ac4f76b-0e1f-479e-8427-c15290283846"
+          },
+          "sessionkey": {
+            "type": "string",
+            "example": "ed8c0343702c3802d7061b755c0881a936330b68ed7bbc794e30b3fd90a50c69"
+          },
+          "loginsalt": {
+            "type": "string",
+            "example": "514225fcdf84f797ac586fc416e25de8a7cad16455338e5144a57e2eb3a7df25"
+          },
+          "username": {
+            "type": "string",
+            "example": "testuser"
+          }
+        }
+      },
+      "AuthenticationRequest": {
+        "required": [
+          "clientkey",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "clientkey": {
+            "type": "string",
+            "example": "9b8d25dbc01f96962230884795dd7325cc877d42c2ec317009a15bd298f35ce8"
+          },
+          "password": {
+            "type": "string",
+            "example": "a83b5820446c8dbd2bcf7cb6d968bfed0b58ff7e0f1a9d61d863d7dc6d132ddd"
+          }
+        }
+      },
+      "AuthenticationResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "token",
+          "useruuid",
+          "userlogin",
+          "userrole",
+          "userlanguage"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.auth' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.auth"
+          },
+          "version": {
+            "type": "string",
+            "example": "2.0.0"
+          },
+          "token": {
+            "type": "string",
+            "example": "eyJzZXNzaW9uIjoiY2Q4YjQyYjgtYTJlMS00YzE1LWFiN2ItYTc2OGVjYWUxZGMyIiwidG9rZW4iOiI3OGJjNTBlYmM3OGQ4NDA1ZmQyMDY2NTU2NDhiZmFjNDVhODUxNDVkM2Q4OWQ3Yjc0ZWEzOTYyZDhkMTE1MmUzIn0="
+          },
+          "useruuid": {
+            "type": "string",
+            "example": "bdb3e909-ce8a-4602-910d-f64d60b8b8e3"
+          },
+          "userlogin": {
+            "type": "string",
+            "example": "testuser"
+          },
+          "userdescription": {
+            "type": "string",
+            "example": "This is the default user"
+          },
+          "userrole": {
+            "type": "string",
+            "example": "administrator"
+          },
+          "userlanguage": {
+            "type": "string",
+            "example": "en"
+          },
+          "userpermissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "permission_start_build"
+            }
+          }
+        }
+      },
+      "StateMachineParameter": {
+        "required": [
+          "name",
+          "parameters"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the Parameter",
+            "example": "jobuuid"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value of the Parameter",
+            "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "StateMachineParameterGroup": {
+        "required": [
+          "name",
+          "parameters"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the Parameter Group",
+            "example": "jobinfo"
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StateMachineParameter"
+            }
+          }
+        }
+      },
+      "StateMachineInstance": {
+        "required": [
+          "name",
+          "state",
+          "parametergroups"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the State Machine instance",
+            "example": "main"
+          },
+          "state": {
+            "type": "string",
+            "description": "The current state of the State Machine instance",
+            "example": "idle"
+          },
+          "parametergroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StateMachineParameterGroup"
+            }
+          }
+        }
+      },
+      "StatusResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "instances"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.status' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.status"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "instances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StateMachineInstance"
+            }
+          }
+        }
+      },
+      "EventRequest": {
+        "required": [
+          "eventname",
+          "parameters"
+        ],
+        "type": "object",
+        "properties": {
+          "eventname": {
+            "type": "string",
+            "example": "onclick"
+          },
+          "senderuuid": {
+            "type": "string",
+            "example": "6d0d0bfc-72e5-4688-b806-54608e226ca9"
+          },
+          "parameters": {
+            "type": "object",
+            "example": {
+              "example_checkbox": true,
+              "example_run": "examplecalculation"
+            }
+          }
+        }
+      },
+      "EventResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "instances"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.ui' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.ui"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "results": {
+            "type": "object",
+            "example": {
+              "example_runtime": 123.45
+            }
+          }
+        }
+      }
+    }
+  }
+}
