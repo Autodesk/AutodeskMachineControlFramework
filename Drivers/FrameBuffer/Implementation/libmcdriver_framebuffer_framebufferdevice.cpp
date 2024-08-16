@@ -103,7 +103,7 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
     m_nLineLength = (uint32_t)finfo.line_length;
     m_nMemorySize = m_nVirtualResolutionY * m_nLineLength;
 
-    m_bDoubleBufferingEnabled = (m_nVirtualResolutionY <= (2 * m_nScreenHeight));
+    m_bDoubleBufferingEnabled = (m_nVirtualResolutionY >= (2 * m_nScreenHeight));
 
     m_pFramebufferPtr = (uint8_t*) mmap(0, m_nMemorySize, PROT_READ | PROT_WRITE, MAP_SHARED, m_nFBDeviceHandle, 0);
     if (((intptr_t)m_pFramebufferPtr == -1) || (m_pFramebufferPtr == nullptr)) {
