@@ -48,7 +48,7 @@ Abstract: This is the class declaration of CDriver_FrameBuffer
 #include "libmcdriver_framebuffer_framebufferinstance.hpp"
 #include <map>
 
-namespace LibMCDriver_Framebuffer {
+namespace LibMCDriver_FrameBuffer {
 namespace Impl {
 
 
@@ -76,7 +76,7 @@ public:
 
 	std::string GetType() override;
 
-	void GetVersion(LibMCDriver_Framebuffer_uint32& nMajor, LibMCDriver_Framebuffer_uint32& nMinor, LibMCDriver_Framebuffer_uint32& nMicro, std::string& sBuild) override;
+	void GetVersion(LibMCDriver_FrameBuffer_uint32& nMajor, LibMCDriver_FrameBuffer_uint32& nMinor, LibMCDriver_FrameBuffer_uint32& nMicro, std::string& sBuild) override;
 
 	void QueryParameters() override;
 
@@ -86,7 +86,7 @@ public:
 
 	bool SupportsDevice() override;
 
-	IFrameBufferAccess* CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_Framebuffer_uint32 nScreenWidth, const LibMCDriver_Framebuffer_uint32 nScreenHeight, const LibMCDriver_Framebuffer::eFrameBufferBitDepth eBitDepth) override;
+	IFrameBufferAccess* CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_FrameBuffer_uint32 nScreenWidth, const LibMCDriver_FrameBuffer_uint32 nScreenHeight, const LibMCDriver_FrameBuffer::eFrameBufferBitDepth eBitDepth) override;
 
 	IFrameBufferAccess* OpenFrameBufferDevice(const std::string & sIdentifier, const std::string & sDeviceName) override;
 

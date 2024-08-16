@@ -41,13 +41,13 @@ Interface version: 2.0.0
 #include "libmcdriver_framebuffer_interfaceexception.hpp"
 #include "libmcdriver_framebuffer_driver_framebuffer.hpp"
 
-using namespace LibMCDriver_Framebuffer;
-using namespace LibMCDriver_Framebuffer::Impl;
+using namespace LibMCDriver_FrameBuffer;
+using namespace LibMCDriver_FrameBuffer::Impl;
 
 // Injected Components
 LibMCEnv::PWrapper CWrapper::sPLibMCEnvWrapper;
 
-void CWrapper::GetVersion(LibMCDriver_Framebuffer_uint32 & nMajor, LibMCDriver_Framebuffer_uint32 & nMinor, LibMCDriver_Framebuffer_uint32 & nMicro)
+void CWrapper::GetVersion(LibMCDriver_FrameBuffer_uint32 & nMajor, LibMCDriver_FrameBuffer_uint32 & nMinor, LibMCDriver_FrameBuffer_uint32 & nMicro)
 {
 	nMajor = LIBMCDRIVER_FRAMEBUFFER_VERSION_MAJOR;
 	nMinor = LIBMCDRIVER_FRAMEBUFFER_VERSION_MINOR;

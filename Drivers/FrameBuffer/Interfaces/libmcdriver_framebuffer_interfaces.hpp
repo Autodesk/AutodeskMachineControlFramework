@@ -49,7 +49,7 @@ Interface version: 2.0.0
 
 #include "libmcenv_dynamic.hpp"
 
-namespace LibMCDriver_Framebuffer {
+namespace LibMCDriver_FrameBuffer {
 namespace Impl {
 
 /**
@@ -291,7 +291,7 @@ public:
 	* @param[out] nMicro - Micro version.
 	* @param[out] sBuild - Build identifier.
 	*/
-	virtual void GetVersion(LibMCDriver_Framebuffer_uint32 & nMajor, LibMCDriver_Framebuffer_uint32 & nMinor, LibMCDriver_Framebuffer_uint32 & nMicro, std::string & sBuild) = 0;
+	virtual void GetVersion(LibMCDriver_FrameBuffer_uint32 & nMajor, LibMCDriver_FrameBuffer_uint32 & nMinor, LibMCDriver_FrameBuffer_uint32 & nMicro, std::string & sBuild) = 0;
 
 	/**
 	* IDriver::QueryParameters - Updates the driver parameters in the driver environment. Should only be called in the driver thread.
@@ -319,19 +319,19 @@ public:
 	* IFrameBufferAccess::GetScreenWidth - Returns the width of the screen.
 	* @return Screen width of Framebuffer. Minimum 128, Maximum 16348..
 	*/
-	virtual LibMCDriver_Framebuffer_uint32 GetScreenWidth() = 0;
+	virtual LibMCDriver_FrameBuffer_uint32 GetScreenWidth() = 0;
 
 	/**
 	* IFrameBufferAccess::GetScreenHeight - Returns the height of the screen.
 	* @return Screen height of Framebuffer. Minimum 128, Maximum 16348..
 	*/
-	virtual LibMCDriver_Framebuffer_uint32 GetScreenHeight() = 0;
+	virtual LibMCDriver_FrameBuffer_uint32 GetScreenHeight() = 0;
 
 	/**
 	* IFrameBufferAccess::BitDepth - Returns the bitdepth of the screen.
 	* @return Framebuffer bit depth.
 	*/
-	virtual LibMCDriver_Framebuffer::eFrameBufferBitDepth BitDepth() = 0;
+	virtual LibMCDriver_FrameBuffer::eFrameBufferBitDepth BitDepth() = 0;
 
 	/**
 	* IFrameBufferAccess::UsesDoubleBuffering - Returns, if the frame buffer supports and uses double buffering.
@@ -348,7 +348,7 @@ public:
 	* IFrameBufferAccess::ClearScreen - Clears the current draw buffer with an arbitrary precision color.
 	* @param[in] RGBColor - Color to use.
 	*/
-	virtual void ClearScreen(const LibMCDriver_Framebuffer::sColor RGBColor) = 0;
+	virtual void ClearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
 
 	/**
 	* IFrameBufferAccess::DrawLine - Draws a line in a certain color.
@@ -359,7 +359,7 @@ public:
 	* @param[in] dThickness - Thickness of the line in pixels.
 	* @param[in] RGBColor - Color to use.
 	*/
-	virtual void DrawLine(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer_double dThickness, const LibMCDriver_Framebuffer::sColor RGBColor) = 0;
+	virtual void DrawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
 
 	/**
 	* IFrameBufferAccess::FillRectangle - Draws a rectangle in a certain color, including the corner points.
@@ -369,7 +369,7 @@ public:
 	* @param[in] nY2 - Y Coordinate of first point to use.
 	* @param[in] RGBColor - Color to use.
 	*/
-	virtual void FillRectangle(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer::sColor RGBColor) = 0;
+	virtual void FillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
 
 	/**
 	* IFrameBufferAccess::DrawImage - Draws an image at a certain position.
@@ -377,7 +377,7 @@ public:
 	* @param[in] nY - Y Coordinate of image.
 	* @param[in] pImage - Image object to draw.
 	*/
-	virtual void DrawImage(const LibMCDriver_Framebuffer_uint32 nX, const LibMCDriver_Framebuffer_uint32 nY, LibMCEnv::PImageData pImage) = 0;
+	virtual void DrawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv::PImageData pImage) = 0;
 
 };
 
@@ -410,7 +410,7 @@ public:
 	* @param[in] eBitDepth - Framebuffer bit depth.
 	* @return Framebuffer access instance.
 	*/
-	virtual IFrameBufferAccess * CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_Framebuffer_uint32 nScreenWidth, const LibMCDriver_Framebuffer_uint32 nScreenHeight, const LibMCDriver_Framebuffer::eFrameBufferBitDepth eBitDepth) = 0;
+	virtual IFrameBufferAccess * CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_FrameBuffer_uint32 nScreenWidth, const LibMCDriver_FrameBuffer_uint32 nScreenHeight, const LibMCDriver_FrameBuffer::eFrameBufferBitDepth eBitDepth) = 0;
 
 	/**
 	* IDriver_FrameBuffer::OpenFrameBufferDevice - Opens a new framebuffer device on Linux. Creates a simulation device on other platforms in 1920x1280x24.
@@ -459,7 +459,7 @@ public:
 	* @param[out] nMinor - returns the minor version of this library
 	* @param[out] nMicro - returns the micro version of this library
 	*/
-	static void GetVersion(LibMCDriver_Framebuffer_uint32 & nMajor, LibMCDriver_Framebuffer_uint32 & nMinor, LibMCDriver_Framebuffer_uint32 & nMicro);
+	static void GetVersion(LibMCDriver_FrameBuffer_uint32 & nMajor, LibMCDriver_FrameBuffer_uint32 & nMinor, LibMCDriver_FrameBuffer_uint32 & nMicro);
 
 	/**
 	* Ilibmcdriver_framebuffer::GetLastError - Returns the last error recorded on this object
@@ -492,9 +492,9 @@ public:
 
 };
 
-LibMCDriver_FramebufferResult LibMCDriver_Framebuffer_GetProcAddress (const char * pProcName, void ** ppProcAddress);
+LibMCDriver_FrameBufferResult LibMCDriver_FrameBuffer_GetProcAddress (const char * pProcName, void ** ppProcAddress);
 
 } // namespace Impl
-} // namespace LibMCDriver_Framebuffer
+} // namespace LibMCDriver_FrameBuffer
 
 #endif // __LIBMCDRIVER_FRAMEBUFFER_CPPINTERFACES

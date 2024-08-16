@@ -39,7 +39,7 @@ Abstract: This is the class declaration of CFrameBufferAccess
 #include "libmcdriver_framebuffer_framebufferinstance.hpp"
 
 
-namespace LibMCDriver_Framebuffer {
+namespace LibMCDriver_FrameBuffer {
 namespace Impl {
 
 
@@ -52,15 +52,18 @@ private:
 	std::string m_sIdentifier;
 
 	int m_nFBDeviceHandle;
-	uint8_t * m_pFramebufferPtr;
 
 	uint32_t m_nScreenWidth;
 	uint32_t m_nScreenHeight;
 	uint32_t m_nVirtualResolutionY;
 	uint32_t m_nLineLength;
 	uint32_t m_nMemorySize;
+	uint32_t m_nCurrentBufferIndex;
 
-	LibMCDriver_Framebuffer::eFrameBufferBitDepth m_BitDepth;
+	uint8_t* m_pFramebufferPtr;
+	uint8_t* m_pDrawbufferPtr;
+
+	LibMCDriver_FrameBuffer::eFrameBufferBitDepth m_BitDepth;
 	bool m_bDoubleBufferingEnabled;
 
 
@@ -70,29 +73,29 @@ public:
 	
 	virtual ~CFrameBufferDeviceInstance ();
 	
-	virtual LibMCDriver_Framebuffer_uint32 getScreenWidth() override;
+	virtual LibMCDriver_FrameBuffer_uint32 getScreenWidth() override;
 
-	virtual LibMCDriver_Framebuffer_uint32 getScreenHeight() override;
+	virtual LibMCDriver_FrameBuffer_uint32 getScreenHeight() override;
 
-	virtual LibMCDriver_Framebuffer::eFrameBufferBitDepth bitDepth() override;
+	virtual LibMCDriver_FrameBuffer::eFrameBufferBitDepth bitDepth() override;
 
 	virtual bool usesDoubleBuffering() override;
 
 	virtual void flip() override;
 
-	virtual void clearScreen(const LibMCDriver_Framebuffer::sColor RGBColor) override;
+	virtual void clearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor) override;
 
-	virtual void drawLine(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer_double dThickness, const LibMCDriver_Framebuffer::sColor RGBColor) override;
+	virtual void drawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) override;
 
-	virtual void fillRectangle(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer::sColor RGBColor) override;
+	virtual void fillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor) override;
 
-	virtual void drawImage(const LibMCDriver_Framebuffer_uint32 nX, const LibMCDriver_Framebuffer_uint32 nY, LibMCEnv::PImageData pImage) override;
+	virtual void drawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv::PImageData pImage) override;
 
 };
 
 typedef std::shared_ptr<CFrameBufferDeviceInstance> PFrameBufferDeviceInstance;
 
 } // namespace Impl
-} // namespace LibMCDriver_Framebuffer
+} // namespace LibMCDriver_FrameBuffer
 
 #endif // __LIBMCDRIVER_FRAMEBUFFER_FRAMEBUFFERDEVICE

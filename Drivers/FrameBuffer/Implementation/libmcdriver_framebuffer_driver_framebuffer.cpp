@@ -41,7 +41,7 @@ Abstract: This is a stub class definition of CDriver_FrameBuffer
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 
-using namespace LibMCDriver_Framebuffer::Impl;
+using namespace LibMCDriver_FrameBuffer::Impl;
 
 /*************************************************************************************************************************
  Class definition of CDriver_FrameBuffer 
@@ -70,7 +70,7 @@ std::string CDriver_FrameBuffer::GetType()
 	return "framebuffer";
 }
 
-void CDriver_FrameBuffer::GetVersion(LibMCDriver_Framebuffer_uint32& nMajor, LibMCDriver_Framebuffer_uint32& nMinor, LibMCDriver_Framebuffer_uint32& nMicro, std::string& sBuild)
+void CDriver_FrameBuffer::GetVersion(LibMCDriver_FrameBuffer_uint32& nMajor, LibMCDriver_FrameBuffer_uint32& nMinor, LibMCDriver_FrameBuffer_uint32& nMicro, std::string& sBuild)
 {
 	nMajor = LIBMCDRIVER_FRAMEBUFFER_VERSION_MAJOR;
 	nMinor = LIBMCDRIVER_FRAMEBUFFER_VERSION_MINOR;
@@ -103,9 +103,9 @@ bool CDriver_FrameBuffer::SupportsDevice()
 	
 }
 
-IFrameBufferAccess* CDriver_FrameBuffer::CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_Framebuffer_uint32 nScreenWidth, const LibMCDriver_Framebuffer_uint32 nScreenHeight, const LibMCDriver_Framebuffer::eFrameBufferBitDepth eBitDepth)
+IFrameBufferAccess* CDriver_FrameBuffer::CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_FrameBuffer_uint32 nScreenWidth, const LibMCDriver_FrameBuffer_uint32 nScreenHeight, const LibMCDriver_FrameBuffer::eFrameBufferBitDepth eBitDepth)
 {
-	throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
+	throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
 }
 
 IFrameBufferAccess* CDriver_FrameBuffer::OpenFrameBufferDevice(const std::string & sIdentifier, const std::string & sDeviceName)
@@ -126,7 +126,7 @@ void CDriver_FrameBuffer::ReleaseFramebuffer(const std::string & sIdentifier)
 
 IFrameBufferAccess* CDriver_FrameBuffer::FindFrameBuffer(const std::string & sIdentifier)
 {
-	throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
+	throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
 }
 
 bool CDriver_FrameBuffer::FrameBufferExists(const std::string & sIdentifier)

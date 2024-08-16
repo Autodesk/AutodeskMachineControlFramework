@@ -39,7 +39,7 @@ Abstract: This is the class declaration of CFrameBufferAccess
 
 
 
-namespace LibMCDriver_Framebuffer {
+namespace LibMCDriver_FrameBuffer {
 namespace Impl {
 
 
@@ -52,29 +52,29 @@ private:
 
 public:
 
-	virtual LibMCDriver_Framebuffer_uint32 getScreenWidth() = 0;
+	virtual LibMCDriver_FrameBuffer_uint32 getScreenWidth() = 0;
 
-	virtual LibMCDriver_Framebuffer_uint32 getScreenHeight() = 0;
+	virtual LibMCDriver_FrameBuffer_uint32 getScreenHeight() = 0;
 
-	virtual LibMCDriver_Framebuffer::eFrameBufferBitDepth bitDepth() = 0;
+	virtual LibMCDriver_FrameBuffer::eFrameBufferBitDepth bitDepth() = 0;
 
 	virtual bool usesDoubleBuffering() = 0;
 
 	virtual void flip() = 0;
 
-	virtual void clearScreen(const LibMCDriver_Framebuffer::sColor RGBColor) = 0;
+	virtual void clearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
 
-	virtual void drawLine(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer_double dThickness, const LibMCDriver_Framebuffer::sColor RGBColor) = 0;
+	virtual void drawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
 
-	virtual void fillRectangle(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer::sColor RGBColor) = 0;
+	virtual void fillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
 
-	virtual void drawImage(const LibMCDriver_Framebuffer_uint32 nX, const LibMCDriver_Framebuffer_uint32 nY, LibMCEnv::PImageData pImage) = 0;
+	virtual void drawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv::PImageData pImage) = 0;
 
 };
 
 typedef std::shared_ptr<CFrameBufferInstance> PFrameBufferInstance;
 
 } // namespace Impl
-} // namespace LibMCDriver_Framebuffer
+} // namespace LibMCDriver_FrameBuffer
 
 #endif // __LIBMCDRIVER_FRAMEBUFFER_FRAMEBUFFERINSTANCE

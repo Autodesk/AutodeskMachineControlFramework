@@ -47,7 +47,7 @@ Abstract: This is the class declaration of CFrameBufferAccess
 // Include custom headers here.
 #include "libmcdriver_framebuffer_framebufferinstance.hpp"
 
-namespace LibMCDriver_Framebuffer {
+namespace LibMCDriver_FrameBuffer {
 namespace Impl {
 
 
@@ -67,23 +67,23 @@ public:
 	virtual ~CFrameBufferAccess();
 
 
-	LibMCDriver_Framebuffer_uint32 GetScreenWidth() override;
+	LibMCDriver_FrameBuffer_uint32 GetScreenWidth() override;
 
-	LibMCDriver_Framebuffer_uint32 GetScreenHeight() override;
+	LibMCDriver_FrameBuffer_uint32 GetScreenHeight() override;
 
-	LibMCDriver_Framebuffer::eFrameBufferBitDepth BitDepth() override;
+	LibMCDriver_FrameBuffer::eFrameBufferBitDepth BitDepth() override;
 
 	bool UsesDoubleBuffering() override;
 
 	void Flip() override;
 
-	void ClearScreen(const LibMCDriver_Framebuffer::sColor RGBColor) override;
+	void ClearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor) override;
 
-	void DrawLine(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer_double dThickness, const LibMCDriver_Framebuffer::sColor RGBColor) override;
+	void DrawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) override;
 
-	void FillRectangle(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer::sColor RGBColor) override;
+	void FillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor) override;
 
-	void DrawImage(const LibMCDriver_Framebuffer_uint32 nX, const LibMCDriver_Framebuffer_uint32 nY, LibMCEnv::PImageData pImage) override;
+	void DrawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv::PImageData pImage) override;
 
 };
 

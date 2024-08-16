@@ -72,7 +72,7 @@ extern "C" {
 * @param[in] pConfigurationString - Configuration data of driver.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_configure(LibMCDriver_Framebuffer_Driver pDriver, const char * pConfigurationString);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_configure(LibMCDriver_FrameBuffer_Driver pDriver, const char * pConfigurationString);
 
 /**
 * returns the name identifier of the driver
@@ -83,7 +83,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pNameBuffer -  buffer of Name of the driver., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_getname(LibMCDriver_Framebuffer_Driver pDriver, const LibMCDriver_Framebuffer_uint32 nNameBufferSize, LibMCDriver_Framebuffer_uint32* pNameNeededChars, char * pNameBuffer);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_getname(LibMCDriver_FrameBuffer_Driver pDriver, const LibMCDriver_FrameBuffer_uint32 nNameBufferSize, LibMCDriver_FrameBuffer_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
 * returns the type identifier of the driver
@@ -94,7 +94,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pTypeBuffer -  buffer of Type of the driver., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_gettype(LibMCDriver_Framebuffer_Driver pDriver, const LibMCDriver_Framebuffer_uint32 nTypeBufferSize, LibMCDriver_Framebuffer_uint32* pTypeNeededChars, char * pTypeBuffer);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_gettype(LibMCDriver_FrameBuffer_Driver pDriver, const LibMCDriver_FrameBuffer_uint32 nTypeBufferSize, LibMCDriver_FrameBuffer_uint32* pTypeNeededChars, char * pTypeBuffer);
 
 /**
 * returns the version identifiers of the driver
@@ -108,7 +108,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pBuildBuffer -  buffer of Build identifier., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_getversion(LibMCDriver_Framebuffer_Driver pDriver, LibMCDriver_Framebuffer_uint32 * pMajor, LibMCDriver_Framebuffer_uint32 * pMinor, LibMCDriver_Framebuffer_uint32 * pMicro, const LibMCDriver_Framebuffer_uint32 nBuildBufferSize, LibMCDriver_Framebuffer_uint32* pBuildNeededChars, char * pBuildBuffer);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_getversion(LibMCDriver_FrameBuffer_Driver pDriver, LibMCDriver_FrameBuffer_uint32 * pMajor, LibMCDriver_FrameBuffer_uint32 * pMinor, LibMCDriver_FrameBuffer_uint32 * pMicro, const LibMCDriver_FrameBuffer_uint32 nBuildBufferSize, LibMCDriver_FrameBuffer_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
 * Updates the driver parameters in the driver environment. Should only be called in the driver thread.
@@ -116,7 +116,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pDriver - Driver instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_queryparameters(LibMCDriver_Framebuffer_Driver pDriver);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_queryparameters(LibMCDriver_FrameBuffer_Driver pDriver);
 
 /**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
@@ -125,7 +125,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_queryparametersex(LibMCDriver_Framebuffer_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_queryparametersex(LibMCDriver_FrameBuffer_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for FrameBufferAccess
@@ -138,7 +138,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pScreenWidth - Screen width of Framebuffer. Minimum 128, Maximum 16348..
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_getscreenwidth(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 * pScreenWidth);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_getscreenwidth(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 * pScreenWidth);
 
 /**
 * Returns the height of the screen.
@@ -147,7 +147,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pScreenHeight - Screen height of Framebuffer. Minimum 128, Maximum 16348..
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_getscreenheight(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 * pScreenHeight);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_getscreenheight(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 * pScreenHeight);
 
 /**
 * Returns the bitdepth of the screen.
@@ -156,7 +156,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pBitDepth - Framebuffer bit depth.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_bitdepth(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer::eFrameBufferBitDepth * pBitDepth);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_bitdepth(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer::eFrameBufferBitDepth * pBitDepth);
 
 /**
 * Returns, if the frame buffer supports and uses double buffering.
@@ -165,7 +165,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pDoubleBufferingIsEnabled - Returns true if Double buffering is in enabled.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_usesdoublebuffering(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, bool * pDoubleBufferingIsEnabled);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_usesdoublebuffering(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, bool * pDoubleBufferingIsEnabled);
 
 /**
 * Flips the buffers and shows the current draw buffer on screen. Does nothing if double buffering is disabled.
@@ -173,7 +173,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pFrameBufferAccess - FrameBufferAccess instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_flip(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_flip(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess);
 
 /**
 * Clears the current draw buffer with an arbitrary precision color.
@@ -182,7 +182,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pRGBColor - Color to use.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_clearscreen(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, const LibMCDriver_Framebuffer::sColor * pRGBColor);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_clearscreen(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
 
 /**
 * Draws a line in a certain color.
@@ -196,7 +196,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pRGBColor - Color to use.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 nX1, LibMCDriver_Framebuffer_uint32 nY1, LibMCDriver_Framebuffer_uint32 nX2, LibMCDriver_Framebuffer_uint32 nY2, LibMCDriver_Framebuffer_double dThickness, const LibMCDriver_Framebuffer::sColor * pRGBColor);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX1, LibMCDriver_FrameBuffer_uint32 nY1, LibMCDriver_FrameBuffer_uint32 nX2, LibMCDriver_FrameBuffer_uint32 nY2, LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
 
 /**
 * Draws a rectangle in a certain color, including the corner points.
@@ -209,7 +209,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pRGBColor - Color to use.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_fillrectangle(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 nX1, LibMCDriver_Framebuffer_uint32 nY1, LibMCDriver_Framebuffer_uint32 nX2, LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer::sColor * pRGBColor);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrectangle(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX1, LibMCDriver_FrameBuffer_uint32 nY1, LibMCDriver_FrameBuffer_uint32 nX2, LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
 
 /**
 * Draws an image at a certain position.
@@ -220,7 +220,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pImage - Image object to draw.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_drawimage(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 nX, LibMCDriver_Framebuffer_uint32 nY, LibMCEnv_ImageData pImage);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawimage(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX, LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv_ImageData pImage);
 
 /*************************************************************************************************************************
  Class definition for Driver_FrameBuffer
@@ -233,7 +233,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pSupportFlag - Returns true if simulation Framebuffer are supported.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_supportssimulation(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, bool * pSupportFlag);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_supportssimulation(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, bool * pSupportFlag);
 
 /**
 * Returns if a the driver supports physical framebuffer devices.
@@ -242,7 +242,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pSupportFlag - Returns true if physical framebuffer devices are supported. Returns false on platforms that do not support Framebuffers.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_supportsdevice(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, bool * pSupportFlag);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_supportsdevice(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, bool * pSupportFlag);
 
 /**
 * Creates a fake framebuffer instance. Failes if Simulation is not supported.
@@ -255,7 +255,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pFrameBufferInstance - Framebuffer access instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_Framebuffer_uint32 nScreenWidth, LibMCDriver_Framebuffer_uint32 nScreenHeight, LibMCDriver_Framebuffer::eFrameBufferBitDepth eBitDepth, LibMCDriver_Framebuffer_FrameBufferAccess * pFrameBufferInstance);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_FrameBuffer_uint32 nScreenWidth, LibMCDriver_FrameBuffer_uint32 nScreenHeight, LibMCDriver_FrameBuffer::eFrameBufferBitDepth eBitDepth, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance);
 
 /**
 * Opens a new framebuffer device on Linux. Creates a simulation device on other platforms in 1920x1280x24.
@@ -266,7 +266,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pFrameBufferInstance - Framebuffer access instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, const char * pDeviceName, LibMCDriver_Framebuffer_FrameBufferAccess * pFrameBufferInstance);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, const char * pDeviceName, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance);
 
 /**
 * Releases a Framebuffer instance. Does nothing if insance does not exist.
@@ -275,7 +275,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pIdentifier - Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_releaseframebuffer(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_releaseframebuffer(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier);
 
 /**
 * Retrieves a previously created framebuffer instance. Fails if instance does not exist.
@@ -285,7 +285,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pFrameBufferInstance - Framebuffer access instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_findframebuffer(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_Framebuffer_FrameBufferAccess * pFrameBufferInstance);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_findframebuffer(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance);
 
 /**
 * Returns if a framebuffer instance exists.
@@ -295,7 +295,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pExists - Returns true if Framebuffer exists.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_framebufferexists(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, bool * pExists);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_framebufferexists(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, bool * pExists);
 
 /*************************************************************************************************************************
  Global functions
@@ -309,7 +309,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pMicro - returns the micro version of this library
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_getversion(LibMCDriver_Framebuffer_uint32 * pMajor, LibMCDriver_Framebuffer_uint32 * pMinor, LibMCDriver_Framebuffer_uint32 * pMicro);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_getversion(LibMCDriver_FrameBuffer_uint32 * pMajor, LibMCDriver_FrameBuffer_uint32 * pMinor, LibMCDriver_FrameBuffer_uint32 * pMicro);
 
 /**
 * Returns the last error recorded on this object
@@ -321,7 +321,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pHasError - Is there a last error to query
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_getlasterror(LibMCDriver_Framebuffer_Base pInstance, const LibMCDriver_Framebuffer_uint32 nErrorMessageBufferSize, LibMCDriver_Framebuffer_uint32* pErrorMessageNeededChars, char * pErrorMessageBuffer, bool * pHasError);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_getlasterror(LibMCDriver_FrameBuffer_Base pInstance, const LibMCDriver_FrameBuffer_uint32 nErrorMessageBufferSize, LibMCDriver_FrameBuffer_uint32* pErrorMessageNeededChars, char * pErrorMessageBuffer, bool * pHasError);
 
 /**
 * Releases shared ownership of an Instance
@@ -329,7 +329,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pInstance - Instance Handle
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_releaseinstance(LibMCDriver_Framebuffer_Base pInstance);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_releaseinstance(LibMCDriver_FrameBuffer_Base pInstance);
 
 /**
 * Acquires shared ownership of an Instance
@@ -337,7 +337,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pInstance - Instance Handle
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_acquireinstance(LibMCDriver_Framebuffer_Base pInstance);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_acquireinstance(LibMCDriver_FrameBuffer_Base pInstance);
 
 /**
 * Injects an imported component for usage within this component
@@ -346,7 +346,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[in] pSymbolAddressMethod - Address of the SymbolAddressMethod of the injected component
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_injectcomponent(const char * pNameSpace, LibMCDriver_Framebuffer_pvoid pSymbolAddressMethod);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_injectcomponent(const char * pNameSpace, LibMCDriver_FrameBuffer_pvoid pSymbolAddressMethod);
 
 /**
 * Returns the address of the SymbolLookupMethod
@@ -354,7 +354,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pSymbolLookupMethod - Address of the SymbolAddressMethod
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_getsymbollookupmethod(LibMCDriver_Framebuffer_pvoid * pSymbolLookupMethod);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_getsymbollookupmethod(LibMCDriver_FrameBuffer_pvoid * pSymbolLookupMethod);
 
 /**
 * Creates a driver instance with a specific name.
@@ -365,7 +365,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_frame
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FramebufferResult libmcdriver_framebuffer_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Framebuffer_Driver * pInstance);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_FrameBuffer_Driver * pInstance);
 
 #ifdef __cplusplus
 }

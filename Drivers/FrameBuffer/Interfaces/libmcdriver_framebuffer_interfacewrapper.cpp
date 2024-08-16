@@ -42,11 +42,11 @@ Interface version: 2.0.0
 
 #include <map>
 
-using namespace LibMCDriver_Framebuffer::Impl;
+using namespace LibMCDriver_FrameBuffer::Impl;
 
-LibMCDriver_FramebufferResult handleLibMCDriver_FramebufferException(IBase * pIBaseClass, ELibMCDriver_FramebufferInterfaceException & Exception)
+LibMCDriver_FrameBufferResult handleLibMCDriver_FrameBufferException(IBase * pIBaseClass, ELibMCDriver_FrameBufferInterfaceException & Exception)
 {
-	LibMCDriver_FramebufferResult errorCode = Exception.getErrorCode();
+	LibMCDriver_FrameBufferResult errorCode = Exception.getErrorCode();
 
 	if (pIBaseClass != nullptr)
 		pIBaseClass->RegisterErrorMessage(Exception.what());
@@ -54,9 +54,9 @@ LibMCDriver_FramebufferResult handleLibMCDriver_FramebufferException(IBase * pIB
 	return errorCode;
 }
 
-LibMCDriver_FramebufferResult handleStdException(IBase * pIBaseClass, std::exception & Exception)
+LibMCDriver_FrameBufferResult handleStdException(IBase * pIBaseClass, std::exception & Exception)
 {
-	LibMCDriver_FramebufferResult errorCode = LIBMCDRIVER_FRAMEBUFFER_ERROR_GENERICEXCEPTION;
+	LibMCDriver_FrameBufferResult errorCode = LIBMCDRIVER_FRAMEBUFFER_ERROR_GENERICEXCEPTION;
 
 	if (pIBaseClass != nullptr)
 		pIBaseClass->RegisterErrorMessage(Exception.what());
@@ -64,9 +64,9 @@ LibMCDriver_FramebufferResult handleStdException(IBase * pIBaseClass, std::excep
 	return errorCode;
 }
 
-LibMCDriver_FramebufferResult handleUnhandledException(IBase * pIBaseClass)
+LibMCDriver_FrameBufferResult handleUnhandledException(IBase * pIBaseClass)
 {
-	LibMCDriver_FramebufferResult errorCode = LIBMCDRIVER_FRAMEBUFFER_ERROR_GENERICEXCEPTION;
+	LibMCDriver_FrameBufferResult errorCode = LIBMCDRIVER_FRAMEBUFFER_ERROR_GENERICEXCEPTION;
 
 	if (pIBaseClass != nullptr)
 		pIBaseClass->RegisterErrorMessage("Unhandled Exception");
@@ -83,24 +83,24 @@ LibMCDriver_FramebufferResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_configure(LibMCDriver_Framebuffer_Driver pDriver, const char * pConfigurationString)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_configure(LibMCDriver_FrameBuffer_Driver pDriver, const char * pConfigurationString)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
 	try {
 		if (pConfigurationString == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sConfigurationString(pConfigurationString);
 		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
 		if (!pIDriver)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIDriver->Configure(sConfigurationString);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -110,17 +110,17 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_configure(LibMCDriv
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_getname(LibMCDriver_Framebuffer_Driver pDriver, const LibMCDriver_Framebuffer_uint32 nNameBufferSize, LibMCDriver_Framebuffer_uint32* pNameNeededChars, char * pNameBuffer)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_getname(LibMCDriver_FrameBuffer_Driver pDriver, const LibMCDriver_FrameBuffer_uint32 nNameBufferSize, LibMCDriver_FrameBuffer_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
 	try {
 		if ( (!pNameBuffer) && !(pNameNeededChars) )
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sName("");
 		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
 		if (!pIDriver)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		bool isCacheCall = (pNameBuffer == nullptr);
 		if (isCacheCall) {
@@ -131,24 +131,24 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_getname(LibMCDriver
 		else {
 			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDriver->_getCache ());
 			if (cache == nullptr)
-				throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+				throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 			cache->retrieveData (sName);
 			pIDriver->_setCache (nullptr);
 		}
 		
 		if (pNameNeededChars)
-			*pNameNeededChars = (LibMCDriver_Framebuffer_uint32) (sName.size()+1);
+			*pNameNeededChars = (LibMCDriver_FrameBuffer_uint32) (sName.size()+1);
 		if (pNameBuffer) {
 			if (sName.size() >= nNameBufferSize)
-				throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_BUFFERTOOSMALL);
+				throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_BUFFERTOOSMALL);
 			for (size_t iName = 0; iName < sName.size(); iName++)
 				pNameBuffer[iName] = sName[iName];
 			pNameBuffer[sName.size()] = 0;
 		}
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -158,17 +158,17 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_getname(LibMCDriver
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_gettype(LibMCDriver_Framebuffer_Driver pDriver, const LibMCDriver_Framebuffer_uint32 nTypeBufferSize, LibMCDriver_Framebuffer_uint32* pTypeNeededChars, char * pTypeBuffer)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_gettype(LibMCDriver_FrameBuffer_Driver pDriver, const LibMCDriver_FrameBuffer_uint32 nTypeBufferSize, LibMCDriver_FrameBuffer_uint32* pTypeNeededChars, char * pTypeBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
 	try {
 		if ( (!pTypeBuffer) && !(pTypeNeededChars) )
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sType("");
 		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
 		if (!pIDriver)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		bool isCacheCall = (pTypeBuffer == nullptr);
 		if (isCacheCall) {
@@ -179,24 +179,24 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_gettype(LibMCDriver
 		else {
 			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDriver->_getCache ());
 			if (cache == nullptr)
-				throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+				throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 			cache->retrieveData (sType);
 			pIDriver->_setCache (nullptr);
 		}
 		
 		if (pTypeNeededChars)
-			*pTypeNeededChars = (LibMCDriver_Framebuffer_uint32) (sType.size()+1);
+			*pTypeNeededChars = (LibMCDriver_FrameBuffer_uint32) (sType.size()+1);
 		if (pTypeBuffer) {
 			if (sType.size() >= nTypeBufferSize)
-				throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_BUFFERTOOSMALL);
+				throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_BUFFERTOOSMALL);
 			for (size_t iType = 0; iType < sType.size(); iType++)
 				pTypeBuffer[iType] = sType[iType];
 			pTypeBuffer[sType.size()] = 0;
 		}
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -206,51 +206,51 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_gettype(LibMCDriver
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_getversion(LibMCDriver_Framebuffer_Driver pDriver, LibMCDriver_Framebuffer_uint32 * pMajor, LibMCDriver_Framebuffer_uint32 * pMinor, LibMCDriver_Framebuffer_uint32 * pMicro, const LibMCDriver_Framebuffer_uint32 nBuildBufferSize, LibMCDriver_Framebuffer_uint32* pBuildNeededChars, char * pBuildBuffer)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_getversion(LibMCDriver_FrameBuffer_Driver pDriver, LibMCDriver_FrameBuffer_uint32 * pMajor, LibMCDriver_FrameBuffer_uint32 * pMinor, LibMCDriver_FrameBuffer_uint32 * pMicro, const LibMCDriver_FrameBuffer_uint32 nBuildBufferSize, LibMCDriver_FrameBuffer_uint32* pBuildNeededChars, char * pBuildBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
 	try {
 		if (!pMajor)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (!pMinor)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (!pMicro)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if ( (!pBuildBuffer) && !(pBuildNeededChars) )
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sBuild("");
 		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
 		if (!pIDriver)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		bool isCacheCall = (pBuildBuffer == nullptr);
 		if (isCacheCall) {
 			pIDriver->GetVersion(*pMajor, *pMinor, *pMicro, sBuild);
 
-			pIDriver->_setCache (new ParameterCache_4<LibMCDriver_Framebuffer_uint32, LibMCDriver_Framebuffer_uint32, LibMCDriver_Framebuffer_uint32, std::string> (*pMajor, *pMinor, *pMicro, sBuild));
+			pIDriver->_setCache (new ParameterCache_4<LibMCDriver_FrameBuffer_uint32, LibMCDriver_FrameBuffer_uint32, LibMCDriver_FrameBuffer_uint32, std::string> (*pMajor, *pMinor, *pMicro, sBuild));
 		}
 		else {
-			auto cache = dynamic_cast<ParameterCache_4<LibMCDriver_Framebuffer_uint32, LibMCDriver_Framebuffer_uint32, LibMCDriver_Framebuffer_uint32, std::string>*> (pIDriver->_getCache ());
+			auto cache = dynamic_cast<ParameterCache_4<LibMCDriver_FrameBuffer_uint32, LibMCDriver_FrameBuffer_uint32, LibMCDriver_FrameBuffer_uint32, std::string>*> (pIDriver->_getCache ());
 			if (cache == nullptr)
-				throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+				throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 			cache->retrieveData (*pMajor, *pMinor, *pMicro, sBuild);
 			pIDriver->_setCache (nullptr);
 		}
 		
 		if (pBuildNeededChars)
-			*pBuildNeededChars = (LibMCDriver_Framebuffer_uint32) (sBuild.size()+1);
+			*pBuildNeededChars = (LibMCDriver_FrameBuffer_uint32) (sBuild.size()+1);
 		if (pBuildBuffer) {
 			if (sBuild.size() >= nBuildBufferSize)
-				throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_BUFFERTOOSMALL);
+				throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_BUFFERTOOSMALL);
 			for (size_t iBuild = 0; iBuild < sBuild.size(); iBuild++)
 				pBuildBuffer[iBuild] = sBuild[iBuild];
 			pBuildBuffer[sBuild.size()] = 0;
 		}
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -260,21 +260,21 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_getversion(LibMCDri
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_queryparameters(LibMCDriver_Framebuffer_Driver pDriver)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_queryparameters(LibMCDriver_FrameBuffer_Driver pDriver)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
 	try {
 		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
 		if (!pIDriver)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIDriver->QueryParameters();
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -284,7 +284,7 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_queryparameters(Lib
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_queryparametersex(LibMCDriver_Framebuffer_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_queryparametersex(LibMCDriver_FrameBuffer_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
@@ -292,18 +292,18 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_queryparametersex(L
 		LibMCEnv::PDriverStatusUpdateSession pIDriverUpdateInstance = std::make_shared<LibMCEnv::CDriverStatusUpdateSession>(CWrapper::sPLibMCEnvWrapper.get(), pDriverUpdateInstance);
 		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverUpdateInstance.get());
 		if (!pIDriverUpdateInstance)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
 		if (!pIDriver)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIDriver->QueryParametersEx(pIDriverUpdateInstance);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -317,23 +317,23 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_queryparametersex(L
 /*************************************************************************************************************************
  Class implementation for FrameBufferAccess
 **************************************************************************************************************************/
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_getscreenwidth(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 * pScreenWidth)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_getscreenwidth(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 * pScreenWidth)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
 	try {
 		if (pScreenWidth == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		*pScreenWidth = pIFrameBufferAccess->GetScreenWidth();
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -343,23 +343,23 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_getscree
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_getscreenheight(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 * pScreenHeight)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_getscreenheight(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 * pScreenHeight)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
 	try {
 		if (pScreenHeight == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		*pScreenHeight = pIFrameBufferAccess->GetScreenHeight();
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -369,23 +369,23 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_getscree
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_bitdepth(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, eLibMCDriver_FramebufferFrameBufferBitDepth * pBitDepth)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_bitdepth(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, eLibMCDriver_FrameBufferFrameBufferBitDepth * pBitDepth)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
 	try {
 		if (pBitDepth == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		*pBitDepth = pIFrameBufferAccess->BitDepth();
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -395,23 +395,23 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_bitdepth
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_usesdoublebuffering(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, bool * pDoubleBufferingIsEnabled)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_usesdoublebuffering(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, bool * pDoubleBufferingIsEnabled)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
 	try {
 		if (pDoubleBufferingIsEnabled == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		*pDoubleBufferingIsEnabled = pIFrameBufferAccess->UsesDoubleBuffering();
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -421,21 +421,21 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_usesdoub
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_flip(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_flip(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
 	try {
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIFrameBufferAccess->Flip();
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -445,21 +445,21 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_flip(Lib
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_clearscreen(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, const sLibMCDriver_FramebufferColor * pRGBColor)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_clearscreen(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, const sLibMCDriver_FrameBufferColor * pRGBColor)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
 	try {
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIFrameBufferAccess->ClearScreen(*pRGBColor);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -469,21 +469,21 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_clearscr
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 nX1, LibMCDriver_Framebuffer_uint32 nY1, LibMCDriver_Framebuffer_uint32 nX2, LibMCDriver_Framebuffer_uint32 nY2, LibMCDriver_Framebuffer_double dThickness, const sLibMCDriver_FramebufferColor * pRGBColor)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX1, LibMCDriver_FrameBuffer_uint32 nY1, LibMCDriver_FrameBuffer_uint32 nX2, LibMCDriver_FrameBuffer_uint32 nY2, LibMCDriver_FrameBuffer_double dThickness, const sLibMCDriver_FrameBufferColor * pRGBColor)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
 	try {
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIFrameBufferAccess->DrawLine(nX1, nY1, nX2, nY2, dThickness, *pRGBColor);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -493,21 +493,21 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_drawline
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_fillrectangle(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 nX1, LibMCDriver_Framebuffer_uint32 nY1, LibMCDriver_Framebuffer_uint32 nX2, LibMCDriver_Framebuffer_uint32 nY2, const sLibMCDriver_FramebufferColor * pRGBColor)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrectangle(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX1, LibMCDriver_FrameBuffer_uint32 nY1, LibMCDriver_FrameBuffer_uint32 nX2, LibMCDriver_FrameBuffer_uint32 nY2, const sLibMCDriver_FrameBufferColor * pRGBColor)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
 	try {
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIFrameBufferAccess->FillRectangle(nX1, nY1, nX2, nY2, *pRGBColor);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -517,7 +517,7 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_fillrect
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_drawimage(LibMCDriver_Framebuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_Framebuffer_uint32 nX, LibMCDriver_Framebuffer_uint32 nY, LibMCEnv_ImageData pImage)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawimage(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX, LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv_ImageData pImage)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
@@ -525,18 +525,18 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_drawimag
 		LibMCEnv::PImageData pIImage = std::make_shared<LibMCEnv::CImageData>(CWrapper::sPLibMCEnvWrapper.get(), pImage);
 		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIImage.get());
 		if (!pIImage)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
 		if (!pIFrameBufferAccess)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIFrameBufferAccess->DrawImage(nX, nY, pIImage);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -550,23 +550,23 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_framebufferaccess_drawimag
 /*************************************************************************************************************************
  Class implementation for Driver_FrameBuffer
 **************************************************************************************************************************/
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_supportssimulation(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, bool * pSupportFlag)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_supportssimulation(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, bool * pSupportFlag)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_FrameBuffer;
 
 	try {
 		if (pSupportFlag == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		IDriver_FrameBuffer* pIDriver_FrameBuffer = dynamic_cast<IDriver_FrameBuffer*>(pIBaseClass);
 		if (!pIDriver_FrameBuffer)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		*pSupportFlag = pIDriver_FrameBuffer->SupportsSimulation();
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -576,23 +576,23 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_support
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_supportsdevice(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, bool * pSupportFlag)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_supportsdevice(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, bool * pSupportFlag)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_FrameBuffer;
 
 	try {
 		if (pSupportFlag == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		IDriver_FrameBuffer* pIDriver_FrameBuffer = dynamic_cast<IDriver_FrameBuffer*>(pIBaseClass);
 		if (!pIDriver_FrameBuffer)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		*pSupportFlag = pIDriver_FrameBuffer->SupportsDevice();
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -602,28 +602,28 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_support
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_Framebuffer_uint32 nScreenWidth, LibMCDriver_Framebuffer_uint32 nScreenHeight, eLibMCDriver_FramebufferFrameBufferBitDepth eBitDepth, LibMCDriver_Framebuffer_FrameBufferAccess * pFrameBufferInstance)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_FrameBuffer_uint32 nScreenWidth, LibMCDriver_FrameBuffer_uint32 nScreenHeight, eLibMCDriver_FrameBufferFrameBufferBitDepth eBitDepth, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_FrameBuffer;
 
 	try {
 		if (pIdentifier == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (pFrameBufferInstance == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
 		IBase* pBaseFrameBufferInstance(nullptr);
 		IDriver_FrameBuffer* pIDriver_FrameBuffer = dynamic_cast<IDriver_FrameBuffer*>(pIBaseClass);
 		if (!pIDriver_FrameBuffer)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pBaseFrameBufferInstance = pIDriver_FrameBuffer->CreateFrameBufferSimulation(sIdentifier, nScreenWidth, nScreenHeight, eBitDepth);
 
 		*pFrameBufferInstance = (IBase*)(pBaseFrameBufferInstance);
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -633,31 +633,31 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_createf
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, const char * pDeviceName, LibMCDriver_Framebuffer_FrameBufferAccess * pFrameBufferInstance)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, const char * pDeviceName, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_FrameBuffer;
 
 	try {
 		if (pIdentifier == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (pDeviceName == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (pFrameBufferInstance == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
 		std::string sDeviceName(pDeviceName);
 		IBase* pBaseFrameBufferInstance(nullptr);
 		IDriver_FrameBuffer* pIDriver_FrameBuffer = dynamic_cast<IDriver_FrameBuffer*>(pIBaseClass);
 		if (!pIDriver_FrameBuffer)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pBaseFrameBufferInstance = pIDriver_FrameBuffer->OpenFrameBufferDevice(sIdentifier, sDeviceName);
 
 		*pFrameBufferInstance = (IBase*)(pBaseFrameBufferInstance);
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -667,24 +667,24 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_openfra
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_releaseframebuffer(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_releaseframebuffer(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_FrameBuffer;
 
 	try {
 		if (pIdentifier == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
 		IDriver_FrameBuffer* pIDriver_FrameBuffer = dynamic_cast<IDriver_FrameBuffer*>(pIBaseClass);
 		if (!pIDriver_FrameBuffer)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pIDriver_FrameBuffer->ReleaseFramebuffer(sIdentifier);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -694,28 +694,28 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_release
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_findframebuffer(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_Framebuffer_FrameBufferAccess * pFrameBufferInstance)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_findframebuffer(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_FrameBuffer;
 
 	try {
 		if (pIdentifier == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (pFrameBufferInstance == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
 		IBase* pBaseFrameBufferInstance(nullptr);
 		IDriver_FrameBuffer* pIDriver_FrameBuffer = dynamic_cast<IDriver_FrameBuffer*>(pIBaseClass);
 		if (!pIDriver_FrameBuffer)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		pBaseFrameBufferInstance = pIDriver_FrameBuffer->FindFrameBuffer(sIdentifier);
 
 		*pFrameBufferInstance = (IBase*)(pBaseFrameBufferInstance);
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -725,26 +725,26 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_findfra
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_framebufferexists(LibMCDriver_Framebuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, bool * pExists)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_framebufferexists(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, bool * pExists)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_FrameBuffer;
 
 	try {
 		if (pIdentifier == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (pExists == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sIdentifier(pIdentifier);
 		IDriver_FrameBuffer* pIDriver_FrameBuffer = dynamic_cast<IDriver_FrameBuffer*>(pIBaseClass);
 		if (!pIDriver_FrameBuffer)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		*pExists = pIDriver_FrameBuffer->FrameBufferExists(sIdentifier);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -760,7 +760,7 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_driver_framebuffer_framebu
  Function table lookup implementation
 **************************************************************************************************************************/
 
-LibMCDriver_FramebufferResult LibMCDriver_Framebuffer::Impl::LibMCDriver_Framebuffer_GetProcAddress (const char * pProcName, void ** ppProcAddress)
+LibMCDriver_FrameBufferResult LibMCDriver_FrameBuffer::Impl::LibMCDriver_FrameBuffer_GetProcAddress (const char * pProcName, void ** ppProcAddress)
 {
 	if (pProcName == nullptr)
 		return LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM;
@@ -836,23 +836,23 @@ LibMCDriver_FramebufferResult LibMCDriver_Framebuffer::Impl::LibMCDriver_Framebu
 /*************************************************************************************************************************
  Global functions implementation
 **************************************************************************************************************************/
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_getversion(LibMCDriver_Framebuffer_uint32 * pMajor, LibMCDriver_Framebuffer_uint32 * pMinor, LibMCDriver_Framebuffer_uint32 * pMicro)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_getversion(LibMCDriver_FrameBuffer_uint32 * pMajor, LibMCDriver_FrameBuffer_uint32 * pMinor, LibMCDriver_FrameBuffer_uint32 * pMicro)
 {
 	IBase* pIBaseClass = nullptr;
 
 	try {
 		if (!pMajor)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (!pMinor)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (!pMicro)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		CWrapper::GetVersion(*pMajor, *pMinor, *pMicro);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -862,36 +862,36 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_getversion(LibMCDriver_Fra
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_getlasterror(LibMCDriver_Framebuffer_Base pInstance, const LibMCDriver_Framebuffer_uint32 nErrorMessageBufferSize, LibMCDriver_Framebuffer_uint32* pErrorMessageNeededChars, char * pErrorMessageBuffer, bool * pHasError)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_getlasterror(LibMCDriver_FrameBuffer_Base pInstance, const LibMCDriver_FrameBuffer_uint32 nErrorMessageBufferSize, LibMCDriver_FrameBuffer_uint32* pErrorMessageNeededChars, char * pErrorMessageBuffer, bool * pHasError)
 {
 	IBase* pIBaseClass = nullptr;
 
 	try {
 		if ( (!pErrorMessageBuffer) && !(pErrorMessageNeededChars) )
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (pHasError == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		IBase* pIBaseClassInstance = (IBase *)pInstance;
 		IBase* pIInstance = dynamic_cast<IBase*>(pIBaseClassInstance);
 		if (!pIInstance)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		std::string sErrorMessage("");
 		*pHasError = CWrapper::GetLastError(pIInstance, sErrorMessage);
 
 		if (pErrorMessageNeededChars)
-			*pErrorMessageNeededChars = (LibMCDriver_Framebuffer_uint32) (sErrorMessage.size()+1);
+			*pErrorMessageNeededChars = (LibMCDriver_FrameBuffer_uint32) (sErrorMessage.size()+1);
 		if (pErrorMessageBuffer) {
 			if (sErrorMessage.size() >= nErrorMessageBufferSize)
-				throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_BUFFERTOOSMALL);
+				throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_BUFFERTOOSMALL);
 			for (size_t iErrorMessage = 0; iErrorMessage < sErrorMessage.size(); iErrorMessage++)
 				pErrorMessageBuffer[iErrorMessage] = sErrorMessage[iErrorMessage];
 			pErrorMessageBuffer[sErrorMessage.size()] = 0;
 		}
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -901,7 +901,7 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_getlasterror(LibMCDriver_F
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_releaseinstance(LibMCDriver_Framebuffer_Base pInstance)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_releaseinstance(LibMCDriver_FrameBuffer_Base pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -909,14 +909,14 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_releaseinstance(LibMCDrive
 		IBase* pIBaseClassInstance = (IBase *)pInstance;
 		IBase* pIInstance = dynamic_cast<IBase*>(pIBaseClassInstance);
 		if (!pIInstance)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		CWrapper::ReleaseInstance(pIInstance);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -926,7 +926,7 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_releaseinstance(LibMCDrive
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_acquireinstance(LibMCDriver_Framebuffer_Base pInstance)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_acquireinstance(LibMCDriver_FrameBuffer_Base pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -934,14 +934,14 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_acquireinstance(LibMCDrive
 		IBase* pIBaseClassInstance = (IBase *)pInstance;
 		IBase* pIInstance = dynamic_cast<IBase*>(pIBaseClassInstance);
 		if (!pIInstance)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		CWrapper::AcquireInstance(pIInstance);
 
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -951,32 +951,32 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_acquireinstance(LibMCDrive
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_injectcomponent(const char * pNameSpace, LibMCDriver_Framebuffer_pvoid pSymbolAddressMethod)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_injectcomponent(const char * pNameSpace, LibMCDriver_FrameBuffer_pvoid pSymbolAddressMethod)
 {
 	IBase* pIBaseClass = nullptr;
 
 	try {
 		if (pNameSpace == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sNameSpace(pNameSpace);
 		
 		bool bNameSpaceFound = false;
 		
 		if (sNameSpace == "LibMCEnv") {
 			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
-				throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTLOADLIBRARY);
+				throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTLOADLIBRARY);
 			}
 			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
 		if (!bNameSpaceFound)
-			throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTLOADLIBRARY);
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTLOADLIBRARY);
 		
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -986,18 +986,18 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_injectcomponent(const char
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_getsymbollookupmethod(LibMCDriver_Framebuffer_pvoid * pSymbolLookupMethod)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_getsymbollookupmethod(LibMCDriver_FrameBuffer_pvoid * pSymbolLookupMethod)
 {
 	IBase* pIBaseClass = nullptr;
 
 	try {
 		if (pSymbolLookupMethod == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
-		*pSymbolLookupMethod = (void*)&LibMCDriver_Framebuffer::Impl::LibMCDriver_Framebuffer_GetProcAddress;
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+		*pSymbolLookupMethod = (void*)&LibMCDriver_FrameBuffer::Impl::LibMCDriver_FrameBuffer_GetProcAddress;
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);
@@ -1007,23 +1007,23 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_getsymbollookupmethod(LibM
 	}
 }
 
-LibMCDriver_FramebufferResult libmcdriver_framebuffer_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Framebuffer_Driver * pInstance)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_FrameBuffer_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
 	try {
 		if (pName == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (pType == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		if (pInstance == nullptr)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
 		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
 		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
-			throw ELibMCDriver_FramebufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+			throw ELibMCDriver_FrameBufferInterfaceException (LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
 		IBase* pBaseInstance(nullptr);
 		pBaseInstance = CWrapper::CreateDriver(sName, sType, pIDriverEnvironment);
@@ -1031,8 +1031,8 @@ LibMCDriver_FramebufferResult libmcdriver_framebuffer_createdriver(const char * 
 		*pInstance = (IBase*)(pBaseInstance);
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	catch (ELibMCDriver_FramebufferInterfaceException & Exception) {
-		return handleLibMCDriver_FramebufferException(pIBaseClass, Exception);
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
 	}
 	catch (std::exception & StdException) {
 		return handleStdException(pIBaseClass, StdException);

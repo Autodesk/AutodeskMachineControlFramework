@@ -44,7 +44,7 @@ Abstract: This is the class declaration of CBase
 // Include custom headers here.
 
 
-namespace LibMCDriver_Framebuffer {
+namespace LibMCDriver_FrameBuffer {
 namespace Impl {
 
 

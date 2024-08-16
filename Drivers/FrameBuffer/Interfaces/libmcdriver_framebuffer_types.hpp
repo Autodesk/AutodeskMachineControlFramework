@@ -46,43 +46,43 @@ Interface version: 2.0.0
 
 #ifdef LIBMCDRIVER_FRAMEBUFFER_USELEGACYINTEGERTYPES
 
-typedef unsigned char LibMCDriver_Framebuffer_uint8;
-typedef unsigned short LibMCDriver_Framebuffer_uint16 ;
-typedef unsigned int LibMCDriver_Framebuffer_uint32;
-typedef unsigned long long LibMCDriver_Framebuffer_uint64;
-typedef char LibMCDriver_Framebuffer_int8;
-typedef short LibMCDriver_Framebuffer_int16;
-typedef int LibMCDriver_Framebuffer_int32;
-typedef long long LibMCDriver_Framebuffer_int64;
+typedef unsigned char LibMCDriver_FrameBuffer_uint8;
+typedef unsigned short LibMCDriver_FrameBuffer_uint16 ;
+typedef unsigned int LibMCDriver_FrameBuffer_uint32;
+typedef unsigned long long LibMCDriver_FrameBuffer_uint64;
+typedef char LibMCDriver_FrameBuffer_int8;
+typedef short LibMCDriver_FrameBuffer_int16;
+typedef int LibMCDriver_FrameBuffer_int32;
+typedef long long LibMCDriver_FrameBuffer_int64;
 
 #else // LIBMCDRIVER_FRAMEBUFFER_USELEGACYINTEGERTYPES
 
 #include <stdint.h>
 
-typedef uint8_t LibMCDriver_Framebuffer_uint8;
-typedef uint16_t LibMCDriver_Framebuffer_uint16;
-typedef uint32_t LibMCDriver_Framebuffer_uint32;
-typedef uint64_t LibMCDriver_Framebuffer_uint64;
-typedef int8_t LibMCDriver_Framebuffer_int8;
-typedef int16_t LibMCDriver_Framebuffer_int16;
-typedef int32_t LibMCDriver_Framebuffer_int32;
-typedef int64_t LibMCDriver_Framebuffer_int64 ;
+typedef uint8_t LibMCDriver_FrameBuffer_uint8;
+typedef uint16_t LibMCDriver_FrameBuffer_uint16;
+typedef uint32_t LibMCDriver_FrameBuffer_uint32;
+typedef uint64_t LibMCDriver_FrameBuffer_uint64;
+typedef int8_t LibMCDriver_FrameBuffer_int8;
+typedef int16_t LibMCDriver_FrameBuffer_int16;
+typedef int32_t LibMCDriver_FrameBuffer_int32;
+typedef int64_t LibMCDriver_FrameBuffer_int64 ;
 
 #endif // LIBMCDRIVER_FRAMEBUFFER_USELEGACYINTEGERTYPES
 
-typedef float LibMCDriver_Framebuffer_single;
-typedef double LibMCDriver_Framebuffer_double;
+typedef float LibMCDriver_FrameBuffer_single;
+typedef double LibMCDriver_FrameBuffer_double;
 
 /*************************************************************************************************************************
  General type definitions
 **************************************************************************************************************************/
 
-typedef LibMCDriver_Framebuffer_int32 LibMCDriver_FramebufferResult;
-typedef void * LibMCDriver_FramebufferHandle;
-typedef void * LibMCDriver_Framebuffer_pvoid;
+typedef LibMCDriver_FrameBuffer_int32 LibMCDriver_FrameBufferResult;
+typedef void * LibMCDriver_FrameBufferHandle;
+typedef void * LibMCDriver_FrameBuffer_pvoid;
 
 /*************************************************************************************************************************
- Version for LibMCDriver_Framebuffer
+ Version for LibMCDriver_FrameBuffer
 **************************************************************************************************************************/
 
 #define LIBMCDRIVER_FRAMEBUFFER_VERSION_MAJOR 2
@@ -92,7 +92,7 @@ typedef void * LibMCDriver_Framebuffer_pvoid;
 #define LIBMCDRIVER_FRAMEBUFFER_VERSION_BUILDINFO ""
 
 /*************************************************************************************************************************
- Error constants for LibMCDriver_Framebuffer
+ Error constants for LibMCDriver_FrameBuffer
 **************************************************************************************************************************/
 
 #define LIBMCDRIVER_FRAMEBUFFER_SUCCESS 0
@@ -113,10 +113,10 @@ typedef void * LibMCDriver_Framebuffer_pvoid;
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_UNKNOWNFRAMEBUFFERBITDEPTH 1006 /** unknown framebuffer bit depth */
 
 /*************************************************************************************************************************
- Error strings for LibMCDriver_Framebuffer
+ Error strings for LibMCDriver_FrameBuffer
 **************************************************************************************************************************/
 
-inline const char * LIBMCDRIVER_FRAMEBUFFER_GETERRORSTRING (LibMCDriver_FramebufferResult nErrorCode) {
+inline const char * LIBMCDRIVER_FRAMEBUFFER_GETERRORSTRING (LibMCDriver_FrameBufferResult nErrorCode) {
   switch (nErrorCode) {
     case LIBMCDRIVER_FRAMEBUFFER_SUCCESS: return "no error";
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED: return "functionality not implemented";
@@ -142,12 +142,12 @@ inline const char * LIBMCDRIVER_FRAMEBUFFER_GETERRORSTRING (LibMCDriver_Framebuf
  Declaration of handle classes 
 **************************************************************************************************************************/
 
-typedef LibMCDriver_FramebufferHandle LibMCDriver_Framebuffer_Base;
-typedef LibMCDriver_FramebufferHandle LibMCDriver_Framebuffer_Driver;
-typedef LibMCDriver_FramebufferHandle LibMCDriver_Framebuffer_FrameBufferAccess;
-typedef LibMCDriver_FramebufferHandle LibMCDriver_Framebuffer_Driver_FrameBuffer;
+typedef LibMCDriver_FrameBufferHandle LibMCDriver_FrameBuffer_Base;
+typedef LibMCDriver_FrameBufferHandle LibMCDriver_FrameBuffer_Driver;
+typedef LibMCDriver_FrameBufferHandle LibMCDriver_FrameBuffer_FrameBufferAccess;
+typedef LibMCDriver_FrameBufferHandle LibMCDriver_FrameBuffer_Driver_FrameBuffer;
 
-namespace LibMCDriver_Framebuffer {
+namespace LibMCDriver_FrameBuffer {
 
   /*************************************************************************************************************************
    Declaration of enums
@@ -156,7 +156,7 @@ namespace LibMCDriver_Framebuffer {
   /**
   * enum class eFrameBufferBitDepth - Bit Depth of a frame buffer
   */
-  enum class eFrameBufferBitDepth : LibMCDriver_Framebuffer_int32 {
+  enum class eFrameBufferBitDepth : LibMCDriver_FrameBuffer_int32 {
     Unknown = 0,
     RGB888 = 1,
     RGBA8888 = 2,
@@ -170,17 +170,17 @@ namespace LibMCDriver_Framebuffer {
   #pragma pack (1)
   
   typedef struct sColor {
-      LibMCDriver_Framebuffer_uint8 m_Red;
-      LibMCDriver_Framebuffer_uint8 m_Green;
-      LibMCDriver_Framebuffer_uint8 m_Blue;
+      LibMCDriver_FrameBuffer_uint8 m_Red;
+      LibMCDriver_FrameBuffer_uint8 m_Green;
+      LibMCDriver_FrameBuffer_uint8 m_Blue;
   } sColor;
   
   #pragma pack ()
   
-} // namespace LibMCDriver_Framebuffer;
+} // namespace LibMCDriver_FrameBuffer;
 
 // define legacy C-names for enums, structs and function types
-typedef LibMCDriver_Framebuffer::eFrameBufferBitDepth eLibMCDriver_FramebufferFrameBufferBitDepth;
-typedef LibMCDriver_Framebuffer::sColor sLibMCDriver_FramebufferColor;
+typedef LibMCDriver_FrameBuffer::eFrameBufferBitDepth eLibMCDriver_FrameBufferFrameBufferBitDepth;
+typedef LibMCDriver_FrameBuffer::sColor sLibMCDriver_FrameBufferColor;
 
 #endif // __LIBMCDRIVER_FRAMEBUFFER_TYPES_HEADER_CPP

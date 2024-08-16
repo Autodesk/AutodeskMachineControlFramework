@@ -54,7 +54,7 @@ Interface version: 2.0.0
 #include <vector>
 #include <exception>
 
-namespace LibMCDriver_Framebuffer {
+namespace LibMCDriver_FrameBuffer {
 
 /*************************************************************************************************************************
  Forward Declaration of all classes
@@ -68,11 +68,11 @@ class CDriver_FrameBuffer;
 /*************************************************************************************************************************
  Declaration of deprecated class types
 **************************************************************************************************************************/
-typedef CWrapper CLibMCDriver_FramebufferWrapper;
-typedef CBase CLibMCDriver_FramebufferBase;
-typedef CDriver CLibMCDriver_FramebufferDriver;
-typedef CFrameBufferAccess CLibMCDriver_FramebufferFrameBufferAccess;
-typedef CDriver_FrameBuffer CLibMCDriver_FramebufferDriver_FrameBuffer;
+typedef CWrapper CLibMCDriver_FrameBufferWrapper;
+typedef CBase CLibMCDriver_FrameBufferBase;
+typedef CDriver CLibMCDriver_FrameBufferDriver;
+typedef CFrameBufferAccess CLibMCDriver_FrameBufferFrameBufferAccess;
+typedef CDriver_FrameBuffer CLibMCDriver_FrameBufferDriver_FrameBuffer;
 
 /*************************************************************************************************************************
  Declaration of shared pointer types
@@ -86,11 +86,11 @@ typedef std::shared_ptr<CDriver_FrameBuffer> PDriver_FrameBuffer;
 /*************************************************************************************************************************
  Declaration of deprecated shared pointer types
 **************************************************************************************************************************/
-typedef PWrapper PLibMCDriver_FramebufferWrapper;
-typedef PBase PLibMCDriver_FramebufferBase;
-typedef PDriver PLibMCDriver_FramebufferDriver;
-typedef PFrameBufferAccess PLibMCDriver_FramebufferFrameBufferAccess;
-typedef PDriver_FrameBuffer PLibMCDriver_FramebufferDriver_FrameBuffer;
+typedef PWrapper PLibMCDriver_FrameBufferWrapper;
+typedef PBase PLibMCDriver_FrameBufferBase;
+typedef PDriver PLibMCDriver_FrameBufferDriver;
+typedef PFrameBufferAccess PLibMCDriver_FrameBufferFrameBufferAccess;
+typedef PDriver_FrameBuffer PLibMCDriver_FrameBufferDriver_FrameBuffer;
 
 
 /*************************************************************************************************************************
@@ -112,7 +112,7 @@ public:
 	{
 	}
 
-	LibMCDriver_FramebufferHandle GetHandle()
+	LibMCDriver_FrameBufferHandle GetHandle()
 	{
 		if (m_ptr != nullptr)
 			return m_ptr->handle();
@@ -121,14 +121,14 @@ public:
 };
 
 /*************************************************************************************************************************
- Class ELibMCDriver_FramebufferException 
+ Class ELibMCDriver_FrameBufferException 
 **************************************************************************************************************************/
-class ELibMCDriver_FramebufferException : public std::exception {
+class ELibMCDriver_FrameBufferException : public std::exception {
 protected:
 	/**
 	* Error code for the Exception.
 	*/
-	LibMCDriver_FramebufferResult m_errorCode;
+	LibMCDriver_FrameBufferResult m_errorCode;
 	/**
 	* Error message for the Exception.
 	*/
@@ -139,7 +139,7 @@ public:
 	/**
 	* Exception Constructor.
 	*/
-	ELibMCDriver_FramebufferException(LibMCDriver_FramebufferResult errorCode, const std::string & sErrorMessage)
+	ELibMCDriver_FrameBufferException(LibMCDriver_FrameBufferResult errorCode, const std::string & sErrorMessage)
 		: m_errorCode(errorCode), m_originalErrorMessage(sErrorMessage)
 	{
 		m_errorMessage = buildErrorMessage();
@@ -148,7 +148,7 @@ public:
 	/**
 	* Returns error code
 	*/
-	LibMCDriver_FramebufferResult getErrorCode() const noexcept
+	LibMCDriver_FrameBufferResult getErrorCode() const noexcept
 	{
 		return m_errorCode;
 	}
@@ -260,7 +260,7 @@ public:
 
 // declare deprecated class name
 template<typename T>
-using CLibMCDriver_FramebufferInputVector = CInputVector<T>;
+using CLibMCDriver_FrameBufferInputVector = CInputVector<T>;
 
 /*************************************************************************************************************************
  Class CWrapper 
@@ -299,35 +299,35 @@ public:
 		releaseWrapperTable(&m_WrapperTable);
 	}
 	
-	inline void CheckError(CBase * pBaseClass, LibMCDriver_FramebufferResult nResult);
+	inline void CheckError(CBase * pBaseClass, LibMCDriver_FrameBufferResult nResult);
 
-	inline void GetVersion(LibMCDriver_Framebuffer_uint32 & nMajor, LibMCDriver_Framebuffer_uint32 & nMinor, LibMCDriver_Framebuffer_uint32 & nMicro);
+	inline void GetVersion(LibMCDriver_FrameBuffer_uint32 & nMajor, LibMCDriver_FrameBuffer_uint32 & nMinor, LibMCDriver_FrameBuffer_uint32 & nMicro);
 	inline bool GetLastError(classParam<CBase> pInstance, std::string & sErrorMessage);
 	inline void ReleaseInstance(classParam<CBase> pInstance);
 	inline void AcquireInstance(classParam<CBase> pInstance);
-	inline void InjectComponent(const std::string & sNameSpace, const LibMCDriver_Framebuffer_pvoid pSymbolAddressMethod);
-	inline LibMCDriver_Framebuffer_pvoid GetSymbolLookupMethod();
+	inline void InjectComponent(const std::string & sNameSpace, const LibMCDriver_FrameBuffer_pvoid pSymbolAddressMethod);
+	inline LibMCDriver_FrameBuffer_pvoid GetSymbolLookupMethod();
 	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCEnv::CDriverEnvironment> pDriverEnvironment);
 
 private:
-	sLibMCDriver_FramebufferDynamicWrapperTable m_WrapperTable;
+	sLibMCDriver_FrameBufferDynamicWrapperTable m_WrapperTable;
 	// Injected Components
 	LibMCEnv::PWrapper m_pLibMCEnvWrapper;
 
 	
-	LibMCDriver_FramebufferResult checkBinaryVersion()
+	LibMCDriver_FrameBufferResult checkBinaryVersion()
 	{
-		LibMCDriver_Framebuffer_uint32 nMajor, nMinor, nMicro;
+		LibMCDriver_FrameBuffer_uint32 nMajor, nMinor, nMicro;
 		GetVersion(nMajor, nMinor, nMicro);
 		if (nMajor != LIBMCDRIVER_FRAMEBUFFER_VERSION_MAJOR) {
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_INCOMPATIBLEBINARYVERSION;
 		}
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
-	LibMCDriver_FramebufferResult initWrapperTable(sLibMCDriver_FramebufferDynamicWrapperTable * pWrapperTable);
-	LibMCDriver_FramebufferResult releaseWrapperTable(sLibMCDriver_FramebufferDynamicWrapperTable * pWrapperTable);
-	LibMCDriver_FramebufferResult loadWrapperTable(sLibMCDriver_FramebufferDynamicWrapperTable * pWrapperTable, const char * pLibraryFileName);
-	LibMCDriver_FramebufferResult loadWrapperTableFromSymbolLookupMethod(sLibMCDriver_FramebufferDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
+	LibMCDriver_FrameBufferResult initWrapperTable(sLibMCDriver_FrameBufferDynamicWrapperTable * pWrapperTable);
+	LibMCDriver_FrameBufferResult releaseWrapperTable(sLibMCDriver_FrameBufferDynamicWrapperTable * pWrapperTable);
+	LibMCDriver_FrameBufferResult loadWrapperTable(sLibMCDriver_FrameBufferDynamicWrapperTable * pWrapperTable, const char * pLibraryFileName);
+	LibMCDriver_FrameBufferResult loadWrapperTableFromSymbolLookupMethod(sLibMCDriver_FrameBufferDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
 	friend class CDriver;
@@ -347,10 +347,10 @@ protected:
 	/* Wrapper Object that created the class. */
 	CWrapper * m_pWrapper;
 	/* Handle to Instance in library*/
-	LibMCDriver_FramebufferHandle m_pHandle;
+	LibMCDriver_FrameBufferHandle m_pHandle;
 
 	/* Checks for an Error code and raises Exceptions */
-	void CheckError(LibMCDriver_FramebufferResult nResult)
+	void CheckError(LibMCDriver_FrameBufferResult nResult)
 	{
 		if (m_pWrapper != nullptr)
 			m_pWrapper->CheckError(this, nResult);
@@ -359,7 +359,7 @@ public:
 	/**
 	* CBase::CBase - Constructor for Base class.
 	*/
-	CBase(CWrapper * pWrapper, LibMCDriver_FramebufferHandle pHandle)
+	CBase(CWrapper * pWrapper, LibMCDriver_FrameBufferHandle pHandle)
 		: m_pWrapper(pWrapper), m_pHandle(pHandle)
 	{
 	}
@@ -377,7 +377,7 @@ public:
 	/**
 	* CBase::handle - Returns handle to instance.
 	*/
-	LibMCDriver_FramebufferHandle handle() const
+	LibMCDriver_FrameBufferHandle handle() const
 	{
 		return m_pHandle;
 	}
@@ -402,7 +402,7 @@ public:
 	/**
 	* CDriver::CDriver - Constructor for Driver class.
 	*/
-	CDriver(CWrapper* pWrapper, LibMCDriver_FramebufferHandle pHandle)
+	CDriver(CWrapper* pWrapper, LibMCDriver_FrameBufferHandle pHandle)
 		: CBase(pWrapper, pHandle)
 	{
 	}
@@ -410,7 +410,7 @@ public:
 	inline void Configure(const std::string & sConfigurationString);
 	inline std::string GetName();
 	inline std::string GetType();
-	inline void GetVersion(LibMCDriver_Framebuffer_uint32 & nMajor, LibMCDriver_Framebuffer_uint32 & nMinor, LibMCDriver_Framebuffer_uint32 & nMicro, std::string & sBuild);
+	inline void GetVersion(LibMCDriver_FrameBuffer_uint32 & nMajor, LibMCDriver_FrameBuffer_uint32 & nMinor, LibMCDriver_FrameBuffer_uint32 & nMicro, std::string & sBuild);
 	inline void QueryParameters();
 	inline void QueryParametersEx(classParam<LibMCEnv::CDriverStatusUpdateSession> pDriverUpdateInstance);
 };
@@ -424,20 +424,20 @@ public:
 	/**
 	* CFrameBufferAccess::CFrameBufferAccess - Constructor for FrameBufferAccess class.
 	*/
-	CFrameBufferAccess(CWrapper* pWrapper, LibMCDriver_FramebufferHandle pHandle)
+	CFrameBufferAccess(CWrapper* pWrapper, LibMCDriver_FrameBufferHandle pHandle)
 		: CBase(pWrapper, pHandle)
 	{
 	}
 	
-	inline LibMCDriver_Framebuffer_uint32 GetScreenWidth();
-	inline LibMCDriver_Framebuffer_uint32 GetScreenHeight();
+	inline LibMCDriver_FrameBuffer_uint32 GetScreenWidth();
+	inline LibMCDriver_FrameBuffer_uint32 GetScreenHeight();
 	inline eFrameBufferBitDepth BitDepth();
 	inline bool UsesDoubleBuffering();
 	inline void Flip();
 	inline void ClearScreen(const sColor & RGBColor);
-	inline void DrawLine(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer_double dThickness, const sColor & RGBColor);
-	inline void FillRectangle(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const sColor & RGBColor);
-	inline void DrawImage(const LibMCDriver_Framebuffer_uint32 nX, const LibMCDriver_Framebuffer_uint32 nY, classParam<LibMCEnv::CImageData> pImage);
+	inline void DrawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const sColor & RGBColor);
+	inline void FillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const sColor & RGBColor);
+	inline void DrawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, classParam<LibMCEnv::CImageData> pImage);
 };
 	
 /*************************************************************************************************************************
@@ -449,14 +449,14 @@ public:
 	/**
 	* CDriver_FrameBuffer::CDriver_FrameBuffer - Constructor for Driver_FrameBuffer class.
 	*/
-	CDriver_FrameBuffer(CWrapper* pWrapper, LibMCDriver_FramebufferHandle pHandle)
+	CDriver_FrameBuffer(CWrapper* pWrapper, LibMCDriver_FrameBufferHandle pHandle)
 		: CDriver(pWrapper, pHandle)
 	{
 	}
 	
 	inline bool SupportsSimulation();
 	inline bool SupportsDevice();
-	inline PFrameBufferAccess CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_Framebuffer_uint32 nScreenWidth, const LibMCDriver_Framebuffer_uint32 nScreenHeight, const eFrameBufferBitDepth eBitDepth);
+	inline PFrameBufferAccess CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_FrameBuffer_uint32 nScreenWidth, const LibMCDriver_FrameBuffer_uint32 nScreenHeight, const eFrameBufferBitDepth eBitDepth);
 	inline PFrameBufferAccess OpenFrameBufferDevice(const std::string & sIdentifier, const std::string & sDeviceName);
 	inline void ReleaseFramebuffer(const std::string & sIdentifier);
 	inline PFrameBufferAccess FindFrameBuffer(const std::string & sIdentifier);
@@ -469,7 +469,7 @@ public:
 	* @param[out] nMinor - returns the minor version of this library
 	* @param[out] nMicro - returns the micro version of this library
 	*/
-	inline void CWrapper::GetVersion(LibMCDriver_Framebuffer_uint32 & nMajor, LibMCDriver_Framebuffer_uint32 & nMinor, LibMCDriver_Framebuffer_uint32 & nMicro)
+	inline void CWrapper::GetVersion(LibMCDriver_FrameBuffer_uint32 & nMajor, LibMCDriver_FrameBuffer_uint32 & nMinor, LibMCDriver_FrameBuffer_uint32 & nMicro)
 	{
 		CheckError(nullptr,m_WrapperTable.m_GetVersion(&nMajor, &nMinor, &nMicro));
 	}
@@ -482,9 +482,9 @@ public:
 	*/
 	inline bool CWrapper::GetLastError(classParam<CBase> pInstance, std::string & sErrorMessage)
 	{
-		LibMCDriver_FramebufferHandle hInstance = pInstance.GetHandle();
-		LibMCDriver_Framebuffer_uint32 bytesNeededErrorMessage = 0;
-		LibMCDriver_Framebuffer_uint32 bytesWrittenErrorMessage = 0;
+		LibMCDriver_FrameBufferHandle hInstance = pInstance.GetHandle();
+		LibMCDriver_FrameBuffer_uint32 bytesNeededErrorMessage = 0;
+		LibMCDriver_FrameBuffer_uint32 bytesWrittenErrorMessage = 0;
 		bool resultHasError = 0;
 		CheckError(nullptr,m_WrapperTable.m_GetLastError(hInstance, 0, &bytesNeededErrorMessage, nullptr, &resultHasError));
 		std::vector<char> bufferErrorMessage(bytesNeededErrorMessage);
@@ -500,7 +500,7 @@ public:
 	*/
 	inline void CWrapper::ReleaseInstance(classParam<CBase> pInstance)
 	{
-		LibMCDriver_FramebufferHandle hInstance = pInstance.GetHandle();
+		LibMCDriver_FrameBufferHandle hInstance = pInstance.GetHandle();
 		CheckError(nullptr,m_WrapperTable.m_ReleaseInstance(hInstance));
 	}
 	
@@ -510,7 +510,7 @@ public:
 	*/
 	inline void CWrapper::AcquireInstance(classParam<CBase> pInstance)
 	{
-		LibMCDriver_FramebufferHandle hInstance = pInstance.GetHandle();
+		LibMCDriver_FrameBufferHandle hInstance = pInstance.GetHandle();
 		CheckError(nullptr,m_WrapperTable.m_AcquireInstance(hInstance));
 	}
 	
@@ -519,29 +519,29 @@ public:
 	* @param[in] sNameSpace - NameSpace of the injected component
 	* @param[in] pSymbolAddressMethod - Address of the SymbolAddressMethod of the injected component
 	*/
-	inline void CWrapper::InjectComponent(const std::string & sNameSpace, const LibMCDriver_Framebuffer_pvoid pSymbolAddressMethod)
+	inline void CWrapper::InjectComponent(const std::string & sNameSpace, const LibMCDriver_FrameBuffer_pvoid pSymbolAddressMethod)
 	{
 		CheckError(nullptr,m_WrapperTable.m_InjectComponent(sNameSpace.c_str(), pSymbolAddressMethod));
 		
 		bool bNameSpaceFound = false;
 		if (sNameSpace == "LibMCEnv") {
 			if (m_pLibMCEnvWrapper != nullptr) {
-				throw ELibMCDriver_FramebufferException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTLOADLIBRARY, "Library with namespace " + sNameSpace + " is already registered.");
+				throw ELibMCDriver_FrameBufferException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTLOADLIBRARY, "Library with namespace " + sNameSpace + " is already registered.");
 			}
 			m_pLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		if (!bNameSpaceFound)
-			throw ELibMCDriver_FramebufferException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTLOADLIBRARY, "Unknown namespace " + sNameSpace);
+			throw ELibMCDriver_FrameBufferException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTLOADLIBRARY, "Unknown namespace " + sNameSpace);
 	}
 	
 	/**
 	* CWrapper::GetSymbolLookupMethod - Returns the address of the SymbolLookupMethod
 	* @return Address of the SymbolAddressMethod
 	*/
-	inline LibMCDriver_Framebuffer_pvoid CWrapper::GetSymbolLookupMethod()
+	inline LibMCDriver_FrameBuffer_pvoid CWrapper::GetSymbolLookupMethod()
 	{
-		LibMCDriver_Framebuffer_pvoid resultSymbolLookupMethod = 0;
+		LibMCDriver_FrameBuffer_pvoid resultSymbolLookupMethod = 0;
 		CheckError(nullptr,m_WrapperTable.m_GetSymbolLookupMethod(&resultSymbolLookupMethod));
 		
 		return resultSymbolLookupMethod;
@@ -557,7 +557,7 @@ public:
 	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCEnv::CDriverEnvironment> pDriverEnvironment)
 	{
 		LibMCEnvHandle hDriverEnvironment = pDriverEnvironment.GetHandle();
-		LibMCDriver_FramebufferHandle hInstance = nullptr;
+		LibMCDriver_FrameBufferHandle hInstance = nullptr;
 		CheckError(nullptr,m_WrapperTable.m_CreateDriver(sName.c_str(), sType.c_str(), hDriverEnvironment, &hInstance));
 		
 		if (hInstance) {
@@ -567,19 +567,19 @@ public:
 		}
 	}
 	
-	inline void CWrapper::CheckError(CBase * pBaseClass, LibMCDriver_FramebufferResult nResult)
+	inline void CWrapper::CheckError(CBase * pBaseClass, LibMCDriver_FrameBufferResult nResult)
 	{
 		if (nResult != 0) {
 			std::string sErrorMessage;
 			if (pBaseClass != nullptr) {
 				GetLastError(pBaseClass, sErrorMessage);
 			}
-			throw ELibMCDriver_FramebufferException(nResult, sErrorMessage);
+			throw ELibMCDriver_FrameBufferException(nResult, sErrorMessage);
 		}
 	}
 	
 
-	inline LibMCDriver_FramebufferResult CWrapper::initWrapperTable(sLibMCDriver_FramebufferDynamicWrapperTable * pWrapperTable)
+	inline LibMCDriver_FrameBufferResult CWrapper::initWrapperTable(sLibMCDriver_FrameBufferDynamicWrapperTable * pWrapperTable)
 	{
 		if (pWrapperTable == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM;
@@ -618,7 +618,7 @@ public:
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
 
-	inline LibMCDriver_FramebufferResult CWrapper::releaseWrapperTable(sLibMCDriver_FramebufferDynamicWrapperTable * pWrapperTable)
+	inline LibMCDriver_FrameBufferResult CWrapper::releaseWrapperTable(sLibMCDriver_FrameBufferDynamicWrapperTable * pWrapperTable)
 	{
 		if (pWrapperTable == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM;
@@ -636,7 +636,7 @@ public:
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
 
-	inline LibMCDriver_FramebufferResult CWrapper::loadWrapperTable(sLibMCDriver_FramebufferDynamicWrapperTable * pWrapperTable, const char * pLibraryFileName)
+	inline LibMCDriver_FrameBufferResult CWrapper::loadWrapperTable(sLibMCDriver_FrameBufferDynamicWrapperTable * pWrapperTable, const char * pLibraryFileName)
 	{
 		if (pWrapperTable == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM;
@@ -665,261 +665,261 @@ public:
 		#endif // _WIN32
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_Configure = (PLibMCDriver_FramebufferDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_configure");
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_FrameBufferDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_configure");
 		#else // _WIN32
-		pWrapperTable->m_Driver_Configure = (PLibMCDriver_FramebufferDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_configure");
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_FrameBufferDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_configure");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_Configure == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_GetName = (PLibMCDriver_FramebufferDriver_GetNamePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_getname");
+		pWrapperTable->m_Driver_GetName = (PLibMCDriver_FrameBufferDriver_GetNamePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_getname");
 		#else // _WIN32
-		pWrapperTable->m_Driver_GetName = (PLibMCDriver_FramebufferDriver_GetNamePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_getname");
+		pWrapperTable->m_Driver_GetName = (PLibMCDriver_FrameBufferDriver_GetNamePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_getname");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_GetName == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_GetType = (PLibMCDriver_FramebufferDriver_GetTypePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_gettype");
+		pWrapperTable->m_Driver_GetType = (PLibMCDriver_FrameBufferDriver_GetTypePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_gettype");
 		#else // _WIN32
-		pWrapperTable->m_Driver_GetType = (PLibMCDriver_FramebufferDriver_GetTypePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_gettype");
+		pWrapperTable->m_Driver_GetType = (PLibMCDriver_FrameBufferDriver_GetTypePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_gettype");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_GetType == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_GetVersion = (PLibMCDriver_FramebufferDriver_GetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_getversion");
+		pWrapperTable->m_Driver_GetVersion = (PLibMCDriver_FrameBufferDriver_GetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_getversion");
 		#else // _WIN32
-		pWrapperTable->m_Driver_GetVersion = (PLibMCDriver_FramebufferDriver_GetVersionPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_getversion");
+		pWrapperTable->m_Driver_GetVersion = (PLibMCDriver_FrameBufferDriver_GetVersionPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_getversion");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_GetVersion == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriver_FramebufferDriver_QueryParametersPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_queryparameters");
+		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriver_FrameBufferDriver_QueryParametersPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_queryparameters");
 		#else // _WIN32
-		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriver_FramebufferDriver_QueryParametersPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_queryparameters");
+		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriver_FrameBufferDriver_QueryParametersPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_queryparameters");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_QueryParametersEx = (PLibMCDriver_FramebufferDriver_QueryParametersExPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_queryparametersex");
+		pWrapperTable->m_Driver_QueryParametersEx = (PLibMCDriver_FrameBufferDriver_QueryParametersExPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_queryparametersex");
 		#else // _WIN32
-		pWrapperTable->m_Driver_QueryParametersEx = (PLibMCDriver_FramebufferDriver_QueryParametersExPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_queryparametersex");
+		pWrapperTable->m_Driver_QueryParametersEx = (PLibMCDriver_FrameBufferDriver_QueryParametersExPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_queryparametersex");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParametersEx == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_GetScreenWidth = (PLibMCDriver_FramebufferFrameBufferAccess_GetScreenWidthPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_getscreenwidth");
+		pWrapperTable->m_FrameBufferAccess_GetScreenWidth = (PLibMCDriver_FrameBufferFrameBufferAccess_GetScreenWidthPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_getscreenwidth");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_GetScreenWidth = (PLibMCDriver_FramebufferFrameBufferAccess_GetScreenWidthPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_getscreenwidth");
+		pWrapperTable->m_FrameBufferAccess_GetScreenWidth = (PLibMCDriver_FrameBufferFrameBufferAccess_GetScreenWidthPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_getscreenwidth");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_GetScreenWidth == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_GetScreenHeight = (PLibMCDriver_FramebufferFrameBufferAccess_GetScreenHeightPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_getscreenheight");
+		pWrapperTable->m_FrameBufferAccess_GetScreenHeight = (PLibMCDriver_FrameBufferFrameBufferAccess_GetScreenHeightPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_getscreenheight");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_GetScreenHeight = (PLibMCDriver_FramebufferFrameBufferAccess_GetScreenHeightPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_getscreenheight");
+		pWrapperTable->m_FrameBufferAccess_GetScreenHeight = (PLibMCDriver_FrameBufferFrameBufferAccess_GetScreenHeightPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_getscreenheight");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_GetScreenHeight == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_BitDepth = (PLibMCDriver_FramebufferFrameBufferAccess_BitDepthPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_bitdepth");
+		pWrapperTable->m_FrameBufferAccess_BitDepth = (PLibMCDriver_FrameBufferFrameBufferAccess_BitDepthPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_bitdepth");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_BitDepth = (PLibMCDriver_FramebufferFrameBufferAccess_BitDepthPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_bitdepth");
+		pWrapperTable->m_FrameBufferAccess_BitDepth = (PLibMCDriver_FrameBufferFrameBufferAccess_BitDepthPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_bitdepth");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_BitDepth == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_UsesDoubleBuffering = (PLibMCDriver_FramebufferFrameBufferAccess_UsesDoubleBufferingPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_usesdoublebuffering");
+		pWrapperTable->m_FrameBufferAccess_UsesDoubleBuffering = (PLibMCDriver_FrameBufferFrameBufferAccess_UsesDoubleBufferingPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_usesdoublebuffering");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_UsesDoubleBuffering = (PLibMCDriver_FramebufferFrameBufferAccess_UsesDoubleBufferingPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_usesdoublebuffering");
+		pWrapperTable->m_FrameBufferAccess_UsesDoubleBuffering = (PLibMCDriver_FrameBufferFrameBufferAccess_UsesDoubleBufferingPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_usesdoublebuffering");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_UsesDoubleBuffering == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_Flip = (PLibMCDriver_FramebufferFrameBufferAccess_FlipPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_flip");
+		pWrapperTable->m_FrameBufferAccess_Flip = (PLibMCDriver_FrameBufferFrameBufferAccess_FlipPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_flip");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_Flip = (PLibMCDriver_FramebufferFrameBufferAccess_FlipPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_flip");
+		pWrapperTable->m_FrameBufferAccess_Flip = (PLibMCDriver_FrameBufferFrameBufferAccess_FlipPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_flip");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_Flip == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_ClearScreen = (PLibMCDriver_FramebufferFrameBufferAccess_ClearScreenPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_clearscreen");
+		pWrapperTable->m_FrameBufferAccess_ClearScreen = (PLibMCDriver_FrameBufferFrameBufferAccess_ClearScreenPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_clearscreen");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_ClearScreen = (PLibMCDriver_FramebufferFrameBufferAccess_ClearScreenPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_clearscreen");
+		pWrapperTable->m_FrameBufferAccess_ClearScreen = (PLibMCDriver_FrameBufferFrameBufferAccess_ClearScreenPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_clearscreen");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_ClearScreen == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_DrawLine = (PLibMCDriver_FramebufferFrameBufferAccess_DrawLinePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawline");
+		pWrapperTable->m_FrameBufferAccess_DrawLine = (PLibMCDriver_FrameBufferFrameBufferAccess_DrawLinePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawline");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_DrawLine = (PLibMCDriver_FramebufferFrameBufferAccess_DrawLinePtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawline");
+		pWrapperTable->m_FrameBufferAccess_DrawLine = (PLibMCDriver_FrameBufferFrameBufferAccess_DrawLinePtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawline");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_DrawLine == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_FillRectangle = (PLibMCDriver_FramebufferFrameBufferAccess_FillRectanglePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_fillrectangle");
+		pWrapperTable->m_FrameBufferAccess_FillRectangle = (PLibMCDriver_FrameBufferFrameBufferAccess_FillRectanglePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_fillrectangle");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_FillRectangle = (PLibMCDriver_FramebufferFrameBufferAccess_FillRectanglePtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_fillrectangle");
+		pWrapperTable->m_FrameBufferAccess_FillRectangle = (PLibMCDriver_FrameBufferFrameBufferAccess_FillRectanglePtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_fillrectangle");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_FillRectangle == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_DrawImage = (PLibMCDriver_FramebufferFrameBufferAccess_DrawImagePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawimage");
+		pWrapperTable->m_FrameBufferAccess_DrawImage = (PLibMCDriver_FrameBufferFrameBufferAccess_DrawImagePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawimage");
 		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_DrawImage = (PLibMCDriver_FramebufferFrameBufferAccess_DrawImagePtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawimage");
+		pWrapperTable->m_FrameBufferAccess_DrawImage = (PLibMCDriver_FrameBufferFrameBufferAccess_DrawImagePtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawimage");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_DrawImage == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_SupportsSimulation = (PLibMCDriver_FramebufferDriver_FrameBuffer_SupportsSimulationPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_supportssimulation");
+		pWrapperTable->m_Driver_FrameBuffer_SupportsSimulation = (PLibMCDriver_FrameBufferDriver_FrameBuffer_SupportsSimulationPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_supportssimulation");
 		#else // _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_SupportsSimulation = (PLibMCDriver_FramebufferDriver_FrameBuffer_SupportsSimulationPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_supportssimulation");
+		pWrapperTable->m_Driver_FrameBuffer_SupportsSimulation = (PLibMCDriver_FrameBufferDriver_FrameBuffer_SupportsSimulationPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_supportssimulation");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_FrameBuffer_SupportsSimulation == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_SupportsDevice = (PLibMCDriver_FramebufferDriver_FrameBuffer_SupportsDevicePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_supportsdevice");
+		pWrapperTable->m_Driver_FrameBuffer_SupportsDevice = (PLibMCDriver_FrameBufferDriver_FrameBuffer_SupportsDevicePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_supportsdevice");
 		#else // _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_SupportsDevice = (PLibMCDriver_FramebufferDriver_FrameBuffer_SupportsDevicePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_supportsdevice");
+		pWrapperTable->m_Driver_FrameBuffer_SupportsDevice = (PLibMCDriver_FrameBufferDriver_FrameBuffer_SupportsDevicePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_supportsdevice");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_FrameBuffer_SupportsDevice == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_CreateFrameBufferSimulation = (PLibMCDriver_FramebufferDriver_FrameBuffer_CreateFrameBufferSimulationPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation");
+		pWrapperTable->m_Driver_FrameBuffer_CreateFrameBufferSimulation = (PLibMCDriver_FrameBufferDriver_FrameBuffer_CreateFrameBufferSimulationPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation");
 		#else // _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_CreateFrameBufferSimulation = (PLibMCDriver_FramebufferDriver_FrameBuffer_CreateFrameBufferSimulationPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation");
+		pWrapperTable->m_Driver_FrameBuffer_CreateFrameBufferSimulation = (PLibMCDriver_FrameBufferDriver_FrameBuffer_CreateFrameBufferSimulationPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_FrameBuffer_CreateFrameBufferSimulation == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_OpenFrameBufferDevice = (PLibMCDriver_FramebufferDriver_FrameBuffer_OpenFrameBufferDevicePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice");
+		pWrapperTable->m_Driver_FrameBuffer_OpenFrameBufferDevice = (PLibMCDriver_FrameBufferDriver_FrameBuffer_OpenFrameBufferDevicePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice");
 		#else // _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_OpenFrameBufferDevice = (PLibMCDriver_FramebufferDriver_FrameBuffer_OpenFrameBufferDevicePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice");
+		pWrapperTable->m_Driver_FrameBuffer_OpenFrameBufferDevice = (PLibMCDriver_FrameBufferDriver_FrameBuffer_OpenFrameBufferDevicePtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_FrameBuffer_OpenFrameBufferDevice == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_ReleaseFramebuffer = (PLibMCDriver_FramebufferDriver_FrameBuffer_ReleaseFramebufferPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_releaseframebuffer");
+		pWrapperTable->m_Driver_FrameBuffer_ReleaseFramebuffer = (PLibMCDriver_FrameBufferDriver_FrameBuffer_ReleaseFramebufferPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_releaseframebuffer");
 		#else // _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_ReleaseFramebuffer = (PLibMCDriver_FramebufferDriver_FrameBuffer_ReleaseFramebufferPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_releaseframebuffer");
+		pWrapperTable->m_Driver_FrameBuffer_ReleaseFramebuffer = (PLibMCDriver_FrameBufferDriver_FrameBuffer_ReleaseFramebufferPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_releaseframebuffer");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_FrameBuffer_ReleaseFramebuffer == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_FindFrameBuffer = (PLibMCDriver_FramebufferDriver_FrameBuffer_FindFrameBufferPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_findframebuffer");
+		pWrapperTable->m_Driver_FrameBuffer_FindFrameBuffer = (PLibMCDriver_FrameBufferDriver_FrameBuffer_FindFrameBufferPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_findframebuffer");
 		#else // _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_FindFrameBuffer = (PLibMCDriver_FramebufferDriver_FrameBuffer_FindFrameBufferPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_findframebuffer");
+		pWrapperTable->m_Driver_FrameBuffer_FindFrameBuffer = (PLibMCDriver_FrameBufferDriver_FrameBuffer_FindFrameBufferPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_findframebuffer");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_FrameBuffer_FindFrameBuffer == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_FrameBufferExists = (PLibMCDriver_FramebufferDriver_FrameBuffer_FrameBufferExistsPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_framebufferexists");
+		pWrapperTable->m_Driver_FrameBuffer_FrameBufferExists = (PLibMCDriver_FrameBufferDriver_FrameBuffer_FrameBufferExistsPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_framebufferexists");
 		#else // _WIN32
-		pWrapperTable->m_Driver_FrameBuffer_FrameBufferExists = (PLibMCDriver_FramebufferDriver_FrameBuffer_FrameBufferExistsPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_framebufferexists");
+		pWrapperTable->m_Driver_FrameBuffer_FrameBufferExists = (PLibMCDriver_FrameBufferDriver_FrameBuffer_FrameBufferExistsPtr) dlsym(hLibrary, "libmcdriver_framebuffer_driver_framebuffer_framebufferexists");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_FrameBuffer_FrameBufferExists == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_GetVersion = (PLibMCDriver_FramebufferGetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_getversion");
+		pWrapperTable->m_GetVersion = (PLibMCDriver_FrameBufferGetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_getversion");
 		#else // _WIN32
-		pWrapperTable->m_GetVersion = (PLibMCDriver_FramebufferGetVersionPtr) dlsym(hLibrary, "libmcdriver_framebuffer_getversion");
+		pWrapperTable->m_GetVersion = (PLibMCDriver_FrameBufferGetVersionPtr) dlsym(hLibrary, "libmcdriver_framebuffer_getversion");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_GetVersion == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_GetLastError = (PLibMCDriver_FramebufferGetLastErrorPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_getlasterror");
+		pWrapperTable->m_GetLastError = (PLibMCDriver_FrameBufferGetLastErrorPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_getlasterror");
 		#else // _WIN32
-		pWrapperTable->m_GetLastError = (PLibMCDriver_FramebufferGetLastErrorPtr) dlsym(hLibrary, "libmcdriver_framebuffer_getlasterror");
+		pWrapperTable->m_GetLastError = (PLibMCDriver_FrameBufferGetLastErrorPtr) dlsym(hLibrary, "libmcdriver_framebuffer_getlasterror");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_GetLastError == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ReleaseInstance = (PLibMCDriver_FramebufferReleaseInstancePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_releaseinstance");
+		pWrapperTable->m_ReleaseInstance = (PLibMCDriver_FrameBufferReleaseInstancePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_releaseinstance");
 		#else // _WIN32
-		pWrapperTable->m_ReleaseInstance = (PLibMCDriver_FramebufferReleaseInstancePtr) dlsym(hLibrary, "libmcdriver_framebuffer_releaseinstance");
+		pWrapperTable->m_ReleaseInstance = (PLibMCDriver_FrameBufferReleaseInstancePtr) dlsym(hLibrary, "libmcdriver_framebuffer_releaseinstance");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ReleaseInstance == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_AcquireInstance = (PLibMCDriver_FramebufferAcquireInstancePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_acquireinstance");
+		pWrapperTable->m_AcquireInstance = (PLibMCDriver_FrameBufferAcquireInstancePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_acquireinstance");
 		#else // _WIN32
-		pWrapperTable->m_AcquireInstance = (PLibMCDriver_FramebufferAcquireInstancePtr) dlsym(hLibrary, "libmcdriver_framebuffer_acquireinstance");
+		pWrapperTable->m_AcquireInstance = (PLibMCDriver_FrameBufferAcquireInstancePtr) dlsym(hLibrary, "libmcdriver_framebuffer_acquireinstance");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_AcquireInstance == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_InjectComponent = (PLibMCDriver_FramebufferInjectComponentPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_injectcomponent");
+		pWrapperTable->m_InjectComponent = (PLibMCDriver_FrameBufferInjectComponentPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_injectcomponent");
 		#else // _WIN32
-		pWrapperTable->m_InjectComponent = (PLibMCDriver_FramebufferInjectComponentPtr) dlsym(hLibrary, "libmcdriver_framebuffer_injectcomponent");
+		pWrapperTable->m_InjectComponent = (PLibMCDriver_FrameBufferInjectComponentPtr) dlsym(hLibrary, "libmcdriver_framebuffer_injectcomponent");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_InjectComponent == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_GetSymbolLookupMethod = (PLibMCDriver_FramebufferGetSymbolLookupMethodPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_getsymbollookupmethod");
+		pWrapperTable->m_GetSymbolLookupMethod = (PLibMCDriver_FrameBufferGetSymbolLookupMethodPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_getsymbollookupmethod");
 		#else // _WIN32
-		pWrapperTable->m_GetSymbolLookupMethod = (PLibMCDriver_FramebufferGetSymbolLookupMethodPtr) dlsym(hLibrary, "libmcdriver_framebuffer_getsymbollookupmethod");
+		pWrapperTable->m_GetSymbolLookupMethod = (PLibMCDriver_FrameBufferGetSymbolLookupMethodPtr) dlsym(hLibrary, "libmcdriver_framebuffer_getsymbollookupmethod");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_GetSymbolLookupMethod == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_CreateDriver = (PLibMCDriver_FramebufferCreateDriverPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_createdriver");
+		pWrapperTable->m_CreateDriver = (PLibMCDriver_FrameBufferCreateDriverPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_createdriver");
 		#else // _WIN32
-		pWrapperTable->m_CreateDriver = (PLibMCDriver_FramebufferCreateDriverPtr) dlsym(hLibrary, "libmcdriver_framebuffer_createdriver");
+		pWrapperTable->m_CreateDriver = (PLibMCDriver_FrameBufferCreateDriverPtr) dlsym(hLibrary, "libmcdriver_framebuffer_createdriver");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_CreateDriver == nullptr)
@@ -929,18 +929,18 @@ public:
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 	}
 
-	inline LibMCDriver_FramebufferResult CWrapper::loadWrapperTableFromSymbolLookupMethod(sLibMCDriver_FramebufferDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod)
+	inline LibMCDriver_FrameBufferResult CWrapper::loadWrapperTableFromSymbolLookupMethod(sLibMCDriver_FrameBufferDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod)
 {
 		if (pWrapperTable == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM;
 		if (pSymbolLookupMethod == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM;
 		
-		typedef LibMCDriver_FramebufferResult(*SymbolLookupType)(const char*, void**);
+		typedef LibMCDriver_FrameBufferResult(*SymbolLookupType)(const char*, void**);
 		
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
-		LibMCDriver_FramebufferResult eLookupError = LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
+		LibMCDriver_FrameBufferResult eLookupError = LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
 		eLookupError = (*pLookup)("libmcdriver_framebuffer_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1085,8 +1085,8 @@ public:
 	*/
 	std::string CDriver::GetName()
 	{
-		LibMCDriver_Framebuffer_uint32 bytesNeededName = 0;
-		LibMCDriver_Framebuffer_uint32 bytesWrittenName = 0;
+		LibMCDriver_FrameBuffer_uint32 bytesNeededName = 0;
+		LibMCDriver_FrameBuffer_uint32 bytesWrittenName = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
 		std::vector<char> bufferName(bytesNeededName);
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
@@ -1100,8 +1100,8 @@ public:
 	*/
 	std::string CDriver::GetType()
 	{
-		LibMCDriver_Framebuffer_uint32 bytesNeededType = 0;
-		LibMCDriver_Framebuffer_uint32 bytesWrittenType = 0;
+		LibMCDriver_FrameBuffer_uint32 bytesNeededType = 0;
+		LibMCDriver_FrameBuffer_uint32 bytesWrittenType = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GetType(m_pHandle, 0, &bytesNeededType, nullptr));
 		std::vector<char> bufferType(bytesNeededType);
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GetType(m_pHandle, bytesNeededType, &bytesWrittenType, &bufferType[0]));
@@ -1116,10 +1116,10 @@ public:
 	* @param[out] nMicro - Micro version.
 	* @param[out] sBuild - Build identifier.
 	*/
-	void CDriver::GetVersion(LibMCDriver_Framebuffer_uint32 & nMajor, LibMCDriver_Framebuffer_uint32 & nMinor, LibMCDriver_Framebuffer_uint32 & nMicro, std::string & sBuild)
+	void CDriver::GetVersion(LibMCDriver_FrameBuffer_uint32 & nMajor, LibMCDriver_FrameBuffer_uint32 & nMinor, LibMCDriver_FrameBuffer_uint32 & nMicro, std::string & sBuild)
 	{
-		LibMCDriver_Framebuffer_uint32 bytesNeededBuild = 0;
-		LibMCDriver_Framebuffer_uint32 bytesWrittenBuild = 0;
+		LibMCDriver_FrameBuffer_uint32 bytesNeededBuild = 0;
+		LibMCDriver_FrameBuffer_uint32 bytesWrittenBuild = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GetVersion(m_pHandle, &nMajor, &nMinor, &nMicro, 0, &bytesNeededBuild, nullptr));
 		std::vector<char> bufferBuild(bytesNeededBuild);
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GetVersion(m_pHandle, &nMajor, &nMinor, &nMicro, bytesNeededBuild, &bytesWrittenBuild, &bufferBuild[0]));
@@ -1152,9 +1152,9 @@ public:
 	* CFrameBufferAccess::GetScreenWidth - Returns the width of the screen.
 	* @return Screen width of Framebuffer. Minimum 128, Maximum 16348..
 	*/
-	LibMCDriver_Framebuffer_uint32 CFrameBufferAccess::GetScreenWidth()
+	LibMCDriver_FrameBuffer_uint32 CFrameBufferAccess::GetScreenWidth()
 	{
-		LibMCDriver_Framebuffer_uint32 resultScreenWidth = 0;
+		LibMCDriver_FrameBuffer_uint32 resultScreenWidth = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_FrameBufferAccess_GetScreenWidth(m_pHandle, &resultScreenWidth));
 		
 		return resultScreenWidth;
@@ -1164,9 +1164,9 @@ public:
 	* CFrameBufferAccess::GetScreenHeight - Returns the height of the screen.
 	* @return Screen height of Framebuffer. Minimum 128, Maximum 16348..
 	*/
-	LibMCDriver_Framebuffer_uint32 CFrameBufferAccess::GetScreenHeight()
+	LibMCDriver_FrameBuffer_uint32 CFrameBufferAccess::GetScreenHeight()
 	{
-		LibMCDriver_Framebuffer_uint32 resultScreenHeight = 0;
+		LibMCDriver_FrameBuffer_uint32 resultScreenHeight = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_FrameBufferAccess_GetScreenHeight(m_pHandle, &resultScreenHeight));
 		
 		return resultScreenHeight;
@@ -1222,7 +1222,7 @@ public:
 	* @param[in] dThickness - Thickness of the line in pixels.
 	* @param[in] RGBColor - Color to use.
 	*/
-	void CFrameBufferAccess::DrawLine(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer_double dThickness, const sColor & RGBColor)
+	void CFrameBufferAccess::DrawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const sColor & RGBColor)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_FrameBufferAccess_DrawLine(m_pHandle, nX1, nY1, nX2, nY2, dThickness, &RGBColor));
 	}
@@ -1235,7 +1235,7 @@ public:
 	* @param[in] nY2 - Y Coordinate of first point to use.
 	* @param[in] RGBColor - Color to use.
 	*/
-	void CFrameBufferAccess::FillRectangle(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const sColor & RGBColor)
+	void CFrameBufferAccess::FillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const sColor & RGBColor)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_FrameBufferAccess_FillRectangle(m_pHandle, nX1, nY1, nX2, nY2, &RGBColor));
 	}
@@ -1246,7 +1246,7 @@ public:
 	* @param[in] nY - Y Coordinate of image.
 	* @param[in] pImage - Image object to draw.
 	*/
-	void CFrameBufferAccess::DrawImage(const LibMCDriver_Framebuffer_uint32 nX, const LibMCDriver_Framebuffer_uint32 nY, classParam<LibMCEnv::CImageData> pImage)
+	void CFrameBufferAccess::DrawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, classParam<LibMCEnv::CImageData> pImage)
 	{
 		LibMCEnvHandle hImage = pImage.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_FrameBufferAccess_DrawImage(m_pHandle, nX, nY, hImage));
@@ -1288,9 +1288,9 @@ public:
 	* @param[in] eBitDepth - Framebuffer bit depth.
 	* @return Framebuffer access instance.
 	*/
-	PFrameBufferAccess CDriver_FrameBuffer::CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_Framebuffer_uint32 nScreenWidth, const LibMCDriver_Framebuffer_uint32 nScreenHeight, const eFrameBufferBitDepth eBitDepth)
+	PFrameBufferAccess CDriver_FrameBuffer::CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_FrameBuffer_uint32 nScreenWidth, const LibMCDriver_FrameBuffer_uint32 nScreenHeight, const eFrameBufferBitDepth eBitDepth)
 	{
-		LibMCDriver_FramebufferHandle hFrameBufferInstance = nullptr;
+		LibMCDriver_FrameBufferHandle hFrameBufferInstance = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_FrameBuffer_CreateFrameBufferSimulation(m_pHandle, sIdentifier.c_str(), nScreenWidth, nScreenHeight, eBitDepth, &hFrameBufferInstance));
 		
 		if (!hFrameBufferInstance) {
@@ -1307,7 +1307,7 @@ public:
 	*/
 	PFrameBufferAccess CDriver_FrameBuffer::OpenFrameBufferDevice(const std::string & sIdentifier, const std::string & sDeviceName)
 	{
-		LibMCDriver_FramebufferHandle hFrameBufferInstance = nullptr;
+		LibMCDriver_FrameBufferHandle hFrameBufferInstance = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_FrameBuffer_OpenFrameBufferDevice(m_pHandle, sIdentifier.c_str(), sDeviceName.c_str(), &hFrameBufferInstance));
 		
 		if (!hFrameBufferInstance) {
@@ -1332,7 +1332,7 @@ public:
 	*/
 	PFrameBufferAccess CDriver_FrameBuffer::FindFrameBuffer(const std::string & sIdentifier)
 	{
-		LibMCDriver_FramebufferHandle hFrameBufferInstance = nullptr;
+		LibMCDriver_FrameBufferHandle hFrameBufferInstance = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_FrameBuffer_FindFrameBuffer(m_pHandle, sIdentifier.c_str(), &hFrameBufferInstance));
 		
 		if (!hFrameBufferInstance) {
@@ -1354,7 +1354,7 @@ public:
 		return resultExists;
 	}
 
-} // namespace LibMCDriver_Framebuffer
+} // namespace LibMCDriver_FrameBuffer
 
 #endif // __LIBMCDRIVER_FRAMEBUFFER_CPPHEADER_DYNAMIC_CPP
 

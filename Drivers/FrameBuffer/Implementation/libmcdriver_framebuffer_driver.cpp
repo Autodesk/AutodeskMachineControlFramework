@@ -34,4 +34,4 @@ Abstract: This is a stub class definition of CDriver
 #include "libmcdriver_framebuffer_driver.hpp"
 #include "libmcdriver_framebuffer_interfaceexception.hpp"
 
-using namespace LibMCDriver_Framebuffer::Impl;
+using namespace LibMCDriver_FrameBuffer::Impl;

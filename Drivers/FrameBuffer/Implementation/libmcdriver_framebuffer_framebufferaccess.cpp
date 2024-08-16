@@ -38,7 +38,7 @@ Abstract: This is a stub class definition of CFrameBufferAccess
 
 
 
-using namespace LibMCDriver_Framebuffer::Impl;
+using namespace LibMCDriver_FrameBuffer::Impl;
 
 /*************************************************************************************************************************
  Class definition of CFrameBufferAccess 
@@ -47,7 +47,7 @@ CFrameBufferAccess::CFrameBufferAccess(PFrameBufferInstance pInstance)
 	: m_pInstance(pInstance)
 {
 	if (pInstance.get () == nullptr)
-		throw ELibMCDriver_FramebufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
+		throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 
 
 }
@@ -57,17 +57,17 @@ CFrameBufferAccess::~CFrameBufferAccess()
 
 }
 
-LibMCDriver_Framebuffer_uint32 CFrameBufferAccess::GetScreenWidth()
+LibMCDriver_FrameBuffer_uint32 CFrameBufferAccess::GetScreenWidth()
 {
 	return m_pInstance->getScreenWidth();
 }
 
-LibMCDriver_Framebuffer_uint32 CFrameBufferAccess::GetScreenHeight()
+LibMCDriver_FrameBuffer_uint32 CFrameBufferAccess::GetScreenHeight()
 {
 	return m_pInstance->getScreenWidth();
 }
 
-LibMCDriver_Framebuffer::eFrameBufferBitDepth CFrameBufferAccess::BitDepth()
+LibMCDriver_FrameBuffer::eFrameBufferBitDepth CFrameBufferAccess::BitDepth()
 {
 	return m_pInstance->bitDepth();
 }
@@ -82,22 +82,22 @@ void CFrameBufferAccess::Flip()
 	m_pInstance->flip();
 }
 
-void CFrameBufferAccess::ClearScreen(const LibMCDriver_Framebuffer::sColor RGBColor)
+void CFrameBufferAccess::ClearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor)
 {
 	m_pInstance->clearScreen(RGBColor);
 }
 
-void CFrameBufferAccess::DrawLine(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer_double dThickness, const LibMCDriver_Framebuffer::sColor RGBColor)
+void CFrameBufferAccess::DrawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor)
 {
 	m_pInstance->drawLine(nX1, nY1, nX2, nY2, dThickness, RGBColor);
 }
 
-void CFrameBufferAccess::FillRectangle(const LibMCDriver_Framebuffer_uint32 nX1, const LibMCDriver_Framebuffer_uint32 nY1, const LibMCDriver_Framebuffer_uint32 nX2, const LibMCDriver_Framebuffer_uint32 nY2, const LibMCDriver_Framebuffer::sColor RGBColor)
+void CFrameBufferAccess::FillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor)
 {
 	m_pInstance->fillRectangle(nX1, nY1, nX2, nY2, RGBColor);
 }
 
-void CFrameBufferAccess::DrawImage(const LibMCDriver_Framebuffer_uint32 nX, const LibMCDriver_Framebuffer_uint32 nY, LibMCEnv::PImageData pImage)
+void CFrameBufferAccess::DrawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv::PImageData pImage)
 {
 	m_pInstance->drawImage(nX, nY, pImage);
 }

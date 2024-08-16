@@ -44,16 +44,16 @@ Interface version: 2.0.0
 #include "libmcdriver_framebuffer_types.hpp"
 
 /*************************************************************************************************************************
- Class ELibMCDriver_FramebufferInterfaceException
+ Class ELibMCDriver_FrameBufferInterfaceException
 **************************************************************************************************************************/
 
 
-class ELibMCDriver_FramebufferInterfaceException : public std::exception {
+class ELibMCDriver_FrameBufferInterfaceException : public std::exception {
 protected:
 	/**
 	* Error code for the Exception.
 	*/
-	LibMCDriver_FramebufferResult m_errorCode;
+	LibMCDriver_FrameBufferResult m_errorCode;
 	/**
 	* Error message for the Exception.
 	*/
@@ -63,17 +63,17 @@ public:
 	/**
 	* Exception Constructor.
 	*/
-	ELibMCDriver_FramebufferInterfaceException(LibMCDriver_FramebufferResult errorCode);
+	ELibMCDriver_FrameBufferInterfaceException(LibMCDriver_FrameBufferResult errorCode);
 
 	/**
 	* Custom Exception Constructor.
 	*/
-	ELibMCDriver_FramebufferInterfaceException(LibMCDriver_FramebufferResult errorCode, std::string errorMessage);
+	ELibMCDriver_FrameBufferInterfaceException(LibMCDriver_FrameBufferResult errorCode, std::string errorMessage);
 
 	/**
 	* Returns error code
 	*/
-	LibMCDriver_FramebufferResult getErrorCode();
+	LibMCDriver_FrameBufferResult getErrorCode();
 	/**
 	* Returns error message
 	*/

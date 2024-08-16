@@ -42,26 +42,26 @@ Interface version: 2.0.0
 #include "libmcdriver_framebuffer_interfaceexception.hpp"
 
 /*************************************************************************************************************************
- Class ELibMCDriver_FramebufferInterfaceException
+ Class ELibMCDriver_FrameBufferInterfaceException
 **************************************************************************************************************************/
-ELibMCDriver_FramebufferInterfaceException::ELibMCDriver_FramebufferInterfaceException(LibMCDriver_FramebufferResult errorCode)
+ELibMCDriver_FrameBufferInterfaceException::ELibMCDriver_FrameBufferInterfaceException(LibMCDriver_FrameBufferResult errorCode)
 	: m_errorMessage(LIBMCDRIVER_FRAMEBUFFER_GETERRORSTRING (errorCode))
 {
 	m_errorCode = errorCode;
 }
 
-ELibMCDriver_FramebufferInterfaceException::ELibMCDriver_FramebufferInterfaceException(LibMCDriver_FramebufferResult errorCode, std::string errorMessage)
+ELibMCDriver_FrameBufferInterfaceException::ELibMCDriver_FrameBufferInterfaceException(LibMCDriver_FrameBufferResult errorCode, std::string errorMessage)
 	: m_errorMessage(errorMessage + " (" + std::to_string (errorCode) + ")")
 {
 	m_errorCode = errorCode;
 }
 
-LibMCDriver_FramebufferResult ELibMCDriver_FramebufferInterfaceException::getErrorCode ()
+LibMCDriver_FrameBufferResult ELibMCDriver_FrameBufferInterfaceException::getErrorCode ()
 {
 	return m_errorCode;
 }
 
-const char * ELibMCDriver_FramebufferInterfaceException::what () const noexcept
+const char * ELibMCDriver_FrameBufferInterfaceException::what () const noexcept
 {
 	return m_errorMessage.c_str();
 }

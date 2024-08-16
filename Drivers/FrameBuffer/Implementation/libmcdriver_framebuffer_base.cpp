@@ -37,7 +37,7 @@ Abstract: This is a stub class definition of CBase
 // Include custom headers here.
 
 
-using namespace LibMCDriver_Framebuffer::Impl;
+using namespace LibMCDriver_FrameBuffer::Impl;
 
 /*************************************************************************************************************************
  Class definition of CBase 
