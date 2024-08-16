@@ -469,7 +469,79 @@ LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_clearscr
 	}
 }
 
-LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX1, LibMCDriver_FrameBuffer_uint32 nY1, LibMCDriver_FrameBuffer_uint32 nX2, LibMCDriver_FrameBuffer_uint32 nY2, LibMCDriver_FrameBuffer_double dThickness, const sLibMCDriver_FrameBufferColor * pRGBColor)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_clearscreenrgb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue)
+{
+	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
+
+	try {
+		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
+		if (!pIFrameBufferAccess)
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+		
+		pIFrameBufferAccess->ClearScreenRGB(nRed, nGreen, nBlue);
+
+		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
+	}
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_setpixel(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX, LibMCDriver_FrameBuffer_int32 nY, const sLibMCDriver_FrameBufferColor * pRGBColor)
+{
+	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
+
+	try {
+		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
+		if (!pIFrameBufferAccess)
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+		
+		pIFrameBufferAccess->SetPixel(nX, nY, *pRGBColor);
+
+		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
+	}
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_setpixelrgb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX, LibMCDriver_FrameBuffer_int32 nY, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue)
+{
+	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
+
+	try {
+		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
+		if (!pIFrameBufferAccess)
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+		
+		pIFrameBufferAccess->SetPixelRGB(nX, nY, nRed, nGreen, nBlue);
+
+		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
+	}
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, LibMCDriver_FrameBuffer_double dThickness, const sLibMCDriver_FrameBufferColor * pRGBColor)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
@@ -493,7 +565,31 @@ LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawline
 	}
 }
 
-LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrectangle(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX1, LibMCDriver_FrameBuffer_uint32 nY1, LibMCDriver_FrameBuffer_uint32 nX2, LibMCDriver_FrameBuffer_uint32 nY2, const sLibMCDriver_FrameBufferColor * pRGBColor)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawlinergb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, LibMCDriver_FrameBuffer_double dThickness, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue)
+{
+	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
+
+	try {
+		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
+		if (!pIFrameBufferAccess)
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+		
+		pIFrameBufferAccess->DrawLineRGB(nX1, nY1, nX2, nY2, dThickness, nRed, nGreen, nBlue);
+
+		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
+	}
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrectangle(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, const sLibMCDriver_FrameBufferColor * pRGBColor)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
@@ -517,7 +613,31 @@ LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrect
 	}
 }
 
-LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawimage(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX, LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv_ImageData pImage)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrectanglergb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue)
+{
+	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
+
+	try {
+		IFrameBufferAccess* pIFrameBufferAccess = dynamic_cast<IFrameBufferAccess*>(pIBaseClass);
+		if (!pIFrameBufferAccess)
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
+		
+		pIFrameBufferAccess->FillRectangleRGB(nX1, nY1, nX2, nY2, nRed, nGreen, nBlue);
+
+		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
+	}
+	catch (ELibMCDriver_FrameBufferInterfaceException & Exception) {
+		return handleLibMCDriver_FrameBufferException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawimage(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX, LibMCDriver_FrameBuffer_int32 nY, LibMCEnv_ImageData pImage)
 {
 	IBase* pIBaseClass = (IBase *)pFrameBufferAccess;
 
@@ -633,7 +753,7 @@ LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_createf
 	}
 }
 
-LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, const char * pDeviceName, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance)
+LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, const char * pDeviceName, bool bAllowSimulationFallback, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_FrameBuffer;
 
@@ -651,7 +771,7 @@ LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_openfra
 		if (!pIDriver_FrameBuffer)
 			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDCAST);
 		
-		pBaseFrameBufferInstance = pIDriver_FrameBuffer->OpenFrameBufferDevice(sIdentifier, sDeviceName);
+		pBaseFrameBufferInstance = pIDriver_FrameBuffer->OpenFrameBufferDevice(sIdentifier, sDeviceName, bAllowSimulationFallback);
 
 		*pFrameBufferInstance = (IBase*)(pBaseFrameBufferInstance);
 		return LIBMCDRIVER_FRAMEBUFFER_SUCCESS;
@@ -793,10 +913,20 @@ LibMCDriver_FrameBufferResult LibMCDriver_FrameBuffer::Impl::LibMCDriver_FrameBu
 		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_flip;
 	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_clearscreen") 
 		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_clearscreen;
+	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_clearscreenrgb") 
+		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_clearscreenrgb;
+	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_setpixel") 
+		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_setpixel;
+	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_setpixelrgb") 
+		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_setpixelrgb;
 	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_drawline") 
 		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_drawline;
+	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_drawlinergb") 
+		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_drawlinergb;
 	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_fillrectangle") 
 		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_fillrectangle;
+	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_fillrectanglergb") 
+		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_fillrectanglergb;
 	if (sProcName == "libmcdriver_framebuffer_framebufferaccess_drawimage") 
 		*ppProcAddress = (void*) &libmcdriver_framebuffer_framebufferaccess_drawimage;
 	if (sProcName == "libmcdriver_framebuffer_driver_framebuffer_supportssimulation") 

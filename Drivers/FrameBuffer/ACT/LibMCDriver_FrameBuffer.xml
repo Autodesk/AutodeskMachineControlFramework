@@ -56,11 +56,11 @@
 		<error name="COULDNOTGETVARIABLESCREENINFO" code="1004" description="could not get fixed variable info" />
 		<error name="COULDNOTMAPFRAMEBUFFERMEMORY" code="1005" description="could not get map framebuffer memory" />
 		<error name="UNKNOWNFRAMEBUFFERBITDEPTH" code="1006" description="unknown framebuffer bit depth" />
+		<error name="FRAMEBUFFERDEVICENOTFOUND" code="1007" description="framebuffer device not found" />
+		<error name="EMPTYFRAMEBUFFERIDENTIFIER" code="1008" description="empty framebuffer identifier" />
+		<error name="FRAMEBUFFERIDENTIFIERISTOOLONG" code="1009" description="framebuffer identifier is too long" />
+		<error name="INVALIDFRAMEBUFFERIDENTIFIER" code="1010" description="invalid framebuffer identifier" />
 		
-		
-		
-		
-
 	</errors>
 
 	
@@ -155,27 +155,68 @@ Custom implementation
 		<method name="ClearScreen" description = "Clears the current draw buffer with an arbitrary precision color.">
 			<param name="RGBColor" type="struct" class="Color" pass="in" description="Color to use." />
 		</method>
-								
+
+		<method name="ClearScreenRGB" description = "Clears the current draw buffer with an arbitrary precision color.">
+			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
+			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
+			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />
+		</method>
+
+		<method name="SetPixel" description = "Sets a pixel in a certain color.">
+			<param name="X" type="int32" pass="in" description="X Coordinate of pixel to set." />
+			<param name="Y" type="int32" pass="in" description="Y Coordinate of pixel to set." />
+			<param name="RGBColor" type="struct" class="Color" pass="in" description="Color to use." />
+		</method>				
+
+		<method name="SetPixelRGB" description = "Sets a pixel in a certain color.">
+			<param name="X" type="int32" pass="in" description="X Coordinate of pixel to set." />
+			<param name="Y" type="int32" pass="in" description="Y Coordinate of pixel to set." />
+			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
+			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
+			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />
+		</method>				
+
 		<method name="DrawLine" description = "Draws a line in a certain color.">
-			<param name="X1" type="uint32" pass="in" description="X Coordinate of first point to use." />
-			<param name="Y1" type="uint32" pass="in" description="Y Coordinate of first point to use." />
-			<param name="X2" type="uint32" pass="in" description="X Coordinate of first point to use." />
-			<param name="Y2" type="uint32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="X1" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y1" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="X2" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y2" type="int32" pass="in" description="Y Coordinate of first point to use." />
 			<param name="Thickness" type="double" pass="in" description="Thickness of the line in pixels." />
 			<param name="RGBColor" type="struct" class="Color" pass="in" description="Color to use." />
 		</method>				
 
+		<method name="DrawLineRGB" description = "Draws a line in a certain color.">
+			<param name="X1" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y1" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="X2" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y2" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="Thickness" type="double" pass="in" description="Thickness of the line in pixels." />
+			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
+			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
+			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />
+		</method>				
+
 		<method name="FillRectangle" description = "Draws a rectangle in a certain color, including the corner points.">
-			<param name="X1" type="uint32" pass="in" description="X Coordinate of first point to use." />
-			<param name="Y1" type="uint32" pass="in" description="Y Coordinate of first point to use." />
-			<param name="X2" type="uint32" pass="in" description="X Coordinate of first point to use." />
-			<param name="Y2" type="uint32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="X1" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y1" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="X2" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y2" type="int32" pass="in" description="Y Coordinate of first point to use." />
 			<param name="RGBColor" type="struct" class="Color" pass="in" description="Color to use." />
 		</method>				
 
+		<method name="FillRectangleRGB" description = "Draws a rectangle in a certain color, including the corner points.">
+			<param name="X1" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y1" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="X2" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y2" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
+			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
+			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />
+		</method>				
+
 		<method name="DrawImage" description = "Draws an image at a certain position.">
-			<param name="X" type="uint32" pass="in" description="X Coordinate of image." />
-			<param name="Y" type="uint32" pass="in" description="Y Coordinate of image." />
+			<param name="X" type="int32" pass="in" description="X Coordinate of image." />
+			<param name="Y" type="int32" pass="in" description="Y Coordinate of image." />
 			<param name="Image" type="class" class="LibMCEnv:ImageData" pass="in" description="Image object to draw." />
 		</method>				
 
@@ -199,9 +240,10 @@ Custom implementation
 			<param name="FrameBufferInstance" type="class" class="FrameBufferAccess" pass="return" description="Framebuffer access instance." />
 		</method>
 
-		<method name="OpenFrameBufferDevice" description = "Opens a new framebuffer device on Linux. Creates a simulation device on other platforms in 1920x1280x24.">
+		<method name="OpenFrameBufferDevice" description = "Opens a new framebuffer device on Linux.">
 			<param name="Identifier" type="string" pass="in" description="Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists." />
 			<param name="DeviceName" type="string" pass="in" description="Device name, for example /dev/fb0." />
+			<param name="AllowSimulationFallback" type="bool" pass="in" description="If true, the call will creates a simulation device on other platforms than Linux. The standard resolution in this case will be 1920x1080x24." />
 			<param name="FrameBufferInstance" type="class" class="FrameBufferAccess" pass="return" description="Framebuffer access instance." />
 		</method>
 

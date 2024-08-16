@@ -185,6 +185,41 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_frame
 LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_clearscreen(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
 
 /**
+* Clears the current draw buffer with an arbitrary precision color.
+*
+* @param[in] pFrameBufferAccess - FrameBufferAccess instance.
+* @param[in] nRed - Red value to use (0-255).
+* @param[in] nGreen - Green value to use (0-255).
+* @param[in] nBlue - Blue value to use (0-255).
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_clearscreenrgb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue);
+
+/**
+* Sets a pixel in a certain color.
+*
+* @param[in] pFrameBufferAccess - FrameBufferAccess instance.
+* @param[in] nX - X Coordinate of pixel to set.
+* @param[in] nY - Y Coordinate of pixel to set.
+* @param[in] pRGBColor - Color to use.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_setpixel(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX, LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
+
+/**
+* Sets a pixel in a certain color.
+*
+* @param[in] pFrameBufferAccess - FrameBufferAccess instance.
+* @param[in] nX - X Coordinate of pixel to set.
+* @param[in] nY - Y Coordinate of pixel to set.
+* @param[in] nRed - Red value to use (0-255).
+* @param[in] nGreen - Green value to use (0-255).
+* @param[in] nBlue - Blue value to use (0-255).
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_setpixelrgb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX, LibMCDriver_FrameBuffer_int32 nY, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue);
+
+/**
 * Draws a line in a certain color.
 *
 * @param[in] pFrameBufferAccess - FrameBufferAccess instance.
@@ -196,7 +231,23 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_frame
 * @param[in] pRGBColor - Color to use.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX1, LibMCDriver_FrameBuffer_uint32 nY1, LibMCDriver_FrameBuffer_uint32 nX2, LibMCDriver_FrameBuffer_uint32 nY2, LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
+
+/**
+* Draws a line in a certain color.
+*
+* @param[in] pFrameBufferAccess - FrameBufferAccess instance.
+* @param[in] nX1 - X Coordinate of first point to use.
+* @param[in] nY1 - Y Coordinate of first point to use.
+* @param[in] nX2 - X Coordinate of first point to use.
+* @param[in] nY2 - Y Coordinate of first point to use.
+* @param[in] dThickness - Thickness of the line in pixels.
+* @param[in] nRed - Red value to use (0-255).
+* @param[in] nGreen - Green value to use (0-255).
+* @param[in] nBlue - Blue value to use (0-255).
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawlinergb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, LibMCDriver_FrameBuffer_double dThickness, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue);
 
 /**
 * Draws a rectangle in a certain color, including the corner points.
@@ -209,7 +260,22 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_frame
 * @param[in] pRGBColor - Color to use.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrectangle(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX1, LibMCDriver_FrameBuffer_uint32 nY1, LibMCDriver_FrameBuffer_uint32 nX2, LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrectangle(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
+
+/**
+* Draws a rectangle in a certain color, including the corner points.
+*
+* @param[in] pFrameBufferAccess - FrameBufferAccess instance.
+* @param[in] nX1 - X Coordinate of first point to use.
+* @param[in] nY1 - Y Coordinate of first point to use.
+* @param[in] nX2 - X Coordinate of first point to use.
+* @param[in] nY2 - Y Coordinate of first point to use.
+* @param[in] nRed - Red value to use (0-255).
+* @param[in] nGreen - Green value to use (0-255).
+* @param[in] nBlue - Blue value to use (0-255).
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_fillrectanglergb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue);
 
 /**
 * Draws an image at a certain position.
@@ -220,7 +286,7 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_frame
 * @param[in] pImage - Image object to draw.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawimage(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_uint32 nX, LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv_ImageData pImage);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawimage(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX, LibMCDriver_FrameBuffer_int32 nY, LibMCEnv_ImageData pImage);
 
 /*************************************************************************************************************************
  Class definition for Driver_FrameBuffer
@@ -258,15 +324,16 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_frame
 LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_createframebuffersimulation(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, LibMCDriver_FrameBuffer_uint32 nScreenWidth, LibMCDriver_FrameBuffer_uint32 nScreenHeight, LibMCDriver_FrameBuffer::eFrameBufferBitDepth eBitDepth, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance);
 
 /**
-* Opens a new framebuffer device on Linux. Creates a simulation device on other platforms in 1920x1280x24.
+* Opens a new framebuffer device on Linux.
 *
 * @param[in] pDriver_FrameBuffer - Driver_FrameBuffer instance.
 * @param[in] pIdentifier - Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists.
 * @param[in] pDeviceName - Device name, for example /dev/fb0.
+* @param[in] bAllowSimulationFallback - If true, the call will creates a simulation device on other platforms than Linux. The standard resolution in this case will be 1920x1080x24.
 * @param[out] pFrameBufferInstance - Framebuffer access instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, const char * pDeviceName, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance);
+LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_driver_framebuffer_openframebufferdevice(LibMCDriver_FrameBuffer_Driver_FrameBuffer pDriver_FrameBuffer, const char * pIdentifier, const char * pDeviceName, bool bAllowSimulationFallback, LibMCDriver_FrameBuffer_FrameBufferAccess * pFrameBufferInstance);
 
 /**
 * Releases a Framebuffer instance. Does nothing if insance does not exist.

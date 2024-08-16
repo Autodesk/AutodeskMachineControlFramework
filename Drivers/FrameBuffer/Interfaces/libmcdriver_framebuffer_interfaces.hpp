@@ -351,6 +351,32 @@ public:
 	virtual void ClearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
 
 	/**
+	* IFrameBufferAccess::ClearScreenRGB - Clears the current draw buffer with an arbitrary precision color.
+	* @param[in] nRed - Red value to use (0-255).
+	* @param[in] nGreen - Green value to use (0-255).
+	* @param[in] nBlue - Blue value to use (0-255).
+	*/
+	virtual void ClearScreenRGB(const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) = 0;
+
+	/**
+	* IFrameBufferAccess::SetPixel - Sets a pixel in a certain color.
+	* @param[in] nX - X Coordinate of pixel to set.
+	* @param[in] nY - Y Coordinate of pixel to set.
+	* @param[in] RGBColor - Color to use.
+	*/
+	virtual void SetPixel(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
+
+	/**
+	* IFrameBufferAccess::SetPixelRGB - Sets a pixel in a certain color.
+	* @param[in] nX - X Coordinate of pixel to set.
+	* @param[in] nY - Y Coordinate of pixel to set.
+	* @param[in] nRed - Red value to use (0-255).
+	* @param[in] nGreen - Green value to use (0-255).
+	* @param[in] nBlue - Blue value to use (0-255).
+	*/
+	virtual void SetPixelRGB(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) = 0;
+
+	/**
 	* IFrameBufferAccess::DrawLine - Draws a line in a certain color.
 	* @param[in] nX1 - X Coordinate of first point to use.
 	* @param[in] nY1 - Y Coordinate of first point to use.
@@ -359,7 +385,20 @@ public:
 	* @param[in] dThickness - Thickness of the line in pixels.
 	* @param[in] RGBColor - Color to use.
 	*/
-	virtual void DrawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
+	virtual void DrawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
+
+	/**
+	* IFrameBufferAccess::DrawLineRGB - Draws a line in a certain color.
+	* @param[in] nX1 - X Coordinate of first point to use.
+	* @param[in] nY1 - Y Coordinate of first point to use.
+	* @param[in] nX2 - X Coordinate of first point to use.
+	* @param[in] nY2 - Y Coordinate of first point to use.
+	* @param[in] dThickness - Thickness of the line in pixels.
+	* @param[in] nRed - Red value to use (0-255).
+	* @param[in] nGreen - Green value to use (0-255).
+	* @param[in] nBlue - Blue value to use (0-255).
+	*/
+	virtual void DrawLineRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) = 0;
 
 	/**
 	* IFrameBufferAccess::FillRectangle - Draws a rectangle in a certain color, including the corner points.
@@ -369,7 +408,19 @@ public:
 	* @param[in] nY2 - Y Coordinate of first point to use.
 	* @param[in] RGBColor - Color to use.
 	*/
-	virtual void FillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
+	virtual void FillRectangle(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
+
+	/**
+	* IFrameBufferAccess::FillRectangleRGB - Draws a rectangle in a certain color, including the corner points.
+	* @param[in] nX1 - X Coordinate of first point to use.
+	* @param[in] nY1 - Y Coordinate of first point to use.
+	* @param[in] nX2 - X Coordinate of first point to use.
+	* @param[in] nY2 - Y Coordinate of first point to use.
+	* @param[in] nRed - Red value to use (0-255).
+	* @param[in] nGreen - Green value to use (0-255).
+	* @param[in] nBlue - Blue value to use (0-255).
+	*/
+	virtual void FillRectangleRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) = 0;
 
 	/**
 	* IFrameBufferAccess::DrawImage - Draws an image at a certain position.
@@ -377,7 +428,7 @@ public:
 	* @param[in] nY - Y Coordinate of image.
 	* @param[in] pImage - Image object to draw.
 	*/
-	virtual void DrawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv::PImageData pImage) = 0;
+	virtual void DrawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, LibMCEnv::PImageData pImage) = 0;
 
 };
 
@@ -413,12 +464,13 @@ public:
 	virtual IFrameBufferAccess * CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_FrameBuffer_uint32 nScreenWidth, const LibMCDriver_FrameBuffer_uint32 nScreenHeight, const LibMCDriver_FrameBuffer::eFrameBufferBitDepth eBitDepth) = 0;
 
 	/**
-	* IDriver_FrameBuffer::OpenFrameBufferDevice - Opens a new framebuffer device on Linux. Creates a simulation device on other platforms in 1920x1280x24.
+	* IDriver_FrameBuffer::OpenFrameBufferDevice - Opens a new framebuffer device on Linux.
 	* @param[in] sIdentifier - Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists.
 	* @param[in] sDeviceName - Device name, for example /dev/fb0.
+	* @param[in] bAllowSimulationFallback - If true, the call will creates a simulation device on other platforms than Linux. The standard resolution in this case will be 1920x1080x24.
 	* @return Framebuffer access instance.
 	*/
-	virtual IFrameBufferAccess * OpenFrameBufferDevice(const std::string & sIdentifier, const std::string & sDeviceName) = 0;
+	virtual IFrameBufferAccess * OpenFrameBufferDevice(const std::string & sIdentifier, const std::string & sDeviceName, const bool bAllowSimulationFallback) = 0;
 
 	/**
 	* IDriver_FrameBuffer::ReleaseFramebuffer - Releases a Framebuffer instance. Does nothing if insance does not exist.

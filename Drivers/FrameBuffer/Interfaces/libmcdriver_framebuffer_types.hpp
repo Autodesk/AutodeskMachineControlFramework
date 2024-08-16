@@ -111,6 +111,10 @@ typedef void * LibMCDriver_FrameBuffer_pvoid;
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTGETVARIABLESCREENINFO 1004 /** could not get fixed variable info */
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTMAPFRAMEBUFFERMEMORY 1005 /** could not get map framebuffer memory */
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_UNKNOWNFRAMEBUFFERBITDEPTH 1006 /** unknown framebuffer bit depth */
+#define LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERDEVICENOTFOUND 1007 /** framebuffer device not found */
+#define LIBMCDRIVER_FRAMEBUFFER_ERROR_EMPTYFRAMEBUFFERIDENTIFIER 1008 /** empty framebuffer identifier */
+#define LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG 1009 /** framebuffer identifier is too long */
+#define LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER 1010 /** invalid framebuffer identifier */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_FrameBuffer
@@ -134,6 +138,10 @@ inline const char * LIBMCDRIVER_FRAMEBUFFER_GETERRORSTRING (LibMCDriver_FrameBuf
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTGETVARIABLESCREENINFO: return "could not get fixed variable info";
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTMAPFRAMEBUFFERMEMORY: return "could not get map framebuffer memory";
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_UNKNOWNFRAMEBUFFERBITDEPTH: return "unknown framebuffer bit depth";
+    case LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERDEVICENOTFOUND: return "framebuffer device not found";
+    case LIBMCDRIVER_FRAMEBUFFER_ERROR_EMPTYFRAMEBUFFERIDENTIFIER: return "empty framebuffer identifier";
+    case LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG: return "framebuffer identifier is too long";
+    case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER: return "invalid framebuffer identifier";
     default: return "unknown error";
   }
 }

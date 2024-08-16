@@ -96,6 +96,7 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
     }
 
 
+    m_nScreenWidth = (uint32_t)vinfo.xres;
     m_nScreenHeight = (uint32_t)vinfo.yres;
     m_nVirtualResolutionY = (uint32_t)vinfo.yres_virtual;
 
@@ -123,9 +124,9 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
     vinfo.yoffset = 0;
     ioctl(m_nFBDeviceHandle, FBIOPAN_DISPLAY, &vinfo);
 
-    m_nCurrentBufferIndex = 0;
     if (m_bDoubleBufferingEnabled) {
-        flip();
+        m_nCurrentBufferIndex = 1;
+        m_pDrawbufferPtr = m_pFramebufferPtr + (m_nLineLength * m_nScreenHeight);
     }
 
 #else
@@ -190,18 +191,61 @@ void CFrameBufferDeviceInstance::flip()
 
 }
 
+void CFrameBufferDeviceInstance::setPixel(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer::sColor RGBColor)
+{
+    throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
+}
+
 void CFrameBufferDeviceInstance::clearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor)
 {
     fillRectangle(0, 0, m_nScreenWidth - 1, m_nScreenHeight - 1, RGBColor);
 }
 
-void CFrameBufferDeviceInstance::drawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor)
-{
 
+
+void CFrameBufferDeviceInstance::drawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor)
+{
+    throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
 }
 
-void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor)
+void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor)
 {
+
+    int32_t nMinX;
+    int32_t nMaxX;
+    int32_t nMinY;
+    int32_t nMaxY;
+
+    if (nX1 < nX2) {
+        nMinX = nX1;
+        nMaxX = nX2;
+    }
+    else {
+        nMinX = nX2;
+        nMaxX = nX1;
+    }
+
+    if (nY1 < nY2) {
+        nMinY = nY1;
+        nMaxY = nY2;
+    }
+    else {
+        nMinY = nY2;
+        nMaxY = nY1;
+    }
+
+    if ((int64_t)nMinX >= (int64_t)m_nScreenWidth)
+        return;
+    if ((int64_t)nMinY >= (int64_t)m_nScreenHeight)
+        return;
+
+    if (nMaxX >= m_nScreenWidth)
+        nMaxX = m_nScreenWidth - 1;
+    if (nMaxY >= m_nScreenHeight)
+        nMaxY = m_nScreenHeight - 1;
+
+    uint32_t nCountX = (nMaxX - nMinX) + 1;
+    uint32_t nCountY = (nMaxY - nMinY) + 1;
 
     switch (m_BitDepth) {
     case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB565: {
@@ -212,11 +256,11 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_uin
 
         uint16_t rawColor = ((nBlue & 0xF8) << 8) | ((nGreen & 0xFC) << 3) | (nRed >> 3);
 
-        for (uint32_t nY = 0; nY < m_nScreenHeight; nY++) {
+        for (uint32_t nY = 0; nY < nCountY; nY++) {
 
-            uint16_t* pPixelPtr = (uint16_t*)(m_pDrawbufferPtr + (uint64_t)m_nLineLength * nY);
+            uint16_t* pPixelPtr = (uint16_t*)(m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nMinY)) + nMinX;
 
-            for (uint32_t nX = 0; nX < m_nScreenWidth; nX++) {
+            for (uint32_t nX = 0; nX < nCountX; nX++) {
                 *pPixelPtr = rawColor;
                 pPixelPtr++;
             }
@@ -226,11 +270,11 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_uin
     }
 
     case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB888: {
-        for (uint32_t nY = 0; nY < m_nScreenHeight; nY++) {
+        for (uint32_t nY = 0; nY < nCountY; nY++) {
 
-            uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * nY;
+            uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nMinY) + (uint64_t) nMinX * 3;
 
-            for (uint32_t nX = 0; nX < m_nScreenWidth; nX++) {
+            for (uint32_t nX = 0; nX < nCountX; nX++) {
                 *pPixelPtr = RGBColor.m_Red;
                 pPixelPtr++;
                 *pPixelPtr = RGBColor.m_Green;
@@ -244,11 +288,11 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_uin
     }
 
     case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGBA8888: {
-        for (uint32_t nY = 0; nY < m_nScreenHeight; nY++) {
+        for (uint32_t nY = 0; nY < nCountY; nY++) {
 
-            uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * nY;
+            uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nMinY) + (uint64_t)nMinX * 4;
 
-            for (uint32_t nX = 0; nX < m_nScreenWidth; nX++) {
+            for (uint32_t nX = 0; nX < nCountX; nX++) {
                 *pPixelPtr = RGBColor.m_Red;
                 pPixelPtr++;
                 *pPixelPtr = RGBColor.m_Green;
@@ -269,8 +313,9 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_uin
 
 }
 
-void CFrameBufferDeviceInstance::drawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv::PImageData pImage)
+void CFrameBufferDeviceInstance::drawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, LibMCEnv::PImageData pImage)
 {
+
 
 }
 

@@ -95,10 +95,10 @@ bool CDriver_FrameBuffer::SupportsSimulation()
 
 bool CDriver_FrameBuffer::SupportsDevice()
 {
-#ifdef _WIN32
-	return false;
-#else
+#ifdef __linux__
 	return true;
+#else
+	return false;
 #endif
 	
 }
@@ -108,11 +108,21 @@ IFrameBufferAccess* CDriver_FrameBuffer::CreateFrameBufferSimulation(const std::
 	throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
 }
 
-IFrameBufferAccess* CDriver_FrameBuffer::OpenFrameBufferDevice(const std::string & sIdentifier, const std::string & sDeviceName)
+IFrameBufferAccess* CDriver_FrameBuffer::OpenFrameBufferDevice(const std::string& sIdentifier, const std::string& sDeviceName, const bool bAllowSimulationFallback)
 {
-	// TODO: Check for duplicates and identifier following the rules
+	checkIdentifier(sIdentifier);
+	
+	PFrameBufferDeviceInstance pDevice;
+	
+	if (SupportsDevice()) {
+		pDevice = std::make_shared<CFrameBufferDeviceInstance>(sIdentifier, sDeviceName);
+	}
+	else {
+		if (bAllowSimulationFallback)
+			return CreateFrameBufferSimulation(sIdentifier, 1920, 1080, eFrameBufferBitDepth::RGB888);
 
-	auto pDevice = std::make_shared<CFrameBufferDeviceInstance>(sIdentifier, sDeviceName);
+		throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_DEVICENOTSUPPORTEDONPLATFORM);
+	}
 
 	m_Instances.insert(std::make_pair (sIdentifier, pDevice));
 
@@ -126,7 +136,16 @@ void CDriver_FrameBuffer::ReleaseFramebuffer(const std::string & sIdentifier)
 
 IFrameBufferAccess* CDriver_FrameBuffer::FindFrameBuffer(const std::string & sIdentifier)
 {
-	throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
+	checkIdentifier(sIdentifier);
+
+	auto iIter = m_Instances.find(sIdentifier);
+	if (iIter != m_Instances.end()) {
+		return new CFrameBufferAccess(iIter->second);
+	}
+	else {
+		throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERDEVICENOTFOUND, "framebuffer device not found: " + sIdentifier);
+	}
+	
 }
 
 bool CDriver_FrameBuffer::FrameBufferExists(const std::string & sIdentifier)
@@ -135,3 +154,17 @@ bool CDriver_FrameBuffer::FrameBufferExists(const std::string & sIdentifier)
 	return (iIter != m_Instances.end());
 }
 
+void CDriver_FrameBuffer::checkIdentifier(const std::string& sIdentifier)
+{
+	if (sIdentifier.empty ())
+		throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_EMPTYFRAMEBUFFERIDENTIFIER);
+
+	if (sIdentifier.length() > 256)
+		throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG);
+
+	for (auto ch : sIdentifier) {
+		if (!(isalnum (ch) || (ch == '_') || (ch == '-')))
+			throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER, "invalid framebuffer identifier: " + sIdentifier);
+	}
+
+}

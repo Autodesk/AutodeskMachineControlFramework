@@ -64,6 +64,8 @@ private:
 
 	std::map<std::string, PFrameBufferInstance> m_Instances;
 
+	void checkIdentifier(const std::string & sIdentifier);
+
 public:
 
 	CDriver_FrameBuffer(const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
@@ -88,7 +90,7 @@ public:
 
 	IFrameBufferAccess* CreateFrameBufferSimulation(const std::string & sIdentifier, const LibMCDriver_FrameBuffer_uint32 nScreenWidth, const LibMCDriver_FrameBuffer_uint32 nScreenHeight, const LibMCDriver_FrameBuffer::eFrameBufferBitDepth eBitDepth) override;
 
-	IFrameBufferAccess* OpenFrameBufferDevice(const std::string & sIdentifier, const std::string & sDeviceName) override;
+	IFrameBufferAccess* OpenFrameBufferDevice(const std::string& sIdentifier, const std::string& sDeviceName, const bool bAllowSimulationFallback) override;
 
 	void ReleaseFramebuffer(const std::string & sIdentifier) override;
 

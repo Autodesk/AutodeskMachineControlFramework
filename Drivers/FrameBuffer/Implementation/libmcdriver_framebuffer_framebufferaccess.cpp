@@ -64,7 +64,7 @@ LibMCDriver_FrameBuffer_uint32 CFrameBufferAccess::GetScreenWidth()
 
 LibMCDriver_FrameBuffer_uint32 CFrameBufferAccess::GetScreenHeight()
 {
-	return m_pInstance->getScreenWidth();
+	return m_pInstance->getScreenHeight();
 }
 
 LibMCDriver_FrameBuffer::eFrameBufferBitDepth CFrameBufferAccess::BitDepth()
@@ -87,18 +87,59 @@ void CFrameBufferAccess::ClearScreen(const LibMCDriver_FrameBuffer::sColor RGBCo
 	m_pInstance->clearScreen(RGBColor);
 }
 
-void CFrameBufferAccess::DrawLine(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor)
+void CFrameBufferAccess::ClearScreenRGB(const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue)
+{
+	LibMCDriver_FrameBuffer::sColor RGBColor;
+	RGBColor.m_Red = nRed;
+	RGBColor.m_Green = nGreen;
+	RGBColor.m_Blue = nBlue;
+	m_pInstance->clearScreen(RGBColor);
+}
+
+void CFrameBufferAccess::SetPixel(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer::sColor RGBColor) 
+{
+	m_pInstance->setPixel(nX, nY, RGBColor);
+}
+
+void CFrameBufferAccess::SetPixelRGB(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) 
+{
+	LibMCDriver_FrameBuffer::sColor RGBColor;
+	RGBColor.m_Red = nRed;
+	RGBColor.m_Green = nGreen;
+	RGBColor.m_Blue = nBlue;
+	m_pInstance->setPixel(nX, nY, RGBColor);
+}
+
+void CFrameBufferAccess::DrawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor)
 {
 	m_pInstance->drawLine(nX1, nY1, nX2, nY2, dThickness, RGBColor);
 }
 
-void CFrameBufferAccess::FillRectangle(const LibMCDriver_FrameBuffer_uint32 nX1, const LibMCDriver_FrameBuffer_uint32 nY1, const LibMCDriver_FrameBuffer_uint32 nX2, const LibMCDriver_FrameBuffer_uint32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor)
+void CFrameBufferAccess::DrawLineRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) 
+{
+	LibMCDriver_FrameBuffer::sColor RGBColor;
+	RGBColor.m_Red = nRed;
+	RGBColor.m_Green = nGreen;
+	RGBColor.m_Blue = nBlue;
+	m_pInstance->drawLine(nX1, nY1, nX2, nY2, dThickness, RGBColor);
+}
+
+void CFrameBufferAccess::FillRectangle(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor)
 {
 	m_pInstance->fillRectangle(nX1, nY1, nX2, nY2, RGBColor);
 }
 
-void CFrameBufferAccess::DrawImage(const LibMCDriver_FrameBuffer_uint32 nX, const LibMCDriver_FrameBuffer_uint32 nY, LibMCEnv::PImageData pImage)
+
+void CFrameBufferAccess::FillRectangleRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) 
+{
+	LibMCDriver_FrameBuffer::sColor RGBColor;
+	RGBColor.m_Red = nRed;
+	RGBColor.m_Green = nGreen;
+	RGBColor.m_Blue = nBlue;
+	m_pInstance->fillRectangle(nX1, nY1, nX2, nY2, RGBColor);
+}
+
+void CFrameBufferAccess::DrawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, LibMCEnv::PImageData pImage) 
 {
 	m_pInstance->drawImage(nX, nY, pImage);
 }
-
