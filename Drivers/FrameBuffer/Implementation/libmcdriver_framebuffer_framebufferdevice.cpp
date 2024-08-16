@@ -193,7 +193,51 @@ void CFrameBufferDeviceInstance::flip()
 
 void CFrameBufferDeviceInstance::setPixel(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer::sColor RGBColor)
 {
-    throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
+    if ((nX >= 0) && (nY >= 0)) {
+        uint32_t nPositiveX = (uint32_t)nX;
+        uint32_t nPositiveY = (uint32_t)nY;
+
+        if ((nPositiveX < m_nScreenWidth) && (nPositiveY < m_nScreenHeight)) {
+            switch (m_BitDepth) {
+                case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB565: {
+
+                    uint32_t nRed = RGBColor.m_Red;
+                    uint32_t nGreen = RGBColor.m_Green;
+                    uint32_t nBlue = RGBColor.m_Blue;
+
+                    uint16_t rawColor = ((nBlue & 0xF8) << 8) | ((nGreen & 0xFC) << 3) | (nRed >> 3);
+
+                    uint16_t* pPixelPtr = (uint16_t*)(m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nPositiveY)) + nPositiveX;
+                    *pPixelPtr = rawColor;
+
+                    break;
+                }
+
+                case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB888: {
+                    uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nPositiveY) + (uint64_t)nPositiveX * 3;
+                    *pPixelPtr = RGBColor.m_Red;
+                    pPixelPtr++;
+                    *pPixelPtr = RGBColor.m_Green;
+                    pPixelPtr++;
+                    *pPixelPtr = RGBColor.m_Blue;
+                    break;
+                }
+
+                case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGBA8888: {
+                    uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nPositiveY) + (uint64_t)nPositiveX * 4;
+                    *pPixelPtr = RGBColor.m_Red;
+                    pPixelPtr++;
+                    *pPixelPtr = RGBColor.m_Green;
+                    pPixelPtr++;
+                    *pPixelPtr = RGBColor.m_Blue;
+                    pPixelPtr++;
+                    *pPixelPtr = 255;
+                    break;
+                }
+
+            }
+        }
+    }
 }
 
 void CFrameBufferDeviceInstance::clearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor)
@@ -315,7 +359,10 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int
 
 void CFrameBufferDeviceInstance::drawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, LibMCEnv::PImageData pImage)
 {
+    if (pImage.get() == nullptr)
+        throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 
+    throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
 
 }
 
