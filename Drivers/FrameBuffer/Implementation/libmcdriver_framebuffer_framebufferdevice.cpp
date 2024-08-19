@@ -224,7 +224,7 @@ void CFrameBufferDeviceInstance::setPixel(const LibMCDriver_FrameBuffer_int32 nX
                 }
 
                 case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB888: {
-                    uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nPositiveY) + (uint64_t)nPositiveX * 3;
+                    uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nPositiveY) + (uint64_t)nPositiveX * 3;
                     *pPixelPtr = RGBColor.m_Red;
                     pPixelPtr++;
                     *pPixelPtr = RGBColor.m_Green;
@@ -234,7 +234,7 @@ void CFrameBufferDeviceInstance::setPixel(const LibMCDriver_FrameBuffer_int32 nX
                 }
 
                 case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGBA8888: {
-                    uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nPositiveY) + (uint64_t)nPositiveX * 4;
+                    uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nPositiveY) + (uint64_t)nPositiveX * 4;
                     *pPixelPtr = RGBColor.m_Red;
                     pPixelPtr++;
                     *pPixelPtr = RGBColor.m_Green;
