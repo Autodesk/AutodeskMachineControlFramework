@@ -127,7 +127,7 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
 
     if (m_bDoubleBufferingEnabled) {
         m_nCurrentBufferIndex = 1;
-        setDrawBuffer(m_pFramebufferPtr + ((uint64_t)m_nScanLineLength * nScreenHeight, m_nScanLineLength));
+        setDrawBuffer(m_pFramebufferPtr + ((uint64_t)m_nScanLineLength * nScreenHeight), m_nScanLineLength);
     }
 
 #else
