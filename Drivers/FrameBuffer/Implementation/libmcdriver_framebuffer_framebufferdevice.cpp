@@ -102,7 +102,7 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
     setScreenResolution(nScreenWidth, nScreenHeight, bitDepth);
 
     m_nScanLineLength = (uint32_t)finfo.line_length;
-    m_nMemorySize = m_nVirtualResolutionY * nScanLineLength;
+    m_nMemorySize = m_nVirtualResolutionY * m_nScanLineLength;
 
     m_bDoubleBufferingEnabled = ((uint64_t) m_nVirtualResolutionY >= (2 * (uint64_t)nScreenHeight));
 
@@ -127,7 +127,7 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
 
     if (m_bDoubleBufferingEnabled) {
         m_nCurrentBufferIndex = 1;
-        setDrawBuffer(m_pFramebufferPtr + ((uint64_t)m_nScanLineLength * nScreenHeight, m_nScanLineLength);
+        setDrawBuffer(m_pFramebufferPtr + ((uint64_t)m_nScanLineLength * nScreenHeight, m_nScanLineLength));
     }
 
 #else
