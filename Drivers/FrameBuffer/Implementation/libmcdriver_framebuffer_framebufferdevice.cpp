@@ -165,7 +165,7 @@ void CFrameBufferDeviceInstance::flip()
 
         if (m_nCurrentBufferIndex == 0) {
             m_nCurrentBufferIndex = 1;
-            setDrawBuffer(m_pFramebufferPtr + (m_nLineLength * m_nScreenHeight));
+            setDrawBuffer(m_pFramebufferPtr + (m_nLineLength * m_nScreenHeight), m_nScanLineLength);
         }
         else {
             m_nCurrentBufferIndex = 0;
