@@ -104,7 +104,7 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
     m_nScanLineLength = (uint32_t)finfo.line_length;
     m_nMemorySize = m_nVirtualResolutionY * m_nLineLength;
 
-    m_bDoubleBufferingEnabled = (m_nVirtualResolutionY >= (2 * m_nScreenHeight));
+    m_bDoubleBufferingEnabled = ((uint64_t) m_nVirtualResolutionY >= (2 * (uint64_t)nScreenHeight));
 
     m_pFramebufferPtr = (uint8_t*) mmap(0, m_nMemorySize, PROT_READ | PROT_WRITE, MAP_SHARED, m_nFBDeviceHandle, 0);
     if (((intptr_t)m_pFramebufferPtr == -1) || (m_pFramebufferPtr == nullptr)) {
@@ -127,7 +127,7 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
 
     if (m_bDoubleBufferingEnabled) {
         m_nCurrentBufferIndex = 1;
-        setDrawBuffer(m_pFramebufferPtr + (m_nLineLength * m_nScreenHeight, m_nScanLineLength);
+        setDrawBuffer(m_pFramebufferPtr + ((uint64_t)m_nScanLineLength * nScreenHeight, m_nScanLineLength);
     }
 
 #else
@@ -160,12 +160,13 @@ void CFrameBufferDeviceInstance::flip()
         if (ioctl(m_nFBDeviceHandle, FBIOGET_VSCREENINFO, &vinfo)) 
             throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTGETVARIABLESCREENINFO);
         
-        vinfo.yoffset = m_nCurrentBufferIndex * m_nScreenHeight;
+        uint32_t nScreenHeight = getScreenHeight();
+        vinfo.yoffset = m_nCurrentBufferIndex * nScreenHeight;
         ioctl(m_nFBDeviceHandle, FBIOPAN_DISPLAY, &vinfo);
 
         if (m_nCurrentBufferIndex == 0) {
             m_nCurrentBufferIndex = 1;
-            setDrawBuffer(m_pFramebufferPtr + (m_nLineLength * m_nScreenHeight), m_nScanLineLength);
+            setDrawBuffer(m_pFramebufferPtr + ((uint64_t)m_nScanLineLength * nScreenHeight), m_nScanLineLength);
         }
         else {
             m_nCurrentBufferIndex = 0;
