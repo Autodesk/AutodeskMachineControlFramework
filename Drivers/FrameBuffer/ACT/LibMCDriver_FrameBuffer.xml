@@ -60,6 +60,8 @@
 		<error name="EMPTYFRAMEBUFFERIDENTIFIER" code="1008" description="empty framebuffer identifier" />
 		<error name="FRAMEBUFFERIDENTIFIERISTOOLONG" code="1009" description="framebuffer identifier is too long" />
 		<error name="INVALIDFRAMEBUFFERIDENTIFIER" code="1010" description="invalid framebuffer identifier" />
+		<error name="INVALIDPIXELFORMAT" code="1011" description="invalid pixel format" />
+		
 		
 	</errors>
 

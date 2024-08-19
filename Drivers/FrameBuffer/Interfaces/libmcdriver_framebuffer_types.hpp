@@ -115,6 +115,7 @@ typedef void * LibMCDriver_FrameBuffer_pvoid;
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_EMPTYFRAMEBUFFERIDENTIFIER 1008 /** empty framebuffer identifier */
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG 1009 /** framebuffer identifier is too long */
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER 1010 /** invalid framebuffer identifier */
+#define LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPIXELFORMAT 1011 /** invalid pixel format */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_FrameBuffer
@@ -142,6 +143,7 @@ inline const char * LIBMCDRIVER_FRAMEBUFFER_GETERRORSTRING (LibMCDriver_FrameBuf
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_EMPTYFRAMEBUFFERIDENTIFIER: return "empty framebuffer identifier";
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG: return "framebuffer identifier is too long";
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER: return "invalid framebuffer identifier";
+    case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPIXELFORMAT: return "invalid pixel format";
     default: return "unknown error";
   }
 }

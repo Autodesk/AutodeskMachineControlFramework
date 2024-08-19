@@ -260,6 +260,7 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int
     int32_t nMinY;
     int32_t nMaxY;
 
+    // Determine the minimum and maximum X coordinates of the rectangle
     if (nX1 < nX2) {
         nMinX = nX1;
         nMaxX = nX2;
@@ -269,6 +270,7 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int
         nMaxX = nX1;
     }
 
+    // Determine the minimum and maximum Y coordinates of the rectangle
     if (nY1 < nY2) {
         nMinY = nY1;
         nMaxY = nY2;
@@ -278,28 +280,43 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int
         nMaxY = nY1;
     }
 
-    if ((int64_t)nMinX >= (int64_t)m_nScreenWidth)
+    // Early exit if the rectangle is completely outside the framebuffer
+    if (nMinX >= (int32_t)m_nScreenWidth)
         return;
-    if ((int64_t)nMinY >= (int64_t)m_nScreenHeight)
+    if (nMinY >= (int32_t)m_nScreenHeight)
+        return;
+    if (nMaxX < 0)
+        return;
+    if (nMaxY < 0)
         return;
 
-    if (nMaxX >= m_nScreenWidth)
-        nMaxX = m_nScreenWidth - 1;
-    if (nMaxY >= m_nScreenHeight)
-        nMaxY = m_nScreenHeight - 1;
+    // Clamp the rectangle to the framebuffer bounds
+    if (nMinX < 0)
+        nMinX = 0;
+    if (nMinY < 0)
+        nMinY = 0;
 
-    uint32_t nCountX = (nMaxX - nMinX) + 1;
-    uint32_t nCountY = (nMaxY - nMinY) + 1;
+    if (nMaxX >= (int32_t)m_nScreenWidth)
+        nMaxX = (int32_t)m_nScreenWidth - 1;
+    if (nMaxY >= (int32_t)m_nScreenHeight)
+        nMaxY = (int32_t)m_nScreenHeight - 1;
 
+    // Calculate the width and height of the rectangle to fill
+    uint32_t nCountX = (uint32_t) ((nMaxX - nMinX) + 1);
+    uint32_t nCountY = (uint32_t) ((nMaxY - nMinY) + 1);
+
+    // Fill the rectangle based on the framebuffer's bit depth
     switch (m_BitDepth) {
     case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB565: {
 
+        // Convert the RGB color to RGB565 format
         uint32_t nRed = RGBColor.m_Red;
         uint32_t nGreen = RGBColor.m_Green;
         uint32_t nBlue = RGBColor.m_Blue;
 
         uint16_t rawColor = ((nBlue & 0xF8) << 8) | ((nGreen & 0xFC) << 3) | (nRed >> 3);
 
+        // Fill the rectangle row by row
         for (uint32_t nY = 0; nY < nCountY; nY++) {
 
             uint16_t* pPixelPtr = (uint16_t*)(m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nMinY)) + nMinX;
@@ -314,6 +331,8 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int
     }
 
     case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB888: {
+
+        // Fill the rectangle row by row with 24-bit RGB values
         for (uint32_t nY = 0; nY < nCountY; nY++) {
 
             uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nMinY) + (uint64_t) nMinX * 3;
@@ -332,6 +351,9 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int
     }
 
     case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGBA8888: {
+
+        // Fill the rectangle row by row with 32-bit RGBA values
+
         for (uint32_t nY = 0; nY < nCountY; nY++) {
 
             uint8_t* pPixelPtr = m_pDrawbufferPtr + (uint64_t)m_nLineLength * ((uint64_t)nY + nMinY) + (uint64_t)nMinX * 4;
@@ -343,13 +365,16 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int
                 pPixelPtr++;
                 *pPixelPtr = RGBColor.m_Blue;
                 pPixelPtr++;
-                *pPixelPtr = 255;
+                *pPixelPtr = 255; // Hardcoded alpha value (fully opaque)
                 pPixelPtr++;
             }
         }
 
         break;
     }
+
+    default:
+        throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPIXELFORMAT);
 
     }
 
@@ -359,10 +384,93 @@ void CFrameBufferDeviceInstance::fillRectangle(const LibMCDriver_FrameBuffer_int
 
 void CFrameBufferDeviceInstance::drawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, LibMCEnv::PImageData pImage)
 {
+    // Check if the image pointer is valid
     if (pImage.get() == nullptr)
         throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPARAM);
 
-    throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_NOTIMPLEMENTED);
+    // Get the dimensions of the image in pixels
+    uint32_t nImageSizeX, nImageSizeY;
+    pImage->GetSizeInPixels(nImageSizeX, nImageSizeY);
+
+    // Ensure the image has content, otherwise return without drawing
+    if ((nImageSizeX == 0) || (nImageSizeY == 0))
+        return;
+
+    // Check if the entire image is outside of the framebuffer bounds and return early if so
+    if ((int64_t)nX <= (-(int64_t)nImageSizeX))
+        return;
+    if ((int64_t)nY <= (-(int64_t)nImageSizeY))
+        return;
+    if ((int64_t)nX >=  ((int64_t)m_nScreenWidth))
+        return;
+    if ((int64_t)nY >= ((int64_t)m_nScreenHeight))
+        return;
+
+    // Initialize variables for determining the section of the image to be drawn and its position in the framebuffer
+    uint32_t nFrameBufferCoordStartX, nFrameBufferCoordStartY;
+    uint32_t nImageSectionStartX, nImageSectionStartY;
+    uint32_t nImageSectionCountX, nImageSectionCountY;
+
+    // Handle cases where the image starts outside the framebuffer horizontally
+    if (nX >= 0) {
+        nFrameBufferCoordStartX = (uint32_t) nX; // Start drawing at the specified X coordinate in the framebuffer
+        nImageSectionStartX = 0; // Start at the beginning of the image
+        nImageSectionCountX = nImageSizeX; // Draw the full width of the image
+    }
+    else {
+        nFrameBufferCoordStartX = 0; // Start drawing at the left edge of the framebuffer
+        nImageSectionStartX = (uint32_t)-nX; // Skip part of the image that is outside the framebuffer
+        nImageSectionCountX = nImageSizeX - nImageSectionStartX; // Adjust the width to only include the visible part
+    }
+
+    // Handle cases where the image starts outside the framebuffer vertically
+    if (nY >= 0) {
+        nFrameBufferCoordStartY = (uint32_t)nY; // Start drawing at the specified Y coordinate in the framebuffer
+        nImageSectionStartY = 0; // Start at the top of the image
+        nImageSectionCountY = nImageSizeY; // Draw the full height of the image
+    }
+    else {
+        nFrameBufferCoordStartY = 0; // Start drawing at the top edge of the framebuffer
+        nImageSectionStartY = (uint32_t)-nY; // Skip part of the image that is outside the framebuffer
+        nImageSectionCountY = nImageSizeY - nImageSectionStartY; // Adjust the height to only include the visible part
+    }
+
+    // Adjust the section of the image to ensure it fits within the framebuffer horizontally
+    if ((nFrameBufferCoordStartX + nImageSectionCountX) > m_nScreenWidth)
+        nImageSectionCountX = m_nScreenWidth - nFrameBufferCoordStartX;
+
+    // Adjust the section of the image to ensure it fits within the framebuffer vertically
+    if ((nFrameBufferCoordStartY + nImageSectionCountY) > m_nScreenHeight)
+        nImageSectionCountY = m_nScreenHeight - nFrameBufferCoordStartY;
+
+    // Determine the pixel format and bytes per pixel based on the framebuffer's bit depth
+    LibMCEnv::eImagePixelFormat imagePixelFormat;
+    size_t nBytesPerPixel;
+    switch (m_BitDepth) {
+        case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB565:
+            imagePixelFormat = LibMCEnv::eImagePixelFormat::RGB16bit; 
+            nBytesPerPixel = 2;
+            break;
+            
+        case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGB888:
+            imagePixelFormat = LibMCEnv::eImagePixelFormat::RGB24bit; 
+            nBytesPerPixel = 3;
+
+            break;
+        case LibMCDriver_FrameBuffer::eFrameBufferBitDepth::RGBA8888:
+            nBytesPerPixel = 4;
+            imagePixelFormat = LibMCEnv::eImagePixelFormat::RGBA32bit; 
+            break;
+
+        default:
+            throw ELibMCDriver_FrameBufferInterfaceException(LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPIXELFORMAT);
+    }
+
+    // Calculate the starting position in the framebuffer where the image will be drawn
+    uint8_t* pTargetPtr = m_pDrawbufferPtr + (size_t)m_nLineLength * nFrameBufferCoordStartY + nFrameBufferCoordStartX * nBytesPerPixel;
+
+    // Write the relevant section of the image directly to the framebuffer memory
+    pImage->WriteToRawMemory(nImageSectionStartX, nImageSectionStartY, nImageSectionCountX, nImageSectionCountY, imagePixelFormat, (LibMCEnv_pvoid)pTargetPtr, m_nLineLength);
 
 }
 
