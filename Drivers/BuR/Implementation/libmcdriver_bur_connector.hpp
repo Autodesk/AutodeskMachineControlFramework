@@ -110,12 +110,12 @@ public:
 
 typedef std::shared_ptr<CDriver_BuRPacket> PDriver_BuRPacket;
 
-class CDriver_BuRSocketConnection;
-
 class CDriver_BuRConnector {
 private:
 
 protected:
+
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
     uint32_t m_nWorkerThreadCount;
     uint32_t m_nMaxReceiveBufferSize;
@@ -131,9 +131,11 @@ protected:
     uint32_t m_nSequenceID;
     uint32_t m_nPacketSignature;
 
+    uint32_t m_nReceiveTimeoutInMS;
+
     bool m_StartJournaling;
 
-    std::shared_ptr<CDriver_BuRSocketConnection> m_pCurrentConnection;
+    LibMCEnv::PTCPIPConnection m_pCurrentConnection;
 
     std::mutex m_ConnectionOrJournalMutex;
     std::mutex m_SequenceMapMutex;
@@ -154,7 +156,9 @@ protected:
 
 public:
 
-	CDriver_BuRConnector (uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize, eDriver_BurProtocolVersion ProtocolVersion, uint32_t nPacketSignature);
+	CDriver_BuRConnector (LibMCEnv::PDriverEnvironment pDriverEnvironment, uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize, eDriver_BurProtocolVersion ProtocolVersion, uint32_t nPacketSignature);
+
+    virtual ~CDriver_BuRConnector();
 
     void queryParametersLegacy (BurPacketCallback callback);
 

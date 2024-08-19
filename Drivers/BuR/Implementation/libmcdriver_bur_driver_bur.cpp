@@ -330,7 +330,7 @@ void CDriver_BuR::Configure(const std::string& sConfigurationString)
 
     }
 
-    m_pConnector = std::make_shared<CDriver_BuRConnector>(m_nWorkerThreadCount, m_nMaxReceiveBufferSize, m_nMajorVersion, m_nMinorVersion, m_nPatchVersion, m_nBuildVersion, m_nMaxPacketQueueSize, m_ProtocolVersion, m_nPacketSignature); 
+    m_pConnector = std::make_shared<CDriver_BuRConnector>(m_pDriverEnvironment, m_nWorkerThreadCount, m_nMaxReceiveBufferSize, m_nMajorVersion, m_nMinorVersion, m_nPatchVersion, m_nBuildVersion, m_nMaxPacketQueueSize, m_ProtocolVersion, m_nPacketSignature); 
 
 
 }

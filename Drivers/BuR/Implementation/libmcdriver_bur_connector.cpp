@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdriver_bur_connector.hpp"
 #include "libmcdriver_bur_interfaceexception.hpp"
-#include "libmcdriver_bur_sockets.hpp"
 
 #include "crcpp/CRC.h"
 #include <random>
@@ -202,7 +201,7 @@ std::vector<uint8_t>& CDriver_BuRPacket::getDataBuffer()
 }
 
 
-CDriver_BuRConnector::CDriver_BuRConnector(uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize, eDriver_BurProtocolVersion ProtocolVersion, uint32_t nPacketSignature)
+CDriver_BuRConnector::CDriver_BuRConnector(LibMCEnv::PDriverEnvironment pDriverEnvironment, uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize, eDriver_BurProtocolVersion ProtocolVersion, uint32_t nPacketSignature)
     : m_nWorkerThreadCount(nWorkerThreadCount),
     m_nMaxReceiveBufferSize(nMaxReceiveBufferSize),
     m_nMajorVersion(nMajorVersion),
@@ -213,13 +212,21 @@ CDriver_BuRConnector::CDriver_BuRConnector(uint32_t nWorkerThreadCount, uint32_t
     m_ProtocolVersion (ProtocolVersion),
     m_StartJournaling (false),
     m_nSequenceID (1),
-    m_nMaxPacketQueueSize (nMaxPacketQueueSize)
+    m_nMaxPacketQueueSize (nMaxPacketQueueSize),
+    m_nReceiveTimeoutInMS (1000),
+    m_pDriverEnvironment (pDriverEnvironment)
 
 {
-   
+    if (pDriverEnvironment.get() == nullptr)
+        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
 
 }
 
+CDriver_BuRConnector::~CDriver_BuRConnector()
+{
+    disconnect();
+    m_pDriverEnvironment = nullptr;
+}
 
 bool CDriver_BuRConnector::isLegacy()
 {
@@ -234,7 +241,7 @@ bool CDriver_BuRConnector::isVersion3()
 
 void CDriver_BuRConnector::queryParametersLegacy(BurPacketCallback callback)
 {    
-    std::shared_ptr<CDriver_BuRSocketConnection> pConnection;
+    LibMCEnv::PTCPIPConnection pConnection;
     {
         std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
         pConnection = m_pCurrentConnection;
@@ -251,7 +258,7 @@ void CDriver_BuRConnector::queryParametersLegacy(BurPacketCallback callback)
 
 void CDriver_BuRConnector::queryParametersVersion3(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
-    std::shared_ptr<CDriver_BuRSocketConnection> pConnection;
+    LibMCEnv::PTCPIPConnection pConnection;
     std::shared_ptr<CDriver_BuRJournal> pJournal;
     {
         std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
@@ -336,7 +343,7 @@ void CDriver_BuRConnector::sendCommandsToPLCVersion3(std::vector<sAMCFToPLCPacke
         if (packetToSend.m_nSequenceID != sendInfo.m_SequenceID)
             throw ELibMCDriver_BuRInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-        m_pCurrentConnection->sendBuffer((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacketVersion3));
+        m_pCurrentConnection->SendBuffer (LibMCEnv::CInputVector<uint8_t> ((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacketVersion3)));
         index++;
 
 
@@ -347,15 +354,17 @@ void CDriver_BuRConnector::sendCommandsToPLCVersion3(std::vector<sAMCFToPLCPacke
 
         //auto sendInfo = SendInfoList.at(index);
 
+        auto pReceivedPacket = m_pCurrentConnection->ReceiveFixedPacket(sizeof(sPLCToAMCFPacketVersion3), m_nReceiveTimeoutInMS);
+
         std::vector<uint8_t> recvBuffer;
-        m_pCurrentConnection->receiveBuffer(recvBuffer, sizeof(sPLCToAMCFPacketVersion3), true);
+        pReceivedPacket->GetData(recvBuffer);
 
         if (recvBuffer.size() != sizeof(sPLCToAMCFPacketVersion3))
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEERROR);
 
         const sPLCToAMCFPacketVersion3* receivedPacket = (const sPLCToAMCFPacketVersion3*)recvBuffer.data();
         if (receivedPacket->m_nSignature != m_nPacketSignature) {
-            m_pCurrentConnection->disconnect();
+            disconnect();
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETSIGNATURE);
         }
 
@@ -365,7 +374,8 @@ void CDriver_BuRConnector::sendCommandsToPLCVersion3(std::vector<sAMCFToPLCPacke
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH);
 
         if (receivedPacket->m_nPayloadLength > 0) {
-            m_pCurrentConnection->receiveBuffer(pPacket->getDataBuffer(), receivedPacket->m_nPayloadLength, true);
+            auto pPayloadPacket = m_pCurrentConnection->ReceiveFixedPacket(receivedPacket->m_nPayloadLength, m_nReceiveTimeoutInMS);
+            pPayloadPacket->GetData (pPacket->getDataBuffer());
         }
 
         if (sendInfo.m_SequenceID != receivedPacket->m_nSequenceID)
@@ -434,7 +444,7 @@ void CDriver_BuRConnector::sendCommandsToPLCLegacy(std::vector<sAMCFToPLCPacketT
         if (packetToSend.m_nSequenceID != sendInfo.m_SequenceID)
             throw ELibMCDriver_BuRInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-        m_pCurrentConnection->sendBuffer((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacketLegacy));
+        m_pCurrentConnection->SendBuffer (LibMCEnv::CInputVector<uint8_t> ((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacketLegacy)));
         index++;
 
         
@@ -446,14 +456,15 @@ void CDriver_BuRConnector::sendCommandsToPLCLegacy(std::vector<sAMCFToPLCPacketT
         //auto sendInfo = SendInfoList.at(index);
 
         std::vector<uint8_t> recvBuffer;
-        m_pCurrentConnection->receiveBuffer(recvBuffer, sizeof(sPLCToAMCFPacketLegacy), true);
+        auto pReceivedPacket = m_pCurrentConnection->ReceiveFixedPacket (sizeof(sPLCToAMCFPacketLegacy), m_nReceiveTimeoutInMS);
+        pReceivedPacket->GetData(recvBuffer);
 
         if (recvBuffer.size() != sizeof(sPLCToAMCFPacketLegacy))
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEERROR);
 
         const sPLCToAMCFPacketLegacy* receivedPacket = (const sPLCToAMCFPacketLegacy*)recvBuffer.data();
         if (receivedPacket->m_nSignature != m_nPacketSignature) {
-            m_pCurrentConnection->disconnect();
+            disconnect();
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETSIGNATURE);
         }
 
@@ -464,7 +475,8 @@ void CDriver_BuRConnector::sendCommandsToPLCLegacy(std::vector<sAMCFToPLCPacketT
 
         uint32_t nDataLen = (receivedPacket->m_nMessageLen - sizeof(sPLCToAMCFPacketLegacy));
         if (nDataLen > 0) {
-            m_pCurrentConnection->receiveBuffer(pPacket->getDataBuffer(), nDataLen, true);
+            auto pPayloadData = m_pCurrentConnection->ReceiveFixedPacket(nDataLen, m_nReceiveTimeoutInMS);
+            pPayloadData->GetData(pPacket->getDataBuffer());
         }
 
         if (sendInfo.m_SequenceID != receivedPacket->m_nSequenceID)
@@ -702,8 +714,7 @@ void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t
         m_pCurrentConnection = nullptr;
     }
 
-    CDriver_BuRSocketConnection::initializeNetworking();
-    auto pConnection = std::make_shared <CDriver_BuRSocketConnection>(sIPAddress, nPort);
+    auto pConnection = m_pDriverEnvironment->CreateTCPIPConnection(sIPAddress, nPort, nTimeout);
 
     {
         std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
@@ -744,7 +755,7 @@ void CDriver_BuRConnector::disconnect()
     std::lock_guard<std::mutex> lockGuard(m_ConnectionOrJournalMutex);
 
     if (m_pCurrentConnection.get() != nullptr) {
-        m_pCurrentConnection->disconnect();
+        m_pCurrentConnection->Disconnect();
         m_pCurrentConnection = nullptr;
     } 
 }
