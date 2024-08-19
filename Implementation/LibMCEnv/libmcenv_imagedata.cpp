@@ -735,7 +735,7 @@ void CImageData::writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nSt
 			size_t nPixelAddress = nLineAddress;
 			uint8_t* pPixelPtr = pLinePtr;
 
-			for (uint32_t nColumn = 0; nColumn <= nCountX; nColumn++) {
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 				*pPixelPtr = m_PixelData->at(nPixelAddress);
 				nPixelAddress++;
 				pPixelPtr++;
@@ -756,7 +756,7 @@ void CImageData::writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nSt
 			size_t nPixelAddress = nLineAddress;
 			uint8_t* pPixelPtr = pLinePtr;
 
-			for (uint32_t nColumn = 0; nColumn <= nCountX; nColumn++) {
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 
 				uint32_t nLow = m_PixelData->at(nPixelAddress); nPixelAddress++;
 				uint32_t nHigh = m_PixelData->at(nPixelAddress); nPixelAddress++;
@@ -785,7 +785,7 @@ void CImageData::writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nSt
 			size_t nPixelAddress = nLineAddress;
 			uint8_t* pPixelPtr = pLinePtr;
 
-			for (uint32_t nColumn = 0; nColumn <= nCountX; nColumn++) {
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 
 				uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
 				uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
@@ -808,7 +808,7 @@ void CImageData::writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nSt
 		size_t nPixelAddress = nLineAddress;
 		uint8_t* pPixelPtr = pLinePtr;
 
-		for (uint32_t nColumn = 0; nColumn <= nCountX; nColumn++) {
+		for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 
 			uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
 			uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
@@ -864,13 +864,13 @@ void CImageData::writeToRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY,
 			size_t nPixelAddress = nLineAddress;
 			uint16_t* pPixelPtr = (uint16_t*)pLinePtr;
 
-			for (uint32_t nColumn = 0; nColumn <= nCountX; nColumn++) {
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 				uint32_t nGrayValue = m_PixelData->at(nPixelAddress);
 				nPixelAddress++;
 
 				*pPixelPtr = ((nGrayValue & 0xF8) << 8) | ((nGrayValue & 0xFC) << 3) | (nGrayValue >> 3);
 
-				pPixelPtr;
+				pPixelPtr++;
 			}
 
 			pLinePtr += nYLineOffset;
@@ -888,7 +888,7 @@ void CImageData::writeToRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY,
 			size_t nPixelAddress = nLineAddress;
 			uint16_t* pPixelPtr = (uint16_t*)pLinePtr;
 
-			for (uint32_t nColumn = 0; nColumn <= nCountX; nColumn++) {
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 
 				uint32_t nLow = m_PixelData->at(nPixelAddress); nPixelAddress++;
 				uint32_t nHigh = m_PixelData->at(nPixelAddress); nPixelAddress++;

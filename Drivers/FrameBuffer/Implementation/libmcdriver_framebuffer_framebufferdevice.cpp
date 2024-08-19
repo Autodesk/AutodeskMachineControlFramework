@@ -136,7 +136,17 @@ CFrameBufferDeviceInstance::CFrameBufferDeviceInstance(const std::string& sIdent
 
 CFrameBufferDeviceInstance::~CFrameBufferDeviceInstance()
 {
+#ifdef __linux__
+    if (m_pFramebufferPtr != nullptr) {
+        munmap(m_pFramebufferPtr, m_nMemorySize);
+        m_pFramebufferPtr = nullptr;
+    }
 
+    if (m_nFBDeviceHandle != -1) {
+        close(m_nFBDeviceHandle);
+        m_nFBDeviceHandle = -1;
+    }
+#endif
 }
 
 LibMCDriver_FrameBuffer_uint32 CFrameBufferDeviceInstance::getScreenWidth()
