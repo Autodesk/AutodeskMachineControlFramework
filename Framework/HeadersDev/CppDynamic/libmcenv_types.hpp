@@ -575,7 +575,8 @@ namespace LibMCEnv {
     Unknown = 0,
     GreyScale8bit = 1,
     RGB24bit = 2,
-    RGBA32bit = 3
+    RGBA32bit = 3,
+    RGB16bit = 4
   };
   
   enum class eFieldSamplingMode : LibMCEnv_int32 {

@@ -392,6 +392,67 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelRangePtr) (LibMCEnv_ImageDat
 */
 typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelRangePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer);
 
+/**
+* Returns a subset of an image or the whole image data. Please use this function instead of GetPixelRange.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[out] pValueNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValueBuffer - uint8  buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on target format.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelsPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eTargetFormat, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer);
+
+/**
+* Exchanges a subset of an image or the whole image data. Please use this function instead of SetPixelRange.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[in] pValueBuffer - uint8 buffer of New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelsPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eSourceFormat, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer);
+
+/**
+* Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+* @param[in] pTarget - Memory address to write to. The pixel value of StartX/StartY will be written to this address.
+* @param[in] nYLineOffset - Offset to add to the Target pointer to advance a line (in bytes).
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_WriteToRawMemoryPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eTargetFormat, LibMCEnv_pvoid pTarget, LibMCEnv_uint32 nYLineOffset);
+
+/**
+* Reads an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the source.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+* @param[in] pSource - Memory address to read from. The pixel value of StartX/StartY will be written to this address.
+* @param[in] nYLineOffset - Offset to add to the source pointer to advance a line (in bytes).
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_ReadFromRawMemoryPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eSourceFormat, LibMCEnv_pvoid pSource, LibMCEnv_uint32 nYLineOffset);
+
 /*************************************************************************************************************************
  Class definition for DiscreteFieldData2DStoreOptions
 **************************************************************************************************************************/
@@ -8643,6 +8704,10 @@ typedef struct {
 	PLibMCEnvImageData_SetPixelPtr m_ImageData_SetPixel;
 	PLibMCEnvImageData_GetPixelRangePtr m_ImageData_GetPixelRange;
 	PLibMCEnvImageData_SetPixelRangePtr m_ImageData_SetPixelRange;
+	PLibMCEnvImageData_GetPixelsPtr m_ImageData_GetPixels;
+	PLibMCEnvImageData_SetPixelsPtr m_ImageData_SetPixels;
+	PLibMCEnvImageData_WriteToRawMemoryPtr m_ImageData_WriteToRawMemory;
+	PLibMCEnvImageData_ReadFromRawMemoryPtr m_ImageData_ReadFromRawMemory;
 	PLibMCEnvDiscreteFieldData2DStoreOptions_ResetToDefaultsPtr m_DiscreteFieldData2DStoreOptions_ResetToDefaults;
 	PLibMCEnvDiscreteFieldData2D_GetDPIPtr m_DiscreteFieldData2D_GetDPI;
 	PLibMCEnvDiscreteFieldData2D_SetDPIPtr m_DiscreteFieldData2D_SetDPI;

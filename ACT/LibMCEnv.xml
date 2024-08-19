@@ -253,6 +253,7 @@
 		<option name="GreyScale8bit" value="1" />
 		<option name="RGB24bit" value="2" />
 		<option name="RGBA32bit" value="3" />
+		<option name="RGB16bit" value="4" />
 	</enum>
 	
 	<enum name="FieldSamplingMode">
@@ -548,6 +549,45 @@
 			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
 			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
 		</method>
+
+		<method name="GetPixels" description="Returns a subset of an image or the whole image data. Please use this function instead of GetPixelRange.">
+			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="CountX" type="uint32" pass="in" description="Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X." />
+			<param name="CountY" type="uint32" pass="in" description="Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y." />
+			<param name="TargetFormat" type="enum" class="ImagePixelFormat" pass="in" description="Target pixel format to convert the image data to." />
+			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on target format." />
+		</method>		
+
+		<method name="SetPixels" description="Exchanges a subset of an image or the whole image data. Please use this function instead of SetPixelRange.">
+			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="CountX" type="uint32" pass="in" description="Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X." />
+			<param name="CountY" type="uint32" pass="in" description="Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y." />
+			<param name="SourceFormat" type="enum" class="ImagePixelFormat" pass="in" description="Source pixel format to convert the image data from." />
+			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format." />
+		</method>
+
+		<method name="WriteToRawMemory" description="Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.">
+			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="CountX" type="uint32" pass="in" description="Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X." />
+			<param name="CountY" type="uint32" pass="in" description="Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y." />
+			<param name="TargetFormat" type="enum" class="ImagePixelFormat" pass="in" description="Target pixel format to convert the image data to." />
+			<param name="Target" type="pointer" pass="in" description="Memory address to write to. The pixel value of StartX/StartY will be written to this address." />
+			<param name="YLineOffset" type="uint32" pass="in" description="Offset to add to the Target pointer to advance a line (in bytes)." />
+		</method>		
+
+		<method name="ReadFromRawMemory" description="Reads an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the source.">
+			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="CountX" type="uint32" pass="in" description="Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X." />
+			<param name="CountY" type="uint32" pass="in" description="Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y." />
+			<param name="SourceFormat" type="enum" class="ImagePixelFormat" pass="in" description="Source pixel format to convert the image data from." />
+			<param name="Source" type="pointer" pass="in" description="Memory address to read from. The pixel value of StartX/StartY will be written to this address." />
+			<param name="YLineOffset" type="uint32" pass="in" description="Offset to add to the source pointer to advance a line (in bytes)." />
+		</method>		
+
 	
 	</class>
 	

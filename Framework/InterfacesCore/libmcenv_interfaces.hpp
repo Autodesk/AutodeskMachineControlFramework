@@ -615,6 +615,55 @@ public:
 	*/
 	virtual void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer) = 0;
 
+	/**
+	* IImageData::GetPixels - Returns a subset of an image or the whole image data. Please use this function instead of GetPixelRange.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[out] pValueNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on target format.
+	*/
+	virtual void GetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eTargetFormat, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer) = 0;
+
+	/**
+	* IImageData::SetPixels - Exchanges a subset of an image or the whole image data. Please use this function instead of SetPixelRange.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[in] pValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format.
+	*/
+	virtual void SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eSourceFormat, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer) = 0;
+
+	/**
+	* IImageData::WriteToRawMemory - Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+	* @param[in] nTarget - Memory address to write to. The pixel value of StartX/StartY will be written to this address.
+	* @param[in] nYLineOffset - Offset to add to the Target pointer to advance a line (in bytes).
+	*/
+	virtual void WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset) = 0;
+
+	/**
+	* IImageData::ReadFromRawMemory - Reads an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the source.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+	* @param[in] nSource - Memory address to read from. The pixel value of StartX/StartY will be written to this address.
+	* @param[in] nYLineOffset - Offset to add to the source pointer to advance a line (in bytes).
+	*/
+	virtual void ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset) = 0;
+
 };
 
 typedef IBaseSharedPtr<IImageData> PIImageData;

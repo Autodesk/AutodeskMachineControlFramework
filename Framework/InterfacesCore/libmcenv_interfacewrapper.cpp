@@ -1059,6 +1059,106 @@ LibMCEnvResult libmcenv_imagedata_setpixelrange(LibMCEnv_ImageData pImageData, L
 	}
 }
 
+LibMCEnvResult libmcenv_imagedata_getpixels(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, eLibMCEnvImagePixelFormat eTargetFormat, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if ((!pValueBuffer) && !(pValueNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->GetPixels(nStartX, nStartY, nCountX, nCountY, eTargetFormat, nValueBufferSize, pValueNeededCount, pValueBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_setpixels(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, eLibMCEnvImagePixelFormat eSourceFormat, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if ( (!pValueBuffer) && (nValueBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->SetPixels(nStartX, nStartY, nCountX, nCountY, eSourceFormat, nValueBufferSize, pValueBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_writetorawmemory(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, eLibMCEnvImagePixelFormat eTargetFormat, LibMCEnv_pvoid pTarget, LibMCEnv_uint32 nYLineOffset)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->WriteToRawMemory(nStartX, nStartY, nCountX, nCountY, eTargetFormat, pTarget, nYLineOffset);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_readfromrawmemory(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, eLibMCEnvImagePixelFormat eSourceFormat, LibMCEnv_pvoid pSource, LibMCEnv_uint32 nYLineOffset)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->ReadFromRawMemory(nStartX, nStartY, nCountX, nCountY, eSourceFormat, pSource, nYLineOffset);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for DiscreteFieldData2DStoreOptions
@@ -25915,6 +26015,14 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelrange;
 	if (sProcName == "libmcenv_imagedata_setpixelrange") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_setpixelrange;
+	if (sProcName == "libmcenv_imagedata_getpixels") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_getpixels;
+	if (sProcName == "libmcenv_imagedata_setpixels") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_setpixels;
+	if (sProcName == "libmcenv_imagedata_writetorawmemory") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_writetorawmemory;
+	if (sProcName == "libmcenv_imagedata_readfromrawmemory") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_readfromrawmemory;
 	if (sProcName == "libmcenv_discretefielddata2dstoreoptions_resettodefaults") 
 		*ppProcAddress = (void*) &libmcenv_discretefielddata2dstoreoptions_resettodefaults;
 	if (sProcName == "libmcenv_discretefielddata2d_getdpi") 

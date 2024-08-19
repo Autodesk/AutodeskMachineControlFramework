@@ -1136,6 +1136,10 @@ public:
 	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue);
 	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer);
 	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+	inline void GetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, std::vector<LibMCEnv_uint8> & ValueBuffer);
+	inline void SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+	inline void WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset);
+	inline void ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset);
 };
 	
 /*************************************************************************************************************************
@@ -2858,6 +2862,10 @@ public:
 		pWrapperTable->m_ImageData_SetPixel = nullptr;
 		pWrapperTable->m_ImageData_GetPixelRange = nullptr;
 		pWrapperTable->m_ImageData_SetPixelRange = nullptr;
+		pWrapperTable->m_ImageData_GetPixels = nullptr;
+		pWrapperTable->m_ImageData_SetPixels = nullptr;
+		pWrapperTable->m_ImageData_WriteToRawMemory = nullptr;
+		pWrapperTable->m_ImageData_ReadFromRawMemory = nullptr;
 		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_GetDPI = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_SetDPI = nullptr;
@@ -3950,6 +3958,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageData_SetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetPixels = (PLibMCEnvImageData_GetPixelsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixels");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetPixels = (PLibMCEnvImageData_GetPixelsPtr) dlsym(hLibrary, "libmcenv_imagedata_getpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetPixels = (PLibMCEnvImageData_SetPixelsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setpixels");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetPixels = (PLibMCEnvImageData_SetPixelsPtr) dlsym(hLibrary, "libmcenv_imagedata_setpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_WriteToRawMemory = (PLibMCEnvImageData_WriteToRawMemoryPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_writetorawmemory");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_WriteToRawMemory = (PLibMCEnvImageData_WriteToRawMemoryPtr) dlsym(hLibrary, "libmcenv_imagedata_writetorawmemory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_WriteToRawMemory == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_ReadFromRawMemory = (PLibMCEnvImageData_ReadFromRawMemoryPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_readfromrawmemory");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_ReadFromRawMemory = (PLibMCEnvImageData_ReadFromRawMemoryPtr) dlsym(hLibrary, "libmcenv_imagedata_readfromrawmemory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_ReadFromRawMemory == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10977,6 +11021,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelRange == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getpixels", (void**)&(pWrapperTable->m_ImageData_GetPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setpixels", (void**)&(pWrapperTable->m_ImageData_SetPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_writetorawmemory", (void**)&(pWrapperTable->m_ImageData_WriteToRawMemory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_WriteToRawMemory == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_readfromrawmemory", (void**)&(pWrapperTable->m_ImageData_ReadFromRawMemory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ReadFromRawMemory == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2dstoreoptions_resettodefaults", (void**)&(pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -14450,6 +14510,68 @@ public:
 	void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	* CImageData::GetPixels - Returns a subset of an image or the whole image data. Please use this function instead of GetPixelRange.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on target format.
+	*/
+	void CImageData::GetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, std::vector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValue = 0;
+		LibMCEnv_uint64 elementsWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixels(m_pHandle, nStartX, nStartY, nCountX, nCountY, eTargetFormat, 0, &elementsNeededValue, nullptr));
+		ValueBuffer.resize((size_t) elementsNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixels(m_pHandle, nStartX, nStartY, nCountX, nCountY, eTargetFormat, elementsNeededValue, &elementsWrittenValue, ValueBuffer.data()));
+	}
+	
+	/**
+	* CImageData::SetPixels - Exchanges a subset of an image or the whole image data. Please use this function instead of SetPixelRange.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+	* @param[in] ValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format.
+	*/
+	void CImageData::SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixels(m_pHandle, nStartX, nStartY, nCountX, nCountY, eSourceFormat, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	* CImageData::WriteToRawMemory - Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+	* @param[in] pTarget - Memory address to write to. The pixel value of StartX/StartY will be written to this address.
+	* @param[in] nYLineOffset - Offset to add to the Target pointer to advance a line (in bytes).
+	*/
+	void CImageData::WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_WriteToRawMemory(m_pHandle, nStartX, nStartY, nCountX, nCountY, eTargetFormat, pTarget, nYLineOffset));
+	}
+	
+	/**
+	* CImageData::ReadFromRawMemory - Reads an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the source.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+	* @param[in] pSource - Memory address to read from. The pixel value of StartX/StartY will be written to this address.
+	* @param[in] nYLineOffset - Offset to add to the source pointer to advance a line (in bytes).
+	*/
+	void CImageData::ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ReadFromRawMemory(m_pHandle, nStartX, nStartY, nCountX, nCountY, eSourceFormat, pSource, nYLineOffset));
 	}
 	
 	/**
