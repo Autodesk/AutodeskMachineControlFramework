@@ -377,30 +377,6 @@ public:
 	virtual void SetPixelRGB(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) = 0;
 
 	/**
-	* IFrameBufferAccess::DrawLine - Draws a line in a certain color.
-	* @param[in] nX1 - X Coordinate of first point to use.
-	* @param[in] nY1 - Y Coordinate of first point to use.
-	* @param[in] nX2 - X Coordinate of first point to use.
-	* @param[in] nY2 - Y Coordinate of first point to use.
-	* @param[in] dThickness - Thickness of the line in pixels.
-	* @param[in] RGBColor - Color to use.
-	*/
-	virtual void DrawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
-
-	/**
-	* IFrameBufferAccess::DrawLineRGB - Draws a line in a certain color.
-	* @param[in] nX1 - X Coordinate of first point to use.
-	* @param[in] nY1 - Y Coordinate of first point to use.
-	* @param[in] nX2 - X Coordinate of first point to use.
-	* @param[in] nY2 - Y Coordinate of first point to use.
-	* @param[in] dThickness - Thickness of the line in pixels.
-	* @param[in] nRed - Red value to use (0-255).
-	* @param[in] nGreen - Green value to use (0-255).
-	* @param[in] nBlue - Blue value to use (0-255).
-	*/
-	virtual void DrawLineRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) = 0;
-
-	/**
 	* IFrameBufferAccess::FillRectangle - Draws a rectangle in a certain color, including the corner points.
 	* @param[in] nX1 - X Coordinate of first point to use.
 	* @param[in] nY1 - Y Coordinate of first point to use.

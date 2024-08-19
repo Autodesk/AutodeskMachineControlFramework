@@ -49,22 +49,16 @@ namespace Impl {
 
 class CFrameBufferDeviceInstance : public CFrameBufferInstance {
 private:
-	std::string m_sIdentifier;
 
 	int m_nFBDeviceHandle;
-
-	uint32_t m_nScreenWidth;
-	uint32_t m_nScreenHeight;
-	uint32_t m_nVirtualResolutionY;
-	uint32_t m_nLineLength;
-	uint32_t m_nMemorySize;
-	uint32_t m_nCurrentBufferIndex;
-
 	uint8_t* m_pFramebufferPtr;
-	uint8_t* m_pDrawbufferPtr;
-
-	LibMCDriver_FrameBuffer::eFrameBufferBitDepth m_BitDepth;
+	uint32_t m_nCurrentBufferIndex;
 	bool m_bDoubleBufferingEnabled;
+
+	uint32_t m_nVirtualResolutionY;
+	uint32_t m_nMemorySize;
+
+	uint32_t m_nScanLineLength;
 
 
 public:
@@ -73,25 +67,9 @@ public:
 	
 	virtual ~CFrameBufferDeviceInstance ();
 	
-	virtual LibMCDriver_FrameBuffer_uint32 getScreenWidth() override;
-
-	virtual LibMCDriver_FrameBuffer_uint32 getScreenHeight() override;
-
-	virtual LibMCDriver_FrameBuffer::eFrameBufferBitDepth bitDepth() override;
-
-	virtual bool usesDoubleBuffering() override;
-
 	virtual void flip() override;
 
-	virtual void clearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor) override;
-
-	virtual void setPixel(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer::sColor RGBColor) override;
-
-	virtual void drawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) override;
-
-	virtual void fillRectangle(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor) override;
-
-	virtual void drawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, LibMCEnv::PImageData pImage) override;
+	virtual bool usesDoubleBuffering() override;
 
 };
 

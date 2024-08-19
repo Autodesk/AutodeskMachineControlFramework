@@ -220,36 +220,6 @@ LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_frame
 LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_setpixelrgb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX, LibMCDriver_FrameBuffer_int32 nY, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue);
 
 /**
-* Draws a line in a certain color.
-*
-* @param[in] pFrameBufferAccess - FrameBufferAccess instance.
-* @param[in] nX1 - X Coordinate of first point to use.
-* @param[in] nY1 - Y Coordinate of first point to use.
-* @param[in] nX2 - X Coordinate of first point to use.
-* @param[in] nY2 - Y Coordinate of first point to use.
-* @param[in] dThickness - Thickness of the line in pixels.
-* @param[in] pRGBColor - Color to use.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawline(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor * pRGBColor);
-
-/**
-* Draws a line in a certain color.
-*
-* @param[in] pFrameBufferAccess - FrameBufferAccess instance.
-* @param[in] nX1 - X Coordinate of first point to use.
-* @param[in] nY1 - Y Coordinate of first point to use.
-* @param[in] nX2 - X Coordinate of first point to use.
-* @param[in] nY2 - Y Coordinate of first point to use.
-* @param[in] dThickness - Thickness of the line in pixels.
-* @param[in] nRed - Red value to use (0-255).
-* @param[in] nGreen - Green value to use (0-255).
-* @param[in] nBlue - Blue value to use (0-255).
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_FRAMEBUFFER_DECLSPEC LibMCDriver_FrameBufferResult libmcdriver_framebuffer_framebufferaccess_drawlinergb(LibMCDriver_FrameBuffer_FrameBufferAccess pFrameBufferAccess, LibMCDriver_FrameBuffer_int32 nX1, LibMCDriver_FrameBuffer_int32 nY1, LibMCDriver_FrameBuffer_int32 nX2, LibMCDriver_FrameBuffer_int32 nY2, LibMCDriver_FrameBuffer_double dThickness, LibMCDriver_FrameBuffer_uint8 nRed, LibMCDriver_FrameBuffer_uint8 nGreen, LibMCDriver_FrameBuffer_uint8 nBlue);
-
-/**
 * Draws a rectangle in a certain color, including the corner points.
 *
 * @param[in] pFrameBufferAccess - FrameBufferAccess instance.

@@ -116,6 +116,9 @@ typedef void * LibMCDriver_FrameBuffer_pvoid;
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG 1009 /** framebuffer identifier is too long */
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER 1010 /** invalid framebuffer identifier */
 #define LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPIXELFORMAT 1011 /** invalid pixel format */
+#define LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDSCREENSIZE 1012 /** invalid screen size */
+#define LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDDRAWBUFFER 1013 /** invalid draw buffer */
+#define LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDLINELENGTH 1014 /** invalid line length */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_FrameBuffer
@@ -144,6 +147,9 @@ inline const char * LIBMCDRIVER_FRAMEBUFFER_GETERRORSTRING (LibMCDriver_FrameBuf
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG: return "framebuffer identifier is too long";
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER: return "invalid framebuffer identifier";
     case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPIXELFORMAT: return "invalid pixel format";
+    case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDSCREENSIZE: return "invalid screen size";
+    case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDDRAWBUFFER: return "invalid draw buffer";
+    case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDLINELENGTH: return "invalid line length";
     default: return "unknown error";
   }
 }

@@ -61,6 +61,10 @@
 		<error name="FRAMEBUFFERIDENTIFIERISTOOLONG" code="1009" description="framebuffer identifier is too long" />
 		<error name="INVALIDFRAMEBUFFERIDENTIFIER" code="1010" description="invalid framebuffer identifier" />
 		<error name="INVALIDPIXELFORMAT" code="1011" description="invalid pixel format" />
+		<error name="INVALIDSCREENSIZE" code="1012" description="invalid screen size" />
+		<error name="INVALIDDRAWBUFFER" code="1013" description="invalid draw buffer" />
+		<error name="INVALIDLINELENGTH" code="1014" description="invalid line length" />
+		
 		
 		
 	</errors>
@@ -173,26 +177,6 @@ Custom implementation
 		<method name="SetPixelRGB" description = "Sets a pixel in a certain color.">
 			<param name="X" type="int32" pass="in" description="X Coordinate of pixel to set." />
 			<param name="Y" type="int32" pass="in" description="Y Coordinate of pixel to set." />
-			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
-			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
-			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />
-		</method>				
-
-		<method name="DrawLine" description = "Draws a line in a certain color.">
-			<param name="X1" type="int32" pass="in" description="X Coordinate of first point to use." />
-			<param name="Y1" type="int32" pass="in" description="Y Coordinate of first point to use." />
-			<param name="X2" type="int32" pass="in" description="X Coordinate of first point to use." />
-			<param name="Y2" type="int32" pass="in" description="Y Coordinate of first point to use." />
-			<param name="Thickness" type="double" pass="in" description="Thickness of the line in pixels." />
-			<param name="RGBColor" type="struct" class="Color" pass="in" description="Color to use." />
-		</method>				
-
-		<method name="DrawLineRGB" description = "Draws a line in a certain color.">
-			<param name="X1" type="int32" pass="in" description="X Coordinate of first point to use." />
-			<param name="Y1" type="int32" pass="in" description="Y Coordinate of first point to use." />
-			<param name="X2" type="int32" pass="in" description="X Coordinate of first point to use." />
-			<param name="Y2" type="int32" pass="in" description="Y Coordinate of first point to use." />
-			<param name="Thickness" type="double" pass="in" description="Thickness of the line in pixels." />
 			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
 			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
 			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />

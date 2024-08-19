@@ -190,6 +190,9 @@ public:
 			case LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG: return "FRAMEBUFFERIDENTIFIERISTOOLONG";
 			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER: return "INVALIDFRAMEBUFFERIDENTIFIER";
 			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPIXELFORMAT: return "INVALIDPIXELFORMAT";
+			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDSCREENSIZE: return "INVALIDSCREENSIZE";
+			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDDRAWBUFFER: return "INVALIDDRAWBUFFER";
+			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDLINELENGTH: return "INVALIDLINELENGTH";
 		}
 		return "UNKNOWN";
 	}
@@ -218,6 +221,9 @@ public:
 			case LIBMCDRIVER_FRAMEBUFFER_ERROR_FRAMEBUFFERIDENTIFIERISTOOLONG: return "framebuffer identifier is too long";
 			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDFRAMEBUFFERIDENTIFIER: return "invalid framebuffer identifier";
 			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDPIXELFORMAT: return "invalid pixel format";
+			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDSCREENSIZE: return "invalid screen size";
+			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDDRAWBUFFER: return "invalid draw buffer";
+			case LIBMCDRIVER_FRAMEBUFFER_ERROR_INVALIDLINELENGTH: return "invalid line length";
 		}
 		return "unknown error";
 	}
@@ -448,8 +454,6 @@ public:
 	inline void ClearScreenRGB(const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue);
 	inline void SetPixel(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const sColor & RGBColor);
 	inline void SetPixelRGB(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue);
-	inline void DrawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const sColor & RGBColor);
-	inline void DrawLineRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue);
 	inline void FillRectangle(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const sColor & RGBColor);
 	inline void FillRectangleRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue);
 	inline void DrawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, classParam<LibMCEnv::CImageData> pImage);
@@ -615,8 +619,6 @@ public:
 		pWrapperTable->m_FrameBufferAccess_ClearScreenRGB = nullptr;
 		pWrapperTable->m_FrameBufferAccess_SetPixel = nullptr;
 		pWrapperTable->m_FrameBufferAccess_SetPixelRGB = nullptr;
-		pWrapperTable->m_FrameBufferAccess_DrawLine = nullptr;
-		pWrapperTable->m_FrameBufferAccess_DrawLineRGB = nullptr;
 		pWrapperTable->m_FrameBufferAccess_FillRectangle = nullptr;
 		pWrapperTable->m_FrameBufferAccess_FillRectangleRGB = nullptr;
 		pWrapperTable->m_FrameBufferAccess_DrawImage = nullptr;
@@ -817,24 +819,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_FrameBufferAccess_SetPixelRGB == nullptr)
-			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_DrawLine = (PLibMCDriver_FrameBufferFrameBufferAccess_DrawLinePtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawline");
-		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_DrawLine = (PLibMCDriver_FrameBufferFrameBufferAccess_DrawLinePtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawline");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_FrameBufferAccess_DrawLine == nullptr)
-			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_FrameBufferAccess_DrawLineRGB = (PLibMCDriver_FrameBufferFrameBufferAccess_DrawLineRGBPtr) GetProcAddress(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawlinergb");
-		#else // _WIN32
-		pWrapperTable->m_FrameBufferAccess_DrawLineRGB = (PLibMCDriver_FrameBufferFrameBufferAccess_DrawLineRGBPtr) dlsym(hLibrary, "libmcdriver_framebuffer_framebufferaccess_drawlinergb");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_FrameBufferAccess_DrawLineRGB == nullptr)
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1064,14 +1048,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_framebuffer_framebufferaccess_setpixelrgb", (void**)&(pWrapperTable->m_FrameBufferAccess_SetPixelRGB));
 		if ( (eLookupError != 0) || (pWrapperTable->m_FrameBufferAccess_SetPixelRGB == nullptr) )
-			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_framebuffer_framebufferaccess_drawline", (void**)&(pWrapperTable->m_FrameBufferAccess_DrawLine));
-		if ( (eLookupError != 0) || (pWrapperTable->m_FrameBufferAccess_DrawLine == nullptr) )
-			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_framebuffer_framebufferaccess_drawlinergb", (void**)&(pWrapperTable->m_FrameBufferAccess_DrawLineRGB));
-		if ( (eLookupError != 0) || (pWrapperTable->m_FrameBufferAccess_DrawLineRGB == nullptr) )
 			return LIBMCDRIVER_FRAMEBUFFER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_framebuffer_framebufferaccess_fillrectangle", (void**)&(pWrapperTable->m_FrameBufferAccess_FillRectangle));
@@ -1331,36 +1307,6 @@ public:
 	void CFrameBufferAccess::SetPixelRGB(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_FrameBufferAccess_SetPixelRGB(m_pHandle, nX, nY, nRed, nGreen, nBlue));
-	}
-	
-	/**
-	* CFrameBufferAccess::DrawLine - Draws a line in a certain color.
-	* @param[in] nX1 - X Coordinate of first point to use.
-	* @param[in] nY1 - Y Coordinate of first point to use.
-	* @param[in] nX2 - X Coordinate of first point to use.
-	* @param[in] nY2 - Y Coordinate of first point to use.
-	* @param[in] dThickness - Thickness of the line in pixels.
-	* @param[in] RGBColor - Color to use.
-	*/
-	void CFrameBufferAccess::DrawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const sColor & RGBColor)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_FrameBufferAccess_DrawLine(m_pHandle, nX1, nY1, nX2, nY2, dThickness, &RGBColor));
-	}
-	
-	/**
-	* CFrameBufferAccess::DrawLineRGB - Draws a line in a certain color.
-	* @param[in] nX1 - X Coordinate of first point to use.
-	* @param[in] nY1 - Y Coordinate of first point to use.
-	* @param[in] nX2 - X Coordinate of first point to use.
-	* @param[in] nY2 - Y Coordinate of first point to use.
-	* @param[in] dThickness - Thickness of the line in pixels.
-	* @param[in] nRed - Red value to use (0-255).
-	* @param[in] nGreen - Green value to use (0-255).
-	* @param[in] nBlue - Blue value to use (0-255).
-	*/
-	void CFrameBufferAccess::DrawLineRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_FrameBufferAccess_DrawLineRGB(m_pHandle, nX1, nY1, nX2, nY2, dThickness, nRed, nGreen, nBlue));
 	}
 	
 	/**

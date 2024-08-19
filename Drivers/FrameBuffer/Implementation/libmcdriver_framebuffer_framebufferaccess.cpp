@@ -110,19 +110,6 @@ void CFrameBufferAccess::SetPixelRGB(const LibMCDriver_FrameBuffer_int32 nX, con
 	m_pInstance->setPixel(nX, nY, RGBColor);
 }
 
-void CFrameBufferAccess::DrawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor)
-{
-	m_pInstance->drawLine(nX1, nY1, nX2, nY2, dThickness, RGBColor);
-}
-
-void CFrameBufferAccess::DrawLineRGB(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer_uint8 nRed, const LibMCDriver_FrameBuffer_uint8 nGreen, const LibMCDriver_FrameBuffer_uint8 nBlue) 
-{
-	LibMCDriver_FrameBuffer::sColor RGBColor;
-	RGBColor.m_Red = nRed;
-	RGBColor.m_Green = nGreen;
-	RGBColor.m_Blue = nBlue;
-	m_pInstance->drawLine(nX1, nY1, nX2, nY2, dThickness, RGBColor);
-}
 
 void CFrameBufferAccess::FillRectangle(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor)
 {

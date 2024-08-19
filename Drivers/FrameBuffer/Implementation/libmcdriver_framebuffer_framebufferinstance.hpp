@@ -37,6 +37,8 @@ Abstract: This is the class declaration of CFrameBufferAccess
 
 #include "libmcdriver_framebuffer_interfaces.hpp"
 
+#define FRAMEBUFFER_MINSCREENSIZE 128UL
+#define FRAMEBUFFER_MAXSCREENSIZE 16384UL
 
 
 namespace LibMCDriver_FrameBuffer {
@@ -50,27 +52,43 @@ namespace Impl {
 class CFrameBufferInstance {
 private:
 
+	std::string m_sIdentifier;
+
+	uint32_t m_nScreenWidth;
+	uint32_t m_nScreenHeight;
+	uint8_t* m_pDrawbufferPtr;
+	uint32_t m_nLineLength;
+
+	LibMCDriver_FrameBuffer::eFrameBufferBitDepth m_BitDepth;
+
+protected:
+
+	void setScreenResolution (uint32_t nScreenWidth, uint32_t nScreenHeight, LibMCDriver_FrameBuffer::eFrameBufferBitDepth bitDepth);
+	void setDrawBuffer (uint8_t* pDrawBuffer, uint32_t nLineLength);
+
 public:
 
-	virtual LibMCDriver_FrameBuffer_uint32 getScreenWidth() = 0;
+	CFrameBufferInstance (const std::string & sIdentifier);
+	
+	virtual ~CFrameBufferInstance ();
 
-	virtual LibMCDriver_FrameBuffer_uint32 getScreenHeight() = 0;
+	LibMCDriver_FrameBuffer_uint32 getScreenWidth();
 
-	virtual LibMCDriver_FrameBuffer::eFrameBufferBitDepth bitDepth() = 0;
+	LibMCDriver_FrameBuffer_uint32 getScreenHeight();
+
+	LibMCDriver_FrameBuffer::eFrameBufferBitDepth bitDepth();
 
 	virtual bool usesDoubleBuffering() = 0;
 
 	virtual void flip() = 0;
 
-	virtual void clearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
+	void clearScreen(const LibMCDriver_FrameBuffer::sColor RGBColor);
 
-	virtual void setPixel(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
+	void setPixel(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, const LibMCDriver_FrameBuffer::sColor RGBColor);
 
-	virtual void drawLine(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 X2, const LibMCDriver_FrameBuffer_int32 Y2, const LibMCDriver_FrameBuffer_double dThickness, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
+	void fillRectangle(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor);
 
-	virtual void fillRectangle(const LibMCDriver_FrameBuffer_int32 nX1, const LibMCDriver_FrameBuffer_int32 nY1, const LibMCDriver_FrameBuffer_int32 nX2, const LibMCDriver_FrameBuffer_int32 nY2, const LibMCDriver_FrameBuffer::sColor RGBColor) = 0;
-
-	virtual void drawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, LibMCEnv::PImageData pImage) = 0;
+	void drawImage(const LibMCDriver_FrameBuffer_int32 nX, const LibMCDriver_FrameBuffer_int32 nY, LibMCEnv::PImageData pImage);
 
 };
 
