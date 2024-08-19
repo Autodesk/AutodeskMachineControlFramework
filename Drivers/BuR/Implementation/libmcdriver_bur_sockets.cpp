@@ -185,11 +185,13 @@ void CDriver_BuRSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, si
 
         uint32_t totalBytesReceived = 0;
 
+        size_t nBytesToReceive = nCount;
+
 #ifdef _WIN32
         while (totalBytesReceived < nCount) {
 
             uint8_t* pData = &Buffer[oldSize + totalBytesReceived];
-            int bytesReceived = recv(m_Socket, (char*)pData, (int)nCount, 0);
+            int bytesReceived = recv(m_Socket, (char*)pData, (int)nBytesToReceive, 0);
 
             if (bytesReceived == 0) {
                 disconnect();
@@ -199,6 +201,10 @@ void CDriver_BuRSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, si
             if (bytesReceived < 0)
                 throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEERROR, "socket receive error: " + std::to_string(WSAGetLastError()));
 
+            if (bytesReceived > nBytesToReceive)
+                throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEERROR, "socket receive error: received too many bytes");
+            
+            nBytesToReceive -= bytesReceived;
             totalBytesReceived += bytesReceived;
             if (!bMustReceiveAll)
                 break;
