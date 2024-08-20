@@ -241,7 +241,38 @@ __DECLARESTATE(exposure)
 			pStateEnvironment->Sleep(2000);
 		}
 
-		pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		auto pContext = pDriver->GetContext();
+		auto pRecording = pContext->PrepareRecording(true);
+
+		pRecording->AddChannel("x", LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetXBacktransformed);
+		pRecording->AddChannel("y", LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetYBacktransformed);
+		pRecording->AddChannel("power", LibMCDriver_ScanLab::eRTCChannelType::ChannelAnalogOut1);
+
+		pContext->SetStartList(1, 0);
+		pRecording->EnableRecording(LibMCDriver_ScanLab::eRTCRecordingFrequency::Record100kHz);
+
+		auto pAccessor = pBuildJob->CreateToolpathAccessor();
+		auto pLayer = pAccessor->LoadLayer(nLayerIndex);
+		pContext->AddLayerToList(pLayer, false);
+
+		pRecording->DisableRecording();
+
+		pStateEnvironment->LogMessage("Starting Execution...");
+
+		pRecording->ExecuteListWithRecording();
+
+		pStateEnvironment->LogMessage("Execution finished");
+
+		auto pDataTable = pStateEnvironment->CreateDataTable();
+		pRecording->AddRecordsToDataTable("x", pDataTable, "x", "X");
+		pRecording->AddRecordsToDataTable("y", pDataTable, "y", "Y");
+		pRecording->AddRecordsToDataTable("power", pDataTable, "power", "Power");
+
+		auto pTempStream = pStateEnvironment->CreateTemporaryStream("layer_" + std::to_string (nLayerIndex), "text/csv");
+		pDataTable->WriteCSVToStream(pTempStream, nullptr);
+		pTempStream->Finish();
+
+		//pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
 	}
 	else if (sCardType == "scanlabsmc")
 	{
