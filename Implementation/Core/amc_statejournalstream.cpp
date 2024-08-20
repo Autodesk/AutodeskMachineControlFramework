@@ -61,8 +61,14 @@ namespace AMC {
 			: CStateJournalStreamChunk(), m_nChunkIndex(nChunkIndex), m_nStartTimeStampInMicroSeconds(nStartTimeStampInMicroSeconds), m_nEndTimeStampInMicroSeconds(nEndTimeStampInMicroSeconds), m_nCurrentTimeStampInMicroSeconds(nStartTimeStampInMicroSeconds)
 		{
 			m_Entries.resize(nVariableCount);
+			//std::cout << "creating dynamic chunk " << m_nChunkIndex << std::endl;
 		}
 
+
+		virtual ~CStateJournalStreamChunk_Dynamic()
+		{
+			//std::cout << "destroying dynamic chunk " << m_nChunkIndex << std::endl;
+		}
 
 		uint64_t getChunkIndex() override
 		{
@@ -373,14 +379,16 @@ namespace AMC {
 			m_nStartTimeStampInMicroSeconds = pDynamicChunk->getStartTimeStampInMicroSeconds();
 			m_nEndTimeStampInMicroSeconds = pDynamicChunk->getEndTimeStampInMicroSeconds();
 
-		//	std::cout << "serializing chunk #" << m_nChunkIndex << " to disk " << std::endl;
 			pDynamicChunk->serialize(m_VariableBuffer, m_EntryBuffer);
+
+			//std::cout << "creating in memory chunk " << m_nChunkIndex << std::endl;
 
 
 		}
 
 		virtual ~CStateJournalStreamChunk_InMemory()
 		{
+			//std::cout << "destroying in memory chunk " << m_nChunkIndex << std::endl;
 
 		}
 
@@ -449,11 +457,13 @@ namespace AMC {
 		CStateJournalStreamChunk_OnDisk(uint64_t nStartTimeStampInMicroSeconds, uint64_t nEndTimeStampInMicroSeconds, uint64_t nChunkIndex)
 			: CStateJournalStreamChunk(), m_nStartTimeStampInMicroSeconds(nStartTimeStampInMicroSeconds), m_nEndTimeStampInMicroSeconds(nEndTimeStampInMicroSeconds), m_nChunkIndex (nChunkIndex)
 		{
+			//std::cout << "creating on disk chunk " << m_nChunkIndex << std::endl;
 
 		}
 
 		virtual ~CStateJournalStreamChunk_OnDisk()
 		{
+			//std::cout << "destroying on disk chunk " << m_nChunkIndex << std::endl;
 
 		}
 
@@ -513,7 +523,7 @@ namespace AMC {
 
 
 	CStateJournalStream::CStateJournalStream(LibMCData::PJournalSession pJournalSession)
-		: m_nChunkSizeInMicroseconds(6000000), m_pJournalSession(pJournalSession), m_nCurrentTimeStampInMicroseconds (0)
+		: m_nChunkSizeInMicroseconds(600 * 1000000), m_pJournalSession(pJournalSession), m_nCurrentTimeStampInMicroseconds (0)
 	{
 		if (pJournalSession.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -637,8 +647,10 @@ namespace AMC {
 				std::lock_guard<std::mutex> lockGuard(m_ChunkChangeMutex);
 				m_ChunksToWrite.push(pMemoryChunk);
 
-				// TODO
-				//m_ChunkTimeline.at(pMemoryChunk->getChunkIndex()) = pMemoryChunk;
+				//std::cout << "serializing chunk " << pMemoryChunk->getChunkIndex () << std::endl;
+
+				
+				m_ChunkTimeline.at(pMemoryChunk->getChunkIndex()) = pMemoryChunk;
  
 			}
 
@@ -661,15 +673,20 @@ namespace AMC {
 
 			// Write Chunk to Journal
 			{
+				//std::cout << "writing chunk " << pChunkToWrite->getChunkIndex() << std::endl;
+
 				std::lock_guard<std::mutex> lockGuard(m_JournalSessionMutex);
 				pChunkToWrite->writeToJournal(m_pJournalSession);
 
 				// Push disk chunk to the archive queue
-				m_ChunksToArchive.push(std::make_shared<CStateJournalStreamChunk_OnDisk>(pChunkToWrite->getStartTimeStampInMicroSeconds(), pChunkToWrite->getEndTimeStampInMicroSeconds(), pChunkToWrite->getChunkIndex ()));
+				auto pOnDiskChunk = std::make_shared<CStateJournalStreamChunk_OnDisk>(pChunkToWrite->getStartTimeStampInMicroSeconds(), pChunkToWrite->getEndTimeStampInMicroSeconds(), pChunkToWrite->getChunkIndex());
+				m_ChunksToArchive.push(pOnDiskChunk);
+
+				m_ChunkTimeline.at(pChunkToWrite->getChunkIndex()) = pOnDiskChunk;
+
 			}
 
-			// TODO: Remove Chunks from memory if necessary...
-
+			
 		}
 		
 	}

@@ -291,7 +291,6 @@ namespace AMC {
 		std::map<uint32_t, PStateJournalImplVariable> m_VariableIDMap;
 		std::vector<PStateJournalImplVariable> m_VariableList;
 
-		uint32_t m_nChunkIntervalInMilliseconds;
 		uint32_t m_nChunkWriteIntervalInSeconds;
 
 		eStateJournalMode m_JournalMode;
@@ -340,7 +339,6 @@ namespace AMC {
 	CStateJournalImpl::CStateJournalImpl(PStateJournalStream pStream, AMCCommon::PChrono pGlobalChrono)
 		: m_JournalMode(eStateJournalMode::sjmInitialising),	     
 		m_pStream (pStream),
-		m_nChunkIntervalInMilliseconds(0),
 		m_nChunkWriteIntervalInSeconds (1),
 		m_ThreadStopFlag (false),
 		m_pGlobalChrono (pGlobalChrono)
@@ -353,7 +351,6 @@ namespace AMC {
 
 		m_nAbsoluteStartTimeInMicroseconds = pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
-		m_nChunkIntervalInMilliseconds = 60000;
 		m_nChunkWriteIntervalInSeconds = 10;
 	}
 
