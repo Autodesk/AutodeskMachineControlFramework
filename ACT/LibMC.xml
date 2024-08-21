@@ -633,7 +633,7 @@
 		<error name="INTERNALMETADATAERROR" code="607" description="Internal metadata error" />
 		<error name="INVALIDBINARYMETADATAPATH" code="608" description="Invalid Binary metadata path" />
 		<error name="BINARYMETADATAPATHNOTFOUND" code="609" description="Binary metadata path not found" />
-		
+		<error name="JOURNALCHUNKHASTOOMANYENTRIES" code="610" description="Journal chunk has too many entries" />				
 		
 	</errors>
 	
