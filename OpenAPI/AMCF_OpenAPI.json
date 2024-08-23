@@ -191,6 +191,28 @@
         }
       }
     },
+    "/build": {
+      "get": {
+        "tags": [
+          "ui"
+        ],
+        "summary": "Retrieves build list",
+        "description": "Retrieves build list from server",
+        "operationId": "getBuildList",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ui/config": {
       "get": {
         "tags": [
@@ -525,6 +547,61 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/StateMachineInstance"
+            }
+          }
+        }
+      },
+      "BuildJobInstance": {
+        "required": [
+          "name",
+          "uuid"
+        ],
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "description": "The UUID of the build job",
+            "example": "8bf469fa-4c36-474f-8ade-8474a1d621bd"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the build job",
+            "example": "test.3mf"
+          },
+          "storagestream": {
+            "type": "string",
+            "description": "The UUID of the storage stream of the job data",
+            "example": "e1118949-1b6b-4c4f-83e1-a4f5e03024bb"
+          },
+          "layercount": {
+            "type": "integer",
+            "description": "The number of layers of the build job",
+            "example": 120
+          }
+        }
+      },
+      "BuildListResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "instances"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.build' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.build"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "buildjobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuildJobInstance"
             }
           }
         }
