@@ -399,17 +399,24 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
-	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
-	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
+	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);	
+	std::string sSenderUUID;
+	if (apiRequest.hasValue (AMC_API_KEY_UI_EVENTSENDER))
+		sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
 
 	std::string sFormValueJSON;
 	if (apiRequest.hasValue(AMC_API_KEY_UI_FORMVALUEJSON)) {
 		sFormValueJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
 	}
+
+	std::string sEventParameterJSON;
+	if (apiRequest.hasValue(AMC_API_KEY_UI_EVENTPARAMETERS)) {
+		sEventParameterJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
+	}
 	
 	auto pUIHandler = m_pSystemState->uiHandler();
 
-	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth);
+	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, sEventParameterJSON, pAuth);
 
 	CJSONWriterArray contentUpdateNode(writer);
 

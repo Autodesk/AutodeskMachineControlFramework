@@ -749,7 +749,7 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
 }
 
 
-CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sEventPayloadJSON, PAPIAuth pAPIAuth)
+CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sEventFormPayloadJSON, const std::string& sEventParameterJSON, PAPIAuth pAPIAuth)
 {
     auto pLogger = m_pUISystemState->getLogger();
 
@@ -790,10 +790,10 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
 
         auto pClientVariableHandler = pAPIAuth->getClientVariableHandler();
-        if ((pClientVariableHandler.get() != nullptr) && (!sEventPayloadJSON.empty())) {
+        if ((pClientVariableHandler.get() != nullptr) && (!sEventFormPayloadJSON.empty())) {
 
             rapidjson::Document document;
-            document.Parse(sEventPayloadJSON.c_str());
+            document.Parse(sEventFormPayloadJSON.c_str());
             if (!document.IsObject())
                 throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
 
