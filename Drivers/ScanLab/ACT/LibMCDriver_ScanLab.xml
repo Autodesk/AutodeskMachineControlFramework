@@ -918,6 +918,10 @@ Custom implementation
 
 		<method name="DisableOIEMeasurementTagging" description="Disables OIE Measurement tagging.">
 		</method>
+		
+		<method name="GetOIEMaxMeasurementTag" description="Returns the current maximum measurement tag that has been sent to the OIE.">
+			<param name="MeasurementTag" type="uint32" pass="return" description="Measurement Tag that has been sent to the OIE." />
+		</method>		
 
 		<method name="MapOIEMeasurementTag" description="Maps an OIE Measurement tag back to the original scan parameters.">
 			<param name="MeasurementTag" type="uint32" pass="in" description="Measurement Tag that has been sent to the OIE." />

@@ -1286,6 +1286,12 @@ public:
 	virtual void DisableOIEMeasurementTagging() = 0;
 
 	/**
+	* IRTCContext::GetOIEMaxMeasurementTag - Returns the current maximum measurement tag that has been sent to the OIE.
+	* @return Measurement Tag that has been sent to the OIE.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetOIEMaxMeasurementTag() = 0;
+
+	/**
 	* IRTCContext::MapOIEMeasurementTag - Maps an OIE Measurement tag back to the original scan parameters.
 	* @param[in] nMeasurementTag - Measurement Tag that has been sent to the OIE.
 	* @param[out] nPartID - ID of the part.

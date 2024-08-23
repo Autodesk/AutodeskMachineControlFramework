@@ -136,8 +136,6 @@ protected:
 
 	void sendOIEMeasurementTag (uint32_t nCurrentVectorID);
 
-	uint32_t saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY);
-
 	void addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordingMode oieRecordingMode, uint32_t nAttributeFilterID, int64_t nAttributeFilterValue, float fMaxLaserPowerInWatts, bool bFailIfNonAssignedDataExists);
 
 	void updateLaserField(double dMinXInMM, double dMaxXInMM, double dMinYInMM, double dMaxYInMM);
@@ -271,6 +269,8 @@ public:
 	void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) override;
 
 	void ClearOIEMeasurementTags() override;
+
+	LibMCDriver_ScanLab_uint32 GetOIEMaxMeasurementTag() override;
 
 	void EnableOIEMeasurementTagging() override;
 

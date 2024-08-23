@@ -831,6 +831,7 @@ public:
 	inline void ClearOIEMeasurementTags();
 	inline void EnableOIEMeasurementTagging();
 	inline void DisableOIEMeasurementTagging();
+	inline LibMCDriver_ScanLab_uint32 GetOIEMaxMeasurementTag();
 	inline void MapOIEMeasurementTag(const LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32 & nPartID, LibMCDriver_ScanLab_uint32 & nProfileID, LibMCDriver_ScanLab_uint32 & nSegmentID, LibMCDriver_ScanLab_uint32 & nVectorID);
 	inline void DisableSkyWriting();
 	inline void EnableSkyWritingMode1(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost);
@@ -1245,6 +1246,7 @@ public:
 		pWrapperTable->m_RTCContext_ClearOIEMeasurementTags = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIEMeasurementTagging = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging = nullptr;
+		pWrapperTable->m_RTCContext_GetOIEMaxMeasurementTag = nullptr;
 		pWrapperTable->m_RTCContext_MapOIEMeasurementTag = nullptr;
 		pWrapperTable->m_RTCContext_DisableSkyWriting = nullptr;
 		pWrapperTable->m_RTCContext_EnableSkyWritingMode1 = nullptr;
@@ -2470,6 +2472,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetOIEMaxMeasurementTag = (PLibMCDriver_ScanLabRTCContext_GetOIEMaxMeasurementTagPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getoiemaxmeasurementtag");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetOIEMaxMeasurementTag = (PLibMCDriver_ScanLabRTCContext_GetOIEMaxMeasurementTagPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getoiemaxmeasurementtag");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetOIEMaxMeasurementTag == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3993,6 +4004,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableoiemeasurementtagging", (void**)&(pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableOIEMeasurementTagging == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getoiemaxmeasurementtag", (void**)&(pWrapperTable->m_RTCContext_GetOIEMaxMeasurementTag));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetOIEMaxMeasurementTag == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_mapoiemeasurementtag", (void**)&(pWrapperTable->m_RTCContext_MapOIEMeasurementTag));
@@ -5745,6 +5760,18 @@ public:
 	void CRTCContext::DisableOIEMeasurementTagging()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableOIEMeasurementTagging(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::GetOIEMaxMeasurementTag - Returns the current maximum measurement tag that has been sent to the OIE.
+	* @return Measurement Tag that has been sent to the OIE.
+	*/
+	LibMCDriver_ScanLab_uint32 CRTCContext::GetOIEMaxMeasurementTag()
+	{
+		LibMCDriver_ScanLab_uint32 resultMeasurementTag = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetOIEMaxMeasurementTag(m_pHandle, &resultMeasurementTag));
+		
+		return resultMeasurementTag;
 	}
 	
 	/**

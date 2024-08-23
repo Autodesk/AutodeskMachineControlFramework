@@ -1282,6 +1282,15 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disableoiemeasurementtagging(LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
+* Returns the current maximum measurement tag that has been sent to the OIE.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pMeasurementTag - Measurement Tag that has been sent to the OIE.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getoiemaxmeasurementtag(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pMeasurementTag);
+
+/**
 * Maps an OIE Measurement tag back to the original scan parameters.
 *
 * @param[in] pRTCContext - RTCContext instance.

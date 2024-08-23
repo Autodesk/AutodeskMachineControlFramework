@@ -1269,6 +1269,15 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEMeas
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
+* Returns the current maximum measurement tag that has been sent to the OIE.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pMeasurementTag - Measurement Tag that has been sent to the OIE.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetOIEMaxMeasurementTagPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pMeasurementTag);
+
+/**
 * Maps an OIE Measurement tag back to the original scan parameters.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -2596,6 +2605,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_ClearOIEMeasurementTagsPtr m_RTCContext_ClearOIEMeasurementTags;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEMeasurementTaggingPtr m_RTCContext_EnableOIEMeasurementTagging;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr m_RTCContext_DisableOIEMeasurementTagging;
+	PLibMCDriver_ScanLabRTCContext_GetOIEMaxMeasurementTagPtr m_RTCContext_GetOIEMaxMeasurementTag;
 	PLibMCDriver_ScanLabRTCContext_MapOIEMeasurementTagPtr m_RTCContext_MapOIEMeasurementTag;
 	PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr m_RTCContext_DisableSkyWriting;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;

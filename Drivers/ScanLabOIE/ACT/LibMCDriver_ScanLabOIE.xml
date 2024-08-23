@@ -521,6 +521,10 @@ Custom implementation
 			<param name="Value" type="bool" pass="return" description="Flag if the device is streaming." />
 		</method>		
 		
+		<method name="GetReceivedMeasurementTag" description="Returns the last measurement tag that has been retrieved.">
+			<param name="MeasurementTag" type="uint32" pass="return" description="Measurement Tag that has been retrieved last." />
+		</method>		
+
 		<method name="RTCIsBusy" description="Returns if the connected RTC is busy.">
 			<param name="Value" type="bool" pass="return" description="Flag if the connected RTC is busy." />
 		</method>		

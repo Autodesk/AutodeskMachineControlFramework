@@ -2283,6 +2283,32 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_isstreaming(LibMCD
 	}
 }
 
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_getreceivedmeasurementtag(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTag)
+{
+	IBase* pIBaseClass = (IBase *)pOIEDevice;
+
+	try {
+		if (pMeasurementTag == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		IOIEDevice* pIOIEDevice = dynamic_cast<IOIEDevice*>(pIBaseClass);
+		if (!pIOIEDevice)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		*pMeasurementTag = pIOIEDevice->GetReceivedMeasurementTag();
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_rtcisbusy(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pOIEDevice;
@@ -2803,6 +2829,8 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_isloggedin;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_isstreaming") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_isstreaming;
+	if (sProcName == "libmcdriver_scanlaboie_oiedevice_getreceivedmeasurementtag") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_getreceivedmeasurementtag;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_rtcisbusy") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_rtcisbusy;
 	if (sProcName == "libmcdriver_scanlaboie_driver_scanlab_oie_getdrivertype") 

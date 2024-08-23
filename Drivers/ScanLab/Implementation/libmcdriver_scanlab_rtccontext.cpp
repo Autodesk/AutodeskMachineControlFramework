@@ -1550,6 +1550,12 @@ void CRTCContext::ClearOIEMeasurementTags()
 	m_MeasurementTags.clear();
 }
 
+LibMCDriver_ScanLab_uint32 CRTCContext::GetOIEMaxMeasurementTag()
+{
+	return (uint32_t)m_MeasurementTags.size();
+}
+
+
 void CRTCContext::EnableOIEMeasurementTagging()
 {
 	m_bMeasurementTagging = true;

@@ -3271,6 +3271,32 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disableoiemeasurementta
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getoiemaxmeasurementtag(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pMeasurementTag)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pMeasurementTag == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pMeasurementTag = pIRTCContext->GetOIEMaxMeasurementTag();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_mapoiemeasurementtag(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nMeasurementTag, LibMCDriver_ScanLab_uint32 * pPartID, LibMCDriver_ScanLab_uint32 * pProfileID, LibMCDriver_ScanLab_uint32 * pSegmentID, LibMCDriver_ScanLab_uint32 * pVectorID)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -6466,6 +6492,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enableoiemeasurementtagging;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disableoiemeasurementtagging") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disableoiemeasurementtagging;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getoiemaxmeasurementtag") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getoiemaxmeasurementtag;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_mapoiemeasurementtag") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_mapoiemeasurementtag;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disableskywriting") 
