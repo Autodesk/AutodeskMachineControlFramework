@@ -194,11 +194,16 @@
     "/build": {
       "get": {
         "tags": [
-          "ui"
+          "general"
         ],
         "summary": "Retrieves build list",
         "description": "Retrieves build list from server",
         "operationId": "getBuildList",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],		
         "responses": {
           "200": {
             "description": "",
