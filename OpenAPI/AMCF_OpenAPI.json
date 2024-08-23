@@ -191,6 +191,29 @@
         }
       }
     },
+    "/ui/config": {
+      "get": {
+        "tags": [
+          "ui"
+        ],
+        "summary": "Retrieves config",
+        "description": "Retrieves config from server",
+        "operationId": "getConfig",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ui/event": {
       "post": {
         "tags": [
