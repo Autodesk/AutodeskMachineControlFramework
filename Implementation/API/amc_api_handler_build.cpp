@@ -239,10 +239,10 @@ void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAut
 		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBLAYERCOUNT, pBuildJob->GetLayerCount());
 
 		if (pBuildJob->HasThumbnailStream())
-			jobJSON.addString(AMC_API_KEY_UI_ITEMBUILDTHUMBNAIL, pBuildJob->GetThumbnailStreamUUID());
+			jobJSON.addString(AMC_API_KEY_UPLOAD_ITEMBUILDTHUMBNAIL, pBuildJob->GetThumbnailStreamUUID());
 
-		jobJSON.addString(AMC_API_KEY_UI_ITEMBUILDUSER, pBuildJob->GetCreatorName());
-		jobJSON.addInteger(AMC_API_KEY_UI_ITEMBUILDEXECUTIONCOUNT, pBuildJob->GetExecutionCount());
+		/*jobJSON.addString(AMC_API_KEY_UI_ITEMBUILDUSER, pBuildJob->GetCreatorName());
+		jobJSON.addInteger(AMC_API_KEY_UI_ITEMBUILDEXECUTIONCOUNT, pBuildJob->GetExecutionCount()); */
 
 		jobJSONArray.addObject(jobJSON);
 	}
