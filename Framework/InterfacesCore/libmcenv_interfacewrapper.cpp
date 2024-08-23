@@ -25938,6 +25938,116 @@ LibMCEnvResult libmcenv_uienvironment_sleep(LibMCEnv_UIEnvironment pUIEnvironmen
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_hasexternaleventparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pParameterName, bool * pParameterExists)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pParameterExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pParameterExists = pIUIEnvironment->HasExternalEventParameter(sParameterName);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_getexternaleventparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pParameterName, const LibMCEnv_uint32 nParameterValueBufferSize, LibMCEnv_uint32* pParameterValueNeededChars, char * pParameterValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pParameterValueBuffer) && !(pParameterValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sParameterValue("");
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pParameterValueBuffer == nullptr);
+		if (isCacheCall) {
+			sParameterValue = pIUIEnvironment->GetExternalEventParameter(sParameterName);
+
+			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sParameterValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUIEnvironment->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sParameterValue);
+			pIUIEnvironment->_setCache (nullptr);
+		}
+		
+		if (pParameterValueNeededChars)
+			*pParameterValueNeededChars = (LibMCEnv_uint32) (sParameterValue.size()+1);
+		if (pParameterValueBuffer) {
+			if (sParameterValue.size() >= nParameterValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iParameterValue = 0; iParameterValue < sParameterValue.size(); iParameterValue++)
+				pParameterValueBuffer[iParameterValue] = sParameterValue[iParameterValue];
+			pParameterValueBuffer[sParameterValue.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_addexternaleventresultvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, const char * pReturnValue)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pReturnValueName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pReturnValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sReturnValueName(pReturnValueName);
+		std::string sReturnValue(pReturnValue);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUIEnvironment->AddExternalEventResultValue(sReturnValueName, sReturnValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -27543,6 +27653,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getstartdatetime;
 	if (sProcName == "libmcenv_uienvironment_sleep") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_sleep;
+	if (sProcName == "libmcenv_uienvironment_hasexternaleventparameter") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_hasexternaleventparameter;
+	if (sProcName == "libmcenv_uienvironment_getexternaleventparameter") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getexternaleventparameter;
+	if (sProcName == "libmcenv_uienvironment_addexternaleventresultvalue") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_addexternaleventresultvalue;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

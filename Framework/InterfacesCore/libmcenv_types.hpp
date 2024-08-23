@@ -283,6 +283,9 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDSUPPORTINDEX 10186 /** Invalid support index */
 #define LIBMCENV_ERROR_INVALIDSOLIDINDEX 10187 /** Invalid solid index */
 #define LIBMCENV_ERROR_INVALIDCOMPONENTINDEX 10188 /** Invalid component index */
+#define LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY 10189 /** Invalid external event parameter key */
+#define LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER 10190 /** Could not find external event parameter */
+#define LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY 10191 /** Invalid external event return value key */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -478,6 +481,9 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "Invalid support index";
     case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "Invalid solid index";
     case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "Invalid component index";
+    case LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY: return "Invalid external event parameter key";
+    case LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER: return "Could not find external event parameter";
+    case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "Invalid external event return value key";
     default: return "unknown error";
   }
 }

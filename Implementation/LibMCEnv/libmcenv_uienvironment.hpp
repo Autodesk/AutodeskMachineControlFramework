@@ -84,6 +84,10 @@ private:
 
 	std::vector<AMC::PUIClientAction> m_ClientActions;
 
+	std::map<std::string, std::string> m_ExternalEventParameters;
+
+	std::map<std::string, std::string> m_ExternalEventReturnValues;
+
 protected:
 
 public:
@@ -242,6 +246,16 @@ public:
 	IDateTime* GetStartDateTime() override;
 
 	void Sleep(const LibMCEnv_uint32 nDelay) override;
+
+	void addExternalEventParameter (const std::string & sKey, const std::string & sValue);
+
+	std::map<std::string, std::string> getExternalEventReturnValues();
+
+	bool HasExternalEventParameter(const std::string& sParameterName) override;
+
+	std::string GetExternalEventParameter(const std::string& sParameterName) override;
+
+	void AddExternalEventResultValue(const std::string& sReturnValueName, const std::string& sReturnValue) override;
 
 };
 

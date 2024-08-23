@@ -226,6 +226,11 @@
 		<error name="INVALIDSUPPORTINDEX" code="10186" description="Invalid support index" />		
 		<error name="INVALIDSOLIDINDEX" code="10187" description="Invalid solid index" />		
 		<error name="INVALIDCOMPONENTINDEX" code="10188" description="Invalid component index" />		
+		<error name="INVALIDEXTERNALEVENTPARAMETERKEY" code="10189" description="Invalid external event parameter key" />		
+		<error name="COULDNOTFINDEXTERNALEVENTPARAMETER" code="10190" description="Could not find external event parameter" />		
+		<error name="INVALIDEXTERNALEVENTRETURNVALUEKEY" code="10191" description="Invalid external event return value key" />		
+		
+		
 
 		
 	</errors>
@@ -4633,6 +4638,21 @@
 
 		<method name="Sleep" description="Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
 			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
+		<method name="HasExternalEventParameter" description="Checks if an external event parameter exists">
+			<param name="ParameterName" type="string" pass="in" description="The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+			<param name="ParameterExists" type="bool" pass="return" description="Flag if the parameter exists." />
+		</method>
+		
+		<method name="GetExternalEventParameter" description="Returns an external event parameter. Fails if it exists.">
+			<param name="ParameterName" type="string" pass="in" description="The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+			<param name="ParameterValue" type="string" pass="return" description="Parameter value." />
+		</method>
+		
+		<method name="AddExternalEventResultValue" description="Adds a return value to return to the external event caller.">
+			<param name="ReturnValueName" type="string" pass="in" description="The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+			<param name="ReturnValue" type="string" pass="in" description="Return value." />
 		</method>
 
 	</class>

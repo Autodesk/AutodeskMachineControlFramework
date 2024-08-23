@@ -580,6 +580,9 @@ public:
 			case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "INVALIDSUPPORTINDEX";
 			case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "INVALIDSOLIDINDEX";
 			case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "INVALIDCOMPONENTINDEX";
+			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY: return "INVALIDEXTERNALEVENTPARAMETERKEY";
+			case LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER: return "COULDNOTFINDEXTERNALEVENTPARAMETER";
+			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "INVALIDEXTERNALEVENTRETURNVALUEKEY";
 		}
 		return "UNKNOWN";
 	}
@@ -775,6 +778,9 @@ public:
 			case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "Invalid support index";
 			case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "Invalid solid index";
 			case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "Invalid component index";
+			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY: return "Invalid external event parameter key";
+			case LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER: return "Could not find external event parameter";
+			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "Invalid external event return value key";
 		}
 		return "unknown error";
 	}
@@ -2748,6 +2754,9 @@ public:
 	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
 	inline PDateTime GetStartDateTime();
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
+	inline bool HasExternalEventParameter(const std::string & sParameterName);
+	inline std::string GetExternalEventParameter(const std::string & sParameterName);
+	inline void AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue);
 };
 	
 	/**
@@ -3626,6 +3635,9 @@ public:
 		pWrapperTable->m_UIEnvironment_GetCustomDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_GetStartDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_Sleep = nullptr;
+		pWrapperTable->m_UIEnvironment_HasExternalEventParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_AddExternalEventResultValue = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -10837,6 +10849,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasExternalEventParameter = (PLibMCEnvUIEnvironment_HasExternalEventParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasexternaleventparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasExternalEventParameter = (PLibMCEnvUIEnvironment_HasExternalEventParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasexternaleventparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasExternalEventParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameter = (PLibMCEnvUIEnvironment_GetExternalEventParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getexternaleventparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameter = (PLibMCEnvUIEnvironment_GetExternalEventParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getexternaleventparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetExternalEventParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_AddExternalEventResultValue = (PLibMCEnvUIEnvironment_AddExternalEventResultValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_addexternaleventresultvalue");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_AddExternalEventResultValue = (PLibMCEnvUIEnvironment_AddExternalEventResultValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_addexternaleventresultvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_AddExternalEventResultValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -14075,6 +14114,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_sleep", (void**)&(pWrapperTable->m_UIEnvironment_Sleep));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_Sleep == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasexternaleventparameter", (void**)&(pWrapperTable->m_UIEnvironment_HasExternalEventParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasExternalEventParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getexternaleventparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetExternalEventParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetExternalEventParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_addexternaleventresultvalue", (void**)&(pWrapperTable->m_UIEnvironment_AddExternalEventResultValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_AddExternalEventResultValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -25109,6 +25160,45 @@ public:
 	void CUIEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_Sleep(m_pHandle, nDelay));
+	}
+	
+	/**
+	* CUIEnvironment::HasExternalEventParameter - Checks if an external event parameter exists
+	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @return Flag if the parameter exists.
+	*/
+	bool CUIEnvironment::HasExternalEventParameter(const std::string & sParameterName)
+	{
+		bool resultParameterExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasExternalEventParameter(m_pHandle, sParameterName.c_str(), &resultParameterExists));
+		
+		return resultParameterExists;
+	}
+	
+	/**
+	* CUIEnvironment::GetExternalEventParameter - Returns an external event parameter. Fails if it exists.
+	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @return Parameter value.
+	*/
+	std::string CUIEnvironment::GetExternalEventParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededParameterValue = 0;
+		LibMCEnv_uint32 bytesWrittenParameterValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetExternalEventParameter(m_pHandle, sParameterName.c_str(), 0, &bytesNeededParameterValue, nullptr));
+		std::vector<char> bufferParameterValue(bytesNeededParameterValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetExternalEventParameter(m_pHandle, sParameterName.c_str(), bytesNeededParameterValue, &bytesWrittenParameterValue, &bufferParameterValue[0]));
+		
+		return std::string(&bufferParameterValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::AddExternalEventResultValue - Adds a return value to return to the external event caller.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] sReturnValue - Return value.
+	*/
+	void CUIEnvironment::AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_AddExternalEventResultValue(m_pHandle, sReturnValueName.c_str(), sReturnValue.c_str()));
 	}
 
 } // namespace LibMCEnv

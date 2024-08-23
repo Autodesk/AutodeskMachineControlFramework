@@ -930,3 +930,49 @@ void CUIEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
     AMCCommon::CChrono chrono;
     chrono.sleepMilliseconds(nDelay);
 }
+
+void CUIEnvironment::addExternalEventParameter(const std::string& sKey, const std::string& sValue)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY, sKey);
+
+    m_ExternalEventParameters.insert(std::make_pair (sKey, sValue));
+}
+
+std::map<std::string, std::string> CUIEnvironment::getExternalEventReturnValues()
+{
+    return m_ExternalEventReturnValues;
+}
+
+bool CUIEnvironment::HasExternalEventParameter(const std::string& sParameterName)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY, sParameterName);
+
+    auto iIter = m_ExternalEventParameters.find(sParameterName);
+    return (iIter != m_ExternalEventParameters.end());
+
+}
+
+std::string CUIEnvironment::GetExternalEventParameter(const std::string& sParameterName)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY, "invalid external event parameter key: " +  sParameterName);
+
+    auto iIter = m_ExternalEventParameters.find(sParameterName);
+    if (iIter == m_ExternalEventParameters.end())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER, "could not find external event parameter: " + sParameterName);
+
+    return iIter->second;
+
+}
+
+void CUIEnvironment::AddExternalEventResultValue(const std::string& sReturnValueName, const std::string& sReturnValue)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sReturnValueName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY, "invalid external return value key: " + sReturnValueName);
+
+    m_ExternalEventReturnValues.insert(std::make_pair (sReturnValueName, sReturnValue));
+}
+
+

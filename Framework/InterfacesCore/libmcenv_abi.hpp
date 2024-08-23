@@ -8630,6 +8630,38 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getstartdatetime(LibMCEn
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_sleep(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nDelay);
 
+/**
+* Checks if an external event parameter exists
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[out] pParameterExists - Flag if the parameter exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasexternaleventparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pParameterName, bool * pParameterExists);
+
+/**
+* Returns an external event parameter. Fails if it exists.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[in] nParameterValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pParameterValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pParameterValueBuffer -  buffer of Parameter value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getexternaleventparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pParameterName, const LibMCEnv_uint32 nParameterValueBufferSize, LibMCEnv_uint32* pParameterValueNeededChars, char * pParameterValueBuffer);
+
+/**
+* Adds a return value to return to the external event caller.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[in] pReturnValue - Return value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_addexternaleventresultvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, const char * pReturnValue);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/

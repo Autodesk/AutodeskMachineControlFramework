@@ -6619,6 +6619,27 @@ public:
 	*/
 	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
 
+	/**
+	* IUIEnvironment::HasExternalEventParameter - Checks if an external event parameter exists
+	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @return Flag if the parameter exists.
+	*/
+	virtual bool HasExternalEventParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetExternalEventParameter - Returns an external event parameter. Fails if it exists.
+	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @return Parameter value.
+	*/
+	virtual std::string GetExternalEventParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::AddExternalEventResultValue - Adds a return value to return to the external event caller.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] sReturnValue - Return value.
+	*/
+	virtual void AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue) = 0;
+
 };
 
 typedef IBaseSharedPtr<IUIEnvironment> PIUIEnvironment;

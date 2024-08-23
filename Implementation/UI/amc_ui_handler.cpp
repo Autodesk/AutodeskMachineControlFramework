@@ -789,6 +789,34 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
 
+        if (!sEventParameterJSON.empty ()) {
+            rapidjson::Document document;
+            document.Parse(sEventParameterJSON.c_str());
+            if (!document.IsObject())
+                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
+
+            for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin();
+                itr != document.MemberEnd(); ++itr)
+            {
+                if (!itr->name.IsString())
+                    throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+
+                std::string sPayloadName = itr->name.GetString();
+                if (!sPayloadName.empty()) {
+
+                    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sPayloadName))
+                        throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERNAME, sPayloadName);
+
+                    if (itr->value.IsString()) {
+                        std::string sPayloadValue = itr->value.GetString();
+                        pInternalUIEnvironment->addExternalEventParameter (sPayloadName, sPayloadValue);
+                    }
+                }
+
+            }
+
+        }
+
         auto pClientVariableHandler = pAPIAuth->getClientVariableHandler();
         if ((pClientVariableHandler.get() != nullptr) && (!sEventFormPayloadJSON.empty())) {
 
