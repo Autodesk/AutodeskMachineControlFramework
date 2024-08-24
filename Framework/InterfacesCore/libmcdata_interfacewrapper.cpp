@@ -1388,20 +1388,22 @@ LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMCData_JournalSession
 	}
 }
 
-LibMCDataResult libmcdata_journalsession_writejournalchunkintegerdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const sLibMCDataJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nEntryDataBufferSize, const sLibMCDataJournalChunkIntegerEntry * pEntryDataBuffer)
+LibMCDataResult libmcdata_journalsession_writejournalchunkintegerdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const sLibMCDataJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pJournalSession;
 
 	try {
 		if ( (!pVariableInfoBuffer) && (nVariableInfoBufferSize>0))
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if ( (!pEntryDataBuffer) && (nEntryDataBufferSize>0))
+		if ( (!pTimeStampDataBuffer) && (nTimeStampDataBufferSize>0))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pValueDataBuffer) && (nValueDataBufferSize>0))
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		IJournalSession* pIJournalSession = dynamic_cast<IJournalSession*>(pIBaseClass);
 		if (!pIJournalSession)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIJournalSession->WriteJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nVariableInfoBufferSize, pVariableInfoBuffer, nEntryDataBufferSize, pEntryDataBuffer);
+		pIJournalSession->WriteJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nVariableInfoBufferSize, pVariableInfoBuffer, nTimeStampDataBufferSize, pTimeStampDataBuffer, nValueDataBufferSize, pValueDataBuffer);
 
 		return LIBMCDATA_SUCCESS;
 	}

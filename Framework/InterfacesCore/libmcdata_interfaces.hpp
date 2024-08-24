@@ -618,11 +618,13 @@ public:
 	* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
 	* @param[in] nEndTimeStamp - End Timestamp of the chunk (in microseconds)
 	* @param[in] nVariableInfoBufferSize - Number of elements in buffer
-	* @param[in] pVariableInfoBuffer - Variable information.
-	* @param[in] nEntryDataBufferSize - Number of elements in buffer
-	* @param[in] pEntryDataBuffer - Entry bulk data.
+	* @param[in] pVariableInfoBuffer - Variable information array. References TimeStamps and Values.
+	* @param[in] nTimeStampDataBufferSize - Number of elements in buffer
+	* @param[in] pTimeStampDataBuffer - Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+	* @param[in] nValueDataBufferSize - Number of elements in buffer
+	* @param[in] pValueDataBuffer - Integer values. Must have same cardinality as TimeStampData.
 	*/
-	virtual void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry * pEntryDataBuffer) = 0;
+	virtual void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer) = 0;
 
 	/**
 	* IJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.

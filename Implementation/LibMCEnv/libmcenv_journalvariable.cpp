@@ -104,8 +104,11 @@ LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTim
     AMC::sStateJournalInterval interval;
     interval.m_nStartTimeInMicroSeconds = nClampedStartTimeInMicroSeconds;
     interval.m_nEndTimeInMicroSeconds = nClampedEndTimeInMicroSeconds;
-    auto sStatistics = m_pStateJournal->computeStatistics(m_sVariableName, interval);
-    return sStatistics.m_dAverageValue;
+    
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+
+    //auto sStatistics = m_pStateJournal->computeStatistics(m_sVariableName, interval);
+    //return sStatistics.m_dAverageValue;        
 
 }
 
@@ -129,7 +132,8 @@ IUniformJournalSampling* CJournalVariable::ComputeEquidistantSamples(const LibMC
 
 void CJournalVariable::ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry* pTimeStreamEntriesBuffer)
 {
-    std::vector<AMC::sJournalTimeStreamDoubleEntry> timeStream;
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+/*    std::vector<AMC::sJournalTimeStreamDoubleEntry> timeStream;
 
     m_pStateJournal->readDoubleTimeStream(m_sVariableName, m_Interval, timeStream);
 
@@ -150,6 +154,6 @@ void CJournalVariable::ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBu
             pTargetEntry->m_Value = timeStreamIter.m_dValue;
             pTargetEntry++;
         }
-    }
+    } */
 
 }

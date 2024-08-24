@@ -1258,7 +1258,7 @@ public:
 	}
 	
 	inline std::string GetSessionUUID();
-	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<sJournalChunkIntegerEntry> & EntryDataBuffer);
+	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<LibMCData_uint32> & TimeStampDataBuffer, const CInputVector<LibMCData_int64> & ValueDataBuffer);
 	inline LibMCData_uint32 GetChunkCapacity();
 	inline LibMCData_uint32 GetFlushInterval();
 };
@@ -5554,12 +5554,13 @@ public:
 	* @param[in] nChunkIndex - Index of the Chunk to write
 	* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
 	* @param[in] nEndTimeStamp - End Timestamp of the chunk (in microseconds)
-	* @param[in] VariableInfoBuffer - Variable information.
-	* @param[in] EntryDataBuffer - Entry bulk data.
+	* @param[in] VariableInfoBuffer - Variable information array. References TimeStamps and Values.
+	* @param[in] TimeStampDataBuffer - Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+	* @param[in] ValueDataBuffer - Integer values. Must have same cardinality as TimeStampData.
 	*/
-	void CJournalSession::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<sJournalChunkIntegerEntry> & EntryDataBuffer)
+	void CJournalSession::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<LibMCData_uint32> & TimeStampDataBuffer, const CInputVector<LibMCData_int64> & ValueDataBuffer)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_WriteJournalChunkIntegerData(m_pHandle, nChunkIndex, nStartTimeStamp, nEndTimeStamp, (LibMCData_uint64)VariableInfoBuffer.size(), VariableInfoBuffer.data(), (LibMCData_uint64)EntryDataBuffer.size(), EntryDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_WriteJournalChunkIntegerData(m_pHandle, nChunkIndex, nStartTimeStamp, nEndTimeStamp, (LibMCData_uint64)VariableInfoBuffer.size(), VariableInfoBuffer.data(), (LibMCData_uint64)TimeStampDataBuffer.size(), TimeStampDataBuffer.data(), (LibMCData_uint64)ValueDataBuffer.size(), ValueDataBuffer.data()));
 	}
 	
 	/**

@@ -97,9 +97,9 @@ namespace AMC {
 		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
-		void readDoubleTimeStream (const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
+		//void readDoubleTimeStream (const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
-		sStateJournalStatistics computeStatistics (const std::string& sName, const sStateJournalInterval& interval);
+		//sStateJournalStatistics computeStatistics (const std::string& sName, const sStateJournalInterval& interval);
 
 		double computeSample(const std::string& sName, const uint64_t nTimeStamp);
 		

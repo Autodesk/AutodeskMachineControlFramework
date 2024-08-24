@@ -457,12 +457,14 @@ typedef LibMCDataResult (*PLibMCDataJournalSession_GetSessionUUIDPtr) (LibMCData
 * @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
 * @param[in] nEndTimeStamp - End Timestamp of the chunk (in microseconds)
 * @param[in] nVariableInfoBufferSize - Number of elements in buffer
-* @param[in] pVariableInfoBuffer - JournalChunkVariableInfo buffer of Variable information.
-* @param[in] nEntryDataBufferSize - Number of elements in buffer
-* @param[in] pEntryDataBuffer - JournalChunkIntegerEntry buffer of Entry bulk data.
+* @param[in] pVariableInfoBuffer - JournalChunkVariableInfo buffer of Variable information array. References TimeStamps and Values.
+* @param[in] nTimeStampDataBufferSize - Number of elements in buffer
+* @param[in] pTimeStampDataBuffer - uint32 buffer of Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+* @param[in] nValueDataBufferSize - Number of elements in buffer
+* @param[in] pValueDataBuffer - int64 buffer of Integer values. Must have same cardinality as TimeStampData.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry * pEntryDataBuffer);
+typedef LibMCDataResult (*PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer);
 
 /**
 * Returns the chunk capacity of the session journal.

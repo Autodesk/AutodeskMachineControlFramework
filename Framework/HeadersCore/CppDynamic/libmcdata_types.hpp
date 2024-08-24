@@ -857,15 +857,9 @@ namespace LibMCData {
   
   typedef struct sJournalChunkVariableInfo {
       LibMCData_uint32 m_VariableIndex;
-      LibMCData_uint32 m_VariableType;
       LibMCData_uint32 m_EntryStartIndex;
       LibMCData_uint32 m_EntryCount;
   } sJournalChunkVariableInfo;
-  
-  typedef struct sJournalChunkIntegerEntry {
-      LibMCData_uint32 m_RelativeTimeStampInMicroseconds;
-      LibMCData_int64 m_IntegerValue;
-  } sJournalChunkIntegerEntry;
   
   #pragma pack ()
   
@@ -914,7 +908,6 @@ typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
 typedef LibMCData::eCustomDataType eLibMCDataCustomDataType;
 typedef LibMCData::eBuildJobExecutionStatus eLibMCDataBuildJobExecutionStatus;
 typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
-typedef LibMCData::sJournalChunkIntegerEntry sLibMCDataJournalChunkIntegerEntry;
 typedef LibMCData::LogCallback LibMCDataLogCallback;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;

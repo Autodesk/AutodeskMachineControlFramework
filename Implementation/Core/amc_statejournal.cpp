@@ -113,10 +113,10 @@ namespace AMC {
 			m_bCurrentValue = bValue;
 		}
 
-		void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
+		/*void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
 		{
 			m_pStream->readRawIntegerData(m_nStorageIndex, interval, timeStream);
-		}
+		} */
 
 		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) override
 		{
@@ -159,12 +159,12 @@ namespace AMC {
 		}
 
 
-		void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
+		/*void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
 		{
 
 			m_pStream->readRawIntegerData (m_nStorageIndex, interval, timeStream);
 
-		}
+		} */
 
 		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) override
 		{			
@@ -231,14 +231,14 @@ namespace AMC {
 
 		}
 
-		void readTimeStream(const sStateJournalInterval & interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
+		/*void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 		{
 			if (!m_bHasUnits)
 				throw ELibMCCustomException(LIBMC_ERROR_UNITSHAVENOTBEENSET, m_sName);
 
 			m_pStream->readRawDoubleData (m_nStorageIndex, interval, m_dUnits, timeStream);
 
-		}
+		} */
 
 		double computeNumericSample(const uint64_t nTimeStampInMicroseconds) 
 		{
@@ -325,7 +325,7 @@ namespace AMC {
 
 		uint64_t retrieveTimeStamp_MicroSecond();
 
-		void readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
+		//void readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
 		double computeSample(const std::string& sName, const uint64_t nTimeStampInMicroseconds);
 
@@ -577,7 +577,7 @@ namespace AMC {
 	}
 
 
-	void CStateJournalImpl::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
+	/*void CStateJournalImpl::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		if (m_JournalMode != eStateJournalMode::sjmRecording)
@@ -627,7 +627,7 @@ namespace AMC {
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + pVariable->getName() + " is not a numeric variable");
 
 
-	}
+	} */
 
 	std::string CStateJournalImpl::getStartTimeAsUTC()
 	{
@@ -740,10 +740,10 @@ namespace AMC {
 		m_pImpl->updateDoubleValue(nVariableID, dValue);
 	}
 
-	void CStateJournal::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
+/*	void CStateJournal::readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
 	{
 		m_pImpl->readDoubleTimeStream(sName, interval, timeStream);
-	}
+	} */
 
 
 	double CStateJournal::computeSample(const std::string& sName, const uint64_t nTimeStamp)
@@ -752,7 +752,7 @@ namespace AMC {
 	}
 
 
-	sStateJournalStatistics CStateJournal::computeStatistics(const std::string& sName, const sStateJournalInterval& interval)
+	/*sStateJournalStatistics CStateJournal::computeStatistics(const std::string& sName, const sStateJournalInterval& interval)
 	{
 		std::vector<sJournalTimeStreamDoubleEntry> timeStream;
 
@@ -825,7 +825,7 @@ namespace AMC {
 
 		return resultStatistics;
 
-	}
+	} */
 
 
 	void CStateJournal::retrieveRecentInterval(uint64_t nLastMicroSeconds, sStateJournalInterval& interval)

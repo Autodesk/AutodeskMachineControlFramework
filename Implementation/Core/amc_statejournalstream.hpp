@@ -101,16 +101,8 @@ namespace AMC {
 
 		virtual uint64_t getChunkIndex() = 0;
 
-		virtual void readRawIntegerData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStampInMicroSeconds, uint64_t nIntervalEndTimeStampInMicroSeconds, std::vector<sJournalTimeStreamInt64Entry> & rawTimeStream) = 0;
-
-		virtual void readRawDoubleData (uint32_t nStorageIndex, uint64_t nIntervalStartTimeStampInMicroSeconds, uint64_t nIntervalEndTimeStampInMicroSeconds, double dUnits, std::vector<sJournalTimeStreamDoubleEntry> & rawTimeStream) = 0;
-
 		virtual int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) = 0;
 		
-		virtual double sampleDoubleData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds, double dUnits) = 0;
-
-		virtual bool sampleBoolData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) = 0;
-
 
 	};
 
@@ -165,10 +157,6 @@ namespace AMC {
 		virtual void writeBool_MicroSecond(const uint64_t nAbsoluteTimeStampInMicroseconds, const uint32_t nStorageIndex, bool bValue);
 		virtual void writeInt64_MicroSecond(const uint64_t nAbsoluteTimeStampInMicroseconds, const uint32_t nStorageIndex, int64_t nValue);
 		virtual void writeDouble_MicroSecond(const uint64_t nAbsoluteTimeStampInMicroseconds, const uint32_t nStorageIndex, int64_t nValue);
-
-		void readRawIntegerData(const uint32_t nStorageIndex, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& rawTimeStream);
-
-		void readRawDoubleData(const uint32_t nStorageIndex, const sStateJournalInterval& interval, double dUnits, std::vector<sJournalTimeStreamDoubleEntry>& rawTimeStream);
 
 		int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds);
 		double sampleDoubleData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds, double dUnits);

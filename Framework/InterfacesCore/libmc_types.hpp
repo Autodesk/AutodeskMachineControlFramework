@@ -625,6 +625,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDBINARYMETADATAPATH 608 /** Invalid Binary metadata path */
 #define LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND 609 /** Binary metadata path not found */
 #define LIBMC_ERROR_JOURNALCHUNKHASTOOMANYENTRIES 610 /** Journal chunk has too many entries */
+#define LIBMC_ERROR_COULDNOTSERIALIZEJOURNALENTRIES 611 /** Could not serialize journal entries */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1162,6 +1163,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDBINARYMETADATAPATH: return "Invalid Binary metadata path";
     case LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND: return "Binary metadata path not found";
     case LIBMC_ERROR_JOURNALCHUNKHASTOOMANYENTRIES: return "Journal chunk has too many entries";
+    case LIBMC_ERROR_COULDNOTSERIALIZEJOURNALENTRIES: return "Could not serialize journal entries";
     default: return "unknown error";
   }
 }

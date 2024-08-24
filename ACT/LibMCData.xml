@@ -399,14 +399,8 @@
 		
 	<struct name="JournalChunkVariableInfo">
 		<member name="VariableIndex" type="uint32" />
-		<member name="VariableType" type="uint32" />
 		<member name="EntryStartIndex" type="uint32" />
 		<member name="EntryCount" type="uint32" />
-	</struct>
-
-	<struct name="JournalChunkIntegerEntry">
-		<member name="RelativeTimeStampInMicroseconds" type="uint32" />
-		<member name="IntegerValue" type="int64" />
 	</struct>
 
 	<enum name="AlertLevel">
@@ -696,8 +690,9 @@
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
 			<param name="StartTimeStamp" type="uint64" pass="in" description="Start Timestamp of the chunk (in microseconds)" />	
 			<param name="EndTimeStamp" type="uint64" pass="in" description="End Timestamp of the chunk (in microseconds)" />	
-			<param name="VariableInfo" type="structarray" class="JournalChunkVariableInfo" pass="in" description="Variable information." />	
-			<param name="EntryData" type="structarray" class="JournalChunkIntegerEntry" pass="in" description="Entry bulk data." />	
+			<param name="VariableInfo" type="structarray" class="JournalChunkVariableInfo" pass="in" description="Variable information array. References TimeStamps and Values." />	
+			<param name="TimeStampData" type="basicarray" class="uint32" pass="in" description="Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData." />	
+			<param name="ValueData" type="basicarray" class="int64" pass="in" description="Integer values. Must have same cardinality as TimeStampData." />	
 		</method>
 		
 		<method name="GetChunkCapacity" description="Returns the chunk capacity of the session journal.">
