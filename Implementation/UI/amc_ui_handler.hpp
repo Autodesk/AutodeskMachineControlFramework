@@ -98,15 +98,18 @@ namespace AMC {
 		std::string m_sErrorMessage;
 
 		std::vector<PUIClientAction> m_clientActions;
+		std::map<std::string, std::string> m_returnValues;
 		
 	public:
-		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::vector<PUIClientAction> & clientActions);
+		CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::vector<PUIClientAction> & clientActions, const std::map<std::string, std::string> & returnValues);
 
 		uint32_t getErrorCode();
 
 		std::string getErrorMessage();
 
 		std::vector<PUIClientAction> & getClientActions ();
+
+		std::map<std::string, std::string>& getReturnValues();
 	};
 
 	class CUIHandler : public CUIModule_UIEventHandler {

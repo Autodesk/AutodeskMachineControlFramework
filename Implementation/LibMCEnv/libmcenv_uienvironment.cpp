@@ -463,6 +463,12 @@ std::vector<AMC::PUIClientAction>& CUIEnvironment::getClientActions()
     return m_ClientActions;
 }
 
+std::map<std::string, std::string>& CUIEnvironment::getExternalEventReturnValues()
+{
+    return m_ExternalEventReturnValues;
+}
+
+
 
 ITestEnvironment* CUIEnvironment::GetTestEnvironment()
 {

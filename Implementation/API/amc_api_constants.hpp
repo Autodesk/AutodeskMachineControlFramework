@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_PROTOCOL_AUTH "com.autodesk.machinecontrol.auth"
 #define AMC_API_PROTOCOL_UI "com.autodesk.machinecontrol.ui"
 #define AMC_API_PROTOCOL_TOKEN "com.autodesk.machinecontrol.token"
+#define AMC_API_PROTOCOL_EXTERNAL "com.autodesk.machinecontrol.external"
 
 #define AMC_API_CONTENTTYPE "application/json"
 

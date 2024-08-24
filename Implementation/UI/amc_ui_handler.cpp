@@ -73,8 +73,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::vector<PUIClientAction>& clientActions)
-    : m_nErrorCode(nErrorCode), m_clientActions (clientActions), m_sErrorMessage (sErrorMessage)
+CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::vector<PUIClientAction>& clientActions, const std::map<std::string, std::string>& returnValues)
+    : m_nErrorCode(nErrorCode), m_clientActions (clientActions), m_sErrorMessage (sErrorMessage), m_returnValues (returnValues)
 {
 
 }
@@ -94,6 +94,10 @@ std::vector<PUIClientAction>& CUIHandleEventResponse::getClientActions()
     return m_clientActions;
 }
 
+std::map<std::string, std::string>& CUIHandleEventResponse::getReturnValues()
+{
+    return m_returnValues;
+}
 
 
 
@@ -757,6 +761,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
     std::string sErrorMessage;
 
     std::vector<PUIClientAction> clientActions;
+    std::map<std::string, std::string> returnValues;
 
     try {
 
@@ -866,6 +871,8 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         clientActions = pInternalUIEnvironment->getClientActions();
 
+        returnValues = pInternalUIEnvironment->getExternalEventReturnValues();
+
     } 
     catch (LibMCUI::ELibMCUIException & UIException) {
         nErrorCode = UIException.getErrorCode();
@@ -886,7 +893,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
     }
 
-    return CUIHandleEventResponse (nErrorCode, sErrorMessage, clientActions);
+    return CUIHandleEventResponse (nErrorCode, sErrorMessage, clientActions, returnValues);
        
 
 }

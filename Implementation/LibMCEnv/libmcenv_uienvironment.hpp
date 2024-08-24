@@ -171,6 +171,8 @@ public:
 
 	std::vector<AMC::PUIClientAction>& getClientActions();
 
+	std::map<std::string, std::string>& getExternalEventReturnValues();
+
 	ITestEnvironment* GetTestEnvironment() override;
 
 	IXMLDocument* CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace) override;
