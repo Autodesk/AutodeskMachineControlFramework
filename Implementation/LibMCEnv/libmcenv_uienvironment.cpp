@@ -945,11 +945,6 @@ void CUIEnvironment::addExternalEventParameter(const std::string& sKey, const st
     m_ExternalEventParameters.insert(std::make_pair (sKey, sValue));
 }
 
-std::map<std::string, std::string> CUIEnvironment::getExternalEventReturnValues()
-{
-    return m_ExternalEventReturnValues;
-}
-
 bool CUIEnvironment::HasExternalEventParameter(const std::string& sParameterName)
 {
     if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName))

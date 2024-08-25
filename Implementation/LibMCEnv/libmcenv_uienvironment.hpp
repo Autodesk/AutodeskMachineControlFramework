@@ -251,8 +251,6 @@ public:
 
 	void addExternalEventParameter (const std::string & sKey, const std::string & sValue);
 
-	std::map<std::string, std::string> getExternalEventReturnValues();
-
 	bool HasExternalEventParameter(const std::string& sParameterName) override;
 
 	std::string GetExternalEventParameter(const std::string& sParameterName) override;
