@@ -66,6 +66,7 @@ class CLogSession;
 class CAlert;
 class CAlertIterator;
 class CAlertSession;
+class CJournalChunkIntegerData;
 class CJournalSession;
 class CStorageStream;
 class CStorageZIPWriter;
@@ -97,6 +98,7 @@ typedef CLogSession CLibMCDataLogSession;
 typedef CAlert CLibMCDataAlert;
 typedef CAlertIterator CLibMCDataAlertIterator;
 typedef CAlertSession CLibMCDataAlertSession;
+typedef CJournalChunkIntegerData CLibMCDataJournalChunkIntegerData;
 typedef CJournalSession CLibMCDataJournalSession;
 typedef CStorageStream CLibMCDataStorageStream;
 typedef CStorageZIPWriter CLibMCDataStorageZIPWriter;
@@ -128,6 +130,7 @@ typedef std::shared_ptr<CLogSession> PLogSession;
 typedef std::shared_ptr<CAlert> PAlert;
 typedef std::shared_ptr<CAlertIterator> PAlertIterator;
 typedef std::shared_ptr<CAlertSession> PAlertSession;
+typedef std::shared_ptr<CJournalChunkIntegerData> PJournalChunkIntegerData;
 typedef std::shared_ptr<CJournalSession> PJournalSession;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
 typedef std::shared_ptr<CStorageZIPWriter> PStorageZIPWriter;
@@ -159,6 +162,7 @@ typedef PLogSession PLibMCDataLogSession;
 typedef PAlert PLibMCDataAlert;
 typedef PAlertIterator PLibMCDataAlertIterator;
 typedef PAlertSession PLibMCDataAlertSession;
+typedef PJournalChunkIntegerData PLibMCDataJournalChunkIntegerData;
 typedef PJournalSession PLibMCDataJournalSession;
 typedef PStorageStream PLibMCDataStorageStream;
 typedef PStorageZIPWriter PLibMCDataStorageZIPWriter;
@@ -580,6 +584,23 @@ public:
 			case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIPWRITINGALREADYFINISHED";
 			case LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT: return "INVALIDBUILDJOBLAYERCOUNT";
 			case LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT: return "COULDNOTDETERMINEEXECUTIONCOUNT";
+			case LIBMCDATA_ERROR_COULDNOTCREATEJOURNALFILE: return "COULDNOTCREATEJOURNALFILE";
+			case LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP: return "INVALIDJOURNALTIMESTAMP";
+			case LIBMCDATA_ERROR_INVALIDJOURNALDATAOFFSET: return "INVALIDJOURNALDATAOFFSET";
+			case LIBMCDATA_ERROR_INVALIDJOURNALDATALENGTH: return "INVALIDJOURNALDATALENGTH";
+			case LIBMCDATA_ERROR_INVALIDJOURNALDATASIGNATURE: return "INVALIDJOURNALDATASIGNATURE";
+			case LIBMCDATA_ERROR_JOURNALMEMORYSIZEMISMATCH: return "JOURNALMEMORYSIZEMISMATCH";
+			case LIBMCDATA_ERROR_JOURNALMEMORYVARIABLECOUNTISZERO: return "JOURNALMEMORYVARIABLECOUNTISZERO";
+			case LIBMCDATA_ERROR_JOURNALMEMORYVALUECOUNTISZERO: return "JOURNALMEMORYVALUECOUNTISZERO";
+			case LIBMCDATA_ERROR_COULDNOTSEEKJOURNALSTREAM: return "COULDNOTSEEKJOURNALSTREAM";
+			case LIBMCDATA_ERROR_COULDNOTPREPAREJOURNALWRITING: return "COULDNOTPREPAREJOURNALWRITING";
+			case LIBMCDATA_ERROR_COULDNOTFINISHJOURNALWRITING: return "COULDNOTFINISHJOURNALWRITING";
+			case LIBMCDATA_ERROR_COULDNOTWRITETOJOURNALSTREAM: return "COULDNOTWRITETOJOURNALSTREAM";
+			case LIBMCDATA_ERROR_COULDNOTREADFROMJOURNALSTREAM: return "COULDNOTREADFROMJOURNALSTREAM";
+			case LIBMCDATA_ERROR_COULDNOTFULLYREADFROMJOURNALSTREAM: return "COULDNOTFULLYREADFROMJOURNALSTREAM";
+			case LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION: return "COULDGETJOURNALSTREAMPOSITION";
+			case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "INVALIDJOURNALFILEINDEX";
+			case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "JOURNALEXCEEDSMAXIMUMFILES";
 		}
 		return "UNKNOWN";
 	}
@@ -911,6 +932,23 @@ public:
 			case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIP Writing already finished.";
 			case LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT: return "Invalid build job layer count.";
 			case LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT: return "Could not determine execution count.";
+			case LIBMCDATA_ERROR_COULDNOTCREATEJOURNALFILE: return "Could not create journal file.";
+			case LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP: return "Invalid journal time stamp.";
+			case LIBMCDATA_ERROR_INVALIDJOURNALDATAOFFSET: return "Invalid journal data offset.";
+			case LIBMCDATA_ERROR_INVALIDJOURNALDATALENGTH: return "Invalid journal data length.";
+			case LIBMCDATA_ERROR_INVALIDJOURNALDATASIGNATURE: return "Invalid journal data signature.";
+			case LIBMCDATA_ERROR_JOURNALMEMORYSIZEMISMATCH: return "Invalid journal memory size mismatch.";
+			case LIBMCDATA_ERROR_JOURNALMEMORYVARIABLECOUNTISZERO: return "Invalid journal memory variable count.";
+			case LIBMCDATA_ERROR_JOURNALMEMORYVALUECOUNTISZERO: return "Invalid journal memory value count.";
+			case LIBMCDATA_ERROR_COULDNOTSEEKJOURNALSTREAM: return "Could not create seek journal stream.";
+			case LIBMCDATA_ERROR_COULDNOTPREPAREJOURNALWRITING: return "Could not prepare journal writing.";
+			case LIBMCDATA_ERROR_COULDNOTFINISHJOURNALWRITING: return "Could not finish journal writing.";
+			case LIBMCDATA_ERROR_COULDNOTWRITETOJOURNALSTREAM: return "Could not write to journal stream.";
+			case LIBMCDATA_ERROR_COULDNOTREADFROMJOURNALSTREAM: return "Could not read from journal stream.";
+			case LIBMCDATA_ERROR_COULDNOTFULLYREADFROMJOURNALSTREAM: return "Could not fully read from journal stream.";
+			case LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION: return "Could not get journal stream position.";
+			case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "Invalid journal file index.";
+			case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "Journal exceeds maxium files.";
 		}
 		return "unknown error";
 	}
@@ -1035,6 +1073,7 @@ private:
 	friend class CAlert;
 	friend class CAlertIterator;
 	friend class CAlertSession;
+	friend class CJournalChunkIntegerData;
 	friend class CJournalSession;
 	friend class CStorageStream;
 	friend class CStorageZIPWriter;
@@ -1244,6 +1283,28 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CJournalChunkIntegerData 
+**************************************************************************************************************************/
+class CJournalChunkIntegerData : public CBase {
+public:
+	
+	/**
+	* CJournalChunkIntegerData::CJournalChunkIntegerData - Constructor for JournalChunkIntegerData class.
+	*/
+	CJournalChunkIntegerData(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCData_uint32 GetChunkIndex();
+	inline LibMCData_uint64 GetStartTimeStamp();
+	inline LibMCData_uint64 GetEndTimeStamp();
+	inline void GetVariableInfo(std::vector<sJournalChunkVariableInfo> & VariableInfoBuffer);
+	inline void GetTimeStampData(std::vector<LibMCData_uint32> & TimeStampDataBuffer);
+	inline void GetValueData(std::vector<LibMCData_int64> & ValueDataBuffer);
+};
+	
+/*************************************************************************************************************************
  Class CJournalSession 
 **************************************************************************************************************************/
 class CJournalSession : public CBase {
@@ -1259,8 +1320,9 @@ public:
 	
 	inline std::string GetSessionUUID();
 	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<LibMCData_uint32> & TimeStampDataBuffer, const CInputVector<LibMCData_int64> & ValueDataBuffer);
-	inline LibMCData_uint32 GetChunkCapacity();
-	inline LibMCData_uint32 GetFlushInterval();
+	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
+	inline LibMCData_uint64 GetChunkCacheQuota();
+	inline LibMCData_uint32 GetChunkIntervalInMicroseconds();
 };
 	
 /*************************************************************************************************************************
@@ -1859,10 +1921,17 @@ public:
 		pWrapperTable->m_AlertSession_GetAlertByUUID = nullptr;
 		pWrapperTable->m_AlertSession_RetrieveAlerts = nullptr;
 		pWrapperTable->m_AlertSession_RetrieveAlertsByType = nullptr;
+		pWrapperTable->m_JournalChunkIntegerData_GetChunkIndex = nullptr;
+		pWrapperTable->m_JournalChunkIntegerData_GetStartTimeStamp = nullptr;
+		pWrapperTable->m_JournalChunkIntegerData_GetEndTimeStamp = nullptr;
+		pWrapperTable->m_JournalChunkIntegerData_GetVariableInfo = nullptr;
+		pWrapperTable->m_JournalChunkIntegerData_GetTimeStampData = nullptr;
+		pWrapperTable->m_JournalChunkIntegerData_GetValueData = nullptr;
 		pWrapperTable->m_JournalSession_GetSessionUUID = nullptr;
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = nullptr;
-		pWrapperTable->m_JournalSession_GetChunkCapacity = nullptr;
-		pWrapperTable->m_JournalSession_GetFlushInterval = nullptr;
+		pWrapperTable->m_JournalSession_ReadChunkIntegerData = nullptr;
+		pWrapperTable->m_JournalSession_GetChunkCacheQuota = nullptr;
+		pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
 		pWrapperTable->m_StorageStream_GetTimeStamp = nullptr;
 		pWrapperTable->m_StorageStream_GetContextIdentifier = nullptr;
@@ -2396,6 +2465,60 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetChunkIndex = (PLibMCDataJournalChunkIntegerData_GetChunkIndexPtr) GetProcAddress(hLibrary, "libmcdata_journalchunkintegerdata_getchunkindex");
+		#else // _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetChunkIndex = (PLibMCDataJournalChunkIntegerData_GetChunkIndexPtr) dlsym(hLibrary, "libmcdata_journalchunkintegerdata_getchunkindex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalChunkIntegerData_GetChunkIndex == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetStartTimeStamp = (PLibMCDataJournalChunkIntegerData_GetStartTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_journalchunkintegerdata_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetStartTimeStamp = (PLibMCDataJournalChunkIntegerData_GetStartTimeStampPtr) dlsym(hLibrary, "libmcdata_journalchunkintegerdata_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalChunkIntegerData_GetStartTimeStamp == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetEndTimeStamp = (PLibMCDataJournalChunkIntegerData_GetEndTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_journalchunkintegerdata_getendtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetEndTimeStamp = (PLibMCDataJournalChunkIntegerData_GetEndTimeStampPtr) dlsym(hLibrary, "libmcdata_journalchunkintegerdata_getendtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalChunkIntegerData_GetEndTimeStamp == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetVariableInfo = (PLibMCDataJournalChunkIntegerData_GetVariableInfoPtr) GetProcAddress(hLibrary, "libmcdata_journalchunkintegerdata_getvariableinfo");
+		#else // _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetVariableInfo = (PLibMCDataJournalChunkIntegerData_GetVariableInfoPtr) dlsym(hLibrary, "libmcdata_journalchunkintegerdata_getvariableinfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalChunkIntegerData_GetVariableInfo == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetTimeStampData = (PLibMCDataJournalChunkIntegerData_GetTimeStampDataPtr) GetProcAddress(hLibrary, "libmcdata_journalchunkintegerdata_gettimestampdata");
+		#else // _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetTimeStampData = (PLibMCDataJournalChunkIntegerData_GetTimeStampDataPtr) dlsym(hLibrary, "libmcdata_journalchunkintegerdata_gettimestampdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalChunkIntegerData_GetTimeStampData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetValueData = (PLibMCDataJournalChunkIntegerData_GetValueDataPtr) GetProcAddress(hLibrary, "libmcdata_journalchunkintegerdata_getvaluedata");
+		#else // _WIN32
+		pWrapperTable->m_JournalChunkIntegerData_GetValueData = (PLibMCDataJournalChunkIntegerData_GetValueDataPtr) dlsym(hLibrary, "libmcdata_journalchunkintegerdata_getvaluedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalChunkIntegerData_GetValueData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalSession_GetSessionUUID = (PLibMCDataJournalSession_GetSessionUUIDPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getsessionuuid");
 		#else // _WIN32
 		pWrapperTable->m_JournalSession_GetSessionUUID = (PLibMCDataJournalSession_GetSessionUUIDPtr) dlsym(hLibrary, "libmcdata_journalsession_getsessionuuid");
@@ -2414,21 +2537,30 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalSession_GetChunkCapacity = (PLibMCDataJournalSession_GetChunkCapacityPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getchunkcapacity");
+		pWrapperTable->m_JournalSession_ReadChunkIntegerData = (PLibMCDataJournalSession_ReadChunkIntegerDataPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_readchunkintegerdata");
 		#else // _WIN32
-		pWrapperTable->m_JournalSession_GetChunkCapacity = (PLibMCDataJournalSession_GetChunkCapacityPtr) dlsym(hLibrary, "libmcdata_journalsession_getchunkcapacity");
+		pWrapperTable->m_JournalSession_ReadChunkIntegerData = (PLibMCDataJournalSession_ReadChunkIntegerDataPtr) dlsym(hLibrary, "libmcdata_journalsession_readchunkintegerdata");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_JournalSession_GetChunkCapacity == nullptr)
+		if (pWrapperTable->m_JournalSession_ReadChunkIntegerData == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalSession_GetFlushInterval = (PLibMCDataJournalSession_GetFlushIntervalPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getflushinterval");
+		pWrapperTable->m_JournalSession_GetChunkCacheQuota = (PLibMCDataJournalSession_GetChunkCacheQuotaPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getchunkcachequota");
 		#else // _WIN32
-		pWrapperTable->m_JournalSession_GetFlushInterval = (PLibMCDataJournalSession_GetFlushIntervalPtr) dlsym(hLibrary, "libmcdata_journalsession_getflushinterval");
+		pWrapperTable->m_JournalSession_GetChunkCacheQuota = (PLibMCDataJournalSession_GetChunkCacheQuotaPtr) dlsym(hLibrary, "libmcdata_journalsession_getchunkcachequota");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_JournalSession_GetFlushInterval == nullptr)
+		if (pWrapperTable->m_JournalSession_GetChunkCacheQuota == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds = (PLibMCDataJournalSession_GetChunkIntervalInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_getchunkintervalinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds = (PLibMCDataJournalSession_GetChunkIntervalInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_journalsession_getchunkintervalinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4244,6 +4376,30 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_AlertSession_RetrieveAlertsByType == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_journalchunkintegerdata_getchunkindex", (void**)&(pWrapperTable->m_JournalChunkIntegerData_GetChunkIndex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalChunkIntegerData_GetChunkIndex == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalchunkintegerdata_getstarttimestamp", (void**)&(pWrapperTable->m_JournalChunkIntegerData_GetStartTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalChunkIntegerData_GetStartTimeStamp == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalchunkintegerdata_getendtimestamp", (void**)&(pWrapperTable->m_JournalChunkIntegerData_GetEndTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalChunkIntegerData_GetEndTimeStamp == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalchunkintegerdata_getvariableinfo", (void**)&(pWrapperTable->m_JournalChunkIntegerData_GetVariableInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalChunkIntegerData_GetVariableInfo == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalchunkintegerdata_gettimestampdata", (void**)&(pWrapperTable->m_JournalChunkIntegerData_GetTimeStampData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalChunkIntegerData_GetTimeStampData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalchunkintegerdata_getvaluedata", (void**)&(pWrapperTable->m_JournalChunkIntegerData_GetValueData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalChunkIntegerData_GetValueData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_journalsession_getsessionuuid", (void**)&(pWrapperTable->m_JournalSession_GetSessionUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetSessionUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4252,12 +4408,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_journalsession_getchunkcapacity", (void**)&(pWrapperTable->m_JournalSession_GetChunkCapacity));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetChunkCapacity == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_journalsession_readchunkintegerdata", (void**)&(pWrapperTable->m_JournalSession_ReadChunkIntegerData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_ReadChunkIntegerData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_journalsession_getflushinterval", (void**)&(pWrapperTable->m_JournalSession_GetFlushInterval));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetFlushInterval == nullptr) )
+		eLookupError = (*pLookup)("libmcdata_journalsession_getchunkcachequota", (void**)&(pWrapperTable->m_JournalSession_GetChunkCacheQuota));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetChunkCacheQuota == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalsession_getchunkintervalinmicroseconds", (void**)&(pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_storagestream_getuuid", (void**)&(pWrapperTable->m_StorageStream_GetUUID));
@@ -5531,6 +5691,85 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CJournalChunkIntegerData
+	 */
+	
+	/**
+	* CJournalChunkIntegerData::GetChunkIndex - Returns index of chunk.
+	* @return Index of the Chunk
+	*/
+	LibMCData_uint32 CJournalChunkIntegerData::GetChunkIndex()
+	{
+		LibMCData_uint32 resultChunkIndex = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetChunkIndex(m_pHandle, &resultChunkIndex));
+		
+		return resultChunkIndex;
+	}
+	
+	/**
+	* CJournalChunkIntegerData::GetStartTimeStamp - Returns start time stamp of chunk.
+	* @return Start Timestamp of the chunk (in microseconds)
+	*/
+	LibMCData_uint64 CJournalChunkIntegerData::GetStartTimeStamp()
+	{
+		LibMCData_uint64 resultStartTimeStamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetStartTimeStamp(m_pHandle, &resultStartTimeStamp));
+		
+		return resultStartTimeStamp;
+	}
+	
+	/**
+	* CJournalChunkIntegerData::GetEndTimeStamp - Returns start end stamp of chunk.
+	* @return End Timestamp of the chunk (in microseconds)
+	*/
+	LibMCData_uint64 CJournalChunkIntegerData::GetEndTimeStamp()
+	{
+		LibMCData_uint64 resultEndTimeStamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetEndTimeStamp(m_pHandle, &resultEndTimeStamp));
+		
+		return resultEndTimeStamp;
+	}
+	
+	/**
+	* CJournalChunkIntegerData::GetVariableInfo - Returns the variable information array.
+	* @param[out] VariableInfoBuffer - Variable information array. References TimeStamps and Values.
+	*/
+	void CJournalChunkIntegerData::GetVariableInfo(std::vector<sJournalChunkVariableInfo> & VariableInfoBuffer)
+	{
+		LibMCData_uint64 elementsNeededVariableInfo = 0;
+		LibMCData_uint64 elementsWrittenVariableInfo = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetVariableInfo(m_pHandle, 0, &elementsNeededVariableInfo, nullptr));
+		VariableInfoBuffer.resize((size_t) elementsNeededVariableInfo);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetVariableInfo(m_pHandle, elementsNeededVariableInfo, &elementsWrittenVariableInfo, VariableInfoBuffer.data()));
+	}
+	
+	/**
+	* CJournalChunkIntegerData::GetTimeStampData - Returns the timestamp data.
+	* @param[out] TimeStampDataBuffer - Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+	*/
+	void CJournalChunkIntegerData::GetTimeStampData(std::vector<LibMCData_uint32> & TimeStampDataBuffer)
+	{
+		LibMCData_uint64 elementsNeededTimeStampData = 0;
+		LibMCData_uint64 elementsWrittenTimeStampData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetTimeStampData(m_pHandle, 0, &elementsNeededTimeStampData, nullptr));
+		TimeStampDataBuffer.resize((size_t) elementsNeededTimeStampData);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetTimeStampData(m_pHandle, elementsNeededTimeStampData, &elementsWrittenTimeStampData, TimeStampDataBuffer.data()));
+	}
+	
+	/**
+	* CJournalChunkIntegerData::GetValueData - Returns the timestamp data.
+	* @param[out] ValueDataBuffer - Integer values. Must have same cardinality as TimeStampData.
+	*/
+	void CJournalChunkIntegerData::GetValueData(std::vector<LibMCData_int64> & ValueDataBuffer)
+	{
+		LibMCData_uint64 elementsNeededValueData = 0;
+		LibMCData_uint64 elementsWrittenValueData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetValueData(m_pHandle, 0, &elementsNeededValueData, nullptr));
+		ValueDataBuffer.resize((size_t) elementsNeededValueData);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalChunkIntegerData_GetValueData(m_pHandle, elementsNeededValueData, &elementsWrittenValueData, ValueDataBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CJournalSession
 	 */
 	
@@ -5564,27 +5803,43 @@ public:
 	}
 	
 	/**
-	* CJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.
-	* @return Maximum Chunk Capacity in Journal in Bytes
+	* CJournalSession::ReadChunkIntegerData - reads journal state data from disk.
+	* @param[in] nChunkIndex - Index of the Chunk to write. Fails if chunk index is not found.
+	* @return Journal Chunk Data Instance
 	*/
-	LibMCData_uint32 CJournalSession::GetChunkCapacity()
+	PJournalChunkIntegerData CJournalSession::ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex)
 	{
-		LibMCData_uint32 resultChunkCapacity = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetChunkCapacity(m_pHandle, &resultChunkCapacity));
+		LibMCDataHandle hIntegerData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_ReadChunkIntegerData(m_pHandle, nChunkIndex, &hIntegerData));
 		
-		return resultChunkCapacity;
+		if (!hIntegerData) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalChunkIntegerData>(m_pWrapper, hIntegerData);
 	}
 	
 	/**
-	* CJournalSession::GetFlushInterval - Returns the flush interval of the session journal.
-	* @return The interval determines how often a session journal chunk is written to disk. In Seconds.
+	* CJournalSession::GetChunkCacheQuota - Returns the chunk cache quota size in bytes.
+	* @return Maximum Chunk Capacity in Journal in Bytes
 	*/
-	LibMCData_uint32 CJournalSession::GetFlushInterval()
+	LibMCData_uint64 CJournalSession::GetChunkCacheQuota()
 	{
-		LibMCData_uint32 resultFlushInterval = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetFlushInterval(m_pHandle, &resultFlushInterval));
+		LibMCData_uint64 resultCacheQuota = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetChunkCacheQuota(m_pHandle, &resultCacheQuota));
 		
-		return resultFlushInterval;
+		return resultCacheQuota;
+	}
+	
+	/**
+	* CJournalSession::GetChunkIntervalInMicroseconds - Returns the chunk interval of the session journal in Microseconds.
+	* @return The interval determines how often a session journal chunk is written to disk.
+	*/
+	LibMCData_uint32 CJournalSession::GetChunkIntervalInMicroseconds()
+	{
+		LibMCData_uint32 resultChunkInterval = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetChunkIntervalInMicroseconds(m_pHandle, &resultChunkInterval));
+		
+		return resultChunkInterval;
 	}
 	
 	/**

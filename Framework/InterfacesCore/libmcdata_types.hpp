@@ -419,6 +419,23 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED 392 /** ZIP Writing already finished. */
 #define LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT 393 /** Invalid build job layer count. */
 #define LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT 394 /** Could not determine execution count. */
+#define LIBMCDATA_ERROR_COULDNOTCREATEJOURNALFILE 395 /** Could not create journal file. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP 396 /** Invalid journal time stamp. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALDATAOFFSET 397 /** Invalid journal data offset. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALDATALENGTH 398 /** Invalid journal data length. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALDATASIGNATURE 399 /** Invalid journal data signature. */
+#define LIBMCDATA_ERROR_JOURNALMEMORYSIZEMISMATCH 400 /** Invalid journal memory size mismatch. */
+#define LIBMCDATA_ERROR_JOURNALMEMORYVARIABLECOUNTISZERO 401 /** Invalid journal memory variable count. */
+#define LIBMCDATA_ERROR_JOURNALMEMORYVALUECOUNTISZERO 402 /** Invalid journal memory value count. */
+#define LIBMCDATA_ERROR_COULDNOTSEEKJOURNALSTREAM 403 /** Could not create seek journal stream. */
+#define LIBMCDATA_ERROR_COULDNOTPREPAREJOURNALWRITING 404 /** Could not prepare journal writing. */
+#define LIBMCDATA_ERROR_COULDNOTFINISHJOURNALWRITING 405 /** Could not finish journal writing. */
+#define LIBMCDATA_ERROR_COULDNOTWRITETOJOURNALSTREAM 406 /** Could not write to journal stream. */
+#define LIBMCDATA_ERROR_COULDNOTREADFROMJOURNALSTREAM 407 /** Could not read from journal stream. */
+#define LIBMCDATA_ERROR_COULDNOTFULLYREADFROMJOURNALSTREAM 408 /** Could not fully read from journal stream. */
+#define LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION 409 /** Could not get journal stream position. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX 410 /** Invalid journal file index. */
+#define LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES 411 /** Journal exceeds maxium files. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -750,6 +767,23 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIP Writing already finished.";
     case LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT: return "Invalid build job layer count.";
     case LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT: return "Could not determine execution count.";
+    case LIBMCDATA_ERROR_COULDNOTCREATEJOURNALFILE: return "Could not create journal file.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP: return "Invalid journal time stamp.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALDATAOFFSET: return "Invalid journal data offset.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALDATALENGTH: return "Invalid journal data length.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALDATASIGNATURE: return "Invalid journal data signature.";
+    case LIBMCDATA_ERROR_JOURNALMEMORYSIZEMISMATCH: return "Invalid journal memory size mismatch.";
+    case LIBMCDATA_ERROR_JOURNALMEMORYVARIABLECOUNTISZERO: return "Invalid journal memory variable count.";
+    case LIBMCDATA_ERROR_JOURNALMEMORYVALUECOUNTISZERO: return "Invalid journal memory value count.";
+    case LIBMCDATA_ERROR_COULDNOTSEEKJOURNALSTREAM: return "Could not create seek journal stream.";
+    case LIBMCDATA_ERROR_COULDNOTPREPAREJOURNALWRITING: return "Could not prepare journal writing.";
+    case LIBMCDATA_ERROR_COULDNOTFINISHJOURNALWRITING: return "Could not finish journal writing.";
+    case LIBMCDATA_ERROR_COULDNOTWRITETOJOURNALSTREAM: return "Could not write to journal stream.";
+    case LIBMCDATA_ERROR_COULDNOTREADFROMJOURNALSTREAM: return "Could not read from journal stream.";
+    case LIBMCDATA_ERROR_COULDNOTFULLYREADFROMJOURNALSTREAM: return "Could not fully read from journal stream.";
+    case LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION: return "Could not get journal stream position.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "Invalid journal file index.";
+    case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "Journal exceeds maxium files.";
     default: return "unknown error";
   }
 }
@@ -765,6 +799,7 @@ typedef LibMCDataHandle LibMCData_LogSession;
 typedef LibMCDataHandle LibMCData_Alert;
 typedef LibMCDataHandle LibMCData_AlertIterator;
 typedef LibMCDataHandle LibMCData_AlertSession;
+typedef LibMCDataHandle LibMCData_JournalChunkIntegerData;
 typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_StorageZIPWriter;
@@ -857,6 +892,7 @@ namespace LibMCData {
   
   typedef struct sJournalChunkVariableInfo {
       LibMCData_uint32 m_VariableIndex;
+      LibMCData_uint32 m_StorageType;
       LibMCData_uint32 m_EntryStartIndex;
       LibMCData_uint32 m_EntryCount;
   } sJournalChunkVariableInfo;

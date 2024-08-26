@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CJournalSession
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "libmcdata_journalchunkintegerdata.hpp"
 
 
 using namespace LibMCData::Impl;
@@ -62,14 +63,28 @@ void CJournalSession::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunk
     m_pJournal->WriteJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nVariableInfoBufferSize, pVariableInfoBuffer, nTimeStampDataBufferSize, pTimeStampDataBuffer, nValueDataBufferSize, pValueDataBuffer);
 }
 
-LibMCData_uint32 CJournalSession::GetChunkCapacity()
+IJournalChunkIntegerData* CJournalSession::ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex)
 {
-    return 1024 * 1024;
+    auto pResult = std::make_unique<CJournalChunkIntegerData>(nChunkIndex);
+
+    uint64_t nStartTimeStamp = 0;
+    uint64_t nEndTimeStamp = 0;
+
+    m_pJournal->ReadJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, pResult->getVariableInfoInternal(), pResult->getTimeStampsInternal(), pResult->getValueDataInternal());
+    pResult->setTimeInterval(nStartTimeStamp, nEndTimeStamp);
+
+    return pResult.release();
 }
 
-LibMCData_uint32 CJournalSession::GetFlushInterval()
+
+LibMCData_uint64 CJournalSession::GetChunkCacheQuota()
 {
-    return 10;
+    return (1024ULL * 1024ULL * 100);
+}
+
+LibMCData_uint32 CJournalSession::GetChunkIntervalInMicroseconds()
+{
+    return 5000000UL;
 }
 
 std::string CJournalSession::GetSessionUUID()

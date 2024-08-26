@@ -448,6 +448,70 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrievealerts(LibMCDa
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrievealertsbytype(LibMCData_AlertSession pAlertSession, const char * pIdentifier, bool bOnlyActive, LibMCData_AlertIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
+ Class definition for JournalChunkIntegerData
+**************************************************************************************************************************/
+
+/**
+* Returns index of chunk.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[out] pChunkIndex - Index of the Chunk
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalchunkintegerdata_getchunkindex(LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, LibMCData_uint32 * pChunkIndex);
+
+/**
+* Returns start time stamp of chunk.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[out] pStartTimeStamp - Start Timestamp of the chunk (in microseconds)
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalchunkintegerdata_getstarttimestamp(LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, LibMCData_uint64 * pStartTimeStamp);
+
+/**
+* Returns start end stamp of chunk.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[out] pEndTimeStamp - End Timestamp of the chunk (in microseconds)
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalchunkintegerdata_getendtimestamp(LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, LibMCData_uint64 * pEndTimeStamp);
+
+/**
+* Returns the variable information array.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[in] nVariableInfoBufferSize - Number of elements in buffer
+* @param[out] pVariableInfoNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pVariableInfoBuffer - JournalChunkVariableInfo  buffer of Variable information array. References TimeStamps and Values.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalchunkintegerdata_getvariableinfo(LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, const LibMCData_uint64 nVariableInfoBufferSize, LibMCData_uint64* pVariableInfoNeededCount, LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer);
+
+/**
+* Returns the timestamp data.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[in] nTimeStampDataBufferSize - Number of elements in buffer
+* @param[out] pTimeStampDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTimeStampDataBuffer - uint32  buffer of Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalchunkintegerdata_gettimestampdata(LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, const LibMCData_uint64 nTimeStampDataBufferSize, LibMCData_uint64* pTimeStampDataNeededCount, LibMCData_uint32 * pTimeStampDataBuffer);
+
+/**
+* Returns the timestamp data.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[in] nValueDataBufferSize - Number of elements in buffer
+* @param[out] pValueDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValueDataBuffer - int64  buffer of Integer values. Must have same cardinality as TimeStampData.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalchunkintegerdata_getvaluedata(LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, const LibMCData_uint64 nValueDataBufferSize, LibMCData_uint64* pValueDataNeededCount, LibMCData_int64 * pValueDataBuffer);
+
+/*************************************************************************************************************************
  Class definition for JournalSession
 **************************************************************************************************************************/
 
@@ -480,22 +544,32 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMC
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_writejournalchunkintegerdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer);
 
 /**
-* Returns the chunk capacity of the session journal.
+* reads journal state data from disk.
 *
 * @param[in] pJournalSession - JournalSession instance.
-* @param[out] pChunkCapacity - Maximum Chunk Capacity in Journal in Bytes
+* @param[in] nChunkIndex - Index of the Chunk to write. Fails if chunk index is not found.
+* @param[out] pIntegerData - Journal Chunk Data Instance
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkcapacity(LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkCapacity);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_readchunkintegerdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_JournalChunkIntegerData * pIntegerData);
 
 /**
-* Returns the flush interval of the session journal.
+* Returns the chunk cache quota size in bytes.
 *
 * @param[in] pJournalSession - JournalSession instance.
-* @param[out] pFlushInterval - The interval determines how often a session journal chunk is written to disk. In Seconds.
+* @param[out] pCacheQuota - Maximum Chunk Capacity in Journal in Bytes
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getflushinterval(LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pFlushInterval);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkcachequota(LibMCData_JournalSession pJournalSession, LibMCData_uint64 * pCacheQuota);
+
+/**
+* Returns the chunk interval of the session journal in Microseconds.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[out] pChunkInterval - The interval determines how often a session journal chunk is written to disk.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkintervalinmicroseconds(LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkInterval);
 
 /*************************************************************************************************************************
  Class definition for StorageStream

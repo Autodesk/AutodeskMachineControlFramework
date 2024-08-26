@@ -61,6 +61,7 @@ class ILogSession;
 class IAlert;
 class IAlertIterator;
 class IAlertSession;
+class IJournalChunkIntegerData;
 class IJournalSession;
 class IStorageStream;
 class IStorageZIPWriter;
@@ -601,6 +602,59 @@ typedef IBaseSharedPtr<IAlertSession> PIAlertSession;
 
 
 /*************************************************************************************************************************
+ Class interface for JournalChunkIntegerData 
+**************************************************************************************************************************/
+
+class IJournalChunkIntegerData : public virtual IBase {
+public:
+	/**
+	* IJournalChunkIntegerData::GetChunkIndex - Returns index of chunk.
+	* @return Index of the Chunk
+	*/
+	virtual LibMCData_uint32 GetChunkIndex() = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetStartTimeStamp - Returns start time stamp of chunk.
+	* @return Start Timestamp of the chunk (in microseconds)
+	*/
+	virtual LibMCData_uint64 GetStartTimeStamp() = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetEndTimeStamp - Returns start end stamp of chunk.
+	* @return End Timestamp of the chunk (in microseconds)
+	*/
+	virtual LibMCData_uint64 GetEndTimeStamp() = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetVariableInfo - Returns the variable information array.
+	* @param[in] nVariableInfoBufferSize - Number of elements in buffer
+	* @param[out] pVariableInfoNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pVariableInfoBuffer - JournalChunkVariableInfo buffer of Variable information array. References TimeStamps and Values.
+	*/
+	virtual void GetVariableInfo(LibMCData_uint64 nVariableInfoBufferSize, LibMCData_uint64* pVariableInfoNeededCount, LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer) = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetTimeStampData - Returns the timestamp data.
+	* @param[in] nTimeStampDataBufferSize - Number of elements in buffer
+	* @param[out] pTimeStampDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTimeStampDataBuffer - uint32 buffer of Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+	*/
+	virtual void GetTimeStampData(LibMCData_uint64 nTimeStampDataBufferSize, LibMCData_uint64* pTimeStampDataNeededCount, LibMCData_uint32 * pTimeStampDataBuffer) = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetValueData - Returns the timestamp data.
+	* @param[in] nValueDataBufferSize - Number of elements in buffer
+	* @param[out] pValueDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValueDataBuffer - int64 buffer of Integer values. Must have same cardinality as TimeStampData.
+	*/
+	virtual void GetValueData(LibMCData_uint64 nValueDataBufferSize, LibMCData_uint64* pValueDataNeededCount, LibMCData_int64 * pValueDataBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalChunkIntegerData> PIJournalChunkIntegerData;
+
+
+/*************************************************************************************************************************
  Class interface for JournalSession 
 **************************************************************************************************************************/
 
@@ -627,16 +681,23 @@ public:
 	virtual void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer) = 0;
 
 	/**
-	* IJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.
-	* @return Maximum Chunk Capacity in Journal in Bytes
+	* IJournalSession::ReadChunkIntegerData - reads journal state data from disk.
+	* @param[in] nChunkIndex - Index of the Chunk to write. Fails if chunk index is not found.
+	* @return Journal Chunk Data Instance
 	*/
-	virtual LibMCData_uint32 GetChunkCapacity() = 0;
+	virtual IJournalChunkIntegerData * ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) = 0;
 
 	/**
-	* IJournalSession::GetFlushInterval - Returns the flush interval of the session journal.
-	* @return The interval determines how often a session journal chunk is written to disk. In Seconds.
+	* IJournalSession::GetChunkCacheQuota - Returns the chunk cache quota size in bytes.
+	* @return Maximum Chunk Capacity in Journal in Bytes
 	*/
-	virtual LibMCData_uint32 GetFlushInterval() = 0;
+	virtual LibMCData_uint64 GetChunkCacheQuota() = 0;
+
+	/**
+	* IJournalSession::GetChunkIntervalInMicroseconds - Returns the chunk interval of the session journal in Microseconds.
+	* @return The interval determines how often a session journal chunk is written to disk.
+	*/
+	virtual LibMCData_uint32 GetChunkIntervalInMicroseconds() = 0;
 
 };
 

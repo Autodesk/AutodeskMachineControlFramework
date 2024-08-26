@@ -626,6 +626,12 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND 609 /** Binary metadata path not found */
 #define LIBMC_ERROR_JOURNALCHUNKHASTOOMANYENTRIES 610 /** Journal chunk has too many entries */
 #define LIBMC_ERROR_COULDNOTSERIALIZEJOURNALENTRIES 611 /** Could not serialize journal entries */
+#define LIBMC_ERROR_JOURNALSAMPLINGOUTSIDEOFRECORDINGINTERVAL 612 /** Journal sampling outside of recording interval */
+#define LIBMC_ERROR_JOURNALWRITINGOUTSIDEOFRECORDINGINTERVAL 613 /** Journal writing outside of recording interval */
+#define LIBMC_ERROR_JOURNALWRITINGISNOTINCREMENTAL 614 /** Journal writing is not incremental */
+#define LIBMC_ERROR_JOURNALCHUNKMEMORYEXCEEDSQUOTA 615 /** Journal chunk memory exceeds quota */
+#define LIBMC_ERROR_JOURNALCHUNKINTERNALMEMORYBOOKKEEPINGERROR 616 /** Journal chunk internal memory bookkeeping error. */
+#define LIBMC_ERROR_JOURNALCHUNKMEMORYISZERO 617 /** Journal chunk memory is zero */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1164,6 +1170,12 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND: return "Binary metadata path not found";
     case LIBMC_ERROR_JOURNALCHUNKHASTOOMANYENTRIES: return "Journal chunk has too many entries";
     case LIBMC_ERROR_COULDNOTSERIALIZEJOURNALENTRIES: return "Could not serialize journal entries";
+    case LIBMC_ERROR_JOURNALSAMPLINGOUTSIDEOFRECORDINGINTERVAL: return "Journal sampling outside of recording interval";
+    case LIBMC_ERROR_JOURNALWRITINGOUTSIDEOFRECORDINGINTERVAL: return "Journal writing outside of recording interval";
+    case LIBMC_ERROR_JOURNALWRITINGISNOTINCREMENTAL: return "Journal writing is not incremental";
+    case LIBMC_ERROR_JOURNALCHUNKMEMORYEXCEEDSQUOTA: return "Journal chunk memory exceeds quota";
+    case LIBMC_ERROR_JOURNALCHUNKINTERNALMEMORYBOOKKEEPINGERROR: return "Journal chunk internal memory bookkeeping error.";
+    case LIBMC_ERROR_JOURNALCHUNKMEMORYISZERO: return "Journal chunk memory is zero";
     default: return "unknown error";
   }
 }

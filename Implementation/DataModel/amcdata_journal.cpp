@@ -34,14 +34,115 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amcdata_sqlhandler_sqlite.hpp"
 #include "common_exportstream_native.hpp"
 
+#include <sstream>
+#include <iomanip>
+
 namespace AMCData {
 		
-	CJournal::CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath, const std::string& sSessionUUID)
-		: m_LogID(1), m_AlertID (1), m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
+	CJournalFile::CJournalFile(const std::string& sFileName, uint32_t nFileIndex)
+		: m_nFileIndex (nFileIndex)
 	{
+#if defined(_WIN32) && !defined(__MINGW32__)
+		std::wstring sUTF16FileName = AMCCommon::CUtils::UTF8toUTF16(sFileName);
+		m_Stream.open(sUTF16FileName.c_str(), std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
+#else 
+		m_Stream.open(sFileName.c_str(), std::ios::in | std::ios::out | std::ios::binary);
+#endif
+		if (m_Stream.fail())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTCREATEJOURNALFILE);
+	}
 
-		m_pJournalStream = std::make_shared<AMCCommon::CExportStream_Native>(sJournalDataPath);
+	CJournalFile::~CJournalFile()
+	{
+		m_Stream.close();
+	}
 
+	void CJournalFile::prepareReading(uint64_t nReadPosition)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_FileMutex);
+
+		std::streampos nStreamPos = nReadPosition;
+		m_Stream.seekp(nStreamPos, std::ios_base::beg);
+
+		if (m_Stream.fail())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTSEEKJOURNALSTREAM);
+	}
+
+	uint64_t CJournalFile::prepareWriting()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_FileMutex);
+		m_Stream.seekp(0, std::ios_base::end);
+
+		if (m_Stream.fail())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTSEEKJOURNALSTREAM);
+
+		m_Stream.clear();
+		if (m_Stream.fail())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTPREPAREJOURNALWRITING);
+
+		std::streampos nStreamPosition = m_Stream.tellp();
+		if (nStreamPosition < 0)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION);
+
+		return (uint64_t)nStreamPosition;
+
+	}
+
+	void CJournalFile::finishWriting()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_FileMutex);
+
+		m_Stream.flush();
+		m_Stream.clear();
+		if (m_Stream.fail())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTFINISHJOURNALWRITING);
+
+	}
+
+
+	void CJournalFile::writeBuffer(const void* pBuffer, size_t nSize)
+	{
+		if (nSize == 0)
+			return;
+		if (pBuffer == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+		const char* pChar = (const char*)pBuffer;		 
+		m_Stream.write (pChar, (std::streamsize) nSize);
+		if (m_Stream.fail())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTWRITETOJOURNALSTREAM);
+	}
+
+	void CJournalFile::readBuffer(void* pBuffer, size_t nSize)
+	{
+		if (nSize == 0)
+			return;
+		if (pBuffer == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+		char* pChar = (char*)pBuffer;
+		m_Stream.read(pChar, (std::streamsize)nSize);
+		if (m_Stream.fail())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTREADFROMJOURNALSTREAM);
+
+		std::streamsize nReadBytes = m_Stream.gcount();
+		if (nReadBytes != (std::streamsize)nSize) {
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTFULLYREADFROMJOURNALSTREAM);
+		}
+	}
+
+
+	uint32_t CJournalFile::getFileIndex()
+	{
+		return m_nFileIndex;
+	}
+
+
+	CJournal::CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath, const std::string& sSessionUUID)
+		: m_LogID(1), m_AlertID(1), m_sSessionUUID(AMCCommon::CUtils::normalizeUUIDString(sSessionUUID)),
+		m_sBaseDataFilePath(sJournalDataPath)
+	{
+		
 		m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(sJournalPath);
 
 		std::string sQuery = "CREATE TABLE `logs` (";
@@ -55,8 +156,17 @@ namespace AMCData {
 		pLogStatement->execute();
 		pLogStatement = nullptr;
 
+		std::string sJournalDataQuery = "CREATE TABLE `journal_datafiles` (";
+		sJournalDataQuery += "`fileindex` int UNIQUE NOT NULL, ";
+		sJournalDataQuery += "`filename` text NOT NULL)";
+
+		auto pJournalDataStatement = m_pSQLHandler->prepareStatement(sJournalDataQuery);
+		pJournalDataStatement->execute();
+		pJournalDataStatement = nullptr;
+
 		std::string sJournalQuery = "CREATE TABLE `journal_chunks` (";
 		sJournalQuery += "`chunkindex` int DEFAULT 0, ";
+		sJournalQuery += "`fileindex` int DEFAULT 0, ";
 		sJournalQuery += "`starttimestamp` int DEFAULT 0, ";
 		sJournalQuery += "`endtimestamp` int DEFAULT 0, ";
 		sJournalQuery += "`dataoffset` int DEFAULT 0, ";
@@ -92,11 +202,40 @@ namespace AMCData {
 		auto pAlertAckStatement = m_pSQLHandler->prepareStatement(sAlertAckQuery);
 		pAlertAckStatement->execute();
 		pAlertAckStatement = nullptr; 
+
+		m_pCurrentJournalFile = createJournalFile();
+
 	}
 
 	CJournal::~CJournal()
 	{
 
+	}
+
+	PJournalFile CJournal::createJournalFile()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
+
+		uint32_t nFileIndex = (uint32_t)m_JournalFiles.size();
+		if (nFileIndex > JOURNAL_MAXFILESPERSESSION)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES);
+
+		std::stringstream sFileNameStream;
+		sFileNameStream << m_sBaseDataFilePath << "_" << std::setw(JOURNAL_MAXFILEDIGITS) << std::setfill('0') << nFileIndex << ".dat";
+
+		std::string sFileName = sFileNameStream.str();
+		
+		std::string sQuery = "INSERT INTO journal_datafiles (fileindex, filename) VALUES (?, ?)";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setInt(1, nFileIndex);
+		pStatement->setString(2, sFileName);
+		pStatement->execute();
+		pStatement = nullptr;
+
+		auto pJournalFile = std::make_shared<CJournalFile>(sFileName, nFileIndex);
+		m_JournalFiles.push_back(pJournalFile);
+
+		return pJournalFile;
 	}
 
 	std::string CJournal::getSessionUUID()
@@ -142,7 +281,6 @@ namespace AMCData {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
 
-		uint64_t nPosition = m_pJournalStream->getPosition();
 		if ((nTimeStampDataBufferSize > 0) && (nVariableInfoBufferSize > 0)) {
 			if (pTimeStampDataBuffer == nullptr)
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -157,25 +295,105 @@ namespace AMCData {
 			uint64_t nTimeStampBufferMemSize = nTimeStampDataBufferSize * sizeof(uint32_t);
 			uint64_t nValueBufferMemSize = nValueDataBufferSize * sizeof(int64_t);
 
-			uint64_t nPosition = m_pJournalStream->getPosition();
-			m_pJournalStream->writeBuffer((const void*)pVariableInfoBuffer, nVariableBufferMemSize);
-			m_pJournalStream->writeBuffer((const void*)pTimeStampDataBuffer, nTimeStampBufferMemSize);
-			m_pJournalStream->writeBuffer((const void*)pValueDataBuffer, nValueBufferMemSize);
-			m_pJournalStream->flushStream();
+			uint64_t nTotalMemSize = sizeof(sJournalChunkHeader) + nVariableBufferMemSize + nTimeStampBufferMemSize + nValueBufferMemSize;
+
+			sJournalChunkHeader chunkHeader;
+			memset((void*)&chunkHeader, 0, sizeof(sJournalChunkHeader));
+			chunkHeader.m_nSignature = JOURNALSIGNATURE_INTEGERDATA_V1;
+			chunkHeader.m_nMemorySize = (uint32_t)(nTotalMemSize);
+			chunkHeader.m_nVariableCount = (uint32_t)nVariableInfoBufferSize;
+			chunkHeader.m_nValueCount = (uint32_t)nValueDataBufferSize;
+
+			uint64_t nPosition = m_pCurrentJournalFile->prepareWriting();
+			m_pCurrentJournalFile->writeBuffer((const void*)&chunkHeader, sizeof (chunkHeader));
+			m_pCurrentJournalFile->writeBuffer((const void*)pVariableInfoBuffer, nVariableBufferMemSize);
+			m_pCurrentJournalFile->writeBuffer((const void*)pTimeStampDataBuffer, nTimeStampBufferMemSize);
+			m_pCurrentJournalFile->writeBuffer((const void*)pValueDataBuffer, nValueBufferMemSize);
+			m_pCurrentJournalFile->finishWriting();
 
 
-			std::string sQuery = "INSERT INTO journal_chunks (chunkindex, starttimestamp, endtimestamp, dataoffset, datalength) VALUES (?, ?, ?, ?, ?)";
+			std::string sQuery = "INSERT INTO journal_chunks (chunkindex, fileindex, starttimestamp, endtimestamp, dataoffset, datalength) VALUES (?, ?, ?, ?, ?, ?)";
 			auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 			pStatement->setInt64(1, nChunkIndex);
-			pStatement->setInt64(2, nStartTimeStamp);
-			pStatement->setInt64(3, nEndTimeStamp);
-			pStatement->setInt64(4, nPosition);
-			pStatement->setInt64(5, nVariableBufferMemSize + nTimeStampBufferMemSize + nValueBufferMemSize);
+			pStatement->setInt64(2, m_pCurrentJournalFile->getFileIndex ());
+			pStatement->setInt64(3, nStartTimeStamp);
+			pStatement->setInt64(4, nEndTimeStamp);
+			pStatement->setInt64(5, nPosition);
+			pStatement->setInt64(6, nTotalMemSize);
 			pStatement->execute();
 			pStatement = nullptr; 
 		}
 
 	}
+
+	void CJournal::ReadJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, uint64_t & nStartTimeStamp, uint64_t & nEndTimeStamp, std::vector<LibMCData::sJournalChunkVariableInfo>& variableInfo, std::vector<uint32_t>& timeStampData, std::vector<int64_t>& valueData)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
+
+		std::string sQuery = "SELECT fileindex, starttimestamp, endtimestamp, dataoffset, datalength FROM journal_chunks WHERE chunkindex = ?";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setInt(1, nChunkIndex);
+		if (pStatement->nextRow()) {
+			int64_t nFileIndex = pStatement->getColumnInt64(1);
+			int64_t nStartTimeStampRaw = pStatement->getColumnInt64(2);
+			int64_t nEndTimeStampRaw = pStatement->getColumnInt64(3);
+			int64_t nDataOffset = pStatement->getColumnInt64(4);
+			int64_t nDataLength = pStatement->getColumnInt64(5);
+
+			if (nFileIndex < 0) 
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX);
+			if ((uint64_t)nFileIndex > m_JournalFiles.size ())
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX);
+			if (nStartTimeStampRaw < 0)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP);
+			if (nEndTimeStampRaw < 0)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP);
+			if (nDataOffset < 0)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALDATAOFFSET);
+			if (nDataLength < 0)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALDATALENGTH);
+
+			if (nStartTimeStampRaw > nEndTimeStampRaw)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP);
+
+			nStartTimeStamp = (uint64_t)nStartTimeStampRaw;
+			nEndTimeStamp = (uint64_t)nEndTimeStampRaw;
+
+			auto pJournalFileToRead = m_JournalFiles.at((uint64_t)nFileIndex);
+
+			pJournalFileToRead->prepareReading((uint64_t)nDataOffset);
+			sJournalChunkHeader chunkHeader;
+			
+			pJournalFileToRead->readBuffer((void*)&chunkHeader, sizeof(chunkHeader));
+			if (chunkHeader.m_nSignature != JOURNALSIGNATURE_INTEGERDATA_V1) 
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALDATASIGNATURE);
+
+			if (chunkHeader.m_nMemorySize != nDataLength)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALMEMORYSIZEMISMATCH);
+
+			if (chunkHeader.m_nVariableCount == 0)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALMEMORYVARIABLECOUNTISZERO);
+			if (chunkHeader.m_nValueCount == 0)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALMEMORYVALUECOUNTISZERO);
+
+			uint64_t nVariableBufferMemSize = (uint64_t)chunkHeader.m_nVariableCount * sizeof(LibMCData::sJournalChunkVariableInfo);
+			uint64_t nTimeStampBufferMemSize = (uint64_t)chunkHeader.m_nValueCount * sizeof(uint32_t);
+			uint64_t nValueBufferMemSize = (uint64_t)chunkHeader.m_nValueCount * sizeof(int64_t);
+	
+			uint64_t nTotalMemSize = sizeof(sJournalChunkHeader) + nVariableBufferMemSize + nTimeStampBufferMemSize + nValueBufferMemSize;
+			if (nTotalMemSize != nDataLength)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALMEMORYSIZEMISMATCH);
+
+			variableInfo.resize(chunkHeader.m_nVariableCount);
+			timeStampData.resize(chunkHeader.m_nValueCount);
+			valueData.resize(chunkHeader.m_nValueCount);
+
+			pJournalFileToRead->readBuffer((void*)variableInfo.data(), nVariableBufferMemSize);
+			pJournalFileToRead->readBuffer((void*)timeStampData.data(), nTimeStampBufferMemSize);
+			pJournalFileToRead->readBuffer((void*)valueData.data(), nValueBufferMemSize);
+		}
+	}
+
 
 	std::string CJournal::convertAlertLevelToString(const LibMCData::eAlertLevel eLevel)
 	{

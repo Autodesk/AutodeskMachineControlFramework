@@ -391,14 +391,32 @@
 		<error name="ZIPSTREAMENTRYIDNOTFOUND" code="391" description="ZIP Stream entry ID not found." />	
 		<error name="ZIPWRITINGALREADYFINISHED" code="392" description="ZIP Writing already finished." />	
 		<error name="INVALIDBUILDJOBLAYERCOUNT" code="393" description="Invalid build job layer count." />	
-		<error name="COULDNOTDETERMINEEXECUTIONCOUNT" code="394" description="Could not determine execution count." />	
-		
+		<error name="COULDNOTDETERMINEEXECUTIONCOUNT" code="394" description="Could not determine execution count." />			
+		<error name="COULDNOTCREATEJOURNALFILE" code="395" description="Could not create journal file." />	
+		<error name="INVALIDJOURNALTIMESTAMP" code="396" description="Invalid journal time stamp." />	
+		<error name="INVALIDJOURNALDATAOFFSET" code="397" description="Invalid journal data offset." />	
+		<error name="INVALIDJOURNALDATALENGTH" code="398" description="Invalid journal data length." />	
+		<error name="INVALIDJOURNALDATASIGNATURE" code="399" description="Invalid journal data signature." />	
+		<error name="JOURNALMEMORYSIZEMISMATCH" code="400" description="Invalid journal memory size mismatch." />	
+		<error name="JOURNALMEMORYVARIABLECOUNTISZERO" code="401" description="Invalid journal memory variable count." />	
+		<error name="JOURNALMEMORYVALUECOUNTISZERO" code="402" description="Invalid journal memory value count." />			
+		<error name="COULDNOTSEEKJOURNALSTREAM" code="403" description="Could not create seek journal stream." />	
+		<error name="COULDNOTPREPAREJOURNALWRITING" code="404" description="Could not prepare journal writing." />	
+		<error name="COULDNOTFINISHJOURNALWRITING" code="405" description="Could not finish journal writing." />	
+		<error name="COULDNOTWRITETOJOURNALSTREAM" code="406" description="Could not write to journal stream." />	
+		<error name="COULDNOTREADFROMJOURNALSTREAM" code="407" description="Could not read from journal stream." />	
+		<error name="COULDNOTFULLYREADFROMJOURNALSTREAM" code="408" description="Could not fully read from journal stream." />	
+		<error name="COULDGETJOURNALSTREAMPOSITION" code="409" description="Could not get journal stream position." />	
+		<error name="INVALIDJOURNALFILEINDEX" code="410" description="Invalid journal file index." />	
+		<error name="JOURNALEXCEEDSMAXIMUMFILES" code="411" description="Journal exceeds maxium files." />	
+
 		
 	</errors>
 	
 		
 	<struct name="JournalChunkVariableInfo">
 		<member name="VariableIndex" type="uint32" />
+		<member name="StorageType" type="uint32" />
 		<member name="EntryStartIndex" type="uint32" />
 		<member name="EntryCount" type="uint32" />
 	</struct>
@@ -679,12 +697,42 @@
 	</class>
 
 
+    <!-- The JournalChunkIntegerData class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="JournalChunkIntegerData" parent="Base" description="Class containing the read out value of a journal chunk">
+
+		<method name="GetChunkIndex" description="Returns index of chunk.">
+			<param name="ChunkIndex" type="uint32" pass="return" description="Index of the Chunk" />	
+		</method>		
+
+		<method name="GetStartTimeStamp" description="Returns start time stamp of chunk.">
+			<param name="StartTimeStamp" type="uint64" pass="return" description="Start Timestamp of the chunk (in microseconds)" />	
+		</method>		
+
+		<method name="GetEndTimeStamp" description="Returns start end stamp of chunk.">
+			<param name="EndTimeStamp" type="uint64" pass="return" description="End Timestamp of the chunk (in microseconds)" />	
+		</method>		
+
+		<method name="GetVariableInfo" description="Returns the variable information array.">
+			<param name="VariableInfo" type="structarray" class="JournalChunkVariableInfo" pass="out" description="Variable information array. References TimeStamps and Values." />	
+		</method>		
+
+		<method name="GetTimeStampData" description="Returns the timestamp data.">
+			<param name="TimeStampData" type="basicarray" class="uint32" pass="out" description="Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData." />	
+		</method>		
+
+		<method name="GetValueData" description="Returns the timestamp data.">
+			<param name="ValueData" type="basicarray" class="int64" pass="out" description="Integer values. Must have same cardinality as TimeStampData." />	
+		</method>		
+
+	</class>
+
+
     <!-- The JournalSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="JournalSession" parent="Base" description="Journaling Instance">
 
 		<method name="GetSessionUUID" description="retrieves the session UUID.">
 			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
-		</method>	
+		</method>
 
 		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
@@ -695,12 +743,17 @@
 			<param name="ValueData" type="basicarray" class="int64" pass="in" description="Integer values. Must have same cardinality as TimeStampData." />	
 		</method>
 		
-		<method name="GetChunkCapacity" description="Returns the chunk capacity of the session journal.">
-			<param name="ChunkCapacity" type="uint32" pass="return" description="Maximum Chunk Capacity in Journal in Bytes" />	
+		<method name="ReadChunkIntegerData" description="reads journal state data from disk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write. Fails if chunk index is not found." />	
+			<param name="IntegerData" type="class" class="JournalChunkIntegerData" pass="return" description="Journal Chunk Data Instance" />	
+		</method>		
+		
+		<method name="GetChunkCacheQuota" description="Returns the chunk cache quota size in bytes.">
+			<param name="CacheQuota" type="uint64" pass="return" description="Maximum Chunk Capacity in Journal in Bytes" />	
 		</method>
 		
-		<method name="GetFlushInterval" description="Returns the flush interval of the session journal.">
-			<param name="FlushInterval" type="uint32" pass="return" description="The interval determines how often a session journal chunk is written to disk. In Seconds." />	
+		<method name="GetChunkIntervalInMicroseconds" description="Returns the chunk interval of the session journal in Microseconds.">
+			<param name="ChunkInterval" type="uint32" pass="return" description="The interval determines how often a session journal chunk is written to disk." />	
 		</method>
 				
 	</class>

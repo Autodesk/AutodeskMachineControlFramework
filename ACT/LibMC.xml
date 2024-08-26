@@ -635,6 +635,13 @@
 		<error name="BINARYMETADATAPATHNOTFOUND" code="609" description="Binary metadata path not found" />
 		<error name="JOURNALCHUNKHASTOOMANYENTRIES" code="610" description="Journal chunk has too many entries" />				
 		<error name="COULDNOTSERIALIZEJOURNALENTRIES" code="611" description="Could not serialize journal entries" />				
+		<error name="JOURNALSAMPLINGOUTSIDEOFRECORDINGINTERVAL" code="612" description="Journal sampling outside of recording interval" />				
+		<error name="JOURNALWRITINGOUTSIDEOFRECORDINGINTERVAL" code="613" description="Journal writing outside of recording interval" />				
+		<error name="JOURNALWRITINGISNOTINCREMENTAL" code="614" description="Journal writing is not incremental" />				
+		<error name="JOURNALCHUNKMEMORYEXCEEDSQUOTA" code="615" description="Journal chunk memory exceeds quota" />				
+		<error name="JOURNALCHUNKINTERNALMEMORYBOOKKEEPINGERROR" code="616" description="Journal chunk internal memory bookkeeping error." />				
+		<error name="JOURNALCHUNKMEMORYISZERO" code="617" description="Journal chunk memory is zero" />	
+		
 		
 	</errors>
 	

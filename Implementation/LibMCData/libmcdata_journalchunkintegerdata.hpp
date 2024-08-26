@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CJournalSession
+Abstract: This is the class declaration of CJournalChunkIntegerData
 
 */
 
 
-#ifndef __LIBMCDATA_JOURNALSESSION
-#define __LIBMCDATA_JOURNALSESSION
+#ifndef __LIBMCDATA_JOURNALCHUNKINTEGERDATA
+#define __LIBMCDATA_JOURNALCHUNKINTEGERDATA
 
 #include "libmcdata_interfaces.hpp"
 
@@ -45,37 +45,56 @@ Abstract: This is the class declaration of CJournalSession
 #endif
 
 // Include custom headers here.
-#include "amcdata_journal.hpp"
+
 
 namespace LibMCData {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CJournalSession 
+ Class declaration of CJournalChunkIntegerData 
 **************************************************************************************************************************/
 
-class CJournalSession : public virtual IJournalSession, public virtual CBase {
+class CJournalChunkIntegerData : public virtual IJournalChunkIntegerData, public virtual CBase {
 private:
 
-    AMCData::PJournal m_pJournal;
+	uint32_t m_nChunkIndex;
+
+	uint64_t m_nStartTimeStamp;
+
+	uint64_t m_nEndTimeStamp;
+
+	std::vector<LibMCData::sJournalChunkVariableInfo> m_VariableInfo;
+
+	std::vector<uint32_t> m_TimeStamps;
+
+	std::vector<int64_t> m_ValueData;
 
 public:
 
-    CJournalSession(AMCData::PJournal pJournalSession);
+	CJournalChunkIntegerData(uint32_t nChunkIndex);
 
-    virtual ~CJournalSession();
+	virtual ~CJournalChunkIntegerData();
 
-    std::string GetSessionUUID() override;
+	LibMCData_uint32 GetChunkIndex() override;
 
-    void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32* pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64* pValueDataBuffer) override;
+	LibMCData_uint64 GetStartTimeStamp() override;
 
-    IJournalChunkIntegerData* ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) override;
-    
-    LibMCData_uint64 GetChunkCacheQuota() override;
+	LibMCData_uint64 GetEndTimeStamp() override;
 
-    LibMCData_uint32 GetChunkIntervalInMicroseconds() override;
+	void GetVariableInfo(LibMCData_uint64 nVariableInfoBufferSize, LibMCData_uint64* pVariableInfoNeededCount, LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer) override;
 
+	void GetTimeStampData(LibMCData_uint64 nTimeStampDataBufferSize, LibMCData_uint64* pTimeStampDataNeededCount, LibMCData_uint32 * pTimeStampDataBuffer) override;
+
+	void GetValueData(LibMCData_uint64 nValueDataBufferSize, LibMCData_uint64* pValueDataNeededCount, LibMCData_int64 * pValueDataBuffer) override;
+
+	std::vector<LibMCData::sJournalChunkVariableInfo> &getVariableInfoInternal();
+
+	std::vector<uint32_t>& getTimeStampsInternal ();
+
+	std::vector<int64_t>& getValueDataInternal();
+
+	void setTimeInterval(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp);
 };
 
 } // namespace Impl
@@ -84,4 +103,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_JOURNALSESSION
+#endif // __LIBMCDATA_JOURNALCHUNKINTEGERDATA

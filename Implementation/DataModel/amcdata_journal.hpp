@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <vector>
 #include <mutex>
+#include <fstream>
 #include <atomic>
 
 #include "amcdata_sqlhandler.hpp"
@@ -43,7 +44,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_types.hpp"
 
 namespace AMCData {
+
+	#define JOURNAL_MAXFILESPERSESSION 999999
+	#define JOURNAL_MAXFILEDIGITS 6
+
+	#define JOURNALSIGNATURE_INTEGERDATA_V1 0x83AC1001
 	
+	typedef struct {
+		uint32_t m_nSignature;
+		uint32_t m_nMemorySize;
+		uint32_t m_nVariableCount;
+		uint32_t m_nValueCount;
+		uint32_t m_nReserved[3];
+	} sJournalChunkHeader;
+
+	class CJournalFile {
+	private:
+		std::fstream m_Stream;
+		std::mutex m_FileMutex;
+
+		uint32_t m_nFileIndex;
+	public:
+
+		CJournalFile(const std::string & sFileName, uint32_t nFileIndex);
+
+		virtual ~CJournalFile();
+
+		void prepareReading (uint64_t nReadPosition);
+
+		uint64_t prepareWriting();
+
+		void finishWriting();
+
+		void writeBuffer (const void * pBuffer, size_t nSize);
+
+		void readBuffer(void* pBuffer, size_t nSize);
+
+		uint32_t getFileIndex();
+
+	};
+
+	typedef std::shared_ptr<CJournalFile> PJournalFile;
 
 	class CJournal {
 	private:
@@ -55,8 +96,14 @@ namespace AMCData {
 		std::atomic<uint32_t> m_AlertID;		
 		std::string m_sSessionUUID;
 
-		AMCCommon::PExportStream_Native m_pJournalStream;
-		
+		std::string m_sBaseDataFilePath;
+
+		std::vector<PJournalFile> m_JournalFiles;
+
+		PJournalFile m_pCurrentJournalFile;
+
+		PJournalFile createJournalFile();
+
 	public:
 
 		static std::string convertAlertLevelToString(const LibMCData::eAlertLevel eLevel);
@@ -76,6 +123,8 @@ namespace AMCData {
 		LibMCData_uint32 GetMaxLogEntryID();
 
 		void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32* pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64* pValueDataBuffer);
+
+		void ReadJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, uint64_t & nStartTimeStamp, uint64_t & nEndTimeStamp, std::vector<LibMCData::sJournalChunkVariableInfo> & variableInfo, std::vector<uint32_t> & timeStampData, std::vector<int64_t> & valueData);
 
 		AMCData::PSQLHandler getSQLHandler();
 

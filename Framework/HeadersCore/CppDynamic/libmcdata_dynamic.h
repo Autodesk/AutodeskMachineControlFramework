@@ -435,6 +435,70 @@ typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAlertsPtr) (LibMCData_A
 typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAlertsByTypePtr) (LibMCData_AlertSession pAlertSession, const char * pIdentifier, bool bOnlyActive, LibMCData_AlertIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
+ Class definition for JournalChunkIntegerData
+**************************************************************************************************************************/
+
+/**
+* Returns index of chunk.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[out] pChunkIndex - Index of the Chunk
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalChunkIntegerData_GetChunkIndexPtr) (LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, LibMCData_uint32 * pChunkIndex);
+
+/**
+* Returns start time stamp of chunk.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[out] pStartTimeStamp - Start Timestamp of the chunk (in microseconds)
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalChunkIntegerData_GetStartTimeStampPtr) (LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, LibMCData_uint64 * pStartTimeStamp);
+
+/**
+* Returns start end stamp of chunk.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[out] pEndTimeStamp - End Timestamp of the chunk (in microseconds)
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalChunkIntegerData_GetEndTimeStampPtr) (LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, LibMCData_uint64 * pEndTimeStamp);
+
+/**
+* Returns the variable information array.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[in] nVariableInfoBufferSize - Number of elements in buffer
+* @param[out] pVariableInfoNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pVariableInfoBuffer - JournalChunkVariableInfo  buffer of Variable information array. References TimeStamps and Values.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalChunkIntegerData_GetVariableInfoPtr) (LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, const LibMCData_uint64 nVariableInfoBufferSize, LibMCData_uint64* pVariableInfoNeededCount, LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer);
+
+/**
+* Returns the timestamp data.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[in] nTimeStampDataBufferSize - Number of elements in buffer
+* @param[out] pTimeStampDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTimeStampDataBuffer - uint32  buffer of Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalChunkIntegerData_GetTimeStampDataPtr) (LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, const LibMCData_uint64 nTimeStampDataBufferSize, LibMCData_uint64* pTimeStampDataNeededCount, LibMCData_uint32 * pTimeStampDataBuffer);
+
+/**
+* Returns the timestamp data.
+*
+* @param[in] pJournalChunkIntegerData - JournalChunkIntegerData instance.
+* @param[in] nValueDataBufferSize - Number of elements in buffer
+* @param[out] pValueDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValueDataBuffer - int64  buffer of Integer values. Must have same cardinality as TimeStampData.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalChunkIntegerData_GetValueDataPtr) (LibMCData_JournalChunkIntegerData pJournalChunkIntegerData, const LibMCData_uint64 nValueDataBufferSize, LibMCData_uint64* pValueDataNeededCount, LibMCData_int64 * pValueDataBuffer);
+
+/*************************************************************************************************************************
  Class definition for JournalSession
 **************************************************************************************************************************/
 
@@ -467,22 +531,32 @@ typedef LibMCDataResult (*PLibMCDataJournalSession_GetSessionUUIDPtr) (LibMCData
 typedef LibMCDataResult (*PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer);
 
 /**
-* Returns the chunk capacity of the session journal.
+* reads journal state data from disk.
 *
 * @param[in] pJournalSession - JournalSession instance.
-* @param[out] pChunkCapacity - Maximum Chunk Capacity in Journal in Bytes
+* @param[in] nChunkIndex - Index of the Chunk to write. Fails if chunk index is not found.
+* @param[out] pIntegerData - Journal Chunk Data Instance
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataJournalSession_GetChunkCapacityPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkCapacity);
+typedef LibMCDataResult (*PLibMCDataJournalSession_ReadChunkIntegerDataPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_JournalChunkIntegerData * pIntegerData);
 
 /**
-* Returns the flush interval of the session journal.
+* Returns the chunk cache quota size in bytes.
 *
 * @param[in] pJournalSession - JournalSession instance.
-* @param[out] pFlushInterval - The interval determines how often a session journal chunk is written to disk. In Seconds.
+* @param[out] pCacheQuota - Maximum Chunk Capacity in Journal in Bytes
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataJournalSession_GetFlushIntervalPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pFlushInterval);
+typedef LibMCDataResult (*PLibMCDataJournalSession_GetChunkCacheQuotaPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint64 * pCacheQuota);
+
+/**
+* Returns the chunk interval of the session journal in Microseconds.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[out] pChunkInterval - The interval determines how often a session journal chunk is written to disk.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalSession_GetChunkIntervalInMicrosecondsPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkInterval);
 
 /*************************************************************************************************************************
  Class definition for StorageStream
@@ -2587,10 +2661,17 @@ typedef struct {
 	PLibMCDataAlertSession_GetAlertByUUIDPtr m_AlertSession_GetAlertByUUID;
 	PLibMCDataAlertSession_RetrieveAlertsPtr m_AlertSession_RetrieveAlerts;
 	PLibMCDataAlertSession_RetrieveAlertsByTypePtr m_AlertSession_RetrieveAlertsByType;
+	PLibMCDataJournalChunkIntegerData_GetChunkIndexPtr m_JournalChunkIntegerData_GetChunkIndex;
+	PLibMCDataJournalChunkIntegerData_GetStartTimeStampPtr m_JournalChunkIntegerData_GetStartTimeStamp;
+	PLibMCDataJournalChunkIntegerData_GetEndTimeStampPtr m_JournalChunkIntegerData_GetEndTimeStamp;
+	PLibMCDataJournalChunkIntegerData_GetVariableInfoPtr m_JournalChunkIntegerData_GetVariableInfo;
+	PLibMCDataJournalChunkIntegerData_GetTimeStampDataPtr m_JournalChunkIntegerData_GetTimeStampData;
+	PLibMCDataJournalChunkIntegerData_GetValueDataPtr m_JournalChunkIntegerData_GetValueData;
 	PLibMCDataJournalSession_GetSessionUUIDPtr m_JournalSession_GetSessionUUID;
 	PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr m_JournalSession_WriteJournalChunkIntegerData;
-	PLibMCDataJournalSession_GetChunkCapacityPtr m_JournalSession_GetChunkCapacity;
-	PLibMCDataJournalSession_GetFlushIntervalPtr m_JournalSession_GetFlushInterval;
+	PLibMCDataJournalSession_ReadChunkIntegerDataPtr m_JournalSession_ReadChunkIntegerData;
+	PLibMCDataJournalSession_GetChunkCacheQuotaPtr m_JournalSession_GetChunkCacheQuota;
+	PLibMCDataJournalSession_GetChunkIntervalInMicrosecondsPtr m_JournalSession_GetChunkIntervalInMicroseconds;
 	PLibMCDataStorageStream_GetUUIDPtr m_StorageStream_GetUUID;
 	PLibMCDataStorageStream_GetTimeStampPtr m_StorageStream_GetTimeStamp;
 	PLibMCDataStorageStream_GetContextIdentifierPtr m_StorageStream_GetContextIdentifier;
