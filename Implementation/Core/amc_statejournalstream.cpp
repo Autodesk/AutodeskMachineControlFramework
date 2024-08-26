@@ -291,7 +291,7 @@ namespace AMC {
 				return m_ValueBuffer.at (startIndex + count - 1); // If nTimeStamp is beyond the last timestamp
 			}
 
-			if (*it == nTimeOffset) {
+			if (*it == (uint32_t)nRelativeTime) {
 				return m_ValueBuffer.at (it - m_TimeStampBuffer.begin());
 			}
 
