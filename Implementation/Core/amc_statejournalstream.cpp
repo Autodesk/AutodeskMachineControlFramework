@@ -98,10 +98,9 @@ namespace AMC {
 		int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) override
 		{
 			if ((nAbsoluteTimeStampInMicroseconds < m_nStartTimeStampInMicroSeconds) || (nAbsoluteTimeStampInMicroseconds > m_nEndTimeStampInMicroSeconds))
-				throw ELibMCInterfaceException (LIBMC_ERROR_JOURNALSAMPLINGOUTSIDEOFRECORDINGINTERVAL);
+				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALSAMPLINGOUTSIDEOFRECORDINGINTERVAL, "Journal sampling at " + std::to_string(nAbsoluteTimeStampInMicroseconds) + " outside of in dynamic recording interval [" + std::to_string(m_nStartTimeStampInMicroSeconds) + ".." + std::to_string(m_nEndTimeStampInMicroSeconds) + "], chunk#" + std::to_string (m_nChunkIndex));
 
-			uint64_t nTimeOffset = m_nStartTimeStampInMicroSeconds;
-			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - nTimeOffset;
+			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - m_nStartTimeStampInMicroSeconds;
 
 			if (nStorageIndex >= m_Data.size())
 				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND);
@@ -127,14 +126,13 @@ namespace AMC {
 				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND);
 
 			if ((nAbsoluteTimeStampInMicroseconds < m_nStartTimeStampInMicroSeconds) || (nAbsoluteTimeStampInMicroseconds > m_nEndTimeStampInMicroSeconds))
-				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALWRITINGOUTSIDEOFRECORDINGINTERVAL);
+				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALWRITINGOUTSIDEOFRECORDINGINTERVAL, "Journal writing at " + std::to_string(nAbsoluteTimeStampInMicroseconds) + " outside of in dynamic interval [" + std::to_string(m_nStartTimeStampInMicroSeconds) + ".." + std::to_string(m_nEndTimeStampInMicroSeconds) + "] chunk#" + std::to_string (m_nChunkIndex));
 
 			if (nAbsoluteTimeStampInMicroseconds < m_nCurrentTimeStampInMicroSeconds)
 				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALWRITINGISNOTINCREMENTAL);
 
 			m_nCurrentTimeStampInMicroSeconds = nAbsoluteTimeStampInMicroseconds;
-			uint64_t nTimeOffset = m_nStartTimeStampInMicroSeconds;
-			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - nTimeOffset;
+			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - m_nStartTimeStampInMicroSeconds;
 
 			m_Data[nStorageIndex][(uint32_t)nRelativeTime] = nValue;
 		}
@@ -219,7 +217,7 @@ namespace AMC {
 
 			pDynamicChunk->serialize(m_VariableBuffer, m_TimeStampBuffer, m_ValueBuffer);
 
-			//std::cout << "creating in memory chunk " << m_nChunkIndex << ":  " << std::endl;				
+			//std::cout << "creating in memory chunk " << m_n<< << ":  " << std::endl;				
 		}
 
 		CStateJournalStreamChunk_InMemory(LibMCData::PJournalChunkIntegerData pIntegerData)
@@ -274,17 +272,16 @@ namespace AMC {
 				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND);
 
 			if ((nAbsoluteTimeStampInMicroseconds < m_nStartTimeStampInMicroSeconds) || (nAbsoluteTimeStampInMicroseconds > m_nEndTimeStampInMicroSeconds))
-				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALWRITINGOUTSIDEOFRECORDINGINTERVAL);
+				throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALSAMPLINGOUTSIDEOFRECORDINGINTERVAL, "Journal sampling at " + std::to_string(nAbsoluteTimeStampInMicroseconds) + " outside of in memory recording interval [" + std::to_string(m_nStartTimeStampInMicroSeconds) + ".." + std::to_string(m_nEndTimeStampInMicroSeconds) + "], chunk#" + std::to_string(m_nChunkIndex));
 
-			uint64_t nTimeOffset = m_nStartTimeStampInMicroSeconds;
-			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - nTimeOffset;
+			uint64_t nRelativeTime = nAbsoluteTimeStampInMicroseconds - m_nStartTimeStampInMicroSeconds;
 
 			auto & variableInfo = m_VariableBuffer.at (nStorageIndex);
 
 			size_t startIndex = variableInfo.m_EntryStartIndex;
 			size_t count = variableInfo.m_EntryCount;
 
-			auto it = std::lower_bound(m_TimeStampBuffer.begin() + startIndex, m_TimeStampBuffer.begin() + startIndex + count, nRelativeTime);
+			auto it = std::lower_bound(m_TimeStampBuffer.begin() + startIndex, m_TimeStampBuffer.begin() + startIndex + count, (uint32_t)nRelativeTime);
 
 			if (it == m_TimeStampBuffer.begin() + startIndex) {
 				return m_ValueBuffer.at(startIndex); // If nTimeStamp is before the first timestamp
