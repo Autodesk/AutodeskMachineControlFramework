@@ -133,20 +133,19 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     // Store Database type after successful initialisation
     m_eDataBaseType = dataBaseType;
 
-    auto sJournalPath = m_pStorageState->getJournalPath(m_sTimeFileName);
-    auto sJournalDataPath = m_pStorageState->getJournalDataPath(m_sTimeFileName);
+    auto sJournalBasePath = m_pStorageState->getJournalBasePath(m_sTimeFileName);
     auto sJournalName = m_pStorageState->getJournalFileName(m_sTimeFileName);
-    auto sJournalDataName = m_pStorageState->getJournalDataFileName(m_sTimeFileName);
+    auto sJournalChunkBaseName = m_pStorageState->getJournalChunkBaseName(m_sTimeFileName);
 
-    m_pJournal = std::make_shared<AMCData::CJournal>(sJournalPath, sJournalDataPath, m_sSessionUUID);
+    m_pJournal = std::make_shared<AMCData::CJournal> (sJournalBasePath, sJournalName, sJournalChunkBaseName, m_sSessionUUID);
 
     auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion) VALUES (?, ?, ?, ?, ?, ?, ?)");
     pStatement->setString(1, m_sSessionUUID);
     pStatement->setString(2, m_sStartTime);
     pStatement->setString(3, sJournalName);
-    pStatement->setString(4, sJournalDataName);
-    pStatement->setString(5, sJournalPath);
-    pStatement->setString(6, sJournalDataPath);
+    pStatement->setString(4, sJournalChunkBaseName);
+    pStatement->setString(5, "");
+    pStatement->setString(6, "");
     pStatement->setInt(7, m_pJournal->getSchemaVersion ());
     pStatement->execute();
 

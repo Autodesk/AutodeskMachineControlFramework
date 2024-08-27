@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCData {
 		
 	CJournalFile::CJournalFile(const std::string& sFileName, uint32_t nFileIndex)
-		: m_nFileIndex (nFileIndex)
+		: m_nFileIndex (nFileIndex), m_nTotalSize (0)
 	{
 #if defined(_WIN32) && !defined(__MINGW32__)
 		std::wstring sUTF16FileName = AMCCommon::CUtils::UTF8toUTF16(sFileName);
@@ -111,6 +111,8 @@ namespace AMCData {
 		m_Stream.write (pChar, (std::streamsize) nSize);
 		if (m_Stream.fail())
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTWRITETOJOURNALSTREAM);
+
+		m_nTotalSize += nSize;
 	}
 
 	void CJournalFile::readBuffer(void* pBuffer, size_t nSize)
@@ -137,13 +139,18 @@ namespace AMCData {
 		return m_nFileIndex;
 	}
 
+	uint64_t CJournalFile::getTotalSize()
+	{
+		return m_nTotalSize;
+	}
 
-	CJournal::CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath, const std::string& sSessionUUID)
+	CJournal::CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string& sSessionUUID)
 		: m_LogID(1), m_AlertID(1), m_sSessionUUID(AMCCommon::CUtils::normalizeUUIDString(sSessionUUID)),
-		m_sBaseDataFilePath(sJournalDataPath)
+		m_sJournalBasePath(sJournalBasePath), m_sChunkBaseName (sJournalChunkBaseName),
+		m_nMaxChunkFileSize (1024ULL * 1024ULL * 2ULL)
 	{
 		
-		m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(sJournalPath);
+		m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(m_sJournalBasePath + sJournalName);
 
 		std::string sQuery = "CREATE TABLE `logs` (";
 		sQuery += "`logindex`	int DEFAULT 0, ";
@@ -214,14 +221,12 @@ namespace AMCData {
 
 	PJournalFile CJournal::createJournalFile()
 	{
-		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
-
 		uint32_t nFileIndex = (uint32_t)m_JournalFiles.size();
 		if (nFileIndex > JOURNAL_MAXFILESPERSESSION)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES);
 
 		std::stringstream sFileNameStream;
-		sFileNameStream << m_sBaseDataFilePath << "_" << std::setw(JOURNAL_MAXFILEDIGITS) << std::setfill('0') << nFileIndex << ".dat";
+		sFileNameStream << m_sChunkBaseName << std::setw(JOURNAL_MAXFILEDIGITS) << std::setfill('0') << nFileIndex << ".data";
 
 		std::string sFileName = sFileNameStream.str();
 		
@@ -232,7 +237,7 @@ namespace AMCData {
 		pStatement->execute();
 		pStatement = nullptr;
 
-		auto pJournalFile = std::make_shared<CJournalFile>(sFileName, nFileIndex);
+		auto pJournalFile = std::make_shared<CJournalFile>(m_sJournalBasePath + sFileName, nFileIndex);
 		m_JournalFiles.push_back(pJournalFile);
 
 		return pJournalFile;
@@ -282,6 +287,10 @@ namespace AMCData {
 		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
 
 		if ((nTimeStampDataBufferSize > 0) && (nVariableInfoBufferSize > 0)) {
+
+			if (m_pCurrentJournalFile->getTotalSize() > m_nMaxChunkFileSize)
+				m_pCurrentJournalFile = createJournalFile();
+
 			if (pTimeStampDataBuffer == nullptr)
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 			if (pValueDataBuffer == nullptr)

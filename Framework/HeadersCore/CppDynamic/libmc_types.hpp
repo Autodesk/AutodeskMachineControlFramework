@@ -632,6 +632,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_JOURNALCHUNKMEMORYEXCEEDSQUOTA 615 /** Journal chunk memory exceeds quota */
 #define LIBMC_ERROR_JOURNALCHUNKINTERNALMEMORYBOOKKEEPINGERROR 616 /** Journal chunk internal memory bookkeeping error. */
 #define LIBMC_ERROR_JOURNALCHUNKMEMORYISZERO 617 /** Journal chunk memory is zero */
+#define LIBMC_ERROR_JOURNALRECORDINGCHUNKISEMPTY 618 /** Journal recording chunk is empty. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1176,6 +1177,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_JOURNALCHUNKMEMORYEXCEEDSQUOTA: return "Journal chunk memory exceeds quota";
     case LIBMC_ERROR_JOURNALCHUNKINTERNALMEMORYBOOKKEEPINGERROR: return "Journal chunk internal memory bookkeeping error.";
     case LIBMC_ERROR_JOURNALCHUNKMEMORYISZERO: return "Journal chunk memory is zero";
+    case LIBMC_ERROR_JOURNALRECORDINGCHUNKISEMPTY: return "Journal recording chunk is empty.";
     default: return "unknown error";
   }
 }

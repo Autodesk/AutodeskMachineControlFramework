@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <queue>
 #include <unordered_map>
+#include "amc_logger.hpp"
 
 #include "Common/common_exportstream_native.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -90,9 +91,12 @@ namespace AMC {
 	class CStateJournalStreamChunk
 	{
 	private:
+		AMC::PLogger m_pDebugLogger;
+
 	public:
 
-		CStateJournalStreamChunk();
+		// pDebugLogger may be null
+		CStateJournalStreamChunk(AMC::PLogger pDebugLogger);
 
 		virtual ~CStateJournalStreamChunk();
 
@@ -104,6 +108,7 @@ namespace AMC {
 
 		virtual int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) = 0;
 		
+		void debugLog(const std::string & sDebugMessage);
 
 	};
 
@@ -122,6 +127,9 @@ namespace AMC {
 
 		uint64_t m_nMemoryUsage;
 		uint64_t m_nMemoryQuota;
+
+		// Debug Logger Object, May be null
+		PLogger m_pDebugLogger;
 
 		// General Mutex for the cache
 		std::mutex m_CacheMutex;
@@ -147,7 +155,7 @@ namespace AMC {
 
 	public:
 
-		CStateJournalStreamCache(uint64_t nMemoryQuota, LibMCData::PJournalSession pJournalSession);
+		CStateJournalStreamCache(uint64_t nMemoryQuota, LibMCData::PJournalSession pJournalSession, PLogger pDebugLogger);
 
 		virtual ~CStateJournalStreamCache();
 
@@ -174,6 +182,9 @@ namespace AMC {
 		std::mutex m_ChunkChangeMutex;
 		PStateJournalStreamChunk_Dynamic m_pCurrentChunk;
 
+		// Optional Debug logger, maybe optional
+		PLogger m_pDebugLogger;
+
 		// Memory Stream Cache
 		PStateJournalStreamCache m_Cache;
 
@@ -198,7 +209,7 @@ namespace AMC {
 		void ensureChunk(const uint64_t nAbsoluteTimeStampInMicroseconds);
 
 	public:
-		CStateJournalStream(LibMCData::PJournalSession pJournalSession);
+		CStateJournalStream(LibMCData::PJournalSession pJournalSession, PLogger pDebugLogger);
 		virtual ~CStateJournalStream();
 
 		virtual void writeBool_MicroSecond(const uint64_t nAbsoluteTimeStampInMicroseconds, const uint32_t nStorageIndex, bool bValue);

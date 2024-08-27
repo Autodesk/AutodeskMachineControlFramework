@@ -38,10 +38,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCData {
 		
 	CStorageState::CStorageState(const std::string& sDataPath, const std::string& sSessionUUID)
-		: m_sDataPath (sDataPath), m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
+		: m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
 	{
 		if (sDataPath.empty())
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+		m_sDataPath = sDataPath;
+
+		// Replace all backslashes with slashes
+		for (char& c : m_sDataPath) {
+			if (c == '\\') {
+				c = '/';
+			}
+		}
+
+		// Remove trailing slash if it exists
+		if (m_sDataPath.back() == '/') {
+			m_sDataPath.pop_back();
+		}
+
 	}
 
 	CStorageState::~CStorageState()
@@ -54,14 +69,9 @@ namespace AMCData {
 		return m_sDataPath + "/" + AMCCommon::CUtils::normalizeUUIDString(sStreamUUID) + ".stream";
 	}
 
-	std::string CStorageState::getJournalPath(const std::string& sTimeFileName)
-	{		
-		return m_sDataPath + "/" + getJournalFileName (sTimeFileName);
-	}
-
-	std::string CStorageState::getJournalDataPath(const std::string& sTimeFileName)
+	std::string CStorageState::getJournalBasePath(const std::string& sTimeFileName)
 	{
-		return m_sDataPath + "/" + getJournalDataFileName (sTimeFileName);
+		return m_sDataPath + "/";
 	}
 
 	std::string CStorageState::getJournalFileName(const std::string& sTimeFileName)
@@ -69,9 +79,9 @@ namespace AMCData {
 		return "journal_" + sTimeFileName + ".db";
 	}
 
-	std::string CStorageState::getJournalDataFileName(const std::string& sTimeFileName)
+	std::string CStorageState::getJournalChunkBaseName(const std::string& sTimeFileName)
 	{
-		return "journal_" + sTimeFileName + ".data";
+		return "journal_" + sTimeFileName + "_chunk";
 	}
 
 	std::string CStorageState::getSessionUUID()

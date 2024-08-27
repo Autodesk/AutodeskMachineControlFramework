@@ -64,6 +64,7 @@ namespace AMCData {
 		std::mutex m_FileMutex;
 
 		uint32_t m_nFileIndex;
+		uint64_t m_nTotalSize;
 	public:
 
 		CJournalFile(const std::string & sFileName, uint32_t nFileIndex);
@@ -82,6 +83,8 @@ namespace AMCData {
 
 		uint32_t getFileIndex();
 
+		uint64_t getTotalSize();
+
 	};
 
 	typedef std::shared_ptr<CJournalFile> PJournalFile;
@@ -96,7 +99,10 @@ namespace AMCData {
 		std::atomic<uint32_t> m_AlertID;		
 		std::string m_sSessionUUID;
 
-		std::string m_sBaseDataFilePath;
+		std::string m_sJournalBasePath;
+		std::string m_sChunkBaseName;
+
+		uint64_t m_nMaxChunkFileSize;
 
 		std::vector<PJournalFile> m_JournalFiles;
 
@@ -110,7 +116,7 @@ namespace AMCData {
 		
 		static LibMCData::eAlertLevel convertStringToAlertLevel(const std::string & sValue, bool bFailIfUnknown);
 
-		CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath, const std::string & sSessionUUID);
+		CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string & sSessionUUID);
 
 		virtual ~CJournal();
 

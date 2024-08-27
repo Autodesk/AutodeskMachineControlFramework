@@ -641,6 +641,7 @@
 		<error name="JOURNALCHUNKMEMORYEXCEEDSQUOTA" code="615" description="Journal chunk memory exceeds quota" />				
 		<error name="JOURNALCHUNKINTERNALMEMORYBOOKKEEPINGERROR" code="616" description="Journal chunk internal memory bookkeeping error." />				
 		<error name="JOURNALCHUNKMEMORYISZERO" code="617" description="Journal chunk memory is zero" />	
+		<error name="JOURNALRECORDINGCHUNKISEMPTY" code="618" description="Journal recording chunk is empty." />	
 		
 		
 	</errors>
