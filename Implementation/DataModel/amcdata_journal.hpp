@@ -101,9 +101,7 @@ namespace AMCData {
 
 		std::string m_sJournalBasePath;
 		std::string m_sChunkBaseName;
-
-		uint64_t m_nMaxChunkFileSize;
-
+		
 		std::vector<PJournalFile> m_JournalFiles;
 
 		PJournalFile m_pCurrentJournalFile;
@@ -156,6 +154,13 @@ namespace AMCData {
 
 		void acknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimeStampUTC);
 		void deactivateAlert(const std::string& sAlertUUID);
+
+		uint64_t getChunkIntervalInMicroseconds ();
+
+		uint64_t getMaxMemoryQuotaInBytes ();
+
+		uint64_t getMaxChunkFileSizeQuotaInBytes ();
+
 	};
 
 	typedef std::shared_ptr<CJournal> PJournal;

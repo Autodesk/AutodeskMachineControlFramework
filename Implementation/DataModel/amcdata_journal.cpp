@@ -146,8 +146,7 @@ namespace AMCData {
 
 	CJournal::CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string& sSessionUUID)
 		: m_LogID(1), m_AlertID(1), m_sSessionUUID(AMCCommon::CUtils::normalizeUUIDString(sSessionUUID)),
-		m_sJournalBasePath(sJournalBasePath), m_sChunkBaseName (sJournalChunkBaseName),
-		m_nMaxChunkFileSize (1024ULL * 1024ULL * 2ULL)
+		m_sJournalBasePath(sJournalBasePath), m_sChunkBaseName (sJournalChunkBaseName)		
 	{
 		
 		m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(m_sJournalBasePath + sJournalName);
@@ -288,7 +287,7 @@ namespace AMCData {
 
 		if ((nTimeStampDataBufferSize > 0) && (nVariableInfoBufferSize > 0)) {
 
-			if (m_pCurrentJournalFile->getTotalSize() > m_nMaxChunkFileSize)
+			if (m_pCurrentJournalFile->getTotalSize() > getMaxChunkFileSizeQuotaInBytes ())
 				m_pCurrentJournalFile = createJournalFile();
 
 			if (pTimeStampDataBuffer == nullptr)
@@ -713,6 +712,20 @@ namespace AMCData {
 
 	}
 
+	uint64_t CJournal::getChunkIntervalInMicroseconds()
+	{
+		return 10ULL * 1000000ULL; // 10 seconds chunk interval
+	}
+
+	uint64_t CJournal::getMaxMemoryQuotaInBytes()
+	{
+		return (1024ULL * 1024ULL * 1024ULL); // 1GB Memory Quota for caching chunks
+	}
+
+	uint64_t CJournal::getMaxChunkFileSizeQuotaInBytes()
+	{
+		return (512ULL * 1024ULL * 1024ULL); // create many 512MB files on disk
+	}
 }
 
 

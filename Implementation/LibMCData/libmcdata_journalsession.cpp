@@ -79,12 +79,12 @@ IJournalChunkIntegerData* CJournalSession::ReadChunkIntegerData(const LibMCData_
 
 LibMCData_uint64 CJournalSession::GetChunkCacheQuota()
 {
-    return (1024ULL * 1024ULL * 2);
+    m_pJournal->getMaxMemoryQuotaInBytes();
 }
 
 LibMCData_uint32 CJournalSession::GetChunkIntervalInMicroseconds()
 {
-    return 500000UL;
+    m_pJournal->getChunkIntervalInMicroseconds();
 }
 
 std::string CJournalSession::GetSessionUUID()
