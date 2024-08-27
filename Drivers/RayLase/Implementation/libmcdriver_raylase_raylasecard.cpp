@@ -173,7 +173,7 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
     double dUnits = pToolpathAccessor->GetUnits();
 
     rlListHandle listHandle = m_pSDK->rlListAllocate(m_Handle);
-    m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(listHandle), "rlListAppendLaserOn");
+    //m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(listHandle), "rlListAppendLaserOn");
 
     uint32_t nSegmentCount = pLayer->GetSegmentCount();
     for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
@@ -199,7 +199,7 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
 
             m_pSDK->checkError(m_pSDK->rlListAppendJumpSpeed(listHandle, dJumpSpeedInMeterPerSecond), "rlListAppendJumpSpeed");
             m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(listHandle, dMarkSpeedInMeterPerSecond), "rlListAppendMarkSpeed");
-            m_pSDK->checkError(m_pSDK->rlListAppendPower(listHandle, nPowerInUnits), "rlListAppendPower");
+            //m_pSDK->checkError(m_pSDK->rlListAppendPower(listHandle, nPowerInUnits), "rlListAppendPower");
 
 
             std::vector<LibMCEnv::sPosition2D> Points;
@@ -266,7 +266,7 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
 
     }
 
-    m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(listHandle), "rlListAppendLaserOff");
+    //m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(listHandle), "rlListAppendLaserOff");
 
     m_pSDK->checkError(m_pSDK->rlListSet(m_Handle, 0, listHandle, false, -1), "rlListSet");
     m_pSDK->checkError(m_pSDK->rlListExecute(m_Handle, 0), "rlListExecute");
@@ -276,34 +276,6 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
     m_pSDK->checkError(m_pSDK->rlListWaitForListDone(m_Handle, timeoutMs, done, listID), "rlListWaitForListDone");
     m_pSDK->checkError(m_pSDK->rlListDelete(m_Handle, 0, true), "rlListDelete");
     m_pSDK->checkError(m_pSDK->rlListReleaseHandle(listHandle), "rlListReleaseHandle");
-
-
-    /*
-
-    double squareSize = 50000.0;
-
-    for (uint32_t nIndex = 0; nIndex < 100; nIndex++) {
-
-        rlListHandle listHandle = m_pSDK->rlListAllocate(m_Handle);
-        m_pSDK->checkError(m_pSDK->rlListAppendJumpSpeed(listHandle, 1.0));
-        m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(listHandle, 0.05));
-        m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(listHandle, -squareSize, -squareSize));
-        m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, squareSize, -squareSize));
-        m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, squareSize, squareSize));
-        m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, -squareSize, squareSize));
-        m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, -squareSize, -squareSize));
-        m_pSDK->checkError(m_pSDK->rlListSet(m_Handle, 0, listHandle, false, -1));
-        m_pSDK->checkError(m_pSDK->rlListExecute(m_Handle, 0));
-        int timeoutMs = 30000;
-        bool done = false;
-        int32_t listID = 0;
-        m_pSDK->checkError(m_pSDK->rlListWaitForListDone(m_Handle, timeoutMs, done, listID));
-        m_pSDK->checkError(m_pSDK->rlListDelete(m_Handle, 0, true));
-        m_pSDK->checkError(m_pSDK->rlListReleaseHandle(listHandle));
-
-    }
-
-    */
 
 
 }

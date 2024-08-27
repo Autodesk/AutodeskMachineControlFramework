@@ -93,7 +93,21 @@ namespace LibMCDriver_Raylase {
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListWaitForListIdle) (rlHandle handle, int32_t timeOutInMilliseconds, bool & successful, int32_t & listID);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListWaitForListDone) (rlHandle handle, int32_t timeOutInMilliseconds, bool& successful, int32_t& listID);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListDelete) (rlHandle handle, int32_t listID, bool bFromDisk);
-		
+
+		typedef void(RAYLASE_CALLINGCONVENTION* PrlGetLastError) (char * pBuffer, int32_t nBufferSize);
+		typedef int32_t(RAYLASE_CALLINGCONVENTION* PrlGetLastErrorLen) ();
+
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* rlEnableCommandLogging) (rlHandle handle, const char* pszPath, int32_t truncateArguments);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* rlDisableCommandLogging) (rlHandle handle);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* rlSetTimeout) (rlHandle handle, uint32_t nTimeOut);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* rlGetTimeout) (rlHandle handle, uint32_t* pnTimeOut);
+
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* rlConfigurationBeginUpdate) (rlHandle handle);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* rlConfigurationEndUpdate) (rlHandle handle);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* rlConfigurationAbortUpdate) (rlHandle handle);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* rlConfigurationIsUpdateActive) (rlHandle handle, uint32_t * pbIsActive);
+
+
 		class CRaylaseSDK {
 		private:
 			void* m_LibraryHandle;
@@ -131,6 +145,9 @@ namespace LibMCDriver_Raylase {
 			PrlListWaitForListIdle rlListWaitForListIdle = nullptr;
 			PrlListWaitForListDone rlListWaitForListDone = nullptr;
 			PrlListDelete rlListDelete = nullptr;
+
+			PrlGetLastError rlGetLastError = nullptr;
+			PrlGetLastErrorLen rlGetLastErrorLen = nullptr;
 
 			CRaylaseSDK(const std::string & sDLLNameUTF8);
 			~CRaylaseSDK();

@@ -129,6 +129,8 @@ CRaylaseSDK::CRaylaseSDK(const std::string& sDLLNameUTF8)
 	this->rlListWaitForListIdle = (PrlListWaitForListIdle)_loadRaylaseAddress(hLibrary, "rlListWaitForListIdle");
 	this->rlListWaitForListDone = (PrlListWaitForListDone)_loadRaylaseAddress(hLibrary, "rlListWaitForListDone");
 	this->rlListDelete = (PrlListDelete)_loadRaylaseAddress(hLibrary, "rlListDelete");
+	this->rlGetLastError = (PrlGetLastError)_loadRaylaseAddress(hLibrary, "rlGetLastError");
+	this->rlGetLastErrorLen = (PrlGetLastErrorLen)_loadRaylaseAddress(hLibrary, "rlGetLastErrorLen");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -153,10 +155,29 @@ CRaylaseSDK::~CRaylaseSDK()
 
 void CRaylaseSDK::checkError(int32_t statusCode, const std::string& sDebugMessage)
 {
-	if (statusCode != 0) {
-		std::string sErrorMessage = "Raylase Error: " + std::to_string(statusCode);
+		if (statusCode != 0) {
+		std::string sErrorMessage = "Raylase Error " + std::to_string(statusCode) + " (";
+		if ((rlGetLastErrorLen != nullptr) && (rlGetLastError != nullptr)) {
+			int32_t nLength = rlGetLastErrorLen();
+			if (nLength > 0) {
+				std::vector<char> messageBuffer;
+				messageBuffer.resize(nLength + 2);
+
+				rlGetLastError(messageBuffer.data(), nLength + 1);
+				messageBuffer.at(nLength) = 0;
+
+				sErrorMessage += std::string(messageBuffer.data());
+			}
+			else {
+				sErrorMessage += "<unknown error>";
+			}
+
+		}
+
 		if (!sDebugMessage.empty ())
-			sErrorMessage += " (" + sDebugMessage + ")";
+			sErrorMessage += " - " + sDebugMessage;
+		sErrorMessage += ")";
+
 		throw std::runtime_error(sErrorMessage);
 	}
 }
@@ -195,6 +216,8 @@ void CRaylaseSDK::resetFunctionPtrs()
 	rlListWaitForListIdle = nullptr;
 	rlListWaitForListDone = nullptr;
 	rlListDelete = nullptr;
+	rlGetLastError = nullptr;
+	rlGetLastErrorLen = nullptr;
 
 }
 
