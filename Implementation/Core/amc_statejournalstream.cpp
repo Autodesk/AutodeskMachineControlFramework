@@ -580,8 +580,9 @@ namespace AMC {
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 		
 		m_nChunkIntervalInMicroseconds = pJournalSession->GetChunkIntervalInMicroseconds();
+		uint64_t nCacheMemoryQuota = pJournalSession->GetChunkCacheQuota();
 
-		m_Cache = std::make_shared<CStateJournalStreamCache>(1024ULL * 1024ULL * 1ULL, pJournalSession, m_pDebugLogger);
+		m_Cache = std::make_shared<CStateJournalStreamCache>(nCacheMemoryQuota, pJournalSession, m_pDebugLogger);
 	}
 
 	CStateJournalStream::~CStateJournalStream()
