@@ -714,7 +714,7 @@ namespace AMCData {
 
 	uint64_t CJournal::getChunkIntervalInMicroseconds()
 	{
-		return 10ULL * 1000000ULL; // 10 seconds chunk interval
+		return 12ULL * 1000000ULL; // 10 seconds chunk interval
 	}
 
 	uint64_t CJournal::getMaxMemoryQuotaInBytes()
