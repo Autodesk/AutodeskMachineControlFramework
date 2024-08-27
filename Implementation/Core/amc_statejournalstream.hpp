@@ -209,7 +209,7 @@ namespace AMC {
 		void ensureChunk(const uint64_t nAbsoluteTimeStampInMicroseconds);
 
 	public:
-		CStateJournalStream(LibMCData::PJournalSession pJournalSession, PLogger pDebugLogger);
+		CStateJournalStream(LibMCData::PJournalSession pJournalSession, PLogger pDebugLogger, bool bEnableDebugLogging);
 		virtual ~CStateJournalStream();
 
 		virtual void writeBool_MicroSecond(const uint64_t nAbsoluteTimeStampInMicroseconds, const uint32_t nStorageIndex, bool bValue);

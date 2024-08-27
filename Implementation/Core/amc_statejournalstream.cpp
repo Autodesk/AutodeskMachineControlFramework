@@ -573,11 +573,14 @@ namespace AMC {
 		return it->second->second;
 	}
 
-	CStateJournalStream::CStateJournalStream(LibMCData::PJournalSession pJournalSession, PLogger pDebugLogger)
-		: m_nChunkIntervalInMicroseconds(0), m_nCurrentTimeStampInMicroseconds (0), m_pDebugLogger (pDebugLogger)
+	CStateJournalStream::CStateJournalStream(LibMCData::PJournalSession pJournalSession, PLogger pDebugLogger, bool bEnableDebugLogging)
+		: m_nChunkIntervalInMicroseconds(0), m_nCurrentTimeStampInMicroseconds (0)
 	{
 		if (pJournalSession.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		if (bEnableDebugLogging)
+			m_pDebugLogger = pDebugLogger;
 		
 		m_nChunkIntervalInMicroseconds = pJournalSession->GetChunkIntervalInMicroseconds();
 		uint64_t nCacheMemoryQuota = pJournalSession->GetChunkCacheQuota();

@@ -72,6 +72,8 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 {
     LibMCAssertNotNull(pDataModel.get());
 
+    bool bEnableJournalLogging = false;
+
     // Create Chrono Object
     auto pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
 
@@ -84,7 +86,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
         pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel, pGlobalChrono));
 
     // Create State Journal
-    m_pStateJournal = std::make_shared<CStateJournal>(std::make_shared<CStateJournalStream>(pDataModel->CreateJournalSession(), pMultiLogger), pGlobalChrono);
+    m_pStateJournal = std::make_shared<CStateJournal>(std::make_shared<CStateJournalStream>(pDataModel->CreateJournalSession(), pMultiLogger, bEnableJournalLogging), pGlobalChrono);
 
     // Create system state
     m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, m_pStateJournal, "./testoutput", pGlobalChrono);
