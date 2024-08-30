@@ -372,13 +372,49 @@ namespace AMCCommon {
 	{
 		std::string trimmedString = trimString(sString);
 
-		size_t nConversionErrorIndex = 0;
-		int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
-		
-		if (nConversionErrorIndex != trimmedString.length())
-			throw std::runtime_error("invalid integer string: " + sString);
+		try {
 
-		return nResult;
+			size_t nConversionErrorIndex = 0;
+			int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
+
+			if (nConversionErrorIndex != trimmedString.length())
+				throw std::runtime_error("invalid integer string: " + sString);
+
+			return nResult;
+		}
+		catch (...)
+		{
+			throw std::runtime_error("invalid integer string: " + sString);
+		}
+
+	}
+
+
+	bool CUtils::stringToBool(const std::string& sString)
+	{
+		std::string trimmedString = toLowerString (trimString(sString));
+
+		try {
+
+			if (trimmedString == "false")
+				return false;
+
+			if (trimmedString == "true")
+				return true;
+
+			size_t nConversionErrorIndex = 0;
+			int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
+
+			if (nConversionErrorIndex != trimmedString.length())
+				throw std::runtime_error("invalid integer string: " + sString);
+
+			return nResult;
+		}
+		catch (...)
+		{
+			throw std::runtime_error("invalid integer string: " + sString);
+		}
+
 	}
 
 	double CUtils::stringToDouble(const std::string& sString)

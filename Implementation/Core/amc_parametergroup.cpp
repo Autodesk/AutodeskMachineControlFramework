@@ -531,7 +531,7 @@ namespace AMC {
 
 			bool bValue = false;
 			if (sDefaultValue.length() > 0)
-				bValue = AMCCommon::CUtils::stringToInteger(sDefaultValue) != 0;
+				bValue = AMCCommon::CUtils::stringToBool(sDefaultValue) != 0;
 			addNewBoolParameter(sName, sDescription, bValue);
 
 		}
