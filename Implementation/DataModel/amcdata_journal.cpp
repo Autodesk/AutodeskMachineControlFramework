@@ -47,7 +47,7 @@ namespace AMCData {
 		std::wstring sUTF16FileName = AMCCommon::CUtils::UTF8toUTF16(sFileName);
 		m_Stream.open(sUTF16FileName.c_str(), std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
 #else 
-		m_Stream.open(sFileName.c_str(), std::ios::in | std::ios::out | std::ios::binary);
+		m_Stream.open(sFileName.c_str(), std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
 #endif
 		if (m_Stream.fail())
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_COULDNOTCREATEJOURNALFILE);
