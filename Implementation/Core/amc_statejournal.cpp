@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger.hpp"
 #include "amc_constants.hpp"
 #include <map>
+#include <string>
 #include <thread>
 #include <future>
 #include <iostream>
