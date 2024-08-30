@@ -191,6 +191,171 @@
         }
       }
     },
+    "/upload": {
+      "post": {
+        "tags": [
+          "general"
+        ],
+        "summary": "start upload session",
+        "operationId": "startUpload",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upload/{streamUUID}": {
+      "post": {
+        "tags": [
+          "general"
+        ],
+        "summary": "upload chunk",
+        "operationId": "uploadChunk",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "streamUUID",
+            "in": "path",
+            "description": "stream uuid",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "size" : {
+                    "type": "integer",
+                    "description": "chunk size"
+                  },
+                  "offset" : {
+                    "type": "integer",
+                    "description": "offset"
+                  },
+                  "data" : {
+                    "type": "string",
+                    "format" : "binary"
+                  }
+                }
+
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upload/finish": {
+      "post": {
+        "tags": [
+          "general"
+        ],
+        "summary": "finish upload session",
+        "operationId": "finishUpload",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFinishRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/build": {
       "get": {
         "tags": [
@@ -203,7 +368,7 @@
           {
             "bearerAuth": []
           }
-        ],		
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -391,6 +556,63 @@
           "username": {
             "type": "string",
             "example": "testuser"
+          }
+        }
+      },
+      "UploadSession" : {
+        "required": [
+          "protocol",
+          "version",
+          "streamuuid"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.auth' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.auth"
+          },
+          "version": {
+            "type": "string",
+            "example": "2.0.0"
+          },
+          "streamuuid": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UploadResult" : {
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.auth' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.auth"
+          },
+          "version": {
+            "type": "string",
+            "example": "2.0.0"
+          },
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contextuuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
           }
         }
       },
@@ -582,6 +804,11 @@
             "type": "integer",
             "description": "The number of layers of the build job",
             "example": 120
+          },
+          "thumbnail": {
+            "type": "string",
+            "description": "The UUID of the thumbnail",
+            "example": "8bf469fa-4c36-474f-8ade-8474a1d621bd"
           }
         }
       },
@@ -608,6 +835,53 @@
             "items": {
               "$ref": "#/components/schemas/BuildJobInstance"
             }
+          }
+        }
+      },
+      "UploadRequest": {
+        "required": [
+          "name",
+          "size",
+          "mimetype",
+          "context"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the build job",
+            "example": "test.3mf"
+          },
+          "context": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "description": "file size",
+            "example": 120
+          }
+        }
+      },
+      "UploadFinishRequest" : {
+        "required": [
+          "streamuuid",
+          "sha256",
+          "context"
+        ],
+        "type": "object",
+        "properties": {
+          "streamuuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "context": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
           }
         }
       },
