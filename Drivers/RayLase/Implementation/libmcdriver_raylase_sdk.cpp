@@ -132,6 +132,205 @@ CRaylaseSDK::CRaylaseSDK(const std::string& sDLLNameUTF8)
 	this->ptrGetLastError = (PrlGetLastError)_loadRaylaseAddress(hLibrary, "rlGetLastError");
 	this->ptrGetLastErrorLen = (PrlGetLastErrorLen)_loadRaylaseAddress(hLibrary, "rlGetLastErrorLen");
 
+	this->ptrEnableCommandLogging = (PrlEnableCommandLogging)_loadRaylaseAddress(hLibrary, "rlEnableCommandLogging");
+	this->ptrDisableCommandLogging = (PrlDisableCommandLogging)_loadRaylaseAddress(hLibrary, "rlDisableCommandLogging");
+	this->ptrSetTimeout = (PrlSetTimeout)_loadRaylaseAddress(hLibrary, "rlSetTimeout");
+	this->ptrGetTimeout = (PrlGetTimeout)_loadRaylaseAddress(hLibrary, "rlGetTimeout");
+	this->ptrConfigurationBeginUpdate = (PrlConfigurationBeginUpdate)_loadRaylaseAddress(hLibrary, "rlConfigurationBeginUpdate");
+	this->ptrConfigurationEndUpdate = (PrlConfigurationEndUpdate)_loadRaylaseAddress(hLibrary, "rlConfigurationEndUpdate");
+	this->ptrConfigurationAbortUpdate = (PrlConfigurationAbortUpdate)_loadRaylaseAddress(hLibrary, "rlConfigurationAbortUpdate");
+	this->ptrConfigurationIsUpdateActive = (PrlConfigurationIsUpdateActive)_loadRaylaseAddress(hLibrary, "rlConfigurationIsUpdateActive");
+
+	this->ptrGpioGetPinCount = (PrlGpioGetPinCount)_loadRaylaseAddress(hLibrary, "rlGpioGetPinCount");
+	this->ptrGpioGetGroupCount = (PrlGpioGetGroupCount)_loadRaylaseAddress(hLibrary, "rlGpioGetGroupCount");
+	this->ptrGpioGetSupportedIOLevels = (PrlGpioGetSupportedIOLevels)_loadRaylaseAddress(hLibrary, "rlGpioGetSupportedIOLevels");
+	this->ptrGpioGetSupportedDirections = (PrlGpioGetSupportedDirections)_loadRaylaseAddress(hLibrary, "rlGpioGetSupportedDirections");
+	this->ptrGpioGetIOLevel = (PrlGpioGetIOLevel)_loadRaylaseAddress(hLibrary, "rlGpioGetIOLevel");
+	this->ptrGpioSetIOLevel = (PrlGpioSetIOLevel)_loadRaylaseAddress(hLibrary, "rlGpioSetIOLevel");
+	this->ptrGpioGetDirections = (PrlGpioGetDirections)_loadRaylaseAddress(hLibrary, "rlGpioGetDirections");
+	this->ptrGpioSetDirections = (PrlGpioSetDirections)_loadRaylaseAddress(hLibrary, "rlGpioSetDirections");
+	this->ptrGpioGetPolarities = (PrlGpioGetPolarities)_loadRaylaseAddress(hLibrary, "rlGpioGetPolarities");
+	this->ptrGpioSetPolarities = (PrlGpioSetPolarities)_loadRaylaseAddress(hLibrary, "rlGpioSetPolarities");
+	this->ptrGpioGetWriteDelay = (PrlGpioGetWriteDelay)_loadRaylaseAddress(hLibrary, "rlGpioGetWriteDelay");
+	this->ptrGpioSetWriteDelay = (PrlGpioSetWriteDelay)_loadRaylaseAddress(hLibrary, "rlGpioSetWriteDelay");
+	this->ptrGpioGetWriteWidth = (PrlGpioGetWriteWidth)_loadRaylaseAddress(hLibrary, "rlGpioGetWriteWidth");
+	this->ptrGpioSetWriteWidth = (PrlGpioSetWriteWidth)_loadRaylaseAddress(hLibrary, "rlGpioSetWriteWidth");
+	this->ptrGpioRead = (PrlGpioRead)_loadRaylaseAddress(hLibrary, "rlGpioRead");
+	this->ptrGpioGetOutput = (PrlGpioGetOutput)_loadRaylaseAddress(hLibrary, "rlGpioGetOutput");
+	this->ptrGpioWrite = (PrlGpioWrite)_loadRaylaseAddress(hLibrary, "rlGpioWrite");
+
+	this->ptrSystemLoadConfig = (PrlSystemLoadConfig)_loadRaylaseAddress(hLibrary, "rlSystemLoadConfig");
+	this->ptrSystemStoreConfig = (PrlSystemStoreConfig)_loadRaylaseAddress(hLibrary, "rlSystemStoreConfig");
+	this->ptrSystemGetConfig = (PrlSystemGetConfig)_loadRaylaseAddress(hLibrary, "rlSystemGetConfig");
+	this->ptrSystemSetConfig = (PrlSystemSetConfig)_loadRaylaseAddress(hLibrary, "rlSystemSetConfig");
+	this->ptrSystemGetFirmwareVersion = (PrlSystemGetFirmwareVersion)_loadRaylaseAddress(hLibrary, "rlSystemGetFirmwareVersion");
+	this->ptrSystemGetFirmwareProductVersion = (PrlSystemGetFirmwareProductVersion)_loadRaylaseAddress(hLibrary, "rlSystemGetFirmwareProductVersion");
+	this->ptrSystemGetFPGAVersion = (PrlSystemGetFPGAVersion)_loadRaylaseAddress(hLibrary, "rlSystemGetFPGAVersion");
+	this->ptrSystemGetOSVersion = (PrlSystemGetOSVersion)_loadRaylaseAddress(hLibrary, "rlSystemGetOSVersion");
+	this->ptrSystemGetCardSerialNumber = (PrlSystemGetCardSerialNumber)_loadRaylaseAddress(hLibrary, "rlSystemGetCardSerialNumber");
+	this->ptrSystemGetConnectionLimit = (PrlSystemGetConnectionLimit)_loadRaylaseAddress(hLibrary, "rlSystemGetConnectionLimit");
+	this->ptrSystemResetOperatingState = (PrlSystemResetOperatingState)_loadRaylaseAddress(hLibrary, "rlSystemResetOperatingState");
+	this->ptrSystemGetOperatingState = (PrlSystemGetOperatingState)_loadRaylaseAddress(hLibrary, "rlSystemGetOperatingState");
+	
+	this->ptrSerialPortInitConfig = (PrlSerialPortInitConfig)_loadRaylaseAddress(hLibrary, "rlSerialPortInitConfig");
+	this->ptrSerialPortLoadConfig = (PrlSerialPortLoadConfig)_loadRaylaseAddress(hLibrary, "rlSerialPortLoadConfig");
+	this->ptrSerialPortStoreConfig = (PrlSerialPortStoreConfig)_loadRaylaseAddress(hLibrary, "rlSerialPortStoreConfig");
+	this->ptrSerialPortGetConfig = (PrlSerialPortGetConfig)_loadRaylaseAddress(hLibrary, "rlSerialPortGetConfig");
+	this->ptrSerialPortSetConfig = (PrlSerialPortSetConfig)_loadRaylaseAddress(hLibrary, "rlSerialPortSetConfig");
+	this->ptrSerialPortTransmitString = (PrlSerialPortTransmitString)_loadRaylaseAddress(hLibrary, "rlSerialPortTransmitString");
+	this->ptrSerialPortTransmitLine = (PrlSerialPortTransmitLine)_loadRaylaseAddress(hLibrary, "rlSerialPortTransmitLine");
+	this->ptrSerialPortTransmitBytes = (PrlSerialPortTransmitBytes)_loadRaylaseAddress(hLibrary, "rlSerialPortTransmitBytes");
+	this->ptrSerialPortTryVerifyResponseString = (PrlSerialPortTryVerifyResponseString)_loadRaylaseAddress(hLibrary, "rlSerialPortTryVerifyResponseString");
+	this->ptrSerialPortTryVerifyResponseLine = (PrlSerialPortTryVerifyResponseLine)_loadRaylaseAddress(hLibrary, "rlSerialPortTryVerifyResponseLine");
+	this->ptrSerialPortTryVerifyResponseBytes = (PrlSerialPortTryVerifyResponseBytes)_loadRaylaseAddress(hLibrary, "rlSerialPortTryVerifyResponseBytes");
+	this->ptrSerialPortReceiveString = (PrlSerialPortReceiveString)_loadRaylaseAddress(hLibrary, "rlSerialPortReceiveString");
+	this->ptrSerialPortReceiveLine = (PrlSerialPortReceiveLine)_loadRaylaseAddress(hLibrary, "rlSerialPortReceiveLine");
+	this->ptrSerialPortReceiveBytes = (PrlSerialPortReceiveBytes)_loadRaylaseAddress(hLibrary, "rlSerialPortReceiveBytes");
+
+	this->ptrLaserInitConfig = (PrlLaserInitConfig)_loadRaylaseAddress(hLibrary, "rlLaserInitConfig");
+	this->ptrLaserLoadConfig = (PrlLaserLoadConfig)_loadRaylaseAddress(hLibrary, "rlLaserLoadConfig");
+	this->ptrLaserStoreConfig = (PrlLaserStoreConfig)_loadRaylaseAddress(hLibrary, "rlLaserStoreConfig");
+	this->ptrLaserGetConfig = (PrlLaserGetConfig)_loadRaylaseAddress(hLibrary, "rlLaserGetConfig");
+	this->ptrLaserSetConfig = (PrlLaserSetConfig)_loadRaylaseAddress(hLibrary, "rlLaserSetConfig");
+	this->ptrLaserCreatePowerCalibration = (PrlLaserCreatePowerCalibration)_loadRaylaseAddress(hLibrary, "rlLaserCreatePowerCalibration");
+	this->ptrLaserLoadPowerCalibration = (PrlLaserLoadPowerCalibration)_loadRaylaseAddress(hLibrary, "rlLaserLoadPowerCalibration");
+	this->ptrLaserStorePowerCalibration = (PrlLaserStorePowerCalibration)_loadRaylaseAddress(hLibrary, "rlLaserStorePowerCalibration");
+	this->ptrLaserGetPowerCalibration = (PrlLaserGetPowerCalibration)_loadRaylaseAddress(hLibrary, "rlLaserGetPowerCalibration");
+	this->ptrLaserSetPowerCalibration = (PrlLaserSetPowerCalibration)_loadRaylaseAddress(hLibrary, "rlLaserSetPowerCalibration");
+	this->ptrLaserPowerCalibrationSet = (PrlLaserPowerCalibrationSet)_loadRaylaseAddress(hLibrary, "rlLaserPowerCalibrationSet");
+	this->ptrLaserPowerCalibrationGet = (PrlLaserPowerCalibrationGet)_loadRaylaseAddress(hLibrary, "rlLaserPowerCalibrationGet");
+	this->ptrLaserGetPowerScale = (PrlLaserGetPowerScale)_loadRaylaseAddress(hLibrary, "rlLaserGetPowerScale");
+	this->ptrLaserSetPowerScale = (PrlLaserSetPowerScale)_loadRaylaseAddress(hLibrary, "rlLaserSetPowerScale");
+
+	this->ptrScannerInitConfig = (PrlScannerInitConfig)_loadRaylaseAddress(hLibrary, "rlScannerInitConfig");
+	this->ptrScannerSetConfig = (PrlScannerSetConfig)_loadRaylaseAddress(hLibrary, "rlScannerSetConfig");
+	this->ptrScannerGetConfig = (PrlScannerGetConfig)_loadRaylaseAddress(hLibrary, "rlScannerGetConfig");
+	this->ptrScannerLoadConfig = (PrlScannerLoadConfig)_loadRaylaseAddress(hLibrary, "rlScannerLoadConfig");
+	this->ptrScannerStoreConfig = (PrlScannerStoreConfig)_loadRaylaseAddress(hLibrary, "rlScannerStoreConfig");
+	this->ptrScannerGetNominalPosition = (PrlScannerGetNominalPosition)_loadRaylaseAddress(hLibrary, "rlScannerGetNominalPosition");
+	this->ptrScannerReadPositions = (PrlScannerReadPositions)_loadRaylaseAddress(hLibrary, "rlScannerReadPositions");
+	this->ptrScannerReadLastPositions = (PrlScannerReadLastPositions)_loadRaylaseAddress(hLibrary, "rlScannerReadLastPositions");
+	this->ptrScannerHeadFormatGetHeadCount = (PrlScannerHeadFormatGetHeadCount)_loadRaylaseAddress(hLibrary, "rlScannerHeadFormatGetHeadCount");
+	this->ptrScannerHeadFormatGetAxisCount = (PrlScannerHeadFormatGetAxisCount)_loadRaylaseAddress(hLibrary, "rlScannerHeadFormatGetAxisCount");
+	this->ptrScannerHeadFormatGetDimensions = (PrlScannerHeadFormatGetDimensions)_loadRaylaseAddress(hLibrary, "rlScannerHeadFormatGetDimensions");
+	this->ptrScannerHeadFormatGetAxes = (PrlScannerHeadFormatGetAxes)_loadRaylaseAddress(hLibrary, "rlScannerHeadFormatGetAxes");
+	this->ptrScannerHeadFormatGetIndexOfAxis = (PrlScannerHeadFormatGetIndexOfAxis)_loadRaylaseAddress(hLibrary, "rlScannerHeadFormatGetIndexOfAxis");
+	this->ptrScannerHeadFormatHasOpticalZoom = (PrlScannerHeadFormatHasOpticalZoom)_loadRaylaseAddress(hLibrary, "rlScannerHeadFormatHasOpticalZoom");
+	this->ptrScannerHeadFormatHasAuxiliary = (PrlScannerHeadFormatHasAuxiliary)_loadRaylaseAddress(hLibrary, "rlScannerHeadFormatHasAuxiliary");
+	this->ptrScannerHeadFormatIsExtended = (PrlScannerHeadFormatIsExtended)_loadRaylaseAddress(hLibrary, "rlScannerHeadFormatIsExtended");
+	this->ptrScannerGetHeadBias = (PrlScannerGetHeadBias)_loadRaylaseAddress(hLibrary, "rlScannerGetHeadBias");
+	this->ptrScannerSetHeadBias = (PrlScannerSetHeadBias)_loadRaylaseAddress(hLibrary, "rlScannerSetHeadBias");
+
+	this->ptrAdapterBoardGetConfig = (PrlAdapterBoardGetConfig)_loadRaylaseAddress(hLibrary, "rlAdapterBoardGetConfig");
+	this->ptrAdapterBoardSetConfig = (PrlAdapterBoardSetConfig)_loadRaylaseAddress(hLibrary, "rlAdapterBoardSetConfig");
+	this->ptrAdapterBoardSetConfigByName = (PrlAdapterBoardSetConfigByName)_loadRaylaseAddress(hLibrary, "rlAdapterBoardSetConfigByName");
+	this->ptrAdapterBoardEnable = (PrlAdapterBoardEnable)_loadRaylaseAddress(hLibrary, "rlAdapterBoardEnable");
+	this->ptrAdapterBoardEnabled = (PrlAdapterBoardEnabled)_loadRaylaseAddress(hLibrary, "rlAdapterBoardEnabled");
+	this->ptrAdapterBoardSupportsAutoConfiguration = (PrlAdapterBoardSupportsAutoConfiguration)_loadRaylaseAddress(hLibrary, "rlAdapterBoardSupportsAutoConfiguration");
+	this->ptrAdapterBoardValid = (PrlAdapterBoardValid)_loadRaylaseAddress(hLibrary, "rlAdapterBoardValid");
+	this->ptrAdapterBoardGetAvailableAdapterBoardNames = (PrlAdapterBoardGetAvailableAdapterBoardNames)_loadRaylaseAddress(hLibrary, "rlAdapterBoardGetAvailableAdapterBoardNames");
+	this->ptrAdapterBoardGetCurrentAdapterBoardName = (PrlAdapterBoardGetCurrentAdapterBoardName)_loadRaylaseAddress(hLibrary, "rlAdapterBoardGetCurrentAdapterBoardName");
+
+	this->ptrProcessInitVariables = (PrlProcessInitVariables)_loadRaylaseAddress(hLibrary, "rlProcessInitVariables");
+	this->ptrProcessLoadVariables = (PrlProcessLoadVariables)_loadRaylaseAddress(hLibrary, "rlProcessLoadVariables");
+	this->ptrProcessStoreVariables = (PrlProcessStoreVariables)_loadRaylaseAddress(hLibrary, "rlProcessStoreVariables");
+	this->ptrProcessGetVariables = (PrlProcessGetVariables)_loadRaylaseAddress(hLibrary, "rlProcessGetVariables");
+	this->ptrProcessSetVariables = (PrlProcessSetVariables)_loadRaylaseAddress(hLibrary, "rlProcessSetVariables");
+	this->ptrProcessGetSpeedScale = (PrlProcessGetSpeedScale)_loadRaylaseAddress(hLibrary, "rlProcessGetSpeedScale");
+	this->ptrProcessSetSpeedScale = (PrlProcessSetSpeedScale)_loadRaylaseAddress(hLibrary, "rlProcessSetSpeedScale");
+	this->ptrProcessGetTransformation = (PrlProcessGetTransformation)_loadRaylaseAddress(hLibrary, "rlProcessGetTransformation");
+	this->ptrProcessSetTransformation = (PrlProcessSetTransformation)_loadRaylaseAddress(hLibrary, "rlProcessSetTransformation");
+	this->ptrProcessWobbleSetCircle = (PrlProcessWobbleSetCircle)_loadRaylaseAddress(hLibrary, "rlProcessWobbleSetCircle");
+	this->ptrProcessWobbleSetEight = (PrlProcessWobbleSetEight)_loadRaylaseAddress(hLibrary, "rlProcessWobbleSetEight");
+
+
+	this->ptrHeadCorrectionExists = (PrlHeadCorrectionExists)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionExists");
+	this->ptrHeadCorrectionDelete = (PrlHeadCorrectionDelete)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionDelete");
+	this->ptrHeadCorrectionGet = (PrlHeadCorrectionGet)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionGet");
+	this->ptrHeadCorrectionSet = (PrlHeadCorrectionSet)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionSet");
+	this->ptrHeadCorrectionLoad = (PrlHeadCorrectionLoad)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionLoad");
+	this->ptrHeadCorrectionStore = (PrlHeadCorrectionStore)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionStore");
+
+	this->ptrHeadCorrectionInitOpticalParameters = (PrlHeadCorrectionInitOpticalParameters)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionInitOpticalParameters");
+	this->ptrHeadCorrectionGetOpticalParameters = (PrlHeadCorrectionGetOpticalParameters)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionGetOpticalParameters");
+	this->ptrHeadCorrectionGetHash = (PrlHeadCorrectionGetHash)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionGetHash");
+	this->ptrHeadCorrectionSelectCorrection = (PrlHeadCorrectionSelectCorrection)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionSelectCorrection");
+	this->ptrHeadCorrectionGetSelectedCorrection = (PrlHeadCorrectionGetSelectedCorrection)_loadRaylaseAddress(hLibrary, "rlHeadCorrectionGetSelectedCorrection");
+
+
+	this->ptrMotfQuadratureDecoderInitConfig = (PrlMotfQuadratureDecoderInitConfig)_loadRaylaseAddress(hLibrary, "rlMotfQuadratureDecoderInitConfig");
+	this->ptrMotfQuadratureDecoderLoadConfig = (PrlMotfQuadratureDecoderLoadConfig)_loadRaylaseAddress(hLibrary, "rlMotfQuadratureDecoderLoadConfig");
+	this->ptrMotfQuadratureDecoderStoreConfig = (PrlMotfQuadratureDecoderStoreConfig)_loadRaylaseAddress(hLibrary, "rlMotfQuadratureDecoderStoreConfig");
+	this->ptrMotfQuadratureDecoderGetConfig = (PrlMotfQuadratureDecoderGetConfig)_loadRaylaseAddress(hLibrary, "rlMotfQuadratureDecoderGetConfig");
+	this->ptrMotfQuadratureDecoderSetConfig = (PrlMotfQuadratureDecoderSetConfig)_loadRaylaseAddress(hLibrary, "rlMotfQuadratureDecoderSetConfig");
+
+
+	this->ptrMotfInitConfig = (PrlMotfInitConfig)_loadRaylaseAddress(hLibrary, "rlMotfInitConfig");
+	this->ptrMotfGetConfig = (PrlMotfGetConfig)_loadRaylaseAddress(hLibrary, "rlMotfGetConfig");
+	this->ptrMotfSetConfig = (PrlMotfSetConfig)_loadRaylaseAddress(hLibrary, "rlMotfSetConfig");
+	this->ptrMotfLoadConfig = (PrlMotfLoadConfig)_loadRaylaseAddress(hLibrary, "rlMotfLoadConfig");
+	this->ptrMotfStoreConfig = (PrlMotfStoreConfig)_loadRaylaseAddress(hLibrary, "rlMotfStoreConfig");
+	this->ptrMotfConfigSetDirectionFromAngle = (PrlMotfConfigSetDirectionFromAngle)_loadRaylaseAddress(hLibrary, "rlMotfConfigSetDirectionFromAngle");
+	this->ptrMotfQuadratureDecoderResetEncoderPosition = (PrlMotfQuadratureDecoderResetEncoderPosition)_loadRaylaseAddress(hLibrary, "rlMotfQuadratureDecoderResetEncoderPosition");
+	this->ptrMotfQuadratureDecoderReadEncoderPosition = (PrlMotfQuadratureDecoderReadEncoderPosition)_loadRaylaseAddress(hLibrary, "rlMotfQuadratureDecoderReadEncoderPosition");
+	this->ptrMotfGetPendingParts = (PrlMotfGetPendingParts)_loadRaylaseAddress(hLibrary, "rlMotfGetPendingParts");
+	this->ptrMotfResetState = (PrlMotfResetState)_loadRaylaseAddress(hLibrary, "rlMotfResetState");
+	
+	
+	this->ptrSfioRead = (PrlSfioRead)_loadRaylaseAddress(hLibrary, "rlSfioRead");
+	this->ptrSfioSpiInitConfig = (PrlSfioSpiInitConfig)_loadRaylaseAddress(hLibrary, "rlSfioSpiInitConfig");
+	this->ptrSfioSpiLoadConfig = (PrlSfioSpiLoadConfig)_loadRaylaseAddress(hLibrary, "rlSfioSpiLoadConfig");
+	this->ptrSfioSpiStoreConfig = (PrlSfioSpiStoreConfig)_loadRaylaseAddress(hLibrary, "rlSfioSpiStoreConfig");
+	this->ptrSfioSpiGetConfig = (PrlSfioSpiGetConfig)_loadRaylaseAddress(hLibrary, "rlSfioSpiGetConfig");
+	this->ptrSfioSpiSetConfig = (PrlSfioSpiSetConfig)_loadRaylaseAddress(hLibrary, "rlSfioSpiSetConfig");
+	this->ptrSfioSpiTransmit = (PrlSfioSpiTransmit)_loadRaylaseAddress(hLibrary, "rlSfioSpiTransmit");
+	this->ptrSfioSpiTransceive = (PrlSfioSpiTransceive)_loadRaylaseAddress(hLibrary, "rlSfioSpiTransceive");
+	this->ptrSfioSpiReceive = (PrlSfioSpiReceive)_loadRaylaseAddress(hLibrary, "rlSfioSpiReceive");
+	this->ptrSfioSpiWaitForActiveTransfersDone = (PrlSfioSpiWaitForActiveTransfersDone)_loadRaylaseAddress(hLibrary, "rlSfioSpiWaitForActiveTransfersDone");
+
+	this->ptrPowerCorrectionCreate = (PrlPowerCorrectionCreate)_loadRaylaseAddress(hLibrary, "rlPowerCorrectionCreate");
+	this->ptrPowerCorrectionSet = (PrlPowerCorrectionSet)_loadRaylaseAddress(hLibrary, "rlPowerCorrectionSet");
+	this->ptrPowerCorrectionGet = (PrlPowerCorrectionGet)_loadRaylaseAddress(hLibrary, "rlPowerCorrectionGet");
+	this->ptrPowerCorrectionLoad = (PrlPowerCorrectionLoad)_loadRaylaseAddress(hLibrary, "rlPowerCorrectionLoad");
+	this->ptrPowerCorrectionStore = (PrlPowerCorrectionStore)_loadRaylaseAddress(hLibrary, "rlPowerCorrectionStore");
+	this->ptrPowerCorrectionChangeValue = (PrlPowerCorrectionChangeValue)_loadRaylaseAddress(hLibrary, "rlPowerCorrectionChangeValue");
+	this->ptrPowerCorrectionGetOpticalParameters = (PrlPowerCorrectionGetOpticalParameters)_loadRaylaseAddress(hLibrary, "rlPowerCorrectionGetOpticalParameters");
+
+	this->ptrScannerCommunicationTransceiveEnhanced = (PrlScannerCommunicationTransceiveEnhanced)_loadRaylaseAddress(hLibrary, "rlScannerCommunicationTransceiveEnhanced");
+	this->ptrScannerCommunicationTransmitEnhanced = (PrlScannerCommunicationTransmitEnhanced)_loadRaylaseAddress(hLibrary, "rlScannerCommunicationTransmitEnhanced");
+	this->ptrScannerCommunicationReceiveEnhanced = (PrlScannerCommunicationReceiveEnhanced)_loadRaylaseAddress(hLibrary, "rlScannerCommunicationReceiveEnhanced");
+	this->ptrScannerCommunicationTransceiveRaylase = (PrlScannerCommunicationTransceiveRaylase)_loadRaylaseAddress(hLibrary, "rlScannerCommunicationTransceiveRaylase");
+	this->ptrScannerCommunicationTransmitRaylase = (PrlScannerCommunicationTransmitRaylase)_loadRaylaseAddress(hLibrary, "rlScannerCommunicationTransmitRaylase");
+
+	this->ptrVariableBooleanCreate = (PrlVariableBooleanCreate)_loadRaylaseAddress(hLibrary, "rlVariableBooleanCreate");
+	this->ptrVariableBooleanDelete = (PrlVariableBooleanDelete)_loadRaylaseAddress(hLibrary, "rlVariableBooleanDelete");
+	this->ptrVariableBooleanExists = (PrlVariableBooleanExists)_loadRaylaseAddress(hLibrary, "rlVariableBooleanExists");
+	this->ptrVariableBooleanLoad = (PrlVariableBooleanLoad)_loadRaylaseAddress(hLibrary, "rlVariableBooleanLoad");
+	this->ptrVariableBooleanStore = (PrlVariableBooleanStore)_loadRaylaseAddress(hLibrary, "rlVariableBooleanStore");
+	this->ptrVariableBooleanGetValue = (PrlVariableBooleanGetValue)_loadRaylaseAddress(hLibrary, "rlVariableBooleanGetValue");
+	this->ptrVariableBooleanSetValue = (PrlVariableBooleanSetValue)_loadRaylaseAddress(hLibrary, "rlVariableBooleanSetValue");
+	this->ptrVariableBooleanToggleValue = (PrlVariableBooleanToggleValue)_loadRaylaseAddress(hLibrary, "rlVariableBooleanToggleValue");
+	this->ptrVariableIntegerCreate = (PrlVariableIntegerCreate)_loadRaylaseAddress(hLibrary, "rlVariableIntegerCreate");
+	this->ptrVariableIntegerDelete = (PrlVariableIntegerDelete)_loadRaylaseAddress(hLibrary, "rlVariableIntegerDelete");
+	this->ptrVariableIntegerExists = (PrlVariableIntegerExists)_loadRaylaseAddress(hLibrary, "rlVariableIntegerExists");
+	this->ptrVariableIntegerLoad = (PrlVariableIntegerLoad)_loadRaylaseAddress(hLibrary, "rlVariableIntegerLoad");
+	this->ptrVariableIntegerStore = (PrlVariableIntegerStore)_loadRaylaseAddress(hLibrary, "rlVariableIntegerStore");
+	
+	this->ptrVariableIntegerGetValue = (PrlVariableIntegerGetValue)_loadRaylaseAddress(hLibrary, "rlVariableIntegerGetValue");
+	this->ptrVariableIntegerSetValue = (PrlVariableIntegerSetValue)_loadRaylaseAddress(hLibrary, "rlVariableIntegerSetValue");
+	this->ptrVariableIntegerIncrementValue = (PrlVariableIntegerIncrementValue)_loadRaylaseAddress(hLibrary, "rlVariableIntegerIncrementValue");
+	this->ptrVariableIntegerDecrementValue = (PrlVariableIntegerDecrementValue)_loadRaylaseAddress(hLibrary, "rlVariableIntegerDecrementValue");
+	this->ptrVariableMarkCounterCreate = (PrlVariableMarkCounterCreate)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterCreate");
+	this->ptrVariableMarkCounterDelete = (PrlVariableMarkCounterDelete)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterDelete");
+	this->ptrVariableMarkCounterExists = (PrlVariableMarkCounterExists)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterExists");
+	this->ptrVariableMarkCounterLoad = (PrlVariableMarkCounterLoad)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterLoad");
+	this->ptrVariableMarkCounterStore = (PrlVariableMarkCounterStore)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterStore");
+	this->ptrVariableMarkCounterGetValue = (PrlVariableMarkCounterGetValue)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterGetValue");
+	this->ptrVariableMarkCounterSetValue = (PrlVariableMarkCounterSetValue)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterSetValue");
+	this->ptrVariableMarkCounterGetAndResetValue = (PrlVariableMarkCounterGetAndResetValue)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterGetAndResetValue");
+	this->ptrVariableMarkCounterGetMarkTimeFormat = (PrlVariableMarkCounterGetMarkTimeFormat)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterGetMarkTimeFormat");
+	this->ptrVariableMarkCounterSetMarkTimeFormat = (PrlVariableMarkCounterSetMarkTimeFormat)_loadRaylaseAddress(hLibrary, "rlVariableMarkCounterSetMarkTimeFormat");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -226,7 +425,205 @@ void CRaylaseSDK::resetFunctionPtrs()
 	ptrListDelete = nullptr;
 	ptrGetLastError = nullptr;
 	ptrGetLastErrorLen = nullptr;
+	ptrEnableCommandLogging = nullptr;
+	ptrDisableCommandLogging = nullptr;
+	ptrSetTimeout = nullptr;
+	ptrGetTimeout = nullptr;
+	ptrConfigurationBeginUpdate = nullptr;
+	ptrConfigurationEndUpdate = nullptr;
+	ptrConfigurationAbortUpdate = nullptr;
+	ptrConfigurationIsUpdateActive = nullptr;
 
+	ptrGpioGetPinCount = nullptr;
+	ptrGpioGetGroupCount = nullptr;
+	ptrGpioGetSupportedIOLevels = nullptr;
+	ptrGpioGetSupportedDirections = nullptr;
+	ptrGpioGetIOLevel = nullptr;
+	ptrGpioSetIOLevel = nullptr;
+	ptrGpioGetDirections = nullptr;
+	ptrGpioSetDirections = nullptr;
+	ptrGpioGetPolarities = nullptr;
+	ptrGpioSetPolarities = nullptr;
+	ptrGpioGetWriteDelay = nullptr;
+	ptrGpioSetWriteDelay = nullptr;
+	ptrGpioGetWriteWidth = nullptr;
+	ptrGpioSetWriteWidth = nullptr;
+	ptrGpioRead = nullptr;
+	ptrGpioGetOutput = nullptr;
+	ptrGpioWrite = nullptr;
+	ptrSystemInitConfig = nullptr;
+	ptrSystemLoadConfig = nullptr;
+	ptrSystemStoreConfig = nullptr;
+	ptrSystemGetConfig = nullptr;
+	ptrSystemSetConfig = nullptr;
+	ptrSystemGetFirmwareVersion = nullptr;
+	ptrSystemGetFirmwareProductVersion = nullptr;
+	ptrSystemGetFPGAVersion = nullptr;
+	ptrSystemGetOSVersion = nullptr;
+	ptrSystemGetCardSerialNumber = nullptr;
+	ptrSystemGetConnectionLimit = nullptr;
+	ptrSystemResetOperatingState = nullptr;
+	ptrSystemGetOperatingState = nullptr;
+	ptrSerialPortInitConfig = nullptr;
+	ptrSerialPortLoadConfig = nullptr;
+	ptrSerialPortStoreConfig = nullptr;
+	ptrSerialPortGetConfig = nullptr;
+	ptrSerialPortSetConfig = nullptr;
+	ptrSerialPortTransmitString = nullptr;
+	ptrSerialPortTransmitLine = nullptr;
+	ptrSerialPortTransmitBytes = nullptr;
+	ptrSerialPortTryVerifyResponseString = nullptr;
+	ptrSerialPortTryVerifyResponseLine = nullptr;
+	ptrSerialPortTryVerifyResponseBytes = nullptr;
+	ptrSerialPortReceiveString = nullptr;
+	ptrSerialPortReceiveLine = nullptr;
+	ptrSerialPortReceiveBytes = nullptr;
+	ptrLaserInitConfig = nullptr;
+	ptrLaserLoadConfig = nullptr;
+	ptrLaserStoreConfig = nullptr;
+	ptrLaserGetConfig = nullptr;
+	ptrLaserSetConfig = nullptr;
+	ptrLaserCreatePowerCalibration = nullptr;
+	ptrLaserLoadPowerCalibration = nullptr;
+	ptrLaserStorePowerCalibration = nullptr;
+	ptrLaserGetPowerCalibration = nullptr;
+	ptrLaserSetPowerCalibration = nullptr;
+	ptrLaserPowerCalibrationSet = nullptr;
+	ptrLaserPowerCalibrationGet = nullptr;
+	ptrLaserGetPowerScale = nullptr;
+	ptrLaserSetPowerScale = nullptr;
+	ptrScannerInitConfig = nullptr;
+	ptrScannerSetConfig = nullptr;
+	ptrScannerGetConfig = nullptr;
+	ptrScannerLoadConfig = nullptr;
+	ptrScannerStoreConfig = nullptr;
+	ptrScannerGetNominalPosition = nullptr;
+	ptrScannerReadPositions = nullptr;
+	ptrScannerReadLastPositions = nullptr;
+	ptrScannerHeadFormatGetHeadCount = nullptr;
+	ptrScannerHeadFormatGetAxisCount = nullptr;
+	ptrScannerHeadFormatGetDimensions = nullptr;
+	ptrScannerHeadFormatGetAxes = nullptr;
+	ptrScannerHeadFormatGetIndexOfAxis = nullptr;
+	ptrScannerHeadFormatHasOpticalZoom = nullptr;
+	ptrScannerHeadFormatHasAuxiliary = nullptr;
+	ptrScannerHeadFormatIsExtended = nullptr;
+	ptrScannerGetHeadBias = nullptr;
+	ptrScannerSetHeadBias = nullptr;
+
+	ptrAdapterBoardGetConfig = nullptr;
+	ptrAdapterBoardSetConfig = nullptr;
+	ptrAdapterBoardSetConfigByName = nullptr;
+	ptrAdapterBoardEnable = nullptr;
+	ptrAdapterBoardEnabled = nullptr;
+	ptrAdapterBoardSupportsAutoConfiguration = nullptr;
+	ptrAdapterBoardValid = nullptr;
+	ptrAdapterBoardGetAvailableAdapterBoardNames = nullptr;
+	ptrAdapterBoardGetCurrentAdapterBoardName = nullptr;
+
+	ptrProcessInitVariables = nullptr;
+	ptrProcessLoadVariables = nullptr;
+	ptrProcessStoreVariables = nullptr;
+	ptrProcessGetVariables = nullptr;
+	ptrProcessSetVariables = nullptr;
+
+	ptrProcessGetSpeedScale = nullptr;
+	ptrProcessSetSpeedScale = nullptr;
+	ptrProcessGetTransformation = nullptr;
+	ptrProcessSetTransformation = nullptr;
+	ptrProcessWobbleSetCircle = nullptr;
+	ptrProcessWobbleSetEight = nullptr;
+
+	ptrHeadCorrectionExists = nullptr;
+	ptrHeadCorrectionDelete = nullptr;
+	ptrHeadCorrectionGet = nullptr;
+	ptrHeadCorrectionSet = nullptr;
+	ptrHeadCorrectionLoad = nullptr;
+	ptrHeadCorrectionStore = nullptr;
+
+	ptrHeadCorrectionInitOpticalParameters = nullptr;
+	ptrHeadCorrectionGetOpticalParameters = nullptr;
+	ptrHeadCorrectionGetHash = nullptr;
+	ptrHeadCorrectionSelectCorrection = nullptr;
+	ptrHeadCorrectionGetSelectedCorrection = nullptr;
+
+	ptrMotfQuadratureDecoderInitConfig = nullptr;
+	ptrMotfQuadratureDecoderLoadConfig = nullptr;
+	ptrMotfQuadratureDecoderStoreConfig = nullptr;
+	ptrMotfQuadratureDecoderGetConfig = nullptr;
+	ptrMotfQuadratureDecoderSetConfig = nullptr;
+
+	ptrMotfInitConfig = nullptr;
+	ptrMotfGetConfig = nullptr;
+	ptrMotfSetConfig = nullptr;
+	ptrMotfLoadConfig = nullptr;
+	ptrMotfStoreConfig = nullptr;
+	ptrMotfConfigSetDirectionFromAngle = nullptr;
+	ptrMotfQuadratureDecoderResetEncoderPosition = nullptr;
+	ptrMotfQuadratureDecoderReadEncoderPosition = nullptr;
+	ptrMotfGetPendingParts = nullptr;
+	ptrMotfResetState = nullptr;
+
+	ptrSfioRead = nullptr;
+	ptrSfioSpiInitConfig = nullptr;
+	ptrSfioSpiLoadConfig = nullptr;
+	ptrSfioSpiStoreConfig = nullptr;
+	ptrSfioSpiGetConfig = nullptr;
+	ptrSfioSpiSetConfig = nullptr;
+	ptrSfioSpiTransmit = nullptr;
+	ptrSfioSpiTransceive = nullptr;
+	ptrSfioSpiReceive = nullptr;
+	ptrSfioSpiWaitForActiveTransfersDone = nullptr;
+
+	ptrPowerCorrectionCreate = nullptr;
+	ptrPowerCorrectionSet = nullptr;
+	ptrPowerCorrectionGet = nullptr;
+	ptrPowerCorrectionLoad = nullptr;
+	ptrPowerCorrectionStore = nullptr;
+
+	ptrPowerCorrectionChangeValue = nullptr;
+
+	ptrPowerCorrectionGetOpticalParameters = nullptr;
+
+	ptrScannerCommunicationTransceiveEnhanced = nullptr;
+	ptrScannerCommunicationTransmitEnhanced = nullptr;
+	ptrScannerCommunicationReceiveEnhanced = nullptr;
+	ptrScannerCommunicationTransceiveRaylase = nullptr;
+	ptrScannerCommunicationTransmitRaylase = nullptr;
+
+	ptrVariableBooleanCreate = nullptr;
+	ptrVariableBooleanDelete = nullptr;
+	ptrVariableBooleanExists = nullptr;
+	ptrVariableBooleanLoad = nullptr;
+	ptrVariableBooleanStore = nullptr;
+
+	ptrVariableBooleanGetValue = nullptr;
+	ptrVariableBooleanSetValue = nullptr;
+	ptrVariableBooleanToggleValue = nullptr;
+
+	ptrVariableIntegerCreate = nullptr;
+	ptrVariableIntegerDelete = nullptr;
+	ptrVariableIntegerExists = nullptr;
+	ptrVariableIntegerLoad = nullptr;
+	ptrVariableIntegerStore = nullptr;
+
+	ptrVariableIntegerGetValue = nullptr;
+	ptrVariableIntegerSetValue = nullptr;
+	ptrVariableIntegerIncrementValue = nullptr;
+	ptrVariableIntegerDecrementValue = nullptr;
+
+	ptrVariableMarkCounterCreate = nullptr;
+	ptrVariableMarkCounterDelete = nullptr;
+	ptrVariableMarkCounterExists = nullptr;
+	ptrVariableMarkCounterLoad = nullptr;
+	ptrVariableMarkCounterStore = nullptr;
+
+	ptrVariableMarkCounterGetValue = nullptr;
+	ptrVariableMarkCounterSetValue = nullptr;
+	ptrVariableMarkCounterGetAndResetValue = nullptr;
+
+	ptrVariableMarkCounterGetMarkTimeFormat = nullptr;
+	ptrVariableMarkCounterSetMarkTimeFormat = nullptr;
 }
 
 rlHandle CRaylaseSDK::rlConnect(const char* pszAddress, int32_t nPort)

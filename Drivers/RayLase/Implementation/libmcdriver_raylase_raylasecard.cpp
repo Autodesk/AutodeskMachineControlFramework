@@ -156,9 +156,9 @@ void CRaylaseCardImpl::GetLaserStatus(bool& bPilotIsEnabled, bool& bLaserIsArmed
     uint32_t nStatusFlag = 0;
     m_pSDK->checkError(m_pSDK->rlLaserReadLaserStatus(m_Handle, nStatusFlag));
 
-    bPilotIsEnabled = (nStatusFlag & (uint32_t)eRLLaserStatus::lsPilot) != 0;
-    bLaserIsArmed = (nStatusFlag & (uint32_t)eRLLaserStatus::lsArmed) != 0;
-    bLaserAlarm = (nStatusFlag & (uint32_t)eRLLaserStatus::lsAlarm) != 0;
+    bPilotIsEnabled = ((uint32_t)nStatusFlag & (uint32_t)eRLLaserStatus::lsPilot) != 0;
+    bLaserIsArmed = ((uint32_t)nStatusFlag & (uint32_t)eRLLaserStatus::lsArmed) != 0;
+    bLaserAlarm = ((uint32_t)nStatusFlag & (uint32_t)eRLLaserStatus::lsAlarm) != 0;
 
 }
 
