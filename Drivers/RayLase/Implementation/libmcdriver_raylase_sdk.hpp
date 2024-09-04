@@ -201,8 +201,8 @@ namespace LibMCDriver_Raylase {
 			double m_Translation[3];
 		} rlTransform3D;
 
-		typedef void rlGpioConfig;
 		typedef void rlSystemConfig;
+		typedef void rlGpioConfig;
 		typedef void rlSerialPortConfig;
 		typedef void rlLaserConfig;
 		typedef void rlScannerConfig;
@@ -783,6 +783,215 @@ namespace LibMCDriver_Raylase {
 			rlResult rlConfigurationAbortUpdate (rlHandle handle);
 			rlResult rlConfigurationIsUpdateActive (rlHandle handle, uint32_t* pbIsActive);
 
+			uint32_t rlGpioConfigMemorySize ();
+			rlResult rlGpioInitConfig (rlGpioConfig* pConfig);
+			rlResult rlGpioLoadConfig (rlHandle handle);
+			rlResult rlGpioStoreConfig (rlHandle handle);
+			rlResult rlGpioGetConfig (rlHandle handle, rlGpioConfig* pConfig);
+			rlResult rlGpioSetConfig (rlHandle handle, rlGpioConfig* pConfig);
+			rlResult rlGpioGetPinCount (rlHandle handle, eRLIOPort port, int32_t& pPinCount);
+			rlResult rlGpioGetGroupCount (rlHandle handle, eRLIOPort port, int32_t& pGroupCount);
+			rlResult rlGpioGetSupportedIOLevels (rlHandle handle, eRLIOPort port, eRLIOVoltage* pIOLevels, uint32_t nIOLevelSize, uint32_t& nLevelsCount);
+			rlResult rlGpioGetSupportedDirections (rlHandle handle, eRLIOPort port, eRLIODirection* pIODirections, uint32_t nIODirectionsSize, uint32_t& nDirectionsCount);
+			rlResult rlGpioGetIOLevel (rlHandle handle, eRLIOPort port, eRLIOVoltage& ioLevel);
+			rlResult rlGpioSetIOLevel (rlHandle handle, eRLIOPort port, eRLIOVoltage ioLevel);
+			rlResult rlGpioGetDirections (rlHandle handle, eRLIOPort port, eRLIODirection* pIODirections, uint32_t nIODirectionsSize, uint32_t& nDirectionsCount);
+			rlResult rlGpioSetDirections (rlHandle handle, eRLIOPort port, eRLIODirection* pIODirections, uint32_t nDirectionsCount);
+			rlResult rlGpioGetPolarities (rlHandle handle, eRLIOPort port, eRLPolarity* pPolarities, uint32_t nPolaritiesSize, uint32_t& nPolaritiesCount);
+			rlResult rlGpioSetPolarities (rlHandle handle, eRLIOPort port, eRLPolarity* pPolarities, uint32_t nPolaritiesCount);
+			rlResult rlGpioGetWriteDelay (rlHandle handle, eRLIOPort port, double& dDelay);
+			rlResult rlGpioSetWriteDelay (rlHandle handle, eRLIOPort port, double dDelay);
+			rlResult rlGpioGetWriteWidth (rlHandle handle, eRLIOPort port, double& dWidth);
+			rlResult rlGpioSetWriteWidth (rlHandle handle, eRLIOPort port, double dWidth);
+			rlResult rlGpioRead (rlHandle handle, eRLIOPort port, uint32_t& nValue);
+			rlResult rlGpioGetOutput (rlHandle handle, eRLIOPort port, uint32_t& nValue);
+			rlResult rlGpioWrite (rlHandle handle, eRLIOPort port, eRLPinAction action, uint32_t nValue);
+
+			uint32_t rlSystemConfigMemorySize ();
+			rlResult rlSystemInitConfig (rlSystemConfig* pConfig);
+			rlResult rlSystemLoadConfig (rlHandle handle);
+			rlResult rlSystemStoreConfig (rlHandle handle);
+			rlResult rlSystemGetConfig (rlHandle handle, rlSystemConfig* pConfig);
+			rlResult rlSystemSetConfig (rlHandle handle, rlSystemConfig* pConfig);
+
+			rlResult rlSystemGetFirmwareVersion (rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+			rlResult rlSystemGetFirmwareProductVersion (rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+			rlResult rlSystemGetFPGAVersion (rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+			rlResult rlSystemGetOSVersion (rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+			rlResult rlSystemGetCardSerialNumber (rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+
+			rlResult rlSystemGetConnectionLimit (rlHandle handle, int32_t nConnectionLimit);
+			rlResult rlSystemResetOperatingState (rlHandle handle);
+			rlResult rlSystemGetOperatingState (rlHandle handle, eRLOperatingState& operatingState);
+
+			rlResult rlSerialPortInitConfig (rlSerialPortConfig* pConfig);
+			rlResult rlSerialPortLoadConfig (rlHandle handle);
+			rlResult rlSerialPortStoreConfig (rlHandle handle);
+			rlResult rlSerialPortGetConfig (rlHandle handle, rlSerialPortConfig* pConfig);
+			rlResult rlSerialPortSetConfig (rlHandle handle, rlSerialPortConfig* pConfig);
+			rlResult rlSerialPortTransmitString (rlHandle handle, const char* pTransmitMessage, uint32_t nTransmitMessageLength);
+			rlResult rlSerialPortTransmitLine (rlHandle handle, const char* pTransmitMessage, uint32_t nTransmitMessageLength);
+			rlResult rlSerialPortTransmitBytes (rlHandle handle, const uint8_t* pTransmitMessage, uint32_t nTransmitMessageLength);
+
+			rlResult rlSerialPortTryVerifyResponseString (rlHandle handle, const char* pTransmitMessage, uint32_t nTransmitMessageLength, const char* pGoodresponse, uint32_t nGoodResponseLength, uint32_t& nSuccessFlag);
+			rlResult rlSerialPortTryVerifyResponseLine (rlHandle handle, const char* pTransmitMessage, uint32_t nTransmitMessageLength, const char* pGoodresponse, uint32_t nGoodResponseLength, uint32_t& nSuccessFlag);
+			rlResult rlSerialPortTryVerifyResponseBytes (rlHandle handle, const uint8_t* pTransmitMessage, uint32_t nTransmitMessageLength, const uint8_t* pGoodresponse, uint32_t nGoodResponseLength, uint32_t& nSuccessFlag);
+
+			rlResult rlSerialPortReceiveString (rlHandle handle, uint32_t nReadCount, char* pOutBuffer, uint32_t nBufferLength, uint32_t& nReceivedLength);
+			rlResult rlSerialPortReceiveLine (rlHandle handle, char* pOutBuffer, uint32_t nBufferLength, uint32_t& nReceivedLength);
+			rlResult rlSerialPortReceiveBytes (rlHandle handle, uint32_t nReadCount, uint8_t* pOutBuffer, uint32_t nBufferLength, uint32_t& nReceivedLength);
+
+			rlResult rlLaserInitConfig (rlLaserConfig* pConfig);
+			rlResult rlLaserLoadConfig (rlHandle handle);
+			rlResult rlLaserStoreConfig (rlHandle handle);
+			rlResult rlLaserGetConfig (rlHandle handle, rlLaserConfig* pConfig);
+			rlResult rlLaserSetConfig (rlHandle handle, rlLaserConfig* pConfig);
+
+
+			rlResult rlLaserCreatePowerCalibration (rlHandle handle, eRLPowerChannels powerTargetChannel);
+			rlResult rlLaserLoadPowerCalibration (rlHandle handle, eRLPowerChannels powerTargetChannel);
+			rlResult rlLaserStorePowerCalibration (rlHandle handle, eRLPowerChannels powerTargetChannel);
+			rlResult rlLaserGetPowerCalibration (rlHandle handle, eRLPowerChannels powerTargetChannel, uint32_t* pBuffer, int32_t nBufferSize, int32_t& calibrationValuesCount);
+			rlResult rlLaserSetPowerCalibration (rlHandle handle, eRLPowerChannels powerTargetChannel, uint32_t* pCalibrationValues, int32_t calibrationValuesLength);
+			rlResult rlLaserPowerCalibrationSet (rlHandle handle, eRLPowerChannels powerTargetChannel, const char* pLocalFileName);
+			rlResult rlLaserPowerCalibrationGet (rlHandle handle, eRLPowerChannels powerTargetChannel, const char* pLocalFileName);
+			rlResult rlLaserGetPowerScale (rlHandle handle, eRLPowerChannels powerTargetChannel, double& dPowerScale);
+			rlResult rlLaserSetPowerScale (rlHandle handle, eRLPowerChannels powerTargetChannel, double dPowerScale);
+
+			rlResult rlScannerInitConfig (rlScannerConfig* pConfig);
+			rlResult rlScannerSetConfig (rlHandle handle, rlScannerConfig* pConfig);
+			rlResult rlScannerGetConfig (rlHandle handle, rlScannerConfig* pConfig);
+			rlResult rlScannerLoadConfig (rlHandle handle);
+			rlResult rlScannerStoreConfig (rlHandle handle);
+			rlResult rlScannerGetNominalPosition (rlHandle handle, double& dX, double& dY, double& dZ);
+			rlResult rlScannerReadPositions (rlHandle handle, double* pdPositions);
+			rlResult rlScannerReadLastPositions (rlHandle handle, double* pdPositions);
+			rlResult rlScannerHeadFormatGetHeadCount (eRLScanHeadFormat headFormat, int32_t& nOut);
+			rlResult rlScannerHeadFormatGetAxisCount (eRLScanHeadFormat headFormat, int32_t& nOut);
+			rlResult rlScannerHeadFormatGetDimensions (eRLScanHeadFormat headFormat, int32_t* pDimensions);
+			rlResult rlScannerHeadFormatGetAxes (eRLScanHeadFormat headFormat, eRLAxes& axes);
+			rlResult rlScannerHeadFormatGetIndexOfAxis (eRLScanHeadFormat headFormat, int32_t nIndex, eRLAxis& axis);
+			rlResult rlScannerHeadFormatHasOpticalZoom (eRLScanHeadFormat headFormat, uint32_t& bHasZoom);
+			rlResult rlScannerHeadFormatHasAuxiliary (eRLScanHeadFormat headFormat, uint32_t& bHasAuxiliary);
+			rlResult rlScannerHeadFormatIsExtended (eRLScanHeadFormat headFormat, uint32_t& bIsExtended);
+			rlResult rlScannerGetHeadBias (rlHandle handle, int32_t nHead, rlPoint3D& bias);
+			rlResult rlScannerSetHeadBias (rlHandle handle, int32_t nHead, eRLAxes axes, double* pBiases, int32_t nLength);
+
+			rlResult rlAdapterBoardGetConfig (rlHandle handle, eRLIOPort port, rlAdapterBoardConfig* pConfig);
+			rlResult rlAdapterBoardSetConfig (rlHandle handle, eRLIOPort port, rlAdapterBoardConfig* pConfig);
+			rlResult rlAdapterBoardSetConfigByName (rlHandle handle, eRLIOPort port, const char* pName);
+			rlResult rlAdapterBoardEnable (rlHandle handle, eRLIOPort port, uint32_t bEnable);
+			rlResult rlAdapterBoardEnabled (rlHandle handle, eRLIOPort port, uint32_t& bEnabled);
+			rlResult rlAdapterBoardSupportsAutoConfiguration (rlHandle handle, eRLIOPort port, uint32_t& bSupportsAutoConfiguration);
+			rlResult rlAdapterBoardValid (rlHandle handle, eRLIOPort port, uint32_t& bValid);
+			rlResult rlAdapterBoardGetAvailableAdapterBoardNames (rlHandle handle, eRLIOPort port, char* pBuffer, uint32_t nBufferLen, uint32_t& outLen, int32_t* pOutItems);
+			rlResult rlAdapterBoardGetCurrentAdapterBoardName (rlHandle handle, eRLIOPort port, char* pBuffer, uint32_t nBufferLen, uint32_t& outLen);
+
+
+			rlResult rlProcessInitVariables (rlProcessVariables* pVariables);
+			rlResult rlProcessLoadVariables (rlHandle handle);
+			rlResult rlProcessStoreVariables (rlHandle handle);
+			rlResult rlProcessGetVariables (rlHandle handle, rlProcessVariables* pVariables);
+			rlResult rlProcessSetVariables (rlHandle handle, rlProcessVariables* pVariables);
+
+			rlResult rlProcessGetSpeedScale (rlHandle handle, double& dSpeedScale);
+			rlResult rlProcessSetSpeedScale (rlHandle handle, double dSpeedScale);
+			rlResult rlProcessGetTransformation (rlHandle handle, rlTransform3D* pTransformation);
+			rlResult rlProcessSetTransformation (rlHandle handle, rlTransform3D* pTransformation);
+			rlResult rlProcessWobbleSetCircle (rlHandle handle, rlProcessVariables* pVariables, double dAmplitude, double dFrequency);
+			rlResult rlProcessWobbleSetEight (rlHandle handle, rlProcessVariables* pVariables, rlPoint2D* pAmplitude, double dFrequency);
+
+			rlResult rlHeadCorrectionExists (rlHandle handle, int32_t nHead, int32_t nCorrection, uint32_t& bExists);
+			rlResult rlHeadCorrectionDelete (rlHandle handle, int32_t nHead, int32_t nCorrection);
+			rlResult rlHeadCorrectionGet (rlHandle handle, int32_t nHead, int32_t nCorrection, const char* pLocalFileName);
+			rlResult rlHeadCorrectionSet (rlHandle handle, int32_t nHead, int32_t nCorrection, const char* pLocalFileName);
+			rlResult rlHeadCorrectionLoad (rlHandle handle);
+			rlResult rlHeadCorrectionStore (rlHandle handle);
+
+			rlResult rlHeadCorrectionInitOpticalParameters (rlOpticalParameters* pParameters);
+			rlResult rlHeadCorrectionGetOpticalParameters (rlHandle handle, int32_t nHead, int32_t nCorrection, rlOpticalParameters* pParameters);
+			rlResult rlHeadCorrectionGetHash (rlHandle handle, int32_t nHead, int32_t nCorrection, char* pOutBuffer, uint32_t nBufferLen, uint32_t& nOutLen);
+			rlResult rlHeadCorrectionSelectCorrection (rlHandle handle, int32_t nHead, int32_t nCorrection);
+			rlResult rlHeadCorrectionGetSelectedCorrection (rlHandle handle, int32_t nHead, int32_t& nSelectedCorrection);
+
+			rlResult rlMotfQuadratureDecoderInitConfig (rlQuadratureDecoderConfig* pConfig);
+			rlResult rlMotfQuadratureDecoderLoadConfig (rlHandle handle);
+			rlResult rlMotfQuadratureDecoderStoreConfig (rlHandle handle);
+			rlResult rlMotfQuadratureDecoderGetConfig (rlHandle handle, rlQuadratureDecoderConfig* pConfig);
+			rlResult rlMotfQuadratureDecoderSetConfig (rlHandle handle, rlQuadratureDecoderConfig* pConfig);
+
+			rlResult rlMotfInitConfig (rlMotfConfig* pConfig);
+			rlResult rlMotfGetConfig (rlHandle handle, rlMotfConfig* pConfig);
+			rlResult rlMotfSetConfig (rlHandle handle, rlMotfConfig* pConfig);
+			rlResult rlMotfLoadConfig (rlHandle handle);
+			rlResult rlMotfStoreConfig (rlHandle handle);
+			rlResult rlMotfConfigSetDirectionFromAngle (rlMotfConfig* pConfig, double dAngle);
+			rlResult rlMotfQuadratureDecoderResetEncoderPosition (rlHandle handle, int32_t nEncoderID);
+			rlResult rlMotfQuadratureDecoderReadEncoderPosition (rlHandle handle, int32_t nEncoderID, int32_t& nPosition);
+			rlResult rlMotfGetPendingParts (rlHandle handle, int32_t& nPendingPart);
+			rlResult rlMotfResetState (rlHandle handle);
+
+			rlResult rlSfioRead (rlHandle handle, eRLSfRegister, uint32_t& nValue);
+			rlResult rlSfioSpiInitConfig (rlSpiConfig* pConfig);
+			rlResult rlSfioSpiLoadConfig (rlHandle handle);
+			rlResult rlSfioSpiStoreConfig (rlHandle handle);
+			rlResult rlSfioSpiGetConfig (rlHandle handle, rlSpiConfig* pConfig);
+			rlResult rlSfioSpiSetConfig (rlHandle handle, rlSpiConfig* pConfig);
+			rlResult rlSfioSpiTransmit (rlHandle handle, int32_t nModule, uint32_t* pTransmitMessage, uint32_t nTransmitMessageLen, uint32_t bAsync);
+			rlResult rlSfioSpiTransceive (rlHandle handle, int32_t nModule, uint32_t* pTransmitMessage, uint32_t nTransmitMessageLen, int32_t nTimeoutInMS, uint32_t* pBuffer, uint32_t nBufferSize, uint32_t nReceiveLength);
+			rlResult rlSfioSpiReceive (rlHandle handle, int32_t nModule, uint32_t nReadCount, int32_t nTimeoutInMS, uint32_t* pBuffer, uint32_t nBufferSize, uint32_t nReceiveLength);
+			rlResult rlSfioSpiWaitForActiveTransfersDone (rlHandle handle, int32_t nModule);
+
+			rlResult rlPowerCorrectionCreate (rlHandle handle, rlOpticalParameters* parameters);
+			rlResult rlPowerCorrectionSet (rlHandle handle, const char* pLocalFileName);
+			rlResult rlPowerCorrectionGet (rlHandle handle, const char* pLocalFileName);
+			rlResult rlPowerCorrectionLoad (rlHandle handle);
+			rlResult rlPowerCorrectionStore (rlHandle handle);
+
+			rlResult rlPowerCorrectionChangeValue (rlHandle handle, rlPoint3D position, double dFactor);
+
+			rlResult rlPowerCorrectionGetOpticalParameters (rlHandle handle, rlOpticalParameters* pParameters);
+
+			rlResult rlScannerCommunicationTransceiveEnhanced (rlHandle handle, int32_t nHead, eRLAxes axes, const uint32_t* commands, uint32_t commandsLength, int32_t timeoutMilliseconds, uint32_t* buffer, uint32_t bufferSize, uint32_t& receiveCount);
+			rlResult rlScannerCommunicationTransmitEnhanced (rlHandle handle, int32_t nHead, eRLAxes axes, const uint32_t* commands, uint32_t commandsLength, int32_t timeoutMilliseconds);
+			rlResult rlScannerCommunicationReceiveEnhanced (rlHandle handle, int32_t nHead, eRLAxes axes, int32_t timeoutMilliseconds, uint32_t* buffer, uint32_t bufferSize, uint32_t& receiveCount);
+			rlResult rlScannerCommunicationTransceiveRaylase (rlHandle handle, int32_t nHead, eRLAxis axis, const unsigned char* transmitMessage, uint32_t transmitMessageLength, int32_t timeoutMilliseconds, unsigned char* buffer, uint32_t bufferSize, uint32_t& receiveCount);
+			rlResult rlScannerCommunicationTransmitRaylase (rlHandle handle, int32_t nHead, eRLAxis axis, const unsigned char* transmitMessage, uint32_t transmitMessageLength, int32_t timeoutMilliseconds);
+
+
+			rlResult rlVariableBooleanCreate (rlHandle handle, const char* name, bool initialValue);
+			rlResult rlVariableBooleanDelete (rlHandle handle, const char* name, bool fromDisk);
+			rlResult rlVariableBooleanExists (rlHandle handle, const char* name, bool& exists);
+			rlResult rlVariableBooleanLoad (rlHandle handle, const char* name);
+			rlResult rlVariableBooleanStore (rlHandle handle, const char* name);
+
+			rlResult rlVariableBooleanGetValue (rlHandle handle, const char* name, bool& value);
+			rlResult rlVariableBooleanSetValue (rlHandle handle, const char* name, bool value);
+			rlResult rlVariableBooleanToggleValue (rlHandle handle, const char* name);
+
+			rlResult rlVariableIntegerCreate (rlHandle handle, const char* name, int32_t initialValue);
+			rlResult rlVariableIntegerDelete (rlHandle handle, const char* name, bool fromDisk);
+			rlResult rlVariableIntegerExists (rlHandle handle, const char* name, bool& exists);
+			rlResult rlVariableIntegerLoad (rlHandle handle, const char* name);
+			rlResult rlVariableIntegerStore (rlHandle handle, const char* name);
+
+			rlResult rlVariableIntegerGetValue (rlHandle handle, const char* name, int32_t& value);
+			rlResult rlVariableIntegerSetValue (rlHandle handle, const char* name, int32_t value);
+			rlResult rlVariableIntegerIncrementValue (rlHandle handle, const char* name);
+			rlResult rlVariableIntegerDecrementValue (rlHandle handle, const char* name);
+
+			rlResult rlVariableMarkCounterCreate (rlHandle handle, const char* name, int32_t initialValue);
+			rlResult rlVariableMarkCounterDelete (rlHandle handle, const char* name, bool fromDisk);
+			rlResult rlVariableMarkCounterExists (rlHandle handle, const char* name, bool& exists);
+			rlResult rlVariableMarkCounterLoad (rlHandle handle, const char* name);
+			rlResult rlVariableMarkCounterStore (rlHandle handle, const char* name);
+
+			rlResult rlVariableMarkCounterGetValue (rlHandle handle, const char* name, int32_t& value);
+			rlResult rlVariableMarkCounterSetValue (rlHandle handle, const char* name, int32_t value);
+			rlResult rlVariableMarkCounterGetAndResetValue (rlHandle handle, const char* name, int32_t& value);
+
+			rlResult rlVariableMarkCounterGetMarkTimeFormat (rlHandle handle, char* buffer, uint32_t bufferSize, uint32_t& stringLength);
+			rlResult rlVariableMarkCounterSetMarkTimeFormat (rlHandle handle, const char* format);
 
 
 		};

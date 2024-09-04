@@ -1017,3 +1017,173 @@ rlResult CRaylaseSDK::rlConfigurationIsUpdateActive(rlHandle handle, uint32_t* p
 	return ptrConfigurationIsUpdateActive(handle, pbIsActive);
 }
 
+
+rlResult CRaylaseSDK::rlGpioInitConfig(rlGpioConfig* pConfig)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioInitConfig (" + std::to_string((uintptr_t)pConfig) + "); ");
+	}
+
+	return ptrGpioInitConfig(pConfig);
+}
+
+rlResult CRaylaseSDK::rlGpioLoadConfig(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioLoadConfig (" + std::to_string(handle) + "); ");
+	}
+
+	return ptrGpioLoadConfig(handle);
+}
+
+rlResult CRaylaseSDK::rlGpioStoreConfig(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioStoreConfig (" + std::to_string(handle) + "); ");
+	}
+
+	return ptrGpioStoreConfig(handle);
+}
+
+rlResult CRaylaseSDK::rlGpioGetConfig(rlHandle handle, rlGpioConfig* pConfig)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioGetConfig (" + std::to_string(handle) + ", " + std::to_string ((uintptr_t) pConfig) + "); ");
+	}
+
+	return ptrGpioGetConfig(handle, pConfig);
+}
+
+rlResult CRaylaseSDK::rlGpioSetConfig(rlHandle handle, rlGpioConfig* pConfig)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioSetConfig (" + std::to_string(handle) + ", " + std::to_string((uintptr_t)pConfig) + "); ");
+	}
+
+	return ptrGpioSetConfig(handle, pConfig);
+}
+
+rlResult CRaylaseSDK::rlGpioGetPinCount(rlHandle handle, eRLIOPort port, int32_t& pPinCount)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioGetPinCount (" + std::to_string(handle) + ", " + std::to_string ((int32_t) port) + ", &pinCount); ");
+	}
+
+	return ptrGpioGetPinCount(handle, port, pPinCount);
+}
+
+rlResult CRaylaseSDK::rlGpioGetGroupCount(rlHandle handle, eRLIOPort port, int32_t& pGroupCount)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioGetGroupCount (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", &groupCount); ");
+	}
+
+	return ptrGpioGetGroupCount(handle, port, pGroupCount);
+}
+
+rlResult CRaylaseSDK::rlGpioGetSupportedIOLevels(rlHandle handle, eRLIOPort port, eRLIOVoltage* pIOLevels, uint32_t nIOLevelSize, uint32_t& nLevelsCount)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioGetSupportedIOLevels (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", pIOLevels, " + std::to_string (nIOLevelSize) + ", levelsCount); ");
+	}
+
+	return ptrGpioGetSupportedIOLevels(handle, port, pIOLevels, nIOLevelSize, nLevelsCount);
+}
+
+rlResult CRaylaseSDK::rlGpioGetSupportedDirections(rlHandle handle, eRLIOPort port, eRLIODirection* pIODirections, uint32_t nIODirectionsSize, uint32_t& nDirectionsCount)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioGetSupportedDirections (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", pIODirections, " + std::to_string(nIODirectionsSize) + ", directionsCount); ");
+	}
+
+	return ptrGpioGetSupportedDirections(handle, port, pIODirections, nIODirectionsSize, nDirectionsCount);
+}
+
+rlResult CRaylaseSDK::rlGpioGetIOLevel(rlHandle handle, eRLIOPort port, eRLIOVoltage& ioLevel)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioGetIOLevel (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", &ioLevel); ");
+	}
+
+	return ptrGpioGetIOLevel(handle, port, ioLevel);
+}
+
+rlResult CRaylaseSDK::rlGpioSetIOLevel(rlHandle handle, eRLIOPort port, eRLIOVoltage ioLevel)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioSetIOLevel (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", " + std::to_string ((int32_t) ioLevel) + "); ");
+	}
+
+	return ptrGpioSetIOLevel(handle, port, ioLevel);
+}
+
+rlResult CRaylaseSDK::rlGpioGetDirections(rlHandle handle, eRLIOPort port, eRLIODirection* pIODirections, uint32_t nIODirectionsSize, uint32_t& nDirectionsCount)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioGetDirections (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", pIODirections, " + std::to_string(nIODirectionsSize) + ", directionsCount); ");
+	}
+
+	return ptrGpioGetDirections(handle, port, pIODirections, nIODirectionsSize, nDirectionsCount);
+}
+
+rlResult CRaylaseSDK::rlGpioSetDirections(rlHandle handle, eRLIOPort port, eRLIODirection* pIODirections, uint32_t nDirectionsCount)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioSetDirections (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", pIODirections, " + std::to_string(nDirectionsCount) + "); ");
+	}
+
+	return ptrGpioSetDirections(handle, port, pIODirections, nDirectionsCount);
+}
+
+rlResult CRaylaseSDK::rlGpioGetPolarities(rlHandle handle, eRLIOPort port, eRLPolarity* pPolarities, uint32_t nPolaritiesSize, uint32_t& nPolaritiesCount)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioGetPolarities (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", pPolarities, " + std::to_string(nPolaritiesSize) + ", polaritiesCount); ");
+	}
+
+	return ptrGpioGetPolarities(handle, port, pPolarities, nPolaritiesSize, nPolaritiesCount);
+
+}
+
+rlResult CRaylaseSDK::rlGpioSetPolarities(rlHandle handle, eRLIOPort port, eRLPolarity* pPolarities, uint32_t nPolaritiesCount)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlGpioSetPolarities (" + std::to_string(handle) + ", " + std::to_string((int32_t)port) + ", pPolarities, polaritiesCount); ");
+	}
+
+	return ptrGpioSetPolarities(handle, port, pPolarities, nPolaritiesCount);
+
+}
+
+/* lResult CRaylaseSDK::rlGpioGetWriteDelay(rlHandle handle, eRLIOPort port, double& dDelay);
+rlResult CRaylaseSDK::rlGpioSetWriteDelay(rlHandle handle, eRLIOPort port, double dDelay);
+rlResult CRaylaseSDK::rlGpioGetWriteWidth(rlHandle handle, eRLIOPort port, double& dWidth);
+rlResult CRaylaseSDK::rlGpioSetWriteWidth(rlHandle handle, eRLIOPort port, double dWidth);
+rlResult CRaylaseSDK::rlGpioRead(rlHandle handle, eRLIOPort port, uint32_t& nValue);
+rlResult CRaylaseSDK::rlGpioGetOutput(rlHandle handle, eRLIOPort port, uint32_t& nValue);
+rlResult CRaylaseSDK::rlGpioWrite(rlHandle handle, eRLIOPort port, eRLPinAction action, uint32_t nValue);
+
+rlResult CRaylaseSDK::rlSystemInitConfig(rlSystemConfig* pConfig);
+rlResult CRaylaseSDK::rlSystemLoadConfig(rlHandle handle);
+rlResult CRaylaseSDK::rlSystemStoreConfig(rlHandle handle);
+rlResult CRaylaseSDK::rlSystemGetConfig(rlHandle handle, rlSystemConfig* pConfig);
+rlResult CRaylaseSDK::rlSystemSetConfig(rlHandle handle, rlSystemConfig* pConfig);
+
+rlResult CRaylaseSDK::rlSystemGetFirmwareVersion(rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+rlResult CRaylaseSDK::rlSystemGetFirmwareProductVersion(rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+rlResult CRaylaseSDK::rlSystemGetFPGAVersion(rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+rlResult CRaylaseSDK::rlSystemGetOSVersion(rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength);
+rlResult CRaylaseSDK::rlSystemGetCardSerialNumber(rlHandle handle, char* pBuffer, uint32_t nBufferSize, uint32_t& nStringLength); 
+ */
+
+uint32_t CRaylaseSDK::rlGpioConfigMemorySize()
+{
+	return 1024;
+}
+
+
+uint32_t CRaylaseSDK::rlSystemConfigMemorySize()
+{
+	return 1024;
+}
+
