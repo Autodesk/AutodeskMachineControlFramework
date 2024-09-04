@@ -79,6 +79,7 @@ namespace AMCCommon {
 		static std::string encodeBase64 (const std::string& sString, eBase64Type eType);
 		static void decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t> & byteBuffer);
 		static std::string decodeBase64ToASCIIString(const std::string& sString, eBase64Type eType);
+		static std::string encodeRFC5987(const std::string& sInput);
 
 		static bool fileOrPathExistsOnDisk(const std::string& sPathName);
 		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);

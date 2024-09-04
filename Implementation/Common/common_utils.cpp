@@ -996,6 +996,25 @@ namespace AMCCommon {
 
 	}
 
+	std::string CUtils::encodeRFC5987(const std::string& sInput) 
+	{
+		std::ostringstream encoded;
+		encoded << "UTF-8''";  // RFC 5987 syntax starts with "charset'lang'"
+
+		for (unsigned char c : sInput) {
+			if (isalnum(c) || c == '*' || c == '-' || c == '.' || c == '_') {
+				// Characters that are safe to use directly
+				encoded << c;
+			}
+			else {
+				// Percent-encode all other characters
+				encoded << '%' << std::uppercase << std::hex << static_cast<int>(c);
+			}
+		}
+
+		return encoded.str();
+	}
+
 	void CUtils::decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t>& byteBuffer)
 	{
 		switch (eType) {

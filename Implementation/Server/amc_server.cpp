@@ -402,9 +402,8 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 							res.set_header("Content-Disposition", "attachment; filename=\"" + sContentDispositionName + "\"");
 						}
 						else {
-							// TODO: Encode in RFC 5987 Encoding
-							//res.set_header("Content-Disposition", "attachment; filename*=UTF-8''" + sContentDispositionName);
-							throw std::runtime_error("Content disposition filename contains invalid characters...");
+							// Encode in RFC 5987 Encoding
+							res.set_header("Content-Disposition", "attachment; filename*=" + AMCCommon::CUtils::encodeRFC5987 (sContentDispositionName));
 						}
 					}
 
