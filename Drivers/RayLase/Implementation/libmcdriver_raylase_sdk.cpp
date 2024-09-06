@@ -785,13 +785,13 @@ rlResult CRaylaseSDK::rlListAppendLaserOff(rlListHandle handle)
 	return ptrListAppendLaserOff(handle);
 }
 
-rlResult CRaylaseSDK::rlListAppendPower(rlListHandle handle, uint16_t nPower)
+rlResult CRaylaseSDK::rlListAppendPower(rlListHandle handle, uint16_t nPower, eRLPowerChannels powerTargetChannel)
 {
 	if (m_bEnableJournal) {
-		logJournal("rlListAppendPower (" + std::to_string(handle) + ", " + std::to_string (nPower) + "); ");
+		logJournal("rlListAppendPower (" + std::to_string(handle) + ", " + std::to_string (nPower) + ", " + std::to_string((uint32_t) powerTargetChannel) + "); ");
 	}
 
-	return ptrListAppendPower(handle, nPower);
+	return ptrListAppendPower(handle, nPower, powerTargetChannel);
 }
 
 rlResult CRaylaseSDK::rlListAppendJumpSpeed(rlListHandle handle, double jumpSpeed)

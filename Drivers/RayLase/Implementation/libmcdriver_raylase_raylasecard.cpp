@@ -63,6 +63,8 @@ CRaylaseCardImpl::CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardNam
         m_Handle = m_pSDK->rlConnect(sCardIP.c_str(), nPort);
         if (m_Handle < 0)
             m_pSDK->checkError(m_Handle);
+
+        //m_pSDK->ptrEnableCommandLogging (m_Handle, "d:/raylase.txt", -1);
     }
 }
 
@@ -173,7 +175,7 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
     double dUnits = pToolpathAccessor->GetUnits();
 
     rlListHandle listHandle = m_pSDK->rlListAllocate(m_Handle);
-    //m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(listHandle), "rlListAppendLaserOn");
+    m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(listHandle), "rlListAppendLaserOn");
 
     uint32_t nSegmentCount = pLayer->GetSegmentCount();
     for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
@@ -199,8 +201,7 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
 
             m_pSDK->checkError(m_pSDK->rlListAppendJumpSpeed(listHandle, dJumpSpeedInMeterPerSecond), "rlListAppendJumpSpeed");
             m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(listHandle, dMarkSpeedInMeterPerSecond), "rlListAppendMarkSpeed");
-            m_pSDK->checkError(m_pSDK->rlListAppendPower(listHandle, nPowerInUnits), "rlListAppendPower");
-
+            m_pSDK->checkError(m_pSDK->rlListAppendPower(listHandle, nPowerInUnits, eRLPowerChannels::ptcAllChannels), "rlListAppendPower");
 
             std::vector<LibMCEnv::sPosition2D> Points;
             pLayer->GetSegmentPointData(nSegmentIndex, Points);
@@ -266,7 +267,7 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
 
     }
 
-    //m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(listHandle), "rlListAppendLaserOff");
+    m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(listHandle), "rlListAppendLaserOff");
 
     m_pSDK->checkError(m_pSDK->rlListSet(m_Handle, 0, listHandle, false, -1), "rlListSet");
     m_pSDK->checkError(m_pSDK->rlListExecute(m_Handle, 0), "rlListExecute");

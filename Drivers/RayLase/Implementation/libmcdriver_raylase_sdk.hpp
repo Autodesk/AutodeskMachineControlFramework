@@ -236,7 +236,7 @@ namespace LibMCDriver_Raylase {
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListReleaseHandle) (rlListHandle handle);		
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendLaserOn) (rlListHandle handle);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendLaserOff) (rlListHandle handle);
-		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendPower) (rlListHandle handle, uint16_t nPower);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendPower) (rlListHandle handle, uint16_t nPower, eRLPowerChannels powerTargetChannel);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendJumpSpeed) (rlListHandle handle, double jumpSpeed);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendMarkSpeed) (rlListHandle handle, double markSpeed);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendJumpDelay) (rlListHandle handle, double jumpDelay);
@@ -755,7 +755,7 @@ namespace LibMCDriver_Raylase {
 			rlResult rlListReleaseHandle (rlListHandle handle);
 			rlResult rlListAppendLaserOn (rlListHandle handle);
 			rlResult rlListAppendLaserOff (rlListHandle handle);
-			rlResult rlListAppendPower (rlListHandle handle, uint16_t nPower);
+			rlResult rlListAppendPower (rlListHandle handle, uint16_t nPower, eRLPowerChannels powerTargetChannel);
 			rlResult rlListAppendJumpSpeed (rlListHandle handle, double jumpSpeed);
 			rlResult rlListAppendMarkSpeed (rlListHandle handle, double markSpeed);
 			rlResult rlListAppendJumpDelay (rlListHandle handle, double jumpDelay);
