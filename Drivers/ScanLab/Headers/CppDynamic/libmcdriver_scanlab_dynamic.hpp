@@ -315,6 +315,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "COULDNOTFINDRECORDING";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "INVALIDCHANNELTYPE";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "INVALIDRTCRECORDINGFREQUENCY";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE: return "INVALIDDIGITALOUTPUTVALUE";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK: return "INVALIDDIGITALOUTPUTMASK";
 		}
 		return "UNKNOWN";
 	}
@@ -444,6 +446,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "Could not find recording.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "Invalid channel type.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "Invalid RTC recording frequency.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE: return "Invalid digital output value.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK: return "Invalid digital output mask.";
 		}
 		return "unknown error";
 	}
@@ -820,6 +824,8 @@ public:
 	inline void SetLaserPinOut(const bool bLaserOut1, const bool bLaserOut2);
 	inline void GetLaserPinIn(bool & bLaserOut1, bool & bLaserOut2);
 	inline void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2);
+	inline void AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput);
+	inline void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask);
 	inline void EnableOIE();
 	inline void DisableOIE();
 	inline void StartOIEMeasurement();
@@ -1235,6 +1241,8 @@ public:
 		pWrapperTable->m_RTCContext_SetLaserPinOut = nullptr;
 		pWrapperTable->m_RTCContext_GetLaserPinIn = nullptr;
 		pWrapperTable->m_RTCContext_AddLaserPinOutToList = nullptr;
+		pWrapperTable->m_RTCContext_AddWriteDigitalIOList = nullptr;
+		pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
@@ -2373,6 +2381,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_AddLaserPinOutToList == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddWriteDigitalIOList = (PLibMCDriver_ScanLabRTCContext_AddWriteDigitalIOListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addwritedigitaliolist");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddWriteDigitalIOList = (PLibMCDriver_ScanLabRTCContext_AddWriteDigitalIOListPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addwritedigitaliolist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddWriteDigitalIOList == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList = (PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList = (PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3960,6 +3986,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addlaserpinouttolist", (void**)&(pWrapperTable->m_RTCContext_AddLaserPinOutToList));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddLaserPinOutToList == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addwritedigitaliolist", (void**)&(pWrapperTable->m_RTCContext_AddWriteDigitalIOList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddWriteDigitalIOList == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist", (void**)&(pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoie", (void**)&(pWrapperTable->m_RTCContext_EnableOIE));
@@ -5670,6 +5704,25 @@ public:
 	void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddLaserPinOutToList(m_pHandle, bLaserOut1, bLaserOut2));
+	}
+	
+	/**
+	* CRTCContext::AddWriteDigitalIOList - Adds the change of all 16 digital IO Ports to the current open list.
+	* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+	*/
+	void CRTCContext::AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddWriteDigitalIOList(m_pHandle, nDigitalOutput));
+	}
+	
+	/**
+	* CRTCContext::AddWriteMaskedDigitalIOList - Adds the change a subset of 16 digital IO Ports to the current open list.
+	* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+	* @param[in] nOutputMask - Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535.
+	*/
+	void CRTCContext::AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddWriteMaskedDigitalIOList(m_pHandle, nDigitalOutput, nOutputMask));
 	}
 	
 	/**

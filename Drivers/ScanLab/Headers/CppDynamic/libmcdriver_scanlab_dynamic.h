@@ -1179,6 +1179,25 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserPinIn
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOut1, bool bLaserOut2);
 
 /**
+* Adds the change of all 16 digital IO Ports to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddWriteDigitalIOListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput);
+
+/**
+* Adds the change a subset of 16 digital IO Ports to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+* @param[in] nOutputMask - Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput, LibMCDriver_ScanLab_uint32 nOutputMask);
+
+/**
 * Writes an OIE enabling command block to the open list.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -2594,6 +2613,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetLaserPinOutPtr m_RTCContext_SetLaserPinOut;
 	PLibMCDriver_ScanLabRTCContext_GetLaserPinInPtr m_RTCContext_GetLaserPinIn;
 	PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr m_RTCContext_AddLaserPinOutToList;
+	PLibMCDriver_ScanLabRTCContext_AddWriteDigitalIOListPtr m_RTCContext_AddWriteDigitalIOList;
+	PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr m_RTCContext_AddWriteMaskedDigitalIOList;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPtr m_RTCContext_EnableOIE;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr m_RTCContext_StartOIEMeasurement;

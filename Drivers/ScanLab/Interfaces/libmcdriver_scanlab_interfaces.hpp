@@ -1229,6 +1229,19 @@ public:
 	virtual void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2) = 0;
 
 	/**
+	* IRTCContext::AddWriteDigitalIOList - Adds the change of all 16 digital IO Ports to the current open list.
+	* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+	*/
+	virtual void AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput) = 0;
+
+	/**
+	* IRTCContext::AddWriteMaskedDigitalIOList - Adds the change a subset of 16 digital IO Ports to the current open list.
+	* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+	* @param[in] nOutputMask - Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535.
+	*/
+	virtual void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) = 0;
+
+	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
 	*/
 	virtual void EnableOIE() = 0;

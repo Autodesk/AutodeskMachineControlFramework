@@ -164,7 +164,9 @@
 		<error name="COULDNOTFINDRECORDING" code="1112" description="Could not find recording." />		
 		<error name="INVALIDCHANNELTYPE" code="1113" description="Invalid channel type." />	
 		<error name="INVALIDRTCRECORDINGFREQUENCY" code="1114" description="Invalid RTC recording frequency." />	
-
+		<error name="INVALIDDIGITALOUTPUTVALUE" code="1115" description="Invalid digital output value." />	
+		<error name="INVALIDDIGITALOUTPUTMASK" code="1116" description="Invalid digital output mask." />	
+		
 
 	</errors>
 
@@ -884,6 +886,15 @@ Custom implementation
 			<param name="LaserOut2" type="bool" pass="in" description="Value for Laser Out Pin 2" />
 		</method>
 				
+		<method name="AddWriteDigitalIOList" description="Adds the change of all 16 digital IO Ports to the current open list.">
+			<param name="DigitalOutput" type="uint32" pass="in" description="Value for the digital IO. MUST be between 0 and 65535." />
+		</method>
+
+		<method name="AddWriteMaskedDigitalIOList" description="Adds the change a subset of 16 digital IO Ports to the current open list.">
+			<param name="DigitalOutput" type="uint32" pass="in" description="Value for the digital IO. MUST be between 0 and 65535." />
+			<param name="OutputMask" type="uint32" pass="in" description="Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535." />
+		</method>
+
 		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">
 		</method>
 

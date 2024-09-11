@@ -217,6 +217,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING 1112 /** Could not find recording. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE 1113 /** Invalid channel type. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY 1114 /** Invalid RTC recording frequency. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE 1115 /** Invalid digital output value. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK 1116 /** Invalid digital output mask. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -346,6 +348,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDRECORDING: return "Could not find recording.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE: return "Invalid channel type.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "Invalid RTC recording frequency.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE: return "Invalid digital output value.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK: return "Invalid digital output mask.";
     default: return "unknown error";
   }
 }

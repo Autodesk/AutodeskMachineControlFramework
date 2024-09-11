@@ -1416,6 +1416,32 @@ void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserO
 }
 
 
+void CRTCContext::AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput)
+{
+	if (nDigitalOutput > 65535)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE);
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_write_io_port_list(m_CardNo, nDigitalOutput);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask)
+{
+	if (nDigitalOutput > 65535)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE);
+	if (nOutputMask > 65535)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK);
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_write_io_port_mask_list(m_CardNo, nDigitalOutput, nOutputMask);
+	
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+
 void CRTCContext::callSetTriggerOIE(uint32_t nPeriod)
 {
 

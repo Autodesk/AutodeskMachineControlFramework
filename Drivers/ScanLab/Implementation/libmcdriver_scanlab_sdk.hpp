@@ -99,6 +99,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_io_port_list) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_io_port_mask_list) (uint32_t nCardNo, uint32_t nValue, uint32_t nMask);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_8bit_port_list) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1_list) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2_list) (uint32_t nCardNo, uint32_t nValue);
@@ -289,7 +290,8 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_write_8bit_port ptr_n_write_8bit_port = nullptr;
 			PScanLabPtr_n_write_da_1 ptr_n_write_da_1 = nullptr;
 			PScanLabPtr_n_write_da_2 ptr_n_write_da_2 = nullptr;
-			PScanLabPtr_n_write_io_port ptr_n_write_io_port_list = nullptr;
+			PScanLabPtr_n_write_io_port_list ptr_n_write_io_port_list = nullptr;
+			PScanLabPtr_n_write_io_port_mask_list ptr_n_write_io_port_mask_list = nullptr;
 			PScanLabPtr_n_write_8bit_port ptr_n_write_8bit_port_list = nullptr;
 			PScanLabPtr_n_write_da_1 ptr_n_write_da_1_list = nullptr;
 			PScanLabPtr_n_write_da_2 ptr_n_write_da_2_list = nullptr;
@@ -451,6 +453,7 @@ namespace LibMCDriver_ScanLab {
 			void n_write_da_1 (uint32_t nCardNo, uint32_t nValue);
 			void n_write_da_2 (uint32_t nCardNo, uint32_t nValue);
 			void n_write_io_port_list (uint32_t nCardNo, uint32_t nValue);
+			void n_write_io_port_mask_list(uint32_t nCardNo, uint32_t nValue, uint32_t nMask);			
 			void n_write_8bit_port_list (uint32_t nCardNo, uint32_t nValue);
 			void n_write_da_1_list (uint32_t nCardNo, uint32_t nValue);
 			void n_write_da_2_list (uint32_t nCardNo, uint32_t nValue);

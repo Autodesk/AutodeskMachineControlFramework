@@ -214,7 +214,8 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_write_8bit_port = (PScanLabPtr_n_write_8bit_port)_loadScanLabAddress(hLibrary, "n_write_8bit_port");
 	this->ptr_n_write_da_1 = (PScanLabPtr_n_write_da_1)_loadScanLabAddress(hLibrary, "n_write_da_1");
 	this->ptr_n_write_da_2 = (PScanLabPtr_n_write_da_2)_loadScanLabAddress(hLibrary, "n_write_da_2");
-	this->ptr_n_write_io_port_list = (PScanLabPtr_n_write_io_port)_loadScanLabAddress(hLibrary, "n_write_io_port_list");
+	this->ptr_n_write_io_port_list = (PScanLabPtr_n_write_io_port_list)_loadScanLabAddress(hLibrary, "n_write_io_port_list");
+	this->ptr_n_write_io_port_mask_list = (PScanLabPtr_n_write_io_port_mask_list)_loadScanLabAddress(hLibrary, "n_write_io_port_mask_list");
 	this->ptr_n_write_8bit_port_list = (PScanLabPtr_n_write_8bit_port)_loadScanLabAddress(hLibrary, "n_write_8bit_port_list");
 	this->ptr_n_write_da_1_list = (PScanLabPtr_n_write_da_1)_loadScanLabAddress(hLibrary, "n_write_da_1_list");
 	this->ptr_n_write_da_2_list = (PScanLabPtr_n_write_da_2)_loadScanLabAddress(hLibrary, "n_write_da_2_list");
@@ -429,6 +430,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_write_da_1 = nullptr;
 	ptr_n_write_da_2 = nullptr;
 	ptr_n_write_io_port_list = nullptr;
+	ptr_n_write_io_port_mask_list = nullptr;
 	ptr_n_write_8bit_port_list = nullptr;
 	ptr_n_write_da_1_list = nullptr;
 	ptr_n_write_da_2_list = nullptr;
@@ -866,6 +868,15 @@ void CScanLabSDK::n_write_io_port_list(uint32_t nCardNo, uint32_t nValue)
 
 	ptr_n_write_io_port_list(nCardNo, nValue);
 }
+
+void CScanLabSDK::n_write_io_port_mask_list(uint32_t nCardNo, uint32_t nValue, uint32_t nMask)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("ptr_n_write_io_port_mask_list", std::to_string(nCardNo) + ", " + std::to_string(nValue) + ", " + std::to_string(nMask));
+
+	ptr_n_write_io_port_mask_list(nCardNo, nValue, nMask);
+}
+
 
 void CScanLabSDK::n_write_8bit_port_list(uint32_t nCardNo, uint32_t nValue)
 {

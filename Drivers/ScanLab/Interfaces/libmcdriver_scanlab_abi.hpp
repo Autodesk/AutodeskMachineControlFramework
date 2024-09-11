@@ -1192,6 +1192,25 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addlaserpinouttolist(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOut1, bool bLaserOut2);
 
 /**
+* Adds the change of all 16 digital IO Ports to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addwritedigitaliolist(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput);
+
+/**
+* Adds the change a subset of 16 digital IO Ports to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+* @param[in] nOutputMask - Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput, LibMCDriver_ScanLab_uint32 nOutputMask);
+
+/**
 * Writes an OIE enabling command block to the open list.
 *
 * @param[in] pRTCContext - RTCContext instance.
