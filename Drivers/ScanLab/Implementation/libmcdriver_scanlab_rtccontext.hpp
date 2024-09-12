@@ -15,6 +15,7 @@ Abstract: This is the class declaration of CRTCContext
 #include "libmcdriver_scanlab_interfaces.hpp"
 #include "libmcdriver_scanlab_sdk.hpp"
 #include "libmcdriver_scanlab_rtcrecordinginstance.hpp"
+#include "libmcdriver_scanlab_nlightafxprofileselector.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlab_base.hpp"
@@ -65,6 +66,8 @@ public:
 };
 
 typedef std::shared_ptr<CRTCContextOwnerData> PRTCContextOwnerData;
+
+
 
 class CRTCContext : public virtual IRTCContext, public virtual CBase {
 
@@ -121,6 +124,8 @@ protected:
 	std::vector<sLaserCalibrationPoint> m_LaserPowerCalibrationList;
 
 	std::map<std::string, PRTCRecordingInstance> m_Recordings;
+
+	PNLightAFXProfileSelectorInstance m_pNLightAFXSelectorInstance;
 	
 	void writeJumpSpeed (float jumpSpeed);
 
@@ -263,6 +268,8 @@ public:
 	void EnableOIE() override;
 
 	void DisableOIE() override;
+
+	INLightAFXProfileSelector* CreateNLightAFXBeamProfileSelector() override;
 
 	void StartOIEMeasurement() override;
 

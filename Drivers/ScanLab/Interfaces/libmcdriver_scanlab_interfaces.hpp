@@ -60,6 +60,7 @@ class IDriver;
 class IUARTConnection;
 class IRTCJob;
 class IRTCRecording;
+class INLightAFXProfileSelector;
 class IRTCContext;
 class IRTCSelector;
 class IDriver_ScanLab;
@@ -748,6 +749,99 @@ typedef IBaseSharedPtr<IRTCRecording> PIRTCRecording;
 
 
 /*************************************************************************************************************************
+ Class interface for NLightAFXProfileSelector 
+**************************************************************************************************************************/
+
+class INLightAFXProfileSelector : public virtual IBase {
+public:
+	/**
+	* INLightAFXProfileSelector::SetControlOutputPins - Sets the control output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+	* @param[in] nStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+	*/
+	virtual void SetControlOutputPins(const LibMCDriver_ScanLab_uint32 nEnableDigitalOutputBit, const LibMCDriver_ScanLab_uint32 nStartDigitalOutputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetControlOutputPins - Returns the control output pin mapping for the nLight AFX Laser.
+	* @param[out] nEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+	* @param[out] nStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+	*/
+	virtual void GetControlOutputPins(LibMCDriver_ScanLab_uint32 & nEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 & nStartDigitalOutputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::SetSelectionOutputPins - Sets the selection output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+	* @param[in] nStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+	* @param[in] nStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+	*/
+	virtual void SetSelectionOutputPins(const LibMCDriver_ScanLab_uint32 nStartIndexSelection0OutputBit, const LibMCDriver_ScanLab_uint32 nStartIndexSelection1OutputBit, const LibMCDriver_ScanLab_uint32 nStartIndexSelection2OutputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetSelectionOutputPins - Returns the selection output pin mapping for the nLight AFX Laser.
+	* @param[out] nStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+	* @param[out] nStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+	* @param[out] nStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+	*/
+	virtual void GetSelectionOutputPins(LibMCDriver_ScanLab_uint32 & nStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 & nStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 & nStartIndexSelection2OutputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::SetAcknowledgeInputPin - Sets the acknowledge pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nSelectionAcknowledgeInputBit - RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY). MUST be between 0 and 15. Default is 0.
+	*/
+	virtual void SetAcknowledgeInputPin(const LibMCDriver_ScanLab_uint32 nSelectionAcknowledgeInputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetAcknowledgeInputPin - Returns the acknowledge pin mapping for the nLight AFX Laser.
+	* @return RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY).
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetAcknowledgeInputPin() = 0;
+
+	/**
+	* INLightAFXProfileSelector::SetSelectionDelay - Sets the delay that is added for the AFX Mode selection to be transfered. Call will fail if profile selection is enabled.
+	* @param[in] nSelectionDelayInMilliseconds - Selection Delay in milliseconds. Default is 30.
+	*/
+	virtual void SetSelectionDelay(const LibMCDriver_ScanLab_uint32 nSelectionDelayInMilliseconds) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetSelectionDelay - Returns the delay that is added for the AFX Mode selection to transfered.
+	* @return Selection Delay in milliseconds. Default is 30.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetSelectionDelay() = 0;
+
+	/**
+	* INLightAFXProfileSelector::SetAcknowledgeTimeout - Sets the timeout that the AFX Mode selection will wait to be applied. Call will fail if profile selection is enabled.
+	* @param[in] nAcknowledgeInMilliseconds - Acknowledge Timeout in Milliseconds. Default is 500.
+	*/
+	virtual void SetAcknowledgeTimeout(const LibMCDriver_ScanLab_uint32 nAcknowledgeInMilliseconds) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetAcknowledgeTimeout - Returns the timeout that the AFX Mode selection will wait to be applied.
+	* @return Acknowledge Timeout in Milliseconds. Default is 500.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetAcknowledgeTimeout() = 0;
+
+	/**
+	* INLightAFXProfileSelector::EnableAutomaticSelection - Enables the AFX Mode selection inside the DrawLayer Routine. The Laser Mode will be taken out of the build profile in this case.
+	*/
+	virtual void EnableAutomaticSelection() = 0;
+
+	/**
+	* INLightAFXProfileSelector::DisableAutomaticSelection - Disables the AFX Mode selection.
+	*/
+	virtual void DisableAutomaticSelection() = 0;
+
+	/**
+	* INLightAFXProfileSelector::AddCustomSelection - Adds a custom selection cycle to the currenly open list.
+	* @param[in] nAFXModeIndex - AFX Mode index to set. MUST be between 0 and 7.
+	*/
+	virtual void AddCustomSelection(const LibMCDriver_ScanLab_uint32 nAFXModeIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<INLightAFXProfileSelector> PINLightAFXProfileSelector;
+
+
+/*************************************************************************************************************************
  Class interface for RTCContext 
 **************************************************************************************************************************/
 
@@ -1250,6 +1344,12 @@ public:
 	* IRTCContext::DisableOIE - Writes an OIE disabling command block to the open list.
 	*/
 	virtual void DisableOIE() = 0;
+
+	/**
+	* IRTCContext::CreateNLightAFXBeamProfileSelector - Creates an nLight AFX Beam Selector instance. If called multiple times, the same instance will be returned.
+	* @return nLight Profile selector instance.
+	*/
+	virtual INLightAFXProfileSelector * CreateNLightAFXBeamProfileSelector() = 0;
 
 	/**
 	* IRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.

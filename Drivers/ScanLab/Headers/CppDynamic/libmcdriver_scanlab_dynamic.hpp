@@ -65,6 +65,7 @@ class CDriver;
 class CUARTConnection;
 class CRTCJob;
 class CRTCRecording;
+class CNLightAFXProfileSelector;
 class CRTCContext;
 class CRTCSelector;
 class CDriver_ScanLab;
@@ -80,6 +81,7 @@ typedef CDriver CLibMCDriver_ScanLabDriver;
 typedef CUARTConnection CLibMCDriver_ScanLabUARTConnection;
 typedef CRTCJob CLibMCDriver_ScanLabRTCJob;
 typedef CRTCRecording CLibMCDriver_ScanLabRTCRecording;
+typedef CNLightAFXProfileSelector CLibMCDriver_ScanLabNLightAFXProfileSelector;
 typedef CRTCContext CLibMCDriver_ScanLabRTCContext;
 typedef CRTCSelector CLibMCDriver_ScanLabRTCSelector;
 typedef CDriver_ScanLab CLibMCDriver_ScanLabDriver_ScanLab;
@@ -95,6 +97,7 @@ typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<CUARTConnection> PUARTConnection;
 typedef std::shared_ptr<CRTCJob> PRTCJob;
 typedef std::shared_ptr<CRTCRecording> PRTCRecording;
+typedef std::shared_ptr<CNLightAFXProfileSelector> PNLightAFXProfileSelector;
 typedef std::shared_ptr<CRTCContext> PRTCContext;
 typedef std::shared_ptr<CRTCSelector> PRTCSelector;
 typedef std::shared_ptr<CDriver_ScanLab> PDriver_ScanLab;
@@ -110,6 +113,7 @@ typedef PDriver PLibMCDriver_ScanLabDriver;
 typedef PUARTConnection PLibMCDriver_ScanLabUARTConnection;
 typedef PRTCJob PLibMCDriver_ScanLabRTCJob;
 typedef PRTCRecording PLibMCDriver_ScanLabRTCRecording;
+typedef PNLightAFXProfileSelector PLibMCDriver_ScanLabNLightAFXProfileSelector;
 typedef PRTCContext PLibMCDriver_ScanLabRTCContext;
 typedef PRTCSelector PLibMCDriver_ScanLabRTCSelector;
 typedef PDriver_ScanLab PLibMCDriver_ScanLabDriver_ScanLab;
@@ -317,6 +321,13 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "INVALIDRTCRECORDINGFREQUENCY";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE: return "INVALIDDIGITALOUTPUTVALUE";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK: return "INVALIDDIGITALOUTPUTMASK";
+			case LIBMCDRIVER_SCANLAB_ERROR_CANNOTCHANGENLIGHTSETTINGSWHILEENABLED: return "CANNOTCHANGENLIGHTSETTINGSWHILEENABLED";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTCONTROLPIN: return "INVALIDNLIGHTCONTROLPIN";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTSELECTIONPIN: return "INVALIDNLIGHTSELECTIONPIN";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTINPUTPIN: return "INVALIDNLIGHTINPUTPIN";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXSELECTIONDELAY: return "INVALIDNLIGHTAFXSELECTIONDELAY";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT: return "INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE: return "INVALIDNLIGHTAFXMODE";
 		}
 		return "UNKNOWN";
 	}
@@ -448,6 +459,13 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "Invalid RTC recording frequency.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE: return "Invalid digital output value.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK: return "Invalid digital output mask.";
+			case LIBMCDRIVER_SCANLAB_ERROR_CANNOTCHANGENLIGHTSETTINGSWHILEENABLED: return "Cannot change nLight settings while enabled.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTCONTROLPIN: return "Invalid nLight Control Pin.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTSELECTIONPIN: return "Invalid nLight Selection Pin.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTINPUTPIN: return "Invalid nLight Input Pin.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXSELECTIONDELAY: return "Invalid nLight AFX Selection Delay.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT: return "Invalid nLight AFX Selection Timeout.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE: return "Invalid nLight AFX Mode.";
 		}
 		return "unknown error";
 	}
@@ -574,6 +592,7 @@ private:
 	friend class CUARTConnection;
 	friend class CRTCJob;
 	friend class CRTCRecording;
+	friend class CNLightAFXProfileSelector;
 	friend class CRTCContext;
 	friend class CRTCSelector;
 	friend class CDriver_ScanLab;
@@ -747,6 +766,35 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CNLightAFXProfileSelector 
+**************************************************************************************************************************/
+class CNLightAFXProfileSelector : public CBase {
+public:
+	
+	/**
+	* CNLightAFXProfileSelector::CNLightAFXProfileSelector - Constructor for NLightAFXProfileSelector class.
+	*/
+	CNLightAFXProfileSelector(CWrapper* pWrapper, LibMCDriver_ScanLabHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void SetControlOutputPins(const LibMCDriver_ScanLab_uint32 nEnableDigitalOutputBit, const LibMCDriver_ScanLab_uint32 nStartDigitalOutputBit);
+	inline void GetControlOutputPins(LibMCDriver_ScanLab_uint32 & nEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 & nStartDigitalOutputBit);
+	inline void SetSelectionOutputPins(const LibMCDriver_ScanLab_uint32 nStartIndexSelection0OutputBit, const LibMCDriver_ScanLab_uint32 nStartIndexSelection1OutputBit, const LibMCDriver_ScanLab_uint32 nStartIndexSelection2OutputBit);
+	inline void GetSelectionOutputPins(LibMCDriver_ScanLab_uint32 & nStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 & nStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 & nStartIndexSelection2OutputBit);
+	inline void SetAcknowledgeInputPin(const LibMCDriver_ScanLab_uint32 nSelectionAcknowledgeInputBit);
+	inline LibMCDriver_ScanLab_uint32 GetAcknowledgeInputPin();
+	inline void SetSelectionDelay(const LibMCDriver_ScanLab_uint32 nSelectionDelayInMilliseconds);
+	inline LibMCDriver_ScanLab_uint32 GetSelectionDelay();
+	inline void SetAcknowledgeTimeout(const LibMCDriver_ScanLab_uint32 nAcknowledgeInMilliseconds);
+	inline LibMCDriver_ScanLab_uint32 GetAcknowledgeTimeout();
+	inline void EnableAutomaticSelection();
+	inline void DisableAutomaticSelection();
+	inline void AddCustomSelection(const LibMCDriver_ScanLab_uint32 nAFXModeIndex);
+};
+	
+/*************************************************************************************************************************
  Class CRTCContext 
 **************************************************************************************************************************/
 class CRTCContext : public CBase {
@@ -828,6 +876,7 @@ public:
 	inline void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask);
 	inline void EnableOIE();
 	inline void DisableOIE();
+	inline PNLightAFXProfileSelector CreateNLightAFXBeamProfileSelector();
 	inline void StartOIEMeasurement();
 	inline void StartOIEMeasurementEx(const bool bLaserOnTrigger);
 	inline void StopOIEMeasurement();
@@ -1177,6 +1226,19 @@ public:
 		pWrapperTable->m_RTCRecording_ExecuteListWithRecording = nullptr;
 		pWrapperTable->m_RTCRecording_AddRecordsToDataTable = nullptr;
 		pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_SetControlOutputPins = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_GetControlOutputPins = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_SetSelectionOutputPins = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_GetSelectionOutputPins = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeInputPin = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeInputPin = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_SetSelectionDelay = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_GetSelectionDelay = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeTimeout = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeTimeout = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_EnableAutomaticSelection = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_DisableAutomaticSelection = nullptr;
+		pWrapperTable->m_NLightAFXProfileSelector_AddCustomSelection = nullptr;
 		pWrapperTable->m_RTCContext_LoadFirmware = nullptr;
 		pWrapperTable->m_RTCContext_LoadCorrectionFile = nullptr;
 		pWrapperTable->m_RTCContext_SelectCorrectionTable = nullptr;
@@ -1245,6 +1307,7 @@ public:
 		pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
+		pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurementEx = nullptr;
 		pWrapperTable->m_RTCContext_StopOIEMeasurement = nullptr;
@@ -1805,6 +1868,123 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetControlOutputPins = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetControlOutputPinsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetControlOutputPins = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetControlOutputPinsPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_SetControlOutputPins == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetControlOutputPins = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetControlOutputPinsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getcontroloutputpins");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetControlOutputPins = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetControlOutputPinsPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getcontroloutputpins");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_GetControlOutputPins == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetSelectionOutputPins = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionOutputPinsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setselectionoutputpins");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetSelectionOutputPins = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionOutputPinsPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setselectionoutputpins");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_SetSelectionOutputPins == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetSelectionOutputPins = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionOutputPinsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getselectionoutputpins");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetSelectionOutputPins = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionOutputPinsPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getselectionoutputpins");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_GetSelectionOutputPins == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeInputPin = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeInputPinPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setacknowledgeinputpin");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeInputPin = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeInputPinPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setacknowledgeinputpin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeInputPin == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeInputPin = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeInputPinPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getacknowledgeinputpin");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeInputPin = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeInputPinPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getacknowledgeinputpin");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeInputPin == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetSelectionDelay = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionDelayPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setselectiondelay");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetSelectionDelay = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionDelayPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setselectiondelay");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_SetSelectionDelay == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetSelectionDelay = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionDelayPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getselectiondelay");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetSelectionDelay = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionDelayPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getselectiondelay");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_GetSelectionDelay == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeTimeout = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeTimeoutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setacknowledgetimeout");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeTimeout = (PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeTimeoutPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_setacknowledgetimeout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeTimeout == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeTimeout = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeTimeoutPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getacknowledgetimeout");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeTimeout = (PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeTimeoutPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_getacknowledgetimeout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeTimeout == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_EnableAutomaticSelection = (PLibMCDriver_ScanLabNLightAFXProfileSelector_EnableAutomaticSelectionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_enableautomaticselection");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_EnableAutomaticSelection = (PLibMCDriver_ScanLabNLightAFXProfileSelector_EnableAutomaticSelectionPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_enableautomaticselection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_EnableAutomaticSelection == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_DisableAutomaticSelection = (PLibMCDriver_ScanLabNLightAFXProfileSelector_DisableAutomaticSelectionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_disableautomaticselection");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_DisableAutomaticSelection = (PLibMCDriver_ScanLabNLightAFXProfileSelector_DisableAutomaticSelectionPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_disableautomaticselection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_DisableAutomaticSelection == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_AddCustomSelection = (PLibMCDriver_ScanLabNLightAFXProfileSelector_AddCustomSelectionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_addcustomselection");
+		#else // _WIN32
+		pWrapperTable->m_NLightAFXProfileSelector_AddCustomSelection = (PLibMCDriver_ScanLabNLightAFXProfileSelector_AddCustomSelectionPtr) dlsym(hLibrary, "libmcdriver_scanlab_nlightafxprofileselector_addcustomselection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightAFXProfileSelector_AddCustomSelection == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2417,6 +2597,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_DisableOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector = (PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_createnlightafxbeamprofileselector");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector = (PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_createnlightafxbeamprofileselector");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3732,6 +3921,58 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_SetControlOutputPins));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_SetControlOutputPins == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_getcontroloutputpins", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_GetControlOutputPins));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_GetControlOutputPins == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_setselectionoutputpins", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_SetSelectionOutputPins));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_SetSelectionOutputPins == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_getselectionoutputpins", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_GetSelectionOutputPins));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_GetSelectionOutputPins == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_setacknowledgeinputpin", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeInputPin));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeInputPin == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_getacknowledgeinputpin", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeInputPin));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeInputPin == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_setselectiondelay", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_SetSelectionDelay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_SetSelectionDelay == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_getselectiondelay", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_GetSelectionDelay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_GetSelectionDelay == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_setacknowledgetimeout", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeTimeout));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_SetAcknowledgeTimeout == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_getacknowledgetimeout", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeTimeout));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_GetAcknowledgeTimeout == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_enableautomaticselection", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_EnableAutomaticSelection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_EnableAutomaticSelection == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_disableautomaticselection", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_DisableAutomaticSelection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_DisableAutomaticSelection == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_addcustomselection", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_AddCustomSelection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightAFXProfileSelector_AddCustomSelection == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_loadfirmware", (void**)&(pWrapperTable->m_RTCContext_LoadFirmware));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_LoadFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4002,6 +4243,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableoie", (void**)&(pWrapperTable->m_RTCContext_DisableOIE));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableOIE == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_createnlightafxbeamprofileselector", (void**)&(pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_startoiemeasurement", (void**)&(pWrapperTable->m_RTCContext_StartOIEMeasurement));
@@ -5011,6 +5256,140 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CNLightAFXProfileSelector
+	 */
+	
+	/**
+	* CNLightAFXProfileSelector::SetControlOutputPins - Sets the control output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+	* @param[in] nStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+	*/
+	void CNLightAFXProfileSelector::SetControlOutputPins(const LibMCDriver_ScanLab_uint32 nEnableDigitalOutputBit, const LibMCDriver_ScanLab_uint32 nStartDigitalOutputBit)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_SetControlOutputPins(m_pHandle, nEnableDigitalOutputBit, nStartDigitalOutputBit));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::GetControlOutputPins - Returns the control output pin mapping for the nLight AFX Laser.
+	* @param[out] nEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+	* @param[out] nStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+	*/
+	void CNLightAFXProfileSelector::GetControlOutputPins(LibMCDriver_ScanLab_uint32 & nEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 & nStartDigitalOutputBit)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_GetControlOutputPins(m_pHandle, &nEnableDigitalOutputBit, &nStartDigitalOutputBit));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::SetSelectionOutputPins - Sets the selection output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+	* @param[in] nStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+	* @param[in] nStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+	*/
+	void CNLightAFXProfileSelector::SetSelectionOutputPins(const LibMCDriver_ScanLab_uint32 nStartIndexSelection0OutputBit, const LibMCDriver_ScanLab_uint32 nStartIndexSelection1OutputBit, const LibMCDriver_ScanLab_uint32 nStartIndexSelection2OutputBit)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_SetSelectionOutputPins(m_pHandle, nStartIndexSelection0OutputBit, nStartIndexSelection1OutputBit, nStartIndexSelection2OutputBit));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::GetSelectionOutputPins - Returns the selection output pin mapping for the nLight AFX Laser.
+	* @param[out] nStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+	* @param[out] nStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+	* @param[out] nStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+	*/
+	void CNLightAFXProfileSelector::GetSelectionOutputPins(LibMCDriver_ScanLab_uint32 & nStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 & nStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 & nStartIndexSelection2OutputBit)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_GetSelectionOutputPins(m_pHandle, &nStartIndexSelection0OutputBit, &nStartIndexSelection1OutputBit, &nStartIndexSelection2OutputBit));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::SetAcknowledgeInputPin - Sets the acknowledge pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nSelectionAcknowledgeInputBit - RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY). MUST be between 0 and 15. Default is 0.
+	*/
+	void CNLightAFXProfileSelector::SetAcknowledgeInputPin(const LibMCDriver_ScanLab_uint32 nSelectionAcknowledgeInputBit)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_SetAcknowledgeInputPin(m_pHandle, nSelectionAcknowledgeInputBit));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::GetAcknowledgeInputPin - Returns the acknowledge pin mapping for the nLight AFX Laser.
+	* @return RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY).
+	*/
+	LibMCDriver_ScanLab_uint32 CNLightAFXProfileSelector::GetAcknowledgeInputPin()
+	{
+		LibMCDriver_ScanLab_uint32 resultSelectionAcknowledgeInputBit = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_GetAcknowledgeInputPin(m_pHandle, &resultSelectionAcknowledgeInputBit));
+		
+		return resultSelectionAcknowledgeInputBit;
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::SetSelectionDelay - Sets the delay that is added for the AFX Mode selection to be transfered. Call will fail if profile selection is enabled.
+	* @param[in] nSelectionDelayInMilliseconds - Selection Delay in milliseconds. Default is 30.
+	*/
+	void CNLightAFXProfileSelector::SetSelectionDelay(const LibMCDriver_ScanLab_uint32 nSelectionDelayInMilliseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_SetSelectionDelay(m_pHandle, nSelectionDelayInMilliseconds));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::GetSelectionDelay - Returns the delay that is added for the AFX Mode selection to transfered.
+	* @return Selection Delay in milliseconds. Default is 30.
+	*/
+	LibMCDriver_ScanLab_uint32 CNLightAFXProfileSelector::GetSelectionDelay()
+	{
+		LibMCDriver_ScanLab_uint32 resultSelectionDelayInMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_GetSelectionDelay(m_pHandle, &resultSelectionDelayInMilliseconds));
+		
+		return resultSelectionDelayInMilliseconds;
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::SetAcknowledgeTimeout - Sets the timeout that the AFX Mode selection will wait to be applied. Call will fail if profile selection is enabled.
+	* @param[in] nAcknowledgeInMilliseconds - Acknowledge Timeout in Milliseconds. Default is 500.
+	*/
+	void CNLightAFXProfileSelector::SetAcknowledgeTimeout(const LibMCDriver_ScanLab_uint32 nAcknowledgeInMilliseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_SetAcknowledgeTimeout(m_pHandle, nAcknowledgeInMilliseconds));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::GetAcknowledgeTimeout - Returns the timeout that the AFX Mode selection will wait to be applied.
+	* @return Acknowledge Timeout in Milliseconds. Default is 500.
+	*/
+	LibMCDriver_ScanLab_uint32 CNLightAFXProfileSelector::GetAcknowledgeTimeout()
+	{
+		LibMCDriver_ScanLab_uint32 resultAcknowledgeTimeoutInMilliseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_GetAcknowledgeTimeout(m_pHandle, &resultAcknowledgeTimeoutInMilliseconds));
+		
+		return resultAcknowledgeTimeoutInMilliseconds;
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::EnableAutomaticSelection - Enables the AFX Mode selection inside the DrawLayer Routine. The Laser Mode will be taken out of the build profile in this case.
+	*/
+	void CNLightAFXProfileSelector::EnableAutomaticSelection()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_EnableAutomaticSelection(m_pHandle));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::DisableAutomaticSelection - Disables the AFX Mode selection.
+	*/
+	void CNLightAFXProfileSelector::DisableAutomaticSelection()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_DisableAutomaticSelection(m_pHandle));
+	}
+	
+	/**
+	* CNLightAFXProfileSelector::AddCustomSelection - Adds a custom selection cycle to the currenly open list.
+	* @param[in] nAFXModeIndex - AFX Mode index to set. MUST be between 0 and 7.
+	*/
+	void CNLightAFXProfileSelector::AddCustomSelection(const LibMCDriver_ScanLab_uint32 nAFXModeIndex)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightAFXProfileSelector_AddCustomSelection(m_pHandle, nAFXModeIndex));
+	}
+	
+	/**
 	 * Method definitions for class CRTCContext
 	 */
 	
@@ -5739,6 +6118,21 @@ public:
 	void CRTCContext::DisableOIE()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableOIE(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::CreateNLightAFXBeamProfileSelector - Creates an nLight AFX Beam Selector instance. If called multiple times, the same instance will be returned.
+	* @return nLight Profile selector instance.
+	*/
+	PNLightAFXProfileSelector CRTCContext::CreateNLightAFXBeamProfileSelector()
+	{
+		LibMCDriver_ScanLabHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_CreateNLightAFXBeamProfileSelector(m_pHandle, &hInstance));
+		
+		if (!hInstance) {
+			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CNLightAFXProfileSelector>(m_pWrapper, hInstance);
 	}
 	
 	/**

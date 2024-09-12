@@ -219,6 +219,13 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY 1114 /** Invalid RTC recording frequency. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE 1115 /** Invalid digital output value. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK 1116 /** Invalid digital output mask. */
+#define LIBMCDRIVER_SCANLAB_ERROR_CANNOTCHANGENLIGHTSETTINGSWHILEENABLED 1117 /** Cannot change nLight settings while enabled. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTCONTROLPIN 1118 /** Invalid nLight Control Pin. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTSELECTIONPIN 1119 /** Invalid nLight Selection Pin. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTINPUTPIN 1120 /** Invalid nLight Input Pin. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXSELECTIONDELAY 1121 /** Invalid nLight AFX Selection Delay. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT 1122 /** Invalid nLight AFX Selection Timeout. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE 1123 /** Invalid nLight AFX Mode. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -350,6 +357,13 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDRTCRECORDINGFREQUENCY: return "Invalid RTC recording frequency.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE: return "Invalid digital output value.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK: return "Invalid digital output mask.";
+    case LIBMCDRIVER_SCANLAB_ERROR_CANNOTCHANGENLIGHTSETTINGSWHILEENABLED: return "Cannot change nLight settings while enabled.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTCONTROLPIN: return "Invalid nLight Control Pin.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTSELECTIONPIN: return "Invalid nLight Selection Pin.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTINPUTPIN: return "Invalid nLight Input Pin.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXSELECTIONDELAY: return "Invalid nLight AFX Selection Delay.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT: return "Invalid nLight AFX Selection Timeout.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE: return "Invalid nLight AFX Mode.";
     default: return "unknown error";
   }
 }
@@ -363,6 +377,7 @@ typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_UARTConnection;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCJob;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCRecording;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_NLightAFXProfileSelector;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCContext;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCSelector;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab;

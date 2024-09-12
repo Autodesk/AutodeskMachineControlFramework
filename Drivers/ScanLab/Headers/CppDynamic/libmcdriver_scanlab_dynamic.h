@@ -504,6 +504,131 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddRecordsT
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddScaledRecordsToDataTablePtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLab_double dScaleFactor, LibMCDriver_ScanLab_double dOffset);
 
 /*************************************************************************************************************************
+ Class definition for NLightAFXProfileSelector
+**************************************************************************************************************************/
+
+/**
+* Sets the control output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+* @param[in] nStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetControlOutputPinsPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 nStartDigitalOutputBit);
+
+/**
+* Returns the control output pin mapping for the nLight AFX Laser.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+* @param[out] pStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetControlOutputPinsPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 * pStartDigitalOutputBit);
+
+/**
+* Sets the selection output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+* @param[in] nStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+* @param[in] nStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionOutputPinsPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 nStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 nStartIndexSelection2OutputBit);
+
+/**
+* Returns the selection output pin mapping for the nLight AFX Laser.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+* @param[out] pStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+* @param[out] pStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionOutputPinsPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 * pStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 * pStartIndexSelection2OutputBit);
+
+/**
+* Sets the acknowledge pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nSelectionAcknowledgeInputBit - RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY). MUST be between 0 and 15. Default is 0.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeInputPinPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nSelectionAcknowledgeInputBit);
+
+/**
+* Returns the acknowledge pin mapping for the nLight AFX Laser.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pSelectionAcknowledgeInputBit - RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY).
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeInputPinPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pSelectionAcknowledgeInputBit);
+
+/**
+* Sets the delay that is added for the AFX Mode selection to be transfered. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nSelectionDelayInMilliseconds - Selection Delay in milliseconds. Default is 30.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionDelayPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nSelectionDelayInMilliseconds);
+
+/**
+* Returns the delay that is added for the AFX Mode selection to transfered.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pSelectionDelayInMilliseconds - Selection Delay in milliseconds. Default is 30.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionDelayPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pSelectionDelayInMilliseconds);
+
+/**
+* Sets the timeout that the AFX Mode selection will wait to be applied. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nAcknowledgeInMilliseconds - Acknowledge Timeout in Milliseconds. Default is 500.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeTimeoutPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nAcknowledgeInMilliseconds);
+
+/**
+* Returns the timeout that the AFX Mode selection will wait to be applied.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pAcknowledgeTimeoutInMilliseconds - Acknowledge Timeout in Milliseconds. Default is 500.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeTimeoutPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pAcknowledgeTimeoutInMilliseconds);
+
+/**
+* Enables the AFX Mode selection inside the DrawLayer Routine. The Laser Mode will be taken out of the build profile in this case.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_EnableAutomaticSelectionPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector);
+
+/**
+* Disables the AFX Mode selection.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_DisableAutomaticSelectionPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector);
+
+/**
+* Adds a custom selection cycle to the currenly open list.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nAFXModeIndex - AFX Mode index to set. MUST be between 0 and 7.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_AddCustomSelectionPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nAFXModeIndex);
+
+/*************************************************************************************************************************
  Class definition for RTCContext
 **************************************************************************************************************************/
 
@@ -1212,6 +1337,15 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPtr)
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Creates an nLight AFX Beam Selector instance. If called multiple times, the same instance will be returned.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pInstance - nLight Profile selector instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_NLightAFXProfileSelector * pInstance);
 
 /**
 * Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
@@ -2549,6 +2683,19 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCRecording_ExecuteListWithRecordingPtr m_RTCRecording_ExecuteListWithRecording;
 	PLibMCDriver_ScanLabRTCRecording_AddRecordsToDataTablePtr m_RTCRecording_AddRecordsToDataTable;
 	PLibMCDriver_ScanLabRTCRecording_AddScaledRecordsToDataTablePtr m_RTCRecording_AddScaledRecordsToDataTable;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetControlOutputPinsPtr m_NLightAFXProfileSelector_SetControlOutputPins;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetControlOutputPinsPtr m_NLightAFXProfileSelector_GetControlOutputPins;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionOutputPinsPtr m_NLightAFXProfileSelector_SetSelectionOutputPins;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionOutputPinsPtr m_NLightAFXProfileSelector_GetSelectionOutputPins;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeInputPinPtr m_NLightAFXProfileSelector_SetAcknowledgeInputPin;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeInputPinPtr m_NLightAFXProfileSelector_GetAcknowledgeInputPin;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionDelayPtr m_NLightAFXProfileSelector_SetSelectionDelay;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionDelayPtr m_NLightAFXProfileSelector_GetSelectionDelay;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeTimeoutPtr m_NLightAFXProfileSelector_SetAcknowledgeTimeout;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeTimeoutPtr m_NLightAFXProfileSelector_GetAcknowledgeTimeout;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_EnableAutomaticSelectionPtr m_NLightAFXProfileSelector_EnableAutomaticSelection;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_DisableAutomaticSelectionPtr m_NLightAFXProfileSelector_DisableAutomaticSelection;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_AddCustomSelectionPtr m_NLightAFXProfileSelector_AddCustomSelection;
 	PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr m_RTCContext_LoadFirmware;
 	PLibMCDriver_ScanLabRTCContext_LoadCorrectionFilePtr m_RTCContext_LoadCorrectionFile;
 	PLibMCDriver_ScanLabRTCContext_SelectCorrectionTablePtr m_RTCContext_SelectCorrectionTable;
@@ -2617,6 +2764,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr m_RTCContext_AddWriteMaskedDigitalIOList;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPtr m_RTCContext_EnableOIE;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
+	PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr m_RTCContext_CreateNLightAFXBeamProfileSelector;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr m_RTCContext_StartOIEMeasurement;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr m_RTCContext_StartOIEMeasurementEx;
 	PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr m_RTCContext_StopOIEMeasurement;

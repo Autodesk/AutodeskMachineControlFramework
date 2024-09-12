@@ -1501,6 +1501,15 @@ void CRTCContext::DisableOIE()
 
 }
 
+INLightAFXProfileSelector* CRTCContext::CreateNLightAFXBeamProfileSelector()
+{
+	if (m_pNLightAFXSelectorInstance.get () == nullptr)
+		m_pNLightAFXSelectorInstance = std::make_shared <CNLightAFXProfileSelectorInstance> (m_pScanLabSDK, m_CardNo);
+
+	return new CNLightAFXProfileSelector(m_pNLightAFXSelectorInstance);
+}
+
+
 void CRTCContext::StartOIEMeasurement()
 {
 	StartOIEMeasurementEx(false);

@@ -165,9 +165,15 @@
 		<error name="INVALIDCHANNELTYPE" code="1113" description="Invalid channel type." />	
 		<error name="INVALIDRTCRECORDINGFREQUENCY" code="1114" description="Invalid RTC recording frequency." />	
 		<error name="INVALIDDIGITALOUTPUTVALUE" code="1115" description="Invalid digital output value." />	
-		<error name="INVALIDDIGITALOUTPUTMASK" code="1116" description="Invalid digital output mask." />	
+		<error name="INVALIDDIGITALOUTPUTMASK" code="1116" description="Invalid digital output mask." />			
+		<error name="CANNOTCHANGENLIGHTSETTINGSWHILEENABLED" code="1117" description="Cannot change nLight settings while enabled." />	
+		<error name="INVALIDNLIGHTCONTROLPIN" code="1118" description="Invalid nLight Control Pin." />	
+		<error name="INVALIDNLIGHTSELECTIONPIN" code="1119" description="Invalid nLight Selection Pin." />	
+		<error name="INVALIDNLIGHTINPUTPIN" code="1120" description="Invalid nLight Input Pin." />	
+		<error name="INVALIDNLIGHTAFXSELECTIONDELAY" code="1121" description="Invalid nLight AFX Selection Delay." />	
+		<error name="INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT" code="1122" description="Invalid nLight AFX Selection Timeout." />	
+		<error name="INVALIDNLIGHTAFXMODE" code="1123" description="Invalid nLight AFX Mode." />	
 		
-
 	</errors>
 
 
@@ -544,6 +550,67 @@ Custom implementation
 		
 	</class>
 
+
+	<class name="NLightAFXProfileSelector" parent="Base" description="Profile selector for nLight AFX Laser">
+
+		<method name="SetControlOutputPins" description="Sets the control output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.">
+			<param name="EnableDigitalOutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0." />
+			<param name="StartDigitalOutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1" />
+		</method>
+		
+		<method name="GetControlOutputPins" description="Returns the control output pin mapping for the nLight AFX Laser.">
+			<param name="EnableDigitalOutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0." />
+			<param name="StartDigitalOutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1" />
+		</method>
+
+		<method name="SetSelectionOutputPins" description="Sets the selection output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.">
+			<param name="StartIndexSelection0OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2." />
+			<param name="StartIndexSelection1OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3." />
+			<param name="StartIndexSelection2OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4." />		
+		</method>
+		
+		<method name="GetSelectionOutputPins" description="Returns the selection output pin mapping for the nLight AFX Laser.">
+			<param name="StartIndexSelection0OutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2." />
+			<param name="StartIndexSelection1OutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3." />
+			<param name="StartIndexSelection2OutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4." />		
+		</method>
+
+		<method name="SetAcknowledgeInputPin" description="Sets the acknowledge pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.">
+			<param name="SelectionAcknowledgeInputBit" type="uint32" pass="in" description="RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY). MUST be between 0 and 15. Default is 0." />
+		</method>
+
+		<method name="GetAcknowledgeInputPin" description="Returns the acknowledge pin mapping for the nLight AFX Laser.">
+			<param name="SelectionAcknowledgeInputBit" type="uint32" pass="return" description="RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY)." />
+		</method>
+
+		<method name="SetSelectionDelay" description="Sets the delay that is added for the AFX Mode selection to be transfered. Call will fail if profile selection is enabled.">
+			<param name="SelectionDelayInMilliseconds" type="uint32" pass="in" description="Selection Delay in milliseconds. Default is 30." />
+		</method>
+
+		<method name="GetSelectionDelay" description="Returns the delay that is added for the AFX Mode selection to transfered.">
+			<param name="SelectionDelayInMilliseconds" type="uint32" pass="return" description="Selection Delay in milliseconds. Default is 30." />
+		</method>
+
+		<method name="SetAcknowledgeTimeout" description="Sets the timeout that the AFX Mode selection will wait to be applied. Call will fail if profile selection is enabled.">
+			<param name="AcknowledgeInMilliseconds" type="uint32" pass="in" description="Acknowledge Timeout in Milliseconds. Default is 500." />
+		</method>
+
+		<method name="GetAcknowledgeTimeout" description="Returns the timeout that the AFX Mode selection will wait to be applied.">
+			<param name="AcknowledgeTimeoutInMilliseconds" type="uint32" pass="return" description="Acknowledge Timeout in Milliseconds. Default is 500." />
+		</method>
+
+		<method name="EnableAutomaticSelection" description="Enables the AFX Mode selection inside the DrawLayer Routine. The Laser Mode will be taken out of the build profile in this case.">
+		</method>
+		
+		<method name="DisableAutomaticSelection" description="Disables the AFX Mode selection.">
+		</method>
+
+		<method name="AddCustomSelection" description="Adds a custom selection cycle to the currenly open list.">
+			<param name="AFXModeIndex" type="uint32" pass="in" description="AFX Mode index to set. MUST be between 0 and 7." />
+		</method>
+
+	</class>
+
 	<class name="RTCContext" parent="Base" description="Context of the RTC Controller Card">
 
 		<method name="LoadFirmware" description="Loads card firmware from resource files.">
@@ -901,6 +968,10 @@ Custom implementation
 		<method name="DisableOIE" description="Writes an OIE disabling command block to the open list.">
 		</method>
 				
+		<method name="CreateNLightAFXBeamProfileSelector" description="Creates an nLight AFX Beam Selector instance. If called multiple times, the same instance will be returned.">
+			<param name="Instance" type="class" class="NLightAFXProfileSelector" pass="return" description="nLight Profile selector instance." />		
+		</method>
+
 		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.">
 		</method>
 

@@ -1322,6 +1322,338 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addscaledrecordstodat
 
 
 /*************************************************************************************************************************
+ Class implementation for NLightAFXProfileSelector
+**************************************************************************************************************************/
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 nStartDigitalOutputBit)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->SetControlOutputPins(nEnableDigitalOutputBit, nStartDigitalOutputBit);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_getcontroloutputpins(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 * pStartDigitalOutputBit)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		if (!pEnableDigitalOutputBit)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pStartDigitalOutputBit)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->GetControlOutputPins(*pEnableDigitalOutputBit, *pStartDigitalOutputBit);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_setselectionoutputpins(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 nStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 nStartIndexSelection2OutputBit)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->SetSelectionOutputPins(nStartIndexSelection0OutputBit, nStartIndexSelection1OutputBit, nStartIndexSelection2OutputBit);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_getselectionoutputpins(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 * pStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 * pStartIndexSelection2OutputBit)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		if (!pStartIndexSelection0OutputBit)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pStartIndexSelection1OutputBit)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pStartIndexSelection2OutputBit)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->GetSelectionOutputPins(*pStartIndexSelection0OutputBit, *pStartIndexSelection1OutputBit, *pStartIndexSelection2OutputBit);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_setacknowledgeinputpin(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nSelectionAcknowledgeInputBit)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->SetAcknowledgeInputPin(nSelectionAcknowledgeInputBit);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_getacknowledgeinputpin(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pSelectionAcknowledgeInputBit)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		if (pSelectionAcknowledgeInputBit == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pSelectionAcknowledgeInputBit = pINLightAFXProfileSelector->GetAcknowledgeInputPin();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_setselectiondelay(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nSelectionDelayInMilliseconds)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->SetSelectionDelay(nSelectionDelayInMilliseconds);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_getselectiondelay(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pSelectionDelayInMilliseconds)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		if (pSelectionDelayInMilliseconds == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pSelectionDelayInMilliseconds = pINLightAFXProfileSelector->GetSelectionDelay();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_setacknowledgetimeout(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nAcknowledgeInMilliseconds)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->SetAcknowledgeTimeout(nAcknowledgeInMilliseconds);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_getacknowledgetimeout(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pAcknowledgeTimeoutInMilliseconds)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		if (pAcknowledgeTimeoutInMilliseconds == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pAcknowledgeTimeoutInMilliseconds = pINLightAFXProfileSelector->GetAcknowledgeTimeout();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_enableautomaticselection(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->EnableAutomaticSelection();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_disableautomaticselection(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->DisableAutomaticSelection();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_nlightafxprofileselector_addcustomselection(LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nAFXModeIndex)
+{
+	IBase* pIBaseClass = (IBase *)pNLightAFXProfileSelector;
+
+	try {
+		INLightAFXProfileSelector* pINLightAFXProfileSelector = dynamic_cast<INLightAFXProfileSelector*>(pIBaseClass);
+		if (!pINLightAFXProfileSelector)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pINLightAFXProfileSelector->AddCustomSelection(nAFXModeIndex);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for RTCContext
 **************************************************************************************************************************/
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadfirmware(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer)
@@ -3090,6 +3422,34 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disableoie(LibMCDriver_
 		
 		pIRTCContext->DisableOIE();
 
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_createnlightafxbeamprofileselector(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_NLightAFXProfileSelector * pInstance)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pInstance == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IBase* pBaseInstance(nullptr);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pBaseInstance = pIRTCContext->CreateNLightAFXBeamProfileSelector();
+
+		*pInstance = (IBase*)(pBaseInstance);
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
@@ -6390,6 +6750,32 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_addrecordstodatatable;
 	if (sProcName == "libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_getcontroloutputpins") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_getcontroloutputpins;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_setselectionoutputpins") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_setselectionoutputpins;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_getselectionoutputpins") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_getselectionoutputpins;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_setacknowledgeinputpin") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_setacknowledgeinputpin;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_getacknowledgeinputpin") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_getacknowledgeinputpin;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_setselectiondelay") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_setselectiondelay;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_getselectiondelay") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_getselectiondelay;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_setacknowledgetimeout") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_setacknowledgetimeout;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_getacknowledgetimeout") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_getacknowledgetimeout;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_enableautomaticselection") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_enableautomaticselection;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_disableautomaticselection") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_disableautomaticselection;
+	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_addcustomselection") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_addcustomselection;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadfirmware") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_loadfirmware;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadcorrectionfile") 
@@ -6526,6 +6912,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enableoie;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disableoie") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disableoie;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_createnlightafxbeamprofileselector") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_createnlightafxbeamprofileselector;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_startoiemeasurement") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_startoiemeasurement;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_startoiemeasurementex") 
