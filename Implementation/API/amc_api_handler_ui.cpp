@@ -408,15 +408,10 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	if (apiRequest.hasValue(AMC_API_KEY_UI_FORMVALUEJSON)) {
 		sFormValueJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
 	}
-
-	std::string sEventParameterJSON;
-	if (apiRequest.hasValue(AMC_API_KEY_UI_EVENTPARAMETERS)) {
-		sEventParameterJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
-	}
 	
 	auto pUIHandler = m_pSystemState->uiHandler();
 
-	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, sEventParameterJSON, pAuth);
+	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, "", pAuth);
 
 	CJSONWriterArray contentUpdateNode(writer);
 

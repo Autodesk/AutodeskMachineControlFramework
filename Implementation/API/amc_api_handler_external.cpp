@@ -93,7 +93,7 @@ bool CAPIHandler_External::expectsRawBody(const std::string& sURI, const eAPIReq
 }
 
 
-void CAPIHandler_External::handleEventRequest(CJSONWriter& writer, const std::string& sEventName, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+uint32_t CAPIHandler_External::handleEventRequest(CJSONWriter& writer, const std::string& sEventName, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -104,18 +104,11 @@ void CAPIHandler_External::handleEventRequest(CJSONWriter& writer, const std::st
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDEVENTNAME, "invalid external event name: " + sEventName);
 
 	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
-	std::string sSenderUUID;
-	if (apiRequest.hasValue (AMC_API_KEY_UI_EVENTSENDER))
-		sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
-
-	std::string sEventParameterJSON;
-	if (apiRequest.hasValue(AMC_API_KEY_UI_EVENTPARAMETERS)) {
-		sEventParameterJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_EVENTPARAMETERS, LIBMC_ERROR_INVALIDFORMVALUES);
-	}
+	std::string sEventParameterJSON(reinterpret_cast<const char*>(pBodyData), nBodyDataSize);
 	
 	auto pUIHandler = m_pSystemState->uiHandler();
 
-	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, "", sEventParameterJSON, pAuth);
+	auto pEventResult = pUIHandler->handleEvent(sEventName, "", "", sEventParameterJSON, pAuth);
 
 	CJSONWriterArray contentUpdateNode(writer);
 
@@ -123,7 +116,8 @@ void CAPIHandler_External::handleEventRequest(CJSONWriter& writer, const std::st
 	{
 		writer.addInteger(AMC_API_KEY_UI_EVENTERRORCODE, pEventResult.getErrorCode ());
 		writer.addString(AMC_API_KEY_UI_EVENTERRORMESSAGE, pEventResult.getErrorMessage());
-	} 
+		return AMC_API_HTTP_BADREQUEST;
+	}
 	else {
 
 		auto& clientActions = pEventResult.getClientActions();
@@ -142,12 +136,11 @@ void CAPIHandler_External::handleEventRequest(CJSONWriter& writer, const std::st
 
 		if (returnValues.size() > 0) {
 
-			AMC::CJSONWriterObject returnValuesObject(writer);
 			for (auto& returnValueIter : returnValues) {
-				returnValuesObject.addString(returnValueIter.first, returnValueIter.second);
-			}
 
-			writer.addObject(AMC_API_KEY_UI_EVENTRETURNVALUES, returnValuesObject);
+				if (returnValueIter.first != AMC_API_KEY_UI_EVENTACTIONS)
+					writer.addString(returnValueIter.first, returnValueIter.second);
+			}
 		}
 
 		
@@ -157,6 +150,7 @@ void CAPIHandler_External::handleEventRequest(CJSONWriter& writer, const std::st
 		writer.addArray(AMC_API_KEY_UI_CONTENTUPDATE, contentUpdateNode);
 	}
 
+	return AMC_API_HTTP_SUCCESS;
 
 }
 
@@ -177,9 +171,9 @@ PAPIResponse CAPIHandler_External::handleRequest(const std::string& sURI, const 
 	CJSONWriter writer;
 	writeJSONHeader(writer, AMC_API_PROTOCOL_EXTERNAL);
 
-	handleEventRequest (writer, sEventName, pBodyData, nBodyDataSize, pAuth);
+	uint32_t nStatusCode = handleEventRequest (writer, sEventName, pBodyData, nBodyDataSize, pAuth);
 
-	return std::make_shared<CAPIStringResponse>(AMC_API_HTTP_SUCCESS, AMC_API_CONTENTTYPE, writer.saveToString());
+	return std::make_shared<CAPIStringResponse>(nStatusCode, AMC_API_CONTENTTYPE, writer.saveToString());
 }
 
 

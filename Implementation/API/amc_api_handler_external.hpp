@@ -45,7 +45,7 @@ namespace AMC {
 		
 		PSystemState m_pSystemState;
 
-		void handleEventRequest(CJSONWriter& writer, const std::string & sEventName, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
+		uint32_t handleEventRequest(CJSONWriter& writer, const std::string & sEventName, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 	public:
 
