@@ -341,30 +341,26 @@ namespace AMCCommon {
 
 	void CUtils::splitString(const std::string& sString, const std::string& sDelimiter, std::vector<std::string>& stringVector)
 	{
-		auto nDelimiterLength = sDelimiter.length();
-		if (nDelimiterLength == 0)
-			throw std::runtime_error("split string delimiter is empty");
-
-		if (!sString.empty()) {
-			
-			size_t nOffset = 0;
-			bool bFinished = false;
-			while (!bFinished) {
-				auto nPos = sString.find(sDelimiter, nOffset);
-				if (nPos == std::string::npos) {
-					stringVector.push_back(sString);
-					bFinished = true;
-				}
-				else {
-					stringVector.push_back(sString.substr (nOffset, nPos - nOffset));
-					nOffset = nPos + nDelimiterLength;
-				}
-
-			}
-
-
+		if (sDelimiter.empty()) {
+			throw std::runtime_error("Delimiter is empty");
 		}
 
+		size_t prev = 0;
+		size_t pos = 0;
+		const size_t delimiterLength = sDelimiter.length();
+
+		while ((pos = sString.find(sDelimiter, prev)) != std::string::npos) {
+			if (pos != prev) {
+				// Add non-empty substring to the vector
+				stringVector.emplace_back(sString.substr(prev, pos - prev));
+			}
+			prev = pos + delimiterLength;
+		}
+
+		// Add the last substring if it's not empty
+		if (prev < sString.size()) {
+			stringVector.emplace_back(sString.substr(prev));
+		}
 	}
 
 
