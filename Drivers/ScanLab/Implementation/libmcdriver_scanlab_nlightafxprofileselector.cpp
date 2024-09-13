@@ -56,7 +56,7 @@ CNLightAFXProfileSelectorInstance::CNLightAFXProfileSelectorInstance(PScanLabSDK
 	   m_pSDK (pSDK),
 	   m_nCardNo (nCardNo)
 {
-	if (pSDK.get())
+	if (pSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 }
 
