@@ -60,8 +60,8 @@ namespace AMCCommon {
 		static std::string createEmptyUUID();
 		static bool stringIsUUIDString(const std::string& sRawString);
 
-		static std::string UTF16toUTF8(std::wstring sString);
-		static std::wstring UTF8toUTF16(std::string sString);
+		static std::string UTF16toUTF8(const std::wstring & sString);
+		static std::wstring UTF8toUTF16(const std::string & sString);
 		static bool UTF8StringIsValid (const std::string & sString);
 		static std::string trimString (const std::string& sString);
 		static std::string toLowerString(const std::string& sString);
