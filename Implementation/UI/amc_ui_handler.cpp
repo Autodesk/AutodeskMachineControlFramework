@@ -99,6 +99,13 @@ std::map<std::string, std::string>& CUIHandleEventResponse::getReturnValues()
     return m_returnValues;
 }
 
+bool CUIHandleEventResponse::externalValueNameIsReserved(const std::string& sName)
+{
+    if (sName == AMC_API_KEY_UI_EVENTACTIONS)
+        return true;
+
+    return false;
+}
 
 
 

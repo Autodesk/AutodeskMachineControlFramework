@@ -228,7 +228,9 @@
 		<error name="INVALIDCOMPONENTINDEX" code="10188" description="Invalid component index" />		
 		<error name="INVALIDEXTERNALEVENTPARAMETERKEY" code="10189" description="Invalid external event parameter key" />		
 		<error name="COULDNOTFINDEXTERNALEVENTPARAMETER" code="10190" description="Could not find external event parameter" />		
-		<error name="INVALIDEXTERNALEVENTRETURNVALUEKEY" code="10191" description="Invalid external event return value key" />		
+		<error name="INVALIDEXTERNALEVENTRETURNVALUEKEY" code="10191" description="Invalid external event return value key" />				
+		<error name="EXTERNALEVENTVALUEKEYISRESERVED" code="10192" description="External event value key is reserved." />		
+		<error name="EXTERNALEVENTRETURNVALUEKEYISRESERVED" code="10193" description="External event return value key is reserved." />		
 		
 		
 

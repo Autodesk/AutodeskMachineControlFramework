@@ -110,6 +110,8 @@ namespace AMC {
 		std::vector<PUIClientAction> & getClientActions ();
 
 		std::map<std::string, std::string>& getReturnValues();
+
+		static bool externalValueNameIsReserved (const std::string & sName);
 	};
 
 	class CUIHandler : public CUIModule_UIEventHandler {

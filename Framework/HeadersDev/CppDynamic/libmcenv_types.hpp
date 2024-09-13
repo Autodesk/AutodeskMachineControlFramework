@@ -286,6 +286,8 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY 10189 /** Invalid external event parameter key */
 #define LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER 10190 /** Could not find external event parameter */
 #define LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY 10191 /** Invalid external event return value key */
+#define LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED 10192 /** External event value key is reserved. */
+#define LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED 10193 /** External event return value key is reserved. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -484,6 +486,8 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY: return "Invalid external event parameter key";
     case LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER: return "Could not find external event parameter";
     case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "Invalid external event return value key";
+    case LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED: return "External event value key is reserved.";
+    case LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED: return "External event return value key is reserved.";
     default: return "unknown error";
   }
 }

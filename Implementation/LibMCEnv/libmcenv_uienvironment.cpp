@@ -942,6 +942,9 @@ void CUIEnvironment::addExternalEventParameter(const std::string& sKey, const st
     if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY, sKey);
 
+    if (AMC::CUIHandleEventResponse::externalValueNameIsReserved(sKey))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED, "external return value key is reserved: " + sKey);
+
     m_ExternalEventParameters.insert(std::make_pair (sKey, sValue));
 }
 
@@ -972,6 +975,9 @@ void CUIEnvironment::AddExternalEventResultValue(const std::string& sReturnValue
 {
     if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sReturnValueName))
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY, "invalid external return value key: " + sReturnValueName);
+
+    if (AMC::CUIHandleEventResponse::externalValueNameIsReserved (sReturnValueName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED, "external return value key is reserved: " + sReturnValueName);
 
     m_ExternalEventReturnValues.insert(std::make_pair (sReturnValueName, sReturnValue));
 }
