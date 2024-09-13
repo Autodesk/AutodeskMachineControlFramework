@@ -126,7 +126,7 @@ namespace AMCCommon {
 	}
 
 
-	std::string CUtils::UTF16toUTF8(const std::wstring sString)
+	std::string CUtils::UTF16toUTF8(const std::wstring & sString)
 	{
 
 		// Check Input Sanity
@@ -404,7 +404,7 @@ namespace AMCCommon {
 			if (nConversionErrorIndex != trimmedString.length())
 				throw std::runtime_error("invalid integer string: " + sString);
 
-			return nResult;
+			return nResult != 0;
 		}
 		catch (...)
 		{
@@ -427,7 +427,7 @@ namespace AMCCommon {
 	}
 
 
-    std::wstring CUtils::UTF8toUTF16(const std::string sString)
+    std::wstring CUtils::UTF8toUTF16(const std::string & sString)
 	{
 
 		// Check Input Sanity
@@ -634,18 +634,6 @@ namespace AMCCommon {
 		normalizedArray[36] = 0;
 
 		return std::string(normalizedArray.data());
-
-		/*
-		Depreciated code!
-		 
-		std::transform(sRawString.begin(), sRawString.end(), sRawString.begin(), ::tolower);
-		sRawString.erase(std::remove_if(sRawString.begin(), sRawString.end(), &UUIDInValid), sRawString.end());
-		if (sRawString.length() != 32) {
-			throw std::runtime_error("invalid uuid string " + sRawString);
-		}
-		return sRawString.substr(0, 8) + '-' + sRawString.substr(8, 4) + '-' + sRawString.substr(12, 4) + '-' + sRawString.substr(16, 4) + '-' + sRawString.substr(20, 12);
-		
-		*/
 	}
 
 
@@ -1037,8 +1025,7 @@ namespace AMCCommon {
 				throw std::runtime_error("invalid ASCII character in base64 decoding");
 		}
 
-		byteBuffer.push_back (0);
-		return std::string((char*)byteBuffer.data());
+		return std::string(byteBuffer.begin(), byteBuffer.end());
 	}
 
 
