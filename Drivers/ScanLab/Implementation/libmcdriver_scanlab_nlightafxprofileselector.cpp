@@ -54,7 +54,8 @@ CNLightAFXProfileSelectorInstance::CNLightAFXProfileSelectorInstance(PScanLabSDK
 	   m_nSelectionDelayInMilliseconds (30),
 	   m_nAcknowledgeTimeoutInMilliseconds(500),
 	   m_pSDK (pSDK),
-	   m_nCardNo (nCardNo)
+	   m_nCardNo (nCardNo),
+	   m_nCurrentAFXMode (NLIGHTAFX_MODEUNSELECTED)
 {
 	if (pSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -171,7 +172,29 @@ void CNLightAFXProfileSelectorInstance::disableSelection()
 	}
 }
 
-void CNLightAFXProfileSelectorInstance::addCustomSelection(const LibMCDriver_ScanLab_uint32 nAFXModeIndex)
+bool CNLightAFXProfileSelectorInstance::isEnabled()
+{
+	return m_bIsEnabled;
+}
+
+
+uint32_t CNLightAFXProfileSelectorInstance::getMaxAFXMode()
+{
+	return NLIGHTAFX_MAXMODEINDEX;
+}
+
+
+void CNLightAFXProfileSelectorInstance::selectAFXModeIfNecessary(uint32_t nAFXModeIndex)
+{
+	if (nAFXModeIndex > NLIGHTAFX_MAXMODEINDEX)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE);
+
+	if (nAFXModeIndex != m_nCurrentAFXMode)
+		addCustomSelection(nAFXModeIndex);
+}
+
+
+void CNLightAFXProfileSelectorInstance::addCustomSelection(const uint32_t nAFXModeIndex)
 {
 	if (nAFXModeIndex > NLIGHTAFX_MAXMODEINDEX)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE);
@@ -200,6 +223,8 @@ void CNLightAFXProfileSelectorInstance::addCustomSelection(const LibMCDriver_Sca
 	m_pSDK->n_long_delay(m_nCardNo, nDelayInCycles);
 	m_pSDK->n_write_io_port_mask_list(m_nCardNo, nStartValue, nBitmask);
 	m_pSDK->n_long_delay(m_nCardNo, nTimeOutInCycles);
+
+	m_nCurrentAFXMode = nAFXModeIndex;
 
 }
 

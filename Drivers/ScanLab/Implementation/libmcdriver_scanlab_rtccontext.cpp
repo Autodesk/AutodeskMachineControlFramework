@@ -2213,6 +2213,21 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 		if (bDrawSegment && (nPointCount >= 2)) {
 
+			// Update nLight AFX Mode if necessary
+			if (m_pNLightAFXSelectorInstance.get() != nullptr) {
+				if (m_pNLightAFXSelectorInstance->isEnabled()) {
+					int64_t nLightAFXMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.nlight.com/afx/2024/09", "afxmode", 0);
+					if (nLightAFXMode < 0) 
+						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE, "Invalid nLightAFXMode: " + std::to_string(nLightAFXMode));
+					if (nLightAFXMode > (int64_t) m_pNLightAFXSelectorInstance->getMaxAFXMode ())
+						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE, "Invalid nLightAFXMode: " + std::to_string(nLightAFXMode));
+
+					m_pNLightAFXSelectorInstance->selectAFXModeIfNecessary((uint32_t)nLightAFXMode);
+
+				}
+			}
+
+
 			float fJumpSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
 			float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
 			float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
@@ -2327,6 +2342,12 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 	if ((oieRecordingMode != eOIERecordingMode::OIERecordingDisabled))
 		StopOIEMeasurement();
+
+	// Disable AFX Mode
+	if (m_pNLightAFXSelectorInstance.get() != nullptr) {
+		if (m_pNLightAFXSelectorInstance->isEnabled())
+			m_pNLightAFXSelectorInstance->selectAFXModeIfNecessary (0);
+	}
 
 	switch (oieRecordingMode) {
 	case eOIERecordingMode::OIEEnableAndContinuousMeasurement:

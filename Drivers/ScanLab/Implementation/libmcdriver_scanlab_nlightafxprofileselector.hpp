@@ -45,11 +45,12 @@ Abstract: This is the class declaration of CNLightAFXProfileSelector
 #endif
 
 // Include custom headers here.
-#define NLIGHTAFX_MAXMODEINDEX 7
+#define NLIGHTAFX_MAXMODEINDEX 6
 #define NLIGHTAFX_MINSELECTIONDELAY 1
 #define NLIGHTAFX_MAXSELECTIONDELAY 1000
 #define NLIGHTAFX_MINACKNOWLEDGETIMEOUT 1
 #define NLIGHTAFX_MAXACKNOWLEDGETIMEOUT 1000
+#define NLIGHTAFX_MODEUNSELECTED 0xffffffff
 
 #include "libmcdriver_scanlab_sdk.hpp"
 
@@ -78,6 +79,8 @@ private:
 
 	uint32_t m_nAcknowledgeTimeoutInMilliseconds;
 	uint32_t m_nSelectionDelayInMilliseconds;
+
+	uint32_t m_nCurrentAFXMode;
 
 public:
 
@@ -109,7 +112,13 @@ public:
 
 	void disableSelection();
 
-	void addCustomSelection(const LibMCDriver_ScanLab_uint32 nAFXModeIndex);
+	bool isEnabled();
+
+	void addCustomSelection(uint32_t nAFXModeIndex);
+
+	void selectAFXModeIfNecessary(uint32_t nAFXModeIndex);
+
+	static uint32_t getMaxAFXMode();
 
 
 };
