@@ -194,3 +194,57 @@ bool CDriver_Raylase::IsSimulationMode()
 {
     return m_bSimulationMode;
 }
+
+void CDriver_Raylase::DrawLayerMultiLaser(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists)
+{
+    std::map <uint32_t, PRaylaseCardImpl> laserMap;
+    if (m_bSimulationMode)
+        return;
+
+    for (auto iCardIter : m_CardInstances) {
+        auto pCard = iCardIter.second;
+        uint32_t nLaserIndex = pCard->getAssignedLaserIndex();
+
+        if (nLaserIndex != 0) {
+            auto iExistingIter = laserMap.find(nLaserIndex);
+            if (iExistingIter != laserMap.end())
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX, "a duplicate laser index was assigned: " + std::to_string (nLaserIndex) + " at cards " + pCard->getCardName () + " / " + iExistingIter->second->getCardName ());
+
+            laserMap.insert (std::make_pair (nLaserIndex, pCard));
+        }
+    }
+
+    if (laserMap.empty ())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED);
+
+    auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+    auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+
+    std::vector<PRaylaseCardList> executionLists;
+
+    for (auto iCardIter : laserMap) {
+        auto pCard = iCardIter.second;
+        auto pList = pCard->createNewList();
+        pList->addLayerToList(pLayer);
+        pList->executeList(0);
+
+        executionLists.push_back(pList);
+    }
+
+    bool allDone = false;
+    while (!allDone) {
+        allDone = true;
+        for (auto pList : executionLists) {
+            bool listDone = pList->waitForExecution(100);
+            if (!listDone) {
+                allDone = false;
+                break;
+            }
+        }        
+    }
+
+    for (auto pList : executionLists) {
+        pList->deleteListListOnCard();
+    }
+
+}

@@ -32,74 +32,84 @@ Abstract: This is the class declaration of CRaylaseCard
 */
 
 
-#ifndef __LIBMCDRIVER_RAYLASE_RAYLASECARD
-#define __LIBMCDRIVER_RAYLASE_RAYLASECARD
+#ifndef __LIBMCDRIVER_RAYLASE_RAYLASECARDIMPL
+#define __LIBMCDRIVER_RAYLASE_RAYLASECARDIMPL
 
 #include "libmcdriver_raylase_interfaces.hpp"
 #include "libmcdriver_raylase_sdk.hpp"
 #include "libmcdriver_raylase_raylasecardlist.hpp"
-#include "libmcdriver_raylase_raylasecardimpl.hpp"
-
-// Parent classes
-#include "libmcdriver_raylase_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
-
-// Include custom headers here.
-
 
 namespace LibMCDriver_Raylase {
 namespace Impl {
 
+#define RAYLASE_LISTONCARDNOTSET 0xffffffff
+#define RAYLASE_MAXLISTONCARDID 256
 
-/*************************************************************************************************************************
- Class declaration of CRaylaseCard 
-**************************************************************************************************************************/
+class CRaylaseCardImpl;
+typedef std::shared_ptr<CRaylaseCardImpl> PRaylaseCardImpl;
 
-class CRaylaseCard : public virtual IRaylaseCard, public virtual CBase {
+class CRaylaseCardImpl {
 private:
-	PRaylaseCardImpl m_pRaylaseCardImpl;
+
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
+	PRaylaseSDK m_pSDK;
+	std::string m_sCardName;
+	std::string m_sCardIP;
+	uint32_t m_nPort;
+
+	uint32_t m_nAssignedLaserIndex;
+
+	double m_dMaxLaserPowerInWatts;
+
+	rlHandle m_Handle;
+	bool m_bSimulationMode;
+
+	bool m_bSimulatedPilotIsEnabled;
+	bool m_bSimulatedPilotIsArmed;
+	bool m_bSimulatedPilotIsAlarm;
 
 public:
+	
+	static PRaylaseCardImpl connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
-	CRaylaseCard(PRaylaseCardImpl pRaylaseCardImpl);
+	CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	virtual ~CRaylaseCardImpl();
 
-	virtual ~CRaylaseCard();
+	std::string getCardName();
 
-	bool IsConnected() override;
+	void ResetToSystemDefaults();
 
-	void Disconnect() override;
+	void LaserOn();
 
-	void ResetToSystemDefaults() override;
+	void LaserOff();
 
-	void LaserOn() override;
+	void ArmLaser(const bool bShallBeArmed);
 
-	void LaserOff() override;
+	bool IsLaserArmed();
 
-	void ArmLaser(const bool bShallBeArmed) override;
+	void EnablePilot(const bool bShallBeEnabled);
 
-	bool IsLaserArmed() override;
+	bool PilotIsEnabled();
 
-	void EnablePilot(const bool bShallBeEnabled) override;
+	void GetLaserStatus(bool& bPilotIsEnabled, bool& bLaserIsArmed, bool& bLaserAlarm);
 
-	bool PilotIsEnabled() override;
+	bool IsConnected();
 
-	void GetLaserStatus(bool & bPilotIsEnabled, bool & bLaserIsArmed, bool & bLaserAlarm) override;
+	void Disconnect();
 
-	void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex) override;
+	void assignLaserIndex(uint32_t nLaserIndex);
 
-	LibMCDriver_Raylase_uint32 GetAssignedLaserIndex() override;
+	uint32_t getAssignedLaserIndex();
 
-	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex) override;
+	bool isSimulationMode();
 
+	LibMCEnv::PDriverEnvironment getDriverEnvironment ();
+
+	PRaylaseCardList createNewList();
 };
 
 } // namespace Impl
 } // namespace LibMCDriver_Raylase
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_RAYLASE_RAYLASECARD
+#endif // __LIBMCDRIVER_RAYLASE_RAYLASECARDIMPL

@@ -374,6 +374,18 @@ public:
 	virtual void GetLaserStatus(bool & bPilotIsEnabled, bool & bLaserIsArmed, bool & bLaserAlarm) = 0;
 
 	/**
+	* IRaylaseCard::AssignLaserIndex - Assigns a laser index to the card.
+	* @param[in] nLaserIndex - Laser index to assign. This will map to the laser indices given in the build file. 0 means no assignment.
+	*/
+	virtual void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex) = 0;
+
+	/**
+	* IRaylaseCard::GetAssignedLaserIndex - Returns the assigned laser index to the card. Default value is 0 (unassigned).
+	* @return Assigned laser index. This will map to the laser indices given in the build file. 0 means no assignment.
+	*/
+	virtual LibMCDriver_Raylase_uint32 GetAssignedLaserIndex() = 0;
+
+	/**
 	* IRaylaseCard::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
@@ -429,6 +441,14 @@ public:
 	* @return Instance of connected card.
 	*/
 	virtual IRaylaseCard * GetConnectedCard(const std::string & sCardName) = 0;
+
+	/**
+	* IDriver_Raylase::DrawLayerMultiLaser - Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
+	* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+	*/
+	virtual void DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists) = 0;
 
 };
 

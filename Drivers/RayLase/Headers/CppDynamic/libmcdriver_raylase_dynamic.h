@@ -207,6 +207,24 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_PilotIsEnabl
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetLaserStatusPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pPilotIsEnabled, bool * pLaserIsArmed, bool * pLaserAlarm);
 
 /**
+* Assigns a laser index to the card.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] nLaserIndex - Laser index to assign. This will map to the laser indices given in the build file. 0 means no assignment.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_AssignLaserIndexPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 nLaserIndex);
+
+/**
+* Returns the assigned laser index to the card. Default value is 0 (unassigned).
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pLaserIndex - Assigned laser index. This will map to the laser indices given in the build file. 0 means no assignment.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetAssignedLaserIndexPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 * pLaserIndex);
+
+/**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
@@ -276,6 +294,17 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_ConnectBy
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_GetConnectedCardPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
+
+/**
+* Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
+* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists);
 
 /*************************************************************************************************************************
  Global functions
@@ -369,6 +398,8 @@ typedef struct {
 	PLibMCDriver_RaylaseRaylaseCard_EnablePilotPtr m_RaylaseCard_EnablePilot;
 	PLibMCDriver_RaylaseRaylaseCard_PilotIsEnabledPtr m_RaylaseCard_PilotIsEnabled;
 	PLibMCDriver_RaylaseRaylaseCard_GetLaserStatusPtr m_RaylaseCard_GetLaserStatus;
+	PLibMCDriver_RaylaseRaylaseCard_AssignLaserIndexPtr m_RaylaseCard_AssignLaserIndex;
+	PLibMCDriver_RaylaseRaylaseCard_GetAssignedLaserIndexPtr m_RaylaseCard_GetAssignedLaserIndex;
 	PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr m_RaylaseCard_DrawLayer;
 	PLibMCDriver_RaylaseDriver_Raylase_SetToSimulationModePtr m_Driver_Raylase_SetToSimulationMode;
 	PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr m_Driver_Raylase_IsSimulationMode;
@@ -376,6 +407,7 @@ typedef struct {
 	PLibMCDriver_RaylaseDriver_Raylase_LoadSDKPtr m_Driver_Raylase_LoadSDK;
 	PLibMCDriver_RaylaseDriver_Raylase_ConnectByIPPtr m_Driver_Raylase_ConnectByIP;
 	PLibMCDriver_RaylaseDriver_Raylase_GetConnectedCardPtr m_Driver_Raylase_GetConnectedCard;
+	PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr m_Driver_Raylase_DrawLayerMultiLaser;
 	PLibMCDriver_RaylaseGetVersionPtr m_GetVersion;
 	PLibMCDriver_RaylaseGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_RaylaseReleaseInstancePtr m_ReleaseInstance;

@@ -59,6 +59,10 @@
 		<error name="INVALIDPOINTCOUNT" code="1007" description="Invalid point count" />
 		<error name="INVALIDLASERPOWER" code="1008" description="Invalid laser power" />
 		<error name="INVALIDRAYLASESDK" code="1009" description="Invalid Raylase SDK" />		
+		<error name="ASSIGNEDDUPLICATELASERINDEX" code="1010" description="Assigned duplicate laser index" />		
+		<error name="NOLASERINDICESASSIGNED" code="1011" description="No laser indices have been assigned" />		
+		<error name="INVALIDLISTID" code="1012" description="Invalid list ID" />		
+			
 				
 	</errors>
 
@@ -171,6 +175,14 @@ Custom implementation
 			<param name="LaserAlarm" type="bool" pass="out" description="Flag if the laser is in alarm state." />
 		</method>
 		
+		<method name="AssignLaserIndex" description="Assigns a laser index to the card.">
+			<param name="LaserIndex" type="uint32" pass="in" description="Laser index to assign. This will map to the laser indices given in the build file. 0 means no assignment." />
+		</method>
+
+		<method name="GetAssignedLaserIndex" description="Returns the assigned laser index to the card. Default value is 0 (unassigned).">
+			<param name="LaserIndex" type="uint32" pass="return" description="Assigned laser index. This will map to the laser indices given in the build file. 0 means no assignment." />
+		</method>
+		
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
@@ -207,6 +219,12 @@ Custom implementation
 		<method name="GetConnectedCard" description="Retrieves a connected card instance.">
 			<param name="CardName" type="string" pass="in" description="Name of scanner card to retrieve. MUST have been connected before." />
 			<param name="RaylaseCardInstance" type="class" class="RaylaseCard" pass="return" description="Instance of connected card." />
+		</method>
+
+		<method name="DrawLayerMultiLaser" description="Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card." />
 		</method>
 
 	</class>

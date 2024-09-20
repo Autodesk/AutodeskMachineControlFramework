@@ -188,6 +188,9 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT: return "INVALIDPOINTCOUNT";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER: return "INVALIDLASERPOWER";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK: return "INVALIDRAYLASESDK";
+			case LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX: return "ASSIGNEDDUPLICATELASERINDEX";
+			case LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED: return "NOLASERINDICESASSIGNED";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID: return "INVALIDLISTID";
 		}
 		return "UNKNOWN";
 	}
@@ -214,6 +217,9 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER: return "Invalid laser power";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK: return "Invalid Raylase SDK";
+			case LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX: return "Assigned duplicate laser index";
+			case LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED: return "No laser indices have been assigned";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID: return "Invalid list ID";
 		}
 		return "unknown error";
 	}
@@ -445,6 +451,8 @@ public:
 	inline void EnablePilot(const bool bShallBeEnabled);
 	inline bool PilotIsEnabled();
 	inline void GetLaserStatus(bool & bPilotIsEnabled, bool & bLaserIsArmed, bool & bLaserAlarm);
+	inline void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex);
+	inline LibMCDriver_Raylase_uint32 GetAssignedLaserIndex();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex);
 };
 	
@@ -468,6 +476,7 @@ public:
 	inline void LoadSDK();
 	inline PRaylaseCard ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts);
 	inline PRaylaseCard GetConnectedCard(const std::string & sCardName);
+	inline void DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists);
 };
 	
 	/**
@@ -608,6 +617,8 @@ public:
 		pWrapperTable->m_RaylaseCard_EnablePilot = nullptr;
 		pWrapperTable->m_RaylaseCard_PilotIsEnabled = nullptr;
 		pWrapperTable->m_RaylaseCard_GetLaserStatus = nullptr;
+		pWrapperTable->m_RaylaseCard_AssignLaserIndex = nullptr;
+		pWrapperTable->m_RaylaseCard_GetAssignedLaserIndex = nullptr;
 		pWrapperTable->m_RaylaseCard_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_Raylase_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_Raylase_IsSimulationMode = nullptr;
@@ -615,6 +626,7 @@ public:
 		pWrapperTable->m_Driver_Raylase_LoadSDK = nullptr;
 		pWrapperTable->m_Driver_Raylase_ConnectByIP = nullptr;
 		pWrapperTable->m_Driver_Raylase_GetConnectedCard = nullptr;
+		pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -817,6 +829,24 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_AssignLaserIndex = (PLibMCDriver_RaylaseRaylaseCard_AssignLaserIndexPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_assignlaserindex");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_AssignLaserIndex = (PLibMCDriver_RaylaseRaylaseCard_AssignLaserIndexPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_assignlaserindex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_AssignLaserIndex == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_GetAssignedLaserIndex = (PLibMCDriver_RaylaseRaylaseCard_GetAssignedLaserIndexPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_getassignedlaserindex");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_GetAssignedLaserIndex = (PLibMCDriver_RaylaseRaylaseCard_GetAssignedLaserIndexPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_getassignedlaserindex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_GetAssignedLaserIndex == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RaylaseCard_DrawLayer = (PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_drawlayer");
 		#else // _WIN32
 		pWrapperTable->m_RaylaseCard_DrawLayer = (PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_drawlayer");
@@ -877,6 +907,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_Raylase_GetConnectedCard == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser = (PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_driver_raylase_drawlayermultilaser");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser = (PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr) dlsym(hLibrary, "libmcdriver_raylase_driver_raylase_drawlayermultilaser");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1022,6 +1061,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_GetLaserStatus == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_assignlaserindex", (void**)&(pWrapperTable->m_RaylaseCard_AssignLaserIndex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_AssignLaserIndex == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_getassignedlaserindex", (void**)&(pWrapperTable->m_RaylaseCard_GetAssignedLaserIndex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_GetAssignedLaserIndex == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_drawlayer", (void**)&(pWrapperTable->m_RaylaseCard_DrawLayer));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_DrawLayer == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1048,6 +1095,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_getconnectedcard", (void**)&(pWrapperTable->m_Driver_Raylase_GetConnectedCard));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_GetConnectedCard == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_drawlayermultilaser", (void**)&(pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1267,6 +1318,27 @@ public:
 	}
 	
 	/**
+	* CRaylaseCard::AssignLaserIndex - Assigns a laser index to the card.
+	* @param[in] nLaserIndex - Laser index to assign. This will map to the laser indices given in the build file. 0 means no assignment.
+	*/
+	void CRaylaseCard::AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_AssignLaserIndex(m_pHandle, nLaserIndex));
+	}
+	
+	/**
+	* CRaylaseCard::GetAssignedLaserIndex - Returns the assigned laser index to the card. Default value is 0 (unassigned).
+	* @return Assigned laser index. This will map to the laser indices given in the build file. 0 means no assignment.
+	*/
+	LibMCDriver_Raylase_uint32 CRaylaseCard::GetAssignedLaserIndex()
+	{
+		LibMCDriver_Raylase_uint32 resultLaserIndex = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_GetAssignedLaserIndex(m_pHandle, &resultLaserIndex));
+		
+		return resultLaserIndex;
+	}
+	
+	/**
 	* CRaylaseCard::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
@@ -1350,6 +1422,17 @@ public:
 			CheckError(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CRaylaseCard>(m_pWrapper, hRaylaseCardInstance);
+	}
+	
+	/**
+	* CDriver_Raylase::DrawLayerMultiLaser - Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
+	* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+	*/
+	void CDriver_Raylase::DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_DrawLayerMultiLaser(m_pHandle, sStreamUUID.c_str(), nLayerIndex, bFailIfNonAssignedDataExists));
 	}
 
 } // namespace LibMCDriver_Raylase

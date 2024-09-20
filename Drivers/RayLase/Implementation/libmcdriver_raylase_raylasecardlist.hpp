@@ -32,74 +32,48 @@ Abstract: This is the class declaration of CRaylaseCard
 */
 
 
-#ifndef __LIBMCDRIVER_RAYLASE_RAYLASECARD
-#define __LIBMCDRIVER_RAYLASE_RAYLASECARD
+#ifndef __LIBMCDRIVER_RAYLASE_RAYLASECARDLIST
+#define __LIBMCDRIVER_RAYLASE_RAYLASECARDLIST
 
 #include "libmcdriver_raylase_interfaces.hpp"
 #include "libmcdriver_raylase_sdk.hpp"
-#include "libmcdriver_raylase_raylasecardlist.hpp"
-#include "libmcdriver_raylase_raylasecardimpl.hpp"
-
-// Parent classes
-#include "libmcdriver_raylase_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
-
-// Include custom headers here.
 
 
 namespace LibMCDriver_Raylase {
 namespace Impl {
 
+#define RAYLASE_LISTONCARDNOTSET 0xffffffff
+#define RAYLASE_MAXLISTONCARDID 256
 
-/*************************************************************************************************************************
- Class declaration of CRaylaseCard 
-**************************************************************************************************************************/
+class CRaylaseCardList
+{
+	private:
+		PRaylaseSDK m_pSDK;
+		rlHandle m_CardHandle;
+		rlListHandle m_ListHandle;
+		double m_dMaxLaserPowerInWatts;
+		uint32_t m_nListIDOnCard;
+	public:
 
-class CRaylaseCard : public virtual IRaylaseCard, public virtual CBase {
-private:
-	PRaylaseCardImpl m_pRaylaseCardImpl;
+		CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double dMaxLaserPowerInWatts);
 
-public:
+		virtual ~CRaylaseCardList();
 
-	CRaylaseCard(PRaylaseCardImpl pRaylaseCardImpl);
+		void addLayerToList (LibMCEnv::PToolpathLayer pLayer);
 
-	virtual ~CRaylaseCard();
+		void setListOnCard(uint32_t nListIDOnCard);
 
-	bool IsConnected() override;
+		void deleteListListOnCard();
 
-	void Disconnect() override;
+		void executeList(uint32_t nListIDOnCard);
 
-	void ResetToSystemDefaults() override;
-
-	void LaserOn() override;
-
-	void LaserOff() override;
-
-	void ArmLaser(const bool bShallBeArmed) override;
-
-	bool IsLaserArmed() override;
-
-	void EnablePilot(const bool bShallBeEnabled) override;
-
-	bool PilotIsEnabled() override;
-
-	void GetLaserStatus(bool & bPilotIsEnabled, bool & bLaserIsArmed, bool & bLaserAlarm) override;
-
-	void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex) override;
-
-	LibMCDriver_Raylase_uint32 GetAssignedLaserIndex() override;
-
-	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex) override;
-
+		bool waitForExecution(uint32_t nTimeOutInMS);
 };
+
+typedef std::shared_ptr<CRaylaseCardList> PRaylaseCardList;
 
 } // namespace Impl
 } // namespace LibMCDriver_Raylase
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_RAYLASE_RAYLASECARD
+
+#endif // __LIBMCDRIVER_RAYLASE_RAYLASECARDLIST

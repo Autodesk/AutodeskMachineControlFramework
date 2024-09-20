@@ -220,6 +220,24 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_rayla
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_getlaserstatus(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pPilotIsEnabled, bool * pLaserIsArmed, bool * pLaserAlarm);
 
 /**
+* Assigns a laser index to the card.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] nLaserIndex - Laser index to assign. This will map to the laser indices given in the build file. 0 means no assignment.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_assignlaserindex(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 nLaserIndex);
+
+/**
+* Returns the assigned laser index to the card. Default value is 0 (unassigned).
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pLaserIndex - Assigned laser index. This will map to the laser indices given in the build file. 0 means no assignment.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_getassignedlaserindex(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 * pLaserIndex);
+
+/**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
@@ -289,6 +307,17 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_getconnectedcard(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
+
+/**
+* Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
+* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_drawlayermultilaser(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists);
 
 /*************************************************************************************************************************
  Global functions

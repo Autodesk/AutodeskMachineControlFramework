@@ -114,6 +114,9 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT 1007 /** Invalid point count */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER 1008 /** Invalid laser power */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK 1009 /** Invalid Raylase SDK */
+#define LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX 1010 /** Assigned duplicate laser index */
+#define LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED 1011 /** No laser indices have been assigned */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID 1012 /** Invalid list ID */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -140,6 +143,9 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER: return "Invalid laser power";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK: return "Invalid Raylase SDK";
+    case LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX: return "Assigned duplicate laser index";
+    case LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED: return "No laser indices have been assigned";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID: return "Invalid list ID";
     default: return "unknown error";
   }
 }

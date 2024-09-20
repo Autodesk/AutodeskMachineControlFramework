@@ -569,6 +569,56 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_getlaserstatus(LibMCDr
 	}
 }
 
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_assignlaserindex(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 nLaserIndex)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCard;
+
+	try {
+		IRaylaseCard* pIRaylaseCard = dynamic_cast<IRaylaseCard*>(pIBaseClass);
+		if (!pIRaylaseCard)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIRaylaseCard->AssignLaserIndex(nLaserIndex);
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_getassignedlaserindex(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 * pLaserIndex)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCard;
+
+	try {
+		if (pLaserIndex == nullptr)
+			throw ELibMCDriver_RaylaseInterfaceException (LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		IRaylaseCard* pIRaylaseCard = dynamic_cast<IRaylaseCard*>(pIBaseClass);
+		if (!pIRaylaseCard)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		*pLaserIndex = pIRaylaseCard->GetAssignedLaserIndex();
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_drawlayer(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex)
 {
 	IBase* pIBaseClass = (IBase *)pRaylaseCard;
@@ -766,6 +816,33 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_getconnectedcard(Li
 	}
 }
 
+LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_drawlayermultilaser(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Raylase;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCDriver_RaylaseInterfaceException (LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		IDriver_Raylase* pIDriver_Raylase = dynamic_cast<IDriver_Raylase*>(pIBaseClass);
+		if (!pIDriver_Raylase)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIDriver_Raylase->DrawLayerMultiLaser(sStreamUUID, nLayerIndex, bFailIfNonAssignedDataExists);
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -813,6 +890,10 @@ LibMCDriver_RaylaseResult LibMCDriver_Raylase::Impl::LibMCDriver_Raylase_GetProc
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_pilotisenabled;
 	if (sProcName == "libmcdriver_raylase_raylasecard_getlaserstatus") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_getlaserstatus;
+	if (sProcName == "libmcdriver_raylase_raylasecard_assignlaserindex") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_assignlaserindex;
+	if (sProcName == "libmcdriver_raylase_raylasecard_getassignedlaserindex") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_getassignedlaserindex;
 	if (sProcName == "libmcdriver_raylase_raylasecard_drawlayer") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_drawlayer;
 	if (sProcName == "libmcdriver_raylase_driver_raylase_settosimulationmode") 
@@ -827,6 +908,8 @@ LibMCDriver_RaylaseResult LibMCDriver_Raylase::Impl::LibMCDriver_Raylase_GetProc
 		*ppProcAddress = (void*) &libmcdriver_raylase_driver_raylase_connectbyip;
 	if (sProcName == "libmcdriver_raylase_driver_raylase_getconnectedcard") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_driver_raylase_getconnectedcard;
+	if (sProcName == "libmcdriver_raylase_driver_raylase_drawlayermultilaser") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_driver_raylase_drawlayermultilaser;
 	if (sProcName == "libmcdriver_raylase_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_getversion;
 	if (sProcName == "libmcdriver_raylase_getlasterror") 
