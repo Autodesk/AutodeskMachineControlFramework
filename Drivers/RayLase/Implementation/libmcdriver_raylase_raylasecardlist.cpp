@@ -65,7 +65,7 @@ CRaylaseCardList::~CRaylaseCardList()
     m_ListHandle = 0;
 }
 
-void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer)
+void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t nLaserIndexFilter, bool bFailIfNonAssignedDataExists)
 {
     if (pLayer.get() == nullptr)
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
@@ -81,7 +81,24 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer)
         uint32_t nPointCount;
         pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
 
-        if (nPointCount >= 2) {
+        bool bDrawSegment = true;
+
+        // Check for laser index in file.
+        int64_t nLaserIndexOfSegment = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
+        if (nLaserIndexOfSegment == 0) {
+            if (bFailIfNonAssignedDataExists)
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD, "Segment has no assigned card: " + std::to_string(nLaserIndexOfSegment));
+        }
+
+        // Only draw segments of current laser index
+        if (nLaserIndexFilter != 0) {
+            if (nLaserIndexOfSegment != nLaserIndexOfSegment)
+                bDrawSegment = false;
+        }
+
+
+
+        if ((nPointCount >= 2) && bDrawSegment) {
 
             double dJumpSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
             double dMarkSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);

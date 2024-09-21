@@ -59,7 +59,8 @@ class CRaylaseCardList
 
 		virtual ~CRaylaseCardList();
 
-		void addLayerToList (LibMCEnv::PToolpathLayer pLayer);
+		// Laser Index Filter of 0 means no filter.
+		void addLayerToList (LibMCEnv::PToolpathLayer pLayer, uint32_t nLaserIndexFilter, bool bFailIfNonAssignedDataExists);
 
 		void setListOnCard(uint32_t nListIDOnCard);
 

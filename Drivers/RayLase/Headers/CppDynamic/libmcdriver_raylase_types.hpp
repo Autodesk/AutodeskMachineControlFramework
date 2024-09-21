@@ -117,6 +117,7 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX 1010 /** Assigned duplicate laser index */
 #define LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED 1011 /** No laser indices have been assigned */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID 1012 /** Invalid list ID */
+#define LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD 1013 /** Segment has no assigned card. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -146,6 +147,7 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX: return "Assigned duplicate laser index";
     case LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED: return "No laser indices have been assigned";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID: return "Invalid list ID";
+    case LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD: return "Segment has no assigned card.";
     default: return "unknown error";
   }
 }

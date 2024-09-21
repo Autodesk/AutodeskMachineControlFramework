@@ -118,7 +118,7 @@ void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_
     auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
     auto pList = m_pRaylaseCardImpl->createNewList();
-    pList->addLayerToList(pLayer);
+    pList->addLayerToList(pLayer, 0, false);
     pList->executeList(0);
     bool done = false;
     while (!done) {
