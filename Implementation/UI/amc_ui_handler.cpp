@@ -823,6 +823,21 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
                         std::string sPayloadValue = itr->value.GetString();
                         pInternalUIEnvironment->addExternalEventParameter (sPayloadName, sPayloadValue);
                     }
+
+                    if (itr->value.IsBool()) {
+                        std::string sPayloadValue = itr->value.GetBool() ? "1" : "0";
+                        pInternalUIEnvironment->addExternalEventParameter(sPayloadName, sPayloadValue);
+                    }
+
+                    if (itr->value.IsInt()) {
+                        std::string sPayloadValue = std::to_string (itr->value.GetInt64());
+                        pInternalUIEnvironment->addExternalEventParameter(sPayloadName, sPayloadValue);
+                    }
+
+                    if (itr->value.IsDouble()) {
+                        std::string sPayloadValue = std::to_string(itr->value.GetDouble());
+                        pInternalUIEnvironment->addExternalEventParameter(sPayloadName, sPayloadValue);
+                    }
                 }
 
             }
