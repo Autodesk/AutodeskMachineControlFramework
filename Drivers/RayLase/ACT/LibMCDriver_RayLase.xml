@@ -62,6 +62,8 @@
 		<error name="ASSIGNEDDUPLICATELASERINDEX" code="1010" description="Assigned duplicate laser index" />		
 		<error name="NOLASERINDICESASSIGNED" code="1011" description="No laser indices have been assigned" />		
 		<error name="INVALIDLISTID" code="1012" description="Invalid list ID" />		
+		<error name="SEGMENTHASNOASSIGNEDCARD" code="1013" description="Segment has no assigned card." />		
+		
 			
 				
 	</errors>
