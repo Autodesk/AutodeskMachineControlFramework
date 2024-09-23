@@ -65,7 +65,10 @@ class CTestEnvironment;
 class CCryptoContext;
 class CPNGImageStoreOptions;
 class CPNGImageData;
+class CJPEGImageStoreOptions;
+class CJPEGImageData;
 class CImageData;
+class CVideoStream;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
 class CDataTableWriteOptions;
@@ -130,7 +133,10 @@ typedef CTestEnvironment CLibMCEnvTestEnvironment;
 typedef CCryptoContext CLibMCEnvCryptoContext;
 typedef CPNGImageStoreOptions CLibMCEnvPNGImageStoreOptions;
 typedef CPNGImageData CLibMCEnvPNGImageData;
+typedef CJPEGImageStoreOptions CLibMCEnvJPEGImageStoreOptions;
+typedef CJPEGImageData CLibMCEnvJPEGImageData;
 typedef CImageData CLibMCEnvImageData;
+typedef CVideoStream CLibMCEnvVideoStream;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
 typedef CDataTableWriteOptions CLibMCEnvDataTableWriteOptions;
@@ -195,7 +201,10 @@ typedef std::shared_ptr<CTestEnvironment> PTestEnvironment;
 typedef std::shared_ptr<CCryptoContext> PCryptoContext;
 typedef std::shared_ptr<CPNGImageStoreOptions> PPNGImageStoreOptions;
 typedef std::shared_ptr<CPNGImageData> PPNGImageData;
+typedef std::shared_ptr<CJPEGImageStoreOptions> PJPEGImageStoreOptions;
+typedef std::shared_ptr<CJPEGImageData> PJPEGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
+typedef std::shared_ptr<CVideoStream> PVideoStream;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
 typedef std::shared_ptr<CDataTableWriteOptions> PDataTableWriteOptions;
@@ -260,7 +269,10 @@ typedef PTestEnvironment PLibMCEnvTestEnvironment;
 typedef PCryptoContext PLibMCEnvCryptoContext;
 typedef PPNGImageStoreOptions PLibMCEnvPNGImageStoreOptions;
 typedef PPNGImageData PLibMCEnvPNGImageData;
+typedef PJPEGImageStoreOptions PLibMCEnvJPEGImageStoreOptions;
+typedef PJPEGImageData PLibMCEnvJPEGImageData;
 typedef PImageData PLibMCEnvImageData;
+typedef PVideoStream PLibMCEnvVideoStream;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
 typedef PDataTableWriteOptions PLibMCEnvDataTableWriteOptions;
@@ -907,7 +919,10 @@ private:
 	friend class CCryptoContext;
 	friend class CPNGImageStoreOptions;
 	friend class CPNGImageData;
+	friend class CJPEGImageStoreOptions;
+	friend class CJPEGImageData;
 	friend class CImageData;
+	friend class CVideoStream;
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
 	friend class CDataTableWriteOptions;
@@ -1117,6 +1132,41 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CJPEGImageStoreOptions 
+**************************************************************************************************************************/
+class CJPEGImageStoreOptions : public CBase {
+public:
+	
+	/**
+	* CJPEGImageStoreOptions::CJPEGImageStoreOptions - Constructor for JPEGImageStoreOptions class.
+	*/
+	CJPEGImageStoreOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void ResetToDefaults();
+};
+	
+/*************************************************************************************************************************
+ Class CJPEGImageData 
+**************************************************************************************************************************/
+class CJPEGImageData : public CBase {
+public:
+	
+	/**
+	* CJPEGImageData::CJPEGImageData - Constructor for JPEGImageData class.
+	*/
+	CJPEGImageData(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void GetJPEGDataStream(std::vector<LibMCEnv_uint8> & JPEGDataBuffer);
+};
+	
+/*************************************************************************************************************************
  Class CImageData 
 **************************************************************************************************************************/
 class CImageData : public CBase {
@@ -1150,6 +1200,22 @@ public:
 	inline void SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
 	inline void WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset);
 	inline void ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset);
+};
+	
+/*************************************************************************************************************************
+ Class CVideoStream 
+**************************************************************************************************************************/
+class CVideoStream : public CBase {
+public:
+	
+	/**
+	* CVideoStream::CVideoStream - Constructor for VideoStream class.
+	*/
+	CVideoStream(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
 };
 	
 /*************************************************************************************************************************
@@ -2859,6 +2925,9 @@ public:
 		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = nullptr;
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_PNGImageData_GetPNGDataStream = nullptr;
+		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = nullptr;
+		pWrapperTable->m_JPEGImageData_GetSizeInPixels = nullptr;
+		pWrapperTable->m_JPEGImageData_GetJPEGDataStream = nullptr;
 		pWrapperTable->m_ImageData_GetPixelFormat = nullptr;
 		pWrapperTable->m_ImageData_ChangePixelFormat = nullptr;
 		pWrapperTable->m_ImageData_GetDPI = nullptr;
@@ -3830,6 +3899,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = (PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagestoreoptions_resettodefaults");
+		#else // _WIN32
+		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = (PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr) dlsym(hLibrary, "libmcenv_jpegimagestoreoptions_resettodefaults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JPEGImageData_GetSizeInPixels = (PLibMCEnvJPEGImageData_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagedata_getsizeinpixels");
+		#else // _WIN32
+		pWrapperTable->m_JPEGImageData_GetSizeInPixels = (PLibMCEnvJPEGImageData_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_jpegimagedata_getsizeinpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JPEGImageData_GetSizeInPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JPEGImageData_GetJPEGDataStream = (PLibMCEnvJPEGImageData_GetJPEGDataStreamPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagedata_getjpegdatastream");
+		#else // _WIN32
+		pWrapperTable->m_JPEGImageData_GetJPEGDataStream = (PLibMCEnvJPEGImageData_GetJPEGDataStreamPtr) dlsym(hLibrary, "libmcenv_jpegimagedata_getjpegdatastream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JPEGImageData_GetJPEGDataStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11000,6 +11096,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_jpegimagestoreoptions_resettodefaults", (void**)&(pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jpegimagedata_getsizeinpixels", (void**)&(pWrapperTable->m_JPEGImageData_GetSizeInPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageData_GetSizeInPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jpegimagedata_getjpegdatastream", (void**)&(pWrapperTable->m_JPEGImageData_GetJPEGDataStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageData_GetJPEGDataStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelformat", (void**)&(pWrapperTable->m_ImageData_GetPixelFormat));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixelFormat == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -14383,6 +14491,45 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CJPEGImageStoreOptions
+	 */
+	
+	/**
+	* CJPEGImageStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	void CJPEGImageStoreOptions::ResetToDefaults()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageStoreOptions_ResetToDefaults(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CJPEGImageData
+	 */
+	
+	/**
+	* CJPEGImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CJPEGImageData::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_GetSizeInPixels(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CJPEGImageData::GetJPEGDataStream - Retrieves encoded data stream of image object.
+	* @param[out] JPEGDataBuffer - JPEG Data stream.
+	*/
+	void CJPEGImageData::GetJPEGDataStream(std::vector<LibMCEnv_uint8> & JPEGDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededJPEGData = 0;
+		LibMCEnv_uint64 elementsWrittenJPEGData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_GetJPEGDataStream(m_pHandle, 0, &elementsNeededJPEGData, nullptr));
+		JPEGDataBuffer.resize((size_t) elementsNeededJPEGData);
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_GetJPEGDataStream(m_pHandle, elementsNeededJPEGData, &elementsWrittenJPEGData, JPEGDataBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CImageData
 	 */
 	
@@ -14628,6 +14775,10 @@ public:
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ReadFromRawMemory(m_pHandle, nStartX, nStartY, nCountX, nCountY, eSourceFormat, pSource, nYLineOffset));
 	}
+	
+	/**
+	 * Method definitions for class CVideoStream
+	 */
 	
 	/**
 	 * Method definitions for class CDiscreteFieldData2DStoreOptions

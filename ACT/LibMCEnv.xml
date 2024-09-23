@@ -475,6 +475,28 @@
 
 	</class>
 	
+	
+	<class name="JPEGImageStoreOptions" parent="Base" description="Option class to parametrize saving of JPEG Images.">
+	
+		<method name="ResetToDefaults" description="Resets Options to default.">
+		</method>	
+	
+	</class>
+	
+	
+	<class name="JPEGImageData" parent="Base" description="Binary representation of JPEG Data.">
+
+		<method name="GetSizeInPixels" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="GetJPEGDataStream" description="Retrieves encoded data stream of image object.">
+			<param name="JPEGData" type="basicarray" class="uint8" pass="out" description="JPEG Data stream." />
+		</method>
+
+	</class>
+	
 	<class name="ImageData" parent="Base" description="In memory representation of an image.">
 
 		<method name="GetPixelFormat" description="Returns Pixel format of the image.">
@@ -597,6 +619,13 @@
 
 	
 	</class>
+	
+	<class name="VideoStream" parent="Base" description="Video stream class.">
+	
+		
+	
+	</class>
+	
 	
 	<class name="DiscreteFieldData2DStoreOptions" parent="Base" description="Option class to parametrize saving of Field Data.">
 	

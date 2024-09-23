@@ -641,6 +641,92 @@ LibMCEnvResult libmcenv_pngimagedata_getpngdatastream(LibMCEnv_PNGImageData pPNG
 
 
 /*************************************************************************************************************************
+ Class implementation for JPEGImageStoreOptions
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_jpegimagestoreoptions_resettodefaults(LibMCEnv_JPEGImageStoreOptions pJPEGImageStoreOptions)
+{
+	IBase* pIBaseClass = (IBase *)pJPEGImageStoreOptions;
+
+	try {
+		IJPEGImageStoreOptions* pIJPEGImageStoreOptions = dynamic_cast<IJPEGImageStoreOptions*>(pIBaseClass);
+		if (!pIJPEGImageStoreOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIJPEGImageStoreOptions->ResetToDefaults();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for JPEGImageData
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_jpegimagedata_getsizeinpixels(LibMCEnv_JPEGImageData pJPEGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY)
+{
+	IBase* pIBaseClass = (IBase *)pJPEGImageData;
+
+	try {
+		if (!pPixelSizeX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pPixelSizeY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IJPEGImageData* pIJPEGImageData = dynamic_cast<IJPEGImageData*>(pIBaseClass);
+		if (!pIJPEGImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIJPEGImageData->GetSizeInPixels(*pPixelSizeX, *pPixelSizeY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_jpegimagedata_getjpegdatastream(LibMCEnv_JPEGImageData pJPEGImageData, const LibMCEnv_uint64 nJPEGDataBufferSize, LibMCEnv_uint64* pJPEGDataNeededCount, LibMCEnv_uint8 * pJPEGDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pJPEGImageData;
+
+	try {
+		if ((!pJPEGDataBuffer) && !(pJPEGDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IJPEGImageData* pIJPEGImageData = dynamic_cast<IJPEGImageData*>(pIBaseClass);
+		if (!pIJPEGImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIJPEGImageData->GetJPEGDataStream(nJPEGDataBufferSize, pJPEGDataNeededCount, pJPEGDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for ImageData
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_imagedata_getpixelformat(LibMCEnv_ImageData pImageData, eLibMCEnvImagePixelFormat * pPixelFormat)
@@ -1159,6 +1245,10 @@ LibMCEnvResult libmcenv_imagedata_readfromrawmemory(LibMCEnv_ImageData pImageDat
 	}
 }
 
+
+/*************************************************************************************************************************
+ Class implementation for VideoStream
+**************************************************************************************************************************/
 
 /*************************************************************************************************************************
  Class implementation for DiscreteFieldData2DStoreOptions
@@ -26093,6 +26183,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_pngimagedata_getsizeinpixels;
 	if (sProcName == "libmcenv_pngimagedata_getpngdatastream") 
 		*ppProcAddress = (void*) &libmcenv_pngimagedata_getpngdatastream;
+	if (sProcName == "libmcenv_jpegimagestoreoptions_resettodefaults") 
+		*ppProcAddress = (void*) &libmcenv_jpegimagestoreoptions_resettodefaults;
+	if (sProcName == "libmcenv_jpegimagedata_getsizeinpixels") 
+		*ppProcAddress = (void*) &libmcenv_jpegimagedata_getsizeinpixels;
+	if (sProcName == "libmcenv_jpegimagedata_getjpegdatastream") 
+		*ppProcAddress = (void*) &libmcenv_jpegimagedata_getjpegdatastream;
 	if (sProcName == "libmcenv_imagedata_getpixelformat") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelformat;
 	if (sProcName == "libmcenv_imagedata_changepixelformat") 

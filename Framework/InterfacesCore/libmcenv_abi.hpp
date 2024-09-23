@@ -237,6 +237,43 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_pngimagedata_getsizeinpixels(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_pngimagedata_getpngdatastream(LibMCEnv_PNGImageData pPNGImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
 
 /*************************************************************************************************************************
+ Class definition for JPEGImageStoreOptions
+**************************************************************************************************************************/
+
+/**
+* Resets Options to default.
+*
+* @param[in] pJPEGImageStoreOptions - JPEGImageStoreOptions instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jpegimagestoreoptions_resettodefaults(LibMCEnv_JPEGImageStoreOptions pJPEGImageStoreOptions);
+
+/*************************************************************************************************************************
+ Class definition for JPEGImageData
+**************************************************************************************************************************/
+
+/**
+* Returns image pixel sizes.
+*
+* @param[in] pJPEGImageData - JPEGImageData instance.
+* @param[out] pPixelSizeX - Number of pixels in X
+* @param[out] pPixelSizeY - Number of pixels in Y
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jpegimagedata_getsizeinpixels(LibMCEnv_JPEGImageData pJPEGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
+
+/**
+* Retrieves encoded data stream of image object.
+*
+* @param[in] pJPEGImageData - JPEGImageData instance.
+* @param[in] nJPEGDataBufferSize - Number of elements in buffer
+* @param[out] pJPEGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pJPEGDataBuffer - uint8  buffer of JPEG Data stream.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jpegimagedata_getjpegdatastream(LibMCEnv_JPEGImageData pJPEGImageData, const LibMCEnv_uint64 nJPEGDataBufferSize, LibMCEnv_uint64* pJPEGDataNeededCount, LibMCEnv_uint8 * pJPEGDataBuffer);
+
+/*************************************************************************************************************************
  Class definition for ImageData
 **************************************************************************************************************************/
 
@@ -465,6 +502,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_writetorawmemory(LibMCEnv_Im
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_readfromrawmemory(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eSourceFormat, LibMCEnv_pvoid pSource, LibMCEnv_uint32 nYLineOffset);
+
+/*************************************************************************************************************************
+ Class definition for VideoStream
+**************************************************************************************************************************/
 
 /*************************************************************************************************************************
  Class definition for DiscreteFieldData2DStoreOptions

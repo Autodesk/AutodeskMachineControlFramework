@@ -60,7 +60,10 @@ class ITestEnvironment;
 class ICryptoContext;
 class IPNGImageStoreOptions;
 class IPNGImageData;
+class IJPEGImageStoreOptions;
+class IJPEGImageData;
 class IImageData;
+class IVideoStream;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
 class IDataTableWriteOptions;
@@ -493,6 +496,48 @@ typedef IBaseSharedPtr<IPNGImageData> PIPNGImageData;
 
 
 /*************************************************************************************************************************
+ Class interface for JPEGImageStoreOptions 
+**************************************************************************************************************************/
+
+class IJPEGImageStoreOptions : public virtual IBase {
+public:
+	/**
+	* IJPEGImageStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	virtual void ResetToDefaults() = 0;
+
+};
+
+typedef IBaseSharedPtr<IJPEGImageStoreOptions> PIJPEGImageStoreOptions;
+
+
+/*************************************************************************************************************************
+ Class interface for JPEGImageData 
+**************************************************************************************************************************/
+
+class IJPEGImageData : public virtual IBase {
+public:
+	/**
+	* IJPEGImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IJPEGImageData::GetJPEGDataStream - Retrieves encoded data stream of image object.
+	* @param[in] nJPEGDataBufferSize - Number of elements in buffer
+	* @param[out] pJPEGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pJPEGDataBuffer - uint8 buffer of JPEG Data stream.
+	*/
+	virtual void GetJPEGDataStream(LibMCEnv_uint64 nJPEGDataBufferSize, LibMCEnv_uint64* pJPEGDataNeededCount, LibMCEnv_uint8 * pJPEGDataBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJPEGImageData> PIJPEGImageData;
+
+
+/*************************************************************************************************************************
  Class interface for ImageData 
 **************************************************************************************************************************/
 
@@ -667,6 +712,17 @@ public:
 };
 
 typedef IBaseSharedPtr<IImageData> PIImageData;
+
+
+/*************************************************************************************************************************
+ Class interface for VideoStream 
+**************************************************************************************************************************/
+
+class IVideoStream : public virtual IBase {
+public:
+};
+
+typedef IBaseSharedPtr<IVideoStream> PIVideoStream;
 
 
 /*************************************************************************************************************************
