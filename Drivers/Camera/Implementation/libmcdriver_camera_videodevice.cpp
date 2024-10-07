@@ -43,37 +43,72 @@ using namespace LibMCDriver_Camera::Impl;
  Class definition of CVideoDevice 
 **************************************************************************************************************************/
 
-std::string CVideoDevice::GetIdentifier()
+CVideoDevice_Win32::CVideoDevice_Win32(PVideoDeviceInstance_Win32 pDeviceInstance)
+    : m_pDeviceInstance (pDeviceInstance)
+{
+    if (pDeviceInstance.get() == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+
+}
+
+CVideoDevice_Win32::~CVideoDevice_Win32()
+{
+
+}
+
+std::string CVideoDevice_Win32::GetFriendlyName()
+{
+    return m_pDeviceInstance->getFriendlyName();
+}
+
+std::string CVideoDevice_Win32::GetOperatingSystemName()
+{
+    return m_pDeviceInstance->getOperatingSystemName();
+}
+
+bool CVideoDevice_Win32::IsVideoDevice()
+{
+    return m_pDeviceInstance->isVideoDevice();
+}
+
+
+std::string CVideoDevice_Win32::GetIdentifier()
+{
+    return m_pDeviceInstance->getIdentifier();
+}
+
+void CVideoDevice_Win32::GetCurrentResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight)
+{
+    m_pDeviceInstance->getCurrentResolution(nWidth, nHeight);
+}
+
+void CVideoDevice_Win32::SetResolution(LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight)
+{
+    m_pDeviceInstance->setResolution(nWidth, nHeight);
+}
+
+void CVideoDevice_Win32::CaptureRawImage(LibMCEnv::PImageData pImageData)
+{
+    throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
+}
+
+
+void CVideoDevice_Win32::StartStreamCapture(const LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv::PVideoStream pStreamInstance)
 {
 	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
 }
 
-void CVideoDevice::GetCurrentResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight)
+void CVideoDevice_Win32::StopStreamCapture()
 {
 	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
 }
 
-void CVideoDevice::SetResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight)
+bool CVideoDevice_Win32::StreamCaptureIsActive()
 {
 	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
 }
 
-void CVideoDevice::StartStreamCapture(const LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv::PVideoStream pStreamInstance)
-{
-	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
-}
-
-void CVideoDevice::StopStreamCapture()
-{
-	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
-}
-
-bool CVideoDevice::StreamCaptureIsActive()
-{
-	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
-}
-
-void CVideoDevice::GetStreamCaptureStatistics(LibMCDriver_Camera_double & dDesiredFramerate, LibMCDriver_Camera_double & dMinFramerate, LibMCDriver_Camera_double & dMaxFramerate, LibMCDriver_Camera_double & dMeanFramerate, LibMCDriver_Camera_double & dStdDevFramerate)
+void CVideoDevice_Win32::GetStreamCaptureStatistics(LibMCDriver_Camera_double & dDesiredFramerate, LibMCDriver_Camera_double & dMinFramerate, LibMCDriver_Camera_double & dMaxFramerate, LibMCDriver_Camera_double & dMeanFramerate, LibMCDriver_Camera_double & dStdDevFramerate)
 {
 	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
 }

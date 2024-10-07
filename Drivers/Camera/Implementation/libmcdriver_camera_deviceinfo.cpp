@@ -72,8 +72,3 @@ bool CDeviceInfo::IsVideoDevice()
 }
 
 
-IVideoDevice* CDeviceInfo::OpenVideoDevice(const std::string& sIdentifier)
-{
-	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
-}
-

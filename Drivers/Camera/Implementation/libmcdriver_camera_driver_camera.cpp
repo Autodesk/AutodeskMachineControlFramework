@@ -103,6 +103,13 @@ IDeviceList * CDriver_Camera::EnumerateDevices()
 	return new CDeviceList();
 }
 
+IVideoDevice* CDriver_Camera::OpenVideoDevice(const std::string& sIdentifier, IDeviceInfo* pVideoDeviceInfo)
+{
+	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTOPENVIDEODEVICE, "could not open video device: " + sIdentifier);
+
+}
+
+
 IVideoDevice * CDriver_Camera::FindDeviceByIdentifier(const std::string & sIdentifier, const bool bMustExist)
 {
 	if (bMustExist)

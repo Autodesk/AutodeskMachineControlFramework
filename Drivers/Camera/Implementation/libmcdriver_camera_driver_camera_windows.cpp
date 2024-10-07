@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CDriver_Camera_Windows
 
 // Include custom headers here.
 #include "libmcdriver_camera_devicelist.hpp"
+#include "libmcdriver_camera_videodevice.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -239,6 +240,10 @@ IDeviceList* CDriver_Camera_Windows::EnumerateDevices()
 
 IVideoDevice* CDriver_Camera_Windows::FindDeviceByIdentifier(const std::string& sIdentifier, const bool bMustExist)
 {
+    auto iIter = m_VideoDeviceIdentifierMap.find(sIdentifier);
+    if (iIter != m_VideoDeviceIdentifierMap.end())
+        return new CVideoDevice_Win32(iIter->second);
+
     if (bMustExist)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_CAMERADEVICENOTFOUND, "camera device not found: " + sIdentifier);
 
@@ -247,8 +252,42 @@ IVideoDevice* CDriver_Camera_Windows::FindDeviceByIdentifier(const std::string& 
 
 IVideoDevice* CDriver_Camera_Windows::FindDeviceByOperatingSystemName(const std::string& sOperatingSystemName, const bool bMustExist)
 {
+    auto iIter = m_VideoDeviceOSNameMap.find(sOperatingSystemName);
+    if (iIter != m_VideoDeviceOSNameMap.end())
+        return new CVideoDevice_Win32(iIter->second);
+
     if (bMustExist)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_CAMERADEVICENOTFOUND, "camera device not found: " + sOperatingSystemName);
 
     return nullptr;
 }
+
+IVideoDevice* CDriver_Camera_Windows::OpenVideoDevice(const std::string& sIdentifier, IDeviceInfo* pVideoDeviceInfo)
+{
+    if (pVideoDeviceInfo == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+
+    std::string sFriendlyName = pVideoDeviceInfo->GetFriendlyName();
+    std::string sOSName = pVideoDeviceInfo->GetOperatingSystemName();
+
+    if ((sIdentifier.length () < CAMERA_MINIDENTIFIERLENGTH) || (sIdentifier.length() > CAMERA_MAXIDENTIFIERLENGTH))
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIERLENGTH);
+
+    for (auto ch : sIdentifier) {
+        bool bIsOK = isalnum(ch) || (ch == '_') || (ch == '-') || (ch == '.');
+        if (!bIsOK)
+            throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIER, "invalid camera identifier: " + sIdentifier);
+    }
+
+    auto iIter = m_VideoDeviceIdentifierMap.find(sIdentifier);
+    if (iIter != m_VideoDeviceIdentifierMap.end())
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_CAMERAIDENTIFIERALREADYREGISTERED, "camera identifier already registered: " + sIdentifier);
+
+    auto pDeviceInstance = std::make_shared<CVideoDeviceInstance_Win32> (sIdentifier, sOSName, sFriendlyName);
+
+    m_VideoDeviceIdentifierMap.insert(std::make_pair (sIdentifier, pDeviceInstance));
+    m_VideoDeviceOSNameMap.insert(std::make_pair (sOSName, pDeviceInstance));
+
+    return new CVideoDevice_Win32 (pDeviceInstance);
+}
+

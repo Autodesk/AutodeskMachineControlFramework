@@ -73,7 +73,6 @@ public:
 
 	bool IsVideoDevice() override;
 
-	virtual IVideoDevice* OpenVideoDevice(const std::string& sIdentifier) override;
 
 };
 

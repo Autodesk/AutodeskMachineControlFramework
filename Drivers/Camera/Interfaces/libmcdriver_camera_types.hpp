@@ -115,6 +115,10 @@ typedef void * LibMCDriver_Camera_pvoid;
 #define LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEWMFATTRIBUTES 1008 /** could not create Windows Media Foundation Attributes */
 #define LIBMCDRIVER_CAMERA_ERROR_WIDECHARTOUTF8CONVERSIONFAILED 1009 /** Widechar to UTF8 conversion failed */
 #define LIBMCDRIVER_CAMERA_ERROR_CAMERADEVICELISTOVERRUN 1010 /** Camera device list overrun */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTOPENVIDEODEVICE 1011 /** Could not open video device */
+#define LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIERLENGTH 1012 /** Invalid camera identifier length */
+#define LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIER 1013 /** Invalid camera identifier */
+#define LIBMCDRIVER_CAMERA_ERROR_CAMERAIDENTIFIERALREADYREGISTERED 1014 /** Camera identifier already registered */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Camera
@@ -142,6 +146,10 @@ inline const char * LIBMCDRIVER_CAMERA_GETERRORSTRING (LibMCDriver_CameraResult 
     case LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEWMFATTRIBUTES: return "could not create Windows Media Foundation Attributes";
     case LIBMCDRIVER_CAMERA_ERROR_WIDECHARTOUTF8CONVERSIONFAILED: return "Widechar to UTF8 conversion failed";
     case LIBMCDRIVER_CAMERA_ERROR_CAMERADEVICELISTOVERRUN: return "Camera device list overrun";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTOPENVIDEODEVICE: return "Could not open video device";
+    case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIERLENGTH: return "Invalid camera identifier length";
+    case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIER: return "Invalid camera identifier";
+    case LIBMCDRIVER_CAMERA_ERROR_CAMERAIDENTIFIERALREADYREGISTERED: return "Camera identifier already registered";
     default: return "unknown error";
   }
 }

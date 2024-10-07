@@ -27,74 +27,63 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver_Camera
+Abstract: This is the class declaration of CVideoDevice
 
 */
 
 
-#ifndef __LIBMCDRIVER_CAMERA_DRIVER_CAMERA
-#define __LIBMCDRIVER_CAMERA_DRIVER_CAMERA
+#ifndef __LIBMCDRIVER_CAMERA_VIDEODEVICEINSTANCE_WIN32
+#define __LIBMCDRIVER_CAMERA_VIDEODEVICEINSTANCE_WIN32
 
 #include "libmcdriver_camera_interfaces.hpp"
 
-// Parent classes
-#include "libmcdriver_camera_driver.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
-
-// Include custom headers here.
-#define CAMERA_MINIDENTIFIERLENGTH 1
-#define CAMERA_MAXIDENTIFIERLENGTH 256
 
 namespace LibMCDriver_Camera {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver_Camera 
+ Class declaration of CVideoDevice 
 **************************************************************************************************************************/
 
-class CDriver_Camera : public virtual IDriver_Camera, public virtual CDriver {
+class CVideoDeviceInstance_Win32 {
 private:
-
-	std::string m_sName;
+	std::string m_sIdentifier;
+	std::string m_sOSName;
+	std::string m_sFriendlyName;
 
 public:
 
-	CDriver_Camera(const std::string & sName, LibMCEnv::PDriverEnvironment m_pDriverEnvironment);
+	CVideoDeviceInstance_Win32(const std::string & sIdentifier, const std::string & sOSName, const std::string & sFriendlyName);
 
-	virtual ~CDriver_Camera();
+	virtual ~CVideoDeviceInstance_Win32();
 
-	void Configure(const std::string& sConfigurationString) override;
+	std::string getFriendlyName();
 
-	static std::string getDummyDriverType();
+	std::string getOperatingSystemName();
 
-	std::string GetName() override;
+	bool isVideoDevice();
 
-	std::string GetType() override;
+	std::string getIdentifier();
 
-	void GetVersion(LibMCDriver_Camera_uint32& nMajor, LibMCDriver_Camera_uint32& nMinor, LibMCDriver_Camera_uint32& nMicro, std::string& sBuild) override;
+	void getCurrentResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight);
 
-	void QueryParameters() override;
+	void setResolution(LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight);
 
-	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
+	void startStreamCapture(const LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv::PVideoStream pStreamInstance);
 
-	IDeviceList * EnumerateDevices() override;
+	void stopStreamCapture();
 
-	IVideoDevice* OpenVideoDevice(const std::string& sIdentifier, IDeviceInfo* pVideoDeviceInfo) override;
+	bool streamCaptureIsActive();
 
-	IVideoDevice * FindDeviceByIdentifier(const std::string & sIdentifier, const bool bMustExist) override;
-
-	IVideoDevice * FindDeviceByOperatingSystemName(const std::string & sOperatingSystemName, const bool bMustExist) override;
+	void getStreamCaptureStatistics(LibMCDriver_Camera_double & dDesiredFramerate, LibMCDriver_Camera_double & dMinFramerate, LibMCDriver_Camera_double & dMaxFramerate, LibMCDriver_Camera_double & dMeanFramerate, LibMCDriver_Camera_double & dStdDevFramerate);
 
 };
+
+typedef std::shared_ptr<CVideoDeviceInstance_Win32> PVideoDeviceInstance_Win32;
 
 } // namespace Impl
 } // namespace LibMCDriver_Camera
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_CAMERA_DRIVER_CAMERA
+
+#endif // __LIBMCDRIVER_CAMERA_VIDEODEVICEINSTANCE_WIN32

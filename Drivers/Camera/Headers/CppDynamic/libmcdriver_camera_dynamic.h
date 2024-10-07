@@ -178,11 +178,11 @@ typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraVideoDevice_GetCurrentReso
 * Sets the resolution of the video stream.
 *
 * @param[in] pVideoDevice - VideoDevice instance.
-* @param[out] pWidth - Width in pixels.
-* @param[out] pHeight - Height in pixels.
+* @param[in] nWidth - Width in pixels.
+* @param[in] nHeight - Height in pixels.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraVideoDevice_SetResolutionPtr) (LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight);
+typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraVideoDevice_SetResolutionPtr) (LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight);
 
 /**
 * Captures a still image from the video stream.
@@ -237,16 +237,6 @@ typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraVideoDevice_GetStreamCaptu
  Class definition for DeviceInfo
 **************************************************************************************************************************/
 
-/**
-* Tries to reserve and activate a device. 
-*
-* @param[in] pDeviceInfo - DeviceInfo instance.
-* @param[in] pIdentifier - An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use.
-* @param[out] pVideoDeviceInstance - The actual video device instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraDeviceInfo_OpenVideoDevicePtr) (LibMCDriver_Camera_DeviceInfo pDeviceInfo, const char * pIdentifier, LibMCDriver_Camera_VideoDevice * pVideoDeviceInstance);
-
 /*************************************************************************************************************************
  Class definition for DeviceList
 **************************************************************************************************************************/
@@ -293,6 +283,17 @@ typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraDeviceList_FindDeviceInfoB
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraDriver_Camera_EnumerateDevicesPtr) (LibMCDriver_Camera_Driver_Camera pDriver_Camera, LibMCDriver_Camera_DeviceList * pDeviceListInstance);
+
+/**
+* Tries to reserve and activate a device. 
+*
+* @param[in] pDriver_Camera - Driver_Camera instance.
+* @param[in] pIdentifier - An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use.
+* @param[in] pVideoDeviceInfo - The information object of the device.
+* @param[out] pVideoDeviceInstance - The actual video device instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraDriver_Camera_OpenVideoDevicePtr) (LibMCDriver_Camera_Driver_Camera pDriver_Camera, const char * pIdentifier, LibMCDriver_Camera_DeviceInfo pVideoDeviceInfo, LibMCDriver_Camera_VideoDevice * pVideoDeviceInstance);
 
 /**
 * Finds a device instance by internal identifier.
@@ -413,11 +414,11 @@ typedef struct {
 	PLibMCDriver_CameraVideoDevice_StopStreamCapturePtr m_VideoDevice_StopStreamCapture;
 	PLibMCDriver_CameraVideoDevice_StreamCaptureIsActivePtr m_VideoDevice_StreamCaptureIsActive;
 	PLibMCDriver_CameraVideoDevice_GetStreamCaptureStatisticsPtr m_VideoDevice_GetStreamCaptureStatistics;
-	PLibMCDriver_CameraDeviceInfo_OpenVideoDevicePtr m_DeviceInfo_OpenVideoDevice;
 	PLibMCDriver_CameraDeviceList_GetCountPtr m_DeviceList_GetCount;
 	PLibMCDriver_CameraDeviceList_GetDeviceInfoPtr m_DeviceList_GetDeviceInfo;
 	PLibMCDriver_CameraDeviceList_FindDeviceInfoByOperatingSystemNamePtr m_DeviceList_FindDeviceInfoByOperatingSystemName;
 	PLibMCDriver_CameraDriver_Camera_EnumerateDevicesPtr m_Driver_Camera_EnumerateDevices;
+	PLibMCDriver_CameraDriver_Camera_OpenVideoDevicePtr m_Driver_Camera_OpenVideoDevice;
 	PLibMCDriver_CameraDriver_Camera_FindDeviceByIdentifierPtr m_Driver_Camera_FindDeviceByIdentifier;
 	PLibMCDriver_CameraDriver_Camera_FindDeviceByOperatingSystemNamePtr m_Driver_Camera_FindDeviceByOperatingSystemName;
 	PLibMCDriver_CameraGetVersionPtr m_GetVersion;

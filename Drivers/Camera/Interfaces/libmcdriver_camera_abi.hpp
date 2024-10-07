@@ -191,11 +191,11 @@ LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodev
 * Sets the resolution of the video stream.
 *
 * @param[in] pVideoDevice - VideoDevice instance.
-* @param[out] pWidth - Width in pixels.
-* @param[out] pHeight - Height in pixels.
+* @param[in] nWidth - Width in pixels.
+* @param[in] nHeight - Height in pixels.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight);
+LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight);
 
 /**
 * Captures a still image from the video stream.
@@ -250,16 +250,6 @@ LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodev
  Class definition for DeviceInfo
 **************************************************************************************************************************/
 
-/**
-* Tries to reserve and activate a device. 
-*
-* @param[in] pDeviceInfo - DeviceInfo instance.
-* @param[in] pIdentifier - An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use.
-* @param[out] pVideoDeviceInstance - The actual video device instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_deviceinfo_openvideodevice(LibMCDriver_Camera_DeviceInfo pDeviceInfo, const char * pIdentifier, LibMCDriver_Camera_VideoDevice * pVideoDeviceInstance);
-
 /*************************************************************************************************************************
  Class definition for DeviceList
 **************************************************************************************************************************/
@@ -306,6 +296,17 @@ LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_deviceli
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_driver_camera_enumeratedevices(LibMCDriver_Camera_Driver_Camera pDriver_Camera, LibMCDriver_Camera_DeviceList * pDeviceListInstance);
+
+/**
+* Tries to reserve and activate a device. 
+*
+* @param[in] pDriver_Camera - Driver_Camera instance.
+* @param[in] pIdentifier - An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use.
+* @param[in] pVideoDeviceInfo - The information object of the device.
+* @param[out] pVideoDeviceInstance - The actual video device instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_driver_camera_openvideodevice(LibMCDriver_Camera_Driver_Camera pDriver_Camera, const char * pIdentifier, LibMCDriver_Camera_DeviceInfo pVideoDeviceInfo, LibMCDriver_Camera_VideoDevice * pVideoDeviceInstance);
 
 /**
 * Finds a device instance by internal identifier.

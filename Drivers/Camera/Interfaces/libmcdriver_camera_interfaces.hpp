@@ -386,10 +386,10 @@ public:
 
 	/**
 	* IVideoDevice::SetResolution - Sets the resolution of the video stream.
-	* @param[out] nWidth - Width in pixels.
-	* @param[out] nHeight - Height in pixels.
+	* @param[in] nWidth - Width in pixels.
+	* @param[in] nHeight - Height in pixels.
 	*/
-	virtual void SetResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight) = 0;
+	virtual void SetResolution(const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight) = 0;
 
 	/**
 	* IVideoDevice::CaptureRawImage - Captures a still image from the video stream.
@@ -436,13 +436,6 @@ typedef IBaseSharedPtr<IVideoDevice> PIVideoDevice;
 
 class IDeviceInfo : public virtual IDeviceBase {
 public:
-	/**
-	* IDeviceInfo::OpenVideoDevice - Tries to reserve and activate a device. 
-	* @param[in] sIdentifier - An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use.
-	* @return The actual video device instance.
-	*/
-	virtual IVideoDevice * OpenVideoDevice(const std::string & sIdentifier) = 0;
-
 };
 
 typedef IBaseSharedPtr<IDeviceInfo> PIDeviceInfo;
@@ -491,6 +484,14 @@ public:
 	* @return List of discovered devices.
 	*/
 	virtual IDeviceList * EnumerateDevices() = 0;
+
+	/**
+	* IDriver_Camera::OpenVideoDevice - Tries to reserve and activate a device. 
+	* @param[in] sIdentifier - An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use.
+	* @param[in] pVideoDeviceInfo - The information object of the device.
+	* @return The actual video device instance.
+	*/
+	virtual IVideoDevice * OpenVideoDevice(const std::string & sIdentifier, IDeviceInfo* pVideoDeviceInfo) = 0;
 
 	/**
 	* IDriver_Camera::FindDeviceByIdentifier - Finds a device instance by internal identifier.

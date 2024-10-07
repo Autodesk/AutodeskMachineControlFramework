@@ -519,20 +519,16 @@ LibMCDriver_CameraResult libmcdriver_camera_videodevice_getcurrentresolution(Lib
 	}
 }
 
-LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight)
+LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight)
 {
 	IBase* pIBaseClass = (IBase *)pVideoDevice;
 
 	try {
-		if (!pWidth)
-			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
-		if (!pHeight)
-			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
 		IVideoDevice* pIVideoDevice = dynamic_cast<IVideoDevice*>(pIBaseClass);
 		if (!pIVideoDevice)
 			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
 		
-		pIVideoDevice->SetResolution(*pWidth, *pHeight);
+		pIVideoDevice->SetResolution(nWidth, nHeight);
 
 		return LIBMCDRIVER_CAMERA_SUCCESS;
 	}
@@ -693,37 +689,6 @@ LibMCDriver_CameraResult libmcdriver_camera_videodevice_getstreamcapturestatisti
 /*************************************************************************************************************************
  Class implementation for DeviceInfo
 **************************************************************************************************************************/
-LibMCDriver_CameraResult libmcdriver_camera_deviceinfo_openvideodevice(LibMCDriver_Camera_DeviceInfo pDeviceInfo, const char * pIdentifier, LibMCDriver_Camera_VideoDevice * pVideoDeviceInstance)
-{
-	IBase* pIBaseClass = (IBase *)pDeviceInfo;
-
-	try {
-		if (pIdentifier == nullptr)
-			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
-		if (pVideoDeviceInstance == nullptr)
-			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
-		std::string sIdentifier(pIdentifier);
-		IBase* pBaseVideoDeviceInstance(nullptr);
-		IDeviceInfo* pIDeviceInfo = dynamic_cast<IDeviceInfo*>(pIBaseClass);
-		if (!pIDeviceInfo)
-			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
-		
-		pBaseVideoDeviceInstance = pIDeviceInfo->OpenVideoDevice(sIdentifier);
-
-		*pVideoDeviceInstance = (IBase*)(pBaseVideoDeviceInstance);
-		return LIBMCDRIVER_CAMERA_SUCCESS;
-	}
-	catch (ELibMCDriver_CameraInterfaceException & Exception) {
-		return handleLibMCDriver_CameraException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 
 /*************************************************************************************************************************
  Class implementation for DeviceList
@@ -832,6 +797,42 @@ LibMCDriver_CameraResult libmcdriver_camera_driver_camera_enumeratedevices(LibMC
 		pBaseDeviceListInstance = pIDriver_Camera->EnumerateDevices();
 
 		*pDeviceListInstance = (IBase*)(pBaseDeviceListInstance);
+		return LIBMCDRIVER_CAMERA_SUCCESS;
+	}
+	catch (ELibMCDriver_CameraInterfaceException & Exception) {
+		return handleLibMCDriver_CameraException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CameraResult libmcdriver_camera_driver_camera_openvideodevice(LibMCDriver_Camera_Driver_Camera pDriver_Camera, const char * pIdentifier, LibMCDriver_Camera_DeviceInfo pVideoDeviceInfo, LibMCDriver_Camera_VideoDevice * pVideoDeviceInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Camera;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		if (pVideoDeviceInstance == nullptr)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IBase* pIBaseClassVideoDeviceInfo = (IBase *)pVideoDeviceInfo;
+		IDeviceInfo* pIVideoDeviceInfo = dynamic_cast<IDeviceInfo*>(pIBaseClassVideoDeviceInfo);
+		if (!pIVideoDeviceInfo)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
+		
+		IBase* pBaseVideoDeviceInstance(nullptr);
+		IDriver_Camera* pIDriver_Camera = dynamic_cast<IDriver_Camera*>(pIBaseClass);
+		if (!pIDriver_Camera)
+			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
+		
+		pBaseVideoDeviceInstance = pIDriver_Camera->OpenVideoDevice(sIdentifier, pIVideoDeviceInfo);
+
+		*pVideoDeviceInstance = (IBase*)(pBaseVideoDeviceInstance);
 		return LIBMCDRIVER_CAMERA_SUCCESS;
 	}
 	catch (ELibMCDriver_CameraInterfaceException & Exception) {
@@ -960,8 +961,6 @@ LibMCDriver_CameraResult LibMCDriver_Camera::Impl::LibMCDriver_Camera_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_camera_videodevice_streamcaptureisactive;
 	if (sProcName == "libmcdriver_camera_videodevice_getstreamcapturestatistics") 
 		*ppProcAddress = (void*) &libmcdriver_camera_videodevice_getstreamcapturestatistics;
-	if (sProcName == "libmcdriver_camera_deviceinfo_openvideodevice") 
-		*ppProcAddress = (void*) &libmcdriver_camera_deviceinfo_openvideodevice;
 	if (sProcName == "libmcdriver_camera_devicelist_getcount") 
 		*ppProcAddress = (void*) &libmcdriver_camera_devicelist_getcount;
 	if (sProcName == "libmcdriver_camera_devicelist_getdeviceinfo") 
@@ -970,6 +969,8 @@ LibMCDriver_CameraResult LibMCDriver_Camera::Impl::LibMCDriver_Camera_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_camera_devicelist_finddeviceinfobyoperatingsystemname;
 	if (sProcName == "libmcdriver_camera_driver_camera_enumeratedevices") 
 		*ppProcAddress = (void*) &libmcdriver_camera_driver_camera_enumeratedevices;
+	if (sProcName == "libmcdriver_camera_driver_camera_openvideodevice") 
+		*ppProcAddress = (void*) &libmcdriver_camera_driver_camera_openvideodevice;
 	if (sProcName == "libmcdriver_camera_driver_camera_finddevicebyidentifier") 
 		*ppProcAddress = (void*) &libmcdriver_camera_driver_camera_finddevicebyidentifier;
 	if (sProcName == "libmcdriver_camera_driver_camera_finddevicebyoperatingsystemname") 

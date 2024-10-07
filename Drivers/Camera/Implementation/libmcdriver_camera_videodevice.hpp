@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CVideoDevice
 #endif
 
 // Include custom headers here.
-
+#include "libmcdriver_camera_videodeviceinstance_win32.hpp"
 
 namespace LibMCDriver_Camera {
 namespace Impl {
@@ -55,35 +55,31 @@ namespace Impl {
  Class declaration of CVideoDevice 
 **************************************************************************************************************************/
 
-class CVideoDevice : public virtual IVideoDevice, public virtual CDeviceBase {
+class CVideoDevice_Win32 : public virtual IVideoDevice, public virtual CDeviceBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
+	PVideoDeviceInstance_Win32 m_pDeviceInstance;
 
-protected:
-
-	/**
-	* Put protected members here.
-	*/
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CVideoDevice_Win32(PVideoDeviceInstance_Win32 pDeviceInstance);
 
+	virtual ~CVideoDevice_Win32();
 
-	/**
-	* Public member functions to implement.
-	*/
+	std::string GetFriendlyName() override;
+
+	std::string GetOperatingSystemName() override;
+
+	bool IsVideoDevice() override;
 
 	std::string GetIdentifier() override;
 
 	void GetCurrentResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight) override;
 
-	void SetResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight) override;
+	void SetResolution(LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight) override;
+
+	void CaptureRawImage(LibMCEnv::PImageData pImageData) override;
 
 	void StartStreamCapture(const LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv::PVideoStream pStreamInstance) override;
 

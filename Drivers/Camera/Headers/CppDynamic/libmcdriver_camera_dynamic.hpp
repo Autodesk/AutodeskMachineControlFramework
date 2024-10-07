@@ -205,6 +205,10 @@ public:
 			case LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEWMFATTRIBUTES: return "COULDNOTCREATEWMFATTRIBUTES";
 			case LIBMCDRIVER_CAMERA_ERROR_WIDECHARTOUTF8CONVERSIONFAILED: return "WIDECHARTOUTF8CONVERSIONFAILED";
 			case LIBMCDRIVER_CAMERA_ERROR_CAMERADEVICELISTOVERRUN: return "CAMERADEVICELISTOVERRUN";
+			case LIBMCDRIVER_CAMERA_ERROR_COULDNOTOPENVIDEODEVICE: return "COULDNOTOPENVIDEODEVICE";
+			case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIERLENGTH: return "INVALIDCAMERAIDENTIFIERLENGTH";
+			case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIER: return "INVALIDCAMERAIDENTIFIER";
+			case LIBMCDRIVER_CAMERA_ERROR_CAMERAIDENTIFIERALREADYREGISTERED: return "CAMERAIDENTIFIERALREADYREGISTERED";
 		}
 		return "UNKNOWN";
 	}
@@ -232,6 +236,10 @@ public:
 			case LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEWMFATTRIBUTES: return "could not create Windows Media Foundation Attributes";
 			case LIBMCDRIVER_CAMERA_ERROR_WIDECHARTOUTF8CONVERSIONFAILED: return "Widechar to UTF8 conversion failed";
 			case LIBMCDRIVER_CAMERA_ERROR_CAMERADEVICELISTOVERRUN: return "Camera device list overrun";
+			case LIBMCDRIVER_CAMERA_ERROR_COULDNOTOPENVIDEODEVICE: return "Could not open video device";
+			case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIERLENGTH: return "Invalid camera identifier length";
+			case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIER: return "Invalid camera identifier";
+			case LIBMCDRIVER_CAMERA_ERROR_CAMERAIDENTIFIERALREADYREGISTERED: return "Camera identifier already registered";
 		}
 		return "unknown error";
 	}
@@ -478,7 +486,7 @@ public:
 	
 	inline std::string GetIdentifier();
 	inline void GetCurrentResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight);
-	inline void SetResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight);
+	inline void SetResolution(const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight);
 	inline void CaptureRawImage(classParam<LibMCEnv::CImageData> pImageData);
 	inline void StartStreamCapture(const LibMCDriver_Camera_double dDesiredFramerate, classParam<LibMCEnv::CVideoStream> pStreamInstance);
 	inline void StopStreamCapture();
@@ -500,7 +508,6 @@ public:
 	{
 	}
 	
-	inline PVideoDevice OpenVideoDevice(const std::string & sIdentifier);
 };
 	
 /*************************************************************************************************************************
@@ -537,6 +544,7 @@ public:
 	}
 	
 	inline PDeviceList EnumerateDevices();
+	inline PVideoDevice OpenVideoDevice(const std::string & sIdentifier, classParam<CDeviceInfo> pVideoDeviceInfo);
 	inline PVideoDevice FindDeviceByIdentifier(const std::string & sIdentifier, const bool bMustExist);
 	inline PVideoDevice FindDeviceByOperatingSystemName(const std::string & sOperatingSystemName, const bool bMustExist);
 };
@@ -696,11 +704,11 @@ public:
 		pWrapperTable->m_VideoDevice_StopStreamCapture = nullptr;
 		pWrapperTable->m_VideoDevice_StreamCaptureIsActive = nullptr;
 		pWrapperTable->m_VideoDevice_GetStreamCaptureStatistics = nullptr;
-		pWrapperTable->m_DeviceInfo_OpenVideoDevice = nullptr;
 		pWrapperTable->m_DeviceList_GetCount = nullptr;
 		pWrapperTable->m_DeviceList_GetDeviceInfo = nullptr;
 		pWrapperTable->m_DeviceList_FindDeviceInfoByOperatingSystemName = nullptr;
 		pWrapperTable->m_Driver_Camera_EnumerateDevices = nullptr;
+		pWrapperTable->m_Driver_Camera_OpenVideoDevice = nullptr;
 		pWrapperTable->m_Driver_Camera_FindDeviceByIdentifier = nullptr;
 		pWrapperTable->m_Driver_Camera_FindDeviceByOperatingSystemName = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
@@ -914,15 +922,6 @@ public:
 			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DeviceInfo_OpenVideoDevice = (PLibMCDriver_CameraDeviceInfo_OpenVideoDevicePtr) GetProcAddress(hLibrary, "libmcdriver_camera_deviceinfo_openvideodevice");
-		#else // _WIN32
-		pWrapperTable->m_DeviceInfo_OpenVideoDevice = (PLibMCDriver_CameraDeviceInfo_OpenVideoDevicePtr) dlsym(hLibrary, "libmcdriver_camera_deviceinfo_openvideodevice");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_DeviceInfo_OpenVideoDevice == nullptr)
-			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_DeviceList_GetCount = (PLibMCDriver_CameraDeviceList_GetCountPtr) GetProcAddress(hLibrary, "libmcdriver_camera_devicelist_getcount");
 		#else // _WIN32
 		pWrapperTable->m_DeviceList_GetCount = (PLibMCDriver_CameraDeviceList_GetCountPtr) dlsym(hLibrary, "libmcdriver_camera_devicelist_getcount");
@@ -956,6 +955,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_Camera_EnumerateDevices == nullptr)
+			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Camera_OpenVideoDevice = (PLibMCDriver_CameraDriver_Camera_OpenVideoDevicePtr) GetProcAddress(hLibrary, "libmcdriver_camera_driver_camera_openvideodevice");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Camera_OpenVideoDevice = (PLibMCDriver_CameraDriver_Camera_OpenVideoDevicePtr) dlsym(hLibrary, "libmcdriver_camera_driver_camera_openvideodevice");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Camera_OpenVideoDevice == nullptr)
 			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1123,10 +1131,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_VideoDevice_GetStreamCaptureStatistics == nullptr) )
 			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_camera_deviceinfo_openvideodevice", (void**)&(pWrapperTable->m_DeviceInfo_OpenVideoDevice));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceInfo_OpenVideoDevice == nullptr) )
-			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_camera_devicelist_getcount", (void**)&(pWrapperTable->m_DeviceList_GetCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceList_GetCount == nullptr) )
 			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1141,6 +1145,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_camera_driver_camera_enumeratedevices", (void**)&(pWrapperTable->m_Driver_Camera_EnumerateDevices));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Camera_EnumerateDevices == nullptr) )
+			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_camera_driver_camera_openvideodevice", (void**)&(pWrapperTable->m_Driver_Camera_OpenVideoDevice));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Camera_OpenVideoDevice == nullptr) )
 			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_camera_driver_camera_finddevicebyidentifier", (void**)&(pWrapperTable->m_Driver_Camera_FindDeviceByIdentifier));
@@ -1343,12 +1351,12 @@ public:
 	
 	/**
 	* CVideoDevice::SetResolution - Sets the resolution of the video stream.
-	* @param[out] nWidth - Width in pixels.
-	* @param[out] nHeight - Height in pixels.
+	* @param[in] nWidth - Width in pixels.
+	* @param[in] nHeight - Height in pixels.
 	*/
-	void CVideoDevice::SetResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight)
+	void CVideoDevice::SetResolution(const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_VideoDevice_SetResolution(m_pHandle, &nWidth, &nHeight));
+		CheckError(m_pWrapper->m_WrapperTable.m_VideoDevice_SetResolution(m_pHandle, nWidth, nHeight));
 	}
 	
 	/**
@@ -1408,22 +1416,6 @@ public:
 	/**
 	 * Method definitions for class CDeviceInfo
 	 */
-	
-	/**
-	* CDeviceInfo::OpenVideoDevice - Tries to reserve and activate a device. 
-	* @param[in] sIdentifier - An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use.
-	* @return The actual video device instance.
-	*/
-	PVideoDevice CDeviceInfo::OpenVideoDevice(const std::string & sIdentifier)
-	{
-		LibMCDriver_CameraHandle hVideoDeviceInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceInfo_OpenVideoDevice(m_pHandle, sIdentifier.c_str(), &hVideoDeviceInstance));
-		
-		if (!hVideoDeviceInstance) {
-			CheckError(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CVideoDevice>(m_pWrapper, hVideoDeviceInstance);
-	}
 	
 	/**
 	 * Method definitions for class CDeviceList
@@ -1492,6 +1484,24 @@ public:
 			CheckError(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDeviceList>(m_pWrapper, hDeviceListInstance);
+	}
+	
+	/**
+	* CDriver_Camera::OpenVideoDevice - Tries to reserve and activate a device. 
+	* @param[in] sIdentifier - An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use.
+	* @param[in] pVideoDeviceInfo - The information object of the device.
+	* @return The actual video device instance.
+	*/
+	PVideoDevice CDriver_Camera::OpenVideoDevice(const std::string & sIdentifier, classParam<CDeviceInfo> pVideoDeviceInfo)
+	{
+		LibMCDriver_CameraHandle hVideoDeviceInfo = pVideoDeviceInfo.GetHandle();
+		LibMCDriver_CameraHandle hVideoDeviceInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Camera_OpenVideoDevice(m_pHandle, sIdentifier.c_str(), hVideoDeviceInfo, &hVideoDeviceInstance));
+		
+		if (!hVideoDeviceInstance) {
+			CheckError(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CVideoDevice>(m_pWrapper, hVideoDeviceInstance);
 	}
 	
 	/**

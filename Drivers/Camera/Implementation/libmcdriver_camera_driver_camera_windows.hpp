@@ -39,13 +39,15 @@ Abstract: This is the class declaration of CDriver_Camera_Windows
 
 // Parent classes
 #include "libmcdriver_camera_driver_camera.hpp"
+#include "libmcdriver_camera_videodeviceinstance_win32.hpp"
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-
+#include <map>
 
 namespace LibMCDriver_Camera {
 namespace Impl {
@@ -60,6 +62,9 @@ private:
 
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
+    std::map<std::string, PVideoDeviceInstance_Win32> m_VideoDeviceIdentifierMap;
+    std::map<std::string, PVideoDeviceInstance_Win32> m_VideoDeviceOSNameMap;
+
 public:
 
     CDriver_Camera_Windows(const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
@@ -71,6 +76,8 @@ public:
     std::string GetType() override;
 
     IDeviceList* EnumerateDevices() override;
+
+    IVideoDevice* OpenVideoDevice(const std::string& sIdentifier, IDeviceInfo* pVideoDeviceInfo) override;
 
     IVideoDevice* FindDeviceByIdentifier(const std::string& sIdentifier, const bool bMustExist) override;
 
