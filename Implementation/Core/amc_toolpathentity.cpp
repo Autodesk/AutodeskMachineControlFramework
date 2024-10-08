@@ -138,7 +138,7 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		if (m_pToolpath.get() != nullptr) {
-			auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+			auto nZValue = m_pToolpath->GetLayerZMax(nLayerIndex);
 
 			return nZValue;
 		}
@@ -156,7 +156,7 @@ namespace AMC {
 		double dUnits = m_pToolpath->GetUnits();
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
-		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+		auto nZValue = m_pToolpath->GetLayerZMax(nLayerIndex);
 		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName, m_CustomSegmentAttributes);
 	}
 
@@ -340,10 +340,10 @@ namespace AMC {
 
 		switch (eAttributeType) {
 		case LibMCEnv::eToolpathAttributeType::Integer: 
-			m_pToolpath->RegisterCustomIntegerAttribute (sNameSpace, sAttributeName);
+			m_pToolpath->RegisterCustomIntegerSegmentAttribute (sNameSpace, sAttributeName);
 			break;
 		case LibMCEnv::eToolpathAttributeType::Double:
-			m_pToolpath->RegisterCustomDoubleAttribute (sNameSpace, sAttributeName);
+			m_pToolpath->RegisterCustomDoubleSegmentAttribute (sNameSpace, sAttributeName);
 			break;
 		default: 
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE, "invalid segment attribute type of " + sNameSpace + "/" + sAttributeName);

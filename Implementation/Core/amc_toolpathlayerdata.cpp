@@ -130,7 +130,7 @@ namespace AMC {
 		for (auto& attribute : m_CustomSegmentAttributes) {
 			std::string sNameSpace = attribute->getNameSpace();
 			std::string sAttributeName = attribute->getAttributeName();
-			attribute->setAttributeID (p3MFLayer->FindAttributeIDByName (sNameSpace, sAttributeName));
+			attribute->setAttributeID (p3MFLayer->FindSegmentAttributeIDByName (sNameSpace, sAttributeName));
 			m_CustomSegmentAttributeMap.insert (std::make_pair (std::make_pair (sNameSpace, sAttributeName), attribute));
 		}
 
@@ -143,7 +143,7 @@ namespace AMC {
 			uint32_t nPointCount = 0;
 			p3MFLayer->GetSegmentInfo(nSegmentIndex, eType, nPointCount);
 			std::string sPartUUID = p3MFLayer->GetSegmentPartUUID(nSegmentIndex);
-			std::string sProfileUUID = p3MFLayer->GetSegmentProfileUUID(nSegmentIndex);
+			std::string sProfileUUID = p3MFLayer->GetSegmentDefaultProfileUUID(nSegmentIndex);
 			uint32_t nLocalPartID = p3MFLayer->GetSegmentLocalPartID(nSegmentIndex);
 
 			auto pSegment = &m_Segments[nSegmentIndex];
@@ -185,8 +185,8 @@ namespace AMC {
 		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 			auto pSegment = &m_Segments[nSegmentIndex];
 
-			std::vector<Lib3MF::sPosition2D> PointData;
-			p3MFLayer->GetSegmentPointData(nSegmentIndex, PointData);
+			std::vector<Lib3MF::sDiscretePosition2D> PointData;
+			p3MFLayer->GetSegmentPointDataDiscrete(nSegmentIndex, PointData);
 
 			if ((uint32_t)PointData.size() != pSegment->m_PointCount)
 				throw ELibMCCustomException(LIBMC_ERROR_INVALIDPOINTCOUNT, m_sDebugName);
@@ -201,8 +201,8 @@ namespace AMC {
 
 				for (uint32_t nPointIndex = 0; nPointIndex < pSegment->m_PointCount; nPointIndex++) {
 					
-					pDstPoint->m_Coordinates[0] = (int) pSrcPoint->m_Coordinates[0];
-					pDstPoint->m_Coordinates[1] = (int) pSrcPoint->m_Coordinates[1];
+					pDstPoint->m_Coordinates[0] = pSrcPoint->m_Coordinates[0];
+					pDstPoint->m_Coordinates[1] = pSrcPoint->m_Coordinates[1];
 					pSrcPoint++;
 					pDstPoint++;
 					
