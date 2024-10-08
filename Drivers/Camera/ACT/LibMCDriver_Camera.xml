@@ -60,6 +60,12 @@
 		<error name="COULDNOTCREATEWMFATTRIBUTES" code="1008" description="could not create Windows Media Foundation Attributes" />		
 		<error name="WIDECHARTOUTF8CONVERSIONFAILED" code="1009" description="Widechar to UTF8 conversion failed" />		
 		<error name="CAMERADEVICELISTOVERRUN" code="1010" description="Camera device list overrun" />		
+		<error name="COULDNOTOPENVIDEODEVICE" code="1011" description="Could not open video device" />		
+		<error name="INVALIDCAMERAIDENTIFIERLENGTH" code="1012" description="Invalid camera identifier length" />		
+		<error name="INVALIDCAMERAIDENTIFIER" code="1013" description="Invalid camera identifier" />		
+		<error name="CAMERAIDENTIFIERALREADYREGISTERED" code="1014" description="Camera identifier already registered" />		
+		
+		
 		
 		
 	</errors>
@@ -149,8 +155,8 @@ Custom implementation
 		</method>
 				
 		<method name="SetResolution" description = "Sets the resolution of the video stream.">
-			<param name="Width" type="uint32" pass="out" description="Width in pixels." />
-			<param name="Height" type="uint32" pass="out" description="Height in pixels." />
+			<param name="Width" type="uint32" pass="in" description="Width in pixels." />
+			<param name="Height" type="uint32" pass="in" description="Height in pixels." />
 		</method>
 
 		<method name="CaptureRawImage" description = "Captures a still image from the video stream.">
@@ -182,10 +188,6 @@ Custom implementation
 
 	<class name="DeviceInfo" parent="DeviceBase" description="Contains information about a found device.">			
 
-		<method name="OpenVideoDevice" description = "Tries to reserve and activate a device. ">
-			<param name="Identifier" type="string" pass="in" description="An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use."/>
-			<param name="VideoDeviceInstance" type="class" class="VideoDevice" pass="return" description="The actual video device instance." />
-		</method>
 	</class>
 
 
@@ -214,6 +216,13 @@ Custom implementation
 			<param name="DeviceListInstance" type="class" class="DeviceList" pass="return" description="List of discovered devices." />
 		</method>
 
+		<method name="OpenVideoDevice" description = "Tries to reserve and activate a device. ">
+			<param name="Identifier" type="string" pass="in" description="An internal identifier that will recover the open device. MUST NOT be empty. Fails if the identifier is already in use."/>
+			<param name="VideoDeviceInfo" type="class" class="DeviceInfo" pass="in" description="The information object of the device." />
+			<param name="VideoDeviceInstance" type="class" class="VideoDevice" pass="return" description="The actual video device instance." />
+		</method>		
+
+
 		<method name="FindDeviceByIdentifier" description="Finds a device instance by internal identifier.">
 			<param name="Identifier" type="string" pass="in" description="Internal Identifier of the device." />
 			<param name="MustExist" type="bool" pass="in" description="If true, an exception will be thrown if the device does not exist. If false, the call will return null if the device does not exist." />
@@ -225,7 +234,7 @@ Custom implementation
 			<param name="MustExist" type="bool" pass="in" description="If true, an exception will be thrown if the device does not exist. If false, the call will return null if the device does not exist." />
 			<param name="DeviceInstance" type="optionalclass" class="VideoDevice" pass="return" description="Instance of discovered device." />
 		</method>
-
+		
 	</class>
 
 
