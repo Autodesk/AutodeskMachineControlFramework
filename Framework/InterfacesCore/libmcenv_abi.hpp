@@ -5249,6 +5249,60 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_loginfo(LibM
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_sleep(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, LibMCEnv_uint32 nDelay);
 
+/**
+* Gets a string parameter. Fails if parameter does not exist.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of parameter, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_getstringparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of parameter, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_getuuidparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_getdoubleparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_double * pValue);
+
+/**
+* Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_getintegerparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_int64 * pValue);
+
+/**
+* Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_getboolparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, bool * pValue);
+
 /*************************************************************************************************************************
  Class definition for DriverEnvironment
 **************************************************************************************************************************/
@@ -5480,7 +5534,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registerintegerparam
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registerboolparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, bool bDefaultValue);
 
 /**
-* sets a string parameter
+* Sets a string parameter. For getting a string, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5490,7 +5544,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registerboolparamete
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setstringparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
 
 /**
-* sets a uuid parameter
+* sets a uuid parameter. For getting a UUID, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5500,7 +5554,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setstringparameter(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setuuidparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
 
 /**
-* sets a double parameter
+* sets a double parameter. For getting a Double, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5510,7 +5564,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setuuidparameter(Lib
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setdoubleparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_double dValue);
 
 /**
-* sets an int parameter
+* sets an int parameter. For getting an Integer, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5520,7 +5574,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setdoubleparameter(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setintegerparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_int64 nValue);
 
 /**
-* sets a bool parameter
+* sets a bool parameter. For getting a bool, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name

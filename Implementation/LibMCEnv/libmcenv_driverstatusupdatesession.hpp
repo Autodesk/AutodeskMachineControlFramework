@@ -90,6 +90,16 @@ public:
 
 	void Sleep(const LibMCEnv_uint32 nDelay) override;
 
+	std::string GetStringParameter(const std::string& sParameterName) override;
+
+	std::string GetUUIDParameter(const std::string& sParameterName) override;
+
+	LibMCEnv_double GetDoubleParameter(const std::string& sParameterName) override;
+
+	LibMCEnv_int64 GetIntegerParameter(const std::string& sParameterName) override;
+
+	bool GetBoolParameter(const std::string& sParameterName) override;
+
 };
 
 } // namespace Impl

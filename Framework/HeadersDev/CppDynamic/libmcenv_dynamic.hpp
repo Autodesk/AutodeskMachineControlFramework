@@ -2223,6 +2223,11 @@ public:
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
+	inline std::string GetStringParameter(const std::string & sParameterName);
+	inline std::string GetUUIDParameter(const std::string & sParameterName);
+	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterName);
+	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterName);
+	inline bool GetBoolParameter(const std::string & sParameterName);
 };
 	
 /*************************************************************************************************************************
@@ -3395,6 +3400,11 @@ public:
 		pWrapperTable->m_DriverStatusUpdateSession_LogWarning = nullptr;
 		pWrapperTable->m_DriverStatusUpdateSession_LogInfo = nullptr;
 		pWrapperTable->m_DriverStatusUpdateSession_Sleep = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection = nullptr;
@@ -8129,6 +8139,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverStatusUpdateSession_Sleep == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter = (PLibMCEnvDriverStatusUpdateSession_GetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter = (PLibMCEnvDriverStatusUpdateSession_GetStringParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter = (PLibMCEnvDriverStatusUpdateSession_GetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getuuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter = (PLibMCEnvDriverStatusUpdateSession_GetUUIDParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getuuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter = (PLibMCEnvDriverStatusUpdateSession_GetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter = (PLibMCEnvDriverStatusUpdateSession_GetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter = (PLibMCEnvDriverStatusUpdateSession_GetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter = (PLibMCEnvDriverStatusUpdateSession_GetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter = (PLibMCEnvDriverStatusUpdateSession_GetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter = (PLibMCEnvDriverStatusUpdateSession_GetBoolParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12974,6 +13029,26 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_sleep", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_Sleep));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_Sleep == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getstringparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getuuidparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getdoubleparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getintegerparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getboolparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createstatusupdatesession", (void**)&(pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession));
@@ -20834,6 +20909,77 @@ public:
 	}
 	
 	/**
+	* CDriverStatusUpdateSession::GetStringParameter - Gets a string parameter. Fails if parameter does not exist.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	std::string CDriverStatusUpdateSession::GetStringParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetStringParameter(m_pHandle, sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetStringParameter(m_pHandle, sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::GetUUIDParameter - Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	std::string CDriverStatusUpdateSession::GetUUIDParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetUUIDParameter(m_pHandle, sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetUUIDParameter(m_pHandle, sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::GetDoubleParameter - Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	LibMCEnv_double CDriverStatusUpdateSession::GetDoubleParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetDoubleParameter(m_pHandle, sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::GetIntegerParameter - Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	LibMCEnv_int64 CDriverStatusUpdateSession::GetIntegerParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetIntegerParameter(m_pHandle, sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::GetBoolParameter - Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	bool CDriverStatusUpdateSession::GetBoolParameter(const std::string & sParameterName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetBoolParameter(m_pHandle, sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
 	 * Method definitions for class CDriverEnvironment
 	 */
 	
@@ -21132,7 +21278,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetStringParameter - sets a string parameter
+	* CDriverEnvironment::SetStringParameter - Sets a string parameter. For getting a string, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sValue - Value to set
 	*/
@@ -21142,7 +21288,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetUUIDParameter - sets a uuid parameter
+	* CDriverEnvironment::SetUUIDParameter - sets a uuid parameter. For getting a UUID, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sValue - Value to set
 	*/
@@ -21152,7 +21298,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetDoubleParameter - sets a double parameter
+	* CDriverEnvironment::SetDoubleParameter - sets a double parameter. For getting a Double, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] dValue - Value to set
 	*/
@@ -21162,7 +21308,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetIntegerParameter - sets an int parameter
+	* CDriverEnvironment::SetIntegerParameter - sets an int parameter. For getting an Integer, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] nValue - Value to set
 	*/
@@ -21172,7 +21318,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetBoolParameter - sets a bool parameter
+	* CDriverEnvironment::SetBoolParameter - sets a bool parameter. For getting a bool, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] bValue - Value to set
 	*/

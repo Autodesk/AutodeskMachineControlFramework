@@ -5236,6 +5236,60 @@ typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_LogInfoPtr) (LibMCEn
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_SleepPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, LibMCEnv_uint32 nDelay);
 
+/**
+* Gets a string parameter. Fails if parameter does not exist.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of parameter, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetStringParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of parameter, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetUUIDParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetDoubleParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_double * pValue);
+
+/**
+* Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetIntegerParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_int64 * pValue);
+
+/**
+* Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetBoolParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, bool * pValue);
+
 /*************************************************************************************************************************
  Class definition for DriverEnvironment
 **************************************************************************************************************************/
@@ -5467,7 +5521,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterIntegerParameterPtr)
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, bool bDefaultValue);
 
 /**
-* sets a string parameter
+* Sets a string parameter. For getting a string, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5477,7 +5531,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr) (L
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetStringParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
 
 /**
-* sets a uuid parameter
+* sets a uuid parameter. For getting a UUID, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5487,7 +5541,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetStringParameterPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetUUIDParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
 
 /**
-* sets a double parameter
+* sets a double parameter. For getting a Double, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5497,7 +5551,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetUUIDParameterPtr) (LibMCE
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetDoubleParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_double dValue);
 
 /**
-* sets an int parameter
+* sets an int parameter. For getting an Integer, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5507,7 +5561,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetDoubleParameterPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetIntegerParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_int64 nValue);
 
 /**
-* sets a bool parameter
+* sets a bool parameter. For getting a bool, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -9231,6 +9285,11 @@ typedef struct {
 	PLibMCEnvDriverStatusUpdateSession_LogWarningPtr m_DriverStatusUpdateSession_LogWarning;
 	PLibMCEnvDriverStatusUpdateSession_LogInfoPtr m_DriverStatusUpdateSession_LogInfo;
 	PLibMCEnvDriverStatusUpdateSession_SleepPtr m_DriverStatusUpdateSession_Sleep;
+	PLibMCEnvDriverStatusUpdateSession_GetStringParameterPtr m_DriverStatusUpdateSession_GetStringParameter;
+	PLibMCEnvDriverStatusUpdateSession_GetUUIDParameterPtr m_DriverStatusUpdateSession_GetUUIDParameter;
+	PLibMCEnvDriverStatusUpdateSession_GetDoubleParameterPtr m_DriverStatusUpdateSession_GetDoubleParameter;
+	PLibMCEnvDriverStatusUpdateSession_GetIntegerParameterPtr m_DriverStatusUpdateSession_GetIntegerParameter;
+	PLibMCEnvDriverStatusUpdateSession_GetBoolParameterPtr m_DriverStatusUpdateSession_GetBoolParameter;
 	PLibMCEnvDriverEnvironment_CreateStatusUpdateSessionPtr m_DriverEnvironment_CreateStatusUpdateSession;
 	PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr m_DriverEnvironment_CreateWorkingDirectory;
 	PLibMCEnvDriverEnvironment_CreateTCPIPConnectionPtr m_DriverEnvironment_CreateTCPIPConnection;

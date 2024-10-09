@@ -2922,7 +2922,7 @@
 	</class>	
 
 
-	<class name="DriverStatusUpdateSession" parent="Base" description="Thread-safe class for updating the status variables of the driver">
+	<class name="DriverStatusUpdateSession" parent="Base" description="Class for updating the status variables of the driver in a thread-safe way. One instance should be created per driver thread.">
 	
 		<method name="SetStringParameter" description="sets a string parameter">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
@@ -2963,6 +2963,32 @@
 
 		<method name="Sleep" description="Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
 			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
+
+		<method name="GetStringParameter" description="Gets a string parameter. Fails if parameter does not exist.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value of parameter" />
+		</method>
+
+		<method name="GetUUIDParameter" description="Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value of parameter" />
+		</method>
+
+		<method name="GetDoubleParameter" description="Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="return" description="Value of parameter" />
+		</method>
+
+		<method name="GetIntegerParameter" description="Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="return" description="Value of parameter" />
+		</method>
+
+		<method name="GetBoolParameter" description="Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="return" description="Value of parameter" />
 		</method>
 
 	</class>
@@ -3084,28 +3110,27 @@
 			<param name="DefaultValue" type="bool" pass="in" description="default value to set" />
 		</method>
 		
-		
-		<method name="SetStringParameter" description="sets a string parameter">
+		<method name="SetStringParameter" description="Sets a string parameter. For getting a string, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetUUIDParameter" description="sets a uuid parameter">
+		<method name="SetUUIDParameter" description="sets a uuid parameter. For getting a UUID, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetDoubleParameter" description="sets a double parameter">
+		<method name="SetDoubleParameter" description="sets a double parameter. For getting a Double, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="double" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetIntegerParameter" description="sets an int parameter">
+		<method name="SetIntegerParameter" description="sets an int parameter. For getting an Integer, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="int64" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetBoolParameter" description="sets a bool parameter">
+		<method name="SetBoolParameter" description="sets a bool parameter. For getting a bool, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="bool" pass="in" description="Value to set" />
 		</method>

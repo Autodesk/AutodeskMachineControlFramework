@@ -4218,6 +4218,41 @@ public:
 	*/
 	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
 
+	/**
+	* IDriverStatusUpdateSession::GetStringParameter - Gets a string parameter. Fails if parameter does not exist.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual std::string GetStringParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::GetUUIDParameter - Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual std::string GetUUIDParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::GetDoubleParameter - Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual LibMCEnv_double GetDoubleParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::GetIntegerParameter - Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::GetBoolParameter - Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual bool GetBoolParameter(const std::string & sParameterName) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverStatusUpdateSession> PIDriverStatusUpdateSession;
@@ -4393,35 +4428,35 @@ public:
 	virtual void RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetStringParameter - sets a string parameter
+	* IDriverEnvironment::SetStringParameter - Sets a string parameter. For getting a string, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sValue - Value to set
 	*/
 	virtual void SetStringParameter(const std::string & sParameterName, const std::string & sValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetUUIDParameter - sets a uuid parameter
+	* IDriverEnvironment::SetUUIDParameter - sets a uuid parameter. For getting a UUID, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sValue - Value to set
 	*/
 	virtual void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetDoubleParameter - sets a double parameter
+	* IDriverEnvironment::SetDoubleParameter - sets a double parameter. For getting a Double, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] dValue - Value to set
 	*/
 	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetIntegerParameter - sets an int parameter
+	* IDriverEnvironment::SetIntegerParameter - sets an int parameter. For getting an Integer, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] nValue - Value to set
 	*/
 	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetBoolParameter - sets a bool parameter
+	* IDriverEnvironment::SetBoolParameter - sets a bool parameter. For getting a bool, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] bValue - Value to set
 	*/
