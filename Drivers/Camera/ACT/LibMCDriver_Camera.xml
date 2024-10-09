@@ -64,7 +64,15 @@
 		<error name="INVALIDCAMERAIDENTIFIERLENGTH" code="1012" description="Invalid camera identifier length" />		
 		<error name="INVALIDCAMERAIDENTIFIER" code="1013" description="Invalid camera identifier" />		
 		<error name="CAMERAIDENTIFIERALREADYREGISTERED" code="1014" description="Camera identifier already registered" />		
-		
+		<error name="COULDNOTCREATEMEDIATYPE" code="1015" description="Could not create media type" />		
+		<error name="COULDNOTSETMEDIATYPETOVIDEO" code="1016" description="Could not set media type to video" />		
+		<error name="COULDNOTSETMEDIATYPEFORMAT" code="1017" description="Could not set media type format" />		
+		<error name="COULDNOTSETMEDIARESOLUTION" code="1018" description="Could not set media resolution" />		
+		<error name="COULDNOTSETMEDIAFRAMERATE" code="1019" description="Could not set media framerate" />		
+		<error name="COULDNOTSETPIXELASPECTRATIO" code="1020" description="Could not set pixel aspect ratio" />		
+		<error name="COULDNOTACTIVATEDEVICE" code="1021" description="Could not activate device" />		
+		<error name="COULDNOTCREATEREADER" code="1022" description="Could not create reader" />		
+		<error name="COULDNOTSETMEDIATYPE" code="1023" description="Could not set media type" />		
 		
 		
 		

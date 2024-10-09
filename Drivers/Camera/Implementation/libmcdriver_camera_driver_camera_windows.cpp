@@ -46,6 +46,8 @@ Abstract: This is a stub class definition of CDriver_Camera_Windows
 #include <mfobjects.h>
 #include <mfidl.h>
 
+#include <wrl/client.h>
+
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfreadwrite.lib")
 #pragma comment(lib, "mfuuid.lib")
@@ -62,6 +64,8 @@ using namespace LibMCDriver_Camera::Impl;
 **************************************************************************************************************************/
 
 #ifdef _WIN32
+
+using Microsoft::WRL::ComPtr;
 
 std::string wstring_to_utf8(const std::wstring& wstr) {
 
@@ -143,93 +147,89 @@ IDeviceList* CDriver_Camera_Windows::EnumerateDevices()
     std::unique_ptr<CDeviceList> pDeviceList (new CDeviceList());
 
 #ifdef _WIN32
-    IMFAttributes* config = nullptr;
+    ComPtr<IMFAttributes> pConfig = nullptr;
 
     // Create attributes to specify the capture device
-    HRESULT hResult = MFCreateAttributes(&config, 1);
+    HRESULT hResult = MFCreateAttributes(&pConfig, 1);
     if (hResult != S_OK)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEWMFATTRIBUTES, "could not create Windows Media Foundation Attributes: " + std::to_string (hResult));
 
-    hResult = config->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+    hResult = pConfig->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
     if (hResult != S_OK)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTFILTERFORVIDEODEVICES, "could not filter for video devices: " + std::to_string(hResult));
 
     // Get the list of video capture devices
-    IMFActivate** devices = nullptr;
+    IMFActivate** devicesPtr = nullptr;
+    std::vector<ComPtr<IMFActivate>> foundDevices;
 
-    try {
-        UINT32 nDeviceCount = 0;
-        hResult = MFEnumDeviceSources(config, &devices, &nDeviceCount);
+    // Store the devices memory-safe
+    UINT32 nDeviceCount = 0;
+    hResult = MFEnumDeviceSources(pConfig.Get(), &devicesPtr, &nDeviceCount);
+    if (hResult != S_OK)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTENUMERATEDEVICESOURCES, "could not enumerate device sources: " + std::to_string(hResult));    
 
-        if (hResult != S_OK)
-            throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTENUMERATEDEVICESOURCES, "could not enumerate device sources: " + std::to_string(hResult));
+    for (uint32_t nDeviceIndex = 0; nDeviceIndex < nDeviceCount; nDeviceIndex++) 
+        foundDevices.push_back(devicesPtr[nDeviceIndex]);
+    CoTaskMemFree(devicesPtr);
 
-        for (uint32_t nDeviceIndex = 0; nDeviceIndex < nDeviceCount; nDeviceIndex++) {
+    // Store all found devices
+    for (uint32_t nDeviceIndex = 0; nDeviceIndex < nDeviceCount; nDeviceIndex++) {
 
-            std::string sFriendlyName;
-            std::string sSymbolicLink;
-            bool bIsVideo = false;
+        std::string sFriendlyName;
+        std::string sSymbolicLink;
+        bool bIsVideo = false;
 
-            bool bSuccess = true;
+        bool bSuccess = true;
 
-            auto pDevice = devices[nDeviceIndex];
+        auto pDevice = foundDevices.at (nDeviceIndex);
 
-            // get Friendly Name
-            {
-                std::array<wchar_t, 256> bufferFriendlyName;
-                UINT32 lengthFriendlyName = 0;
-                hResult = pDevice->GetString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, bufferFriendlyName.data(), (uint32_t)bufferFriendlyName.size(), &lengthFriendlyName);
-                if (hResult == S_OK) {
-                    if (lengthFriendlyName >= bufferFriendlyName.size())
-                        lengthFriendlyName = (uint32_t)bufferFriendlyName.size() - 1;
-                    bufferFriendlyName.at(lengthFriendlyName) = 0;
-                    sFriendlyName = wstring_to_utf8(bufferFriendlyName.data());
-                }
-                else {
-                    bSuccess = false;
-                }
+        // get Friendly Name
+        {
+            std::array<wchar_t, 256> bufferFriendlyName;
+            UINT32 lengthFriendlyName = 0;
+            hResult = pDevice->GetString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, bufferFriendlyName.data(), (uint32_t)bufferFriendlyName.size(), &lengthFriendlyName);
+            if (hResult == S_OK) {
+                if (lengthFriendlyName >= bufferFriendlyName.size())
+                    lengthFriendlyName = (uint32_t)bufferFriendlyName.size() - 1;
+                bufferFriendlyName.at(lengthFriendlyName) = 0;
+                sFriendlyName = wstring_to_utf8(bufferFriendlyName.data());
             }
-
-            // get Symbolic Link Name
-            {
-                std::array<wchar_t, 1024> bufferSymbolicLink;
-                UINT32 lengthSymbolicLink = 0;
-                hResult = pDevice->GetString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, bufferSymbolicLink.data(), (uint32_t)bufferSymbolicLink.size(), &lengthSymbolicLink);
-                if (hResult == S_OK) {
-                    if (lengthSymbolicLink >= bufferSymbolicLink.size())
-                        lengthSymbolicLink = (uint32_t)bufferSymbolicLink.size() - 1;
-                    bufferSymbolicLink.at(lengthSymbolicLink) = 0;
-                    sSymbolicLink = wstring_to_utf8(bufferSymbolicLink.data());
-                }
-                else {
-                    bSuccess = false;
-                }
+            else {
+                bSuccess = false;
             }
+        }
+
+        // get Symbolic Link Name
+        {
+            std::array<wchar_t, 1024> bufferSymbolicLink;
+            UINT32 lengthSymbolicLink = 0;
+            hResult = pDevice->GetString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, bufferSymbolicLink.data(), (uint32_t)bufferSymbolicLink.size(), &lengthSymbolicLink);
+            if (hResult == S_OK) {
+                if (lengthSymbolicLink >= bufferSymbolicLink.size())
+                    lengthSymbolicLink = (uint32_t)bufferSymbolicLink.size() - 1;
+                bufferSymbolicLink.at(lengthSymbolicLink) = 0;
+                sSymbolicLink = wstring_to_utf8(bufferSymbolicLink.data());
+            }
+            else {
+                bSuccess = false;
+            }
+        }
             
-            {
-                GUID sourceType;
-                hResult = pDevice->GetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, &sourceType);
-                if (hResult == S_OK) {
-                    bIsVideo = (sourceType == MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-                }
-                else {
-                    bSuccess = false;
-                }
-
+        {
+            GUID sourceType;
+            hResult = pDevice->GetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, &sourceType);
+            if (hResult == S_OK) {
+                bIsVideo = (sourceType == MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
             }
-
-            if (bSuccess)
-                pDeviceList->addInfo(std::make_shared<CDeviceInfoInstance>(sFriendlyName, sSymbolicLink, bIsVideo));
+            else {
+                bSuccess = false;
+            }
 
         }
 
-        CoTaskMemFree(devices);
-        devices = nullptr;
-    }
-    catch (...) {
-        if (devices != nullptr)
-            CoTaskMemFree(devices);
-        throw;
+        if (bSuccess)
+            pDeviceList->addInfo(std::make_shared<CDeviceInfoInstance>(sFriendlyName, sSymbolicLink, bIsVideo));
+
     }
 
 

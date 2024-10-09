@@ -119,6 +119,15 @@ typedef void * LibMCDriver_Camera_pvoid;
 #define LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIERLENGTH 1012 /** Invalid camera identifier length */
 #define LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIER 1013 /** Invalid camera identifier */
 #define LIBMCDRIVER_CAMERA_ERROR_CAMERAIDENTIFIERALREADYREGISTERED 1014 /** Camera identifier already registered */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEMEDIATYPE 1015 /** Could not create media type */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPETOVIDEO 1016 /** Could not set media type to video */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPEFORMAT 1017 /** Could not set media type format */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIARESOLUTION 1018 /** Could not set media resolution */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIAFRAMERATE 1019 /** Could not set media framerate */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETPIXELASPECTRATIO 1020 /** Could not set pixel aspect ratio */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEDEVICE 1021 /** Could not activate device */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEREADER 1022 /** Could not create reader */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPE 1023 /** Could not set media type */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Camera
@@ -150,6 +159,15 @@ inline const char * LIBMCDRIVER_CAMERA_GETERRORSTRING (LibMCDriver_CameraResult 
     case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIERLENGTH: return "Invalid camera identifier length";
     case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAIDENTIFIER: return "Invalid camera identifier";
     case LIBMCDRIVER_CAMERA_ERROR_CAMERAIDENTIFIERALREADYREGISTERED: return "Camera identifier already registered";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEMEDIATYPE: return "Could not create media type";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPETOVIDEO: return "Could not set media type to video";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPEFORMAT: return "Could not set media type format";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIARESOLUTION: return "Could not set media resolution";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIAFRAMERATE: return "Could not set media framerate";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETPIXELASPECTRATIO: return "Could not set pixel aspect ratio";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEDEVICE: return "Could not activate device";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEREADER: return "Could not create reader";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPE: return "Could not set media type";
     default: return "unknown error";
   }
 }

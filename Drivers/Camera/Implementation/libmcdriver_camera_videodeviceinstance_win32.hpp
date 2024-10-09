@@ -37,6 +37,15 @@ Abstract: This is the class declaration of CVideoDevice
 
 #include "libmcdriver_camera_interfaces.hpp"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <mfapi.h>
+#include <mfplay.h>
+#include <mfreadwrite.h>
+#include <mfobjects.h>
+#include <mfidl.h>
+#include <wrl/client.h>
+#endif
 
 namespace LibMCDriver_Camera {
 namespace Impl {
@@ -51,6 +60,10 @@ private:
 	std::string m_sIdentifier;
 	std::string m_sOSName;
 	std::string m_sFriendlyName;
+
+#ifdef _WIN32
+	Microsoft::WRL::ComPtr<IMFSourceReader> m_pSourceReader;
+#endif
 
 public:
 
