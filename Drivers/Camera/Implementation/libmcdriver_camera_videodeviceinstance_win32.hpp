@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CVideoDevice
 #define __LIBMCDRIVER_CAMERA_VIDEODEVICEINSTANCE_WIN32
 
 #include "libmcdriver_camera_interfaces.hpp"
+#include "libmcdriver_camera_videoresolution.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -65,6 +66,10 @@ private:
 	Microsoft::WRL::ComPtr<IMFSourceReader> m_pSourceReader;
 #endif
 
+	std::vector<PVideoResolution> m_SupportedResolutions;
+
+	void refreshSupportedResolutions();
+
 public:
 
 	CVideoDeviceInstance_Win32(const std::string & sIdentifier, const std::string & sOSName, const std::string & sFriendlyName);
@@ -79,11 +84,15 @@ public:
 
 	std::string getIdentifier();
 
-	void getCurrentResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight);
+	uint32_t getSupportedResolutionCount();
 
-	void setResolution(LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight);
+	void getSupportedResolution(uint32_t nIndex, uint32_t& nWidth, uint32_t& nHeight, uint32_t& nFramerate);
 
-	void startStreamCapture(const LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv::PVideoStream pStreamInstance);
+	void getCurrentResolution(uint32_t & nWidth, uint32_t& nHeight, uint32_t & nFramerate);
+
+	void setResolution(uint32_t nWidth, uint32_t nHeight, uint32_t nFramerate);
+
+	void startStreamCapture(LibMCEnv::PVideoStream pStreamInstance);
 
 	void stopStreamCapture();
 

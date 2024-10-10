@@ -73,8 +73,14 @@
 		<error name="COULDNOTACTIVATEDEVICE" code="1021" description="Could not activate device" />		
 		<error name="COULDNOTCREATEREADER" code="1022" description="Could not create reader" />		
 		<error name="COULDNOTSETMEDIATYPE" code="1023" description="Could not set media type" />		
-		
-		
+		<error name="NOMEDIASOURCEREADERAVAILABLE" code="1024" description="No media source reader available" />		
+		<error name="COULDNOTGETMEDIATYPEFRAMERATE" code="1025" description="Could not get media type framerate" />
+		<error name="COULDNOTGETMEDIATYPESIZE" code="1026" description="Could not get media type size" />				
+		<error name="INVALIDCAMERARESOLUTION" code="1027" description="Invalid camera resolution" />		
+		<error name="INVALIDCAMERAFRAMERATE" code="1028" description="Invalid camera framerate" />		
+		<error name="INVALIDMEDIATYPEFRAMERATE" code="1029" description="Invalid media type framerate" />			
+		<error name="INVALIDRESOLUTIONINDEX" code="1030" description="Invalid resolution index" />		
+				
 		
 	</errors>
 
@@ -157,22 +163,34 @@ Custom implementation
 			<param name="Identifier" type="string" pass="return" description="Identifier of the device." />
 		</method>
 
-		<method name="GetCurrentResolution" description = "Returns a the current resolution of the video stream.">
-			<param name="Width" type="uint32" pass="out" description="Width in pixels." />
-			<param name="Height" type="uint32" pass="out" description="Height in pixels." />
-		</method>
-				
-		<method name="SetResolution" description = "Sets the resolution of the video stream.">
-			<param name="Width" type="uint32" pass="in" description="Width in pixels." />
-			<param name="Height" type="uint32" pass="in" description="Height in pixels." />
+		<method name="GetSupportedResolutionCount" description = "Returns the number of supported resolutions.">
+			<param name="Count" type="uint32" pass="return" description="Number of supported resolutions." />
 		</method>
 
+		<method name="GetSupportedResolution" description = "Returns a resolution from the supported resolution list.">
+			<param name="Index" type="uint32" pass="in" description="Index to return. 0-based." />
+			<param name="Width" type="uint32" pass="out" description="Width in pixels." />
+			<param name="Height" type="uint32" pass="out" description="Height in pixels." />
+			<param name="Framerate" type="uint32" pass="out" description="Framerate in FPS. Currently only integer framerates are supported." />
+		</method>
+
+		<method name="GetCurrentResolution" description = "Returns a the current resolution and Framerate of the video stream.">
+			<param name="Width" type="uint32" pass="out" description="Width in pixels." />
+			<param name="Height" type="uint32" pass="out" description="Height in pixels." />
+			<param name="Framerate" type="uint32" pass="out" description="Framerate in FPS. Currently only integer framerates are supported." />
+		</method>
+				
+		<method name="SetResolution" description = "Sets the resolution of the video stream. Fails if framerate is not supported.">
+			<param name="Width" type="uint32" pass="in" description="Width in pixels." />
+			<param name="Height" type="uint32" pass="in" description="Height in pixels." />
+			<param name="Framerate" type="uint32" pass="in" description="Framerate in FPS to set. Currently only integer framerates are supported." />
+		</method>
+		
 		<method name="CaptureRawImage" description = "Captures a still image from the video stream.">
 			<param name="ImageData" type="class" class="LibMCEnv:ImageData" pass="in" description="Capture image object." />
 		</method>
 	
 		<method name="StartStreamCapture" description = "Starts automatic capturing of the video into a video stream. If a stream capture is active, it will stop the current capture process.">
-			<param name="DesiredFramerate" type="double" pass="in" description="Framerate in fps." />
 			<param name="StreamInstance" type="class" class="LibMCEnv:VideoStream" pass="in" description="Framework stream capture instance." />
 		</method>	
 	

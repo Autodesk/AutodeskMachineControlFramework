@@ -32,73 +32,46 @@ Abstract: This is the class declaration of CVideoDevice
 */
 
 
-#ifndef __LIBMCDRIVER_CAMERA_VIDEODEVICE
-#define __LIBMCDRIVER_CAMERA_VIDEODEVICE
+#ifndef __LIBMCDRIVER_CAMERA_VIDEORESOLUTION
+#define __LIBMCDRIVER_CAMERA_VIDEORESOLUTION
 
-#include "libmcdriver_camera_interfaces.hpp"
+#include <cstdint>
+#include <memory>
 
-// Parent classes
-#include "libmcdriver_camera_devicebase.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
-
-// Include custom headers here.
-#include "libmcdriver_camera_videodeviceinstance_win32.hpp"
+#define CAMERARESOLUTION_MIN 8
+#define CAMERARESOLUTION_MAX (256 * 1024)
+#define CAMERAFRAMERATE_MIN 1
+#define CAMERAFRAMERATE_MAX 1000000
 
 namespace LibMCDriver_Camera {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CVideoDevice 
+ Class declaration of CVideoResolution
 **************************************************************************************************************************/
 
-class CVideoDevice_Win32 : public virtual IVideoDevice, public virtual CDeviceBase {
+class CVideoResolution {
 private:
-
-	PVideoDeviceInstance_Win32 m_pDeviceInstance;
-
+	uint32_t m_nWidth;
+	uint32_t m_nHeight;
+	uint32_t m_nFramerate;
 
 public:
+	
+	CVideoResolution(uint32_t nWidth, uint32_t nHeight, uint32_t nFramerate);
 
-	CVideoDevice_Win32(PVideoDeviceInstance_Win32 pDeviceInstance);
-
-	virtual ~CVideoDevice_Win32();
-
-	std::string GetFriendlyName() override;
-
-	std::string GetOperatingSystemName() override;
-
-	bool IsVideoDevice() override;
-
-	std::string GetIdentifier() override;
-
-	LibMCDriver_Camera_uint32 GetSupportedResolutionCount() override;
-
-	void GetSupportedResolution(const LibMCDriver_Camera_uint32 nIndex, LibMCDriver_Camera_uint32& nWidth, LibMCDriver_Camera_uint32& nHeight, LibMCDriver_Camera_uint32& nFramerate) override;
-
-	void GetCurrentResolution(LibMCDriver_Camera_uint32& nWidth, LibMCDriver_Camera_uint32& nHeight, LibMCDriver_Camera_uint32& nFramerate) override;
-
-	void SetResolution(const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight, const LibMCDriver_Camera_uint32 nFramerate) override;
-
-	void CaptureRawImage(LibMCEnv::PImageData pImageData) override;
-
-	void StartStreamCapture(LibMCEnv::PVideoStream pStreamInstance) override;
-
-	void StopStreamCapture() override;
-
-	bool StreamCaptureIsActive() override;
-
-	void GetStreamCaptureStatistics(LibMCDriver_Camera_double & dDesiredFramerate, LibMCDriver_Camera_double & dMinFramerate, LibMCDriver_Camera_double & dMaxFramerate, LibMCDriver_Camera_double & dMeanFramerate, LibMCDriver_Camera_double & dStdDevFramerate) override;
+	virtual ~CVideoResolution();
+	
+	uint32_t getWidth ();
+	uint32_t getHeight ();
+	uint32_t getFramerate ();
 
 };
+
+typedef std::shared_ptr<CVideoResolution> PVideoResolution;
 
 } // namespace Impl
 } // namespace LibMCDriver_Camera
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_CAMERA_VIDEODEVICE
+#endif // __LIBMCDRIVER_CAMERA_VIDEORESOLUTION

@@ -178,24 +178,47 @@ LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_deviceba
 LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_getidentifier(LibMCDriver_Camera_VideoDevice pVideoDevice, const LibMCDriver_Camera_uint32 nIdentifierBufferSize, LibMCDriver_Camera_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
 
 /**
-* Returns a the current resolution of the video stream.
+* Returns the number of supported resolutions.
+*
+* @param[in] pVideoDevice - VideoDevice instance.
+* @param[out] pCount - Number of supported resolutions.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_getsupportedresolutioncount(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pCount);
+
+/**
+* Returns a resolution from the supported resolution list.
+*
+* @param[in] pVideoDevice - VideoDevice instance.
+* @param[in] nIndex - Index to return. 0-based.
+* @param[out] pWidth - Width in pixels.
+* @param[out] pHeight - Height in pixels.
+* @param[out] pFramerate - Framerate in FPS. Currently only integer framerates are supported.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_getsupportedresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nIndex, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight, LibMCDriver_Camera_uint32 * pFramerate);
+
+/**
+* Returns a the current resolution and Framerate of the video stream.
 *
 * @param[in] pVideoDevice - VideoDevice instance.
 * @param[out] pWidth - Width in pixels.
 * @param[out] pHeight - Height in pixels.
+* @param[out] pFramerate - Framerate in FPS. Currently only integer framerates are supported.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_getcurrentresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight);
+LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_getcurrentresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight, LibMCDriver_Camera_uint32 * pFramerate);
 
 /**
-* Sets the resolution of the video stream.
+* Sets the resolution of the video stream. Fails if framerate is not supported.
 *
 * @param[in] pVideoDevice - VideoDevice instance.
 * @param[in] nWidth - Width in pixels.
 * @param[in] nHeight - Height in pixels.
+* @param[in] nFramerate - Framerate in FPS to set. Currently only integer framerates are supported.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight);
+LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight, LibMCDriver_Camera_uint32 nFramerate);
 
 /**
 * Captures a still image from the video stream.
@@ -210,11 +233,10 @@ LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodev
 * Starts automatic capturing of the video into a video stream. If a stream capture is active, it will stop the current capture process.
 *
 * @param[in] pVideoDevice - VideoDevice instance.
-* @param[in] dDesiredFramerate - Framerate in fps.
 * @param[in] pStreamInstance - Framework stream capture instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_startstreamcapture(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv_VideoStream pStreamInstance);
+LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_videodevice_startstreamcapture(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCEnv_VideoStream pStreamInstance);
 
 /**
 * Stops any current video stream capturing.

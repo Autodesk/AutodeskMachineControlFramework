@@ -165,10 +165,59 @@ CVideoDeviceInstance_Win32::CVideoDeviceInstance_Win32(const std::string& sIdent
     if (hResult != S_OK)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEREADER, "could not create reader: " + sFriendlyName + " (" + std::to_string(hResult) + ")");
 
-#endif _WIN32
+    refreshSupportedResolutions();
+
+#endif //_WIN32
 
 
 }
+
+void CVideoDeviceInstance_Win32::refreshSupportedResolutions()
+{
+#ifdef _WIN32
+    if (m_pSourceReader.Get () == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOMEDIASOURCEREADERAVAILABLE);
+
+    ComPtr<IMFMediaType> pNativeType = nullptr;
+    DWORD nIndex = 0;
+
+    m_SupportedResolutions.clear();
+
+    HRESULT hResult;
+
+    while (m_pSourceReader->GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, nIndex, &pNativeType) == S_OK) {
+        UINT32 nWidth = 0, nHeight = 0;
+        hResult = MFGetAttributeSize(pNativeType.Get(), MF_MT_FRAME_SIZE, &nWidth, &nHeight);
+        if (hResult != S_OK)
+            throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTGETMEDIATYPESIZE);
+
+        UINT32 numerator = 0, denominator = 0;
+        MFGetAttributeRatio(pNativeType.Get (), MF_MT_FRAME_RATE, &numerator, &denominator);
+        if (hResult != S_OK)
+            throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTGETMEDIATYPEFRAMERATE);
+
+        if ((denominator == 0) || (numerator == 0))
+            throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDMEDIATYPEFRAMERATE);
+
+        if ((numerator % denominator) == 0) { 
+            // We only support integer framerates for now!
+            uint32_t nFramerate = numerator / denominator;
+
+            if ((nWidth >= CAMERARESOLUTION_MIN) && (nWidth <= CAMERARESOLUTION_MAX) &&
+                (nHeight >= CAMERARESOLUTION_MIN) && (nHeight <= CAMERARESOLUTION_MAX) &&
+                (nFramerate >= CAMERAFRAMERATE_MIN) && (nFramerate <= CAMERAFRAMERATE_MAX)) {
+
+                m_SupportedResolutions.push_back(std::make_shared<CVideoResolution> (nWidth, nHeight, nFramerate));
+            }
+                
+        }
+
+        nIndex++;
+    }
+
+#endif // _WIN32
+}
+
 
 CVideoDeviceInstance_Win32::~CVideoDeviceInstance_Win32()
 {
@@ -196,23 +245,37 @@ std::string CVideoDeviceInstance_Win32::getIdentifier()
     return m_sIdentifier;
 }
 
-void CVideoDeviceInstance_Win32::getCurrentResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight)
-{
-    
 
-    nWidth = 0;
-    nHeight = 0;
+uint32_t CVideoDeviceInstance_Win32::getSupportedResolutionCount()
+{
+    return (uint32_t)m_SupportedResolutions.size();
 }
 
-void CVideoDeviceInstance_Win32::setResolution(LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight)
+void CVideoDeviceInstance_Win32::getSupportedResolution(uint32_t nIndex, uint32_t& nWidth, uint32_t& nHeight, uint32_t& nFramerate)
+{
+    if (nIndex >= m_SupportedResolutions.size ())
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDRESOLUTIONINDEX, "Invalid resolution index: " + std::to_string(nIndex));
+
+    auto resolution = m_SupportedResolutions.at(nIndex);
+    nWidth = resolution->getWidth();
+    nHeight = resolution->getHeight();
+    nFramerate = resolution->getFramerate();
+
+}
+
+void CVideoDeviceInstance_Win32::getCurrentResolution(uint32_t& nWidth, uint32_t& nHeight, uint32_t& nFramerate)
+{
+    nWidth = 0;
+    nHeight = 0;
+    nFramerate = 0;
+}
+
+void CVideoDeviceInstance_Win32::setResolution(uint32_t nWidth, uint32_t nHeight, uint32_t nFramerate)
 {
 #ifdef _WIN32
 
     
     ComPtr<IMFMediaType> pType = nullptr;
-
-    uint32_t nNumerator = 30;
-    uint32_t nDenominator = 1;
 
     HRESULT hResult;
 
@@ -227,7 +290,7 @@ void CVideoDeviceInstance_Win32::setResolution(LibMCDriver_Camera_uint32 nWidth,
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPETOVIDEO, "Could not set media type to video: " + std::to_string(hResult));
 
     // Set the video format to MJPEG or another format (e.g., YUY2, RGB32)
-    hResult = pType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_MJPG);
+    hResult = pType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_YUY2);
     if (hResult != S_OK)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPEFORMAT, "Could not set media type format: " + std::to_string(hResult));
 
@@ -237,7 +300,7 @@ void CVideoDeviceInstance_Win32::setResolution(LibMCDriver_Camera_uint32 nWidth,
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIARESOLUTION, "Could not set media resolution: " + std::to_string(hResult));
 
     // Set the frame rate (numerator/denominator)
-    hResult = MFSetAttributeRatio(pType.Get(), MF_MT_FRAME_RATE, nNumerator, nDenominator);
+    hResult = MFSetAttributeRatio(pType.Get(), MF_MT_FRAME_RATE, nFramerate, 1);
     if (hResult != S_OK)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIAFRAMERATE, "Could not set media framerate: " + std::to_string(hResult));
 
@@ -254,7 +317,7 @@ void CVideoDeviceInstance_Win32::setResolution(LibMCDriver_Camera_uint32 nWidth,
 #endif //_WIN32
 }
 
-void CVideoDeviceInstance_Win32::startStreamCapture(const LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv::PVideoStream pStreamInstance)
+void CVideoDeviceInstance_Win32::startStreamCapture(LibMCEnv::PVideoStream pStreamInstance)
 {
 }
 

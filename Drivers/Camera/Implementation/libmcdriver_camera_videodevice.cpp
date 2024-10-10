@@ -77,15 +77,27 @@ std::string CVideoDevice_Win32::GetIdentifier()
     return m_pDeviceInstance->getIdentifier();
 }
 
-void CVideoDevice_Win32::GetCurrentResolution(LibMCDriver_Camera_uint32 & nWidth, LibMCDriver_Camera_uint32 & nHeight)
+LibMCDriver_Camera_uint32 CVideoDevice_Win32::GetSupportedResolutionCount()
 {
-    m_pDeviceInstance->getCurrentResolution(nWidth, nHeight);
+    return m_pDeviceInstance->getSupportedResolutionCount();
 }
 
-void CVideoDevice_Win32::SetResolution(LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight)
+void CVideoDevice_Win32::GetSupportedResolution(const LibMCDriver_Camera_uint32 nIndex, LibMCDriver_Camera_uint32& nWidth, LibMCDriver_Camera_uint32& nHeight, LibMCDriver_Camera_uint32& nFramerate)
 {
-    m_pDeviceInstance->setResolution(nWidth, nHeight);
+    m_pDeviceInstance->getSupportedResolution(nIndex, nWidth, nHeight, nFramerate);
+
 }
+
+void CVideoDevice_Win32::GetCurrentResolution(LibMCDriver_Camera_uint32& nWidth, LibMCDriver_Camera_uint32& nHeight, LibMCDriver_Camera_uint32& nFramerate)
+{
+    m_pDeviceInstance->getCurrentResolution(nWidth, nHeight, nFramerate);
+}
+
+void CVideoDevice_Win32::SetResolution(const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight, const LibMCDriver_Camera_uint32 nFramerate)
+{
+    m_pDeviceInstance->setResolution(nWidth, nHeight, nFramerate);
+}
+
 
 void CVideoDevice_Win32::CaptureRawImage(LibMCEnv::PImageData pImageData)
 {
@@ -93,7 +105,7 @@ void CVideoDevice_Win32::CaptureRawImage(LibMCEnv::PImageData pImageData)
 }
 
 
-void CVideoDevice_Win32::StartStreamCapture(const LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv::PVideoStream pStreamInstance)
+void CVideoDevice_Win32::StartStreamCapture(LibMCEnv::PVideoStream pStreamInstance)
 {
 	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
 }

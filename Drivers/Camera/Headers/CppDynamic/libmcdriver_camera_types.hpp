@@ -128,6 +128,13 @@ typedef void * LibMCDriver_Camera_pvoid;
 #define LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEDEVICE 1021 /** Could not activate device */
 #define LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEREADER 1022 /** Could not create reader */
 #define LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPE 1023 /** Could not set media type */
+#define LIBMCDRIVER_CAMERA_ERROR_NOMEDIASOURCEREADERAVAILABLE 1024 /** No media source reader available */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTGETMEDIATYPEFRAMERATE 1025 /** Could not get media type framerate */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTGETMEDIATYPESIZE 1026 /** Could not get media type size */
+#define LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERARESOLUTION 1027 /** Invalid camera resolution */
+#define LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAFRAMERATE 1028 /** Invalid camera framerate */
+#define LIBMCDRIVER_CAMERA_ERROR_INVALIDMEDIATYPEFRAMERATE 1029 /** Invalid media type framerate */
+#define LIBMCDRIVER_CAMERA_ERROR_INVALIDRESOLUTIONINDEX 1030 /** Invalid resolution index */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Camera
@@ -168,6 +175,13 @@ inline const char * LIBMCDRIVER_CAMERA_GETERRORSTRING (LibMCDriver_CameraResult 
     case LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEDEVICE: return "Could not activate device";
     case LIBMCDRIVER_CAMERA_ERROR_COULDNOTCREATEREADER: return "Could not create reader";
     case LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPE: return "Could not set media type";
+    case LIBMCDRIVER_CAMERA_ERROR_NOMEDIASOURCEREADERAVAILABLE: return "No media source reader available";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTGETMEDIATYPEFRAMERATE: return "Could not get media type framerate";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTGETMEDIATYPESIZE: return "Could not get media type size";
+    case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERARESOLUTION: return "Invalid camera resolution";
+    case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAFRAMERATE: return "Invalid camera framerate";
+    case LIBMCDRIVER_CAMERA_ERROR_INVALIDMEDIATYPEFRAMERATE: return "Invalid media type framerate";
+    case LIBMCDRIVER_CAMERA_ERROR_INVALIDRESOLUTIONINDEX: return "Invalid resolution index";
     default: return "unknown error";
   }
 }

@@ -491,20 +491,18 @@ LibMCDriver_CameraResult libmcdriver_camera_videodevice_getidentifier(LibMCDrive
 	}
 }
 
-LibMCDriver_CameraResult libmcdriver_camera_videodevice_getcurrentresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight)
+LibMCDriver_CameraResult libmcdriver_camera_videodevice_getsupportedresolutioncount(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pCount)
 {
 	IBase* pIBaseClass = (IBase *)pVideoDevice;
 
 	try {
-		if (!pWidth)
-			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
-		if (!pHeight)
+		if (pCount == nullptr)
 			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
 		IVideoDevice* pIVideoDevice = dynamic_cast<IVideoDevice*>(pIBaseClass);
 		if (!pIVideoDevice)
 			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
 		
-		pIVideoDevice->GetCurrentResolution(*pWidth, *pHeight);
+		*pCount = pIVideoDevice->GetSupportedResolutionCount();
 
 		return LIBMCDRIVER_CAMERA_SUCCESS;
 	}
@@ -519,7 +517,67 @@ LibMCDriver_CameraResult libmcdriver_camera_videodevice_getcurrentresolution(Lib
 	}
 }
 
-LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight)
+LibMCDriver_CameraResult libmcdriver_camera_videodevice_getsupportedresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nIndex, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight, LibMCDriver_Camera_uint32 * pFramerate)
+{
+	IBase* pIBaseClass = (IBase *)pVideoDevice;
+
+	try {
+		if (!pWidth)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		if (!pHeight)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		if (!pFramerate)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		IVideoDevice* pIVideoDevice = dynamic_cast<IVideoDevice*>(pIBaseClass);
+		if (!pIVideoDevice)
+			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
+		
+		pIVideoDevice->GetSupportedResolution(nIndex, *pWidth, *pHeight, *pFramerate);
+
+		return LIBMCDRIVER_CAMERA_SUCCESS;
+	}
+	catch (ELibMCDriver_CameraInterfaceException & Exception) {
+		return handleLibMCDriver_CameraException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CameraResult libmcdriver_camera_videodevice_getcurrentresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 * pWidth, LibMCDriver_Camera_uint32 * pHeight, LibMCDriver_Camera_uint32 * pFramerate)
+{
+	IBase* pIBaseClass = (IBase *)pVideoDevice;
+
+	try {
+		if (!pWidth)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		if (!pHeight)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		if (!pFramerate)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		IVideoDevice* pIVideoDevice = dynamic_cast<IVideoDevice*>(pIBaseClass);
+		if (!pIVideoDevice)
+			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
+		
+		pIVideoDevice->GetCurrentResolution(*pWidth, *pHeight, *pFramerate);
+
+		return LIBMCDRIVER_CAMERA_SUCCESS;
+	}
+	catch (ELibMCDriver_CameraInterfaceException & Exception) {
+		return handleLibMCDriver_CameraException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_uint32 nWidth, LibMCDriver_Camera_uint32 nHeight, LibMCDriver_Camera_uint32 nFramerate)
 {
 	IBase* pIBaseClass = (IBase *)pVideoDevice;
 
@@ -528,7 +586,7 @@ LibMCDriver_CameraResult libmcdriver_camera_videodevice_setresolution(LibMCDrive
 		if (!pIVideoDevice)
 			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
 		
-		pIVideoDevice->SetResolution(nWidth, nHeight);
+		pIVideoDevice->SetResolution(nWidth, nHeight, nFramerate);
 
 		return LIBMCDRIVER_CAMERA_SUCCESS;
 	}
@@ -572,7 +630,7 @@ LibMCDriver_CameraResult libmcdriver_camera_videodevice_capturerawimage(LibMCDri
 	}
 }
 
-LibMCDriver_CameraResult libmcdriver_camera_videodevice_startstreamcapture(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCDriver_Camera_double dDesiredFramerate, LibMCEnv_VideoStream pStreamInstance)
+LibMCDriver_CameraResult libmcdriver_camera_videodevice_startstreamcapture(LibMCDriver_Camera_VideoDevice pVideoDevice, LibMCEnv_VideoStream pStreamInstance)
 {
 	IBase* pIBaseClass = (IBase *)pVideoDevice;
 
@@ -586,7 +644,7 @@ LibMCDriver_CameraResult libmcdriver_camera_videodevice_startstreamcapture(LibMC
 		if (!pIVideoDevice)
 			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
 		
-		pIVideoDevice->StartStreamCapture(dDesiredFramerate, pIStreamInstance);
+		pIVideoDevice->StartStreamCapture(pIStreamInstance);
 
 		return LIBMCDRIVER_CAMERA_SUCCESS;
 	}
@@ -947,6 +1005,10 @@ LibMCDriver_CameraResult LibMCDriver_Camera::Impl::LibMCDriver_Camera_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_camera_devicebase_isvideodevice;
 	if (sProcName == "libmcdriver_camera_videodevice_getidentifier") 
 		*ppProcAddress = (void*) &libmcdriver_camera_videodevice_getidentifier;
+	if (sProcName == "libmcdriver_camera_videodevice_getsupportedresolutioncount") 
+		*ppProcAddress = (void*) &libmcdriver_camera_videodevice_getsupportedresolutioncount;
+	if (sProcName == "libmcdriver_camera_videodevice_getsupportedresolution") 
+		*ppProcAddress = (void*) &libmcdriver_camera_videodevice_getsupportedresolution;
 	if (sProcName == "libmcdriver_camera_videodevice_getcurrentresolution") 
 		*ppProcAddress = (void*) &libmcdriver_camera_videodevice_getcurrentresolution;
 	if (sProcName == "libmcdriver_camera_videodevice_setresolution") 
