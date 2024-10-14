@@ -1088,4 +1088,38 @@ namespace AMCCommon {
 	}
 
 
+	std::string CUtils::getTempFolder()
+	{
+#if defined _WIN32
+		std::vector<wchar_t> TempPathBuffer;
+		TempPathBuffer.resize(MAX_PATH + 1);
+		auto nSize = GetTempPathW(MAX_PATH, TempPathBuffer.data());
+		if (nSize == 0)
+			throw std::runtime_error("could not get temp file path");
+
+		TempPathBuffer[MAX_PATH] = 0;
+		std::string tmpfolder = CUtils::UTF16toUTF8(TempPathBuffer.data());
+#else
+		std::string tmpfolder = GetEnv("TMPDIR");
+#endif
+		if (tmpfolder.empty())
+			return "";
+		else {
+			auto finaltmpfolder = tmpfolder + "/Autodesk/";
+			if (!CUtils::fileOrPathExistsOnDisk(finaltmpfolder)) {
+#ifdef _WIN32
+				auto finaltmpfolderw = CUtils::UTF8toUTF16(finaltmpfolder);
+				CreateDirectoryW(finaltmpfolderw.data(), NULL);
+#else
+				mkdir(finaltmpfolder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#endif
+
+			}
+			if (!CUtils::fileOrPathExistsOnDisk(finaltmpfolder)) {
+				throw std::runtime_error("tmp filepath does not exist");
+			}
+			return finaltmpfolder;
+		}
+	}
+
 }
