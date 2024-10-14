@@ -135,6 +135,9 @@ typedef void * LibMCDriver_Camera_pvoid;
 #define LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAFRAMERATE 1028 /** Invalid camera framerate */
 #define LIBMCDRIVER_CAMERA_ERROR_INVALIDMEDIATYPEFRAMERATE 1029 /** Invalid media type framerate */
 #define LIBMCDRIVER_CAMERA_ERROR_INVALIDRESOLUTIONINDEX 1030 /** Invalid resolution index */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTQUERYMJPEGENCODERS 1031 /** Could not query MJPEG Encoders */
+#define LIBMCDRIVER_CAMERA_ERROR_NOMJPEGENCODERFOUND 1032 /** No MJPEG Encoder found */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEMJPEGENCODER 1033 /** Could not activate MJPEG Encoder */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Camera
@@ -182,6 +185,9 @@ inline const char * LIBMCDRIVER_CAMERA_GETERRORSTRING (LibMCDriver_CameraResult 
     case LIBMCDRIVER_CAMERA_ERROR_INVALIDCAMERAFRAMERATE: return "Invalid camera framerate";
     case LIBMCDRIVER_CAMERA_ERROR_INVALIDMEDIATYPEFRAMERATE: return "Invalid media type framerate";
     case LIBMCDRIVER_CAMERA_ERROR_INVALIDRESOLUTIONINDEX: return "Invalid resolution index";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTQUERYMJPEGENCODERS: return "Could not query MJPEG Encoders";
+    case LIBMCDRIVER_CAMERA_ERROR_NOMJPEGENCODERFOUND: return "No MJPEG Encoder found";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEMJPEGENCODER: return "Could not activate MJPEG Encoder";
     default: return "unknown error";
   }
 }

@@ -80,6 +80,9 @@
 		<error name="INVALIDCAMERAFRAMERATE" code="1028" description="Invalid camera framerate" />		
 		<error name="INVALIDMEDIATYPEFRAMERATE" code="1029" description="Invalid media type framerate" />			
 		<error name="INVALIDRESOLUTIONINDEX" code="1030" description="Invalid resolution index" />		
+		<error name="COULDNOTQUERYMJPEGENCODERS" code="1031" description="Could not query MJPEG Encoders" />		
+		<error name="NOMJPEGENCODERFOUND" code="1032" description="No MJPEG Encoder found" />		
+		<error name="COULDNOTACTIVATEMJPEGENCODER" code="1033" description="Could not activate MJPEG Encoder" />		
 				
 		
 	</errors>
