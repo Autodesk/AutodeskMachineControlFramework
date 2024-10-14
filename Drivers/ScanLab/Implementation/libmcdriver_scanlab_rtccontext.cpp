@@ -607,7 +607,12 @@ void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID);
 		}
 
-		// See documentation what 1 means.
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+		m_pScanLabSDK->n_set_fly_2d(m_CardNo, 1.0, 1.0);
+		m_pScanLabSDK->n_long_delay(m_CardNo, 10);
+		m_pScanLabSDK->n_fly_return(m_CardNo, 0, 0);
+
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 
