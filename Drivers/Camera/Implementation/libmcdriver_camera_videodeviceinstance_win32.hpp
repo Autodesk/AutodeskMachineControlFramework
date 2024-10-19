@@ -62,8 +62,16 @@ private:
 	std::string m_sOSName;
 	std::string m_sFriendlyName;
 
+	uint32_t m_nCurrentResolutionX;
+	uint32_t m_nCurrentResolutionY;
+	uint32_t m_nCurrentFrameRate;
+
 #ifdef _WIN32
 	Microsoft::WRL::ComPtr<IMFSourceReader> m_pSourceReader;
+	Microsoft::WRL::ComPtr<IMFMediaType> m_pMediaType;
+
+	Microsoft::WRL::ComPtr<IMFTransform> createMJPEGEncoder (IMFMediaType * pInputMediaType);
+
 #endif
 
 	std::vector<PVideoResolution> m_SupportedResolutions;
@@ -99,6 +107,8 @@ public:
 	bool streamCaptureIsActive();
 
 	void getStreamCaptureStatistics(LibMCDriver_Camera_double & dDesiredFramerate, LibMCDriver_Camera_double & dMinFramerate, LibMCDriver_Camera_double & dMaxFramerate, LibMCDriver_Camera_double & dMeanFramerate, LibMCDriver_Camera_double & dStdDevFramerate);
+
+	void captureRawImage(LibMCEnv::PImageData pImageData);
 
 };
 

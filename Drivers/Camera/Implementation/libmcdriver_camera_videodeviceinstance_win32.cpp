@@ -35,6 +35,9 @@ Abstract: This is a stub class definition of CVideoDevice
 #include "libmcdriver_camera_interfaceexception.hpp"
 
 #include <array>
+#include <iostream>
+#include <cmath>
+#include <algorithm>
 
 using namespace LibMCDriver_Camera::Impl;
 
@@ -52,7 +55,7 @@ extern std::string wstring_to_utf8(const std::wstring& wstr);
 **************************************************************************************************************************/
 
 CVideoDeviceInstance_Win32::CVideoDeviceInstance_Win32(const std::string& sIdentifier, const std::string& sOSName, const std::string& sFriendlyName)
-    : m_sIdentifier (sIdentifier)
+    : m_sIdentifier (sIdentifier), m_nCurrentResolutionX (0), m_nCurrentResolutionY (0), m_nCurrentFrameRate (0)
 {
 
 #ifdef _WIN32
@@ -269,13 +272,88 @@ void CVideoDeviceInstance_Win32::getCurrentResolution(uint32_t& nWidth, uint32_t
     nHeight = 0;
     nFramerate = 0;
 }
+std::wstring GUIDToString(const GUID& guid) {
+    wchar_t guidString[39] = { 0 };  // GUID string format is 38 characters long plus null terminator
+    StringFromGUID2(guid, guidString, 39);
+    return std::wstring(guidString);
+}
+
+ComPtr<IMFTransform> CVideoDeviceInstance_Win32::createMJPEGEncoder(IMFMediaType* pInputMediaType)
+{
+    if (pInputMediaType == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+
+    IMFActivate** ppActivate = nullptr;
+    UINT32 numMFTs = 0;
+
+    // Find a hardware encoder MFT that accepts YUY2 as input and outputs MJPEG
+    HRESULT hResult = MFTEnumEx(
+        MFT_CATEGORY_VIDEO_ENCODER,
+        0,
+        nullptr,
+        nullptr,
+        &ppActivate,
+        &numMFTs
+    );
+
+    if (hResult != S_OK) 
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTQUERYMJPEGENCODERS);
+
+    std::vector<ComPtr<IMFActivate>> resultList;
+    if (ppActivate != nullptr) {
+        for (uint32_t nIndex = 0; nIndex < numMFTs; nIndex++)
+            resultList.push_back(ppActivate[nIndex]);
+        CoTaskMemFree(ppActivate);
+    }
+
+    if (resultList.size () == 0)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOMJPEGENCODERFOUND);
+
+    IMFTransform* pResultTransform = nullptr;
+
+    for (auto pActivate : resultList) {
+        IMFTransform* pTransform = nullptr;
+
+        hResult = pActivate->ActivateObject(IID_PPV_ARGS(&pTransform));
+        if (hResult != S_OK)
+            throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEMJPEGENCODER);
+
+        DWORD index = 0;
+        IMFMediaType* pOutputType = nullptr;
+        while (pTransform->GetOutputAvailableType(0, index, &pOutputType) == S_OK) {
+            GUID subtype;
+            hResult = pOutputType->GetGUID(MF_MT_SUBTYPE, &subtype);
+            if (hResult == S_OK) {
+                // Print the subtype (format)
+                if (subtype == MFVideoFormat_RGB24) {
+                    std::cout << "Output Format : RGB24" << std::endl;
+                }
+                else if (subtype == MFVideoFormat_MJPG) {
+                    std::cout << "Output Format: MJPEG" << std::endl;
+                }
+                else if (subtype == MFVideoFormat_YUY2) {
+                    std::cout << "Output Format: YUY2" << std::endl;
+                }
+                else {
+                    std::wcout << L"Output Format: Other" << GUIDToString (subtype) << std::endl;
+                }
+            }
+
+            index++;
+        }
+    }
+
+    return pResultTransform;
+}
+
 
 void CVideoDeviceInstance_Win32::setResolution(uint32_t nWidth, uint32_t nHeight, uint32_t nFramerate)
 {
 #ifdef _WIN32
 
-    
-    ComPtr<IMFMediaType> pType = nullptr;
+    m_pMediaType = nullptr;
+
+    ComPtr<IMFMediaType> pType;
 
     HRESULT hResult;
 
@@ -314,6 +392,11 @@ void CVideoDeviceInstance_Win32::setResolution(uint32_t nWidth, uint32_t nHeight
     if (hResult != S_OK)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTSETMEDIATYPE, "Could not set media type: " + std::to_string(hResult));
 
+    m_pMediaType = pType;
+    m_nCurrentResolutionX = nWidth;
+    m_nCurrentResolutionY = nHeight;
+    m_nCurrentFrameRate = nFramerate;
+
 #endif //_WIN32
 }
 
@@ -327,10 +410,116 @@ void CVideoDeviceInstance_Win32::stopStreamCapture()
 
 bool CVideoDeviceInstance_Win32::streamCaptureIsActive()
 {
-    return false;
+    return false;   
 }
 
 void CVideoDeviceInstance_Win32::getStreamCaptureStatistics(LibMCDriver_Camera_double & dDesiredFramerate, LibMCDriver_Camera_double & dMinFramerate, LibMCDriver_Camera_double & dMaxFramerate, LibMCDriver_Camera_double & dMeanFramerate, LibMCDriver_Camera_double & dStdDevFramerate)
 {
 }
 
+
+void ConvertYUY2ToRGB24 (uint8_t* yuy2Data, uint8_t* rgbData, uint32_t nWidth, uint32_t nHeight)
+{
+    if (yuy2Data == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+    if (rgbData == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+    if (nWidth == 0)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+    if (nHeight == 0)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+
+
+    uint64_t pixelIndex = 0;
+    uint64_t pixelCount = nWidth * nHeight * 2;
+    for (uint64_t i = 0; i < pixelCount; i += 4) {
+        // Read the YUY2 data (2 pixels per 4 bytes)
+        BYTE Y1 = yuy2Data[i];
+        BYTE U = yuy2Data[i + 1];
+        BYTE Y2 = yuy2Data[i + 2];
+        BYTE V = yuy2Data[i + 3];
+
+        // Convert YUV to RGB for two pixels
+        for (int j = 0; j < 2; j++) {
+            BYTE Y = (j == 0) ? Y1 : Y2;
+
+            // YUV to RGB conversion formulas
+            int C = Y - 16;
+            int D = U - 128;
+            int E = V - 128;
+
+            int R = (298 * C + 409 * E + 128) >> 8;
+            int G = (298 * C - 100 * D - 208 * E + 128) >> 8;
+            int B = (298 * C + 516 * D + 128) >> 8;
+
+            // Clamp RGB values to [0, 255]
+            R = min(255, max(0, R));
+            G = min(255, max(0, G));
+            B = min(255, max(0, B));
+
+            // Write the RGB values (RGB24 format)
+            rgbData[pixelIndex++] = (BYTE)R;
+            rgbData[pixelIndex++] = (BYTE)G;
+            rgbData[pixelIndex++] = (BYTE)B;
+        }
+    }
+}
+
+void CVideoDeviceInstance_Win32::captureRawImage(LibMCEnv::PImageData pImageData)
+{
+    std::vector<uint8_t> rgbBuffer;
+
+    if (pImageData.get() == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+
+    if (m_pSourceReader.Get () == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_CAMERAREADERNOTINITIALIZED);
+
+    ComPtr<IMFSample> pSample = nullptr;
+    DWORD streamIndex = 0;
+    DWORD flags = 0;
+    LONGLONG llTimeStamp = 0;
+
+    HRESULT hResult = m_pSourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, &streamIndex, &flags, &llTimeStamp, &pSample);
+    if (hResult != S_OK)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTREADSAMPLEFRAME, "could not read sample frame: " + std::to_string (hResult));
+
+
+    if (pSample.Get () != nullptr) {
+        ComPtr<IMFMediaBuffer> pMediaBuffer = nullptr;
+        hResult = pSample->ConvertToContiguousBuffer (&pMediaBuffer);
+
+        if (hResult != S_OK)
+            throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTREADSAMPLEBUFFER, "could not read sample buffer: " + std::to_string(hResult));
+
+        if (pMediaBuffer.Get() != nullptr) {
+
+            BYTE* rawData = nullptr;
+            DWORD maxLength = 0;
+            DWORD currentLength = 0;
+
+            hResult = pMediaBuffer->Lock(&rawData, &maxLength, &currentLength);
+            if (hResult != S_OK)
+                throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTLOCKMEDIABUFFER, "could not lock media buffer: " + std::to_string(hResult));
+
+            if (rawData == nullptr)
+                throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_RAWBUFFERRETURNEDNULL);
+
+            if (currentLength != (m_nCurrentResolutionX * m_nCurrentResolutionY * 2)) 
+                throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_YUY2SAMPLEBUFFERSIZEMISMATCH);
+
+            rgbBuffer.resize (m_nCurrentResolutionX * m_nCurrentResolutionY * 3);
+
+            ConvertYUY2ToRGB24 (rawData, rgbBuffer.data(), m_nCurrentResolutionX, m_nCurrentResolutionY);
+
+            pMediaBuffer->Unlock();
+
+            uint32_t nImageSizeX = 0;
+            uint32_t nImageSizeY = 0;
+
+            pImageData->SetPixels(0, 0, m_nCurrentResolutionX, m_nCurrentResolutionY, LibMCEnv::eImagePixelFormat::RGB24bit, rgbBuffer);
+
+        }
+    }
+
+}

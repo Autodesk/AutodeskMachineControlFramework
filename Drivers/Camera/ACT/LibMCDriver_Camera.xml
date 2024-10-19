@@ -83,8 +83,13 @@
 		<error name="COULDNOTQUERYMJPEGENCODERS" code="1031" description="Could not query MJPEG Encoders" />		
 		<error name="NOMJPEGENCODERFOUND" code="1032" description="No MJPEG Encoder found" />		
 		<error name="COULDNOTACTIVATEMJPEGENCODER" code="1033" description="Could not activate MJPEG Encoder" />		
+		<error name="CAMERAREADERNOTINITIALIZED" code="1034" description="Camera reader not initialized" />		
+		<error name="COULDNOTREADSAMPLEFRAME" code="1035" description="Could not read sample frame" />		
+		<error name="COULDNOTREADSAMPLEBUFFER" code="1036" description="Could not read sample buffer" />		
+		<error name="COULDNOTLOCKMEDIABUFFER" code="1037" description="Could not lock media buffer" />		
+		<error name="RAWBUFFERRETURNEDNULL" code="1038" description="Raw buffer returned null" />		
+		<error name="YUY2SAMPLEBUFFERSIZEMISMATCH" code="1039" description="YUY2 sample buffer size mismatch" />		
 				
-		
 	</errors>
 
 	

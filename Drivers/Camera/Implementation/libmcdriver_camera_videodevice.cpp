@@ -101,7 +101,7 @@ void CVideoDevice_Win32::SetResolution(const LibMCDriver_Camera_uint32 nWidth, c
 
 void CVideoDevice_Win32::CaptureRawImage(LibMCEnv::PImageData pImageData)
 {
-    throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
+    m_pDeviceInstance->captureRawImage(pImageData);
 }
 
 

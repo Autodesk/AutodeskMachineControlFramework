@@ -59,8 +59,7 @@ class CVideoDevice_Win32 : public virtual IVideoDevice, public virtual CDeviceBa
 private:
 
 	PVideoDeviceInstance_Win32 m_pDeviceInstance;
-
-
+	
 public:
 
 	CVideoDevice_Win32(PVideoDeviceInstance_Win32 pDeviceInstance);

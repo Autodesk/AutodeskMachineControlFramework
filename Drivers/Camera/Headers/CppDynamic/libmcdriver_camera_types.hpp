@@ -138,6 +138,12 @@ typedef void * LibMCDriver_Camera_pvoid;
 #define LIBMCDRIVER_CAMERA_ERROR_COULDNOTQUERYMJPEGENCODERS 1031 /** Could not query MJPEG Encoders */
 #define LIBMCDRIVER_CAMERA_ERROR_NOMJPEGENCODERFOUND 1032 /** No MJPEG Encoder found */
 #define LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEMJPEGENCODER 1033 /** Could not activate MJPEG Encoder */
+#define LIBMCDRIVER_CAMERA_ERROR_CAMERAREADERNOTINITIALIZED 1034 /** Camera reader not initialized */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTREADSAMPLEFRAME 1035 /** Could not read sample frame */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTREADSAMPLEBUFFER 1036 /** Could not read sample buffer */
+#define LIBMCDRIVER_CAMERA_ERROR_COULDNOTLOCKMEDIABUFFER 1037 /** Could not lock media buffer */
+#define LIBMCDRIVER_CAMERA_ERROR_RAWBUFFERRETURNEDNULL 1038 /** Raw buffer returned null */
+#define LIBMCDRIVER_CAMERA_ERROR_YUY2SAMPLEBUFFERSIZEMISMATCH 1039 /** YUY2 sample buffer size mismatch */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Camera
@@ -188,6 +194,12 @@ inline const char * LIBMCDRIVER_CAMERA_GETERRORSTRING (LibMCDriver_CameraResult 
     case LIBMCDRIVER_CAMERA_ERROR_COULDNOTQUERYMJPEGENCODERS: return "Could not query MJPEG Encoders";
     case LIBMCDRIVER_CAMERA_ERROR_NOMJPEGENCODERFOUND: return "No MJPEG Encoder found";
     case LIBMCDRIVER_CAMERA_ERROR_COULDNOTACTIVATEMJPEGENCODER: return "Could not activate MJPEG Encoder";
+    case LIBMCDRIVER_CAMERA_ERROR_CAMERAREADERNOTINITIALIZED: return "Camera reader not initialized";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTREADSAMPLEFRAME: return "Could not read sample frame";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTREADSAMPLEBUFFER: return "Could not read sample buffer";
+    case LIBMCDRIVER_CAMERA_ERROR_COULDNOTLOCKMEDIABUFFER: return "Could not lock media buffer";
+    case LIBMCDRIVER_CAMERA_ERROR_RAWBUFFERRETURNEDNULL: return "Raw buffer returned null";
+    case LIBMCDRIVER_CAMERA_ERROR_YUY2SAMPLEBUFFERSIZEMISMATCH: return "YUY2 sample buffer size mismatch";
     default: return "unknown error";
   }
 }
