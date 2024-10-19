@@ -288,6 +288,19 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY 10191 /** Invalid external event return value key */
 #define LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED 10192 /** External event value key is reserved. */
 #define LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED 10193 /** External event return value key is reserved. */
+#define LIBMCENV_ERROR_INVALIDYUY2BUFFERSIZE 10194 /** Invalid YUY2 buffer size */
+#define LIBMCENV_ERROR_YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2 10195 /** YUY2 pixel count must be a multiple of 2 */
+#define LIBMCENV_ERROR_INVALIDJPEGDATA 10196 /** Invalid JPEG Data size */
+#define LIBMCENV_ERROR_INVALIDJPEGBUFFERSIZE 10197 /** Invalid JPEG Buffer size */
+#define LIBMCENV_ERROR_COULDNOTINITIALIZEJPEGLIBRARY 10198 /** Could not initialize JPEG library */
+#define LIBMCENV_ERROR_COULDNOTSETJPEGSTOPONWARNING 10199 /** Could not set JPEG StopOnWarning */
+#define LIBMCENV_ERROR_COULDNOTSETFASTUPSAMPLE 10200 /** Could not set FastUpSample */
+#define LIBMCENV_ERROR_COULDNOTSETFASTDCT 10201 /** Could not set FastDCT */
+#define LIBMCENV_ERROR_COULDNOTREADJPEGHEADER 10202 /** Could not read JPEG Header */
+#define LIBMCENV_ERROR_INVALIDJPEGIMAGESIZE 10203 /** Invalid JPEG image size */
+#define LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH 10204 /** JPEG color precision too high */
+#define LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG 10205 /** Could not decompress JPEG */
+#define LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE 10206 /** Could not store JPEG image */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -488,6 +501,19 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "Invalid external event return value key";
     case LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED: return "External event value key is reserved.";
     case LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED: return "External event return value key is reserved.";
+    case LIBMCENV_ERROR_INVALIDYUY2BUFFERSIZE: return "Invalid YUY2 buffer size";
+    case LIBMCENV_ERROR_YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2: return "YUY2 pixel count must be a multiple of 2";
+    case LIBMCENV_ERROR_INVALIDJPEGDATA: return "Invalid JPEG Data size";
+    case LIBMCENV_ERROR_INVALIDJPEGBUFFERSIZE: return "Invalid JPEG Buffer size";
+    case LIBMCENV_ERROR_COULDNOTINITIALIZEJPEGLIBRARY: return "Could not initialize JPEG library";
+    case LIBMCENV_ERROR_COULDNOTSETJPEGSTOPONWARNING: return "Could not set JPEG StopOnWarning";
+    case LIBMCENV_ERROR_COULDNOTSETFASTUPSAMPLE: return "Could not set FastUpSample";
+    case LIBMCENV_ERROR_COULDNOTSETFASTDCT: return "Could not set FastDCT";
+    case LIBMCENV_ERROR_COULDNOTREADJPEGHEADER: return "Could not read JPEG Header";
+    case LIBMCENV_ERROR_INVALIDJPEGIMAGESIZE: return "Invalid JPEG image size";
+    case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEG color precision too high";
+    case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "Could not decompress JPEG";
+    case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
     default: return "unknown error";
   }
 }
@@ -505,6 +531,7 @@ typedef LibMCEnvHandle LibMCEnv_PNGImageData;
 typedef LibMCEnvHandle LibMCEnv_JPEGImageStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_JPEGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
+typedef LibMCEnvHandle LibMCEnv_ImageLoader;
 typedef LibMCEnvHandle LibMCEnv_VideoStream;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;

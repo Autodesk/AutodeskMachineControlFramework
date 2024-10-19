@@ -356,31 +356,14 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_resizeimage(LibMCEnv_ImageDa
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_createpngimage(LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions pPNGStorageOptions, LibMCEnv_PNGImageData * pPNGImage);
 
 /**
-* Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
+* Creates JPEG Image out of the pixel data.
 *
 * @param[in] pImageData - ImageData instance.
+* @param[in] pJPEGStorageOptions - Optional encoding options for the image.
+* @param[out] pJPEGImage - Image data.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_encodepng(LibMCEnv_ImageData pImageData);
-
-/**
-* Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
-*
-* @param[in] pImageData - ImageData instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[out] pPNGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pPNGDataBuffer - uint8  buffer of PNG Data stream.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_getencodedpngdata(LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
-
-/**
-* Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
-*
-* @param[in] pImageData - ImageData instance.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_clearencodedpngdata(LibMCEnv_ImageData pImageData);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_createjpegimage(LibMCEnv_ImageData pImageData, LibMCEnv_JPEGImageStoreOptions pJPEGStorageOptions, LibMCEnv_JPEGImageData * pJPEGImage);
 
 /**
 * Sets all pixels to a single value.
@@ -474,6 +457,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_getpixels(LibMCEnv_ImageData
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_setpixels(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eSourceFormat, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer);
 
 /**
+* Sets all pixels from a raw YUY2 color array.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nYUY2DataBufferSize - Number of elements in buffer
+* @param[in] pYUY2DataBuffer - uint8 buffer of Pixel array in YUY2 color format (2 bytes per pixels). The array MUST have a length of PixelSizeX * PixelSizeY * 2.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_setpixelsfromrawyuy2data(LibMCEnv_ImageData pImageData, LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8 * pYUY2DataBuffer);
+
+/**
 * Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
 *
 * @param[in] pImageData - ImageData instance.
@@ -502,6 +495,86 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_writetorawmemory(LibMCEnv_Im
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_readfromrawmemory(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eSourceFormat, LibMCEnv_pvoid pSource, LibMCEnv_uint32 nYLineOffset);
+
+/*************************************************************************************************************************
+ Class definition for ImageLoader
+**************************************************************************************************************************/
+
+/**
+* creates an image object from a PNG data stream.
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nPNGDataBufferSize - Number of elements in buffer
+* @param[in] pPNGDataBuffer - uint8 buffer of PNG Data as byte array. Fails if image cannot be loaded.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_loadpngimage(LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from a JPEG data stream.
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nJPEGDataBufferSize - Number of elements in buffer
+* @param[in] pJPEGDataBuffer - uint8 buffer of JPEG Data as byte array. Fails if image cannot be loaded.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_loadjpegimage(LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nJPEGDataBufferSize, const LibMCEnv_uint8 * pJPEGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from raw RGB24 Data. (3 bytes per pixel)
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nRGB24DataBufferSize - Number of elements in buffer
+* @param[in] pRGB24DataBuffer - uint8 buffer of RGB 24 data. MUST contain PixelSizeX * PixelSizeY * 3 bytes.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use in memory.
+* @param[out] pImageDataInstance - Image instance with the data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_createimagefromrawrgb24data(LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nRGB24DataBufferSize, const LibMCEnv_uint8 * pRGB24DataBuffer, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from raw RGBA32 Data. (4 bytes per pixel)
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nRGBA32DataBufferSize - Number of elements in buffer
+* @param[in] pRGBA32DataBuffer - uint8 buffer of RGBA 32 data. MUST contain PixelSizeX * PixelSizeY * 4 bytes.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use in memory.
+* @param[out] pImageDataInstance - Image instance with the data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_createimagefromrawrgba32data(LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nRGBA32DataBufferSize, const LibMCEnv_uint8 * pRGBA32DataBuffer, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from raw YUY2 Data. (2 bytes per pixel)
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nYUY2DataBufferSize - Number of elements in buffer
+* @param[in] pYUY2DataBuffer - uint8 buffer of YUY2 data. MUST contain PixelSizeX * PixelSizeY * 2 bytes.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use in memory.
+* @param[out] pImageDataInstance - Image instance with the data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_createimagefromrawyuy2data(LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8 * pYUY2DataBuffer, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /*************************************************************************************************************************
  Class definition for VideoStream
@@ -5652,18 +5725,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loginfo(LibMCEnv_Dri
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createemptyimage(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* creates an image object from a PNG data stream.
+* creates an image loader object.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[in] pPNGDataBuffer - uint8 buffer of DPI Value in X. MUST be positive.
-* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @param[out] pImageLoaderInstance - Image loader instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createimageloader(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
 
 /**
 * Creates an empty discrete field.
@@ -7505,18 +7573,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcestring(Li
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createemptyimage(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* creates an image object from a PNG data stream.
+* creates an image loader object.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[in] pPNGDataBuffer - uint8 buffer of DPI Value in X. MUST be positive.
-* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @param[out] pImageLoaderInstance - Image loader instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadpngimage(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createimageloader(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
 
 /**
 * Creates an empty discrete field.
@@ -8294,18 +8357,13 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setuipropertyasbool(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createemptyimage(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* creates an image object from a PNG data stream.
+* creates an image loader object.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[in] pPNGDataBuffer - uint8 buffer of DPI Value in X. MUST be positive.
-* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @param[out] pImageLoaderInstance - Image loader instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_loadpngimage(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createimageloader(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
 
 /**
 * Returns the global timer in milliseconds.

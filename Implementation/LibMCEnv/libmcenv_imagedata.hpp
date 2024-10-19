@@ -45,7 +45,8 @@ Abstract: This is the class declaration of CImageData
 #endif
 
 // Include custom headers here.
-
+#define IMAGEDATA_MAXPNGSIZE (1024UL * 1024UL * 1024UL)
+#define IMAGEDATA_MAXJPEGSIZE (1024UL * 1024UL * 1024UL)
 
 namespace LibMCEnv {
 namespace Impl {
@@ -69,26 +70,37 @@ private:
 
 	std::unique_ptr<std::vector <uint8_t>> m_PixelData;
 
-	// Depreciated cache for encoding PNG images via EncodePNG ()
-	std::unique_ptr<IPNGImageData> m_EncodedPNGDataCache;
-
 	size_t getBytesPerPixel();
 
 	void writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset); 
 	void writeToRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
 	void writeToRawMemoryEx_RGB24bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
-	void writeToRawMemoryEx_RGBA24bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
+	void writeToRawMemoryEx_RGBA32bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
 
-	void readFromRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pSource, uint32_t nYLineOffset);
-	void readFromRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pSource, uint32_t nYLineOffset);
-	void readFromRawMemoryEx_RGB24bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pSource, uint32_t nYLineOffset);
-	void readFromRawMemoryEx_RGBA24bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pSource, uint32_t nYLineOffset);
+	void readFromRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, const uint8_t* pSource, uint32_t nYLineOffset);
+	void readFromRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, const uint8_t* pSource, uint32_t nYLineOffset);
+	void readFromRawMemoryEx_RGB24bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, const uint8_t* pSource, uint32_t nYLineOffset);
+	void readFromRawMemoryEx_RGBA32bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, const uint8_t* pSource, uint32_t nYLineOffset);
+
+	void convertFromYUY2_GreyScale8bit(const uint8_t* pSource);
+	void convertFromYUY2_RGB16bit(const uint8_t* pSource);
+	void convertFromYUY2_RGB24bit(const uint8_t* pSource);
+	void convertFromYUY2_RGBA32bit(const uint8_t* pSource);
 
 protected:
 
 public:
 
 	static CImageData* createFromPNG(const uint8_t * pBuffer, uint64_t nBufferSize, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
+
+	static CImageData* createFromJPEG(const uint8_t* pBuffer, uint64_t nBufferSize, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
+
+	static CImageData* createFromRGB24(const uint8_t* pBuffer, uint64_t nBufferSize, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
+
+	static CImageData* createFromRGBA32(const uint8_t* pBuffer, uint64_t nBufferSize, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
+
+	static CImageData* createFromYUY2(const uint8_t* pBuffer, uint64_t nBufferSize, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
+
 	static CImageData* createEmpty(const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
 
 	CImageData(std::vector<uint8_t> * pPixelData, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat, bool bDoClear);
@@ -111,11 +123,7 @@ public:
 
 	IPNGImageData* CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) override;
 
-	void EncodePNG() override;
-
-	void GetEncodedPNGData(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) override;
-
-	void ClearEncodedPNGData() override;
+	IJPEGImageData* CreateJPEGImage(IJPEGImageStoreOptions* pJPEGStorageOptions) override;
 
 	void Clear(const LibMCEnv_uint32 nValue) override;
 
@@ -134,6 +142,8 @@ public:
 	void WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset) override;
 
 	void ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset) override;
+
+	void SetPixelsFromRawYUY2Data(const LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8* pYUY2DataBuffer) override;
 
 	std::vector <uint8_t> & getPixelData ();
 };

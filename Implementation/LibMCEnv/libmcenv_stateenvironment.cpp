@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
 #include "libmcenv_modeldatacomponentinstance.hpp"
+#include "libmcenv_imageloader.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -485,9 +486,9 @@ IImageData* CStateEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSize
 	return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData* CStateEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+IImageLoader* CStateEnvironment::CreateImageLoader()
 {
-	return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+	return new CImageLoader();
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()

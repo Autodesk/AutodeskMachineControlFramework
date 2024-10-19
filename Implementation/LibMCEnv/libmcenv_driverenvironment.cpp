@@ -46,6 +46,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_datatable.hpp"
+#include "libmcenv_imageloader.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -329,9 +330,9 @@ IImageData* CDriverEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSiz
     return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData* CDriverEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+IImageLoader* CDriverEnvironment::CreateImageLoader()
 {
-    return CImageData::createFromPNG (pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+    return new CImageLoader();
 }
 
 

@@ -63,6 +63,7 @@ class IPNGImageData;
 class IJPEGImageStoreOptions;
 class IJPEGImageData;
 class IImageData;
+class IImageLoader;
 class IVideoStream;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
@@ -598,22 +599,11 @@ public:
 	virtual IPNGImageData * CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) = 0;
 
 	/**
-	* IImageData::EncodePNG - Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
+	* IImageData::CreateJPEGImage - Creates JPEG Image out of the pixel data.
+	* @param[in] pJPEGStorageOptions - Optional encoding options for the image.
+	* @return Image data.
 	*/
-	virtual void EncodePNG() = 0;
-
-	/**
-	* IImageData::GetEncodedPNGData - Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
-	*/
-	virtual void GetEncodedPNGData(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
-
-	/**
-	* IImageData::ClearEncodedPNGData - Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
-	*/
-	virtual void ClearEncodedPNGData() = 0;
+	virtual IJPEGImageData * CreateJPEGImage(IJPEGImageStoreOptions* pJPEGStorageOptions) = 0;
 
 	/**
 	* IImageData::Clear - Sets all pixels to a single value.
@@ -686,6 +676,13 @@ public:
 	virtual void SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eSourceFormat, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer) = 0;
 
 	/**
+	* IImageData::SetPixelsFromRawYUY2Data - Sets all pixels from a raw YUY2 color array.
+	* @param[in] nYUY2DataBufferSize - Number of elements in buffer
+	* @param[in] pYUY2DataBuffer - Pixel array in YUY2 color format (2 bytes per pixels). The array MUST have a length of PixelSizeX * PixelSizeY * 2.
+	*/
+	virtual void SetPixelsFromRawYUY2Data(const LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8 * pYUY2DataBuffer) = 0;
+
+	/**
 	* IImageData::WriteToRawMemory - Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
 	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
 	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
@@ -712,6 +709,78 @@ public:
 };
 
 typedef IBaseSharedPtr<IImageData> PIImageData;
+
+
+/*************************************************************************************************************************
+ Class interface for ImageLoader 
+**************************************************************************************************************************/
+
+class IImageLoader : public virtual IBase {
+public:
+	/**
+	* IImageLoader::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[in] pPNGDataBuffer - PNG Data as byte array. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::LoadJPEGImage - creates an image object from a JPEG data stream.
+	* @param[in] nJPEGDataBufferSize - Number of elements in buffer
+	* @param[in] pJPEGDataBuffer - JPEG Data as byte array. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	virtual IImageData * LoadJPEGImage(const LibMCEnv_uint64 nJPEGDataBufferSize, const LibMCEnv_uint8 * pJPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::CreateImageFromRawRGB24Data - creates an image object from raw RGB24 Data. (3 bytes per pixel)
+	* @param[in] nRGB24DataBufferSize - Number of elements in buffer
+	* @param[in] pRGB24DataBuffer - RGB 24 data. MUST contain PixelSizeX * PixelSizeY * 3 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	virtual IImageData * CreateImageFromRawRGB24Data(const LibMCEnv_uint64 nRGB24DataBufferSize, const LibMCEnv_uint8 * pRGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::CreateImageFromRawRGBA32Data - creates an image object from raw RGBA32 Data. (4 bytes per pixel)
+	* @param[in] nRGBA32DataBufferSize - Number of elements in buffer
+	* @param[in] pRGBA32DataBuffer - RGBA 32 data. MUST contain PixelSizeX * PixelSizeY * 4 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	virtual IImageData * CreateImageFromRawRGBA32Data(const LibMCEnv_uint64 nRGBA32DataBufferSize, const LibMCEnv_uint8 * pRGBA32DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::CreateImageFromRawYUY2Data - creates an image object from raw YUY2 Data. (2 bytes per pixel)
+	* @param[in] nYUY2DataBufferSize - Number of elements in buffer
+	* @param[in] pYUY2DataBuffer - YUY2 data. MUST contain PixelSizeX * PixelSizeY * 2 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	virtual IImageData * CreateImageFromRawYUY2Data(const LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8 * pYUY2DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+};
+
+typedef IBaseSharedPtr<IImageLoader> PIImageLoader;
 
 
 /*************************************************************************************************************************
@@ -4510,15 +4579,10 @@ public:
 	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
-	* IDriverEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* IDriverEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
 	* IDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
@@ -5852,15 +5916,10 @@ public:
 	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
-	* IStateEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* IStateEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
 	* IStateEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
@@ -6412,15 +6471,10 @@ public:
 	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
-	* IUIEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* IUIEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
 	* IUIEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.

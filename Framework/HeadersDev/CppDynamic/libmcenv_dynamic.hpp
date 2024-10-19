@@ -68,6 +68,7 @@ class CPNGImageData;
 class CJPEGImageStoreOptions;
 class CJPEGImageData;
 class CImageData;
+class CImageLoader;
 class CVideoStream;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
@@ -136,6 +137,7 @@ typedef CPNGImageData CLibMCEnvPNGImageData;
 typedef CJPEGImageStoreOptions CLibMCEnvJPEGImageStoreOptions;
 typedef CJPEGImageData CLibMCEnvJPEGImageData;
 typedef CImageData CLibMCEnvImageData;
+typedef CImageLoader CLibMCEnvImageLoader;
 typedef CVideoStream CLibMCEnvVideoStream;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
@@ -204,6 +206,7 @@ typedef std::shared_ptr<CPNGImageData> PPNGImageData;
 typedef std::shared_ptr<CJPEGImageStoreOptions> PJPEGImageStoreOptions;
 typedef std::shared_ptr<CJPEGImageData> PJPEGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
+typedef std::shared_ptr<CImageLoader> PImageLoader;
 typedef std::shared_ptr<CVideoStream> PVideoStream;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
@@ -272,6 +275,7 @@ typedef PPNGImageData PLibMCEnvPNGImageData;
 typedef PJPEGImageStoreOptions PLibMCEnvJPEGImageStoreOptions;
 typedef PJPEGImageData PLibMCEnvJPEGImageData;
 typedef PImageData PLibMCEnvImageData;
+typedef PImageLoader PLibMCEnvImageLoader;
 typedef PVideoStream PLibMCEnvVideoStream;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
@@ -597,6 +601,19 @@ public:
 			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "INVALIDEXTERNALEVENTRETURNVALUEKEY";
 			case LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED: return "EXTERNALEVENTVALUEKEYISRESERVED";
 			case LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED: return "EXTERNALEVENTRETURNVALUEKEYISRESERVED";
+			case LIBMCENV_ERROR_INVALIDYUY2BUFFERSIZE: return "INVALIDYUY2BUFFERSIZE";
+			case LIBMCENV_ERROR_YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2: return "YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2";
+			case LIBMCENV_ERROR_INVALIDJPEGDATA: return "INVALIDJPEGDATA";
+			case LIBMCENV_ERROR_INVALIDJPEGBUFFERSIZE: return "INVALIDJPEGBUFFERSIZE";
+			case LIBMCENV_ERROR_COULDNOTINITIALIZEJPEGLIBRARY: return "COULDNOTINITIALIZEJPEGLIBRARY";
+			case LIBMCENV_ERROR_COULDNOTSETJPEGSTOPONWARNING: return "COULDNOTSETJPEGSTOPONWARNING";
+			case LIBMCENV_ERROR_COULDNOTSETFASTUPSAMPLE: return "COULDNOTSETFASTUPSAMPLE";
+			case LIBMCENV_ERROR_COULDNOTSETFASTDCT: return "COULDNOTSETFASTDCT";
+			case LIBMCENV_ERROR_COULDNOTREADJPEGHEADER: return "COULDNOTREADJPEGHEADER";
+			case LIBMCENV_ERROR_INVALIDJPEGIMAGESIZE: return "INVALIDJPEGIMAGESIZE";
+			case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEGCOLORPRECISIONTOOHIGH";
+			case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "COULDNOTDECOMPRESSJPEG";
+			case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "COULDNOTSTOREJPEGIMAGE";
 		}
 		return "UNKNOWN";
 	}
@@ -797,6 +814,19 @@ public:
 			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "Invalid external event return value key";
 			case LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED: return "External event value key is reserved.";
 			case LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED: return "External event return value key is reserved.";
+			case LIBMCENV_ERROR_INVALIDYUY2BUFFERSIZE: return "Invalid YUY2 buffer size";
+			case LIBMCENV_ERROR_YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2: return "YUY2 pixel count must be a multiple of 2";
+			case LIBMCENV_ERROR_INVALIDJPEGDATA: return "Invalid JPEG Data size";
+			case LIBMCENV_ERROR_INVALIDJPEGBUFFERSIZE: return "Invalid JPEG Buffer size";
+			case LIBMCENV_ERROR_COULDNOTINITIALIZEJPEGLIBRARY: return "Could not initialize JPEG library";
+			case LIBMCENV_ERROR_COULDNOTSETJPEGSTOPONWARNING: return "Could not set JPEG StopOnWarning";
+			case LIBMCENV_ERROR_COULDNOTSETFASTUPSAMPLE: return "Could not set FastUpSample";
+			case LIBMCENV_ERROR_COULDNOTSETFASTDCT: return "Could not set FastDCT";
+			case LIBMCENV_ERROR_COULDNOTREADJPEGHEADER: return "Could not read JPEG Header";
+			case LIBMCENV_ERROR_INVALIDJPEGIMAGESIZE: return "Invalid JPEG image size";
+			case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEG color precision too high";
+			case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "Could not decompress JPEG";
+			case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
 		}
 		return "unknown error";
 	}
@@ -922,6 +952,7 @@ private:
 	friend class CJPEGImageStoreOptions;
 	friend class CJPEGImageData;
 	friend class CImageData;
+	friend class CImageLoader;
 	friend class CVideoStream;
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
@@ -1188,9 +1219,7 @@ public:
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline PPNGImageData CreatePNGImage(classParam<CPNGImageStoreOptions> pPNGStorageOptions);
-	inline void EncodePNG();
-	inline void GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
-	inline void ClearEncodedPNGData();
+	inline PJPEGImageData CreateJPEGImage(classParam<CJPEGImageStoreOptions> pJPEGStorageOptions);
 	inline void Clear(const LibMCEnv_uint32 nValue);
 	inline LibMCEnv_uint32 GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
 	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue);
@@ -1198,8 +1227,30 @@ public:
 	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
 	inline void GetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, std::vector<LibMCEnv_uint8> & ValueBuffer);
 	inline void SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+	inline void SetPixelsFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer);
 	inline void WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset);
 	inline void ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset);
+};
+	
+/*************************************************************************************************************************
+ Class CImageLoader 
+**************************************************************************************************************************/
+class CImageLoader : public CBase {
+public:
+	
+	/**
+	* CImageLoader::CImageLoader - Constructor for ImageLoader class.
+	*/
+	CImageLoader(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadJPEGImage(const CInputVector<LibMCEnv_uint8> & JPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData CreateImageFromRawRGB24Data(const CInputVector<LibMCEnv_uint8> & RGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData CreateImageFromRawRGBA32Data(const CInputVector<LibMCEnv_uint8> & RGBA32DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData CreateImageFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 };
 	
 /*************************************************************************************************************************
@@ -2277,7 +2328,7 @@ public:
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageLoader CreateImageLoader();
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
@@ -2683,7 +2734,7 @@ public:
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageLoader CreateImageLoader();
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
@@ -2788,7 +2839,7 @@ public:
 	inline void SetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_int64 nValue);
 	inline void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageLoader CreateImageLoader();
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline LibMCEnv_uint64 GetGlobalTimerInMicroseconds();
 	inline PTestEnvironment GetTestEnvironment();
@@ -2941,9 +2992,7 @@ public:
 		pWrapperTable->m_ImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_ImageData_ResizeImage = nullptr;
 		pWrapperTable->m_ImageData_CreatePNGImage = nullptr;
-		pWrapperTable->m_ImageData_EncodePNG = nullptr;
-		pWrapperTable->m_ImageData_GetEncodedPNGData = nullptr;
-		pWrapperTable->m_ImageData_ClearEncodedPNGData = nullptr;
+		pWrapperTable->m_ImageData_CreateJPEGImage = nullptr;
 		pWrapperTable->m_ImageData_Clear = nullptr;
 		pWrapperTable->m_ImageData_GetPixel = nullptr;
 		pWrapperTable->m_ImageData_SetPixel = nullptr;
@@ -2951,8 +3000,14 @@ public:
 		pWrapperTable->m_ImageData_SetPixelRange = nullptr;
 		pWrapperTable->m_ImageData_GetPixels = nullptr;
 		pWrapperTable->m_ImageData_SetPixels = nullptr;
+		pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data = nullptr;
 		pWrapperTable->m_ImageData_WriteToRawMemory = nullptr;
 		pWrapperTable->m_ImageData_ReadFromRawMemory = nullptr;
+		pWrapperTable->m_ImageLoader_LoadPNGImage = nullptr;
+		pWrapperTable->m_ImageLoader_LoadJPEGImage = nullptr;
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data = nullptr;
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data = nullptr;
+		pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data = nullptr;
 		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_GetDPI = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_SetDPI = nullptr;
@@ -3438,7 +3493,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_LogWarning = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
-		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateImageLoader = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
@@ -3604,7 +3659,7 @@ public:
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
-		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateImageLoader = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
@@ -3677,7 +3732,7 @@ public:
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger = nullptr;
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
-		pWrapperTable->m_UIEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateImageLoader = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetTestEnvironment = nullptr;
@@ -4011,30 +4066,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ImageData_EncodePNG = (PLibMCEnvImageData_EncodePNGPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_encodepng");
+		pWrapperTable->m_ImageData_CreateJPEGImage = (PLibMCEnvImageData_CreateJPEGImagePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createjpegimage");
 		#else // _WIN32
-		pWrapperTable->m_ImageData_EncodePNG = (PLibMCEnvImageData_EncodePNGPtr) dlsym(hLibrary, "libmcenv_imagedata_encodepng");
+		pWrapperTable->m_ImageData_CreateJPEGImage = (PLibMCEnvImageData_CreateJPEGImagePtr) dlsym(hLibrary, "libmcenv_imagedata_createjpegimage");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ImageData_EncodePNG == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageData_GetEncodedPNGData = (PLibMCEnvImageData_GetEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getencodedpngdata");
-		#else // _WIN32
-		pWrapperTable->m_ImageData_GetEncodedPNGData = (PLibMCEnvImageData_GetEncodedPNGDataPtr) dlsym(hLibrary, "libmcenv_imagedata_getencodedpngdata");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageData_GetEncodedPNGData == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageData_ClearEncodedPNGData = (PLibMCEnvImageData_ClearEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_clearencodedpngdata");
-		#else // _WIN32
-		pWrapperTable->m_ImageData_ClearEncodedPNGData = (PLibMCEnvImageData_ClearEncodedPNGDataPtr) dlsym(hLibrary, "libmcenv_imagedata_clearencodedpngdata");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageData_ClearEncodedPNGData == nullptr)
+		if (pWrapperTable->m_ImageData_CreateJPEGImage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4101,6 +4138,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data = (PLibMCEnvImageData_SetPixelsFromRawYUY2DataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setpixelsfromrawyuy2data");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data = (PLibMCEnvImageData_SetPixelsFromRawYUY2DataPtr) dlsym(hLibrary, "libmcenv_imagedata_setpixelsfromrawyuy2data");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ImageData_WriteToRawMemory = (PLibMCEnvImageData_WriteToRawMemoryPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_writetorawmemory");
 		#else // _WIN32
 		pWrapperTable->m_ImageData_WriteToRawMemory = (PLibMCEnvImageData_WriteToRawMemoryPtr) dlsym(hLibrary, "libmcenv_imagedata_writetorawmemory");
@@ -4116,6 +4162,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageData_ReadFromRawMemory == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_LoadPNGImage = (PLibMCEnvImageLoader_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_imageloader_loadpngimage");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_LoadPNGImage = (PLibMCEnvImageLoader_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_imageloader_loadpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_LoadPNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_LoadJPEGImage = (PLibMCEnvImageLoader_LoadJPEGImagePtr) GetProcAddress(hLibrary, "libmcenv_imageloader_loadjpegimage");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_LoadJPEGImage = (PLibMCEnvImageLoader_LoadJPEGImagePtr) dlsym(hLibrary, "libmcenv_imageloader_loadjpegimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_LoadJPEGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data = (PLibMCEnvImageLoader_CreateImageFromRawRGB24DataPtr) GetProcAddress(hLibrary, "libmcenv_imageloader_createimagefromrawrgb24data");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data = (PLibMCEnvImageLoader_CreateImageFromRawRGB24DataPtr) dlsym(hLibrary, "libmcenv_imageloader_createimagefromrawrgb24data");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data = (PLibMCEnvImageLoader_CreateImageFromRawRGBA32DataPtr) GetProcAddress(hLibrary, "libmcenv_imageloader_createimagefromrawrgba32data");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data = (PLibMCEnvImageLoader_CreateImageFromRawRGBA32DataPtr) dlsym(hLibrary, "libmcenv_imageloader_createimagefromrawrgba32data");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data = (PLibMCEnvImageLoader_CreateImageFromRawYUY2DataPtr) GetProcAddress(hLibrary, "libmcenv_imageloader_createimagefromrawyuy2data");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data = (PLibMCEnvImageLoader_CreateImageFromRawYUY2DataPtr) dlsym(hLibrary, "libmcenv_imageloader_createimagefromrawyuy2data");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8484,12 +8575,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DriverEnvironment_LoadPNGImage = (PLibMCEnvDriverEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_loadpngimage");
+		pWrapperTable->m_DriverEnvironment_CreateImageLoader = (PLibMCEnvDriverEnvironment_CreateImageLoaderPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createimageloader");
 		#else // _WIN32
-		pWrapperTable->m_DriverEnvironment_LoadPNGImage = (PLibMCEnvDriverEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_loadpngimage");
+		pWrapperTable->m_DriverEnvironment_CreateImageLoader = (PLibMCEnvDriverEnvironment_CreateImageLoaderPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createimageloader");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr)
+		if (pWrapperTable->m_DriverEnvironment_CreateImageLoader == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9978,12 +10069,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_LoadPNGImage = (PLibMCEnvStateEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadpngimage");
+		pWrapperTable->m_StateEnvironment_CreateImageLoader = (PLibMCEnvStateEnvironment_CreateImageLoaderPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createimageloader");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_LoadPNGImage = (PLibMCEnvStateEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadpngimage");
+		pWrapperTable->m_StateEnvironment_CreateImageLoader = (PLibMCEnvStateEnvironment_CreateImageLoaderPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createimageloader");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr)
+		if (pWrapperTable->m_StateEnvironment_CreateImageLoader == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10635,12 +10726,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_LoadPNGImage = (PLibMCEnvUIEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadpngimage");
+		pWrapperTable->m_UIEnvironment_CreateImageLoader = (PLibMCEnvUIEnvironment_CreateImageLoaderPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createimageloader");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_LoadPNGImage = (PLibMCEnvUIEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_uienvironment_loadpngimage");
+		pWrapperTable->m_UIEnvironment_CreateImageLoader = (PLibMCEnvUIEnvironment_CreateImageLoaderPtr) dlsym(hLibrary, "libmcenv_uienvironment_createimageloader");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr)
+		if (pWrapperTable->m_UIEnvironment_CreateImageLoader == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11195,16 +11286,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreatePNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_imagedata_encodepng", (void**)&(pWrapperTable->m_ImageData_EncodePNG));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_EncodePNG == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_imagedata_getencodedpngdata", (void**)&(pWrapperTable->m_ImageData_GetEncodedPNGData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetEncodedPNGData == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_imagedata_clearencodedpngdata", (void**)&(pWrapperTable->m_ImageData_ClearEncodedPNGData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ClearEncodedPNGData == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_imagedata_createjpegimage", (void**)&(pWrapperTable->m_ImageData_CreateJPEGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreateJPEGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_clear", (void**)&(pWrapperTable->m_ImageData_Clear));
@@ -11235,12 +11318,36 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixels == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setpixelsfromrawyuy2data", (void**)&(pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_imagedata_writetorawmemory", (void**)&(pWrapperTable->m_ImageData_WriteToRawMemory));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_WriteToRawMemory == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_readfromrawmemory", (void**)&(pWrapperTable->m_ImageData_ReadFromRawMemory));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ReadFromRawMemory == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_loadpngimage", (void**)&(pWrapperTable->m_ImageLoader_LoadPNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_LoadPNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_loadjpegimage", (void**)&(pWrapperTable->m_ImageLoader_LoadJPEGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_LoadJPEGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_createimagefromrawrgb24data", (void**)&(pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_createimagefromrawrgba32data", (void**)&(pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_createimagefromrawyuy2data", (void**)&(pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2dstoreoptions_resettodefaults", (void**)&(pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults));
@@ -13183,8 +13290,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateEmptyImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_driverenvironment_loadpngimage", (void**)&(pWrapperTable->m_DriverEnvironment_LoadPNGImage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createimageloader", (void**)&(pWrapperTable->m_DriverEnvironment_CreateImageLoader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateImageLoader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D));
@@ -13847,8 +13954,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateEmptyImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadpngimage", (void**)&(pWrapperTable->m_StateEnvironment_LoadPNGImage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createimageloader", (void**)&(pWrapperTable->m_StateEnvironment_CreateImageLoader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateImageLoader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_StateEnvironment_CreateDiscreteField2D));
@@ -14139,8 +14246,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateEmptyImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_loadpngimage", (void**)&(pWrapperTable->m_UIEnvironment_LoadPNGImage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createimageloader", (void**)&(pWrapperTable->m_UIEnvironment_CreateImageLoader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateImageLoader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds));
@@ -14697,32 +14804,20 @@ public:
 	}
 	
 	/**
-	* CImageData::EncodePNG - Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
+	* CImageData::CreateJPEGImage - Creates JPEG Image out of the pixel data.
+	* @param[in] pJPEGStorageOptions - Optional encoding options for the image.
+	* @return Image data.
 	*/
-	void CImageData::EncodePNG()
+	PJPEGImageData CImageData::CreateJPEGImage(classParam<CJPEGImageStoreOptions> pJPEGStorageOptions)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_EncodePNG(m_pHandle));
-	}
-	
-	/**
-	* CImageData::GetEncodedPNGData - Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
-	* @param[out] PNGDataBuffer - PNG Data stream.
-	*/
-	void CImageData::GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
-	{
-		LibMCEnv_uint64 elementsNeededPNGData = 0;
-		LibMCEnv_uint64 elementsWrittenPNGData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetEncodedPNGData(m_pHandle, 0, &elementsNeededPNGData, nullptr));
-		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetEncodedPNGData(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
-	}
-	
-	/**
-	* CImageData::ClearEncodedPNGData - Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
-	*/
-	void CImageData::ClearEncodedPNGData()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ClearEncodedPNGData(m_pHandle));
+		LibMCEnvHandle hJPEGStorageOptions = pJPEGStorageOptions.GetHandle();
+		LibMCEnvHandle hJPEGImage = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_CreateJPEGImage(m_pHandle, hJPEGStorageOptions, &hJPEGImage));
+		
+		if (!hJPEGImage) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJPEGImageData>(m_pWrapper, hJPEGImage);
 	}
 	
 	/**
@@ -14822,6 +14917,15 @@ public:
 	}
 	
 	/**
+	* CImageData::SetPixelsFromRawYUY2Data - Sets all pixels from a raw YUY2 color array.
+	* @param[in] YUY2DataBuffer - Pixel array in YUY2 color format (2 bytes per pixels). The array MUST have a length of PixelSizeX * PixelSizeY * 2.
+	*/
+	void CImageData::SetPixelsFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelsFromRawYUY2Data(m_pHandle, (LibMCEnv_uint64)YUY2DataBuffer.size(), YUY2DataBuffer.data()));
+	}
+	
+	/**
 	* CImageData::WriteToRawMemory - Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
 	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
 	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
@@ -14849,6 +14953,111 @@ public:
 	void CImageData::ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ReadFromRawMemory(m_pHandle, nStartX, nStartY, nCountX, nCountY, eSourceFormat, pSource, nYLineOffset));
+	}
+	
+	/**
+	 * Method definitions for class CImageLoader
+	 */
+	
+	/**
+	* CImageLoader::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] PNGDataBuffer - PNG Data as byte array. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CImageLoader::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::LoadJPEGImage - creates an image object from a JPEG data stream.
+	* @param[in] JPEGDataBuffer - JPEG Data as byte array. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CImageLoader::LoadJPEGImage(const CInputVector<LibMCEnv_uint8> & JPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_LoadJPEGImage(m_pHandle, (LibMCEnv_uint64)JPEGDataBuffer.size(), JPEGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::CreateImageFromRawRGB24Data - creates an image object from raw RGB24 Data. (3 bytes per pixel)
+	* @param[in] RGB24DataBuffer - RGB 24 data. MUST contain PixelSizeX * PixelSizeY * 3 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	PImageData CImageLoader::CreateImageFromRawRGB24Data(const CInputVector<LibMCEnv_uint8> & RGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_CreateImageFromRawRGB24Data(m_pHandle, (LibMCEnv_uint64)RGB24DataBuffer.size(), RGB24DataBuffer.data(), nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::CreateImageFromRawRGBA32Data - creates an image object from raw RGBA32 Data. (4 bytes per pixel)
+	* @param[in] RGBA32DataBuffer - RGBA 32 data. MUST contain PixelSizeX * PixelSizeY * 4 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	PImageData CImageLoader::CreateImageFromRawRGBA32Data(const CInputVector<LibMCEnv_uint8> & RGBA32DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_CreateImageFromRawRGBA32Data(m_pHandle, (LibMCEnv_uint64)RGBA32DataBuffer.size(), RGBA32DataBuffer.data(), nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::CreateImageFromRawYUY2Data - creates an image object from raw YUY2 Data. (2 bytes per pixel)
+	* @param[in] YUY2DataBuffer - YUY2 data. MUST contain PixelSizeX * PixelSizeY * 2 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	PImageData CImageLoader::CreateImageFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_CreateImageFromRawYUY2Data(m_pHandle, (LibMCEnv_uint64)YUY2DataBuffer.size(), YUY2DataBuffer.data(), nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
 	}
 	
 	/**
@@ -21408,22 +21617,18 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* CDriverEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	PImageData CDriverEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	PImageLoader CDriverEnvironment::CreateImageLoader()
 	{
-		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		LibMCEnvHandle hImageLoaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateImageLoader(m_pHandle, &hImageLoaderInstance));
 		
-		if (!hImageDataInstance) {
+		if (!hImageLoaderInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
 	}
 	
 	/**
@@ -23785,22 +23990,18 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* CStateEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	PImageData CStateEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	PImageLoader CStateEnvironment::CreateImageLoader()
 	{
-		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		LibMCEnvHandle hImageLoaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateImageLoader(m_pHandle, &hImageLoaderInstance));
 		
-		if (!hImageDataInstance) {
+		if (!hImageLoaderInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
 	}
 	
 	/**
@@ -24832,22 +25033,18 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* CUIEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	PImageData CUIEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	PImageLoader CUIEnvironment::CreateImageLoader()
 	{
-		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		LibMCEnvHandle hImageLoaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateImageLoader(m_pHandle, &hImageLoaderInstance));
 		
-		if (!hImageDataInstance) {
+		if (!hImageLoaderInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
 	}
 	
 	/**

@@ -48,6 +48,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
 #include "libmcenv_zipstreamwriter.hpp"
+#include "libmcenv_imageloader.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -382,10 +383,11 @@ IImageData* CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, 
     return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+IImageLoader* CUIEnvironment::CreateImageLoader()
 {
-    return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+    return new CImageLoader();
 }
+
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
 {

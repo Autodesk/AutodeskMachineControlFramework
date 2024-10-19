@@ -231,10 +231,19 @@
 		<error name="INVALIDEXTERNALEVENTRETURNVALUEKEY" code="10191" description="Invalid external event return value key" />				
 		<error name="EXTERNALEVENTVALUEKEYISRESERVED" code="10192" description="External event value key is reserved." />		
 		<error name="EXTERNALEVENTRETURNVALUEKEYISRESERVED" code="10193" description="External event return value key is reserved." />		
-		
-		
-
-		
+		<error name="INVALIDYUY2BUFFERSIZE" code="10194" description="Invalid YUY2 buffer size" />		
+		<error name="YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2" code="10195" description="YUY2 pixel count must be a multiple of 2" />		
+		<error name="INVALIDJPEGDATA" code="10196" description="Invalid JPEG Data size" />		
+		<error name="INVALIDJPEGBUFFERSIZE" code="10197" description="Invalid JPEG Buffer size" />		
+		<error name="COULDNOTINITIALIZEJPEGLIBRARY" code="10198" description="Could not initialize JPEG library" />		
+		<error name="COULDNOTSETJPEGSTOPONWARNING" code="10199" description="Could not set JPEG StopOnWarning" />		
+		<error name="COULDNOTSETFASTUPSAMPLE" code="10200" description="Could not set FastUpSample" />		
+		<error name="COULDNOTSETFASTDCT" code="10201" description="Could not set FastDCT" />		
+		<error name="COULDNOTREADJPEGHEADER" code="10202" description="Could not read JPEG Header" />		
+		<error name="INVALIDJPEGIMAGESIZE" code="10203" description="Invalid JPEG image size" />		
+		<error name="JPEGCOLORPRECISIONTOOHIGH" code="10204" description="JPEG color precision too high" />		
+		<error name="COULDNOTDECOMPRESSJPEG" code="10205" description="Could not decompress JPEG" />		
+		<error name="COULDNOTSTOREJPEGIMAGE" code="10206" description="Could not store JPEG image" />		
 	</errors>
 
 	<enum name="AlertLevel">
@@ -537,14 +546,9 @@
 			<param name="PNGImage" type="class" class="PNGImageData" pass="return" description="Image data." />		
 		</method>
 
-		<method name="EncodePNG" description="Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.">
-		</method>
-
-		<method name="GetEncodedPNGData" description="Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
-		</method>
-		
-		<method name="ClearEncodedPNGData" description="Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.">
+		<method name="CreateJPEGImage" description="Creates JPEG Image out of the pixel data.">		
+			<param name="JPEGStorageOptions" type="optionalclass" class="JPEGImageStoreOptions" pass="in" description="Optional encoding options for the image." />		
+			<param name="JPEGImage" type="class" class="JPEGImageData" pass="return" description="Image data." />		
 		</method>
 		
 		<method name="Clear" description="Sets all pixels to a single value.">
@@ -597,6 +601,10 @@
 			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format." />
 		</method>
 
+		<method name="SetPixelsFromRawYUY2Data" description="Sets all pixels from a raw YUY2 color array.">
+			<param name="YUY2Data" type="basicarray" class="uint8" pass="in" description="Pixel array in YUY2 color format (2 bytes per pixels). The array MUST have a length of PixelSizeX * PixelSizeY * 2." />
+		</method>
+
 		<method name="WriteToRawMemory" description="Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.">
 			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
 			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
@@ -619,6 +627,59 @@
 
 	
 	</class>
+	
+	<class name="ImageLoader" parent="Base" description="Class for loading images from various data formats.">
+
+		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="PNG Data as byte array. Fails if image cannot be loaded." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
+
+		<method name="LoadJPEGImage" description="creates an image object from a JPEG data stream.">
+			<param name="JPEGData" type="basicarray" class="uint8" pass="in" description="JPEG Data as byte array. Fails if image cannot be loaded." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
+
+		<method name="CreateImageFromRawRGB24Data" description="creates an image object from raw RGB24 Data. (3 bytes per pixel)">
+			<param name="RGB24Data" type="basicarray" class="uint8" pass="in" description="RGB 24 data. MUST contain PixelSizeX * PixelSizeY * 3 bytes." />
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use in memory." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance with the data." />
+		</method>
+	
+		<method name="CreateImageFromRawRGBA32Data" description="creates an image object from raw RGBA32 Data. (4 bytes per pixel)">
+			<param name="RGBA32Data" type="basicarray" class="uint8" pass="in" description="RGBA 32 data. MUST contain PixelSizeX * PixelSizeY * 4 bytes." />
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use in memory." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance with the data." />
+		</method>
+
+		<method name="CreateImageFromRawYUY2Data" description="creates an image object from raw YUY2 Data. (2 bytes per pixel)">
+			<param name="YUY2Data" type="basicarray" class="uint8" pass="in" description="YUY2 data. MUST contain PixelSizeX * PixelSizeY * 2 bytes." />
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use in memory." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance with the data." />
+		</method>
+		
+
+	</class>
+
+	
 	
 	<class name="VideoStream" parent="Base" description="Video stream class.">
 	
@@ -3167,15 +3228,11 @@
 			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
 		</method>		
-		
-		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
-			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
-			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
-		</method>
 
+		<method name="CreateImageLoader" description="creates an image loader object.">			
+			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
+		</method>		
+		
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
 			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
@@ -4075,13 +4132,9 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
 		</method>		
 		
-		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
-			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
-			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />	
-		</method>
+		<method name="CreateImageLoader" description="creates an image loader object.">			
+			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
+		</method>		
 
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
@@ -4480,13 +4533,9 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
 		</method>		
 		
-		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
-			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
-			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
-		</method>
+		<method name="CreateImageLoader" description="creates an image loader object.">			
+			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
+		</method>		
 
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
