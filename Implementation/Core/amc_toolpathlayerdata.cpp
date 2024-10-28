@@ -142,16 +142,16 @@ namespace AMC {
 			Lib3MF::eToolpathSegmentType eType = Lib3MF::eToolpathSegmentType::Unknown;
 			uint32_t nPointCount = 0;
 			p3MFLayer->GetSegmentInfo(nSegmentIndex, eType, nPointCount);
-			std::string sPartUUID = p3MFLayer->GetSegmentPartUUID(nSegmentIndex);
+			std::string sBuildItemUUID = p3MFLayer->GetSegmentBuildItemUUID(nSegmentIndex);
 			std::string sProfileUUID = p3MFLayer->GetSegmentDefaultProfileUUID(nSegmentIndex);
-			uint32_t nLocalPartID = p3MFLayer->GetSegmentLocalPartID(nSegmentIndex);
+			uint32_t nLocalPartID = p3MFLayer->GetSegmentPartID(nSegmentIndex);
 
 			auto pSegment = &m_Segments[nSegmentIndex];
 			pSegment->m_PointCount = nPointCount;
 			pSegment->m_PointStartIndex = nTotalPointCount;
 			pSegment->m_Type = (LibMCEnv::eToolpathSegmentType) eType;
 			pSegment->m_ProfileUUID = registerUUID (sProfileUUID);
-			pSegment->m_PartUUID = registerUUID(sPartUUID);
+			pSegment->m_PartUUID = registerUUID (sBuildItemUUID);
 			pSegment->m_LocalPartID = nLocalPartID;
 			if (m_CustomSegmentAttributes.size() > 0) {
 				pSegment->m_AttributeData = &m_SegmentAttributeData.at((size_t)nSegmentIndex * m_CustomSegmentAttributes.size());
