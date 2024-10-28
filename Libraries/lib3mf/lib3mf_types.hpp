@@ -422,6 +422,13 @@ namespace Lib3MF {
     Double = 2
   };
   
+  enum class eToolpathProfileOverrideFactor : Lib3MF_int32 {
+    Unknown = 0,
+    FactorF = 1,
+    FactorG = 2,
+    FactorH = 3
+  };
+  
   enum class eEncryptionAlgorithm : Lib3MF_int32 {
     AES256_GCM = 1 /** http://www.w3.org/2009/xmlenc11#aes256-gcm */
   };
@@ -478,14 +485,17 @@ namespace Lib3MF {
   typedef struct sHatch2D {
       Lib3MF_double m_Point1Coordinates[2];
       Lib3MF_double m_Point2Coordinates[2];
-      Lib3MF_uint32 m_ProfileOverrideID;
       Lib3MF_int32 m_Tag;
   } sHatch2D;
+  
+  typedef struct sHatch2DOverrides {
+      Lib3MF_double m_Point1Override;
+      Lib3MF_double m_Point2Override;
+  } sHatch2DOverrides;
   
   typedef struct sDiscreteHatch2D {
       Lib3MF_int32 m_Point1Coordinates[2];
       Lib3MF_int32 m_Point2Coordinates[2];
-      Lib3MF_uint32 m_ProfileOverrideID;
       Lib3MF_int32 m_Tag;
   } sDiscreteHatch2D;
   
@@ -630,6 +640,7 @@ typedef Lib3MF::eProgressIdentifier eLib3MFProgressIdentifier;
 typedef Lib3MF::eBlendMethod eLib3MFBlendMethod;
 typedef Lib3MF::eToolpathSegmentType eLib3MFToolpathSegmentType;
 typedef Lib3MF::eToolpathAttributeType eLib3MFToolpathAttributeType;
+typedef Lib3MF::eToolpathProfileOverrideFactor eLib3MFToolpathProfileOverrideFactor;
 typedef Lib3MF::eEncryptionAlgorithm eLib3MFEncryptionAlgorithm;
 typedef Lib3MF::eWrappingAlgorithm eLib3MFWrappingAlgorithm;
 typedef Lib3MF::eMgfAlgorithm eLib3MFMgfAlgorithm;
@@ -641,6 +652,7 @@ typedef Lib3MF::sPosition sLib3MFPosition;
 typedef Lib3MF::sPosition2D sLib3MFPosition2D;
 typedef Lib3MF::sDiscretePosition2D sLib3MFDiscretePosition2D;
 typedef Lib3MF::sHatch2D sLib3MFHatch2D;
+typedef Lib3MF::sHatch2DOverrides sLib3MFHatch2DOverrides;
 typedef Lib3MF::sDiscreteHatch2D sLib3MFDiscreteHatch2D;
 typedef Lib3MF::sCompositeConstituent sLib3MFCompositeConstituent;
 typedef Lib3MF::sMultiPropertyLayer sLib3MFMultiPropertyLayer;
