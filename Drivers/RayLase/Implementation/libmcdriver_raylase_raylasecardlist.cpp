@@ -92,7 +92,7 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
         // Only draw segments of current laser index
         if (nLaserIndexFilter != 0) {
-            if (nLaserIndexOfSegment != nLaserIndexOfSegment)
+            if (nLaserIndexOfSegment != nLaserIndexFilter)
                 bDrawSegment = false;
         }
 
@@ -117,20 +117,20 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
             m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(m_ListHandle, dMarkSpeedInMeterPerSecond), "rlListAppendMarkSpeed");
             m_pSDK->checkError(m_pSDK->rlListAppendPower(m_ListHandle, nPowerInUnits, eRLPowerChannels::ptcAllChannels), "rlListAppendPower");
 
-            std::vector<LibMCEnv::sPosition2D> Points;
-            pLayer->GetSegmentPointData(nSegmentIndex, Points);
-
-            if (nPointCount != Points.size())
-                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
-
             switch (eSegmentType) {
             case LibMCEnv::eToolpathSegmentType::Loop:
             case LibMCEnv::eToolpathSegmentType::Polyline:
             {
 
+                std::vector<LibMCEnv::sFloatPosition2D> PointsInMM;
+                pLayer->GetSegmentPointDataInMM(nSegmentIndex, PointsInMM);
+
+                if (nPointCount != PointsInMM.size())
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
+
                 for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
-                    double dXinMM = (Points[nPointIndex].m_Coordinates[0] * dUnits);
-                    double dYinMM = (Points[nPointIndex].m_Coordinates[1] * dUnits);
+                    double dXinMM = (PointsInMM[nPointIndex].m_Coordinates[0]);
+                    double dYinMM = (PointsInMM[nPointIndex].m_Coordinates[1]);
 
                     double dXinMicron = dXinMM * 1000.0;
                     double dYinMicron = dYinMM * 1000.0;
@@ -153,15 +153,19 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                 if (nPointCount % 2 == 1)
                     throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
 
+                std::vector<LibMCEnv::sFloatHatch2D> HatchesInMM;
+
                 uint64_t nHatchCount = nPointCount / 2;
-                std::vector<sHatch2D> Hatches;
-                Hatches.resize(nHatchCount);
+                pLayer->GetSegmentHatchDataInMM(nSegmentIndex, HatchesInMM);
+
+                if (nHatchCount != HatchesInMM.size())
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
 
                 for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
-                    double dX1inMM = (float)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
-                    double dY1inMM = (float)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
-                    double dX2inMM = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
-                    double dY2inMM = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
+                    double dX1inMM = HatchesInMM[nHatchIndex].m_X1;
+                    double dY1inMM = HatchesInMM[nHatchIndex].m_Y1;
+                    double dX2inMM = HatchesInMM[nHatchIndex].m_X2;
+                    double dY2inMM = HatchesInMM[nHatchIndex].m_Y2;
 
                     double dX1inMicron = dX1inMM * 1000.0;
                     double dY1inMicron = dY1inMM * 1000.0;

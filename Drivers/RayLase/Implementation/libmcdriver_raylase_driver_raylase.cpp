@@ -228,6 +228,7 @@ void CDriver_Raylase::DrawLayerMultiLaser(const std::string& sStreamUUID, const 
 
         auto pList = pCard->createNewList();
         pList->addLayerToList(pLayer, nLaserIndex, true);
+        pList->setListOnCard(0);
         pList->executeList(0);
 
         executionLists.push_back(pList);
