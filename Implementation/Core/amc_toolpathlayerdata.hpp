@@ -43,6 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_types.hpp"
 #include "amc_xmldocument.hpp"
 
+#define TOOLPATHSEGMENTOVERRIDEFACTOR_F 1
+#define TOOLPATHSEGMENTOVERRIDEFACTOR_G 2
+#define TOOLPATHSEGMENTOVERRIDEFACTOR_H 4
+
 namespace AMC {
 
 
@@ -53,8 +57,13 @@ namespace AMC {
 		uint32_t m_ProfileUUID;
 		uint32_t m_PartUUID;
 		uint32_t m_LocalPartID;
+		uint32_t m_HasOverrideFactors;
 		int64_t* m_AttributeData;
 	} sToolpathLayerSegment;
+
+	typedef struct _sToolpathLayerOverride {
+		double m_dFactors[3]; // F, G and H
+	} sToolpathLayerOverride;
 
 	class CToolpathCustomSegmentAttribute {
 	private:
@@ -111,6 +120,7 @@ namespace AMC {
 		std::vector<sToolpathLayerSegment> m_Segments;
 		std::vector<int64_t> m_SegmentAttributeData;
 		std::vector<LibMCEnv::sPosition2D> m_Points;
+		std::vector<sToolpathLayerOverride> m_OverrideFactors;
 
 		std::vector<std::string> m_UUIDs;
 		std::map<std::string, uint32_t> m_UUIDMap;

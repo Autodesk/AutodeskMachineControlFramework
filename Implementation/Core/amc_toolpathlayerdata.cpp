@@ -153,6 +153,7 @@ namespace AMC {
 			pSegment->m_ProfileUUID = registerUUID (sProfileUUID);
 			pSegment->m_PartUUID = registerUUID (sBuildItemUUID);
 			pSegment->m_LocalPartID = nLocalPartID;
+			pSegment->m_HasOverrideFactors = 0;
 			if (m_CustomSegmentAttributes.size() > 0) {
 				pSegment->m_AttributeData = &m_SegmentAttributeData.at((size_t)nSegmentIndex * m_CustomSegmentAttributes.size());
 				int64_t* pAttributeData = pSegment->m_AttributeData;
@@ -182,6 +183,7 @@ namespace AMC {
 
 		// Read point information
 		m_Points.resize(nTotalPointCount);
+		m_OverrideFactors.resize(nTotalPointCount);
 		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 			auto pSegment = &m_Segments[nSegmentIndex];
 
@@ -208,7 +210,73 @@ namespace AMC {
 					
 				}
 
+				for (uint32_t nFactorIndex = 0; nFactorIndex < 3; nFactorIndex++) {
+
+					Lib3MF::eToolpathProfileOverrideFactor factorType = Lib3MF::eToolpathProfileOverrideFactor::Unknown;
+					uint32_t factorFlag = 0;
+					switch (nFactorIndex) {
+						case 0: factorType = Lib3MF::eToolpathProfileOverrideFactor::FactorF;
+							factorFlag = TOOLPATHSEGMENTOVERRIDEFACTOR_F;
+							break;
+						case 1: factorType = Lib3MF::eToolpathProfileOverrideFactor::FactorG;
+							factorFlag = TOOLPATHSEGMENTOVERRIDEFACTOR_G;
+							break;
+						case 2: factorType = Lib3MF::eToolpathProfileOverrideFactor::FactorH;
+							factorFlag = TOOLPATHSEGMENTOVERRIDEFACTOR_H;
+							break;
+					}
+
+					if (p3MFLayer->SegmentHasOverrideFactors(nSegmentIndex, factorType)) {
+
+						if (pSegment->m_Type == LibMCEnv::eToolpathSegmentType::Hatch) {
+							pSegment->m_HasOverrideFactors |= factorFlag;
+
+							std::vector<Lib3MF::sHatch2DOverrides> hatchOverrides;
+							p3MFLayer->GetSegmentHatchOverrideFactors(nSegmentIndex, factorType, hatchOverrides);
+
+							if ((uint32_t)(hatchOverrides.size() * 2) != pSegment->m_PointCount)
+								throw ELibMCCustomException(LIBMC_ERROR_INVALIDHATCHOVERRIDECOUNT, m_sDebugName);
+
+							auto pSrcOverride = &hatchOverrides[0];
+							auto pDstOverride = &m_OverrideFactors.at(pSegment->m_PointStartIndex);
+
+							for (uint32_t nHatchIndex = 0; nHatchIndex < hatchOverrides.size(); nHatchIndex++) {
+								pDstOverride->m_dFactors[nFactorIndex] = pSrcOverride->m_Point1Override;
+								pDstOverride++;
+								pDstOverride->m_dFactors[nFactorIndex] = pSrcOverride->m_Point2Override;
+								pDstOverride++;
+								pSrcOverride++;
+
+							}
+						}
+
+						if ((pSegment->m_Type == LibMCEnv::eToolpathSegmentType::Loop) || (pSegment->m_Type == LibMCEnv::eToolpathSegmentType::Polyline)) {
+							pSegment->m_HasOverrideFactors |= factorFlag;
+
+							std::vector<double> pointOverrides;
+							p3MFLayer->GetSegmentPointOverrideFactors(nSegmentIndex, factorType, pointOverrides);
+
+							if ((uint32_t)pointOverrides.size() != pSegment->m_PointCount)
+								throw ELibMCCustomException(LIBMC_ERROR_INVALIDPOINTOVERRIDECOUNT, m_sDebugName);
+
+							auto pSrcOverride = &pointOverrides[0];
+							auto pDstOverride = &m_OverrideFactors.at(pSegment->m_PointStartIndex);
+
+							for (uint32_t nPointIndex = 0; nPointIndex < pSegment->m_PointCount; nPointIndex++) {
+								pDstOverride->m_dFactors[nFactorIndex] = *pSrcOverride;
+								pSrcOverride++;
+								pDstOverride++;
+
+							}
+
+						}
+
+					}
+
+				}
+
 			}
+
 		}
 
 		uint32_t nCustomDataCount = p3MFLayer->GetCustomDataCount();
