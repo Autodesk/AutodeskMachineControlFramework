@@ -398,7 +398,7 @@ std::string CBuildExecution::StoreDataTable(const std::string& sIdentifier, cons
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLENAME);
 	if (sIdentifier.empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER);
-	if (AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER, "invalid datatable identifier: " + sIdentifier);
 
 	if (pFieldDataInstance == nullptr)

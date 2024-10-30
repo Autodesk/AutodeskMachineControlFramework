@@ -82,7 +82,11 @@
 		<error name="EMPTYRTCAUXILIARYRESOURCENAME" code="1028" description="Empty RTC auxiliary resource name" />		
 		<error name="RTCAUXILIARYRESOURCENOTFOUND" code="1029" description="RTC auxiliary resource not found." />				
 		<error name="INVALIDPOINTCOUNT" code="1030" description="Invalid point count." />		
-									
+		<error name="EMPTYCONFIGURATIONRESOURCENAME" code="1031" description="Empty configuration resource name." />		
+		<error name="CONFIGURATIONRESOURCENOTFOUND" code="1032" description="Configuration resource not found." />		
+		<error name="COULDNOTOOPENSIMULATIONFILE" code="1033" description="Could not open simulation file." />		
+		<error name="INVALIDSIMULATIONFILENAME" code="1034" description="Invalid simulation file name." />		
+											
 	</errors>
 
 	<struct name="Point2D">
@@ -235,6 +239,10 @@ Custom implementation
 		<method name="StopExecution" description="Stops the execution of the current list immediately.">
 		</method>	
 
+		<method name="LoadSimulationData" description="Reads the SMC Simulation data into a data table.">
+			<param name="SimulationDataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table object to read the simulation into." />
+		</method>	
+
 	</class>
 
 
@@ -279,6 +287,19 @@ Custom implementation
 		<method name="SetCorrectionFileResource" description="Sets correction file as resource data. Fails if resource name does not exist.">
 			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
 		</method>
+
+		<method name="SetConfigurationTemplate" description="Sets the SMC Configuration Template. Currently supported version is 0.9.">
+			<param name="TemplateXML" type="string" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="SetConfigurationTemplateResource" description="Sets the SMC Configuration Template from resource data. Currently supported version is 0.9.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+		</method>	
+
+		<method name="GetConfigurationTemplate" description="Returns the current SMC Configuration Template. Currently supported version is 0.9.">
+			<param name="TemplateXML" type="string" pass="return" description="Value to set." />
+		</method>	
+
 
 		<method name="SetFirmware" description="Sets card firmware from binary data.">
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />

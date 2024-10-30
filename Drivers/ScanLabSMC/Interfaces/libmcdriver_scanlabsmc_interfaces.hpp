@@ -429,6 +429,12 @@ public:
 	*/
 	virtual void StopExecution() = 0;
 
+	/**
+	* ISMCJob::LoadSimulationData - Reads the SMC Simulation data into a data table.
+	* @param[in] pSimulationDataTable - Data table object to read the simulation into.
+	*/
+	virtual void LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable) = 0;
+
 };
 
 typedef IBaseSharedPtr<ISMCJob> PISMCJob;
@@ -500,6 +506,24 @@ public:
 	* @param[in] sResourceName - Resource name to load.
 	*/
 	virtual void SetCorrectionFileResource(const std::string & sResourceName) = 0;
+
+	/**
+	* ISMCConfiguration::SetConfigurationTemplate - Sets the SMC Configuration Template. Currently supported version is 0.9.
+	* @param[in] sTemplateXML - Value to set.
+	*/
+	virtual void SetConfigurationTemplate(const std::string & sTemplateXML) = 0;
+
+	/**
+	* ISMCConfiguration::SetConfigurationTemplateResource - Sets the SMC Configuration Template from resource data. Currently supported version is 0.9.
+	* @param[in] sResourceName - Resource name to load.
+	*/
+	virtual void SetConfigurationTemplateResource(const std::string & sResourceName) = 0;
+
+	/**
+	* ISMCConfiguration::GetConfigurationTemplate - Returns the current SMC Configuration Template. Currently supported version is 0.9.
+	* @return Value to set.
+	*/
+	virtual std::string GetConfigurationTemplate() = 0;
 
 	/**
 	* ISMCConfiguration::SetFirmware - Sets card firmware from binary data.

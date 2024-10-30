@@ -256,6 +256,15 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_stopexecution(LibMCDriver_ScanLabSMC_SMCJob pSMCJob);
 
+/**
+* Reads the SMC Simulation data into a data table.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] pSimulationDataTable - Data table object to read the simulation into.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadsimulationdata(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_DataTable pSimulationDataTable);
+
 /*************************************************************************************************************************
  Class definition for SMCConfiguration
 **************************************************************************************************************************/
@@ -352,6 +361,35 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfileresource(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
+
+/**
+* Sets the SMC Configuration Template. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pTemplateXML - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplate(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pTemplateXML);
+
+/**
+* Sets the SMC Configuration Template from resource data. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pResourceName - Resource name to load.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplateresource(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
+
+/**
+* Returns the current SMC Configuration Template. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nTemplateXMLBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTemplateXMLNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTemplateXMLBuffer -  buffer of Value to set., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getconfigurationtemplate(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nTemplateXMLBufferSize, LibMCDriver_ScanLabSMC_uint32* pTemplateXMLNeededChars, char * pTemplateXMLBuffer);
 
 /**
 * Sets card firmware from binary data.

@@ -243,6 +243,15 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_WaitForExec
 */
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_StopExecutionPtr) (LibMCDriver_ScanLabSMC_SMCJob pSMCJob);
 
+/**
+* Reads the SMC Simulation data into a data table.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] pSimulationDataTable - Data table object to read the simulation into.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_LoadSimulationDataPtr) (LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_DataTable pSimulationDataTable);
+
 /*************************************************************************************************************************
  Class definition for SMCConfiguration
 **************************************************************************************************************************/
@@ -339,6 +348,35 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_S
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetCorrectionFileResourcePtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
+
+/**
+* Sets the SMC Configuration Template. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pTemplateXML - Value to set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetConfigurationTemplatePtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pTemplateXML);
+
+/**
+* Sets the SMC Configuration Template from resource data. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pResourceName - Resource name to load.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetConfigurationTemplateResourcePtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
+
+/**
+* Returns the current SMC Configuration Template. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nTemplateXMLBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTemplateXMLNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTemplateXMLBuffer -  buffer of Value to set., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_GetConfigurationTemplatePtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nTemplateXMLBufferSize, LibMCDriver_ScanLabSMC_uint32* pTemplateXMLNeededChars, char * pTemplateXMLBuffer);
 
 /**
 * Sets card firmware from binary data.
@@ -724,6 +762,7 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCJob_IsExecutingPtr m_SMCJob_IsExecuting;
 	PLibMCDriver_ScanLabSMCSMCJob_WaitForExecutionPtr m_SMCJob_WaitForExecution;
 	PLibMCDriver_ScanLabSMCSMCJob_StopExecutionPtr m_SMCJob_StopExecution;
+	PLibMCDriver_ScanLabSMCSMCJob_LoadSimulationDataPtr m_SMCJob_LoadSimulationData;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetDynamicViolationReactionPtr m_SMCConfiguration_SetDynamicViolationReaction;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_GetDynamicViolationReactionPtr m_SMCConfiguration_GetDynamicViolationReaction;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetWarnLevelPtr m_SMCConfiguration_SetWarnLevel;
@@ -734,6 +773,9 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCConfiguration_GetIPAddressPtr m_SMCConfiguration_GetIPAddress;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetCorrectionFilePtr m_SMCConfiguration_SetCorrectionFile;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetCorrectionFileResourcePtr m_SMCConfiguration_SetCorrectionFileResource;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_SetConfigurationTemplatePtr m_SMCConfiguration_SetConfigurationTemplate;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_SetConfigurationTemplateResourcePtr m_SMCConfiguration_SetConfigurationTemplateResource;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_GetConfigurationTemplatePtr m_SMCConfiguration_GetConfigurationTemplate;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwarePtr m_SMCConfiguration_SetFirmware;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwareResourcesPtr m_SMCConfiguration_SetFirmwareResources;
 	PLibMCDriver_ScanLabSMCSMCContext_SetToSimulationModePtr m_SMCContext_SetToSimulationMode;

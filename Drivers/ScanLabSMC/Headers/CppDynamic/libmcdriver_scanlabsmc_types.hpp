@@ -136,6 +136,10 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME 1028 /** Empty RTC auxiliary resource name */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND 1029 /** RTC auxiliary resource not found. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT 1030 /** Invalid point count. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONRESOURCENAME 1031 /** Empty configuration resource name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_CONFIGURATIONRESOURCENOTFOUND 1032 /** Configuration resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTOOPENSIMULATIONFILE 1033 /** Could not open simulation file. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDSIMULATIONFILENAME 1034 /** Invalid simulation file name. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -184,6 +188,10 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME: return "Empty RTC auxiliary resource name";
     case LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND: return "RTC auxiliary resource not found.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT: return "Invalid point count.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONRESOURCENAME: return "Empty configuration resource name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_CONFIGURATIONRESOURCENOTFOUND: return "Configuration resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTOOPENSIMULATIONFILE: return "Could not open simulation file.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDSIMULATIONFILENAME: return "Invalid simulation file name.";
     default: return "unknown error";
   }
 }

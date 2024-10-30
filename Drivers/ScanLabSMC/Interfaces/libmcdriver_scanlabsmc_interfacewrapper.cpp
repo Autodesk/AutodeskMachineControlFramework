@@ -624,6 +624,35 @@ LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_stopexecution(LibMCDr
 	}
 }
 
+LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadsimulationdata(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_DataTable pSimulationDataTable)
+{
+	IBase* pIBaseClass = (IBase *)pSMCJob;
+
+	try {
+		LibMCEnv::PDataTable pISimulationDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pSimulationDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pISimulationDataTable.get());
+		if (!pISimulationDataTable)
+			throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+		
+		ISMCJob* pISMCJob = dynamic_cast<ISMCJob*>(pIBaseClass);
+		if (!pISMCJob)
+			throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+		
+		pISMCJob->LoadSimulationData(pISimulationDataTable);
+
+		return LIBMCDRIVER_SCANLABSMC_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabSMCInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabSMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for SMCConfiguration
@@ -893,6 +922,108 @@ LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setcorrecti
 		
 		pISMCConfiguration->SetCorrectionFileResource(sResourceName);
 
+		return LIBMCDRIVER_SCANLABSMC_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabSMCInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabSMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplate(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pTemplateXML)
+{
+	IBase* pIBaseClass = (IBase *)pSMCConfiguration;
+
+	try {
+		if (pTemplateXML == nullptr)
+			throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+		std::string sTemplateXML(pTemplateXML);
+		ISMCConfiguration* pISMCConfiguration = dynamic_cast<ISMCConfiguration*>(pIBaseClass);
+		if (!pISMCConfiguration)
+			throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+		
+		pISMCConfiguration->SetConfigurationTemplate(sTemplateXML);
+
+		return LIBMCDRIVER_SCANLABSMC_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabSMCInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabSMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplateresource(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName)
+{
+	IBase* pIBaseClass = (IBase *)pSMCConfiguration;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		ISMCConfiguration* pISMCConfiguration = dynamic_cast<ISMCConfiguration*>(pIBaseClass);
+		if (!pISMCConfiguration)
+			throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+		
+		pISMCConfiguration->SetConfigurationTemplateResource(sResourceName);
+
+		return LIBMCDRIVER_SCANLABSMC_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabSMCInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabSMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getconfigurationtemplate(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nTemplateXMLBufferSize, LibMCDriver_ScanLabSMC_uint32* pTemplateXMLNeededChars, char * pTemplateXMLBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pSMCConfiguration;
+
+	try {
+		if ( (!pTemplateXMLBuffer) && !(pTemplateXMLNeededChars) )
+			throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+		std::string sTemplateXML("");
+		ISMCConfiguration* pISMCConfiguration = dynamic_cast<ISMCConfiguration*>(pIBaseClass);
+		if (!pISMCConfiguration)
+			throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTemplateXMLBuffer == nullptr);
+		if (isCacheCall) {
+			sTemplateXML = pISMCConfiguration->GetConfigurationTemplate();
+
+			pISMCConfiguration->_setCache (new ParameterCache_1<std::string> (sTemplateXML));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pISMCConfiguration->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+			cache->retrieveData (sTemplateXML);
+			pISMCConfiguration->_setCache (nullptr);
+		}
+		
+		if (pTemplateXMLNeededChars)
+			*pTemplateXMLNeededChars = (LibMCDriver_ScanLabSMC_uint32) (sTemplateXML.size()+1);
+		if (pTemplateXMLBuffer) {
+			if (sTemplateXML.size() >= nTemplateXMLBufferSize)
+				throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_BUFFERTOOSMALL);
+			for (size_t iTemplateXML = 0; iTemplateXML < sTemplateXML.size(); iTemplateXML++)
+				pTemplateXMLBuffer[iTemplateXML] = sTemplateXML[iTemplateXML];
+			pTemplateXMLBuffer[sTemplateXML.size()] = 0;
+		}
 		return LIBMCDRIVER_SCANLABSMC_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabSMCInterfaceException & Exception) {
@@ -1784,6 +1915,8 @@ LibMCDriver_ScanLabSMCResult LibMCDriver_ScanLabSMC::Impl::LibMCDriver_ScanLabSM
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_waitforexecution;
 	if (sProcName == "libmcdriver_scanlabsmc_smcjob_stopexecution") 
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_stopexecution;
+	if (sProcName == "libmcdriver_scanlabsmc_smcjob_loadsimulationdata") 
+		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_loadsimulationdata;
 	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_setdynamicviolationreaction") 
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcconfiguration_setdynamicviolationreaction;
 	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_getdynamicviolationreaction") 
@@ -1804,6 +1937,12 @@ LibMCDriver_ScanLabSMCResult LibMCDriver_ScanLabSMC::Impl::LibMCDriver_ScanLabSM
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfile;
 	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfileresource") 
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfileresource;
+	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplate") 
+		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplate;
+	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplateresource") 
+		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplateresource;
+	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_getconfigurationtemplate") 
+		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcconfiguration_getconfigurationtemplate;
 	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_setfirmware") 
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcconfiguration_setfirmware;
 	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_setfirmwareresources") 
