@@ -153,6 +153,7 @@ void InitialiseScanlabSMCDriver(LibMCEnv::PStateEnvironment pStateEnvironment, P
 	pConfiguration->SetDynamicViolationReaction(LibMCDriver_ScanLabSMC::eDynamicViolationReaction::StopAndReport);
 
 	pConfiguration->SetSerialNumber((uint32_t) nSerial);
+	pConfiguration->SetConfigurationTemplateResource ("ScanMotionControl_DemoConfig");
 	pConfiguration->SetIPAddress(sIPAddress);
 	pConfiguration->SetCorrectionFileResource(sCorrectionResourceName);
 	pConfiguration->SetFirmwareResources("rtc6eth", "rtc6rbf", "rtc6dat");
@@ -228,6 +229,7 @@ __DECLARESTATE(exposure)
 
 	pStateEnvironment->LogMessage("Exposure...");
 	auto pBuildJob = pStateEnvironment->GetBuildJob(pSignalHandler->GetString("jobuuid"));
+	auto pExecution = pBuildJob->FindExecution(pSignalHandler->GetString("executionuuid"));
 	auto nLayerIndex = (uint32_t)pSignalHandler->GetInteger("layerindex");
 
 
@@ -278,9 +280,36 @@ __DECLARESTATE(exposure)
 	{
 		auto pDriver = __acquireDriver(ScanLabSMC);
 
-		auto pContext = pDriver->FindContext("smccontext");
-		pContext->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
 
+
+		auto pContext = pDriver->FindContext("smccontext");
+		//pContext->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		auto pJob = pContext->BeginJob(0.0, 0.0, LibMCDriver_ScanLabSMC::eBlendMode::Deactivated);
+
+		auto pDataTable = pStateEnvironment->CreateDataTable();
+
+		auto pAccessor = pBuildJob->CreateToolpathAccessor();
+		pStateEnvironment->LogMessage("Loading layer...");
+
+		auto pLayer = pAccessor->LoadLayer(nLayerIndex);
+		pStateEnvironment->LogMessage("Writing layer to SCANmotionControl...");
+
+		pJob->AddLayerToList(pLayer);
+		pJob->Finalize();
+		pStateEnvironment->LogMessage("Executing layer...");
+		pJob->Execute (true);
+
+		pStateEnvironment->LogMessage("Parsing simulation data...");
+		pJob->LoadSimulationData(pDataTable);
+
+		pStateEnvironment->LogMessage("Parsing finished...");
+		//pExecution->StoreDataTable("smcdatalayer" + std::to_string(nLayerIndex), "SMC Data Layer " + std::to_string(nLayerIndex), pDataTable, nullptr, "");
+
+		auto pTempStream = pStateEnvironment->CreateTemporaryStream("smcdatalayer" + std::to_string(nLayerIndex), "text/csv");
+		pDataTable->WriteCSVToStream(pTempStream, nullptr);	
+		pTempStream->Finish();
+
+		pExecution->AttachTempStream("smcdatalayer" + std::to_string(nLayerIndex), "SMC Data Layer " + std::to_string(nLayerIndex), "", pTempStream.get());
 		
 	}
 	else if (sCardType == "raylase") {

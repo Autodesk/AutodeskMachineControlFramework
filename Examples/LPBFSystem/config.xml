@@ -61,8 +61,7 @@
     <queue size="2048"/>
 
     <machinestatus>
-      <dint name="journalindex" address="0" description="Journal Index"/>
-      <dint name="cyclecounter" address="4" description="Cycle Counter"/>
+  
     </machinestatus>
 
 
@@ -70,21 +69,6 @@
 
       <command name="home" id="1025">
       </command>
-
-      <command name="testmove" id="1034">
-        <dint name="target" address="0" description="Target Position in micron"/>
-        <dint name="speed" address="4" description="Speed in micron per second"/>
-        <dint name="acceleration" address="8" description="Acceleration in micron per second squared"/>
-      </command>
-
-      <command name="triggersingleaxismovement" id="2000">
-        <int name="axis" address="0" description="ID of the axis to move (1 = Recoater, 2 = ....)"/>
-        <int name="absoluterelative" address="2" description="Is movement absolute (1) or relative (2)."/>
-        <dint name="target" address="4" description="Target Position in micron"/>
-        <dint name="speed" address="8" description="Speed in micron per second"/>
-        <dint name="acceleration" address="12" description="Acceleration in micron per second squared"/>
-      </command>
-
 
     </commands>
   </driver>
@@ -105,7 +89,8 @@
 		<parametergroup name="jobinfo" description="Job Information">
 			<parameter name="jobname" description="Job Name" default="Job Name" type="string"/>
 			<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string"/>
-			<parameter name="layercount" description="Layer Count" default="0" type="int"/>
+      <parameter name="executionuuid" description="Execution UUID" default="00000000-0000-0000-0000-000000000000" type="string"/>
+      <parameter name="layercount" description="Layer Count" default="0" type="int"/>
 			<parameter name="currentlayer" description="Current Layer" default="0" type="int"/>
 			<parameter name="totalheight" description="Total Height" default="0" type="double" />
 			<parameter name="currentheight" description="Current Height" default="0" type="double"/>
@@ -204,7 +189,7 @@
 	<statemachine name="laser" description="Laser System" initstate="init" failedstate="fatalerror" library="plugin_laser">
 
 		<parametergroup name="cardconfig" description="Scanner Card Config">
-			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlab" type="string"/>
+			<parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="scanlabsmc" type="string"/>
 			<parameter name="serial" description="Serial" default="332663" type="int"/>
 			<parameter name="ipaddress" description="Scanner Ethernet Address" default="192.168.1.200" type="string"/>
 			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string"/>
@@ -231,7 +216,8 @@
 
 		<signaldefinition name="signal_exposure">
 			<parameter name="jobuuid" type="string"/>
-			<parameter name="layerindex" type="int"/>
+      <parameter name="executionuuid" type="string"/>
+      <parameter name="layerindex" type="int"/>
 			<parameter name="timeout" type="int"/>
 			<result name="success" type="bool"/>
 		</signaldefinition>
