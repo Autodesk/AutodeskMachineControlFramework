@@ -107,7 +107,8 @@ namespace LibMCDriver_ScanLabSMC {
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_set_min_mark_speed) (size_t Handle, double dMinimalMarkSpeed);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_jump_min_time) (size_t Handle, const double* Target, double dMinimalJumpTime);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_job_set_corner_tolerance) (size_t Handle, const double* Target, double dCornerTolerance);
-
+		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_ctrl_get_simulation_filename) (size_t Handle, size_t nJobID, char * pszBuffer, size_t nBufferSize);
+		
 		class CScanLabSMCSDK_DLLDirectoryCache {
 		private:
 #ifdef _WIN32
@@ -154,6 +155,7 @@ namespace LibMCDriver_ScanLabSMC {
 			PScanLabSMCPtr_slsc_job_set_corner_tolerance slsc_job_set_corner_tolerance = nullptr;		
 			PScanLabSMCPtr_slsc_ctrl_get_error slsc_ctrl_get_error = nullptr;
 			PScanLabSMCPtr_slsc_ctrl_get_error_count slsc_ctrl_get_error_count = nullptr;
+			PScanLabSMCPtr_slsc_ctrl_get_simulation_filename slsc_ctrl_get_simulation_filename = nullptr;
 
 			CScanLabSMCSDK(const std::string & sDLLNameUTF8, const std::string& sDLLDirectoryUTF8);
 			~CScanLabSMCSDK();

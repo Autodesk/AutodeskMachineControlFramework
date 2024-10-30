@@ -141,7 +141,7 @@ void CSMCContext::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Sc
 {
 	auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
 
-	auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+	auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);	
 
 	auto pJob = m_pContextInstance->BeginJob(0.0, 0.0, eBlendMode::MaxAccuracy);
 	pJob->AddLayerToList(pLayer);

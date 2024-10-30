@@ -94,6 +94,8 @@ public:
 
 	void StopExecution() override;
 
+	void LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable) override;
+
 };
 
 } // namespace Impl

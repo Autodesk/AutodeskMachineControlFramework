@@ -127,3 +127,7 @@ void CSMCJob::StopExecution()
     m_pJobInstance->StopExecution();
 }
 
+void CSMCJob::LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable)
+{
+    m_pJobInstance->ReadSimulationFile(pSimulationDataTable);
+}

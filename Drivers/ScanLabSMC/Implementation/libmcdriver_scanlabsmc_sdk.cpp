@@ -155,6 +155,7 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8, const std::strin
 	this->slsc_job_set_corner_tolerance = (PScanLabSMCPtr_slsc_job_set_corner_tolerance)_loadScanLabSMCAddress(hLibrary, "slsc_job_set_corner_tolerance");
 	this->slsc_ctrl_get_error = (PScanLabSMCPtr_slsc_ctrl_get_error)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_error");
 	this->slsc_ctrl_get_error_count = (PScanLabSMCPtr_slsc_ctrl_get_error_count)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_error_count");
+	this->slsc_ctrl_get_simulation_filename = (PScanLabSMCPtr_slsc_ctrl_get_simulation_filename)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_simulation_filename");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -260,6 +261,7 @@ void CScanLabSMCSDK::resetFunctionPtrs()
 	slsc_job_set_corner_tolerance = nullptr;
 	slsc_ctrl_get_error = nullptr;
 	slsc_ctrl_get_error_count = nullptr;
+	slsc_ctrl_get_simulation_filename = nullptr;
 
 }
 

@@ -89,6 +89,8 @@ public:
 
 	void AddLayerToList(LibMCEnv::PToolpathLayer pLayer);
 
+	void ReadSimulationFile (LibMCEnv::PDataTable pDataTable);
+
 };
 
 typedef std::shared_ptr<CSMCJobInstance> PSMCJobInstance;
