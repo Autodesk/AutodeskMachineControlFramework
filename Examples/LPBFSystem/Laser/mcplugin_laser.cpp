@@ -323,7 +323,7 @@ __DECLARESTATE(exposure)
 		pStateEnvironment->LogMessage("Get Connected Card...");
 		auto pCard = pDriver->GetConnectedCard("card1");
 		pStateEnvironment->LogMessage("Drawing Layer...");
-		pCard->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		pCard->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex, 100000);
 		pStateEnvironment->LogMessage("Drawing Layer successful...");
 	}
 
