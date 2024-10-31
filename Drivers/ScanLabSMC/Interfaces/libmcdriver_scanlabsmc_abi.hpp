@@ -392,6 +392,26 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getconfigurationtemplate(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nTemplateXMLBufferSize, LibMCDriver_ScanLabSMC_uint32* pTemplateXMLNeededChars, char * pTemplateXMLBuffer);
 
 /**
+* Set the simulation subdirectory name. MUST be an alphanumeric string with _ and .
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pSubDirectory - New simulation subdirectory name. Default is Simulations
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setsimulationsubdirectory(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pSubDirectory);
+
+/**
+* Returns the simulation subdirectory name
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nSubDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubDirectoryBuffer -  buffer of Returns the simulation subdirectory name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getsimulationsubdirectory(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nSubDirectoryBufferSize, LibMCDriver_ScanLabSMC_uint32* pSubDirectoryNeededChars, char * pSubDirectoryBuffer);
+
+/**
 * Sets card firmware from binary data.
 *
 * @param[in] pSMCConfiguration - SMCConfiguration instance.
@@ -475,6 +495,17 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_getserialnumber(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_uint32 * pSerialNumber);
+
+/**
+* Returns the simulation subdirectory name
+*
+* @param[in] pSMCContext - SMCContext instance.
+* @param[in] nSubDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubDirectoryBuffer -  buffer of Returns the simulation subdirectory name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_getsimulationsubdirectory(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, const LibMCDriver_ScanLabSMC_uint32 nSubDirectoryBufferSize, LibMCDriver_ScanLabSMC_uint32* pSubDirectoryNeededChars, char * pSubDirectoryBuffer);
 
 /**
 * Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.

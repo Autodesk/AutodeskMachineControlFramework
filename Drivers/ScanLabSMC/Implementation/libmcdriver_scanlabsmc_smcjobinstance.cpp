@@ -48,9 +48,15 @@ using namespace LibMCDriver_ScanLabSMC::Impl;
  Class definition of CSMCJob
 **************************************************************************************************************************/
 
-CSMCJobInstance::CSMCJobInstance(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode)
-    : m_pContextHandle(pContextHandle), m_JobID(0), m_bIsFinalized(false)
+CSMCJobInstance::CSMCJobInstance(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode, LibMCEnv::PWorkingDirectory pWorkingDirectory, std::string sSimulationSubDirectory)
+    : m_pContextHandle(pContextHandle), m_JobID(0), m_bIsFinalized(false), m_pWorkingDirectory (pWorkingDirectory), m_sSimulationSubDirectory (sSimulationSubDirectory)
 {
+
+    if (m_pWorkingDirectory.get() == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+    if (m_pContextHandle.get() == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
     m_pSDK = m_pContextHandle->getSDK();
 
     auto contextHandle = m_pContextHandle->getHandle();
@@ -254,7 +260,8 @@ void CSMCJobInstance::ReadSimulationFile(LibMCEnv::PDataTable pDataTable)
     buffer.at(buffer.size() - 1) = 0;
 
     std::string sSimulationFileName(buffer.data());
-    std::string sSimulationDirectory = "D:/smctest/workindir/";
+
+    std::string sSimulationDirectory = m_pWorkingDirectory->GetAbsoluteFilePath() + "/" + m_sSimulationSubDirectory + "/";
 
     CSMCSimulationParser parser(sSimulationDirectory + sSimulationFileName);
 

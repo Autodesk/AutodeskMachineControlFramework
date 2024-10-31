@@ -97,6 +97,12 @@ LibMCDriver_ScanLabSMC_uint32 CSMCContext::GetLaserIndex()
 	return m_pContextInstance->GetLaserIndex();
 }
 
+std::string CSMCContext::GetSimulationSubDirectory()
+{
+	return m_pContextInstance->GetSimulationSubDirectory();
+}
+
+
 void CSMCContext::SetLaserOrigin(const LibMCDriver_ScanLabSMC_double dOriginX, const LibMCDriver_ScanLabSMC_double dOriginY)
 {
 }

@@ -526,6 +526,18 @@ public:
 	virtual std::string GetConfigurationTemplate() = 0;
 
 	/**
+	* ISMCConfiguration::SetSimulationSubDirectory - Set the simulation subdirectory name. MUST be an alphanumeric string with _ and .
+	* @param[in] sSubDirectory - New simulation subdirectory name. Default is Simulations
+	*/
+	virtual void SetSimulationSubDirectory(const std::string & sSubDirectory) = 0;
+
+	/**
+	* ISMCConfiguration::GetSimulationSubDirectory - Returns the simulation subdirectory name
+	* @return Returns the simulation subdirectory name.
+	*/
+	virtual std::string GetSimulationSubDirectory() = 0;
+
+	/**
 	* ISMCConfiguration::SetFirmware - Sets card firmware from binary data.
 	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
 	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
@@ -588,6 +600,12 @@ public:
 	* @return Returns serial number of board.
 	*/
 	virtual LibMCDriver_ScanLabSMC_uint32 GetSerialNumber() = 0;
+
+	/**
+	* ISMCContext::GetSimulationSubDirectory - Returns the simulation subdirectory name
+	* @return Returns the simulation subdirectory name.
+	*/
+	virtual std::string GetSimulationSubDirectory() = 0;
 
 	/**
 	* ISMCContext::GetLaserIndex - Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.

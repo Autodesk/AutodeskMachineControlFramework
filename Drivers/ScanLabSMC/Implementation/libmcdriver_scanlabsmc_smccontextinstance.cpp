@@ -63,6 +63,8 @@ CSMCContextInstance::CSMCContextInstance(const std::string& sContextName, ISMCCo
 
 	m_nSerialNumber = pSMCConfiguration->GetSerialNumber();
 
+	m_sSimulationSubDirectory = pSMCConfiguration->GetSimulationSubDirectory();
+
 	m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory ();
 
 	auto pCorrectionFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ct5", "");
@@ -127,9 +129,15 @@ LibMCDriver_ScanLabSMC_uint32 CSMCContextInstance::GetLaserIndex()
 	return 1;
 }
 
+std::string CSMCContextInstance::GetSimulationSubDirectory()
+{
+	return m_sSimulationSubDirectory;
+}
+
+
 PSMCJobInstance CSMCContextInstance::BeginJob(const double dStartPositionX, const double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode)
 {
-	return std::make_shared<CSMCJobInstance> (m_pContextHandle, dStartPositionX, dStartPositionY, eBlendMode);
+	return std::make_shared<CSMCJobInstance> (m_pContextHandle, dStartPositionX, dStartPositionY, eBlendMode, m_pWorkingDirectory, m_sSimulationSubDirectory);
 }
 
 PSMCJobInstance CSMCContextInstance::GetUnfinishedJob()

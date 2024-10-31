@@ -53,6 +53,9 @@ private:
 	PSMCContextHandle m_pContextHandle;
 	PScanLabSMCSDK m_pSDK;
 
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	std::string m_sSimulationSubDirectory;
+
 	slscJobID m_JobID;
 	bool m_bIsFinalized;
 
@@ -60,7 +63,7 @@ private:
 
 public:
 
-	CSMCJobInstance(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode);
+	CSMCJobInstance(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode, LibMCEnv::PWorkingDirectory pWorkingDirectory, std::string sSimulationSubDirectory);
 
 	virtual ~CSMCJobInstance();
 

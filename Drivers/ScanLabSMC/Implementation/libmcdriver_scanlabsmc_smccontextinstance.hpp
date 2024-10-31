@@ -57,6 +57,7 @@ private:
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	std::string m_sSimulationSubDirectory;
 
 	uint32_t m_nSerialNumber;
 
@@ -79,6 +80,8 @@ public:
 	LibMCDriver_ScanLabSMC_uint32 GetSerialNumber();
 
 	LibMCDriver_ScanLabSMC_uint32 GetLaserIndex();
+
+	std::string GetSimulationSubDirectory();
 
 	PSMCJobInstance BeginJob(const double dStartPositionX, const double dStartPositionY, const LibMCDriver_ScanLabSMC::eBlendMode eBlendMode);
 

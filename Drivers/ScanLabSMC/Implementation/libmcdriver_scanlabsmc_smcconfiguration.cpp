@@ -173,8 +173,15 @@ std::string CSMCConfiguration::GetConfigurationTemplate()
     return m_sConfigurationTemplateXML;
 }
 
+void CSMCConfiguration::SetSimulationSubDirectory(const std::string& sSubDirectory)
+{
+    m_sSimulationSubDirectory = sSubDirectory;
+}
 
-
+std::string CSMCConfiguration::GetSimulationSubDirectory()
+{
+    return m_sSimulationSubDirectory;
+}
 
 void CSMCConfiguration::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer)
 {

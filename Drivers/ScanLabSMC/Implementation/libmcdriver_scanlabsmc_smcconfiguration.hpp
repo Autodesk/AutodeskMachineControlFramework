@@ -68,6 +68,7 @@ private:
     std::vector<uint8_t> m_AuxiliaryData;
     std::string m_sIPAddress;
     std::string m_sConfigurationTemplateXML;
+    std::string m_sSimulationSubDirectory;
 
 public:
 
@@ -100,6 +101,11 @@ public:
     void SetConfigurationTemplate(const std::string& sTemplateXML) override;
 
     std::string GetConfigurationTemplate() override;
+
+    void SetSimulationSubDirectory(const std::string& sSubDirectory) override;
+
+    std::string GetSimulationSubDirectory() override;
+
 
     void SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer) override;
 

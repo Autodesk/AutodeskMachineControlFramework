@@ -539,6 +539,8 @@ public:
 	inline void SetConfigurationTemplate(const std::string & sTemplateXML);
 	inline void SetConfigurationTemplateResource(const std::string & sResourceName);
 	inline std::string GetConfigurationTemplate();
+	inline void SetSimulationSubDirectory(const std::string & sSubDirectory);
+	inline std::string GetSimulationSubDirectory();
 	inline void SetFirmware(const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLabSMC_uint8> & AuxiliaryDataBuffer);
 	inline void SetFirmwareResources(const std::string & sFirmwareDataResource, const std::string & sFPGADataResource, const std::string & sAuxiliaryDataResource);
 };
@@ -563,6 +565,7 @@ public:
 	inline std::string GetIPAddress();
 	inline std::string GetNetmask();
 	inline LibMCDriver_ScanLabSMC_uint32 GetSerialNumber();
+	inline std::string GetSimulationSubDirectory();
 	inline LibMCDriver_ScanLabSMC_uint32 GetLaserIndex();
 	inline void SetLaserOrigin(const LibMCDriver_ScanLabSMC_double dOriginX, const LibMCDriver_ScanLabSMC_double dOriginY);
 	inline void GetLaserOrigin(LibMCDriver_ScanLabSMC_double & dOriginX, LibMCDriver_ScanLabSMC_double & dOriginY);
@@ -755,6 +758,8 @@ public:
 		pWrapperTable->m_SMCConfiguration_SetConfigurationTemplate = nullptr;
 		pWrapperTable->m_SMCConfiguration_SetConfigurationTemplateResource = nullptr;
 		pWrapperTable->m_SMCConfiguration_GetConfigurationTemplate = nullptr;
+		pWrapperTable->m_SMCConfiguration_SetSimulationSubDirectory = nullptr;
+		pWrapperTable->m_SMCConfiguration_GetSimulationSubDirectory = nullptr;
 		pWrapperTable->m_SMCConfiguration_SetFirmware = nullptr;
 		pWrapperTable->m_SMCConfiguration_SetFirmwareResources = nullptr;
 		pWrapperTable->m_SMCContext_SetToSimulationMode = nullptr;
@@ -763,6 +768,7 @@ public:
 		pWrapperTable->m_SMCContext_GetIPAddress = nullptr;
 		pWrapperTable->m_SMCContext_GetNetmask = nullptr;
 		pWrapperTable->m_SMCContext_GetSerialNumber = nullptr;
+		pWrapperTable->m_SMCContext_GetSimulationSubDirectory = nullptr;
 		pWrapperTable->m_SMCContext_GetLaserIndex = nullptr;
 		pWrapperTable->m_SMCContext_SetLaserOrigin = nullptr;
 		pWrapperTable->m_SMCContext_GetLaserOrigin = nullptr;
@@ -1129,6 +1135,24 @@ public:
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_SMCConfiguration_SetSimulationSubDirectory = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetSimulationSubDirectoryPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setsimulationsubdirectory");
+		#else // _WIN32
+		pWrapperTable->m_SMCConfiguration_SetSimulationSubDirectory = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetSimulationSubDirectoryPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setsimulationsubdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCConfiguration_SetSimulationSubDirectory == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SMCConfiguration_GetSimulationSubDirectory = (PLibMCDriver_ScanLabSMCSMCConfiguration_GetSimulationSubDirectoryPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_getsimulationsubdirectory");
+		#else // _WIN32
+		pWrapperTable->m_SMCConfiguration_GetSimulationSubDirectory = (PLibMCDriver_ScanLabSMCSMCConfiguration_GetSimulationSubDirectoryPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_getsimulationsubdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCConfiguration_GetSimulationSubDirectory == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SMCConfiguration_SetFirmware = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setfirmware");
 		#else // _WIN32
 		pWrapperTable->m_SMCConfiguration_SetFirmware = (PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcconfiguration_setfirmware");
@@ -1198,6 +1222,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_SMCContext_GetSerialNumber == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SMCContext_GetSimulationSubDirectory = (PLibMCDriver_ScanLabSMCSMCContext_GetSimulationSubDirectoryPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smccontext_getsimulationsubdirectory");
+		#else // _WIN32
+		pWrapperTable->m_SMCContext_GetSimulationSubDirectory = (PLibMCDriver_ScanLabSMCSMCContext_GetSimulationSubDirectoryPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smccontext_getsimulationsubdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCContext_GetSimulationSubDirectory == nullptr)
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1587,6 +1620,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_GetConfigurationTemplate == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_setsimulationsubdirectory", (void**)&(pWrapperTable->m_SMCConfiguration_SetSimulationSubDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_SetSimulationSubDirectory == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_getsimulationsubdirectory", (void**)&(pWrapperTable->m_SMCConfiguration_GetSimulationSubDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_GetSimulationSubDirectory == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_setfirmware", (void**)&(pWrapperTable->m_SMCConfiguration_SetFirmware));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_SetFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1617,6 +1658,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_getserialnumber", (void**)&(pWrapperTable->m_SMCContext_GetSerialNumber));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCContext_GetSerialNumber == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_getsimulationsubdirectory", (void**)&(pWrapperTable->m_SMCContext_GetSimulationSubDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCContext_GetSimulationSubDirectory == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smccontext_getlaserindex", (void**)&(pWrapperTable->m_SMCContext_GetLaserIndex));
@@ -2106,6 +2151,30 @@ public:
 	}
 	
 	/**
+	* CSMCConfiguration::SetSimulationSubDirectory - Set the simulation subdirectory name. MUST be an alphanumeric string with _ and .
+	* @param[in] sSubDirectory - New simulation subdirectory name. Default is Simulations
+	*/
+	void CSMCConfiguration::SetSimulationSubDirectory(const std::string & sSubDirectory)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_SetSimulationSubDirectory(m_pHandle, sSubDirectory.c_str()));
+	}
+	
+	/**
+	* CSMCConfiguration::GetSimulationSubDirectory - Returns the simulation subdirectory name
+	* @return Returns the simulation subdirectory name.
+	*/
+	std::string CSMCConfiguration::GetSimulationSubDirectory()
+	{
+		LibMCDriver_ScanLabSMC_uint32 bytesNeededSubDirectory = 0;
+		LibMCDriver_ScanLabSMC_uint32 bytesWrittenSubDirectory = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_GetSimulationSubDirectory(m_pHandle, 0, &bytesNeededSubDirectory, nullptr));
+		std::vector<char> bufferSubDirectory(bytesNeededSubDirectory);
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCConfiguration_GetSimulationSubDirectory(m_pHandle, bytesNeededSubDirectory, &bytesWrittenSubDirectory, &bufferSubDirectory[0]));
+		
+		return std::string(&bufferSubDirectory[0]);
+	}
+	
+	/**
 	* CSMCConfiguration::SetFirmware - Sets card firmware from binary data.
 	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
 	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
@@ -2199,6 +2268,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_SMCContext_GetSerialNumber(m_pHandle, &resultSerialNumber));
 		
 		return resultSerialNumber;
+	}
+	
+	/**
+	* CSMCContext::GetSimulationSubDirectory - Returns the simulation subdirectory name
+	* @return Returns the simulation subdirectory name.
+	*/
+	std::string CSMCContext::GetSimulationSubDirectory()
+	{
+		LibMCDriver_ScanLabSMC_uint32 bytesNeededSubDirectory = 0;
+		LibMCDriver_ScanLabSMC_uint32 bytesWrittenSubDirectory = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCContext_GetSimulationSubDirectory(m_pHandle, 0, &bytesNeededSubDirectory, nullptr));
+		std::vector<char> bufferSubDirectory(bytesNeededSubDirectory);
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCContext_GetSimulationSubDirectory(m_pHandle, bytesNeededSubDirectory, &bytesWrittenSubDirectory, &bufferSubDirectory[0]));
+		
+		return std::string(&bufferSubDirectory[0]);
 	}
 	
 	/**

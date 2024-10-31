@@ -379,6 +379,26 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_S
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_GetConfigurationTemplatePtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nTemplateXMLBufferSize, LibMCDriver_ScanLabSMC_uint32* pTemplateXMLNeededChars, char * pTemplateXMLBuffer);
 
 /**
+* Set the simulation subdirectory name. MUST be an alphanumeric string with _ and .
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pSubDirectory - New simulation subdirectory name. Default is Simulations
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_SetSimulationSubDirectoryPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pSubDirectory);
+
+/**
+* Returns the simulation subdirectory name
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nSubDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubDirectoryBuffer -  buffer of Returns the simulation subdirectory name., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCConfiguration_GetSimulationSubDirectoryPtr) (LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nSubDirectoryBufferSize, LibMCDriver_ScanLabSMC_uint32* pSubDirectoryNeededChars, char * pSubDirectoryBuffer);
+
+/**
 * Sets card firmware from binary data.
 *
 * @param[in] pSMCConfiguration - SMCConfiguration instance.
@@ -462,6 +482,17 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_GetNetm
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_GetSerialNumberPtr) (LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_uint32 * pSerialNumber);
+
+/**
+* Returns the simulation subdirectory name
+*
+* @param[in] pSMCContext - SMCContext instance.
+* @param[in] nSubDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubDirectoryBuffer -  buffer of Returns the simulation subdirectory name., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCContext_GetSimulationSubDirectoryPtr) (LibMCDriver_ScanLabSMC_SMCContext pSMCContext, const LibMCDriver_ScanLabSMC_uint32 nSubDirectoryBufferSize, LibMCDriver_ScanLabSMC_uint32* pSubDirectoryNeededChars, char * pSubDirectoryBuffer);
 
 /**
 * Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.
@@ -776,6 +807,8 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetConfigurationTemplatePtr m_SMCConfiguration_SetConfigurationTemplate;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetConfigurationTemplateResourcePtr m_SMCConfiguration_SetConfigurationTemplateResource;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_GetConfigurationTemplatePtr m_SMCConfiguration_GetConfigurationTemplate;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_SetSimulationSubDirectoryPtr m_SMCConfiguration_SetSimulationSubDirectory;
+	PLibMCDriver_ScanLabSMCSMCConfiguration_GetSimulationSubDirectoryPtr m_SMCConfiguration_GetSimulationSubDirectory;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwarePtr m_SMCConfiguration_SetFirmware;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetFirmwareResourcesPtr m_SMCConfiguration_SetFirmwareResources;
 	PLibMCDriver_ScanLabSMCSMCContext_SetToSimulationModePtr m_SMCContext_SetToSimulationMode;
@@ -784,6 +817,7 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCContext_GetIPAddressPtr m_SMCContext_GetIPAddress;
 	PLibMCDriver_ScanLabSMCSMCContext_GetNetmaskPtr m_SMCContext_GetNetmask;
 	PLibMCDriver_ScanLabSMCSMCContext_GetSerialNumberPtr m_SMCContext_GetSerialNumber;
+	PLibMCDriver_ScanLabSMCSMCContext_GetSimulationSubDirectoryPtr m_SMCContext_GetSimulationSubDirectory;
 	PLibMCDriver_ScanLabSMCSMCContext_GetLaserIndexPtr m_SMCContext_GetLaserIndex;
 	PLibMCDriver_ScanLabSMCSMCContext_SetLaserOriginPtr m_SMCContext_SetLaserOrigin;
 	PLibMCDriver_ScanLabSMCSMCContext_GetLaserOriginPtr m_SMCContext_GetLaserOrigin;

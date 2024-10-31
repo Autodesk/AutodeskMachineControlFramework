@@ -300,6 +300,14 @@ Custom implementation
 			<param name="TemplateXML" type="string" pass="return" description="Value to set." />
 		</method>	
 
+		<method name="SetSimulationSubDirectory" description="Set the simulation subdirectory name. MUST be an alphanumeric string with _ and .">
+			<param name="SubDirectory" type="string" pass="in" description="New simulation subdirectory name. Default is Simulations" />
+		</method>
+
+		<method name="GetSimulationSubDirectory" description="Returns the simulation subdirectory name">
+			<param name="SubDirectory" type="string" pass="return" description="Returns the simulation subdirectory name." />
+		</method>
+
 
 		<method name="SetFirmware" description="Sets card firmware from binary data.">
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
@@ -340,6 +348,10 @@ Custom implementation
 			<param name="SerialNumber" type="uint32" pass="return" description="Returns serial number of board." />
 		</method>
 		
+		<method name="GetSimulationSubDirectory" description="Returns the simulation subdirectory name">
+			<param name="SubDirectory" type="string" pass="return" description="Returns the simulation subdirectory name." />
+		</method>
+				
 		<method name="GetLaserIndex" description="Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.">
 			<param name="LaserIndex" type="uint32" pass="return" description="Returns laser index of board." />
 		</method>

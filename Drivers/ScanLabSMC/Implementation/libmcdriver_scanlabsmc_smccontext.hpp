@@ -83,6 +83,8 @@ public:
 
 	LibMCDriver_ScanLabSMC_uint32 GetLaserIndex() override;
 
+	std::string GetSimulationSubDirectory() override;
+
 	void SetLaserOrigin(const LibMCDriver_ScanLabSMC_double dOriginX, const LibMCDriver_ScanLabSMC_double dOriginY) override;
 
 	void GetLaserOrigin(LibMCDriver_ScanLabSMC_double & dOriginX, LibMCDriver_ScanLabSMC_double & dOriginY) override;
