@@ -644,8 +644,8 @@
 		<error name="JOURNALRECORDINGCHUNKISEMPTY" code="618" description="Journal recording chunk is empty." />	
 		<error name="INVALIDHATCHOVERRIDECOUNT" code="619" description="Invalid hatch override count." />	
 		<error name="INVALIDPOINTOVERRIDECOUNT" code="620" description="Invalid point override count." />	
-		
-		
+		<error name="INVALIDOVERRIDEFACTORINDEX" code="621" description="Invalid override factor index." />	
+				
 	</errors>
 	
 	

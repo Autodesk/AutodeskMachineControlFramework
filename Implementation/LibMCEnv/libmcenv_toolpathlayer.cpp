@@ -394,6 +394,50 @@ void CToolpathLayer::GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, LibMC
 
 }
 
+bool CToolpathLayer::SegmentHasOverrideFactors(const LibMCEnv_uint32 nSegmentIndex, const LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor)
+{
+	return m_pToolpathLayerData->segmentHasOverrideFactors(nSegmentIndex, eOverrideFactor);
+}
+
+void CToolpathLayer::GetSegmentPointOverrides(const LibMCEnv_uint32 nSegmentIndex, const LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, LibMCEnv_uint64 nOverrideDataBufferSize, LibMCEnv_uint64* pOverrideDataNeededCount, LibMCEnv_double* pOverrideDataBuffer)
+{
+	uint64_t nNeededPointCount = m_pToolpathLayerData->getSegmentPointCount(nSegmentIndex);
+	if (pOverrideDataNeededCount != nullptr)
+		*pOverrideDataNeededCount = nNeededPointCount;
+
+	if (pOverrideDataBuffer != nullptr) {
+		if (nOverrideDataBufferSize < nNeededPointCount)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+		m_pToolpathLayerData->storePointOverrides(nSegmentIndex, eOverrideFactor, pOverrideDataBuffer);
+	}
+}
+
+void CToolpathLayer::GetSegmentHatchOverrides(const LibMCEnv_uint32 nSegmentIndex, const LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, LibMCEnv_uint64 nOverrideDataBufferSize, LibMCEnv_uint64* pOverrideDataNeededCount, LibMCEnv::sHatch2DOverrides* pOverrideDataBuffer)
+{
+	auto segmentType = m_pToolpathLayerData->getSegmentType(nSegmentIndex);
+	if (segmentType == LibMCEnv::eToolpathSegmentType::Hatch) {
+		uint64_t nNeededPointCount = m_pToolpathLayerData->getSegmentPointCount(nSegmentIndex);
+		if (nNeededPointCount % 2 != 0)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDHATCHCOUNT);
+		uint64_t nNeededHatchCount = nNeededPointCount / 2;
+
+		if (pOverrideDataNeededCount != nullptr)
+			*pOverrideDataNeededCount = nNeededHatchCount;
+
+		if (pOverrideDataBuffer != nullptr) {
+			if (nOverrideDataBufferSize < nNeededHatchCount)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+			m_pToolpathLayerData->storeHatchOverrides(nSegmentIndex, eOverrideFactor, pOverrideDataBuffer);
+		}
+
+	}
+	else {
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH);
+	}
+
+}
 
 LibMCEnv_double CToolpathLayer::GetUnits()
 {

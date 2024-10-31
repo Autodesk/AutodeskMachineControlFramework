@@ -634,6 +634,107 @@ namespace AMC {
 
 	}
 
+	bool CToolpathLayerData::segmentHasOverrideFactors(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
+
+		auto pSegment = &m_Segments[nSegmentIndex];
+		switch (eOverrideFactor) {
+		case LibMCEnv::eToolpathProfileOverrideFactor::FactorF:
+			return (pSegment->m_HasOverrideFactors | TOOLPATHSEGMENTOVERRIDEFACTOR_F) != 0;
+		case LibMCEnv::eToolpathProfileOverrideFactor::FactorG:
+			return (pSegment->m_HasOverrideFactors | TOOLPATHSEGMENTOVERRIDEFACTOR_G) != 0;
+		case LibMCEnv::eToolpathProfileOverrideFactor::FactorH:
+			return (pSegment->m_HasOverrideFactors | TOOLPATHSEGMENTOVERRIDEFACTOR_H) != 0;
+
+		default:
+			return false;
+		}
+	}
+
+	void CToolpathLayerData::storePointOverrides(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, double* pOverrideData)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
+
+		auto pSegment = &m_Segments[nSegmentIndex];
+		uint32_t nPointCount = pSegment->m_PointCount;
+		uint32_t nStartIndex = pSegment->m_PointStartIndex;
+		if (pSegment->m_PointCount > 0) {
+
+			uint32_t nFactorIndex = 0;
+			switch (eOverrideFactor) {
+				case LibMCEnv::eToolpathProfileOverrideFactor::FactorF: {
+					nFactorIndex = 0;
+					break;
+				}
+				case LibMCEnv::eToolpathProfileOverrideFactor::FactorG: {
+					nFactorIndex = 1;
+					break;
+				}
+				case LibMCEnv::eToolpathProfileOverrideFactor::FactorH: {
+					nFactorIndex = 2;
+					break;
+				}
+				default:
+					throw ELibMCCustomException(LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX, std::to_string ((int)eOverrideFactor));
+
+			}
+
+
+			for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+				auto& overrideFactor = m_OverrideFactors.at(nStartIndex + nPointIndex);
+				pOverrideData[nPointIndex] = overrideFactor.m_dFactors[nFactorIndex];
+			}
+
+		}
+	}
+
+
+	void CToolpathLayerData::storeHatchOverrides(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, LibMCEnv::sHatch2DOverrides* pOverrideData)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
+
+		auto pSegment = &m_Segments[nSegmentIndex];
+		uint32_t nPointCount = pSegment->m_PointCount;
+		uint32_t nHatchCount = nPointCount / 2;
+		uint32_t nStartIndex = pSegment->m_PointStartIndex;
+		if (pSegment->m_PointCount > 0) {
+
+			uint32_t nFactorIndex = 0;
+			switch (eOverrideFactor) {
+			case LibMCEnv::eToolpathProfileOverrideFactor::FactorF: {
+				nFactorIndex = 0;
+				break;
+			}
+			case LibMCEnv::eToolpathProfileOverrideFactor::FactorG: {
+				nFactorIndex = 1;
+				break;
+			}
+			case LibMCEnv::eToolpathProfileOverrideFactor::FactorH: {
+				nFactorIndex = 2;
+				break;
+			}
+			default:
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX, std::to_string((int)eOverrideFactor));
+
+			}
+
+			auto pTarget = &pOverrideData[0];
+			for (uint32_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
+				auto& overrideFactor1 = m_OverrideFactors.at(nStartIndex + nHatchIndex * 2);
+				auto& overrideFactor2 = m_OverrideFactors.at(nStartIndex + nHatchIndex * 2 + 1);
+				pTarget->m_Point1Override = overrideFactor1.m_dFactors[nFactorIndex];
+				pTarget->m_Point2Override = overrideFactor2.m_dFactors[nFactorIndex];
+			}
+
+		}
+
+	}
+
+
 	void CToolpathLayerData::calculateExtents(int32_t & nMinX, int32_t & nMinY, int32_t & nMaxX, int32_t & nMaxY)
 	{
 		nMinX = 0;

@@ -635,6 +635,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_JOURNALRECORDINGCHUNKISEMPTY 618 /** Journal recording chunk is empty. */
 #define LIBMC_ERROR_INVALIDHATCHOVERRIDECOUNT 619 /** Invalid hatch override count. */
 #define LIBMC_ERROR_INVALIDPOINTOVERRIDECOUNT 620 /** Invalid point override count. */
+#define LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX 621 /** Invalid override factor index. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1182,6 +1183,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_JOURNALRECORDINGCHUNKISEMPTY: return "Journal recording chunk is empty.";
     case LIBMC_ERROR_INVALIDHATCHOVERRIDECOUNT: return "Invalid hatch override count.";
     case LIBMC_ERROR_INVALIDPOINTOVERRIDECOUNT: return "Invalid point override count.";
+    case LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX: return "Invalid override factor index.";
     default: return "unknown error";
   }
 }

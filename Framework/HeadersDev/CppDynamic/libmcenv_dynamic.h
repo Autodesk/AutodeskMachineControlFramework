@@ -2487,51 +2487,51 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_FindCustomSegmentAttributeInfoPt
 * Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[out] pHatchCount - Hatch count of segment.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint32 * pHatchCount);
 
 /**
 * Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[out] pHatchCount - Hatch count of segment.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint32 * pHatchCount);
 
 /**
 * Retrieves the assigned segment profile uuid.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nProfileUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pProfileUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pProfileUUIDBuffer -  buffer of Segment Profile UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nProfileUUIDBufferSize, LibMCEnv_uint32* pProfileUUIDNeededChars, char * pProfileUUIDBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint32 nProfileUUIDBufferSize, LibMCEnv_uint32* pProfileUUIDNeededChars, char * pProfileUUIDBuffer);
 
 /**
 * Retrieves an assigned profile custom value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[out] pHasValue - Returns true if value exist.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentProfileHasValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, bool * pHasValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentProfileHasValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, bool * pHasValue);
 
 /**
 * Retrieves an assigned profile custom value. Fails if value does not exist.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
@@ -2539,13 +2539,13 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentProfileHasValuePtr) (LibM
 * @param[out] pValueBuffer -  buffer of String Value., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Retrieves an assigned profile custom value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] pDefaultValue - Default value if value does not exist.
@@ -2554,175 +2554,212 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibM
 * @param[out] pValueBuffer -  buffer of String Value., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[out] pValue - Double Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, LibMCEnv_double * pValue);
 
 /**
 * Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] dDefaultValue - Default value if value does not exist.
 * @param[out] pValue - Double Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
 
 /**
 * Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[out] pValue - Integer Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, LibMCEnv_int64 * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, LibMCEnv_int64 * pValue);
 
 /**
 * Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] nDefaultValue - Default value if value does not exist.
 * @param[out] pValue - Integer Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue);
 
 /**
 * Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[out] pValue - Boolean Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileBoolValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, bool * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileBoolValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, bool * pValue);
 
 /**
 * Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] bDefaultValue - Default value if value does not exist.
 * @param[out] pValue - Boolean Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileBoolValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, bool bDefaultValue, bool * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileBoolValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, bool bDefaultValue, bool * pValue);
 
 /**
 * Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] eValueType - Enum to query for. MUST NOT be custom.
 * @param[out] pValue - Double Value
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
 
 /**
 * Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] eValueType - Enum to query for. MUST NOT be custom.
 * @param[in] dDefaultValue - Default value if value does not exist.
 * @param[out] pValue - Double Value
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
 
 /**
 * Retrieves the assigned segment part uuid.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nPartUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pPartUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pPartUUIDBuffer -  buffer of Segment Part UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPartUUIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nPartUUIDBufferSize, LibMCEnv_uint32* pPartUUIDNeededChars, char * pPartUUIDBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPartUUIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint32 nPartUUIDBufferSize, LibMCEnv_uint32* pPartUUIDNeededChars, char * pPartUUIDBuffer);
 
 /**
 * Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[out] pLocalPartID - Local Part ID of the segment
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pLocalPartID);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint32 * pLocalPartID);
 
 /**
 * Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nPointDataBufferSize - Number of elements in buffer
 * @param[out] pPointDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pPointDataBuffer - Position2D  buffer of The point data array. Positions are absolute in units.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer);
 
 /**
 * Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nHatchDataBufferSize - Number of elements in buffer
 * @param[out] pHatchDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pHatchDataBuffer - Hatch2D  buffer of The hatch data array. Positions are absolute in units.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer);
 
 /**
 * Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nPointDataBufferSize - Number of elements in buffer
 * @param[out] pPointDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pPointDataBuffer - FloatPosition2D  buffer of The point data array. Positions are absolute in mm.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer);
 
 /**
 * Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nHatchDataBufferSize - Number of elements in buffer
 * @param[out] pHatchDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pHatchDataBuffer - FloatHatch2D  buffer of The hatch data array. Positions are absolute in mm.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer);
+
+/**
+* Returns if a segment has override factors attached to its points.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+* @param[out] pHasOverrideFactors - Returns true if the Segment given has an override factor of a certain type.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentHasOverrideFactorsPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, bool * pHasOverrideFactors);
+
+/**
+* Retrieves factor overrides for a specific segment. For type hatch, the points are taken pairwise.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+* @param[in] nOverrideDataBufferSize - Number of elements in buffer
+* @param[out] pOverrideDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pOverrideDataBuffer - double  buffer of The override factor array. Will return as many override factors as points in the segment.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointOverridesPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, const LibMCEnv_uint64 nOverrideDataBufferSize, LibMCEnv_uint64* pOverrideDataNeededCount, LibMCEnv_double * pOverrideDataBuffer);
+
+/**
+* Retrieves factor overrides for a specific segment. Fails if segment type is not hatch.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+* @param[in] nOverrideDataBufferSize - Number of elements in buffer
+* @param[out] pOverrideDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pOverrideDataBuffer - Hatch2DOverrides  buffer of The override factor array. Will return as many override factors as hatches in the segment. Each element contains one factor for the first point or the second point.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchOverridesPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, const LibMCEnv_uint64 nOverrideDataBufferSize, LibMCEnv_uint64* pOverrideDataNeededCount, LibMCEnv::sHatch2DOverrides * pOverrideDataBuffer);
 
 /**
 * Retrieves the layers Z Value in units.
@@ -9107,6 +9144,9 @@ typedef struct {
 	PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr m_ToolpathLayer_GetSegmentHatchData;
 	PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr m_ToolpathLayer_GetSegmentPointDataInMM;
 	PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr m_ToolpathLayer_GetSegmentHatchDataInMM;
+	PLibMCEnvToolpathLayer_SegmentHasOverrideFactorsPtr m_ToolpathLayer_SegmentHasOverrideFactors;
+	PLibMCEnvToolpathLayer_GetSegmentPointOverridesPtr m_ToolpathLayer_GetSegmentPointOverrides;
+	PLibMCEnvToolpathLayer_GetSegmentHatchOverridesPtr m_ToolpathLayer_GetSegmentHatchOverrides;
 	PLibMCEnvToolpathLayer_GetZValuePtr m_ToolpathLayer_GetZValue;
 	PLibMCEnvToolpathLayer_GetZValueInMMPtr m_ToolpathLayer_GetZValueInMM;
 	PLibMCEnvToolpathLayer_GetUnitsPtr m_ToolpathLayer_GetUnits;

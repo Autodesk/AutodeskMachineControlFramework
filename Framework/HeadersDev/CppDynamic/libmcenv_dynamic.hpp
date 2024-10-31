@@ -1726,26 +1726,29 @@ public:
 	inline LibMCEnv_uint32 FindCustomSegmentAttributeID(const std::string & sNamespace, const std::string & sAttributeName);
 	inline eToolpathAttributeType FindCustomSegmentAttributeType(const std::string & sNamespace, const std::string & sAttributeName);
 	inline void FindCustomSegmentAttributeInfo(const std::string & sNamespace, const std::string & sAttributeName, LibMCEnv_uint32 & nAttributeID, eToolpathAttributeType & eAttributeType);
-	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex);
-	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex);
-	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
-	inline bool SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue);
-	inline LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue);
-	inline LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue);
-	inline bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue);
-	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
-	inline LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue);
-	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
-	inline LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex);
-	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
-	inline void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer);
-	inline void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer);
-	inline void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatHatch2D> & HatchDataBuffer);
+	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nSegmentIndex);
+	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nSegmentIndex);
+	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nSegmentIndex);
+	inline bool SegmentProfileHasValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue);
+	inline LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue);
+	inline LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue);
+	inline bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue);
+	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileValueType eValueType);
+	inline LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue);
+	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nSegmentIndex);
+	inline LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nSegmentIndex);
+	inline void GetSegmentPointData(const LibMCEnv_uint32 nSegmentIndex, std::vector<sPosition2D> & PointDataBuffer);
+	inline void GetSegmentHatchData(const LibMCEnv_uint32 nSegmentIndex, std::vector<sHatch2D> & HatchDataBuffer);
+	inline void GetSegmentPointDataInMM(const LibMCEnv_uint32 nSegmentIndex, std::vector<sFloatPosition2D> & PointDataBuffer);
+	inline void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nSegmentIndex, std::vector<sFloatHatch2D> & HatchDataBuffer);
+	inline bool SegmentHasOverrideFactors(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor);
+	inline void GetSegmentPointOverrides(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<LibMCEnv_double> & OverrideDataBuffer);
+	inline void GetSegmentHatchOverrides(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<sHatch2DOverrides> & OverrideDataBuffer);
 	inline LibMCEnv_int32 GetZValue();
 	inline LibMCEnv_double GetZValueInMM();
 	inline LibMCEnv_double GetUnits();
@@ -3215,6 +3218,9 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM = nullptr;
+		pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValueInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetUnits = nullptr;
@@ -6070,6 +6076,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors = (PLibMCEnvToolpathLayer_SegmentHasOverrideFactorsPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_segmenthasoverridefactors");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors = (PLibMCEnvToolpathLayer_SegmentHasOverrideFactorsPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_segmenthasoverridefactors");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides = (PLibMCEnvToolpathLayer_GetSegmentPointOverridesPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentpointoverrides");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides = (PLibMCEnvToolpathLayer_GetSegmentPointOverridesPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentpointoverrides");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides = (PLibMCEnvToolpathLayer_GetSegmentHatchOverridesPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchoverrides");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides = (PLibMCEnvToolpathLayer_GetSegmentHatchOverridesPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchoverrides");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12178,6 +12211,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_segmenthasoverridefactors", (void**)&(pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointoverrides", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenthatchoverrides", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getzvalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetZValue));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetZValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17414,303 +17459,347 @@ public:
 	
 	/**
 	* CToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.
 	*/
-	LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nIndex)
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 resultHatchCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointCount(m_pHandle, nIndex, &resultHatchCount));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointCount(m_pHandle, nSegmentIndex, &resultHatchCount));
 		
 		return resultHatchCount;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentHatchCount - Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.
 	*/
-	LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nIndex)
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 resultHatchCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchCount(m_pHandle, nIndex, &resultHatchCount));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchCount(m_pHandle, nSegmentIndex, &resultHatchCount));
 		
 		return resultHatchCount;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileUUID - Retrieves the assigned segment profile uuid.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Segment Profile UUID
 	*/
-	std::string CToolpathLayer::GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex)
+	std::string CToolpathLayer::GetSegmentProfileUUID(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 bytesNeededProfileUUID = 0;
 		LibMCEnv_uint32 bytesWrittenProfileUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileUUID(m_pHandle, nIndex, 0, &bytesNeededProfileUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileUUID(m_pHandle, nSegmentIndex, 0, &bytesNeededProfileUUID, nullptr));
 		std::vector<char> bufferProfileUUID(bytesNeededProfileUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileUUID(m_pHandle, nIndex, bytesNeededProfileUUID, &bytesWrittenProfileUUID, &bufferProfileUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileUUID(m_pHandle, nSegmentIndex, bytesNeededProfileUUID, &bytesWrittenProfileUUID, &bufferProfileUUID[0]));
 		
 		return std::string(&bufferProfileUUID[0]);
 	}
 	
 	/**
 	* CToolpathLayer::SegmentProfileHasValue - Retrieves an assigned profile custom value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Returns true if value exist.
 	*/
-	bool CToolpathLayer::SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	bool CToolpathLayer::SegmentProfileHasValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		bool resultHasValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentProfileHasValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultHasValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentProfileHasValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), &resultHasValue));
 		
 		return resultHasValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value. Fails if value does not exist.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileValueDef - Retrieves an assigned profile custom value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] sDefaultValue - Default value if value does not exist.
 	* @return String Value.
 	*/
-	std::string CToolpathLayer::GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue)
+	std::string CToolpathLayer::GetSegmentProfileValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileDoubleValue - Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Double Value.
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileDoubleValueDef - Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] dDefaultValue - Default value if value does not exist.
 	* @return Double Value.
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), dDefaultValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), dDefaultValue, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileIntegerValue - Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Integer Value.
 	*/
-	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		LibMCEnv_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileIntegerValueDef - Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] nDefaultValue - Default value if value does not exist.
 	* @return Integer Value.
 	*/
-	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue)
+	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue)
 	{
 		LibMCEnv_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), nDefaultValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), nDefaultValue, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileBoolValue - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Boolean Value.
 	*/
-	bool CToolpathLayer::GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	bool CToolpathLayer::GetSegmentProfileBoolValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileBoolValueDef - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] bDefaultValue - Default value if value does not exist.
 	* @return Boolean Value.
 	*/
-	bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue)
+	bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue)
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), bDefaultValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), bDefaultValue, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileValueType eValueType)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, nIndex, eValueType, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, nSegmentIndex, eValueType, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileTypedValueDef - Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @param[in] dDefaultValue - Default value if value does not exist.
 	* @return Double Value
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValueDef(m_pHandle, nIndex, eValueType, dDefaultValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValueDef(m_pHandle, nSegmentIndex, eValueType, dDefaultValue, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Segment Part UUID
 	*/
-	std::string CToolpathLayer::GetSegmentPartUUID(const LibMCEnv_uint32 nIndex)
+	std::string CToolpathLayer::GetSegmentPartUUID(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 bytesNeededPartUUID = 0;
 		LibMCEnv_uint32 bytesWrittenPartUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nIndex, 0, &bytesNeededPartUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nSegmentIndex, 0, &bytesNeededPartUUID, nullptr));
 		std::vector<char> bufferPartUUID(bytesNeededPartUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nIndex, bytesNeededPartUUID, &bytesWrittenPartUUID, &bufferPartUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nSegmentIndex, bytesNeededPartUUID, &bytesWrittenPartUUID, &bufferPartUUID[0]));
 		
 		return std::string(&bufferPartUUID[0]);
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentLocalPartID - Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Local Part ID of the segment
 	*/
-	LibMCEnv_uint32 CToolpathLayer::GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex)
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentLocalPartID(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 resultLocalPartID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentLocalPartID(m_pHandle, nIndex, &resultLocalPartID));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentLocalPartID(m_pHandle, nSegmentIndex, &resultLocalPartID));
 		
 		return resultLocalPartID;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentPointData - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] PointDataBuffer - The point data array. Positions are absolute in units.
 	*/
-	void CToolpathLayer::GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer)
+	void CToolpathLayer::GetSegmentPointData(const LibMCEnv_uint32 nSegmentIndex, std::vector<sPosition2D> & PointDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededPointData = 0;
 		LibMCEnv_uint64 elementsWrittenPointData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nIndex, 0, &elementsNeededPointData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nSegmentIndex, 0, &elementsNeededPointData, nullptr));
 		PointDataBuffer.resize((size_t) elementsNeededPointData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nSegmentIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentHatchData - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] HatchDataBuffer - The hatch data array. Positions are absolute in units.
 	*/
-	void CToolpathLayer::GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer)
+	void CToolpathLayer::GetSegmentHatchData(const LibMCEnv_uint32 nSegmentIndex, std::vector<sHatch2D> & HatchDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededHatchData = 0;
 		LibMCEnv_uint64 elementsWrittenHatchData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nIndex, 0, &elementsNeededHatchData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nSegmentIndex, 0, &elementsNeededHatchData, nullptr));
 		HatchDataBuffer.resize((size_t) elementsNeededHatchData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nSegmentIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentPointDataInMM - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] PointDataBuffer - The point data array. Positions are absolute in mm.
 	*/
-	void CToolpathLayer::GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer)
+	void CToolpathLayer::GetSegmentPointDataInMM(const LibMCEnv_uint32 nSegmentIndex, std::vector<sFloatPosition2D> & PointDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededPointData = 0;
 		LibMCEnv_uint64 elementsWrittenPointData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nIndex, 0, &elementsNeededPointData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nSegmentIndex, 0, &elementsNeededPointData, nullptr));
 		PointDataBuffer.resize((size_t) elementsNeededPointData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nSegmentIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentHatchDataInMM - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] HatchDataBuffer - The hatch data array. Positions are absolute in mm.
 	*/
-	void CToolpathLayer::GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatHatch2D> & HatchDataBuffer)
+	void CToolpathLayer::GetSegmentHatchDataInMM(const LibMCEnv_uint32 nSegmentIndex, std::vector<sFloatHatch2D> & HatchDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededHatchData = 0;
 		LibMCEnv_uint64 elementsWrittenHatchData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nIndex, 0, &elementsNeededHatchData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nSegmentIndex, 0, &elementsNeededHatchData, nullptr));
 		HatchDataBuffer.resize((size_t) elementsNeededHatchData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nSegmentIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::SegmentHasOverrideFactors - Returns if a segment has override factors attached to its points.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @return Returns true if the Segment given has an override factor of a certain type.
+	*/
+	bool CToolpathLayer::SegmentHasOverrideFactors(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor)
+	{
+		bool resultHasOverrideFactors = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentHasOverrideFactors(m_pHandle, nSegmentIndex, eOverrideFactor, &resultHasOverrideFactors));
+		
+		return resultHasOverrideFactors;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentPointOverrides - Retrieves factor overrides for a specific segment. For type hatch, the points are taken pairwise.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @param[out] OverrideDataBuffer - The override factor array. Will return as many override factors as points in the segment.
+	*/
+	void CToolpathLayer::GetSegmentPointOverrides(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<LibMCEnv_double> & OverrideDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededOverrideData = 0;
+		LibMCEnv_uint64 elementsWrittenOverrideData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointOverrides(m_pHandle, nSegmentIndex, eOverrideFactor, 0, &elementsNeededOverrideData, nullptr));
+		OverrideDataBuffer.resize((size_t) elementsNeededOverrideData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointOverrides(m_pHandle, nSegmentIndex, eOverrideFactor, elementsNeededOverrideData, &elementsWrittenOverrideData, OverrideDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentHatchOverrides - Retrieves factor overrides for a specific segment. Fails if segment type is not hatch.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @param[out] OverrideDataBuffer - The override factor array. Will return as many override factors as hatches in the segment. Each element contains one factor for the first point or the second point.
+	*/
+	void CToolpathLayer::GetSegmentHatchOverrides(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<sHatch2DOverrides> & OverrideDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededOverrideData = 0;
+		LibMCEnv_uint64 elementsWrittenOverrideData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchOverrides(m_pHandle, nSegmentIndex, eOverrideFactor, 0, &elementsNeededOverrideData, nullptr));
+		OverrideDataBuffer.resize((size_t) elementsNeededOverrideData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchOverrides(m_pHandle, nSegmentIndex, eOverrideFactor, elementsNeededOverrideData, &elementsWrittenOverrideData, OverrideDataBuffer.data()));
 	}
 	
 	/**

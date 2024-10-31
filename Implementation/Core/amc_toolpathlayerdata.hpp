@@ -175,6 +175,12 @@ namespace AMC {
 		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 
 		void calculateExtents(int32_t & nMinX, int32_t & nMinY, int32_t & nMaxX, int32_t & nMaxY);
+
+		bool segmentHasOverrideFactors(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor);
+
+		void storePointOverrides(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, double * pOverrideData);
+
+		void storeHatchOverrides(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, LibMCEnv::sHatch2DOverrides* pOverrideData);
 	};
 
 

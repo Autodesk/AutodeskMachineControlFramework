@@ -657,6 +657,13 @@ namespace LibMCEnv {
     LaserFocus = 13
   };
   
+  enum class eToolpathProfileOverrideFactor : LibMCEnv_int32 {
+    Unknown = 0,
+    FactorF = 1,
+    FactorG = 2,
+    FactorH = 3
+  };
+  
   enum class eMessageDialogType : LibMCEnv_int32 {
     Unknown = 0,
     DialogOK = 1,
@@ -729,6 +736,11 @@ namespace LibMCEnv {
       LibMCEnv_double m_Y2;
   } sFloatHatch2D;
   
+  typedef struct sHatch2DOverrides {
+      LibMCEnv_double m_Point1Override;
+      LibMCEnv_double m_Point2Override;
+  } sHatch2DOverrides;
+  
   typedef struct sModelDataTransform {
       LibMCEnv_double m_Matrix[3][3];
       LibMCEnv_double m_Translation[3];
@@ -757,6 +769,7 @@ typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
+typedef LibMCEnv::eToolpathProfileOverrideFactor eLibMCEnvToolpathProfileOverrideFactor;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
 typedef LibMCEnv::eDataTableColumnType eLibMCEnvDataTableColumnType;
@@ -768,6 +781,7 @@ typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;
 typedef LibMCEnv::sFieldData2DPoint sLibMCEnvFieldData2DPoint;
 typedef LibMCEnv::sFieldData3DPoint sLibMCEnvFieldData3DPoint;
 typedef LibMCEnv::sFloatHatch2D sLibMCEnvFloatHatch2D;
+typedef LibMCEnv::sHatch2DOverrides sLibMCEnvHatch2DOverrides;
 typedef LibMCEnv::sModelDataTransform sLibMCEnvModelDataTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
 typedef LibMCEnv::sTimeStreamEntry sLibMCEnvTimeStreamEntry;
