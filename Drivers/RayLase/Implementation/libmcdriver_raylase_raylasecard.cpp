@@ -34,7 +34,6 @@ Abstract: This is a stub class definition of CRaylaseCard
 #include "libmcdriver_raylase_raylasecard.hpp"
 #include "libmcdriver_raylase_interfaceexception.hpp"
 
-
 using namespace LibMCDriver_Raylase::Impl;
 
 
@@ -109,6 +108,8 @@ LibMCDriver_Raylase_uint32 CRaylaseCard::GetAssignedLaserIndex()
 
 void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
 {
+    bool bVerbose = true;
+
     if (m_pRaylaseCardImpl->isSimulationMode ())
         return;
 
@@ -117,14 +118,30 @@ void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_
     uint64_t nStartTime = pDriverEnvironment->GetGlobalTimerInMilliseconds();
 
     auto pToolpathAccessor = pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+
+	if (bVerbose)
+    	pDriverEnvironment->LogMessage("Loading layer");
+
     auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
     auto pList = m_pRaylaseCardImpl->createNewList();
+	if (bVerbose)
+    	pDriverEnvironment->LogMessage("Adding Layer to List");
+
     pList->addLayerToList(pLayer, 0, false);
+    
+	if (bVerbose)
+    	pDriverEnvironment->LogMessage("Set List on Card");
+
     pList->setListOnCard(0);
+	if (bVerbose)
+    	pDriverEnvironment->LogMessage("ExecuteList");
+
     pList->executeList(0);
     bool done = false;
     while (!done) {
+		if (bVerbose)
+	        pDriverEnvironment->LogMessage("Waiting for execution");
 
         uint64_t nCurrentTime = pDriverEnvironment->GetGlobalTimerInMilliseconds();
         if (nCurrentTime < nStartTime)
@@ -133,10 +150,20 @@ void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_
         uint64_t nMillisecondsPassed = nCurrentTime - nStartTime;
         if (nMillisecondsPassed > nScanningTimeoutInMS)
             throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT);
-
+        
         done = pList->waitForExecution(100);
+		if (bVerbose)
+	        pDriverEnvironment->LogMessage("Waiting for execution.. Done: " + std::to_string ((int) done));
+
     }
+
+	if (bVerbose)
+    	pDriverEnvironment->LogMessage("Deleting list from card");
+
     pList->deleteListListOnCard();
+
+	if (bVerbose)
+    	pDriverEnvironment->LogMessage("Layer exposure finished");
 }
 
 bool CRaylaseCard::IsConnected()
