@@ -243,9 +243,10 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_rayla
 * @param[in] pRaylaseCard - RaylaseCard instance.
 * @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 * @param[in] nLayerIndex - Layer index of the build file.
+* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_drawlayer(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex);
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_drawlayer(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 
 /*************************************************************************************************************************
  Class definition for Driver_Raylase
@@ -315,9 +316,10 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 * @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 * @param[in] nLayerIndex - Layer index of the build file.
 * @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_drawlayermultilaser(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists);
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_drawlayermultilaser(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 
 /*************************************************************************************************************************
  Global functions

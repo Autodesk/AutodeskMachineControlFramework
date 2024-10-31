@@ -63,8 +63,9 @@
 		<error name="NOLASERINDICESASSIGNED" code="1011" description="No laser indices have been assigned" />		
 		<error name="INVALIDLISTID" code="1012" description="Invalid list ID" />		
 		<error name="SEGMENTHASNOASSIGNEDCARD" code="1013" description="Segment has no assigned card." />		
-		
-			
+		<error name="INVALIDSYSTEMTIMING" code="1014" description="Invalid system timing" />		
+		<error name="SCANNINGTIMEOUT" code="1015" description="A scanning timeout occured" />		
+						
 				
 	</errors>
 
@@ -188,6 +189,7 @@ Custom implementation
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+			<param name="ScanningTimeoutInMS" type="uint32" pass="in" description="Maximum duration of the scanning process in milliseconds." />
 		</method>
 		
 	
@@ -227,6 +229,7 @@ Custom implementation
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 			<param name="FailIfNonAssignedDataExists" type="bool" pass="in" description="If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card." />
+			<param name="ScanningTimeoutInMS" type="uint32" pass="in" description="Maximum duration of the scanning process in milliseconds." />
 		</method>
 
 	</class>

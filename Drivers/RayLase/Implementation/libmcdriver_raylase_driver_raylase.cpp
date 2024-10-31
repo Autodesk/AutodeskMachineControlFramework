@@ -195,7 +195,7 @@ bool CDriver_Raylase::IsSimulationMode()
     return m_bSimulationMode;
 }
 
-void CDriver_Raylase::DrawLayerMultiLaser(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists)
+void CDriver_Raylase::DrawLayerMultiLaser(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
 {
     std::map <uint32_t, PRaylaseCardImpl> laserMap;
     if (m_bSimulationMode)
@@ -222,6 +222,8 @@ void CDriver_Raylase::DrawLayerMultiLaser(const std::string& sStreamUUID, const 
 
     std::vector<PRaylaseCardList> executionLists;
 
+    uint64_t nStartTime = m_pDriverEnvironment->GetGlobalTimerInMilliseconds();
+
     for (auto iCardIter : laserMap) {
         auto pCard = iCardIter.second;
         uint32_t nLaserIndex = pCard->getAssignedLaserIndex();
@@ -238,6 +240,15 @@ void CDriver_Raylase::DrawLayerMultiLaser(const std::string& sStreamUUID, const 
     while (!allDone) {
         allDone = true;
         for (auto pList : executionLists) {
+
+            uint64_t nCurrentTime = m_pDriverEnvironment->GetGlobalTimerInMilliseconds();
+            if (nCurrentTime < nStartTime)
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING);
+
+            uint64_t nMillisecondsPassed = nCurrentTime - nStartTime;
+            if (nMillisecondsPassed > nScanningTimeoutInMS)
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT);
+
             bool listDone = pList->waitForExecution(100);
             if (!listDone) {
                 allDone = false;

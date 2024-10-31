@@ -619,7 +619,7 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_getassignedlaserindex(
 	}
 }
 
-LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_drawlayer(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex)
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_drawlayer(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
 {
 	IBase* pIBaseClass = (IBase *)pRaylaseCard;
 
@@ -631,7 +631,7 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_drawlayer(LibMCDriver_
 		if (!pIRaylaseCard)
 			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
 		
-		pIRaylaseCard->DrawLayer(sStreamUUID, nLayerIndex);
+		pIRaylaseCard->DrawLayer(sStreamUUID, nLayerIndex, nScanningTimeoutInMS);
 
 		return LIBMCDRIVER_RAYLASE_SUCCESS;
 	}
@@ -816,7 +816,7 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_getconnectedcard(Li
 	}
 }
 
-LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_drawlayermultilaser(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists)
+LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_drawlayermultilaser(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Raylase;
 
@@ -828,7 +828,7 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_drawlayermultilaser
 		if (!pIDriver_Raylase)
 			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
 		
-		pIDriver_Raylase->DrawLayerMultiLaser(sStreamUUID, nLayerIndex, bFailIfNonAssignedDataExists);
+		pIDriver_Raylase->DrawLayerMultiLaser(sStreamUUID, nLayerIndex, bFailIfNonAssignedDataExists, nScanningTimeoutInMS);
 
 		return LIBMCDRIVER_RAYLASE_SUCCESS;
 	}

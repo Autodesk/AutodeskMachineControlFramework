@@ -389,8 +389,9 @@ public:
 	* IRaylaseCard::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
+	* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 	*/
-	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex) = 0;
+	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) = 0;
 
 };
 
@@ -447,8 +448,9 @@ public:
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
 	* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+	* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 	*/
-	virtual void DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists) = 0;
+	virtual void DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) = 0;
 
 };
 

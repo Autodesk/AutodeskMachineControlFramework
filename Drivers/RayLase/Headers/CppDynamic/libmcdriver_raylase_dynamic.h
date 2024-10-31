@@ -230,9 +230,10 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetAssignedL
 * @param[in] pRaylaseCard - RaylaseCard instance.
 * @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 * @param[in] nLayerIndex - Layer index of the build file.
+* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 
 /*************************************************************************************************************************
  Class definition for Driver_Raylase
@@ -302,9 +303,10 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_GetConnec
 * @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 * @param[in] nLayerIndex - Layer index of the build file.
 * @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 
 /*************************************************************************************************************************
  Global functions

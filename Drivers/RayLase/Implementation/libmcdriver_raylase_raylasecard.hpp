@@ -92,7 +92,7 @@ public:
 
 	LibMCDriver_Raylase_uint32 GetAssignedLaserIndex() override;
 
-	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex) override;
+	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) override;
 
 };
 

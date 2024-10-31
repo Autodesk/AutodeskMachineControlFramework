@@ -107,12 +107,14 @@ LibMCDriver_Raylase_uint32 CRaylaseCard::GetAssignedLaserIndex()
     return m_pRaylaseCardImpl->getAssignedLaserIndex();
 }
 
-void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex)
+void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
 {
     if (m_pRaylaseCardImpl->isSimulationMode ())
         return;
 
     auto pDriverEnvironment = m_pRaylaseCardImpl->getDriverEnvironment();
+
+    uint64_t nStartTime = pDriverEnvironment->GetGlobalTimerInMilliseconds();
 
     auto pToolpathAccessor = pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
     auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
@@ -123,7 +125,16 @@ void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_
     pList->executeList(0);
     bool done = false;
     while (!done) {
-        pList->waitForExecution(100);
+
+        uint64_t nCurrentTime = pDriverEnvironment->GetGlobalTimerInMilliseconds();
+        if (nCurrentTime < nStartTime)
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING);
+
+        uint64_t nMillisecondsPassed = nCurrentTime - nStartTime;
+        if (nMillisecondsPassed > nScanningTimeoutInMS)
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT);
+
+        done = pList->waitForExecution(100);
     }
     pList->deleteListListOnCard();
 }

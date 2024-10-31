@@ -192,6 +192,8 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED: return "NOLASERINDICESASSIGNED";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID: return "INVALIDLISTID";
 			case LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD: return "SEGMENTHASNOASSIGNEDCARD";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING: return "INVALIDSYSTEMTIMING";
+			case LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT: return "SCANNINGTIMEOUT";
 		}
 		return "UNKNOWN";
 	}
@@ -222,6 +224,8 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED: return "No laser indices have been assigned";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID: return "Invalid list ID";
 			case LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD: return "Segment has no assigned card.";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING: return "Invalid system timing";
+			case LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT: return "A scanning timeout occured";
 		}
 		return "unknown error";
 	}
@@ -455,7 +459,7 @@ public:
 	inline void GetLaserStatus(bool & bPilotIsEnabled, bool & bLaserIsArmed, bool & bLaserAlarm);
 	inline void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex);
 	inline LibMCDriver_Raylase_uint32 GetAssignedLaserIndex();
-	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex);
+	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 };
 	
 /*************************************************************************************************************************
@@ -478,7 +482,7 @@ public:
 	inline void LoadSDK();
 	inline PRaylaseCard ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts);
 	inline PRaylaseCard GetConnectedCard(const std::string & sCardName);
-	inline void DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists);
+	inline void DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 };
 	
 	/**
@@ -1344,10 +1348,11 @@ public:
 	* CRaylaseCard::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
+	* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 	*/
-	void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex)
+	void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_DrawLayer(m_pHandle, sStreamUUID.c_str(), nLayerIndex));
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_DrawLayer(m_pHandle, sStreamUUID.c_str(), nLayerIndex, nScanningTimeoutInMS));
 	}
 	
 	/**
@@ -1431,10 +1436,11 @@ public:
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
 	* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+	* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 	*/
-	void CDriver_Raylase::DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists)
+	void CDriver_Raylase::DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_DrawLayerMultiLaser(m_pHandle, sStreamUUID.c_str(), nLayerIndex, bFailIfNonAssignedDataExists));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_DrawLayerMultiLaser(m_pHandle, sStreamUUID.c_str(), nLayerIndex, bFailIfNonAssignedDataExists, nScanningTimeoutInMS));
 	}
 
 } // namespace LibMCDriver_Raylase
