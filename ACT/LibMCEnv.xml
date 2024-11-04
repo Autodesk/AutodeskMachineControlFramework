@@ -2742,6 +2742,9 @@
 		<method name="Remove" description="Removes the node from its parent. The root node of the document can not be removed.">
 		</method>
 
+		<method name="CopyFrom" description="Copies all content from another node in a recursive way.">
+			<param name="OtherNode" type="class" class="XMLDocumentNode" pass="in" description="other XML Document Node. Does not need to live in the same document." />
+		</method>
 		
 		
 	</class>
