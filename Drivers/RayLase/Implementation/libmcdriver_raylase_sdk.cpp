@@ -129,6 +129,10 @@ CRaylaseSDK::CRaylaseSDK(const std::string& sDLLNameUTF8)
 	this->ptrListWaitForListIdle = (PrlListWaitForListIdle)_loadRaylaseAddress(hLibrary, "rlListWaitForListIdle");
 	this->ptrListWaitForListDone = (PrlListWaitForListDone)_loadRaylaseAddress(hLibrary, "rlListWaitForListDone");
 	this->ptrListDelete = (PrlListDelete)_loadRaylaseAddress(hLibrary, "rlListDelete");
+	this->ptrListResetExecution = (PrlListResetExecution)_loadRaylaseAddress(hLibrary, "rlListResetExecution");
+	this->ptrListAbortExecution = (PrlListAbortExecution)_loadRaylaseAddress(hLibrary, "rlListAbortExecution");
+	this->ptrListIsExecutionInProgress = (PrlListIsExecutionInProgress)_loadRaylaseAddress(hLibrary, "rlListIsExecutionInProgress");
+
 	this->ptrGetLastError = (PrlGetLastError)_loadRaylaseAddress(hLibrary, "rlGetLastError");
 	this->ptrGetLastErrorLen = (PrlGetLastErrorLen)_loadRaylaseAddress(hLibrary, "rlGetLastErrorLen");
 
@@ -423,6 +427,9 @@ void CRaylaseSDK::resetFunctionPtrs()
 	ptrListWaitForListIdle = nullptr;
 	ptrListWaitForListDone = nullptr;
 	ptrListDelete = nullptr;
+	ptrListResetExecution = nullptr;
+	ptrListAbortExecution = nullptr;
+	ptrListIsExecutionInProgress = nullptr;
 	ptrGetLastError = nullptr;
 	ptrGetLastErrorLen = nullptr;
 	ptrEnableCommandLogging = nullptr;
@@ -934,6 +941,35 @@ rlResult CRaylaseSDK::rlListDelete(rlHandle handle, int32_t listID, bool bFromDi
 
 	return ptrListDelete(handle, listID, bFromDisk);
 
+}
+
+rlResult CRaylaseSDK::rlListResetExecution(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlListResetExecution (" + std::to_string(handle) + "); ");
+	}
+
+	return ptrListResetExecution(handle);
+}
+
+rlResult CRaylaseSDK::rlListAbortExecution(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlListAbortExecution (" + std::to_string(handle) + "); ");
+	}
+
+	return ptrListAbortExecution(handle);
+}
+
+rlResult CRaylaseSDK::rlListIsExecutionInProgress(rlHandle handle, bool & bInProgress)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlListIsExecutionInProgress (" + std::to_string(handle) + ", bIsInProgress); ");
+	}
+
+	bInProgress = false;
+
+	return ptrListIsExecutionInProgress(handle, &bInProgress);
 }
 
 

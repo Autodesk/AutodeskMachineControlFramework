@@ -107,6 +107,8 @@ public:
 	LibMCEnv::PDriverEnvironment getDriverEnvironment ();
 
 	PRaylaseCardList createNewList();
+
+	void abortListExecution();
 };
 
 } // namespace Impl

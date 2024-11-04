@@ -137,28 +137,42 @@ void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_
 	if (bVerbose)
     	pDriverEnvironment->LogMessage("ExecuteList");
 
-    pList->executeList(0);
-    bool done = false;
-    while (!done) {
-		if (bVerbose)
-	        pDriverEnvironment->LogMessage("Waiting for execution");
+    try {
 
-        uint64_t nCurrentTime = pDriverEnvironment->GetGlobalTimerInMilliseconds();
-        if (nCurrentTime < nStartTime)
-            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING);
+        pList->executeList(0);
+        bool done = false;
+        while (!done) {
+            if (bVerbose)
+                pDriverEnvironment->LogMessage("Waiting for execution");
 
-        uint64_t nMillisecondsPassed = nCurrentTime - nStartTime;
-        if (nMillisecondsPassed > nScanningTimeoutInMS)
-            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT);
-        
-        done = pList->waitForExecution(100);
-		if (bVerbose)
-	        pDriverEnvironment->LogMessage("Waiting for execution.. Done: " + std::to_string ((int) done));
+            uint64_t nCurrentTime = pDriverEnvironment->GetGlobalTimerInMilliseconds();
+            if (nCurrentTime < nStartTime)
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING);
+
+            uint64_t nMillisecondsPassed = nCurrentTime - nStartTime;
+            if (nMillisecondsPassed > nScanningTimeoutInMS)
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT);
+
+            done = pList->waitForExecution(100);
+            if (bVerbose)
+                pDriverEnvironment->LogMessage("Waiting for execution.. Done: " + std::to_string((int)done));
+
+        }
+
+        if (bVerbose)
+            pDriverEnvironment->LogMessage("Deleting list from card");
 
     }
+    catch (...)
+    {
+        // Abort execution, if it is still running
+        m_pRaylaseCardImpl->abortListExecution();
 
-	if (bVerbose)
-    	pDriverEnvironment->LogMessage("Deleting list from card");
+        // Always delete list on card
+        pList->deleteListListOnCard();
+
+        throw;
+    }
 
     pList->deleteListListOnCard();
 

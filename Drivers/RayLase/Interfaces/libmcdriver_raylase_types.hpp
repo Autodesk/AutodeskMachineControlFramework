@@ -120,6 +120,7 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD 1013 /** Segment has no assigned card. */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING 1014 /** Invalid system timing */
 #define LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT 1015 /** A scanning timeout occured */
+#define LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS 1016 /** Cannot delete list in progress */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -152,6 +153,7 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD: return "Segment has no assigned card.";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING: return "Invalid system timing";
     case LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT: return "A scanning timeout occured";
+    case LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS: return "Cannot delete list in progress";
     default: return "unknown error";
   }
 }

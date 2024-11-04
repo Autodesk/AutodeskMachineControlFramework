@@ -232,7 +232,6 @@ namespace LibMCDriver_Raylase {
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlLaserReadLaserStatus) (rlHandle handle, uint32_t & laserStatus);
 
 		typedef rlListHandle(RAYLASE_CALLINGCONVENTION* PrlListAllocate) (rlHandle handle);
-
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListReleaseHandle) (rlListHandle handle);		
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendLaserOn) (rlListHandle handle);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendLaserOff) (rlListHandle handle);
@@ -253,6 +252,9 @@ namespace LibMCDriver_Raylase {
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListWaitForListIdle) (rlHandle handle, int32_t timeOutInMilliseconds, bool & successful, int32_t & listID);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListWaitForListDone) (rlHandle handle, int32_t timeOutInMilliseconds, bool& successful, int32_t& listID);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListDelete) (rlHandle handle, int32_t listID, bool bFromDisk);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListResetExecution) (rlHandle handle);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAbortExecution) (rlHandle handle);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListIsExecutionInProgress) (rlHandle handle, bool * pbInProgress);
 
 		typedef void(RAYLASE_CALLINGCONVENTION* PrlGetLastError) (char * pBuffer, int32_t nBufferSize);
 		typedef int32_t(RAYLASE_CALLINGCONVENTION* PrlGetLastErrorLen) ();
@@ -514,6 +516,9 @@ namespace LibMCDriver_Raylase {
 			PrlListWaitForListIdle ptrListWaitForListIdle = nullptr;
 			PrlListWaitForListDone ptrListWaitForListDone = nullptr;
 			PrlListDelete ptrListDelete = nullptr;
+			PrlListResetExecution ptrListResetExecution = nullptr;
+			PrlListAbortExecution ptrListAbortExecution = nullptr;
+			PrlListIsExecutionInProgress ptrListIsExecutionInProgress = nullptr;
 
 			PrlGetLastError ptrGetLastError = nullptr;
 			PrlGetLastErrorLen ptrGetLastErrorLen = nullptr;
@@ -773,6 +778,10 @@ namespace LibMCDriver_Raylase {
 			rlResult rlListWaitForListDone (rlHandle handle, int32_t timeOutInMilliseconds, bool& successful, int32_t& listID);
 			rlResult rlListDelete (rlHandle handle, int32_t listID, bool bFromDisk);
 
+			rlResult rlListResetExecution(rlHandle handle);
+			rlResult rlListAbortExecution(rlHandle handle);
+			rlResult rlListIsExecutionInProgress(rlHandle handle, bool & bInProgress);
+
 			rlResult rlEnableCommandLogging (rlHandle handle, const char* pszPath, int32_t truncateArguments);
 			rlResult rlDisableCommandLogging (rlHandle handle);
 			rlResult rlSetTimeout (rlHandle handle, uint32_t nTimeOut);
@@ -857,7 +866,7 @@ namespace LibMCDriver_Raylase {
 			rlResult rlLaserPowerCalibrationGet (rlHandle handle, eRLPowerChannels powerTargetChannel, const char* pLocalFileName);
 			rlResult rlLaserGetPowerScale (rlHandle handle, eRLPowerChannels powerTargetChannel, double& dPowerScale);
 			rlResult rlLaserSetPowerScale (rlHandle handle, eRLPowerChannels powerTargetChannel, double dPowerScale);
-
+				
 			rlResult rlScannerInitConfig (rlScannerConfig* pConfig);
 			rlResult rlScannerSetConfig (rlHandle handle, rlScannerConfig* pConfig);
 			rlResult rlScannerGetConfig (rlHandle handle, rlScannerConfig* pConfig);

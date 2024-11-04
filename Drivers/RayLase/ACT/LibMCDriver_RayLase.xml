@@ -65,6 +65,8 @@
 		<error name="SEGMENTHASNOASSIGNEDCARD" code="1013" description="Segment has no assigned card." />		
 		<error name="INVALIDSYSTEMTIMING" code="1014" description="Invalid system timing" />		
 		<error name="SCANNINGTIMEOUT" code="1015" description="A scanning timeout occured" />		
+		<error name="CANNOTDELETELISTLISTINPROGRESS" code="1016" description="Cannot delete list in progress" />		
+		
 						
 				
 	</errors>

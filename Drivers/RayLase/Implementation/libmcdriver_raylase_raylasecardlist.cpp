@@ -55,8 +55,14 @@ CRaylaseCardList::CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double
 CRaylaseCardList::~CRaylaseCardList()
 {
     if ((m_pSDK.get() != nullptr) && (m_ListHandle != 0)) {
-        if (m_nListIDOnCard != RAYLASE_LISTONCARDNOTSET)
-            m_pSDK->checkError(m_pSDK->rlListDelete(m_CardHandle, m_nListIDOnCard, true), "rlListDelete");
+        if (m_nListIDOnCard != RAYLASE_LISTONCARDNOTSET) {
+            bool bInProgress = false;
+            m_pSDK->rlListIsExecutionInProgress(m_CardHandle, bInProgress);
+            if (!bInProgress) {
+                // Deleting the list is not possible if it is in progress...
+                m_pSDK->checkError(m_pSDK->rlListDelete(m_CardHandle, m_nListIDOnCard, true), "rlListDelete");
+            }
+        }
         m_nListIDOnCard = RAYLASE_LISTONCARDNOTSET;
 
         m_pSDK->checkError(m_pSDK->rlListReleaseHandle(m_ListHandle), "rlListReleaseHandle");
@@ -204,8 +210,15 @@ void CRaylaseCardList::setListOnCard(uint32_t nListIDOnCard)
 
 void CRaylaseCardList::deleteListListOnCard ()
 {
-    if (m_nListIDOnCard != RAYLASE_LISTONCARDNOTSET)
+    if (m_nListIDOnCard != RAYLASE_LISTONCARDNOTSET) {
+
+        bool bInProgress = false;
+        m_pSDK->rlListIsExecutionInProgress(m_CardHandle, bInProgress);
+        if (bInProgress)
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS);
+
         m_pSDK->checkError(m_pSDK->rlListDelete(m_CardHandle, m_nListIDOnCard, true), "rlListDelete");
+    }
     m_nListIDOnCard = RAYLASE_LISTONCARDNOTSET;
 }
 

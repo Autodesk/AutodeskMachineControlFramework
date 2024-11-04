@@ -227,4 +227,12 @@ PRaylaseCardList CRaylaseCardImpl::createNewList()
     return std::make_shared<CRaylaseCardList>(m_pSDK, m_Handle, m_dMaxLaserPowerInWatts);
 }
 
+void CRaylaseCardImpl::abortListExecution()
+{
+    bool bInProgress = false;
+    m_pSDK->checkError(m_pSDK->rlListIsExecutionInProgress(m_Handle, bInProgress));
+
+    if (bInProgress)
+        m_pSDK->checkError(m_pSDK->rlListAbortExecution(m_Handle));
+}
 
