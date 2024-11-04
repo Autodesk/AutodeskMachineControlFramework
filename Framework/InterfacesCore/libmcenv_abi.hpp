@@ -4734,6 +4734,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_removechildrenwithname
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_remove(LibMCEnv_XMLDocumentNode pXMLDocumentNode);
 
+/**
+* Copies all content from another node in a recursive way.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pOtherNode - other XML Document Node. Does not need to live in the same document.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentnode_copyfrom(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_XMLDocumentNode pOtherNode);
+
 /*************************************************************************************************************************
  Class definition for XMLDocumentNodes
 **************************************************************************************************************************/

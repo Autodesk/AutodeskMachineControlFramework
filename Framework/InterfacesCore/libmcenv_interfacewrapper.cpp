@@ -13884,6 +13884,35 @@ LibMCEnvResult libmcenv_xmldocumentnode_remove(LibMCEnv_XMLDocumentNode pXMLDocu
 	}
 }
 
+LibMCEnvResult libmcenv_xmldocumentnode_copyfrom(LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_XMLDocumentNode pOtherNode)
+{
+	IBase* pIBaseClass = (IBase *)pXMLDocumentNode;
+
+	try {
+		IBase* pIBaseClassOtherNode = (IBase *)pOtherNode;
+		IXMLDocumentNode* pIOtherNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClassOtherNode);
+		if (!pIOtherNode)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IXMLDocumentNode* pIXMLDocumentNode = dynamic_cast<IXMLDocumentNode*>(pIBaseClass);
+		if (!pIXMLDocumentNode)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIXMLDocumentNode->CopyFrom(pIOtherNode);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for XMLDocumentNodes
@@ -27416,6 +27445,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_removechildrenwithname;
 	if (sProcName == "libmcenv_xmldocumentnode_remove") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_remove;
+	if (sProcName == "libmcenv_xmldocumentnode_copyfrom") 
+		*ppProcAddress = (void*) &libmcenv_xmldocumentnode_copyfrom;
 	if (sProcName == "libmcenv_xmldocumentnodes_getnodecount") 
 		*ppProcAddress = (void*) &libmcenv_xmldocumentnodes_getnodecount;
 	if (sProcName == "libmcenv_xmldocumentnodes_getnode") 

@@ -3825,6 +3825,12 @@ public:
 	*/
 	virtual void Remove() = 0;
 
+	/**
+	* IXMLDocumentNode::CopyFrom - Copies all content from another node in a recursive way.
+	* @param[in] pOtherNode - other XML Document Node. Does not need to live in the same document.
+	*/
+	virtual void CopyFrom(IXMLDocumentNode* pOtherNode) = 0;
+
 };
 
 typedef IBaseSharedPtr<IXMLDocumentNode> PIXMLDocumentNode;

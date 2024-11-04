@@ -137,6 +137,8 @@ public:
 
 	void Remove() override;
 
+	void CopyFrom(IXMLDocumentNode* pOtherNode) override;
+
 };
 
 } // namespace Impl

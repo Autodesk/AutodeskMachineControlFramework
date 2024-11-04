@@ -4721,6 +4721,15 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_RemoveChildrenWithNamePtr) (Li
 */
 typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_RemovePtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode);
 
+/**
+* Copies all content from another node in a recursive way.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pOtherNode - other XML Document Node. Does not need to live in the same document.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_CopyFromPtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_XMLDocumentNode pOtherNode);
+
 /*************************************************************************************************************************
  Class definition for XMLDocumentNodes
 **************************************************************************************************************************/
@@ -9328,6 +9337,7 @@ typedef struct {
 	PLibMCEnvXMLDocumentNode_RemoveChildPtr m_XMLDocumentNode_RemoveChild;
 	PLibMCEnvXMLDocumentNode_RemoveChildrenWithNamePtr m_XMLDocumentNode_RemoveChildrenWithName;
 	PLibMCEnvXMLDocumentNode_RemovePtr m_XMLDocumentNode_Remove;
+	PLibMCEnvXMLDocumentNode_CopyFromPtr m_XMLDocumentNode_CopyFrom;
 	PLibMCEnvXMLDocumentNodes_GetNodeCountPtr m_XMLDocumentNodes_GetNodeCount;
 	PLibMCEnvXMLDocumentNodes_GetNodePtr m_XMLDocumentNodes_GetNode;
 	PLibMCEnvXMLDocumentNodes_CountNodesByNamePtr m_XMLDocumentNodes_CountNodesByName;

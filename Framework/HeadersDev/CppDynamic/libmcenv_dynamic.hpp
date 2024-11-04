@@ -2090,6 +2090,7 @@ public:
 	inline void RemoveChild(classParam<CXMLDocumentNode> pChildInstance);
 	inline void RemoveChildrenWithName(const std::string & sNameSpace, const std::string & sName);
 	inline void Remove();
+	inline void CopyFrom(classParam<CXMLDocumentNode> pOtherNode);
 };
 	
 /*************************************************************************************************************************
@@ -3402,6 +3403,7 @@ public:
 		pWrapperTable->m_XMLDocumentNode_RemoveChild = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName = nullptr;
 		pWrapperTable->m_XMLDocumentNode_Remove = nullptr;
+		pWrapperTable->m_XMLDocumentNode_CopyFrom = nullptr;
 		pWrapperTable->m_XMLDocumentNodes_GetNodeCount = nullptr;
 		pWrapperTable->m_XMLDocumentNodes_GetNode = nullptr;
 		pWrapperTable->m_XMLDocumentNodes_CountNodesByName = nullptr;
@@ -7732,6 +7734,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentNode_Remove == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_CopyFrom = (PLibMCEnvXMLDocumentNode_CopyFromPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_copyfrom");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_CopyFrom = (PLibMCEnvXMLDocumentNode_CopyFromPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_copyfrom");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_CopyFrom == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12945,6 +12956,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_remove", (void**)&(pWrapperTable->m_XMLDocumentNode_Remove));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_Remove == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_copyfrom", (void**)&(pWrapperTable->m_XMLDocumentNode_CopyFrom));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_CopyFrom == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_getnodecount", (void**)&(pWrapperTable->m_XMLDocumentNodes_GetNodeCount));
@@ -20424,6 +20439,16 @@ public:
 	void CXMLDocumentNode::Remove()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_Remove(m_pHandle));
+	}
+	
+	/**
+	* CXMLDocumentNode::CopyFrom - Copies all content from another node in a recursive way.
+	* @param[in] pOtherNode - other XML Document Node. Does not need to live in the same document.
+	*/
+	void CXMLDocumentNode::CopyFrom(classParam<CXMLDocumentNode> pOtherNode)
+	{
+		LibMCEnvHandle hOtherNode = pOtherNode.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_CopyFrom(m_pHandle, hOtherNode));
 	}
 	
 	/**
