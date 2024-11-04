@@ -62,6 +62,8 @@ class CRaylaseCardList
 		// Laser Index Filter of 0 means no filter.
 		void addLayerToList (LibMCEnv::PToolpathLayer pLayer, uint32_t nLaserIndexFilter, bool bFailIfNonAssignedDataExists);
 
+		void appendPowerInWatts(double dPowerInWatts);
+
 		void setListOnCard(uint32_t nListIDOnCard);
 
 		void deleteListListOnCard();

@@ -71,6 +71,20 @@ CRaylaseCardList::~CRaylaseCardList()
     m_ListHandle = 0;
 }
 
+void CRaylaseCardList::appendPowerInWatts(double dPowerInWatts)
+{
+    double dPowerFactor = (dPowerInWatts / m_dMaxLaserPowerInWatts);
+    int32_t nPowerInUnits = (int32_t)(dPowerFactor * 65535.0);
+    if (nPowerInUnits < 0)
+        nPowerInUnits = 0;
+    if (nPowerInUnits > 65535)
+        nPowerInUnits = 65535;
+
+    m_pSDK->checkError(m_pSDK->rlListAppendPower(m_ListHandle, nPowerInUnits, eRLPowerChannels::ptcAllChannels), "rlListAppendPower");
+
+}
+
+
 void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t nLaserIndexFilter, bool bFailIfNonAssignedDataExists)
 {
     if (pLayer.get() == nullptr)
@@ -106,22 +120,21 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
         if ((nPointCount >= 2) && bDrawSegment) {
 
+            bool bSegmentHasPowerPerVector = pLayer->SegmentHasOverrideFactors(nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor::FactorF);
+
             double dJumpSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
             double dMarkSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
-            double dPowerInWatts = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
-            double dPowerFactor = (dPowerInWatts / m_dMaxLaserPowerInWatts);
-            int32_t nPowerInUnits = (int32_t)(dPowerFactor * 65535.0);
-            if (nPowerInUnits < 0)
-                nPowerInUnits = 0;
-            if (nPowerInUnits > 65535)
-                nPowerInUnits = 65535;
 
             double dJumpSpeedInMeterPerSecond = dJumpSpeedInMMPerSecond * 0.001;
             double dMarkSpeedInMeterPerSecond = dMarkSpeedInMMPerSecond * 0.001;
 
             m_pSDK->checkError(m_pSDK->rlListAppendJumpSpeed(m_ListHandle, dJumpSpeedInMeterPerSecond), "rlListAppendJumpSpeed");
             m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(m_ListHandle, dMarkSpeedInMeterPerSecond), "rlListAppendMarkSpeed");
-            m_pSDK->checkError(m_pSDK->rlListAppendPower(m_ListHandle, nPowerInUnits, eRLPowerChannels::ptcAllChannels), "rlListAppendPower");
+
+            double dBasePowerInWatts = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
+            if (!bSegmentHasPowerPerVector) {
+                appendPowerInWatts(dBasePowerInWatts);
+            }
 
             switch (eSegmentType) {
             case LibMCEnv::eToolpathSegmentType::Loop:
@@ -130,6 +143,11 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
                 std::vector<LibMCEnv::sFloatPosition2D> PointsInMM;
                 pLayer->GetSegmentPointDataInMM(nSegmentIndex, PointsInMM);
+
+                std::vector<double> FactorOverrides;
+                if (bSegmentHasPowerPerVector) {
+                    pLayer->GetSegmentPointOverrides(nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor::FactorF, FactorOverrides);
+                }
 
                 if (nPointCount != PointsInMM.size())
                     throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
@@ -140,6 +158,10 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
                     double dXinMicron = dXinMM * 1000.0;
                     double dYinMicron = dYinMM * 1000.0;
+
+                    if (bSegmentHasPowerPerVector) {
+                        appendPowerInWatts(dBasePowerInWatts * FactorOverrides.at (nPointIndex));
+                    }
 
                     if (nPointIndex == 0) {
                         m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(m_ListHandle, dXinMicron, dYinMicron), "rlListAppendJumpAbs2D");
@@ -160,6 +182,10 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                     throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
 
                 std::vector<LibMCEnv::sFloatHatch2D> HatchesInMM;
+                std::vector<LibMCEnv::sHatch2DOverrides> FactorOverrides;
+                if (bSegmentHasPowerPerVector) {
+                    pLayer->GetSegmentHatchOverrides(nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor::FactorF, FactorOverrides);
+                }
 
                 uint64_t nHatchCount = nPointCount / 2;
                 pLayer->GetSegmentHatchDataInMM(nSegmentIndex, HatchesInMM);
@@ -177,6 +203,10 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                     double dY1inMicron = dY1inMM * 1000.0;
                     double dX2inMicron = dX2inMM * 1000.0;
                     double dY2inMicron = dY2inMM * 1000.0;
+
+                    if (bSegmentHasPowerPerVector) {
+                        appendPowerInWatts(dBasePowerInWatts * FactorOverrides.at(nHatchIndex).m_Point1Override);
+                    }
 
                     m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(m_ListHandle, dX1inMicron, dY1inMicron), "rlListAppendJumpAbs2D");
                     m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(m_ListHandle, dX2inMicron, dY2inMicron), "rlListAppendMarkAbs2D");
