@@ -146,9 +146,6 @@ Custom implementation
 			<param name="IsConnected" type="bool" pass="return" description="Flag if the card is disconnected." />
 		</method>
 
-		<method name="Disconnect" description="Disconnects and unregisters the card.">
-		</method>
-
 		<method name="ResetToSystemDefaults" description="Resets the card settings to system defaults.">
 		</method>
 
@@ -226,6 +223,15 @@ Custom implementation
 			<param name="CardName" type="string" pass="in" description="Name of scanner card to retrieve. MUST have been connected before." />
 			<param name="RaylaseCardInstance" type="class" class="RaylaseCard" pass="return" description="Instance of connected card." />
 		</method>
+		
+		<method name="CardExists" description="Retrieves.">
+			<param name="CardName" type="string" pass="in" description="Name of scanner card to retrieve." />
+			<param name="CardExistsAndIsConnected" type="bool" pass="return" description="Returns true if card exists, false otherwise." />
+		</method>
+
+		<method name="DisconnectCard" description="Disconnects and unregisters a card. Does nothing if card does not exist.">
+			<param name="CardName" type="string" pass="in" description="Name of scanner card to disconnect. Card will be removed from driver." />
+		</method>		
 
 		<method name="DrawLayerMultiLaser" description="Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
