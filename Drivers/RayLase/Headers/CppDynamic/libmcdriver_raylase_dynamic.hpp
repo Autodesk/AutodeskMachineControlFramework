@@ -450,7 +450,6 @@ public:
 	}
 	
 	inline bool IsConnected();
-	inline void Disconnect();
 	inline void ResetToSystemDefaults();
 	inline void LaserOn();
 	inline void LaserOff();
@@ -484,6 +483,8 @@ public:
 	inline void LoadSDK();
 	inline PRaylaseCard ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts);
 	inline PRaylaseCard GetConnectedCard(const std::string & sCardName);
+	inline bool CardExists(const std::string & sCardName);
+	inline void DisconnectCard(const std::string & sCardName);
 	inline void DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 };
 	
@@ -616,7 +617,6 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_RaylaseCard_IsConnected = nullptr;
-		pWrapperTable->m_RaylaseCard_Disconnect = nullptr;
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOn = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOff = nullptr;
@@ -634,6 +634,8 @@ public:
 		pWrapperTable->m_Driver_Raylase_LoadSDK = nullptr;
 		pWrapperTable->m_Driver_Raylase_ConnectByIP = nullptr;
 		pWrapperTable->m_Driver_Raylase_GetConnectedCard = nullptr;
+		pWrapperTable->m_Driver_Raylase_CardExists = nullptr;
+		pWrapperTable->m_Driver_Raylase_DisconnectCard = nullptr;
 		pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
@@ -753,15 +755,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RaylaseCard_IsConnected == nullptr)
-			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_RaylaseCard_Disconnect = (PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_disconnect");
-		#else // _WIN32
-		pWrapperTable->m_RaylaseCard_Disconnect = (PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_disconnect");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_RaylaseCard_Disconnect == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -918,6 +911,24 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_Raylase_CardExists = (PLibMCDriver_RaylaseDriver_Raylase_CardExistsPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_driver_raylase_cardexists");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Raylase_CardExists = (PLibMCDriver_RaylaseDriver_Raylase_CardExistsPtr) dlsym(hLibrary, "libmcdriver_raylase_driver_raylase_cardexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Raylase_CardExists == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Raylase_DisconnectCard = (PLibMCDriver_RaylaseDriver_Raylase_DisconnectCardPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_driver_raylase_disconnectcard");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Raylase_DisconnectCard = (PLibMCDriver_RaylaseDriver_Raylase_DisconnectCardPtr) dlsym(hLibrary, "libmcdriver_raylase_driver_raylase_disconnectcard");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Raylase_DisconnectCard == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser = (PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_driver_raylase_drawlayermultilaser");
 		#else // _WIN32
 		pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser = (PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr) dlsym(hLibrary, "libmcdriver_raylase_driver_raylase_drawlayermultilaser");
@@ -1033,10 +1044,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_IsConnected == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_disconnect", (void**)&(pWrapperTable->m_RaylaseCard_Disconnect));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_Disconnect == nullptr) )
-			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_resettosystemdefaults", (void**)&(pWrapperTable->m_RaylaseCard_ResetToSystemDefaults));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_ResetToSystemDefaults == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1103,6 +1110,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_getconnectedcard", (void**)&(pWrapperTable->m_Driver_Raylase_GetConnectedCard));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_GetConnectedCard == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_cardexists", (void**)&(pWrapperTable->m_Driver_Raylase_CardExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_CardExists == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_disconnectcard", (void**)&(pWrapperTable->m_Driver_Raylase_DisconnectCard));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_DisconnectCard == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_drawlayermultilaser", (void**)&(pWrapperTable->m_Driver_Raylase_DrawLayerMultiLaser));
@@ -1238,14 +1253,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_IsConnected(m_pHandle, &resultIsConnected));
 		
 		return resultIsConnected;
-	}
-	
-	/**
-	* CRaylaseCard::Disconnect - Disconnects and unregisters the card.
-	*/
-	void CRaylaseCard::Disconnect()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_Disconnect(m_pHandle));
 	}
 	
 	/**
@@ -1431,6 +1438,28 @@ public:
 			CheckError(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CRaylaseCard>(m_pWrapper, hRaylaseCardInstance);
+	}
+	
+	/**
+	* CDriver_Raylase::CardExists - Retrieves.
+	* @param[in] sCardName - Name of scanner card to retrieve.
+	* @return Returns true if card exists, false otherwise.
+	*/
+	bool CDriver_Raylase::CardExists(const std::string & sCardName)
+	{
+		bool resultCardExistsAndIsConnected = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_CardExists(m_pHandle, sCardName.c_str(), &resultCardExistsAndIsConnected));
+		
+		return resultCardExistsAndIsConnected;
+	}
+	
+	/**
+	* CDriver_Raylase::DisconnectCard - Disconnects and unregisters a card. Does nothing if card does not exist.
+	* @param[in] sCardName - Name of scanner card to disconnect. Card will be removed from driver.
+	*/
+	void CDriver_Raylase::DisconnectCard(const std::string & sCardName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_DisconnectCard(m_pHandle, sCardName.c_str()));
 	}
 	
 	/**

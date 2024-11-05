@@ -322,11 +322,6 @@ public:
 	virtual bool IsConnected() = 0;
 
 	/**
-	* IRaylaseCard::Disconnect - Disconnects and unregisters the card.
-	*/
-	virtual void Disconnect() = 0;
-
-	/**
 	* IRaylaseCard::ResetToSystemDefaults - Resets the card settings to system defaults.
 	*/
 	virtual void ResetToSystemDefaults() = 0;
@@ -442,6 +437,19 @@ public:
 	* @return Instance of connected card.
 	*/
 	virtual IRaylaseCard * GetConnectedCard(const std::string & sCardName) = 0;
+
+	/**
+	* IDriver_Raylase::CardExists - Retrieves.
+	* @param[in] sCardName - Name of scanner card to retrieve.
+	* @return Returns true if card exists, false otherwise.
+	*/
+	virtual bool CardExists(const std::string & sCardName) = 0;
+
+	/**
+	* IDriver_Raylase::DisconnectCard - Disconnects and unregisters a card. Does nothing if card does not exist.
+	* @param[in] sCardName - Name of scanner card to disconnect. Card will be removed from driver.
+	*/
+	virtual void DisconnectCard(const std::string & sCardName) = 0;
 
 	/**
 	* IDriver_Raylase::DrawLayerMultiLaser - Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.

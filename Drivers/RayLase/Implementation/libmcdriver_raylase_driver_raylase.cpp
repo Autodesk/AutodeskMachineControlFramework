@@ -184,6 +184,30 @@ IRaylaseCard* CDriver_Raylase::GetConnectedCard(const std::string& sCardName)
 
 }
 
+bool CDriver_Raylase::CardExists(const std::string& sCardName)
+{
+    if (sCardName.empty())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCARDNAME);
+
+    auto iIter = m_CardInstances.find(sCardName);
+    return (iIter != m_CardInstances.end());
+}
+
+void CDriver_Raylase::DisconnectCard(const std::string& sCardName)
+{
+    if (sCardName.empty())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCARDNAME);
+
+    auto iIter = m_CardInstances.find(sCardName);
+    if (iIter != m_CardInstances.end())
+    {
+        auto pCard = iIter->second;
+        m_CardInstances.erase(iIter);
+        pCard->Disconnect();
+    }
+
+}
+
 
 void CDriver_Raylase::SetToSimulationMode()
 {

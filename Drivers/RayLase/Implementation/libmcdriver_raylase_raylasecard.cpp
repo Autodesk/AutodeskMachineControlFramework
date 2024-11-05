@@ -184,9 +184,3 @@ bool CRaylaseCard::IsConnected()
 {
     return m_pRaylaseCardImpl->IsConnected();
 }
-
-void CRaylaseCard::Disconnect()
-{
-    m_pRaylaseCardImpl->Disconnect();
-
-}

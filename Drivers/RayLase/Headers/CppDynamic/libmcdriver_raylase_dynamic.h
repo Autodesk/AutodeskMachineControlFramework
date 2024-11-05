@@ -128,14 +128,6 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_QueryParametersEx
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pIsConnected);
 
 /**
-* Disconnects and unregisters the card.
-*
-* @param[in] pRaylaseCard - RaylaseCard instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
-
-/**
 * Resets the card settings to system defaults.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
@@ -297,6 +289,25 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_ConnectBy
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_GetConnectedCardPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
 
 /**
+* Retrieves.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pCardName - Name of scanner card to retrieve.
+* @param[out] pCardExistsAndIsConnected - Returns true if card exists, false otherwise.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_CardExistsPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, bool * pCardExistsAndIsConnected);
+
+/**
+* Disconnects and unregisters a card. Does nothing if card does not exist.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pCardName - Name of scanner card to disconnect. Card will be removed from driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_DisconnectCardPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName);
+
+/**
 * Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.
 *
 * @param[in] pDriver_Raylase - Driver_Raylase instance.
@@ -391,7 +402,6 @@ typedef struct {
 	PLibMCDriver_RaylaseDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_RaylaseDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr m_RaylaseCard_IsConnected;
-	PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr m_RaylaseCard_Disconnect;
 	PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr m_RaylaseCard_ResetToSystemDefaults;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr m_RaylaseCard_LaserOn;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOffPtr m_RaylaseCard_LaserOff;
@@ -409,6 +419,8 @@ typedef struct {
 	PLibMCDriver_RaylaseDriver_Raylase_LoadSDKPtr m_Driver_Raylase_LoadSDK;
 	PLibMCDriver_RaylaseDriver_Raylase_ConnectByIPPtr m_Driver_Raylase_ConnectByIP;
 	PLibMCDriver_RaylaseDriver_Raylase_GetConnectedCardPtr m_Driver_Raylase_GetConnectedCard;
+	PLibMCDriver_RaylaseDriver_Raylase_CardExistsPtr m_Driver_Raylase_CardExists;
+	PLibMCDriver_RaylaseDriver_Raylase_DisconnectCardPtr m_Driver_Raylase_DisconnectCard;
 	PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr m_Driver_Raylase_DrawLayerMultiLaser;
 	PLibMCDriver_RaylaseGetVersionPtr m_GetVersion;
 	PLibMCDriver_RaylaseGetLastErrorPtr m_GetLastError;

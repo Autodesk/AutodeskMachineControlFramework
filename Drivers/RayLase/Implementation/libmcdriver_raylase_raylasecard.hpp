@@ -70,8 +70,6 @@ public:
 
 	bool IsConnected() override;
 
-	void Disconnect() override;
-
 	void ResetToSystemDefaults() override;
 
 	void LaserOn() override;

@@ -194,8 +194,15 @@ void CRaylaseCardImpl::Disconnect()
         return;
 
     if (m_pSDK.get() != nullptr) {
-        if (m_Handle > 0)
+        if (m_Handle > 0) {
+            bool bInProgress = false;
+            m_pSDK->rlListIsExecutionInProgress(m_Handle, bInProgress);
+
+            if (bInProgress)
+                m_pSDK->rlListAbortExecution(m_Handle);
+
             m_pSDK->rlDisconnect(m_Handle);
+        }
         m_Handle = 0;
     }
 

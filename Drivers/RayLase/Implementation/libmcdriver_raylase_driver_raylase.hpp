@@ -102,6 +102,10 @@ public:
 
     IRaylaseCard* GetConnectedCard(const std::string& sCardName) override;
 
+    bool CardExists(const std::string& sCardName) override;
+
+    void DisconnectCard(const std::string& sCardName) override;
+
     void SetToSimulationMode() override;
 
     bool IsSimulationMode() override;

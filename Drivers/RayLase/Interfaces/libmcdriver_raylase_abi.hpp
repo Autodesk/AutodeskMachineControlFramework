@@ -141,14 +141,6 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_isconnected(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pIsConnected);
 
 /**
-* Disconnects and unregisters the card.
-*
-* @param[in] pRaylaseCard - RaylaseCard instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_disconnect(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
-
-/**
 * Resets the card settings to system defaults.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
@@ -308,6 +300,25 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_getconnectedcard(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
+
+/**
+* Retrieves.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pCardName - Name of scanner card to retrieve.
+* @param[out] pCardExistsAndIsConnected - Returns true if card exists, false otherwise.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_cardexists(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, bool * pCardExistsAndIsConnected);
+
+/**
+* Disconnects and unregisters a card. Does nothing if card does not exist.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pCardName - Name of scanner card to disconnect. Card will be removed from driver.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_disconnectcard(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName);
 
 /**
 * Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.
