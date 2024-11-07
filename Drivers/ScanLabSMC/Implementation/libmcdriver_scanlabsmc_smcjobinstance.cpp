@@ -261,7 +261,9 @@ void CSMCJobInstance::ReadSimulationFile(LibMCEnv::PDataTable pDataTable)
 
     std::string sSimulationFileName(buffer.data());
 
-    std::string sSimulationDirectory = m_pWorkingDirectory->GetAbsoluteFilePath() + "/" + m_sSimulationSubDirectory + "/";
+    std::string sSimulationDirectory = m_pWorkingDirectory->GetAbsoluteFilePath() + "/";
+    if (!m_sSimulationSubDirectory.empty ())
+        sSimulationDirectory += m_sSimulationSubDirectory + "/";
 
     CSMCSimulationParser parser(sSimulationDirectory + sSimulationFileName);
 

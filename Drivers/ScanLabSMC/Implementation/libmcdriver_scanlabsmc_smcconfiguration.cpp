@@ -299,6 +299,10 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     std::string sCorrectionFilePath = newCorrectionFile->GetAbsoluteFileName();
     std::string sLogFilePath = pWorkingDirectory->GetAbsoluteFilePath() + "/log.txt";
 
+    std::string sSimulationDirectory = sBaseDirectoryPath + "/";
+    if (!m_sSimulationSubDirectory.empty())
+        sSimulationDirectory += m_sSimulationSubDirectory + "/";
+
     auto pXMLDocument = m_pDriverEnvironment->CreateXMLDocument("Configuration", "SCANmotionControl");
     
     pXMLDocument->ChangeNamespacePrefix("", "cfg");
@@ -357,7 +361,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
 
     auto pSimulationConfigNode = pGeneralConfigNode->AddChild("", "SimulationConfig");
     pSimulationConfigNode->AddChildText("", "SimulationMode", "true");
-    pSimulationConfigNode->AddChildText("", "SimOutputFileDirectory", "[BaseDirectoryPath]/Simulate/");
+    pSimulationConfigNode->AddChildText("", "SimOutputFileDirectory", sSimulationDirectory);
     pSimulationConfigNode->AddChildText("", "BinaryOutput", "false");
     pSimulationConfigNode->AddChildText("", "DisableFileOutput", "false");
 
