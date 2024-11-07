@@ -61,6 +61,7 @@ private:
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
     LibMCDriver_ScanLabSMC::eDynamicViolationReaction m_DynamicViolationReaction;
     LibMCDriver_ScanLabSMC::eWarnLevel m_WarnLevel;
+    
     uint32_t m_nSerialNumber;
     std::vector<uint8_t> m_CorrectionFileData;
     std::vector<uint8_t> m_FirmwareData;
@@ -111,7 +112,7 @@ public:
 
     void SetFirmwareResources(const std::string& sFirmwareDataResource, const std::string& sFPGADataResource, const std::string& sAuxiliaryDataResource) override;
 
-    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::PWorkingFile & newCorrectionFile);
+    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::PWorkingFile & newCorrectionFile, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion);
 
 };
 

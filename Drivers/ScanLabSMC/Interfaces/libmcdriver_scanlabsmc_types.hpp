@@ -140,6 +140,8 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_CONFIGURATIONRESOURCENOTFOUND 1032 /** Configuration resource not found. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTOOPENSIMULATIONFILE 1033 /** Could not open simulation file. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDSIMULATIONFILENAME 1034 /** Invalid simulation file name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_UNSUPPORTEDSMCVERSION 1035 /** Unsupported SMC Version. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_SMCTEMPLATEVERSIONMISMATCH 1036 /** SMC Template version mismatch. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -192,6 +194,8 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_CONFIGURATIONRESOURCENOTFOUND: return "Configuration resource not found.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTOOPENSIMULATIONFILE: return "Could not open simulation file.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDSIMULATIONFILENAME: return "Invalid simulation file name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_UNSUPPORTEDSMCVERSION: return "Unsupported SMC Version.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_SMCTEMPLATEVERSIONMISMATCH: return "SMC Template version mismatch.";
     default: return "unknown error";
   }
 }
@@ -233,6 +237,12 @@ namespace LibMCDriver_ScanLabSMC {
     Info = 3
   };
   
+  enum class eSMCConfigVersion : LibMCDriver_ScanLabSMC_int32 {
+    Unknown = 0,
+    Version_0_8 = 8,
+    Version_0_9 = 9
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -259,6 +269,7 @@ namespace LibMCDriver_ScanLabSMC {
 typedef LibMCDriver_ScanLabSMC::eBlendMode eLibMCDriver_ScanLabSMCBlendMode;
 typedef LibMCDriver_ScanLabSMC::eDynamicViolationReaction eLibMCDriver_ScanLabSMCDynamicViolationReaction;
 typedef LibMCDriver_ScanLabSMC::eWarnLevel eLibMCDriver_ScanLabSMCWarnLevel;
+typedef LibMCDriver_ScanLabSMC::eSMCConfigVersion eLibMCDriver_ScanLabSMCSMCConfigVersion;
 typedef LibMCDriver_ScanLabSMC::sPoint2D sLibMCDriver_ScanLabSMCPoint2D;
 typedef LibMCDriver_ScanLabSMC::sHatch2D sLibMCDriver_ScanLabSMCHatch2D;
 

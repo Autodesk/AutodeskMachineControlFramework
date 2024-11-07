@@ -86,6 +86,10 @@
 		<error name="CONFIGURATIONRESOURCENOTFOUND" code="1032" description="Configuration resource not found." />		
 		<error name="COULDNOTOOPENSIMULATIONFILE" code="1033" description="Could not open simulation file." />		
 		<error name="INVALIDSIMULATIONFILENAME" code="1034" description="Invalid simulation file name." />		
+		<error name="UNSUPPORTEDSMCVERSION" code="1035" description="Unsupported SMC Version." />		
+		<error name="SMCTEMPLATEVERSIONMISMATCH" code="1036" description="SMC Template version mismatch." />		
+		
+		
 											
 	</errors>
 
@@ -122,6 +126,11 @@
 	</enum>
 
 	
+	<enum name="SMCConfigVersion">
+	   <option name="Unknown" value="0" />
+	   <option name="Version_0_8" value="8" />
+	   <option name="Version_0_9" value="9" />
+	</enum>
 <!--
 
 This base Driver interface MUST be in Sync with LibMCDriver.xml
