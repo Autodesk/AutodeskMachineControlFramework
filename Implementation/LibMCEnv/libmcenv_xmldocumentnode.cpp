@@ -353,7 +353,17 @@ void CXMLDocumentNode::CopyFrom(IXMLDocumentNode* pOtherNode)
     if (pOtherNodeInstance == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    m_pXMLDocumentNode->CopyFrom(pOtherNodeInstance->getXMLDocumentNode().get ());
+}
+
+AMC::PXMLDocumentNodeInstance CXMLDocumentNode::getXMLDocumentNode()
+{
+    return m_pXMLDocumentNode;
+}
+
+AMC::PXMLDocumentInstance CXMLDocumentNode::getXMLDocument()
+{
+    return m_pXMLDocument;
 }
 
 

@@ -636,6 +636,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDHATCHOVERRIDECOUNT 619 /** Invalid hatch override count. */
 #define LIBMC_ERROR_INVALIDPOINTOVERRIDECOUNT 620 /** Invalid point override count. */
 #define LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX 621 /** Invalid override factor index. */
+#define LIBMC_ERROR_XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX 622 /** XML Namespace Definition contains empty prefix. */
+#define LIBMC_ERROR_XMLNODECONTAINSAMBIGOUSCONTENTDATA 623 /** XML node contains ambiguous content data. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1184,6 +1186,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDHATCHOVERRIDECOUNT: return "Invalid hatch override count.";
     case LIBMC_ERROR_INVALIDPOINTOVERRIDECOUNT: return "Invalid point override count.";
     case LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX: return "Invalid override factor index.";
+    case LIBMC_ERROR_XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX: return "XML Namespace Definition contains empty prefix.";
+    case LIBMC_ERROR_XMLNODECONTAINSAMBIGOUSCONTENTDATA: return "XML node contains ambiguous content data.";
     default: return "unknown error";
   }
 }

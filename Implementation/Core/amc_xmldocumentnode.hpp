@@ -70,8 +70,6 @@ namespace AMC {
 
 		void addChildEx(PXMLDocumentNodeInstance pNode);
 
-		void splitNameSpaceName(const std::string & sPrefixedName, std::string & sUnprefixedName, std::string & sNameSpacePrefix);
-
 	public:
 
 		CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocument, CXMLDocumentNodeInstance * pParentNode, PXMLDocumentNameSpace pNameSpace, const std::string& sNodeName);
@@ -128,7 +126,9 @@ namespace AMC {
 
 		void RemoveChildrenWithName(CXMLDocumentNameSpace* pNameSpace, const std::string& sName);
 
+		void CopyFrom(CXMLDocumentNodeInstance* pFromInstance);
 
+		static void splitNameSpaceName(const std::string& sPrefixedName, std::string& sUnprefixedName, std::string& sNameSpacePrefix);
 	};
 
 	

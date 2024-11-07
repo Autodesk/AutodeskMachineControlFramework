@@ -645,7 +645,10 @@
 		<error name="INVALIDHATCHOVERRIDECOUNT" code="619" description="Invalid hatch override count." />	
 		<error name="INVALIDPOINTOVERRIDECOUNT" code="620" description="Invalid point override count." />	
 		<error name="INVALIDOVERRIDEFACTORINDEX" code="621" description="Invalid override factor index." />	
-				
+		<error name="XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX" code="622" description="XML Namespace Definition contains empty prefix." />	
+		<error name="XMLNODECONTAINSAMBIGOUSCONTENTDATA" code="623" description="XML node contains ambiguous content data." />	
+		
+					
 	</errors>
 	
 	

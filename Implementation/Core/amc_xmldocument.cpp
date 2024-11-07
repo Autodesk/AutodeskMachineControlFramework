@@ -81,12 +81,35 @@ void CXMLDocumentInstance::extractPugiDocument(std::shared_ptr<pugi::xml_documen
 	if (nChildCount > 1)
 		throw ELibMCInterfaceException(LIBMC_ERROR_XMLCONTAINSAMBIGOUSROOTNODES);
 
-	pugi::xml_attribute xmlnsAttrib = rootNode.attribute("xmlns");
-	std::string sDefaultNamespace = xmlnsAttrib.as_string();
-	if (sDefaultNamespace.empty())
-		throw ELibMCInterfaceException(LIBMC_ERROR_XMLDOESNOTCONTAINNAMESPACE);
+	auto attributes = rootNode.attributes();
+	for (auto attribute : attributes) {
 
-	m_pDefaultNameSpace = registerNamespaceEx(sDefaultNamespace, "");
+		std::string sAttributeName;
+		std::string sNameSpacePrefix;
+		CXMLDocumentNodeInstance::splitNameSpaceName(attribute.name(), sAttributeName, sNameSpacePrefix);
+
+		std::string sAttributeValue = attribute.value();
+		if (sNameSpacePrefix == "xmlns") {
+			if (sAttributeName.empty ())
+				throw ELibMCInterfaceException(LIBMC_ERROR_XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX);
+
+			RegisterNamespace(sAttributeValue, sAttributeName);
+		}
+
+		if (sNameSpacePrefix.empty() && (sAttributeName == "xmlns")) {
+			RegisterNamespace(sAttributeValue, "");
+		}
+	}
+
+
+	std::string sRootNodeFullName = rootNode.name();
+	std::string sRootNodeName;
+	std::string sRootNodeNameSpacePrefix;
+	CXMLDocumentNodeInstance::splitNameSpaceName(sRootNodeFullName, sRootNodeName, sRootNodeNameSpacePrefix);
+
+
+	m_pDefaultNameSpace = FindNamespaceByPrefix(sRootNodeNameSpacePrefix, true);
+
 	m_pRootNodeInstance = std::make_shared<CXMLDocumentNodeInstance>(this, nullptr, m_pDefaultNameSpace, rootNode.name ());
 
 	m_pRootNodeInstance->extractFromPugiNode (pXMLDocument.get(), &rootNode, true);
