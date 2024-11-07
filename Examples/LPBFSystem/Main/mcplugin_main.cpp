@@ -113,6 +113,16 @@ __DECLARESTATE(initbuild)
 	pStateEnvironment->LogMessage("Initializing build...");
 	auto sJobUUID = pStateEnvironment->GetUUIDParameter("jobinfo", "jobuuid");
 
+	auto pLaserInitSignal = pStateEnvironment->PrepareSignal("laser", "signal_initlaserforjob");
+	pLaserInitSignal->SetUUID("jobuuid", sJobUUID);
+	pLaserInitSignal->Trigger();
+
+	if (!pLaserInitSignal->WaitForHandling(10000))
+		throw std::runtime_error("timeout while initialising laser");
+
+	if (!pLaserInitSignal->GetBoolResult ("success"))
+		throw std::runtime_error("laser initialization failed");
+
 	pStateEnvironment->LogMessage("Loading Toolpath...");
 	auto pBuildJob = pStateEnvironment->GetBuildJob (sJobUUID);
 	pBuildJob->LoadToolpath();

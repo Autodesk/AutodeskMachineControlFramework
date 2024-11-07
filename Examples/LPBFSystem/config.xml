@@ -110,7 +110,7 @@
     </parametergroup>
 
 		<parametergroup name="configuration" description="Machine Configuration">
-			<parameter name="simulatelaser" description="Simulate laser control" default="1" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a" />
+			<parameter name="simulatelaser" description="Simulate laser control" default="0" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a" />
 			<parameter name="simulateplc" description="Simulate PLC behaviour" default="1" type="bool" persistent="d1e8e7d2-8d77-4206-b390-b999300ca8a9" />
 		</parametergroup>
 
@@ -222,6 +222,11 @@
 			<result name="success" type="bool"/>
 		</signaldefinition>
 
+    <signaldefinition name="signal_initlaserforjob">
+      <parameter name="jobuuid" type="string"/>
+      <result name="success" type="bool"/>
+    </signaldefinition>
+    
 		<state name="init" repeatdelay="100">
 			<outstate target="idle"/>
 		</state>
@@ -523,7 +528,7 @@
 
 				<content name="actions1" columnstart="4" rowstart="1" columnend="5" rowend="1" rowposition="centered">
 					<buttongroup distribution="equal">
-						<button caption="Pause Build" event="pausebuild" sync:disabled="!main.ui.build_canbepaused"/>
+						<button caption="Pause Build" event="pause" />
 					</buttongroup>
 				</content>
 

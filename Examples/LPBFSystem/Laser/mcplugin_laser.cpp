@@ -140,9 +140,25 @@ void InitialiseScanlabDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDri
 
 }
 
-void InitialiseScanlabSMCDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDriver_ScanLabSMC pDriver)
+void InitialiseScanlabSMCDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDriver_ScanLabSMC pDriver, const std::string & sJobUUID)
 {
 	pStateEnvironment->LogMessage("Initialising Scanlab SMC Driver");
+
+	pStateEnvironment->LogMessage("Loading build job " + sJobUUID);
+	auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
+	auto pToolpath = pBuildJob->CreateToolpathAccessor();
+	auto pMetaData = pToolpath->FindUniqueMetaData("http://schemas.scanlab.com/smc/2024/10", "smc_control");
+
+	auto pAttribute = pMetaData->FindAttribute("http://schemas.scanlab.com/smc/2024/10", "config", true);
+	std::string sConfigName = pAttribute->GetValue();
+
+	pStateEnvironment->LogMessage("Loading SMC Configuration Template from " + sConfigName);
+
+	std::vector<uint8_t> buffer;
+	pToolpath->GetBinaryMetaData(sConfigName, buffer);
+
+	std::string sSMCConfigurationTemplate(buffer.begin(), buffer.end());
+
 
 	auto sIPAddress = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
 	auto nSerial = pStateEnvironment->GetIntegerParameter("cardconfig", "serial");
@@ -153,9 +169,10 @@ void InitialiseScanlabSMCDriver(LibMCEnv::PStateEnvironment pStateEnvironment, P
 	pConfiguration->SetDynamicViolationReaction(LibMCDriver_ScanLabSMC::eDynamicViolationReaction::StopAndReport);
 
 	pConfiguration->SetSerialNumber((uint32_t) nSerial);
-	pConfiguration->SetConfigurationTemplateResource ("ScanMotionControl_DemoConfig");
+	pConfiguration->SetConfigurationTemplate (sSMCConfigurationTemplate);
 	pConfiguration->SetIPAddress(sIPAddress);
 	pConfiguration->SetCorrectionFileResource(sCorrectionResourceName);
+	pConfiguration->SetSimulationSubDirectory("SMCSimulation");
 	pConfiguration->SetFirmwareResources("rtc6eth", "rtc6rbf", "rtc6dat");
 
 	auto pContext = pDriver->CreateContext("smccontext", pConfiguration);
@@ -177,7 +194,6 @@ __DECLARESTATE(init)
 	}
 	else if (sCardType == "scanlabsmc")
 	{
-		InitialiseScanlabSMCDriver(pStateEnvironment, __acquireDriver(ScanLabSMC));
 	}
 	else if (sCardType == "raylase") {
 		InitialiseRaylaseDriver(pStateEnvironment, __acquireDriver(Raylase));
@@ -207,6 +223,22 @@ __DECLARESTATE(idle)
 
 		
 	LibMCEnv::PSignalHandler pHandlerInstance;
+
+	if (pStateEnvironment->WaitForSignal("signal_initlaserforjob", 0, pHandlerInstance)) {
+		std::string sJobUUID = pHandlerInstance->GetUUID("jobuuid");
+
+		if (sCardType == "scanlabsmc") {
+
+			auto pDriver = __acquireDriver(ScanLabSMC);
+			InitialiseScanlabSMCDriver(pStateEnvironment, pDriver, sJobUUID);
+
+		}		
+
+		pHandlerInstance->SetBoolResult("success", true);
+		pHandlerInstance->SignalHandled();
+	}
+
+
 	if (pStateEnvironment->WaitForSignal("signal_exposure", 0, pHandlerInstance)) {
 		pStateEnvironment->StoreSignal("exposuresignal", pHandlerInstance);
 
