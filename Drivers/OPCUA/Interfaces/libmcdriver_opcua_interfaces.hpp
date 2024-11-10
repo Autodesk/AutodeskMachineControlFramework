@@ -57,8 +57,6 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
-class IPLCCommand;
-class IPLCCommandList;
 class IDriver_OPCUA;
 
 
@@ -311,83 +309,6 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
- Class interface for PLCCommand 
-**************************************************************************************************************************/
-
-class IPLCCommand : public virtual IBase {
-public:
-	/**
-	* IPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] nValue - Parameter Value
-	*/
-	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_OPCUA_int64 nValue) = 0;
-
-	/**
-	* IPLCCommand::SetBoolParameter - Sets a bool parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] bValue - Parameter Value
-	*/
-	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
-
-	/**
-	* IPLCCommand::SetDoubleParameter - Sets a double parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] dValue - Parameter Value
-	*/
-	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_OPCUA_double dValue) = 0;
-
-};
-
-typedef IBaseSharedPtr<IPLCCommand> PIPLCCommand;
-
-
-/*************************************************************************************************************************
- Class interface for PLCCommandList 
-**************************************************************************************************************************/
-
-class IPLCCommandList : public virtual IBase {
-public:
-	/**
-	* IPLCCommandList::AddCommand - Adds a command to the list. List must not be executed before.
-	* @param[in] pCommandInstance - Add a command instance.
-	*/
-	virtual void AddCommand(IPLCCommand* pCommandInstance) = 0;
-
-	/**
-	* IPLCCommandList::FinishList - Finish command list.
-	*/
-	virtual void FinishList() = 0;
-
-	/**
-	* IPLCCommandList::ExecuteList - Execute command list.
-	*/
-	virtual void ExecuteList() = 0;
-
-	/**
-	* IPLCCommandList::WaitForList - Wait for command list to finish executing
-	* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
-	* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
-	* @return Returns true if the command was finished successfully.
-	*/
-	virtual bool WaitForList(const LibMCDriver_OPCUA_uint32 nReactionTimeInMS, const LibMCDriver_OPCUA_uint32 nWaitForTimeInMS) = 0;
-
-	/**
-	* IPLCCommandList::PauseList - Pause command list. Must be executed or resumed before.
-	*/
-	virtual void PauseList() = 0;
-
-	/**
-	* IPLCCommandList::ResumeList - Resume command list. Must be paused before.
-	*/
-	virtual void ResumeList() = 0;
-
-};
-
-typedef IBaseSharedPtr<IPLCCommandList> PIPLCCommandList;
-
-
-/*************************************************************************************************************************
  Class interface for Driver_OPCUA 
 **************************************************************************************************************************/
 
@@ -405,45 +326,89 @@ public:
 	virtual bool IsSimulationMode() = 0;
 
 	/**
-	* IDriver_OPCUA::Connect - Connects to a OPCUA PLC Controller.
-	* @param[in] sIPAddress - IP Address of PLC Service.
-	* @param[in] nPort - Port of PLC Service.
-	* @param[in] nTimeout - Timeout in milliseconds.
+	* IDriver_OPCUA::EnableEncryption - Enables encryption for subsequent connects.
+	* @param[in] sLocalCertificate - Local Certificate String
+	* @param[in] sPrivateKey - Private Key
+	* @param[in] eSecurityMode - Security mode to use.
 	*/
-	virtual void Connect(const std::string & sIPAddress, const LibMCDriver_OPCUA_uint32 nPort, const LibMCDriver_OPCUA_uint32 nTimeout) = 0;
+	virtual void EnableEncryption(const std::string & sLocalCertificate, const std::string & sPrivateKey, const LibMCDriver_OPCUA::eUASecurityMode eSecurityMode) = 0;
 
 	/**
-	* IDriver_OPCUA::Disconnect - Disconnects from the OPCUA PLC Controller.
+	* IDriver_OPCUA::DisableEncryption - Enables encryption for subsequent connects.
+	*/
+	virtual void DisableEncryption() = 0;
+
+	/**
+	* IDriver_OPCUA::ConnectWithUserName - Connects to a OPCUA PLC Controller.
+	* @param[in] sEndPointURL - End point URL to connect to.
+	* @param[in] sUsername - User login.
+	* @param[in] sPassword - Password.
+	* @param[in] sApplicationURL - Application URL to use.
+	*/
+	virtual void ConnectWithUserName(const std::string & sEndPointURL, const std::string & sUsername, const std::string & sPassword, const std::string & sApplicationURL) = 0;
+
+	/**
+	* IDriver_OPCUA::Disconnect - Disconnect from the end point. Does nothing if not connected
 	*/
 	virtual void Disconnect() = 0;
 
 	/**
-	* IDriver_OPCUA::CreateCommandList - Create Command
-	* @return Command list instance
+	* IDriver_OPCUA::IsConnected - Returns if an end point is connected.
+	* @return Returns true if connected.
 	*/
-	virtual IPLCCommandList * CreateCommandList() = 0;
+	virtual bool IsConnected() = 0;
 
 	/**
-	* IDriver_OPCUA::CreateCommand - Creates a command instance.
-	* @param[in] sCommandName - Command Name.
-	* @return Returns a command instance.
+	* IDriver_OPCUA::ReadInteger - Reads an integer node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] eNodeType - Type of Node to read
+	* @return Retrieved Node Value
 	*/
-	virtual IPLCCommand * CreateCommand(const std::string & sCommandName) = 0;
+	virtual LibMCDriver_OPCUA_int64 ReadInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const LibMCDriver_OPCUA::eUAIntegerType eNodeType) = 0;
 
 	/**
-	* IDriver_OPCUA::StartJournaling - Start Journaling.
+	* IDriver_OPCUA::ReadDouble - Reads a double node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] eNodeType - Type of Node to read
+	* @return Retrieved Node Value
 	*/
-	virtual void StartJournaling() = 0;
+	virtual LibMCDriver_OPCUA_double ReadDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const LibMCDriver_OPCUA::eUADoubleType eNodeType) = 0;
 
 	/**
-	* IDriver_OPCUA::StopJournaling - Stop Journaling.
+	* IDriver_OPCUA::ReadString - Reads a string node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @return Retrieved String Value
 	*/
-	virtual void StopJournaling() = 0;
+	virtual std::string ReadString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName) = 0;
 
 	/**
-	* IDriver_OPCUA::RefreshJournal - Refresh Journal.
+	* IDriver_OPCUA::WriteInteger - Writes an integer node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] eNodeType - Type of Node to write
+	* @param[in] nValue - Node Value to write
 	*/
-	virtual void RefreshJournal() = 0;
+	virtual void WriteInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const LibMCDriver_OPCUA::eUAIntegerType eNodeType, const LibMCDriver_OPCUA_int64 nValue) = 0;
+
+	/**
+	* IDriver_OPCUA::WriteDouble - Writes a double node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] eNodeType - Type of Node to write
+	* @param[in] dValue - Node Value to write
+	*/
+	virtual void WriteDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const LibMCDriver_OPCUA::eUADoubleType eNodeType, const LibMCDriver_OPCUA_double dValue) = 0;
+
+	/**
+	* IDriver_OPCUA::WriteString - Writes a string node value. Fails if not connected.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] sValue - Node Value to write
+	*/
+	virtual void WriteString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const std::string & sValue) = 0;
 
 };
 

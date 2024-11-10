@@ -75,7 +75,7 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	if (sType == "opcua")
+	if (sType == "opcua-1.0")
 		return new CDriver_OPCUA(sName, pDriverEnvironment);
 
 	return nullptr;
