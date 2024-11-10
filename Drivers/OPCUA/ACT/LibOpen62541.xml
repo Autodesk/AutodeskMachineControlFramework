@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="Library Wrapper for open62541 OPCUA Library" namespace="LibOpen62541" copyright="Autodesk Inc." year="2024" basename="libopen62541"
+	version="1.2.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	<errors>
+			
+		<error name="NOTIMPLEMENTED" code="1001" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="1002" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="1003" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="1004" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="1005" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="1006" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="1007" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="1008" description="the version of the binary interface does not match the bindings interface" />
+		<error name="NOTCONNECTED" code="1009" description="PLC is not connected" />				
+		<error name="COULDNOTCREATEOPCUACLIENT" code="1010" description="Could not create OPCUA Client" />				
+		<error name="COULDNOTSENDOPCUACLIENTCONFIG" code="1011" description="Could not send OPCUA Client config" />				
+		<error name="COULDNOTCONNECT" code="1012" description="Could not connect" />				
+		<error name="INVALIDSECURITYMODE" code="1013" description="Invalid security mode" />				
+		<error name="COULDNOTREADVALUE" code="1014" description="Could not read value" />				
+		<error name="COULDNOTWRITEVALUE" code="1015" description="Could not write value" />				
+		<error name="READVALUEISOFINCORRECTTYPE" code="1016" description="Read value is of incorrect type." />				
+		<error name="INVALIDFLOATNODETYPE" code="1017" description="Invalid float node type." />				
+		<error name="INVALIDINTEGERNODETYPE" code="1018" description="Invalid integer node type." />				
+		<error name="OPCUAVARIANTDATAISNULL" code="1019" description="OPCUA Variant data is null." />				
+		<error name="OPCUASTRINGDATAISNULL" code="1020" description="OPCUA String data is null." />				
+		<error name="OPCUAWRITEINTEGEROUTOFBOUNDS" code="1021" description="OPCUA Write integer out of bounds." />				
+		
+		
+		
+				
+		
+	</errors>
+	
+	<enum name="UAIntegerType">
+	   <option name="Unknown" value="0" />
+	   <option name="UAUInt8" value="1" />
+	   <option name="UAUInt16" value="2" />
+	   <option name="UAUInt32" value="3" />
+	   <option name="UAUInt64" value="4" />
+	   <option name="UAInt8" value="5" />
+	   <option name="UAInt16" value="6" />
+	   <option name="UAInt32" value="7" />
+	   <option name="UAInt64" value="8" />
+	</enum>
+
+	<enum name="UADoubleType">
+	   <option name="Unknown" value="0" />
+	   <option name="UAFloat32" value="1" />
+	   <option name="UADouble64" value="2" />
+	</enum>
+	
+	<enum name="UASecurityMode">
+	   <option name="None" value="0" />
+	   <option name="Sign" value="1" />
+	   <option name="SignAndEncrypt" value="2" />
+	</enum>
+		
+	<class name="Base">
+	</class>
+
+
+	<class name="OPCClient" parent="Base">
+
+		<method name="EnableEncryption" description="Enables encryption for subsequent connects.">
+			<param name="LocalCertificate" type="string" pass="in" description="Local Certificate String" />
+			<param name="PrivateKey" type="string" pass="in" description="Private Key" />
+			<param name="SecurityMode" type="enum" class="UASecurityMode" pass="in" description="Security mode to use." />
+		</method>
+
+		<method name="DisableEncryption" description="Enables encryption for subsequent connects.">
+		</method>
+
+		<method name="ConnectUserName" description="Connects to the end point with a user name and password.">
+			<param name="EndPointURL" type="string" pass="in" description="End point URL to connect to." />
+			<param name="Username" type="string" pass="in" description="User login." />
+			<param name="Password" type="string" pass="in" description="Password." />
+			<param name="ApplicationURL" type="string" pass="in" description="Application URL to use." />
+		</method>
+
+		<method name="Disconnect" description="Disconnect from the end point. Does nothing if not connected">
+		</method>
+		
+		<method name="IsConnected" description="Returns if an end point is connected.">
+			<param name="Value" type="bool" pass="return" description="Returns true if connected." />
+		</method>
+		
+		<method name="ReadInteger" description="Reads an integer node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="NodeType" type="enum" class="UAIntegerType" pass="in" description="Type of Node to read" />
+			<param name="Value" type="int64" pass="return" description="Retrieved Node Value" />
+		</method>
+
+		<method name="ReadDouble" description="Reads a double node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="NodeType" type="enum" class="UADoubleType" pass="in" description="Type of Node to read" />
+			<param name="Value" type="double" pass="return" description="Retrieved Node Value" />
+		</method>
+	
+		<method name="ReadString" description="Reads a string node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="Value" type="string" pass="return" description="Retrieved String Value" />
+		</method>
+
+		<method name="WriteInteger" description="Writes an integer node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="NodeType" type="enum" class="UAIntegerType" pass="in" description="Type of Node to write" />
+			<param name="Value" type="int64" pass="in" description="Node Value to write" />
+		</method>
+
+		<method name="WriteDouble" description="Writes a double node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="NodeType" type="enum" class="UADoubleType" pass="in" description="Type of Node to write" />
+			<param name="Value" type="double" pass="in" description="Node Value to write" />
+		</method>
+	
+		<method name="WriteString" description="Writes a string node value. Fails if not connected.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="Value" type="string" pass="in" description="Node Value to write" />
+		</method>
+
+	
+	</class>
+	
+	
+	<global baseclassname="Base" stringoutclassname="Base" acquiremethod="AcquireInstance"
+		releasemethod="ReleaseInstance" versionmethod="GetVersion" errormethod="GetLastError" journalmethod="SetJournal"		
+		symbollookupmethod="GetSymbolLookupMethod"
+		>
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="AcquireInstance" description="Acquire shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>
+		
+		<method name="CreateClient" description="Creates an OPC Client">
+			<param name="ClientInstance" type="class" class="OPCClient" pass="return" description="OPCClient Instance" />
+		</method>
+		
+	</global>
+</component>
