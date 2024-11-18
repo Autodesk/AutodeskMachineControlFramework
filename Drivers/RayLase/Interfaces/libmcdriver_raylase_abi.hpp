@@ -128,6 +128,21 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_queryparametersex(LibMCDriver_Raylase_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
+ Class definition for RaylaseCommandLog
+**************************************************************************************************************************/
+
+/**
+* Returns the log as  string.
+*
+* @param[in] pRaylaseCommandLog - RaylaseCommandLog instance.
+* @param[in] nLogStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLogStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLogStringBuffer -  buffer of Retrieved log string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecommandlog_retrieveasstring(LibMCDriver_Raylase_RaylaseCommandLog pRaylaseCommandLog, const LibMCDriver_Raylase_uint32 nLogStringBufferSize, LibMCDriver_Raylase_uint32* pLogStringNeededChars, char * pLogStringBuffer);
+
+/*************************************************************************************************************************
  Class definition for RaylaseCard
 **************************************************************************************************************************/
 
@@ -147,6 +162,31 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_rayla
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_resettosystemdefaults(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Enables Command logging for the Raylase SDK interface.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_enablecommandlogging(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Disables Command logging for the Raylase SDK interface.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_disablecommandlogging(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Retrieves the last Raylase SDK command log. Fails if Command logging was never enabled.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pRaylaseLogInstance - Instance of connected card.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_retrievelatestlog(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_RaylaseCommandLog * pRaylaseLogInstance);
 
 /**
 * Turns the laser on.

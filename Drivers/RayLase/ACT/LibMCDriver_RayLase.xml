@@ -65,7 +65,9 @@
 		<error name="SEGMENTHASNOASSIGNEDCARD" code="1013" description="Segment has no assigned card." />		
 		<error name="INVALIDSYSTEMTIMING" code="1014" description="Invalid system timing" />		
 		<error name="SCANNINGTIMEOUT" code="1015" description="A scanning timeout occured" />		
-		<error name="CANNOTDELETELISTLISTINPROGRESS" code="1016" description="Cannot delete list in progress" />		
+		<error name="CANNOTDELETELISTLISTINPROGRESS" code="1016" description="Cannot delete list in progress" />				
+		<error name="RAYLASESDKNOTLOADED" code="1017" description="Raylase SDK not loaded" />		
+		
 		
 						
 				
@@ -140,6 +142,15 @@ Custom implementation
 
 
 
+	<class name="RaylaseCommandLog" parent="Driver" description="A class that implements a raylase command log.">
+	
+		<method name="RetrieveAsString" description="Returns the log as  string.">
+			<param name="LogString" type="string" pass="return" description="Retrieved log string." />
+		</method>
+		
+	</class>
+
+
 	<class name="RaylaseCard" parent="Base" description="Object to control a raylase-card.">
 	
 		<method name="IsConnected" description="Checks if the card is connected.">
@@ -147,6 +158,16 @@ Custom implementation
 		</method>
 
 		<method name="ResetToSystemDefaults" description="Resets the card settings to system defaults.">
+		</method>
+		
+		<method name="EnableCommandLogging" description="Enables Command logging for the Raylase SDK interface.">
+		</method>
+
+		<method name="DisableCommandLogging" description="Disables Command logging for the Raylase SDK interface.">
+		</method>
+
+		<method name="RetrieveLatestLog" description="Retrieves the last Raylase SDK command log. Fails if Command logging was never enabled.">
+			<param name="RaylaseLogInstance" type="class" class="RaylaseCommandLog" pass="return" description="Instance of connected card." />
 		</method>
 
 		<method name="LaserOn" description="Turns the laser on.">

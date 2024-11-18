@@ -51,7 +51,10 @@ typedef std::shared_ptr<CRaylaseCardImpl> PRaylaseCardImpl;
 class CRaylaseCardImpl {
 private:
 
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+	LibMCEnv::PWorkingFile m_pLoggingFile;
 
 	PRaylaseSDK m_pSDK;
 	std::string m_sCardName;
@@ -71,14 +74,19 @@ private:
 
 public:
 	
-	static PRaylaseCardImpl connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	static PRaylaseCardImpl connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment, LibMCEnv::PWorkingDirectory pWorkingDirectory);
 
-	CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+	CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment, LibMCEnv::PWorkingDirectory pWorkingDirectory);
+	
 	virtual ~CRaylaseCardImpl();
 
 	std::string getCardName();
 
 	void ResetToSystemDefaults();
+
+	void EnableCommandLogging();
+
+	void DisableCommandLogging();
 
 	void LaserOn();
 

@@ -60,6 +60,21 @@ void CRaylaseCard::ResetToSystemDefaults()
     m_pRaylaseCardImpl->ResetToSystemDefaults ();
 }
 
+void CRaylaseCard::EnableCommandLogging()
+{
+    m_pRaylaseCardImpl->EnableCommandLogging();
+}
+
+void CRaylaseCard::DisableCommandLogging()
+{
+    m_pRaylaseCardImpl->DisableCommandLogging();
+}
+
+IRaylaseCommandLog* CRaylaseCard::RetrieveLatestLog()
+{
+    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_NOTIMPLEMENTED);
+}
+
 void CRaylaseCard::LaserOn()
 {
     m_pRaylaseCardImpl->LaserOn();

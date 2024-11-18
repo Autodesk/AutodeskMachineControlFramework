@@ -62,6 +62,7 @@ namespace LibMCDriver_Raylase {
 class CWrapper;
 class CBase;
 class CDriver;
+class CRaylaseCommandLog;
 class CRaylaseCard;
 class CDriver_Raylase;
 
@@ -71,6 +72,7 @@ class CDriver_Raylase;
 typedef CWrapper CLibMCDriver_RaylaseWrapper;
 typedef CBase CLibMCDriver_RaylaseBase;
 typedef CDriver CLibMCDriver_RaylaseDriver;
+typedef CRaylaseCommandLog CLibMCDriver_RaylaseRaylaseCommandLog;
 typedef CRaylaseCard CLibMCDriver_RaylaseRaylaseCard;
 typedef CDriver_Raylase CLibMCDriver_RaylaseDriver_Raylase;
 
@@ -80,6 +82,7 @@ typedef CDriver_Raylase CLibMCDriver_RaylaseDriver_Raylase;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
+typedef std::shared_ptr<CRaylaseCommandLog> PRaylaseCommandLog;
 typedef std::shared_ptr<CRaylaseCard> PRaylaseCard;
 typedef std::shared_ptr<CDriver_Raylase> PDriver_Raylase;
 
@@ -89,6 +92,7 @@ typedef std::shared_ptr<CDriver_Raylase> PDriver_Raylase;
 typedef PWrapper PLibMCDriver_RaylaseWrapper;
 typedef PBase PLibMCDriver_RaylaseBase;
 typedef PDriver PLibMCDriver_RaylaseDriver;
+typedef PRaylaseCommandLog PLibMCDriver_RaylaseRaylaseCommandLog;
 typedef PRaylaseCard PLibMCDriver_RaylaseRaylaseCard;
 typedef PDriver_Raylase PLibMCDriver_RaylaseDriver_Raylase;
 
@@ -195,6 +199,7 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING: return "INVALIDSYSTEMTIMING";
 			case LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT: return "SCANNINGTIMEOUT";
 			case LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS: return "CANNOTDELETELISTLISTINPROGRESS";
+			case LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED: return "RAYLASESDKNOTLOADED";
 		}
 		return "UNKNOWN";
 	}
@@ -228,6 +233,7 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING: return "Invalid system timing";
 			case LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT: return "A scanning timeout occured";
 			case LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS: return "Cannot delete list in progress";
+			case LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED: return "Raylase SDK not loaded";
 		}
 		return "unknown error";
 	}
@@ -351,6 +357,7 @@ private:
 
 	friend class CBase;
 	friend class CDriver;
+	friend class CRaylaseCommandLog;
 	friend class CRaylaseCard;
 	friend class CDriver_Raylase;
 
@@ -436,6 +443,23 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CRaylaseCommandLog 
+**************************************************************************************************************************/
+class CRaylaseCommandLog : public CDriver {
+public:
+	
+	/**
+	* CRaylaseCommandLog::CRaylaseCommandLog - Constructor for RaylaseCommandLog class.
+	*/
+	CRaylaseCommandLog(CWrapper* pWrapper, LibMCDriver_RaylaseHandle pHandle)
+		: CDriver(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string RetrieveAsString();
+};
+	
+/*************************************************************************************************************************
  Class CRaylaseCard 
 **************************************************************************************************************************/
 class CRaylaseCard : public CBase {
@@ -451,6 +475,9 @@ public:
 	
 	inline bool IsConnected();
 	inline void ResetToSystemDefaults();
+	inline void EnableCommandLogging();
+	inline void DisableCommandLogging();
+	inline PRaylaseCommandLog RetrieveLatestLog();
 	inline void LaserOn();
 	inline void LaserOff();
 	inline void ArmLaser(const bool bShallBeArmed);
@@ -616,8 +643,12 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
+		pWrapperTable->m_RaylaseCommandLog_RetrieveAsString = nullptr;
 		pWrapperTable->m_RaylaseCard_IsConnected = nullptr;
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = nullptr;
+		pWrapperTable->m_RaylaseCard_EnableCommandLogging = nullptr;
+		pWrapperTable->m_RaylaseCard_DisableCommandLogging = nullptr;
+		pWrapperTable->m_RaylaseCard_RetrieveLatestLog = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOn = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOff = nullptr;
 		pWrapperTable->m_RaylaseCard_ArmLaser = nullptr;
@@ -749,6 +780,15 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCommandLog_RetrieveAsString = (PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecommandlog_retrieveasstring");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCommandLog_RetrieveAsString = (PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecommandlog_retrieveasstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCommandLog_RetrieveAsString == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RaylaseCard_IsConnected = (PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_isconnected");
 		#else // _WIN32
 		pWrapperTable->m_RaylaseCard_IsConnected = (PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_isconnected");
@@ -764,6 +804,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RaylaseCard_ResetToSystemDefaults == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_EnableCommandLogging = (PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_enablecommandlogging");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_EnableCommandLogging = (PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_enablecommandlogging");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_EnableCommandLogging == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_DisableCommandLogging = (PLibMCDriver_RaylaseRaylaseCard_DisableCommandLoggingPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_disablecommandlogging");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_DisableCommandLogging = (PLibMCDriver_RaylaseRaylaseCard_DisableCommandLoggingPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_disablecommandlogging");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_DisableCommandLogging == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_RetrieveLatestLog = (PLibMCDriver_RaylaseRaylaseCard_RetrieveLatestLogPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_retrievelatestlog");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_RetrieveLatestLog = (PLibMCDriver_RaylaseRaylaseCard_RetrieveLatestLogPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_retrievelatestlog");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_RetrieveLatestLog == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1040,12 +1107,28 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParametersEx == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecommandlog_retrieveasstring", (void**)&(pWrapperTable->m_RaylaseCommandLog_RetrieveAsString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCommandLog_RetrieveAsString == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_isconnected", (void**)&(pWrapperTable->m_RaylaseCard_IsConnected));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_IsConnected == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_resettosystemdefaults", (void**)&(pWrapperTable->m_RaylaseCard_ResetToSystemDefaults));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_ResetToSystemDefaults == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_enablecommandlogging", (void**)&(pWrapperTable->m_RaylaseCard_EnableCommandLogging));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_EnableCommandLogging == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_disablecommandlogging", (void**)&(pWrapperTable->m_RaylaseCard_DisableCommandLogging));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_DisableCommandLogging == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_retrievelatestlog", (void**)&(pWrapperTable->m_RaylaseCard_RetrieveLatestLog));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_RetrieveLatestLog == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_laseron", (void**)&(pWrapperTable->m_RaylaseCard_LaserOn));
@@ -1240,6 +1323,25 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CRaylaseCommandLog
+	 */
+	
+	/**
+	* CRaylaseCommandLog::RetrieveAsString - Returns the log as  string.
+	* @return Retrieved log string.
+	*/
+	std::string CRaylaseCommandLog::RetrieveAsString()
+	{
+		LibMCDriver_Raylase_uint32 bytesNeededLogString = 0;
+		LibMCDriver_Raylase_uint32 bytesWrittenLogString = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCommandLog_RetrieveAsString(m_pHandle, 0, &bytesNeededLogString, nullptr));
+		std::vector<char> bufferLogString(bytesNeededLogString);
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCommandLog_RetrieveAsString(m_pHandle, bytesNeededLogString, &bytesWrittenLogString, &bufferLogString[0]));
+		
+		return std::string(&bufferLogString[0]);
+	}
+	
+	/**
 	 * Method definitions for class CRaylaseCard
 	 */
 	
@@ -1261,6 +1363,37 @@ public:
 	void CRaylaseCard::ResetToSystemDefaults()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_ResetToSystemDefaults(m_pHandle));
+	}
+	
+	/**
+	* CRaylaseCard::EnableCommandLogging - Enables Command logging for the Raylase SDK interface.
+	*/
+	void CRaylaseCard::EnableCommandLogging()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_EnableCommandLogging(m_pHandle));
+	}
+	
+	/**
+	* CRaylaseCard::DisableCommandLogging - Disables Command logging for the Raylase SDK interface.
+	*/
+	void CRaylaseCard::DisableCommandLogging()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_DisableCommandLogging(m_pHandle));
+	}
+	
+	/**
+	* CRaylaseCard::RetrieveLatestLog - Retrieves the last Raylase SDK command log. Fails if Command logging was never enabled.
+	* @return Instance of connected card.
+	*/
+	PRaylaseCommandLog CRaylaseCard::RetrieveLatestLog()
+	{
+		LibMCDriver_RaylaseHandle hRaylaseLogInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_RetrieveLatestLog(m_pHandle, &hRaylaseLogInstance));
+		
+		if (!hRaylaseLogInstance) {
+			CheckError(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CRaylaseCommandLog>(m_pWrapper, hRaylaseLogInstance);
 	}
 	
 	/**

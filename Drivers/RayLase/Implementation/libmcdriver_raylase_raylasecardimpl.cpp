@@ -39,12 +39,12 @@ using namespace LibMCDriver_Raylase::Impl;
 
 #define MINLASERPOWER 0.1
 
-PRaylaseCardImpl CRaylaseCardImpl::connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+PRaylaseCardImpl CRaylaseCardImpl::connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment, LibMCEnv::PWorkingDirectory pWorkingDirectory)
 {
-    return std::make_shared<CRaylaseCardImpl>(pSDK, sCardName, sCardIP, nPort, dMaxLaserPowerInWatts,  bSimulationMode, pDriverEnvironment);
+    return std::make_shared<CRaylaseCardImpl>(pSDK, sCardName, sCardIP, nPort, dMaxLaserPowerInWatts,  bSimulationMode, pDriverEnvironment, pWorkingDirectory);
 }
 
-CRaylaseCardImpl::CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+CRaylaseCardImpl::CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment, LibMCEnv::PWorkingDirectory pWorkingDirectory)
     : m_pSDK (pSDK), 
         m_sCardName (sCardName), 
         m_sCardIP (sCardIP), 
@@ -55,11 +55,14 @@ CRaylaseCardImpl::CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardNam
         m_bSimulatedPilotIsArmed (false), 
         m_bSimulatedPilotIsAlarm (false),
         m_pDriverEnvironment (pDriverEnvironment), 
+        m_pWorkingDirectory (pWorkingDirectory),
         m_dMaxLaserPowerInWatts (dMaxLaserPowerInWatts),
         m_nAssignedLaserIndex (0)
 
 {
     if (pDriverEnvironment.get () == nullptr)
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+    if (pWorkingDirectory.get () == nullptr)
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
 
     if (dMaxLaserPowerInWatts < MINLASERPOWER)
@@ -96,6 +99,28 @@ void CRaylaseCardImpl::ResetToSystemDefaults()
 
     m_pSDK->checkError(m_pSDK->rlSystemResetToDefaults(m_Handle));
 }
+
+void CRaylaseCardImpl::EnableCommandLogging()
+{
+    if (m_bSimulationMode)
+        return;
+
+    auto pUtils = m_pDriverEnvironment->CreateCryptoContext();
+    auto sUUID = pUtils->CreateUUID();
+
+    m_pLoggingFile = m_pWorkingDirectory->AddManagedFile("command_logging_" + sUUID);
+    std::string sFileName = m_pLoggingFile->GetAbsoluteFileName();
+
+    m_pSDK->checkError(m_pSDK->rlEnableCommandLogging(m_Handle, sFileName.c_str (), -1));
+
+}
+
+void CRaylaseCardImpl::DisableCommandLogging()
+{
+    m_pSDK->checkError(m_pSDK->rlDisableCommandLogging(m_Handle));
+
+}
+
 
 void CRaylaseCardImpl::LaserOn()
 {

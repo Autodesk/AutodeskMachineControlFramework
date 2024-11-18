@@ -57,6 +57,7 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
+class IRaylaseCommandLog;
 class IRaylaseCard;
 class IDriver_Raylase;
 
@@ -310,6 +311,23 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
+ Class interface for RaylaseCommandLog 
+**************************************************************************************************************************/
+
+class IRaylaseCommandLog : public virtual IDriver {
+public:
+	/**
+	* IRaylaseCommandLog::RetrieveAsString - Returns the log as  string.
+	* @return Retrieved log string.
+	*/
+	virtual std::string RetrieveAsString() = 0;
+
+};
+
+typedef IBaseSharedPtr<IRaylaseCommandLog> PIRaylaseCommandLog;
+
+
+/*************************************************************************************************************************
  Class interface for RaylaseCard 
 **************************************************************************************************************************/
 
@@ -325,6 +343,22 @@ public:
 	* IRaylaseCard::ResetToSystemDefaults - Resets the card settings to system defaults.
 	*/
 	virtual void ResetToSystemDefaults() = 0;
+
+	/**
+	* IRaylaseCard::EnableCommandLogging - Enables Command logging for the Raylase SDK interface.
+	*/
+	virtual void EnableCommandLogging() = 0;
+
+	/**
+	* IRaylaseCard::DisableCommandLogging - Disables Command logging for the Raylase SDK interface.
+	*/
+	virtual void DisableCommandLogging() = 0;
+
+	/**
+	* IRaylaseCard::RetrieveLatestLog - Retrieves the last Raylase SDK command log. Fails if Command logging was never enabled.
+	* @return Instance of connected card.
+	*/
+	virtual IRaylaseCommandLog * RetrieveLatestLog() = 0;
 
 	/**
 	* IRaylaseCard::LaserOn - Turns the laser on.

@@ -315,6 +315,58 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_driver_queryparametersex(LibMCDriv
 
 
 /*************************************************************************************************************************
+ Class implementation for RaylaseCommandLog
+**************************************************************************************************************************/
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecommandlog_retrieveasstring(LibMCDriver_Raylase_RaylaseCommandLog pRaylaseCommandLog, const LibMCDriver_Raylase_uint32 nLogStringBufferSize, LibMCDriver_Raylase_uint32* pLogStringNeededChars, char * pLogStringBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCommandLog;
+
+	try {
+		if ( (!pLogStringBuffer) && !(pLogStringNeededChars) )
+			throw ELibMCDriver_RaylaseInterfaceException (LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		std::string sLogString("");
+		IRaylaseCommandLog* pIRaylaseCommandLog = dynamic_cast<IRaylaseCommandLog*>(pIBaseClass);
+		if (!pIRaylaseCommandLog)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pLogStringBuffer == nullptr);
+		if (isCacheCall) {
+			sLogString = pIRaylaseCommandLog->RetrieveAsString();
+
+			pIRaylaseCommandLog->_setCache (new ParameterCache_1<std::string> (sLogString));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIRaylaseCommandLog->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+			cache->retrieveData (sLogString);
+			pIRaylaseCommandLog->_setCache (nullptr);
+		}
+		
+		if (pLogStringNeededChars)
+			*pLogStringNeededChars = (LibMCDriver_Raylase_uint32) (sLogString.size()+1);
+		if (pLogStringBuffer) {
+			if (sLogString.size() >= nLogStringBufferSize)
+				throw ELibMCDriver_RaylaseInterfaceException (LIBMCDRIVER_RAYLASE_ERROR_BUFFERTOOSMALL);
+			for (size_t iLogString = 0; iLogString < sLogString.size(); iLogString++)
+				pLogStringBuffer[iLogString] = sLogString[iLogString];
+			pLogStringBuffer[sLogString.size()] = 0;
+		}
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for RaylaseCard
 **************************************************************************************************************************/
 LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_isconnected(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pIsConnected)
@@ -354,6 +406,82 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_resettosystemdefaults(
 		
 		pIRaylaseCard->ResetToSystemDefaults();
 
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_enablecommandlogging(LibMCDriver_Raylase_RaylaseCard pRaylaseCard)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCard;
+
+	try {
+		IRaylaseCard* pIRaylaseCard = dynamic_cast<IRaylaseCard*>(pIBaseClass);
+		if (!pIRaylaseCard)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIRaylaseCard->EnableCommandLogging();
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_disablecommandlogging(LibMCDriver_Raylase_RaylaseCard pRaylaseCard)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCard;
+
+	try {
+		IRaylaseCard* pIRaylaseCard = dynamic_cast<IRaylaseCard*>(pIBaseClass);
+		if (!pIRaylaseCard)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIRaylaseCard->DisableCommandLogging();
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_retrievelatestlog(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_RaylaseCommandLog * pRaylaseLogInstance)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCard;
+
+	try {
+		if (pRaylaseLogInstance == nullptr)
+			throw ELibMCDriver_RaylaseInterfaceException (LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		IBase* pBaseRaylaseLogInstance(nullptr);
+		IRaylaseCard* pIRaylaseCard = dynamic_cast<IRaylaseCard*>(pIBaseClass);
+		if (!pIRaylaseCard)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pBaseRaylaseLogInstance = pIRaylaseCard->RetrieveLatestLog();
+
+		*pRaylaseLogInstance = (IBase*)(pBaseRaylaseLogInstance);
 		return LIBMCDRIVER_RAYLASE_SUCCESS;
 	}
 	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
@@ -902,10 +1030,18 @@ LibMCDriver_RaylaseResult LibMCDriver_Raylase::Impl::LibMCDriver_Raylase_GetProc
 		*ppProcAddress = (void*) &libmcdriver_raylase_driver_queryparameters;
 	if (sProcName == "libmcdriver_raylase_driver_queryparametersex") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_driver_queryparametersex;
+	if (sProcName == "libmcdriver_raylase_raylasecommandlog_retrieveasstring") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecommandlog_retrieveasstring;
 	if (sProcName == "libmcdriver_raylase_raylasecard_isconnected") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_isconnected;
 	if (sProcName == "libmcdriver_raylase_raylasecard_resettosystemdefaults") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_resettosystemdefaults;
+	if (sProcName == "libmcdriver_raylase_raylasecard_enablecommandlogging") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_enablecommandlogging;
+	if (sProcName == "libmcdriver_raylase_raylasecard_disablecommandlogging") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_disablecommandlogging;
+	if (sProcName == "libmcdriver_raylase_raylasecard_retrievelatestlog") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_retrievelatestlog;
 	if (sProcName == "libmcdriver_raylase_raylasecard_laseron") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_laseron;
 	if (sProcName == "libmcdriver_raylase_raylasecard_laseroff") 

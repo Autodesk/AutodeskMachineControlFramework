@@ -121,6 +121,7 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING 1014 /** Invalid system timing */
 #define LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT 1015 /** A scanning timeout occured */
 #define LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS 1016 /** Cannot delete list in progress */
+#define LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED 1017 /** Raylase SDK not loaded */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -154,6 +155,7 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING: return "Invalid system timing";
     case LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT: return "A scanning timeout occured";
     case LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS: return "Cannot delete list in progress";
+    case LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED: return "Raylase SDK not loaded";
     default: return "unknown error";
   }
 }
@@ -164,6 +166,7 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
 
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Base;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver;
+typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCommandLog;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCard;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver_Raylase;
 

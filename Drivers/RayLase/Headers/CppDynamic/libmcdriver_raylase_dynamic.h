@@ -115,6 +115,21 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_QueryParametersPt
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_QueryParametersExPtr) (LibMCDriver_Raylase_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
+ Class definition for RaylaseCommandLog
+**************************************************************************************************************************/
+
+/**
+* Returns the log as  string.
+*
+* @param[in] pRaylaseCommandLog - RaylaseCommandLog instance.
+* @param[in] nLogStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLogStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLogStringBuffer -  buffer of Retrieved log string., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr) (LibMCDriver_Raylase_RaylaseCommandLog pRaylaseCommandLog, const LibMCDriver_Raylase_uint32 nLogStringBufferSize, LibMCDriver_Raylase_uint32* pLogStringNeededChars, char * pLogStringBuffer);
+
+/*************************************************************************************************************************
  Class definition for RaylaseCard
 **************************************************************************************************************************/
 
@@ -134,6 +149,31 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_IsConnectedP
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Enables Command logging for the Raylase SDK interface.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Disables Command logging for the Raylase SDK interface.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DisableCommandLoggingPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Retrieves the last Raylase SDK command log. Fails if Command logging was never enabled.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pRaylaseLogInstance - Instance of connected card.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_RetrieveLatestLogPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_RaylaseCommandLog * pRaylaseLogInstance);
 
 /**
 * Turns the laser on.
@@ -401,8 +441,12 @@ typedef struct {
 	PLibMCDriver_RaylaseDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_RaylaseDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_RaylaseDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
+	PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr m_RaylaseCommandLog_RetrieveAsString;
 	PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr m_RaylaseCard_IsConnected;
 	PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr m_RaylaseCard_ResetToSystemDefaults;
+	PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr m_RaylaseCard_EnableCommandLogging;
+	PLibMCDriver_RaylaseRaylaseCard_DisableCommandLoggingPtr m_RaylaseCard_DisableCommandLogging;
+	PLibMCDriver_RaylaseRaylaseCard_RetrieveLatestLogPtr m_RaylaseCard_RetrieveLatestLog;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr m_RaylaseCard_LaserOn;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOffPtr m_RaylaseCard_LaserOff;
 	PLibMCDriver_RaylaseRaylaseCard_ArmLaserPtr m_RaylaseCard_ArmLaser;

@@ -72,6 +72,12 @@ public:
 
 	void ResetToSystemDefaults() override;
 
+	void EnableCommandLogging() override;
+
+	void DisableCommandLogging() override;
+
+	IRaylaseCommandLog* RetrieveLatestLog() override;
+
 	void LaserOn() override;
 
 	void LaserOff() override;
