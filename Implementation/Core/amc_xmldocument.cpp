@@ -97,7 +97,7 @@ void CXMLDocumentInstance::extractPugiDocument(std::shared_ptr<pugi::xml_documen
 		}
 
 		if (sNameSpacePrefix.empty() && (sAttributeName == "xmlns")) {
-			RegisterNamespace(sAttributeValue, "");
+			m_pDefaultNameSpace = registerNamespaceEx(sAttributeValue, "");
 		}
 	}
 
