@@ -1171,6 +1171,26 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCurrentFre
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pTimeStamp);
 
 /**
+* Returns an RTC Channel in real time. The signal register is instantly read and directly passed back to the caller.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] eChannelType - Internal RTC Channel type. See SCANLAB RTC Documentation for set_trigger for a proper explanation.
+* @param[out] pValue - Internal Value of that signal.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetRTCChannelPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eRTCChannelType eChannelType, LibMCDriver_ScanLab_int32 * pValue);
+
+/**
+* Returns an internal RTC value by RTC Signal ID. The signal register is instantly read and directly passed back to the caller.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nInternalSignalID - Internal RTC Signal ID. See SCANLAB RTC Documentation for set_trigger for a proper explanation. Some values are mapped from the enum definition of RTCChannelType.
+* @param[out] pValue - Internal Value of that signal.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetRTCInternalValuePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nInternalSignalID, LibMCDriver_ScanLab_int32 * pValue);
+
+/**
 * Stops the execution of the current list immediately.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -2861,6 +2881,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr m_RTCContext_AddFreeVariable;
 	PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr m_RTCContext_GetCurrentFreeVariable;
 	PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr m_RTCContext_GetTimeStamp;
+	PLibMCDriver_ScanLabRTCContext_GetRTCChannelPtr m_RTCContext_GetRTCChannel;
+	PLibMCDriver_ScanLabRTCContext_GetRTCInternalValuePtr m_RTCContext_GetRTCInternalValue;
 	PLibMCDriver_ScanLabRTCContext_StopExecutionPtr m_RTCContext_StopExecution;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesOIEPtr m_RTCContext_DrawHatchesOIE;
 	PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr m_RTCContext_AddLayerToList;

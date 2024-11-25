@@ -3025,6 +3025,58 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_gettimestamp(LibMCDrive
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getrtcchannel(LibMCDriver_ScanLab_RTCContext pRTCContext, eLibMCDriver_ScanLabRTCChannelType eChannelType, LibMCDriver_ScanLab_int32 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pValue = pIRTCContext->GetRTCChannel(eChannelType);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getrtcinternalvalue(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nInternalSignalID, LibMCDriver_ScanLab_int32 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pValue = pIRTCContext->GetRTCInternalValue(nInternalSignalID);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_stopexecution(LibMCDriver_ScanLab_RTCContext pRTCContext)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -7198,6 +7250,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getcurrentfreevariable;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_gettimestamp") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_gettimestamp;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getrtcchannel") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getrtcchannel;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getrtcinternalvalue") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getrtcinternalvalue;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_stopexecution") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_stopexecution;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_drawhatchesoie") 

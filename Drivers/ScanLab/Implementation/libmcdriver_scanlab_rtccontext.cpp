@@ -2613,3 +2613,18 @@ void CRTCContext::SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nC
 
 }
 
+LibMCDriver_ScanLab_int32 CRTCContext::GetRTCChannel(const LibMCDriver_ScanLab::eRTCChannelType eChannelType)
+{
+	uint32_t nInternalSignalID = (uint32_t)eChannelType;
+	if ((nInternalSignalID == 0) || (nInternalSignalID >= (uint32_t)LibMCDriver_ScanLab::eRTCChannelType::ChannelLaserOn))
+		throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE);
+
+	return m_pScanLabSDK->n_get_value(m_CardNo, nInternalSignalID);
+
+}
+
+LibMCDriver_ScanLab_int32 CRTCContext::GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID)
+{
+	return m_pScanLabSDK->n_get_value(m_CardNo, nInternalSignalID);
+}
+

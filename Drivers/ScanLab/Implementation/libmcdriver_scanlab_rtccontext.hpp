@@ -419,6 +419,10 @@ public:
 
 	void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale) override;
 
+	LibMCDriver_ScanLab_int32 GetRTCChannel(const LibMCDriver_ScanLab::eRTCChannelType eChannelType) override;
+
+	LibMCDriver_ScanLab_int32 GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID) override;
+
 };
 
 

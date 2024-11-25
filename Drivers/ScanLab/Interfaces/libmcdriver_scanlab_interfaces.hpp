@@ -1232,6 +1232,20 @@ public:
 	virtual LibMCDriver_ScanLab_uint32 GetTimeStamp() = 0;
 
 	/**
+	* IRTCContext::GetRTCChannel - Returns an RTC Channel in real time. The signal register is instantly read and directly passed back to the caller.
+	* @param[in] eChannelType - Internal RTC Channel type. See SCANLAB RTC Documentation for set_trigger for a proper explanation.
+	* @return Internal Value of that signal.
+	*/
+	virtual LibMCDriver_ScanLab_int32 GetRTCChannel(const LibMCDriver_ScanLab::eRTCChannelType eChannelType) = 0;
+
+	/**
+	* IRTCContext::GetRTCInternalValue - Returns an internal RTC value by RTC Signal ID. The signal register is instantly read and directly passed back to the caller.
+	* @param[in] nInternalSignalID - Internal RTC Signal ID. See SCANLAB RTC Documentation for set_trigger for a proper explanation. Some values are mapped from the enum definition of RTCChannelType.
+	* @return Internal Value of that signal.
+	*/
+	virtual LibMCDriver_ScanLab_int32 GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID) = 0;
+
+	/**
 	* IRTCContext::StopExecution - Stops the execution of the current list immediately.
 	*/
 	virtual void StopExecution() = 0;

@@ -881,6 +881,8 @@ public:
 	inline void AddFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo, const LibMCDriver_ScanLab_uint32 nValue);
 	inline LibMCDriver_ScanLab_uint32 GetCurrentFreeVariable(const LibMCDriver_ScanLab_uint32 nVariableNo);
 	inline LibMCDriver_ScanLab_uint32 GetTimeStamp();
+	inline LibMCDriver_ScanLab_int32 GetRTCChannel(const eRTCChannelType eChannelType);
+	inline LibMCDriver_ScanLab_int32 GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID);
 	inline void StopExecution();
 	inline void DrawHatchesOIE(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue, const LibMCDriver_ScanLab_uint32 nOIEPIDControlIndex);
 	inline void AddLayerToList(classParam<LibMCEnv::CToolpathLayer> pLayer, const bool bFailIfNonAssignedDataExists);
@@ -1323,6 +1325,8 @@ public:
 		pWrapperTable->m_RTCContext_AddFreeVariable = nullptr;
 		pWrapperTable->m_RTCContext_GetCurrentFreeVariable = nullptr;
 		pWrapperTable->m_RTCContext_GetTimeStamp = nullptr;
+		pWrapperTable->m_RTCContext_GetRTCChannel = nullptr;
+		pWrapperTable->m_RTCContext_GetRTCInternalValue = nullptr;
 		pWrapperTable->m_RTCContext_StopExecution = nullptr;
 		pWrapperTable->m_RTCContext_DrawHatchesOIE = nullptr;
 		pWrapperTable->m_RTCContext_AddLayerToList = nullptr;
@@ -2496,6 +2500,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_GetTimeStamp == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetRTCChannel = (PLibMCDriver_ScanLabRTCContext_GetRTCChannelPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getrtcchannel");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetRTCChannel = (PLibMCDriver_ScanLabRTCContext_GetRTCChannelPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getrtcchannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetRTCChannel == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetRTCInternalValue = (PLibMCDriver_ScanLabRTCContext_GetRTCInternalValuePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getrtcinternalvalue");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetRTCInternalValue = (PLibMCDriver_ScanLabRTCContext_GetRTCInternalValuePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getrtcinternalvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetRTCInternalValue == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4323,6 +4345,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetTimeStamp == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getrtcchannel", (void**)&(pWrapperTable->m_RTCContext_GetRTCChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetRTCChannel == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getrtcinternalvalue", (void**)&(pWrapperTable->m_RTCContext_GetRTCInternalValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetRTCInternalValue == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_stopexecution", (void**)&(pWrapperTable->m_RTCContext_StopExecution));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StopExecution == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6135,6 +6165,32 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetTimeStamp(m_pHandle, &resultTimeStamp));
 		
 		return resultTimeStamp;
+	}
+	
+	/**
+	* CRTCContext::GetRTCChannel - Returns an RTC Channel in real time. The signal register is instantly read and directly passed back to the caller.
+	* @param[in] eChannelType - Internal RTC Channel type. See SCANLAB RTC Documentation for set_trigger for a proper explanation.
+	* @return Internal Value of that signal.
+	*/
+	LibMCDriver_ScanLab_int32 CRTCContext::GetRTCChannel(const eRTCChannelType eChannelType)
+	{
+		LibMCDriver_ScanLab_int32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetRTCChannel(m_pHandle, eChannelType, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CRTCContext::GetRTCInternalValue - Returns an internal RTC value by RTC Signal ID. The signal register is instantly read and directly passed back to the caller.
+	* @param[in] nInternalSignalID - Internal RTC Signal ID. See SCANLAB RTC Documentation for set_trigger for a proper explanation. Some values are mapped from the enum definition of RTCChannelType.
+	* @return Internal Value of that signal.
+	*/
+	LibMCDriver_ScanLab_int32 CRTCContext::GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID)
+	{
+		LibMCDriver_ScanLab_int32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetRTCInternalValue(m_pHandle, nInternalSignalID, &resultValue));
+		
+		return resultValue;
 	}
 	
 	/**
