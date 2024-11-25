@@ -1514,6 +1514,22 @@ INLightAFXProfileSelector* CRTCContext::CreateNLightAFXBeamProfileSelector()
 	return new CNLightAFXProfileSelector(m_pNLightAFXSelectorInstance);
 }
 
+IGPIOSequence* CRTCContext::AddGPIOSequence(const std::string& sIdentifier)
+{
+	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+}
+
+IGPIOSequence* CRTCContext::FindGPIOSequence(const std::string& sIdentifier, const bool bMustExist)
+{
+	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+}
+
+void CRTCContext::DeleteGPIOSequence(const std::string& sIdentifier)
+{
+
+}
+
+
 
 void CRTCContext::StartOIEMeasurement()
 {

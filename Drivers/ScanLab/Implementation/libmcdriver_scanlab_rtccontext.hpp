@@ -271,6 +271,13 @@ public:
 
 	INLightAFXProfileSelector* CreateNLightAFXBeamProfileSelector() override;
 
+	IGPIOSequence* AddGPIOSequence(const std::string& sIdentifier) override;
+
+	IGPIOSequence* FindGPIOSequence(const std::string& sIdentifier, const bool bMustExist) override;
+
+	void DeleteGPIOSequence(const std::string& sIdentifier) override;
+
+
 	void StartOIEMeasurement() override;
 
 	void StartOIEMeasurementEx(bool bTriggerOnFlag);

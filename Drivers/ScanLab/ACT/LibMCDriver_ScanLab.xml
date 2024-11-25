@@ -551,6 +551,48 @@ Custom implementation
 	</class>
 
 
+	<class name="GPIOSequence" parent="Base" description="IO Sequence to replay on the RTC GPIOs">
+
+		<method name="GetIdentifier" description="Returns the identifier of the GPIO Sequence.">
+			<param name="Identifier" type="string" pass="return" description="Returns identifier string" />
+		</method>
+
+		<method name="Clear" description="Clears all sequence steps.">
+		</method>
+
+		<method name="AddOutput" description="Adds the writing of an output pin.">
+			<param name="OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index. MUST be between 0 and 15." />
+			<param name="OutputValue" type="bool" pass="in" description="If true, bit will be set, if false bit will be cleared." />
+		</method>
+
+		<method name="AddDelay" description="Adds a delay to the GPIO Sequence.">
+			<param name="DelayInMilliseconds" type="uint32" pass="in" description="Delay in milliseconds." />
+		</method>
+
+		<method name="WaitforInput" description="Waits for an input pin to reach a certain value.">
+			<param name="InputBit" type="uint32" pass="in" description="RTC Digital Output Bit index. MUST be between 0 and 15." />
+			<param name="InputValue" type="bool" pass="in" description="If true, the wait is for the bit becoming 1, if false, the wait is for the bit becoming 0." />
+			<param name="MaxDelayInMilliseconds" type="uint32" pass="in" description="Sets the maximum time it is allowed to take. Fails, if MaxDelay is 0." />
+		</method>
+
+		<method name="AddLabel" description="Adds a label to the current sequence position.">
+			<param name="LabelName" type="string" pass="in" description="Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. "/>
+			<param name="MaxPasses" type="uint32" pass="in" description="Maximum number of times this label can be passed. Triggers an error if the label is passed more often." />
+		</method>
+
+		<method name="GoToLabel" description="Jumps to a label. Fails if label does not exist.">
+			<param name="LabelName" type="string" pass="in" description="Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. "/>
+		</method>
+
+		<method name="ConditionalGoToLabel" description="Jumps to a label, if a certain input pin is set or cleared. Fails if label does not exist. Does nothing, if the input condition is not fulfilled.">
+			<param name="InputBit" type="uint32" pass="in" description="RTC Digital Output Bit index. MUST be between 0 and 15." />
+			<param name="InputValue" type="bool" pass="in" description="If true, the jump is for the bit becoming 1, if false, the jump is for the bit becoming 0." />
+			<param name="LabelName" type="string" pass="in" description="Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. "/>
+		</method>
+
+	</class>
+
+
 	<class name="NLightAFXProfileSelector" parent="Base" description="Profile selector for nLight AFX Laser">
 
 		<method name="SetControlOutputPins" description="Sets the control output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.">
@@ -972,6 +1014,21 @@ Custom implementation
 			<param name="Instance" type="class" class="NLightAFXProfileSelector" pass="return" description="nLight Profile selector instance." />		
 		</method>
 
+		<method name="AddGPIOSequence" description="Adds a GPIO Sequence. Fails if Sequence with the same identifier already exists.">
+			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
+			<param name="Instance" type="class" class="GPIOSequence" pass="return" description="GPIOSequence instance." />		
+		</method>
+		
+		<method name="FindGPIOSequence" description="Finds a GPIO Sequence. ">
+			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
+			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if Sequence with the identifier does not exist." />			
+			<param name="Instance" type="optionalclass" class="GPIOSequence" pass="return" description="GPIOSequence instance. Returns null, if MustExist is fales and a sequence with the identifier does not exist." />		
+		</method>
+
+		<method name="DeleteGPIOSequence" description="Deletes a GPIO Sequence. Does nothing if Sequence with the identifier does not exists.">
+			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
+		</method>
+		
 		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.">
 		</method>
 

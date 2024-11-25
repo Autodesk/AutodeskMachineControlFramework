@@ -60,6 +60,7 @@ class IDriver;
 class IUARTConnection;
 class IRTCJob;
 class IRTCRecording;
+class IGPIOSequence;
 class INLightAFXProfileSelector;
 class IRTCContext;
 class IRTCSelector;
@@ -749,6 +750,70 @@ typedef IBaseSharedPtr<IRTCRecording> PIRTCRecording;
 
 
 /*************************************************************************************************************************
+ Class interface for GPIOSequence 
+**************************************************************************************************************************/
+
+class IGPIOSequence : public virtual IBase {
+public:
+	/**
+	* IGPIOSequence::GetIdentifier - Returns the identifier of the GPIO Sequence.
+	* @return Returns identifier string
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* IGPIOSequence::Clear - Clears all sequence steps.
+	*/
+	virtual void Clear() = 0;
+
+	/**
+	* IGPIOSequence::AddOutput - Adds the writing of an output pin.
+	* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+	* @param[in] bOutputValue - If true, bit will be set, if false bit will be cleared.
+	*/
+	virtual void AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue) = 0;
+
+	/**
+	* IGPIOSequence::AddDelay - Adds a delay to the GPIO Sequence.
+	* @param[in] nDelayInMilliseconds - Delay in milliseconds.
+	*/
+	virtual void AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMilliseconds) = 0;
+
+	/**
+	* IGPIOSequence::WaitforInput - Waits for an input pin to reach a certain value.
+	* @param[in] nInputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+	* @param[in] bInputValue - If true, the wait is for the bit becoming 1, if false, the wait is for the bit becoming 0.
+	* @param[in] nMaxDelayInMilliseconds - Sets the maximum time it is allowed to take. Fails, if MaxDelay is 0.
+	*/
+	virtual void WaitforInput(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const LibMCDriver_ScanLab_uint32 nMaxDelayInMilliseconds) = 0;
+
+	/**
+	* IGPIOSequence::AddLabel - Adds a label to the current sequence position.
+	* @param[in] sLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+	* @param[in] nMaxPasses - Maximum number of times this label can be passed. Triggers an error if the label is passed more often.
+	*/
+	virtual void AddLabel(const std::string & sLabelName, const LibMCDriver_ScanLab_uint32 nMaxPasses) = 0;
+
+	/**
+	* IGPIOSequence::GoToLabel - Jumps to a label. Fails if label does not exist.
+	* @param[in] sLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+	*/
+	virtual void GoToLabel(const std::string & sLabelName) = 0;
+
+	/**
+	* IGPIOSequence::ConditionalGoToLabel - Jumps to a label, if a certain input pin is set or cleared. Fails if label does not exist. Does nothing, if the input condition is not fulfilled.
+	* @param[in] nInputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+	* @param[in] bInputValue - If true, the jump is for the bit becoming 1, if false, the jump is for the bit becoming 0.
+	* @param[in] sLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+	*/
+	virtual void ConditionalGoToLabel(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const std::string & sLabelName) = 0;
+
+};
+
+typedef IBaseSharedPtr<IGPIOSequence> PIGPIOSequence;
+
+
+/*************************************************************************************************************************
  Class interface for NLightAFXProfileSelector 
 **************************************************************************************************************************/
 
@@ -1350,6 +1415,27 @@ public:
 	* @return nLight Profile selector instance.
 	*/
 	virtual INLightAFXProfileSelector * CreateNLightAFXBeamProfileSelector() = 0;
+
+	/**
+	* IRTCContext::AddGPIOSequence - Adds a GPIO Sequence. Fails if Sequence with the same identifier already exists.
+	* @param[in] sIdentifier - Identifier for the sequence.
+	* @return GPIOSequence instance.
+	*/
+	virtual IGPIOSequence * AddGPIOSequence(const std::string & sIdentifier) = 0;
+
+	/**
+	* IRTCContext::FindGPIOSequence - Finds a GPIO Sequence. 
+	* @param[in] sIdentifier - Identifier for the sequence.
+	* @param[in] bMustExist - If true, the call fails if Sequence with the identifier does not exist.
+	* @return GPIOSequence instance. Returns null, if MustExist is fales and a sequence with the identifier does not exist.
+	*/
+	virtual IGPIOSequence * FindGPIOSequence(const std::string & sIdentifier, const bool bMustExist) = 0;
+
+	/**
+	* IRTCContext::DeleteGPIOSequence - Deletes a GPIO Sequence. Does nothing if Sequence with the identifier does not exists.
+	* @param[in] sIdentifier - Identifier for the sequence.
+	*/
+	virtual void DeleteGPIOSequence(const std::string & sIdentifier) = 0;
 
 	/**
 	* IRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.

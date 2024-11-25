@@ -517,6 +517,89 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcre
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLab_double dScaleFactor, LibMCDriver_ScanLab_double dOffset);
 
 /*************************************************************************************************************************
+ Class definition for GPIOSequence
+**************************************************************************************************************************/
+
+/**
+* Returns the identifier of the GPIO Sequence.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Returns identifier string, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_getidentifier(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, const LibMCDriver_ScanLab_uint32 nIdentifierBufferSize, LibMCDriver_ScanLab_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Clears all sequence steps.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_clear(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence);
+
+/**
+* Adds the writing of an output pin.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+* @param[in] bOutputValue - If true, bit will be set, if false bit will be cleared.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addoutput(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit, bool bOutputValue);
+
+/**
+* Adds a delay to the GPIO Sequence.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nDelayInMilliseconds - Delay in milliseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_adddelay(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nDelayInMilliseconds);
+
+/**
+* Waits for an input pin to reach a certain value.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nInputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+* @param[in] bInputValue - If true, the wait is for the bit becoming 1, if false, the wait is for the bit becoming 0.
+* @param[in] nMaxDelayInMilliseconds - Sets the maximum time it is allowed to take. Fails, if MaxDelay is 0.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_waitforinput(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nInputBit, bool bInputValue, LibMCDriver_ScanLab_uint32 nMaxDelayInMilliseconds);
+
+/**
+* Adds a label to the current sequence position.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] pLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+* @param[in] nMaxPasses - Maximum number of times this label can be passed. Triggers an error if the label is passed more often.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addlabel(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, const char * pLabelName, LibMCDriver_ScanLab_uint32 nMaxPasses);
+
+/**
+* Jumps to a label. Fails if label does not exist.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] pLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_gotolabel(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, const char * pLabelName);
+
+/**
+* Jumps to a label, if a certain input pin is set or cleared. Fails if label does not exist. Does nothing, if the input condition is not fulfilled.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nInputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+* @param[in] bInputValue - If true, the jump is for the bit becoming 1, if false, the jump is for the bit becoming 0.
+* @param[in] pLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_conditionalgotolabel(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nInputBit, bool bInputValue, const char * pLabelName);
+
+/*************************************************************************************************************************
  Class definition for NLightAFXProfileSelector
 **************************************************************************************************************************/
 
@@ -1359,6 +1442,36 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_createnlightafxbeamprofileselector(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_NLightAFXProfileSelector * pInstance);
+
+/**
+* Adds a GPIO Sequence. Fails if Sequence with the same identifier already exists.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @param[out] pInstance - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addgpiosequence(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier, LibMCDriver_ScanLab_GPIOSequence * pInstance);
+
+/**
+* Finds a GPIO Sequence. 
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @param[in] bMustExist - If true, the call fails if Sequence with the identifier does not exist.
+* @param[out] pInstance - GPIOSequence instance. Returns null, if MustExist is fales and a sequence with the identifier does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_findgpiosequence(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier, bool bMustExist, LibMCDriver_ScanLab_GPIOSequence * pInstance);
+
+/**
+* Deletes a GPIO Sequence. Does nothing if Sequence with the identifier does not exists.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_deletegpiosequence(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier);
 
 /**
 * Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
