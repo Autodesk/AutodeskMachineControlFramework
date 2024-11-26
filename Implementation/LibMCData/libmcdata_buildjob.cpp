@@ -226,6 +226,7 @@ void CBuildJob::SetThumbnailStreamUUID(const std::string& sStreamUUID)
     pStatement = nullptr;
 
     pTransaction->commit();
+    pTransaction = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 }
