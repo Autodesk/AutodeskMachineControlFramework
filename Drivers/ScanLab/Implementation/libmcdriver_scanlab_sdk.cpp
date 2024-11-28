@@ -542,7 +542,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
 	ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
 	ptr_n_eth_set_high_performance_mode = nullptr;
-
+	
 }
 
 
@@ -1701,6 +1701,7 @@ void CScanLabSDK::n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMo
 		ptr_n_eth_set_high_performance_mode(nCardNo, nMode);
 
 }
+
 
 
 void CScanLabSDK::setJournal(PScanLabSDKJournal pLogJournal)

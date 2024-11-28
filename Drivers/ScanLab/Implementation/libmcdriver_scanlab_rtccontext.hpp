@@ -16,6 +16,7 @@ Abstract: This is the class declaration of CRTCContext
 #include "libmcdriver_scanlab_sdk.hpp"
 #include "libmcdriver_scanlab_rtcrecordinginstance.hpp"
 #include "libmcdriver_scanlab_nlightafxprofileselector.hpp"
+#include "libmcdriver_scanlab_gpiosequence.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlab_base.hpp"
@@ -124,6 +125,8 @@ protected:
 	std::vector<sLaserCalibrationPoint> m_LaserPowerCalibrationList;
 
 	std::map<std::string, PRTCRecordingInstance> m_Recordings;
+
+	std::map<std::string, PGPIOSequenceInstance> m_GPIOSequences;
 
 	PNLightAFXProfileSelectorInstance m_pNLightAFXSelectorInstance;
 	

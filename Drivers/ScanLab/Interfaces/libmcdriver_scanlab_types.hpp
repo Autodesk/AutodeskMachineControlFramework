@@ -226,6 +226,11 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXSELECTIONDELAY 1121 /** Invalid nLight AFX Selection Delay. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT 1122 /** Invalid nLight AFX Selection Timeout. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE 1123 /** Invalid nLight AFX Mode. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSEQUENCEIDENTIFIER 1124 /** Invalid sequence identifier. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DUPLICATEGPIOSEQUENCEIDENTIFIER 1125 /** Duplicate GPIO Sequence Identifier. */
+#define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDGPIOSEQUENCE 1126 /** Duplicate GPIO Sequence Identifier. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOTASKDELAY 1127 /** Invalid GPIO Task Delay. */
+#define LIBMCDRIVER_SCANLAB_ERROR_GPIOTASKDELAYMUSTBEMULTIPLEOF10 1128 /** GPIO Task Delay must be a multiple of 10. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -364,6 +369,11 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXSELECTIONDELAY: return "Invalid nLight AFX Selection Delay.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT: return "Invalid nLight AFX Selection Timeout.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE: return "Invalid nLight AFX Mode.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSEQUENCEIDENTIFIER: return "Invalid sequence identifier.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DUPLICATEGPIOSEQUENCEIDENTIFIER: return "Duplicate GPIO Sequence Identifier.";
+    case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDGPIOSEQUENCE: return "Duplicate GPIO Sequence Identifier.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOTASKDELAY: return "Invalid GPIO Task Delay.";
+    case LIBMCDRIVER_SCANLAB_ERROR_GPIOTASKDELAYMUSTBEMULTIPLEOF10: return "GPIO Task Delay must be a multiple of 10.";
     default: return "unknown error";
   }
 }

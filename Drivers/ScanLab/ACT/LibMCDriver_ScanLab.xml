@@ -171,8 +171,15 @@
 		<error name="INVALIDNLIGHTSELECTIONPIN" code="1119" description="Invalid nLight Selection Pin." />	
 		<error name="INVALIDNLIGHTINPUTPIN" code="1120" description="Invalid nLight Input Pin." />	
 		<error name="INVALIDNLIGHTAFXSELECTIONDELAY" code="1121" description="Invalid nLight AFX Selection Delay." />	
-		<error name="INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT" code="1122" description="Invalid nLight AFX Selection Timeout." />	
+		<error name="INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT" code="1122" description="Invalid nLight AFX Selection Timeout." />			
 		<error name="INVALIDNLIGHTAFXMODE" code="1123" description="Invalid nLight AFX Mode." />	
+		<error name="INVALIDSEQUENCEIDENTIFIER" code="1124" description="Invalid sequence identifier." />	
+		<error name="DUPLICATEGPIOSEQUENCEIDENTIFIER" code="1125" description="Duplicate GPIO Sequence Identifier." />	
+		<error name="COULDNOTFINDGPIOSEQUENCE" code="1126" description="Duplicate GPIO Sequence Identifier." />	
+		<error name="INVALIDGPIOTASKDELAY" code="1127" description="Invalid GPIO Task Delay." />	
+		<error name="GPIOTASKDELAYMUSTBEMULTIPLEOF10" code="1128" description="GPIO Task Delay must be a multiple of 10." />	
+		
+		
 		
 	</errors>
 

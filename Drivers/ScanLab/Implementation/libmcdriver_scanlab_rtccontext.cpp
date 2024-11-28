@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 #include "libmcdriver_scanlab_uartconnection.hpp"
 #include "libmcdriver_scanlab_rtcrecording.hpp"
+#include "libmcdriver_scanlab_gpiosequence.hpp"
+#include "libmcdriver_scanlab_gpiosequenceinstance.hpp"
 
 // Include custom headers here.
 #include <math.h>
@@ -1516,16 +1518,34 @@ INLightAFXProfileSelector* CRTCContext::CreateNLightAFXBeamProfileSelector()
 
 IGPIOSequence* CRTCContext::AddGPIOSequence(const std::string& sIdentifier)
 {
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+	auto iIter = m_GPIOSequences.find(sIdentifier);
+	if (iIter != m_GPIOSequences.end())
+		throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_DUPLICATEGPIOSEQUENCEIDENTIFIER, sIdentifier);
+
+	auto pInstance = std::make_shared<CGPIOSequenceInstance>(sIdentifier);
+
+	m_GPIOSequences.insert(std::make_pair (sIdentifier, pInstance));
+
+	return new CGPIOSequence (pInstance);
 }
 
 IGPIOSequence* CRTCContext::FindGPIOSequence(const std::string& sIdentifier, const bool bMustExist)
 {
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
+	auto iIter = m_GPIOSequences.find(sIdentifier);
+	if (iIter != m_GPIOSequences.end())
+		return new CGPIOSequence(iIter->second);
+	
+	if (bMustExist)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDGPIOSEQUENCE, sIdentifier);
+
+	return nullptr;
 }
 
 void CRTCContext::DeleteGPIOSequence(const std::string& sIdentifier)
 {
+	auto iIter = m_GPIOSequences.find(sIdentifier);
+	if (iIter != m_GPIOSequences.end())
+		m_GPIOSequences.erase(iIter);
 
 }
 
