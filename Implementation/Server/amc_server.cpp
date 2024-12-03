@@ -346,6 +346,20 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 			auto requestHandler = [this](const httplib::Request& req, httplib::Response& res) {
 				try {
 
+					// Handle CORS preflight requests
+					if (req.method == "OPTIONS") {
+						res.set_header("Access-Control-Allow-Origin", "*"); // Allow all origins
+						res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+						res.set_header("Access-Control-Allow-Headers", "Authorization, Content-Type");
+						res.status = 200; // HTTP OK
+						return;
+					}
+
+					// Add CORS headers to regular responses
+					res.set_header("Access-Control-Allow-Origin", "*");
+					res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+					res.set_header("Access-Control-Allow-Headers", "Authorization, Content-Type");
+
 					std::string sAuthorization = std::string(req.get_header_value("authorization"));
 					std::string sURL = std::string(req.path);
 					std::string sMethod = req.method;
@@ -451,6 +465,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 					sslsvr.Get("(.*?)", requestHandler);
 					sslsvr.Post("(.*?)", requestHandler);
 					sslsvr.Put("(.*?)", requestHandler);
+					sslsvr.Options("(.*?)", requestHandler);
 
 					m_pListeningServerInstance = &sslsvr;
 					sslsvr.listen(sHostName.c_str(), nPort);
@@ -478,6 +493,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 				svr.Get("(.*?)", requestHandler);
 				svr.Post("(.*?)", requestHandler);
 				svr.Put("(.*?)", requestHandler);
+				svr.Options("(.*?)", requestHandler);
 				m_pListeningServerInstance = &svr;
 				svr.listen(sHostName.c_str(), nPort);
 				m_pListeningServerInstance = nullptr;
