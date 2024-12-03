@@ -59,6 +59,9 @@ private:
 	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 	std::string m_sSimulationSubDirectory;
 
+	std::string m_sIPAddress;
+	std::string m_sNetmask;
+
 	uint32_t m_nSerialNumber;
 
 public:

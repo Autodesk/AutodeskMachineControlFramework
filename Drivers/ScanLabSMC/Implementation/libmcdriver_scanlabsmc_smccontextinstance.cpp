@@ -69,7 +69,25 @@ CSMCContextInstance::CSMCContextInstance(const std::string& sContextName, ISMCCo
 
 	auto pCorrectionFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ct5", "");
 
-	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get (), pCorrectionFile, eSMCConfigVersion::Version_0_8);
+	eSMCConfigVersion configVersion = eSMCConfigVersion::Unknown;
+	auto versionInfo = m_pSDK->slsc_cfg_get_scanmotioncontrol_version();
+	std::string sVersionString = std::to_string(versionInfo.m_nMajor) + "." + std::to_string(versionInfo.m_nMinor) + "." + std::to_string(versionInfo.m_nRevision);
+
+	if (versionInfo.m_nMajor == 0) {
+		switch (versionInfo.m_nMinor) {
+		case 8: configVersion = eSMCConfigVersion::Version_0_8; break;
+		case 9: configVersion = eSMCConfigVersion::Version_0_9; break;
+		default:
+			throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION, "unknown smc minor version: " + sVersionString);
+
+		}
+	}
+	else {
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMAJORVERSION, "unknown smc major version: " + sVersionString);
+	}
+
+
+	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get (), pCorrectionFile, configVersion, m_sIPAddress);
 
 	std::vector<uint8_t> Buffer (sConfigurationXML.begin (), sConfigurationXML.end ());
 
@@ -111,12 +129,12 @@ void CSMCContextInstance::ReinitializeInstance()
 
 std::string CSMCContextInstance::GetIPAddress()
 {
-	return "";
+	return m_sIPAddress;
 }
 
 std::string CSMCContextInstance::GetNetmask()
 {
-	return "";
+	return m_sNetmask;
 }
 
 LibMCDriver_ScanLabSMC_uint32 CSMCContextInstance::GetSerialNumber()

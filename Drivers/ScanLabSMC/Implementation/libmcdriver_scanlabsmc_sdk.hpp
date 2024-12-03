@@ -76,6 +76,13 @@ namespace LibMCDriver_ScanLabSMC {
 			slsc_PolylineProfile ProfileType;
 		};
 
+		struct _slsc_VersionInfo
+		{
+			uint32_t m_nMajor;
+			uint32_t m_nMinor;
+			uint32_t m_nRevision;
+		};
+
 		enum class slsc_ExecState : int32_t
 		{
 			slsc_ExecState_Idle = 0, 
@@ -85,6 +92,9 @@ namespace LibMCDriver_ScanLabSMC {
 		};
 
 		typedef struct _slsc_PolylineOptions slsc_PolylineOptions;
+		typedef struct _slsc_VersionInfo slsc_VersionInfo;
+
+		typedef slsc_VersionInfo(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_cfg_get_scanmotioncontrol_version) (void);
 
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION *PScanLabSMCPtr_slsc_cfg_initialize_from_file) (slscHandle * Handle, const char* XmlConfigFileName);
 		typedef slscReturnValue(SCANLABSMC_CALLINGCONVENTION* PScanLabSMCPtr_slsc_cfg_delete) (size_t Handle);
@@ -136,6 +146,7 @@ namespace LibMCDriver_ScanLabSMC {
 
 		public:
 
+			PScanLabSMCPtr_slsc_cfg_get_scanmotioncontrol_version slsc_cfg_get_scanmotioncontrol_version = nullptr;
 			PScanLabSMCPtr_slsc_cfg_initialize_from_file slsc_cfg_initialize_from_file = nullptr;
 			PScanLabSMCPtr_slsc_cfg_delete slsc_cfg_delete = nullptr;
 			PScanLabSMCPtr_slsc_job_begin slsc_job_begin = nullptr;

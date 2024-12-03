@@ -142,6 +142,8 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDSIMULATIONFILENAME 1034 /** Invalid simulation file name. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_UNSUPPORTEDSMCVERSION 1035 /** Unsupported SMC Version. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_SMCTEMPLATEVERSIONMISMATCH 1036 /** SMC Template version mismatch. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMAJORVERSION 1037 /** Unknown SMC Major Version. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION 1038 /** Unknown SMC Minor Version. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -196,6 +198,8 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDSIMULATIONFILENAME: return "Invalid simulation file name.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_UNSUPPORTEDSMCVERSION: return "Unsupported SMC Version.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_SMCTEMPLATEVERSIONMISMATCH: return "SMC Template version mismatch.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMAJORVERSION: return "Unknown SMC Major Version.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION: return "Unknown SMC Minor Version.";
     default: return "unknown error";
   }
 }

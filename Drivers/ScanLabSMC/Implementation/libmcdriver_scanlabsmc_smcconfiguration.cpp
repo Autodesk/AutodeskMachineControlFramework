@@ -273,7 +273,7 @@ void CSMCConfiguration::SetFirmwareResources(const std::string& sFirmwareDataRes
 
 }
 
-std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCEnv::PWorkingFile& newCorrectionFile, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion)
+std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCEnv::PWorkingFile& newCorrectionFile, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion, const std::string& sRTCIPAddress)
 {
 
     if (pWorkingDirectory == nullptr)
@@ -374,11 +374,27 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
 
     auto pRTC6Node = pBoardsNode->AddChild("", "RTC6");
     if (configVersion != eSMCConfigVersion::Version_0_8)
-        pRTC6Node->AddAttribute("", "Name", "RTC_" + std::to_string(m_nSerialNumber));
+        pRTC6Node->AddAttribute("", "Name", "RtcSingle");
 
     pRTC6Node->AddChildText("", "SerialNumber", std::to_string(m_nSerialNumber));
-    pRTC6Node->AddChildText("", "HeadA", "ScanDevice1");
-    pRTC6Node->AddChildText("", "HeadB", "None");
+    switch (configVersion) {
+        case eSMCConfigVersion::Version_0_8: {
+            pRTC6Node->AddChildText("", "HeadA", "ScanDevice1");
+            pRTC6Node->AddChildText("", "HeadB", "None");
+            break;
+        }
+
+        case eSMCConfigVersion::Version_0_9: {
+            if (!sRTCIPAddress.empty()) {
+                auto pEthSearchNode = pRTCConfigNode->AddChild("", "EthSearch");
+                auto pIPListNode = pEthSearchNode->AddChild("", "IPList");
+                pIPListNode->AddChildText("", "IPAddress", sRTCIPAddress);
+            }
+
+            break;
+        }
+
+    }
 
     if (!m_sConfigurationTemplateXML.empty()) {
         auto pTemplateDocument = m_pDriverEnvironment->ParseXMLString(m_sConfigurationTemplateXML);

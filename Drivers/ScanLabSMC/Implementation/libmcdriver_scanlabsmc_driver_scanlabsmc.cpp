@@ -196,7 +196,7 @@ void CDriver_ScanLabSMC::LoadSDK()
 #endif
 
     if (m_pSDK.get() != nullptr)
-        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_SDKALREADYLOADED);
+        return;
 
     if (m_SMCDLLResourceData.empty() || m_RTCDLLResourceData.empty())
         SetDLLResources(SCANLABSMC_DEFAULT_SMCDLLRESOURCENAME, SCANLABSMC_DEFAULT_RTCDLLRESOURCENAME);
@@ -213,6 +213,11 @@ void CDriver_ScanLabSMC::LoadSDK()
     m_SMCDLLResourceData.resize(0);
     m_RTCDLLResourceData.resize(0);
     m_XercesDLLResourceData.resize(0);
+
+    auto smcVersionInfo = m_pSDK->slsc_cfg_get_scanmotioncontrol_version();
+    m_pDriverEnvironment->SetIntegerParameter("version_major", smcVersionInfo.m_nMajor);
+    m_pDriverEnvironment->SetIntegerParameter("version_minor", smcVersionInfo.m_nMinor);
+    m_pDriverEnvironment->SetIntegerParameter("version_revision", smcVersionInfo.m_nRevision);
 }
 
 
@@ -287,7 +292,10 @@ void CDriver_ScanLabSMC::ReleaseContext(const std::string& sContextName)
 
 void CDriver_ScanLabSMC::Configure(const std::string& sConfigurationString)
 {
-    
+    m_pDriverEnvironment->RegisterIntegerParameter("version_major", "SMC SDK Major Version", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("version_minor", "SMC SDK Minor Version", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("version_revision", "SMC SDK Revision", 0);
+
 }
 
 std::string CDriver_ScanLabSMC::GetName()

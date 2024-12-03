@@ -112,7 +112,7 @@ public:
 
     void SetFirmwareResources(const std::string& sFirmwareDataResource, const std::string& sFPGADataResource, const std::string& sAuxiliaryDataResource) override;
 
-    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::PWorkingFile & newCorrectionFile, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion);
+    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::PWorkingFile & newCorrectionFile, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion, const std::string & sRTCIPAddress);
 
 };
 

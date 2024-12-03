@@ -135,7 +135,7 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8, const std::strin
 	}
 #endif // _WIN32
 
-
+	this->slsc_cfg_get_scanmotioncontrol_version = (PScanLabSMCPtr_slsc_cfg_get_scanmotioncontrol_version)_loadScanLabSMCAddress(hLibrary, "slsc_cfg_get_scanmotioncontrol_version");
 	this->slsc_cfg_initialize_from_file = (PScanLabSMCPtr_slsc_cfg_initialize_from_file)_loadScanLabSMCAddress(hLibrary, "slsc_cfg_initialize_from_file");
 	this->slsc_cfg_delete = (PScanLabSMCPtr_slsc_cfg_delete)_loadScanLabSMCAddress(hLibrary, "slsc_cfg_delete");
 	this->slsc_job_begin = (PScanLabSMCPtr_slsc_job_begin)_loadScanLabSMCAddress(hLibrary, "slsc_job_begin");
@@ -242,6 +242,7 @@ void CScanLabSMCSDK::checkError(size_t hHandle, uint32_t nSMCError)
 
 void CScanLabSMCSDK::resetFunctionPtrs()
 {
+	slsc_cfg_get_scanmotioncontrol_version = nullptr;
 	slsc_cfg_initialize_from_file = nullptr;
 	slsc_cfg_delete = nullptr;
 	slsc_job_begin = nullptr;

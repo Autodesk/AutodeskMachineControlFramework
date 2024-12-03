@@ -88,8 +88,9 @@
 		<error name="INVALIDSIMULATIONFILENAME" code="1034" description="Invalid simulation file name." />		
 		<error name="UNSUPPORTEDSMCVERSION" code="1035" description="Unsupported SMC Version." />		
 		<error name="SMCTEMPLATEVERSIONMISMATCH" code="1036" description="SMC Template version mismatch." />		
-		
-		
+		<error name="UNKNOWNSMCMAJORVERSION" code="1037" description="Unknown SMC Major Version." />		
+		<error name="UNKNOWNSMCMINORVERSION" code="1038" description="Unknown SMC Minor Version." />		
+			
 											
 	</errors>
 
@@ -317,7 +318,6 @@ Custom implementation
 			<param name="SubDirectory" type="string" pass="return" description="Returns the simulation subdirectory name." />
 		</method>
 
-
 		<method name="SetFirmware" description="Sets card firmware from binary data.">
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
 			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
@@ -408,7 +408,7 @@ Custom implementation
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 		</method>
-				
+						
 	</class>
 
 
