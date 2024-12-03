@@ -2708,6 +2708,7 @@ public:
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
 	inline PSignalHandler GetUnhandledSignal(const std::string & sSignalTypeName);
+	inline void ClearAllUnhandledSignals();
 	inline PSignalHandler GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
@@ -3637,6 +3638,7 @@ public:
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals = nullptr;
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
@@ -9843,6 +9845,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals = (PLibMCEnvStateEnvironment_ClearAllUnhandledSignalsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_clearallunhandledsignals");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals = (PLibMCEnvStateEnvironment_ClearAllUnhandledSignalsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_clearallunhandledsignals");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = (PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getunhandledsignalbyuuid");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = (PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getunhandledsignalbyuuid");
@@ -13892,6 +13903,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getunhandledsignal", (void**)&(pWrapperTable->m_StateEnvironment_GetUnhandledSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUnhandledSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_clearallunhandledsignals", (void**)&(pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getunhandledsignalbyuuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID));
@@ -23717,6 +23732,14 @@ public:
 		} else {
 			return nullptr;
 		}
+	}
+	
+	/**
+	* CStateEnvironment::ClearAllUnhandledSignals - Clears all unhandled signals and marks them invalid.
+	*/
+	void CStateEnvironment::ClearAllUnhandledSignals()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ClearAllUnhandledSignals(m_pHandle));
 	}
 	
 	/**

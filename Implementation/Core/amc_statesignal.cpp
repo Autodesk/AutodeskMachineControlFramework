@@ -93,6 +93,14 @@ namespace AMC {
 		return (!m_bIsTriggered);			
 	}
 
+	void CStateSignal::clearSignalInternal()
+	{
+		m_bIsTriggered = false;
+		m_sCurrentSignalUUID = "";
+		m_sCurrentParameterData = "";
+	}
+
+
 	void CStateSignal::markSignalAsHandledInternal(const std::string& sResultData)
 	{
 		if (m_sCurrentSignalUUID.length() > 0) {

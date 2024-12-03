@@ -21770,6 +21770,30 @@ LibMCEnvResult libmcenv_stateenvironment_getunhandledsignal(LibMCEnv_StateEnviro
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_clearallunhandledsignals(LibMCEnv_StateEnvironment pStateEnvironment)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIStateEnvironment->ClearAllUnhandledSignals();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_getunhandledsignalbyuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pUUID, bool bMustExist, LibMCEnv_SignalHandler * pHandler)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -27913,6 +27937,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_waitforsignal;
 	if (sProcName == "libmcenv_stateenvironment_getunhandledsignal") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getunhandledsignal;
+	if (sProcName == "libmcenv_stateenvironment_clearallunhandledsignals") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_clearallunhandledsignals;
 	if (sProcName == "libmcenv_stateenvironment_getunhandledsignalbyuuid") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getunhandledsignalbyuuid;
 	if (sProcName == "libmcenv_stateenvironment_getdriverlibrary") 

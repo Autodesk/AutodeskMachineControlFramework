@@ -7289,6 +7289,14 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_WaitForSignalPtr) (LibMCEnv_S
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUnhandledSignalPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, LibMCEnv_SignalHandler * pHandlerInstance);
 
 /**
+* Clears all unhandled signals and marks them invalid.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ClearAllUnhandledSignalsPtr) (LibMCEnv_StateEnvironment pStateEnvironment);
+
+/**
 * retrieves an unhandled signal from the current state machine by UUID.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -9571,6 +9579,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_PrepareSignalPtr m_StateEnvironment_PrepareSignal;
 	PLibMCEnvStateEnvironment_WaitForSignalPtr m_StateEnvironment_WaitForSignal;
 	PLibMCEnvStateEnvironment_GetUnhandledSignalPtr m_StateEnvironment_GetUnhandledSignal;
+	PLibMCEnvStateEnvironment_ClearAllUnhandledSignalsPtr m_StateEnvironment_ClearAllUnhandledSignals;
 	PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr m_StateEnvironment_GetUnhandledSignalByUUID;
 	PLibMCEnvStateEnvironment_GetDriverLibraryPtr m_StateEnvironment_GetDriverLibrary;
 	PLibMCEnvStateEnvironment_CreateDriverAccessPtr m_StateEnvironment_CreateDriverAccess;

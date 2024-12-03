@@ -5731,6 +5731,11 @@ public:
 	virtual ISignalHandler * GetUnhandledSignal(const std::string & sSignalTypeName) = 0;
 
 	/**
+	* IStateEnvironment::ClearAllUnhandledSignals - Clears all unhandled signals and marks them invalid.
+	*/
+	virtual void ClearAllUnhandledSignals() = 0;
+
+	/**
 	* IStateEnvironment::GetUnhandledSignalByUUID - retrieves an unhandled signal from the current state machine by UUID.
 	* @param[in] sUUID - Name
 	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.

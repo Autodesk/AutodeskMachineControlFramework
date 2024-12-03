@@ -87,6 +87,8 @@ public:
 
 	ISignalHandler* GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist) override;
 
+	void ClearAllUnhandledSignals() override;
+
 	bool HasBuildJob(const std::string& sBuildUUID) override;
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;

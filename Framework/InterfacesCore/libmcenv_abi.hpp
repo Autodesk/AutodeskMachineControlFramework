@@ -7302,6 +7302,14 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_waitforsignal(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getunhandledsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, LibMCEnv_SignalHandler * pHandlerInstance);
 
 /**
+* Clears all unhandled signals and marks them invalid.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_clearallunhandledsignals(LibMCEnv_StateEnvironment pStateEnvironment);
+
+/**
 * retrieves an unhandled signal from the current state machine by UUID.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.

@@ -156,6 +156,12 @@ ISignalHandler* CStateEnvironment::GetUnhandledSignal(const std::string& sSignal
 	return nullptr;
 }
 
+void CStateEnvironment::ClearAllUnhandledSignals()
+{
+	m_pSystemState->stateSignalHandler()->clearUnhandledSignals(m_sInstanceName);
+}
+
+
 ISignalHandler* CStateEnvironment::GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist)
 {
 	std::string sNormalizedSignalUUID = AMCCommon::CUtils::normalizeUUIDString (sUUID);

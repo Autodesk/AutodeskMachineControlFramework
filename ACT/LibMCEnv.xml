@@ -4002,6 +4002,9 @@
 			<param name="SignalTypeName" type="string" pass="in" description="Name Of Signal to be returned" />
 			<param name="HandlerInstance" type="optionalclass" class="SignalHandler" pass="return" description="Signal object. If no signal has been found the signal handler object will be null." />
 		</method>		
+		
+		<method name="ClearAllUnhandledSignals" description="Clears all unhandled signals and marks them invalid.">
+		</method>		
 
 		<method name="GetUnhandledSignalByUUID" description="retrieves an unhandled signal from the current state machine by UUID.">
 			<param name="UUID" type="string" pass="in" description="Name" />
