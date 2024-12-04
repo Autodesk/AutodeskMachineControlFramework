@@ -1549,6 +1549,15 @@ void CRTCContext::DeleteGPIOSequence(const std::string& sIdentifier)
 
 }
 
+void CRTCContext::WriteGPIOSequenceToList(const std::string& sIdentifier)
+{
+	auto iIter = m_GPIOSequences.find(sIdentifier);
+	if (iIter == m_GPIOSequences.end())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDGPIOSEQUENCE, sIdentifier);
+
+	iIter->second->writeToSDKList (m_pScanLabSDK.get (), m_CardNo);
+
+}
 
 
 void CRTCContext::StartOIEMeasurement()

@@ -550,6 +550,15 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpios
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addoutput(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit, bool bOutputValue);
 
 /**
+* Adds the inversion of an output pin.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addswitchoutput(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit);
+
+/**
 * Adds a delay to the GPIO Sequence.
 *
 * @param[in] pGPIOSequence - GPIOSequence instance.
@@ -598,6 +607,22 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpios
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_conditionalgotolabel(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nInputBit, bool bInputValue, const char * pLabelName);
+
+/**
+* Enables the GPIOSequence inside the DrawLayer Routine. The Sequence ID will be taken out of the build profile in this case.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_enableautomaticselection(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence);
+
+/**
+* Disables the GPIOSequence selection.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_disableautomaticselection(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence);
 
 /*************************************************************************************************************************
  Class definition for NLightAFXProfileSelector
@@ -1472,6 +1497,15 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addgpiosequence(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier, LibMCDriver_ScanLab_GPIOSequence * pInstance);
+
+/**
+* Writes a GPIO Sequence to the current list. Fails if sequence does not exist.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_writegpiosequencetolist(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier);
 
 /**
 * Finds a GPIO Sequence. 

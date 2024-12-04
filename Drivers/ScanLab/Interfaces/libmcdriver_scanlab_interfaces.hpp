@@ -774,6 +774,12 @@ public:
 	virtual void AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue) = 0;
 
 	/**
+	* IGPIOSequence::AddSwitchOutput - Adds the inversion of an output pin.
+	* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+	*/
+	virtual void AddSwitchOutput(const LibMCDriver_ScanLab_uint32 nOutputBit) = 0;
+
+	/**
 	* IGPIOSequence::AddDelay - Adds a delay to the GPIO Sequence.
 	* @param[in] nDelayInMilliseconds - Delay in milliseconds.
 	*/
@@ -807,6 +813,16 @@ public:
 	* @param[in] sLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
 	*/
 	virtual void ConditionalGoToLabel(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const std::string & sLabelName) = 0;
+
+	/**
+	* IGPIOSequence::EnableAutomaticSelection - Enables the GPIOSequence inside the DrawLayer Routine. The Sequence ID will be taken out of the build profile in this case.
+	*/
+	virtual void EnableAutomaticSelection() = 0;
+
+	/**
+	* IGPIOSequence::DisableAutomaticSelection - Disables the GPIOSequence selection.
+	*/
+	virtual void DisableAutomaticSelection() = 0;
 
 };
 
@@ -1436,6 +1452,12 @@ public:
 	* @return GPIOSequence instance.
 	*/
 	virtual IGPIOSequence * AddGPIOSequence(const std::string & sIdentifier) = 0;
+
+	/**
+	* IRTCContext::WriteGPIOSequenceToList - Writes a GPIO Sequence to the current list. Fails if sequence does not exist.
+	* @param[in] sIdentifier - Identifier for the sequence.
+	*/
+	virtual void WriteGPIOSequenceToList(const std::string & sIdentifier) = 0;
 
 	/**
 	* IRTCContext::FindGPIOSequence - Finds a GPIO Sequence. 

@@ -537,6 +537,15 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_ClearPtr) (
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_AddOutputPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit, bool bOutputValue);
 
 /**
+* Adds the inversion of an output pin.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_AddSwitchOutputPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit);
+
+/**
 * Adds a delay to the GPIO Sequence.
 *
 * @param[in] pGPIOSequence - GPIOSequence instance.
@@ -585,6 +594,22 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_GoToLabelPt
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_ConditionalGoToLabelPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nInputBit, bool bInputValue, const char * pLabelName);
+
+/**
+* Enables the GPIOSequence inside the DrawLayer Routine. The Sequence ID will be taken out of the build profile in this case.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_EnableAutomaticSelectionPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence);
+
+/**
+* Disables the GPIOSequence selection.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_DisableAutomaticSelectionPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence);
 
 /*************************************************************************************************************************
  Class definition for NLightAFXProfileSelector
@@ -1459,6 +1484,15 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_CreateNLightA
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddGPIOSequencePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier, LibMCDriver_ScanLab_GPIOSequence * pInstance);
+
+/**
+* Writes a GPIO Sequence to the current list. Fails if sequence does not exist.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WriteGPIOSequenceToListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier);
 
 /**
 * Finds a GPIO Sequence. 
@@ -2819,11 +2853,14 @@ typedef struct {
 	PLibMCDriver_ScanLabGPIOSequence_GetIdentifierPtr m_GPIOSequence_GetIdentifier;
 	PLibMCDriver_ScanLabGPIOSequence_ClearPtr m_GPIOSequence_Clear;
 	PLibMCDriver_ScanLabGPIOSequence_AddOutputPtr m_GPIOSequence_AddOutput;
+	PLibMCDriver_ScanLabGPIOSequence_AddSwitchOutputPtr m_GPIOSequence_AddSwitchOutput;
 	PLibMCDriver_ScanLabGPIOSequence_AddDelayPtr m_GPIOSequence_AddDelay;
 	PLibMCDriver_ScanLabGPIOSequence_WaitforInputPtr m_GPIOSequence_WaitforInput;
 	PLibMCDriver_ScanLabGPIOSequence_AddLabelPtr m_GPIOSequence_AddLabel;
 	PLibMCDriver_ScanLabGPIOSequence_GoToLabelPtr m_GPIOSequence_GoToLabel;
 	PLibMCDriver_ScanLabGPIOSequence_ConditionalGoToLabelPtr m_GPIOSequence_ConditionalGoToLabel;
+	PLibMCDriver_ScanLabGPIOSequence_EnableAutomaticSelectionPtr m_GPIOSequence_EnableAutomaticSelection;
+	PLibMCDriver_ScanLabGPIOSequence_DisableAutomaticSelectionPtr m_GPIOSequence_DisableAutomaticSelection;
 	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetControlOutputPinsPtr m_NLightAFXProfileSelector_SetControlOutputPins;
 	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetControlOutputPinsPtr m_NLightAFXProfileSelector_GetControlOutputPins;
 	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionOutputPinsPtr m_NLightAFXProfileSelector_SetSelectionOutputPins;
@@ -2909,6 +2946,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
 	PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr m_RTCContext_CreateNLightAFXBeamProfileSelector;
 	PLibMCDriver_ScanLabRTCContext_AddGPIOSequencePtr m_RTCContext_AddGPIOSequence;
+	PLibMCDriver_ScanLabRTCContext_WriteGPIOSequenceToListPtr m_RTCContext_WriteGPIOSequenceToList;
 	PLibMCDriver_ScanLabRTCContext_FindGPIOSequencePtr m_RTCContext_FindGPIOSequence;
 	PLibMCDriver_ScanLabRTCContext_DeleteGPIOSequencePtr m_RTCContext_DeleteGPIOSequence;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr m_RTCContext_StartOIEMeasurement;

@@ -1420,6 +1420,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addoutput(LibMCDriver
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addswitchoutput(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit)
+{
+	IBase* pIBaseClass = (IBase *)pGPIOSequence;
+
+	try {
+		IGPIOSequence* pIGPIOSequence = dynamic_cast<IGPIOSequence*>(pIBaseClass);
+		if (!pIGPIOSequence)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIGPIOSequence->AddSwitchOutput(nOutputBit);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_adddelay(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nDelayInMilliseconds)
 {
 	IBase* pIBaseClass = (IBase *)pGPIOSequence;
@@ -1535,6 +1559,54 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_conditionalgotolabel(
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		pIGPIOSequence->ConditionalGoToLabel(nInputBit, bInputValue, sLabelName);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_enableautomaticselection(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence)
+{
+	IBase* pIBaseClass = (IBase *)pGPIOSequence;
+
+	try {
+		IGPIOSequence* pIGPIOSequence = dynamic_cast<IGPIOSequence*>(pIBaseClass);
+		if (!pIGPIOSequence)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIGPIOSequence->EnableAutomaticSelection();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_disableautomaticselection(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence)
+{
+	IBase* pIBaseClass = (IBase *)pGPIOSequence;
+
+	try {
+		IGPIOSequence* pIGPIOSequence = dynamic_cast<IGPIOSequence*>(pIBaseClass);
+		if (!pIGPIOSequence)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIGPIOSequence->DisableAutomaticSelection();
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -3762,6 +3834,33 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addgpiosequence(LibMCDr
 		pBaseInstance = pIRTCContext->AddGPIOSequence(sIdentifier);
 
 		*pInstance = (IBase*)(pBaseInstance);
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_writegpiosequencetolist(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->WriteGPIOSequenceToList(sIdentifier);
+
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
@@ -7126,6 +7225,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_clear;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_addoutput") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_addoutput;
+	if (sProcName == "libmcdriver_scanlab_gpiosequence_addswitchoutput") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_addswitchoutput;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_adddelay") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_adddelay;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_waitforinput") 
@@ -7136,6 +7237,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_gotolabel;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_conditionalgotolabel") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_conditionalgotolabel;
+	if (sProcName == "libmcdriver_scanlab_gpiosequence_enableautomaticselection") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_enableautomaticselection;
+	if (sProcName == "libmcdriver_scanlab_gpiosequence_disableautomaticselection") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_disableautomaticselection;
 	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins;
 	if (sProcName == "libmcdriver_scanlab_nlightafxprofileselector_getcontroloutputpins") 
@@ -7306,6 +7411,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_createnlightafxbeamprofileselector;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addgpiosequence") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addgpiosequence;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_writegpiosequencetolist") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_writegpiosequencetolist;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_findgpiosequence") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_findgpiosequence;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_deletegpiosequence") 

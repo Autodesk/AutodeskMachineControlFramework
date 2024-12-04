@@ -280,6 +280,7 @@ public:
 
 	void DeleteGPIOSequence(const std::string& sIdentifier) override;
 
+	void WriteGPIOSequenceToList(const std::string& sIdentifier) override;
 
 	void StartOIEMeasurement() override;
 

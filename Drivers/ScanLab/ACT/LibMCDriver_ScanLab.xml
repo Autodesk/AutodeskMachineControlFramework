@@ -572,6 +572,10 @@ Custom implementation
 			<param name="OutputValue" type="bool" pass="in" description="If true, bit will be set, if false bit will be cleared." />
 		</method>
 
+		<method name="AddSwitchOutput" description="Adds the inversion of an output pin.">
+			<param name="OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index. MUST be between 0 and 15." />
+		</method>
+
 		<method name="AddDelay" description="Adds a delay to the GPIO Sequence.">
 			<param name="DelayInMilliseconds" type="uint32" pass="in" description="Delay in milliseconds." />
 		</method>
@@ -596,6 +600,13 @@ Custom implementation
 			<param name="InputValue" type="bool" pass="in" description="If true, the jump is for the bit becoming 1, if false, the jump is for the bit becoming 0." />
 			<param name="LabelName" type="string" pass="in" description="Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. "/>
 		</method>
+		
+		<method name="EnableAutomaticSelection" description="Enables the GPIOSequence inside the DrawLayer Routine. The Sequence ID will be taken out of the build profile in this case.">
+		</method>
+		
+		<method name="DisableAutomaticSelection" description="Disables the GPIOSequence selection.">
+		</method>
+
 
 	</class>
 
@@ -1036,6 +1047,10 @@ Custom implementation
 			<param name="Instance" type="class" class="GPIOSequence" pass="return" description="GPIOSequence instance." />		
 		</method>
 		
+		<method name="WriteGPIOSequenceToList" description="Writes a GPIO Sequence to the current list. Fails if sequence does not exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
+		</method>
+				
 		<method name="FindGPIOSequence" description="Finds a GPIO Sequence. ">
 			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
 			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if Sequence with the identifier does not exist." />			

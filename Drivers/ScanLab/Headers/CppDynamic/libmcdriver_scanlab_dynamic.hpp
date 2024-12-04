@@ -797,11 +797,14 @@ public:
 	inline std::string GetIdentifier();
 	inline void Clear();
 	inline void AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue);
+	inline void AddSwitchOutput(const LibMCDriver_ScanLab_uint32 nOutputBit);
 	inline void AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMilliseconds);
 	inline void WaitforInput(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const LibMCDriver_ScanLab_uint32 nMaxDelayInMilliseconds);
 	inline void AddLabel(const std::string & sLabelName, const LibMCDriver_ScanLab_uint32 nMaxPasses);
 	inline void GoToLabel(const std::string & sLabelName);
 	inline void ConditionalGoToLabel(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const std::string & sLabelName);
+	inline void EnableAutomaticSelection();
+	inline void DisableAutomaticSelection();
 };
 	
 /*************************************************************************************************************************
@@ -919,6 +922,7 @@ public:
 	inline void DisableOIE();
 	inline PNLightAFXProfileSelector CreateNLightAFXBeamProfileSelector();
 	inline PGPIOSequence AddGPIOSequence(const std::string & sIdentifier);
+	inline void WriteGPIOSequenceToList(const std::string & sIdentifier);
 	inline PGPIOSequence FindGPIOSequence(const std::string & sIdentifier, const bool bMustExist);
 	inline void DeleteGPIOSequence(const std::string & sIdentifier);
 	inline void StartOIEMeasurement();
@@ -1273,11 +1277,14 @@ public:
 		pWrapperTable->m_GPIOSequence_GetIdentifier = nullptr;
 		pWrapperTable->m_GPIOSequence_Clear = nullptr;
 		pWrapperTable->m_GPIOSequence_AddOutput = nullptr;
+		pWrapperTable->m_GPIOSequence_AddSwitchOutput = nullptr;
 		pWrapperTable->m_GPIOSequence_AddDelay = nullptr;
 		pWrapperTable->m_GPIOSequence_WaitforInput = nullptr;
 		pWrapperTable->m_GPIOSequence_AddLabel = nullptr;
 		pWrapperTable->m_GPIOSequence_GoToLabel = nullptr;
 		pWrapperTable->m_GPIOSequence_ConditionalGoToLabel = nullptr;
+		pWrapperTable->m_GPIOSequence_EnableAutomaticSelection = nullptr;
+		pWrapperTable->m_GPIOSequence_DisableAutomaticSelection = nullptr;
 		pWrapperTable->m_NLightAFXProfileSelector_SetControlOutputPins = nullptr;
 		pWrapperTable->m_NLightAFXProfileSelector_GetControlOutputPins = nullptr;
 		pWrapperTable->m_NLightAFXProfileSelector_SetSelectionOutputPins = nullptr;
@@ -1363,6 +1370,7 @@ public:
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector = nullptr;
 		pWrapperTable->m_RTCContext_AddGPIOSequence = nullptr;
+		pWrapperTable->m_RTCContext_WriteGPIOSequenceToList = nullptr;
 		pWrapperTable->m_RTCContext_FindGPIOSequence = nullptr;
 		pWrapperTable->m_RTCContext_DeleteGPIOSequence = nullptr;
 		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
@@ -1955,6 +1963,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_GPIOSequence_AddSwitchOutput = (PLibMCDriver_ScanLabGPIOSequence_AddSwitchOutputPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_gpiosequence_addswitchoutput");
+		#else // _WIN32
+		pWrapperTable->m_GPIOSequence_AddSwitchOutput = (PLibMCDriver_ScanLabGPIOSequence_AddSwitchOutputPtr) dlsym(hLibrary, "libmcdriver_scanlab_gpiosequence_addswitchoutput");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GPIOSequence_AddSwitchOutput == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GPIOSequence_AddDelay = (PLibMCDriver_ScanLabGPIOSequence_AddDelayPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_gpiosequence_adddelay");
 		#else // _WIN32
 		pWrapperTable->m_GPIOSequence_AddDelay = (PLibMCDriver_ScanLabGPIOSequence_AddDelayPtr) dlsym(hLibrary, "libmcdriver_scanlab_gpiosequence_adddelay");
@@ -1997,6 +2014,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_GPIOSequence_ConditionalGoToLabel == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GPIOSequence_EnableAutomaticSelection = (PLibMCDriver_ScanLabGPIOSequence_EnableAutomaticSelectionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_gpiosequence_enableautomaticselection");
+		#else // _WIN32
+		pWrapperTable->m_GPIOSequence_EnableAutomaticSelection = (PLibMCDriver_ScanLabGPIOSequence_EnableAutomaticSelectionPtr) dlsym(hLibrary, "libmcdriver_scanlab_gpiosequence_enableautomaticselection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GPIOSequence_EnableAutomaticSelection == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_GPIOSequence_DisableAutomaticSelection = (PLibMCDriver_ScanLabGPIOSequence_DisableAutomaticSelectionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_gpiosequence_disableautomaticselection");
+		#else // _WIN32
+		pWrapperTable->m_GPIOSequence_DisableAutomaticSelection = (PLibMCDriver_ScanLabGPIOSequence_DisableAutomaticSelectionPtr) dlsym(hLibrary, "libmcdriver_scanlab_gpiosequence_disableautomaticselection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GPIOSequence_DisableAutomaticSelection == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2762,6 +2797,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_AddGPIOSequence == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_WriteGPIOSequenceToList = (PLibMCDriver_ScanLabRTCContext_WriteGPIOSequenceToListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_writegpiosequencetolist");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_WriteGPIOSequenceToList = (PLibMCDriver_ScanLabRTCContext_WriteGPIOSequenceToListPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_writegpiosequencetolist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_WriteGPIOSequenceToList == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4107,6 +4151,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_AddOutput == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_addswitchoutput", (void**)&(pWrapperTable->m_GPIOSequence_AddSwitchOutput));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_AddSwitchOutput == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_adddelay", (void**)&(pWrapperTable->m_GPIOSequence_AddDelay));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_AddDelay == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4125,6 +4173,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_conditionalgotolabel", (void**)&(pWrapperTable->m_GPIOSequence_ConditionalGoToLabel));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_ConditionalGoToLabel == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_enableautomaticselection", (void**)&(pWrapperTable->m_GPIOSequence_EnableAutomaticSelection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_EnableAutomaticSelection == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_disableautomaticselection", (void**)&(pWrapperTable->m_GPIOSequence_DisableAutomaticSelection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_DisableAutomaticSelection == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_nlightafxprofileselector_setcontroloutputpins", (void**)&(pWrapperTable->m_NLightAFXProfileSelector_SetControlOutputPins));
@@ -4465,6 +4521,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addgpiosequence", (void**)&(pWrapperTable->m_RTCContext_AddGPIOSequence));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddGPIOSequence == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_writegpiosequencetolist", (void**)&(pWrapperTable->m_RTCContext_WriteGPIOSequenceToList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_WriteGPIOSequenceToList == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_findgpiosequence", (void**)&(pWrapperTable->m_RTCContext_FindGPIOSequence));
@@ -5519,6 +5579,15 @@ public:
 	}
 	
 	/**
+	* CGPIOSequence::AddSwitchOutput - Adds the inversion of an output pin.
+	* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+	*/
+	void CGPIOSequence::AddSwitchOutput(const LibMCDriver_ScanLab_uint32 nOutputBit)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GPIOSequence_AddSwitchOutput(m_pHandle, nOutputBit));
+	}
+	
+	/**
 	* CGPIOSequence::AddDelay - Adds a delay to the GPIO Sequence.
 	* @param[in] nDelayInMilliseconds - Delay in milliseconds.
 	*/
@@ -5566,6 +5635,22 @@ public:
 	void CGPIOSequence::ConditionalGoToLabel(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const std::string & sLabelName)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_GPIOSequence_ConditionalGoToLabel(m_pHandle, nInputBit, bInputValue, sLabelName.c_str()));
+	}
+	
+	/**
+	* CGPIOSequence::EnableAutomaticSelection - Enables the GPIOSequence inside the DrawLayer Routine. The Sequence ID will be taken out of the build profile in this case.
+	*/
+	void CGPIOSequence::EnableAutomaticSelection()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GPIOSequence_EnableAutomaticSelection(m_pHandle));
+	}
+	
+	/**
+	* CGPIOSequence::DisableAutomaticSelection - Disables the GPIOSequence selection.
+	*/
+	void CGPIOSequence::DisableAutomaticSelection()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_GPIOSequence_DisableAutomaticSelection(m_pHandle));
 	}
 	
 	/**
@@ -6488,6 +6573,15 @@ public:
 			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CGPIOSequence>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CRTCContext::WriteGPIOSequenceToList - Writes a GPIO Sequence to the current list. Fails if sequence does not exist.
+	* @param[in] sIdentifier - Identifier for the sequence.
+	*/
+	void CRTCContext::WriteGPIOSequenceToList(const std::string & sIdentifier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_WriteGPIOSequenceToList(m_pHandle, sIdentifier.c_str()));
 	}
 	
 	/**

@@ -311,6 +311,12 @@ void CGPIOSequenceInstance::AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBi
     m_Tasks.push_back (pTask);
 }
 
+void CGPIOSequenceInstance::AddSwitchOutput(const uint32_t nOutputBit)
+{
+
+}
+
+
 void CGPIOSequenceInstance::AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMilliseconds)
 {
     auto pTask = std::make_shared<CGPIOTask_Delay> (m_nListSize, nDelayInMilliseconds);
@@ -347,3 +353,10 @@ void CGPIOSequenceInstance::ConditionalGoToLabel(const LibMCDriver_ScanLab_uint3
     m_Tasks.push_back(pTask);
 }
 
+void CGPIOSequenceInstance::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
+{
+    for (auto pTask : m_Tasks) {
+       pTask->writeToSDKList(pSDK, nCardNo);
+    }
+
+}
