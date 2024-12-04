@@ -728,6 +728,7 @@ namespace AMC {
 				auto& overrideFactor2 = m_OverrideFactors.at(nStartIndex + nHatchIndex * 2 + 1);
 				pTarget->m_Point1Override = overrideFactor1.m_dFactors[nFactorIndex];
 				pTarget->m_Point2Override = overrideFactor2.m_dFactors[nFactorIndex];
+				pTarget++;
 			}
 
 		}
