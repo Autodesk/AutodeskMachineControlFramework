@@ -797,7 +797,6 @@ public:
 	inline std::string GetIdentifier();
 	inline void Clear();
 	inline void AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue);
-	inline void AddSwitchOutput(const LibMCDriver_ScanLab_uint32 nOutputBit);
 	inline void AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMilliseconds);
 	inline void WaitforInput(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const LibMCDriver_ScanLab_uint32 nMaxDelayInMilliseconds);
 	inline void AddLabel(const std::string & sLabelName, const LibMCDriver_ScanLab_uint32 nMaxPasses);
@@ -1277,7 +1276,6 @@ public:
 		pWrapperTable->m_GPIOSequence_GetIdentifier = nullptr;
 		pWrapperTable->m_GPIOSequence_Clear = nullptr;
 		pWrapperTable->m_GPIOSequence_AddOutput = nullptr;
-		pWrapperTable->m_GPIOSequence_AddSwitchOutput = nullptr;
 		pWrapperTable->m_GPIOSequence_AddDelay = nullptr;
 		pWrapperTable->m_GPIOSequence_WaitforInput = nullptr;
 		pWrapperTable->m_GPIOSequence_AddLabel = nullptr;
@@ -1960,15 +1958,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_GPIOSequence_AddOutput == nullptr)
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_GPIOSequence_AddSwitchOutput = (PLibMCDriver_ScanLabGPIOSequence_AddSwitchOutputPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_gpiosequence_addswitchoutput");
-		#else // _WIN32
-		pWrapperTable->m_GPIOSequence_AddSwitchOutput = (PLibMCDriver_ScanLabGPIOSequence_AddSwitchOutputPtr) dlsym(hLibrary, "libmcdriver_scanlab_gpiosequence_addswitchoutput");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_GPIOSequence_AddSwitchOutput == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4151,10 +4140,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_AddOutput == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_addswitchoutput", (void**)&(pWrapperTable->m_GPIOSequence_AddSwitchOutput));
-		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_AddSwitchOutput == nullptr) )
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_adddelay", (void**)&(pWrapperTable->m_GPIOSequence_AddDelay));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_AddDelay == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5576,15 +5561,6 @@ public:
 	void CGPIOSequence::AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_GPIOSequence_AddOutput(m_pHandle, nOutputBit, bOutputValue));
-	}
-	
-	/**
-	* CGPIOSequence::AddSwitchOutput - Adds the inversion of an output pin.
-	* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
-	*/
-	void CGPIOSequence::AddSwitchOutput(const LibMCDriver_ScanLab_uint32 nOutputBit)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_GPIOSequence_AddSwitchOutput(m_pHandle, nOutputBit));
 	}
 	
 	/**

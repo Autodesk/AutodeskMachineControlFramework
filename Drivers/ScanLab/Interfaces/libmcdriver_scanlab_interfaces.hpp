@@ -774,12 +774,6 @@ public:
 	virtual void AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue) = 0;
 
 	/**
-	* IGPIOSequence::AddSwitchOutput - Adds the inversion of an output pin.
-	* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
-	*/
-	virtual void AddSwitchOutput(const LibMCDriver_ScanLab_uint32 nOutputBit) = 0;
-
-	/**
 	* IGPIOSequence::AddDelay - Adds a delay to the GPIO Sequence.
 	* @param[in] nDelayInMilliseconds - Delay in milliseconds.
 	*/

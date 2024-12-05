@@ -550,15 +550,6 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpios
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addoutput(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit, bool bOutputValue);
 
 /**
-* Adds the inversion of an output pin.
-*
-* @param[in] pGPIOSequence - GPIOSequence instance.
-* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addswitchoutput(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit);
-
-/**
 * Adds a delay to the GPIO Sequence.
 *
 * @param[in] pGPIOSequence - GPIOSequence instance.

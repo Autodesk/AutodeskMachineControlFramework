@@ -235,8 +235,6 @@ public:
 
 	void AddOutput(const uint32_t nOutputBit, const bool bOutputValue);
 
-	void AddSwitchOutput(const uint32_t nOutputBit);
-
 	void AddDelay(const uint32_t nDelayInMilliseconds);
 
 	void WaitforInput(const uint32_t nInputBit, const bool bInputValue, const uint32_t nMaxDelayInMilliseconds);

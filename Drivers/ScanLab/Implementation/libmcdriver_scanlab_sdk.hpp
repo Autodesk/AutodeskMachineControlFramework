@@ -215,7 +215,10 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_config_waveform_streaming_ctrl) (uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
 			
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_set_high_performance_mode) (uint32_t nCardNo, uint32_t nMode);
-
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_repeat) (uint32_t nCardNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_until) (uint32_t nCardNo, uint32_t nNumberOfRepetitions);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_jump_rel_cond) (uint32_t nCardNo, uint32_t nMask1, uint32_t nMask0, int32_t nRelativeJumpPosition);
+		
 		class CScanLabSDKJournal {
 		private:
 			std::map<std::string, uint32_t> m_DefinedVariables;
@@ -395,6 +398,9 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_mcbsp_out_oie_ctrl ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
 			PScanLabPtr_n_eth_config_waveform_streaming_ctrl ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
 			PScanLabPtr_n_eth_set_high_performance_mode ptr_n_eth_set_high_performance_mode = nullptr;
+			PScanLabPtr_n_list_repeat ptr_n_list_repeat = nullptr;
+			PScanLabPtr_n_list_until ptr_n_list_until = nullptr;
+			PScanLabPtr_n_list_jump_rel_cond ptr_n_list_jump_rel_cond = nullptr;
 
 			void resetFunctionPtrs ();
 		public:
@@ -568,6 +574,9 @@ namespace LibMCDriver_ScanLab {
 			void n_set_mcbsp_out_oie_ctrl (uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2);
 			void n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
 			void n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMode);
+			void n_list_repeat (uint32_t nCardNo);
+			void n_list_until (uint32_t nCardNo, uint32_t nNumberOfRepetitions);
+			void n_list_jump_rel_cond (uint32_t nCardNo, uint32_t nMask1, uint32_t nMask0, int32_t nRelativeJumpPosition);
 
 		};
 

@@ -572,10 +572,6 @@ Custom implementation
 			<param name="OutputValue" type="bool" pass="in" description="If true, bit will be set, if false bit will be cleared." />
 		</method>
 
-		<method name="AddSwitchOutput" description="Adds the inversion of an output pin.">
-			<param name="OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index. MUST be between 0 and 15." />
-		</method>
-
 		<method name="AddDelay" description="Adds a delay to the GPIO Sequence.">
 			<param name="DelayInMilliseconds" type="uint32" pass="in" description="Delay in milliseconds." />
 		</method>

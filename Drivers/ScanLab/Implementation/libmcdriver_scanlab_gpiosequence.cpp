@@ -69,11 +69,6 @@ void CGPIOSequence::AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const
 	m_pInstance->AddOutput(nOutputBit, bOutputValue);
 }
 
-void CGPIOSequence::AddSwitchOutput(const LibMCDriver_ScanLab_uint32 nOutputBit)
-{
-	m_pInstance->AddSwitchOutput(nOutputBit);
-}
-
 void CGPIOSequence::AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMilliseconds)
 {
 	m_pInstance->AddDelay(nDelayInMilliseconds);

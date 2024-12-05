@@ -537,15 +537,6 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_ClearPtr) (
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_AddOutputPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit, bool bOutputValue);
 
 /**
-* Adds the inversion of an output pin.
-*
-* @param[in] pGPIOSequence - GPIOSequence instance.
-* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_AddSwitchOutputPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit);
-
-/**
 * Adds a delay to the GPIO Sequence.
 *
 * @param[in] pGPIOSequence - GPIOSequence instance.
@@ -2853,7 +2844,6 @@ typedef struct {
 	PLibMCDriver_ScanLabGPIOSequence_GetIdentifierPtr m_GPIOSequence_GetIdentifier;
 	PLibMCDriver_ScanLabGPIOSequence_ClearPtr m_GPIOSequence_Clear;
 	PLibMCDriver_ScanLabGPIOSequence_AddOutputPtr m_GPIOSequence_AddOutput;
-	PLibMCDriver_ScanLabGPIOSequence_AddSwitchOutputPtr m_GPIOSequence_AddSwitchOutput;
 	PLibMCDriver_ScanLabGPIOSequence_AddDelayPtr m_GPIOSequence_AddDelay;
 	PLibMCDriver_ScanLabGPIOSequence_WaitforInputPtr m_GPIOSequence_WaitforInput;
 	PLibMCDriver_ScanLabGPIOSequence_AddLabelPtr m_GPIOSequence_AddLabel;

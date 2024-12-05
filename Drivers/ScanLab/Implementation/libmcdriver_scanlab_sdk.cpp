@@ -323,6 +323,11 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_eth_config_waveform_streaming_ctrl = (PScanLabPtr_n_eth_config_waveform_streaming_ctrl)_loadScanLabAddress(hLibrary, "n_eth_config_waveform_streaming_ctrl", false);
 	this->ptr_n_eth_set_high_performance_mode = (PScanLabPtr_n_eth_set_high_performance_mode)_loadScanLabAddress(hLibrary, "n_eth_set_high_performance_mode", false);
 
+	this->ptr_n_list_repeat = (PScanLabPtr_n_list_repeat)_loadScanLabAddress(hLibrary, "n_list_repeat");
+	this->ptr_n_list_until = (PScanLabPtr_n_list_until)_loadScanLabAddress(hLibrary, "n_list_until");
+	this->ptr_n_list_jump_rel_cond = (PScanLabPtr_n_list_jump_rel_cond)_loadScanLabAddress(hLibrary, "n_list_jump_rel_cond");
+
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -542,7 +547,10 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
 	ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
 	ptr_n_eth_set_high_performance_mode = nullptr;
-	
+	ptr_n_list_repeat = nullptr;
+	ptr_n_list_until = nullptr;
+	ptr_n_list_jump_rel_cond = nullptr;
+
 }
 
 
@@ -1700,6 +1708,33 @@ void CScanLabSDK::n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMo
 	if (ptr_n_eth_set_high_performance_mode != nullptr)
 		ptr_n_eth_set_high_performance_mode(nCardNo, nMode);
 
+}
+
+void CScanLabSDK::n_list_repeat(uint32_t nCardNo)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_list_repeat", std::to_string(nCardNo));
+
+	if (ptr_n_list_repeat != nullptr)
+		ptr_n_list_repeat(nCardNo);
+}
+
+void CScanLabSDK::n_list_until(uint32_t nCardNo, uint32_t nNumberOfRepetitions)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_list_until", std::to_string(nCardNo) + ", " + std::to_string(nNumberOfRepetitions));
+
+	if (ptr_n_list_until != nullptr)
+		ptr_n_list_until(nCardNo, nNumberOfRepetitions);
+}
+
+void CScanLabSDK::n_list_jump_rel_cond(uint32_t nCardNo, uint32_t nMask1, uint32_t nMask0, int32_t nRelativeJumpPosition)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_list_jump_rel_cond", std::to_string(nCardNo) + ", " + std::to_string(nMask1) + ", " + std::to_string(nMask0) + ", " + std::to_string(nRelativeJumpPosition));
+
+	if (ptr_n_list_jump_rel_cond != nullptr)
+		ptr_n_list_jump_rel_cond(nCardNo, nMask1, nMask0, nRelativeJumpPosition);
 }
 
 

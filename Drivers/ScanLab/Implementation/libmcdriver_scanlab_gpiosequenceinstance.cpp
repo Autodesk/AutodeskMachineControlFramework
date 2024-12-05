@@ -99,8 +99,6 @@ CGPIOTask_Delay::CGPIOTask_Delay(uint32_t nRelativeStartAddress, const uint32_t 
 {
     if ((nDelayInMilliseconds == 0) || (nDelayInMilliseconds > GPIOSEQUENCE_MAXDELAYINMS))
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOTASKDELAY);
-    if ((nDelayInMilliseconds % 10) != 0)
-        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_GPIOTASKDELAYMUSTBEMULTIPLEOF10);
 }
 
 CGPIOTask_Delay::~CGPIOTask_Delay()
@@ -123,7 +121,7 @@ void CGPIOTask_Delay::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
     if (pSDK == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
-    uint32_t nDelayInTicks = m_nDelayInMilliseconds / 10;
+    uint32_t nDelayInTicks = m_nDelayInMilliseconds * 100;
 
     pSDK->n_long_delay(nCardNo, nDelayInTicks);
 }
@@ -134,8 +132,6 @@ CGPIOTask_WaitforInput::CGPIOTask_WaitforInput(uint32_t nRelativeStartAddress, c
 {
     if ((nMaxDelayInMilliseconds == 0) || (nMaxDelayInMilliseconds > GPIOSEQUENCE_MAXDELAYINMS))
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOTASKDELAY);
-    if ((nMaxDelayInMilliseconds % 10) != 0)
-        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_GPIOTASKDELAYMUSTBEMULTIPLEOF10);
 
 }
 
@@ -161,13 +157,29 @@ uint32_t CGPIOTask_WaitforInput::getMaxDelayInMilliseconds()
 
 uint32_t CGPIOTask_WaitforInput::getNeededListCapacity()
 {
-    return 0;
+    return 4;
 }
 
 void CGPIOTask_WaitforInput::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
 {
     if (pSDK == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+    uint32_t nMask1 = 0;
+    uint32_t nMask0 = 0;
+
+    if (m_bInputValue) {
+        nMask1 = 1UL << m_nInputBit;
+    }
+    else {
+        nMask0 = 1UL << m_nInputBit;
+    }
+    
+
+    pSDK->n_list_repeat(nCardNo); // Repeat list
+    pSDK->n_list_jump_rel_cond(nCardNo, nMask1, nMask0, 3); 
+    pSDK->n_long_delay(nCardNo, 100); 
+    pSDK->n_list_until(nCardNo, m_nMaxDelayInMilliseconds);
 
 }
 
@@ -309,11 +321,6 @@ void CGPIOSequenceInstance::AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBi
     auto pTask = std::make_shared<CGPIOTask_Output>(m_nListSize, nOutputBit, bOutputValue);
     m_nListSize += pTask->getNeededListCapacity();
     m_Tasks.push_back (pTask);
-}
-
-void CGPIOSequenceInstance::AddSwitchOutput(const uint32_t nOutputBit)
-{
-
 }
 
 

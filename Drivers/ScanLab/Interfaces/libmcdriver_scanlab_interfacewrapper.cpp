@@ -1420,30 +1420,6 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addoutput(LibMCDriver
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_addswitchoutput(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit)
-{
-	IBase* pIBaseClass = (IBase *)pGPIOSequence;
-
-	try {
-		IGPIOSequence* pIGPIOSequence = dynamic_cast<IGPIOSequence*>(pIBaseClass);
-		if (!pIGPIOSequence)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
-		
-		pIGPIOSequence->AddSwitchOutput(nOutputBit);
-
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCDriver_ScanLabResult libmcdriver_scanlab_gpiosequence_adddelay(LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nDelayInMilliseconds)
 {
 	IBase* pIBaseClass = (IBase *)pGPIOSequence;
@@ -7225,8 +7201,6 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_clear;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_addoutput") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_addoutput;
-	if (sProcName == "libmcdriver_scanlab_gpiosequence_addswitchoutput") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_addswitchoutput;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_adddelay") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_adddelay;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_waitforinput") 

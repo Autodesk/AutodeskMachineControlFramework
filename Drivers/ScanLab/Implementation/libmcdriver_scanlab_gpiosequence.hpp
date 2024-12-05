@@ -71,8 +71,6 @@ public:
 
 	void AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue) override;
 
-	void AddSwitchOutput(const LibMCDriver_ScanLab_uint32 nOutputBit) override;
-
 	void AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMilliseconds) override;
 
 	void WaitforInput(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const LibMCDriver_ScanLab_uint32 nMaxDelayInMilliseconds) override;
