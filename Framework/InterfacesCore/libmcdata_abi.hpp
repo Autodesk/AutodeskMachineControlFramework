@@ -547,7 +547,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_writejournalchunkint
 * reads journal state data from disk.
 *
 * @param[in] pJournalSession - JournalSession instance.
-* @param[in] nChunkIndex - Index of the Chunk to write. Fails if chunk index is not found.
+* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
 * @param[out] pIntegerData - Journal Chunk Data Instance
 * @return error code or 0 (success)
 */
@@ -570,6 +570,42 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkcachequota(L
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkintervalinmicroseconds(LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkInterval);
+
+/*************************************************************************************************************************
+ Class definition for JournalReader
+**************************************************************************************************************************/
+
+/**
+* retrieves the UUID of the journal.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[in] nJournalUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pJournalUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pJournalUUIDBuffer -  buffer of Journal UUID, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getjournaluuid(LibMCData_JournalReader pJournalReader, const LibMCData_uint32 nJournalUUIDBufferSize, LibMCData_uint32* pJournalUUIDNeededChars, char * pJournalUUIDBuffer);
+
+/**
+* returns the start timestamp of the journal.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getstarttime(LibMCData_JournalReader pJournalReader, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* reads journal state data from disk.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
+* @param[out] pIntegerData - Journal Chunk Data Instance
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_readchunkintegerdata(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nChunkIndex, LibMCData_JournalChunkIntegerData * pIntegerData);
 
 /*************************************************************************************************************************
  Class definition for StorageStream
@@ -2474,7 +2510,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createstorage(LibMCData_D
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createbuildjobhandler(LibMCData_DataModel pDataModel, LibMCData_BuildJobHandler * pBuildJobHandler);
 
 /**
-* creates a global log session access class.
+* creates a global log session class.
 *
 * @param[in] pDataModel - DataModel instance.
 * @param[out] pLogSession - LogSession class instance.
@@ -2483,13 +2519,23 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createbuildjobhandler(Lib
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createnewlogsession(LibMCData_DataModel pDataModel, LibMCData_LogSession * pLogSession);
 
 /**
-* creates a global journal session access class.
+* creates a global journal session class.
 *
 * @param[in] pDataModel - DataModel instance.
 * @param[out] pJournalSession - JournalSession class instance.
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createjournalsession(LibMCData_DataModel pDataModel, LibMCData_JournalSession * pJournalSession);
+
+/**
+* creates an access instance to a past journal session. Fails if journal cannot be accessed.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pJournalUUID - UUID of journal to load. UUID MUST NOT reference the current journaling session..
+* @param[out] pJournalReader - JournalReader class instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createjournalreader(LibMCData_DataModel pDataModel, const char * pJournalUUID, LibMCData_JournalReader * pJournalReader);
 
 /**
 * creates a global alert session access class.

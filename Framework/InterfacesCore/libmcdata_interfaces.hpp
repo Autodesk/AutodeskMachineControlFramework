@@ -63,6 +63,7 @@ class IAlertIterator;
 class IAlertSession;
 class IJournalChunkIntegerData;
 class IJournalSession;
+class IJournalReader;
 class IStorageStream;
 class IStorageZIPWriter;
 class IStorage;
@@ -682,7 +683,7 @@ public:
 
 	/**
 	* IJournalSession::ReadChunkIntegerData - reads journal state data from disk.
-	* @param[in] nChunkIndex - Index of the Chunk to write. Fails if chunk index is not found.
+	* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
 	* @return Journal Chunk Data Instance
 	*/
 	virtual IJournalChunkIntegerData * ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) = 0;
@@ -702,6 +703,36 @@ public:
 };
 
 typedef IBaseSharedPtr<IJournalSession> PIJournalSession;
+
+
+/*************************************************************************************************************************
+ Class interface for JournalReader 
+**************************************************************************************************************************/
+
+class IJournalReader : public virtual IBase {
+public:
+	/**
+	* IJournalReader::GetJournalUUID - retrieves the UUID of the journal.
+	* @return Journal UUID
+	*/
+	virtual std::string GetJournalUUID() = 0;
+
+	/**
+	* IJournalReader::GetStartTime - returns the start timestamp of the journal.
+	* @return Timestamp in ISO8601 UTC format
+	*/
+	virtual std::string GetStartTime() = 0;
+
+	/**
+	* IJournalReader::ReadChunkIntegerData - reads journal state data from disk.
+	* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
+	* @return Journal Chunk Data Instance
+	*/
+	virtual IJournalChunkIntegerData * ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalReader> PIJournalReader;
 
 
 /*************************************************************************************************************************
@@ -2078,16 +2109,23 @@ public:
 	virtual IBuildJobHandler * CreateBuildJobHandler() = 0;
 
 	/**
-	* IDataModel::CreateNewLogSession - creates a global log session access class.
+	* IDataModel::CreateNewLogSession - creates a global log session class.
 	* @return LogSession class instance.
 	*/
 	virtual ILogSession * CreateNewLogSession() = 0;
 
 	/**
-	* IDataModel::CreateJournalSession - creates a global journal session access class.
+	* IDataModel::CreateJournalSession - creates a global journal session class.
 	* @return JournalSession class instance.
 	*/
 	virtual IJournalSession * CreateJournalSession() = 0;
+
+	/**
+	* IDataModel::CreateJournalReader - creates an access instance to a past journal session. Fails if journal cannot be accessed.
+	* @param[in] sJournalUUID - UUID of journal to load. UUID MUST NOT reference the current journaling session..
+	* @return JournalReader class instance.
+	*/
+	virtual IJournalReader * CreateJournalReader(const std::string & sJournalUUID) = 0;
 
 	/**
 	* IDataModel::CreateAlertSession - creates a global alert session access class.

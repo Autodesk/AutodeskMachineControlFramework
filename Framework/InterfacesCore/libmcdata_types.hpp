@@ -436,6 +436,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION 409 /** Could not get journal stream position. */
 #define LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX 410 /** Invalid journal file index. */
 #define LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES 411 /** Journal exceeds maxium files. */
+#define LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID 412 /** Could not find journal UUID. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -784,6 +785,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION: return "Could not get journal stream position.";
     case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "Invalid journal file index.";
     case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "Journal exceeds maxium files.";
+    case LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID: return "Could not find journal UUID.";
     default: return "unknown error";
   }
 }
@@ -801,6 +803,7 @@ typedef LibMCDataHandle LibMCData_AlertIterator;
 typedef LibMCDataHandle LibMCData_AlertSession;
 typedef LibMCDataHandle LibMCData_JournalChunkIntegerData;
 typedef LibMCDataHandle LibMCData_JournalSession;
+typedef LibMCDataHandle LibMCData_JournalReader;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_StorageZIPWriter;
 typedef LibMCDataHandle LibMCData_Storage;

@@ -638,6 +638,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX 621 /** Invalid override factor index. */
 #define LIBMC_ERROR_XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX 622 /** XML Namespace Definition contains empty prefix. */
 #define LIBMC_ERROR_XMLNODECONTAINSAMBIGOUSCONTENTDATA 623 /** XML node contains ambiguous content data. */
+#define LIBMC_ERROR_INVALIDPROFILEVALUETYPE 624 /** Invalid profile value type */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1188,6 +1189,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX: return "Invalid override factor index.";
     case LIBMC_ERROR_XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX: return "XML Namespace Definition contains empty prefix.";
     case LIBMC_ERROR_XMLNODECONTAINSAMBIGOUSCONTENTDATA: return "XML node contains ambiguous content data.";
+    case LIBMC_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type";
     default: return "unknown error";
   }
 }

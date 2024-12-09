@@ -1660,6 +1660,134 @@ LibMCDataResult libmcdata_journalsession_getchunkintervalinmicroseconds(LibMCDat
 
 
 /*************************************************************************************************************************
+ Class implementation for JournalReader
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_journalreader_getjournaluuid(LibMCData_JournalReader pJournalReader, const LibMCData_uint32 nJournalUUIDBufferSize, LibMCData_uint32* pJournalUUIDNeededChars, char * pJournalUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if ( (!pJournalUUIDBuffer) && !(pJournalUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sJournalUUID("");
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pJournalUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sJournalUUID = pIJournalReader->GetJournalUUID();
+
+			pIJournalReader->_setCache (new ParameterCache_1<std::string> (sJournalUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIJournalReader->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sJournalUUID);
+			pIJournalReader->_setCache (nullptr);
+		}
+		
+		if (pJournalUUIDNeededChars)
+			*pJournalUUIDNeededChars = (LibMCData_uint32) (sJournalUUID.size()+1);
+		if (pJournalUUIDBuffer) {
+			if (sJournalUUID.size() >= nJournalUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iJournalUUID = 0; iJournalUUID < sJournalUUID.size(); iJournalUUID++)
+				pJournalUUIDBuffer[iJournalUUID] = sJournalUUID[iJournalUUID];
+			pJournalUUIDBuffer[sJournalUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_journalreader_getstarttime(LibMCData_JournalReader pJournalReader, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if ( (!pTimestampBuffer) && !(pTimestampNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTimestamp("");
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTimestampBuffer == nullptr);
+		if (isCacheCall) {
+			sTimestamp = pIJournalReader->GetStartTime();
+
+			pIJournalReader->_setCache (new ParameterCache_1<std::string> (sTimestamp));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIJournalReader->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sTimestamp);
+			pIJournalReader->_setCache (nullptr);
+		}
+		
+		if (pTimestampNeededChars)
+			*pTimestampNeededChars = (LibMCData_uint32) (sTimestamp.size()+1);
+		if (pTimestampBuffer) {
+			if (sTimestamp.size() >= nTimestampBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTimestamp = 0; iTimestamp < sTimestamp.size(); iTimestamp++)
+				pTimestampBuffer[iTimestamp] = sTimestamp[iTimestamp];
+			pTimestampBuffer[sTimestamp.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_journalreader_readchunkintegerdata(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nChunkIndex, LibMCData_JournalChunkIntegerData * pIntegerData)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if (pIntegerData == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseIntegerData(nullptr);
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIntegerData = pIJournalReader->ReadChunkIntegerData(nChunkIndex);
+
+		*pIntegerData = (IBase*)(pBaseIntegerData);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for StorageStream
 **************************************************************************************************************************/
 LibMCDataResult libmcdata_storagestream_getuuid(LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer)
@@ -8032,6 +8160,37 @@ LibMCDataResult libmcdata_datamodel_createjournalsession(LibMCData_DataModel pDa
 	}
 }
 
+LibMCDataResult libmcdata_datamodel_createjournalreader(LibMCData_DataModel pDataModel, const char * pJournalUUID, LibMCData_JournalReader * pJournalReader)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pJournalUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pJournalReader == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sJournalUUID(pJournalUUID);
+		IBase* pBaseJournalReader(nullptr);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseJournalReader = pIDataModel->CreateJournalReader(sJournalUUID);
+
+		*pJournalReader = (IBase*)(pBaseJournalReader);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_datamodel_createalertsession(LibMCData_DataModel pDataModel, LibMCData_AlertSession * pAlertSession)
 {
 	IBase* pIBaseClass = (IBase *)pDataModel;
@@ -8401,6 +8560,12 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_journalsession_getchunkcachequota;
 	if (sProcName == "libmcdata_journalsession_getchunkintervalinmicroseconds") 
 		*ppProcAddress = (void*) &libmcdata_journalsession_getchunkintervalinmicroseconds;
+	if (sProcName == "libmcdata_journalreader_getjournaluuid") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getjournaluuid;
+	if (sProcName == "libmcdata_journalreader_getstarttime") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getstarttime;
+	if (sProcName == "libmcdata_journalreader_readchunkintegerdata") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_readchunkintegerdata;
 	if (sProcName == "libmcdata_storagestream_getuuid") 
 		*ppProcAddress = (void*) &libmcdata_storagestream_getuuid;
 	if (sProcName == "libmcdata_storagestream_gettimestamp") 
@@ -8741,6 +8906,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_datamodel_createnewlogsession;
 	if (sProcName == "libmcdata_datamodel_createjournalsession") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_createjournalsession;
+	if (sProcName == "libmcdata_datamodel_createjournalreader") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_createjournalreader;
 	if (sProcName == "libmcdata_datamodel_createalertsession") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_createalertsession;
 	if (sProcName == "libmcdata_datamodel_createloginhandler") 

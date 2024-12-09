@@ -68,6 +68,7 @@ class CAlertIterator;
 class CAlertSession;
 class CJournalChunkIntegerData;
 class CJournalSession;
+class CJournalReader;
 class CStorageStream;
 class CStorageZIPWriter;
 class CStorage;
@@ -100,6 +101,7 @@ typedef CAlertIterator CLibMCDataAlertIterator;
 typedef CAlertSession CLibMCDataAlertSession;
 typedef CJournalChunkIntegerData CLibMCDataJournalChunkIntegerData;
 typedef CJournalSession CLibMCDataJournalSession;
+typedef CJournalReader CLibMCDataJournalReader;
 typedef CStorageStream CLibMCDataStorageStream;
 typedef CStorageZIPWriter CLibMCDataStorageZIPWriter;
 typedef CStorage CLibMCDataStorage;
@@ -132,6 +134,7 @@ typedef std::shared_ptr<CAlertIterator> PAlertIterator;
 typedef std::shared_ptr<CAlertSession> PAlertSession;
 typedef std::shared_ptr<CJournalChunkIntegerData> PJournalChunkIntegerData;
 typedef std::shared_ptr<CJournalSession> PJournalSession;
+typedef std::shared_ptr<CJournalReader> PJournalReader;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
 typedef std::shared_ptr<CStorageZIPWriter> PStorageZIPWriter;
 typedef std::shared_ptr<CStorage> PStorage;
@@ -164,6 +167,7 @@ typedef PAlertIterator PLibMCDataAlertIterator;
 typedef PAlertSession PLibMCDataAlertSession;
 typedef PJournalChunkIntegerData PLibMCDataJournalChunkIntegerData;
 typedef PJournalSession PLibMCDataJournalSession;
+typedef PJournalReader PLibMCDataJournalReader;
 typedef PStorageStream PLibMCDataStorageStream;
 typedef PStorageZIPWriter PLibMCDataStorageZIPWriter;
 typedef PStorage PLibMCDataStorage;
@@ -601,6 +605,7 @@ public:
 			case LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION: return "COULDGETJOURNALSTREAMPOSITION";
 			case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "INVALIDJOURNALFILEINDEX";
 			case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "JOURNALEXCEEDSMAXIMUMFILES";
+			case LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID: return "COULDNOTFINDJOURNALUUID";
 		}
 		return "UNKNOWN";
 	}
@@ -949,6 +954,7 @@ public:
 			case LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION: return "Could not get journal stream position.";
 			case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "Invalid journal file index.";
 			case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "Journal exceeds maxium files.";
+			case LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID: return "Could not find journal UUID.";
 		}
 		return "unknown error";
 	}
@@ -1075,6 +1081,7 @@ private:
 	friend class CAlertSession;
 	friend class CJournalChunkIntegerData;
 	friend class CJournalSession;
+	friend class CJournalReader;
 	friend class CStorageStream;
 	friend class CStorageZIPWriter;
 	friend class CStorage;
@@ -1323,6 +1330,25 @@ public:
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 	inline LibMCData_uint64 GetChunkCacheQuota();
 	inline LibMCData_uint32 GetChunkIntervalInMicroseconds();
+};
+	
+/*************************************************************************************************************************
+ Class CJournalReader 
+**************************************************************************************************************************/
+class CJournalReader : public CBase {
+public:
+	
+	/**
+	* CJournalReader::CJournalReader - Constructor for JournalReader class.
+	*/
+	CJournalReader(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetJournalUUID();
+	inline std::string GetStartTime();
+	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 };
 	
 /*************************************************************************************************************************
@@ -1781,6 +1807,7 @@ public:
 	inline PBuildJobHandler CreateBuildJobHandler();
 	inline PLogSession CreateNewLogSession();
 	inline PJournalSession CreateJournalSession();
+	inline PJournalReader CreateJournalReader(const std::string & sJournalUUID);
 	inline PAlertSession CreateAlertSession();
 	inline PLoginHandler CreateLoginHandler();
 	inline PPersistencyHandler CreatePersistencyHandler();
@@ -1932,6 +1959,9 @@ public:
 		pWrapperTable->m_JournalSession_ReadChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_GetChunkCacheQuota = nullptr;
 		pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds = nullptr;
+		pWrapperTable->m_JournalReader_GetJournalUUID = nullptr;
+		pWrapperTable->m_JournalReader_GetStartTime = nullptr;
+		pWrapperTable->m_JournalReader_ReadChunkIntegerData = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
 		pWrapperTable->m_StorageStream_GetTimeStamp = nullptr;
 		pWrapperTable->m_StorageStream_GetContextIdentifier = nullptr;
@@ -2102,6 +2132,7 @@ public:
 		pWrapperTable->m_DataModel_CreateBuildJobHandler = nullptr;
 		pWrapperTable->m_DataModel_CreateNewLogSession = nullptr;
 		pWrapperTable->m_DataModel_CreateJournalSession = nullptr;
+		pWrapperTable->m_DataModel_CreateJournalReader = nullptr;
 		pWrapperTable->m_DataModel_CreateAlertSession = nullptr;
 		pWrapperTable->m_DataModel_CreateLoginHandler = nullptr;
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = nullptr;
@@ -2561,6 +2592,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetJournalUUID = (PLibMCDataJournalReader_GetJournalUUIDPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getjournaluuid");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetJournalUUID = (PLibMCDataJournalReader_GetJournalUUIDPtr) dlsym(hLibrary, "libmcdata_journalreader_getjournaluuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetJournalUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetStartTime = (PLibMCDataJournalReader_GetStartTimePtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getstarttime");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetStartTime = (PLibMCDataJournalReader_GetStartTimePtr) dlsym(hLibrary, "libmcdata_journalreader_getstarttime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetStartTime == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_ReadChunkIntegerData = (PLibMCDataJournalReader_ReadChunkIntegerDataPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_readchunkintegerdata");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_ReadChunkIntegerData = (PLibMCDataJournalReader_ReadChunkIntegerDataPtr) dlsym(hLibrary, "libmcdata_journalreader_readchunkintegerdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_ReadChunkIntegerData == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4094,6 +4152,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataModel_CreateJournalReader = (PLibMCDataDataModel_CreateJournalReaderPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createjournalreader");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_CreateJournalReader = (PLibMCDataDataModel_CreateJournalReaderPtr) dlsym(hLibrary, "libmcdata_datamodel_createjournalreader");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_CreateJournalReader == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataModel_CreateAlertSession = (PLibMCDataDataModel_CreateAlertSessionPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createalertsession");
 		#else // _WIN32
 		pWrapperTable->m_DataModel_CreateAlertSession = (PLibMCDataDataModel_CreateAlertSessionPtr) dlsym(hLibrary, "libmcdata_datamodel_createalertsession");
@@ -4418,6 +4485,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_journalsession_getchunkintervalinmicroseconds", (void**)&(pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getjournaluuid", (void**)&(pWrapperTable->m_JournalReader_GetJournalUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetJournalUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getstarttime", (void**)&(pWrapperTable->m_JournalReader_GetStartTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetStartTime == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalreader_readchunkintegerdata", (void**)&(pWrapperTable->m_JournalReader_ReadChunkIntegerData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_ReadChunkIntegerData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_storagestream_getuuid", (void**)&(pWrapperTable->m_StorageStream_GetUUID));
@@ -5098,6 +5177,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createjournalsession", (void**)&(pWrapperTable->m_DataModel_CreateJournalSession));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateJournalSession == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_createjournalreader", (void**)&(pWrapperTable->m_DataModel_CreateJournalReader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateJournalReader == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createalertsession", (void**)&(pWrapperTable->m_DataModel_CreateAlertSession));
@@ -5804,7 +5887,7 @@ public:
 	
 	/**
 	* CJournalSession::ReadChunkIntegerData - reads journal state data from disk.
-	* @param[in] nChunkIndex - Index of the Chunk to write. Fails if chunk index is not found.
+	* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
 	* @return Journal Chunk Data Instance
 	*/
 	PJournalChunkIntegerData CJournalSession::ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex)
@@ -5840,6 +5923,56 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetChunkIntervalInMicroseconds(m_pHandle, &resultChunkInterval));
 		
 		return resultChunkInterval;
+	}
+	
+	/**
+	 * Method definitions for class CJournalReader
+	 */
+	
+	/**
+	* CJournalReader::GetJournalUUID - retrieves the UUID of the journal.
+	* @return Journal UUID
+	*/
+	std::string CJournalReader::GetJournalUUID()
+	{
+		LibMCData_uint32 bytesNeededJournalUUID = 0;
+		LibMCData_uint32 bytesWrittenJournalUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetJournalUUID(m_pHandle, 0, &bytesNeededJournalUUID, nullptr));
+		std::vector<char> bufferJournalUUID(bytesNeededJournalUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetJournalUUID(m_pHandle, bytesNeededJournalUUID, &bytesWrittenJournalUUID, &bufferJournalUUID[0]));
+		
+		return std::string(&bufferJournalUUID[0]);
+	}
+	
+	/**
+	* CJournalReader::GetStartTime - returns the start timestamp of the journal.
+	* @return Timestamp in ISO8601 UTC format
+	*/
+	std::string CJournalReader::GetStartTime()
+	{
+		LibMCData_uint32 bytesNeededTimestamp = 0;
+		LibMCData_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetStartTime(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetStartTime(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		
+		return std::string(&bufferTimestamp[0]);
+	}
+	
+	/**
+	* CJournalReader::ReadChunkIntegerData - reads journal state data from disk.
+	* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
+	* @return Journal Chunk Data Instance
+	*/
+	PJournalChunkIntegerData CJournalReader::ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex)
+	{
+		LibMCDataHandle hIntegerData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_ReadChunkIntegerData(m_pHandle, nChunkIndex, &hIntegerData));
+		
+		if (!hIntegerData) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalChunkIntegerData>(m_pWrapper, hIntegerData);
 	}
 	
 	/**
@@ -8302,7 +8435,7 @@ public:
 	}
 	
 	/**
-	* CDataModel::CreateNewLogSession - creates a global log session access class.
+	* CDataModel::CreateNewLogSession - creates a global log session class.
 	* @return LogSession class instance.
 	*/
 	PLogSession CDataModel::CreateNewLogSession()
@@ -8317,7 +8450,7 @@ public:
 	}
 	
 	/**
-	* CDataModel::CreateJournalSession - creates a global journal session access class.
+	* CDataModel::CreateJournalSession - creates a global journal session class.
 	* @return JournalSession class instance.
 	*/
 	PJournalSession CDataModel::CreateJournalSession()
@@ -8329,6 +8462,22 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CJournalSession>(m_pWrapper, hJournalSession);
+	}
+	
+	/**
+	* CDataModel::CreateJournalReader - creates an access instance to a past journal session. Fails if journal cannot be accessed.
+	* @param[in] sJournalUUID - UUID of journal to load. UUID MUST NOT reference the current journaling session..
+	* @return JournalReader class instance.
+	*/
+	PJournalReader CDataModel::CreateJournalReader(const std::string & sJournalUUID)
+	{
+		LibMCDataHandle hJournalReader = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_CreateJournalReader(m_pHandle, sJournalUUID.c_str(), &hJournalReader));
+		
+		if (!hJournalReader) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJournalReader>(m_pWrapper, hJournalReader);
 	}
 	
 	/**
