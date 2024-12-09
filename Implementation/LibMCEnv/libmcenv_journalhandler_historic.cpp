@@ -31,7 +31,7 @@ Abstract: This is a stub class definition of CJournalHandler
 
 */
 
-#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_journalhandler_historic.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_journalvariable.hpp"
 
@@ -42,62 +42,62 @@ Abstract: This is a stub class definition of CJournalHandler
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class definition of CJournalHandler 
+ Class definition of CJournalHandler_Historic 
 **************************************************************************************************************************/
 
-CJournalHandler::CJournalHandler(AMC::PStateJournal pStateJournal)
-	: m_pStateJournal (pStateJournal)
+CJournalHandler_Historic::CJournalHandler_Historic(LibMCData::PJournalReader pJournalReader)
+	: m_pJournalReader (pJournalReader)
 {
-	if (pStateJournal.get() == nullptr)
+	if (pJournalReader.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
-CJournalHandler::~CJournalHandler()
+CJournalHandler_Historic::~CJournalHandler_Historic()
 {
 
 }
 
 
-IJournalVariable * CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
+IJournalVariable * CJournalHandler_Historic::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
 {
-	AMC::sStateJournalInterval interval;
-	m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMicroseconds, interval);
-
-	return new CJournalVariable(m_pStateJournal, sVariableName, interval);
-}
-
-IJournalVariable* CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string& sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
-{
-	AMC::sStateJournalInterval interval;
-	interval.m_nStartTimeInMicroSeconds = nStartTimeInMicroseconds;
-	interval.m_nEndTimeInMicroSeconds = nEndTimeInMicroseconds;
-
-	return new CJournalVariable(m_pStateJournal, sVariableName, interval);
-}
-
-
-IDateTime* CJournalHandler::GetStartTime()
-{
-	return CDateTime::makefromUTC(m_pStateJournal->getStartTimeAsUTC ());
-}
-
-ILogEntryList* CJournalHandler::RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel)
-{
+	std::lock_guard<std::mutex> lockGuard(m_JournalReaderMutex);
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-ILogEntryList* CJournalHandler::RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel)
+IJournalVariable* CJournalHandler_Historic::RetrieveJournalVariableFromTimeInterval(const std::string& sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
 {
+	std::lock_guard<std::mutex> lockGuard(m_JournalReaderMutex);
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-IAlertIterator* CJournalHandler::RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
+
+IDateTime* CJournalHandler_Historic::GetStartTime()
 {
+	std::lock_guard<std::mutex> lockGuard(m_JournalReaderMutex);
+	return CDateTime::makefromUTC(m_pJournalReader->GetStartTime ());
+}
+
+ILogEntryList* CJournalHandler_Historic::RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel)
+{
+	std::lock_guard<std::mutex> lockGuard(m_JournalReaderMutex);
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-IAlertIterator* CJournalHandler::RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+ILogEntryList* CJournalHandler_Historic::RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel)
 {
+	std::lock_guard<std::mutex> lockGuard(m_JournalReaderMutex);
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IAlertIterator* CJournalHandler_Historic::RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
+{
+	std::lock_guard<std::mutex> lockGuard(m_JournalReaderMutex);
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IAlertIterator* CJournalHandler_Historic::RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+{
+	std::lock_guard<std::mutex> lockGuard(m_JournalReaderMutex);
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 

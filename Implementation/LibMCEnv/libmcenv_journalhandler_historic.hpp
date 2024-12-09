@@ -32,8 +32,8 @@ Abstract: This is the class declaration of CJournalHandler
 */
 
 
-#ifndef __LIBMCENV_JOURNALHANDLER
-#define __LIBMCENV_JOURNALHANDLER
+#ifndef __LIBMCENV_JOURNALHANDLER_HISTORIC
+#define __LIBMCENV_JOURNALHANDLER_HISTORIC
 
 #include "libmcenv_interfaces.hpp"
 
@@ -44,27 +44,28 @@ Abstract: This is the class declaration of CJournalHandler
 #pragma warning(disable : 4250)
 #endif
 
-// Include custom headers here.
-#include "amc_statejournal.hpp"
+#include "libmcdata_dynamic.hpp"
+#include <mutex>
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CJournalHandler 
+ Class declaration of CJournalHandler_Historic 
 **************************************************************************************************************************/
 
-class CJournalHandler : public virtual IJournalHandler, public virtual CBase {
+class CJournalHandler_Historic : public virtual IJournalHandler, public virtual CBase {
 protected:
 
-    AMC::PStateJournal m_pStateJournal;
+    std::mutex m_JournalReaderMutex;
+    LibMCData::PJournalReader m_pJournalReader;
 
 public:
 
-    CJournalHandler(AMC::PStateJournal pStateJournal);
+    CJournalHandler_Historic(LibMCData::PJournalReader pJournalReader);
 
-    virtual ~CJournalHandler();
+    virtual ~CJournalHandler_Historic();
 
 	IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
 
@@ -87,4 +88,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_JOURNALHANDLER
+#endif // __LIBMCENV_JOURNALHANDLER_HISTORIC

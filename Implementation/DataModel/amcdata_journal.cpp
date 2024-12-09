@@ -171,6 +171,16 @@ namespace AMCData {
 		pJournalDataStatement->execute();
 		pJournalDataStatement = nullptr;
 
+		std::string sJournalVariablesQuery = "CREATE TABLE `journal_variables` (";
+		sJournalVariablesQuery += "`variableindex` int UNIQUE NOT NULL, ";
+		sJournalVariablesQuery += "`variableid` int NOT NULL, ";
+		sJournalVariablesQuery += "`variabletype` text NOT NULL, ";
+		sJournalVariablesQuery += "`name` text NOT NULL)";
+
+		auto pJournalVariablesStatement = m_pSQLHandler->prepareStatement(sJournalVariablesQuery);
+		pJournalVariablesStatement->execute();
+		pJournalVariablesStatement = nullptr;
+
 		std::string sJournalQuery = "CREATE TABLE `journal_chunks` (";
 		sJournalQuery += "`chunkindex` int DEFAULT 0, ";
 		sJournalQuery += "`fileindex` int DEFAULT 0, ";

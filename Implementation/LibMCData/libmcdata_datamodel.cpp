@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_storage.hpp"
 #include "libmcdata_logsession.hpp"
 #include "libmcdata_journalsession.hpp"
+#include "libmcdata_journalreader.hpp"
 #include "libmcdata_alertsession.hpp"
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
@@ -199,6 +200,14 @@ IJournalSession* CDataModel::CreateJournalSession()
     return new CJournalSession(m_pJournal);
 
 }
+
+IJournalReader* CDataModel::CreateJournalReader(const std::string& sJournalUUID)
+{
+    auto sJournalBasePath = m_pStorageState->getJournalBasePath(m_sTimeFileName);
+
+    return new CJournalReader(m_pSQLHandler, sJournalUUID, sJournalBasePath);
+}
+
 
 IAlertSession* CDataModel::CreateAlertSession()
 {

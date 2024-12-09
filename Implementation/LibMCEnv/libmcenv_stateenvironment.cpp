@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
-#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_journalhandler_current.hpp"
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_persistentmeshobject.hpp"
@@ -675,7 +675,7 @@ IUserManagementHandler* CStateEnvironment::CreateUserManagement()
 
 IJournalHandler* CStateEnvironment::GetCurrentJournal()
 {
-	return new CJournalHandler(m_pSystemState->getStateJournalInstance());
+	return new CJournalHandler_Current(m_pSystemState->getStateJournalInstance());
 }
 
 /*IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName)

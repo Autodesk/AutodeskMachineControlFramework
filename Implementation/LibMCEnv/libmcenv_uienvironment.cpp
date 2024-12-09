@@ -36,7 +36,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_usermanagementhandler.hpp"
-#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_journalhandler_current.hpp"
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_scenehandler.hpp"
@@ -655,7 +655,7 @@ IUserManagementHandler* CUIEnvironment::CreateUserManagement()
 
 IJournalHandler* CUIEnvironment::GetCurrentJournal()
 {
-    return new CJournalHandler(m_pUISystemState->getStateJournal());
+    return new CJournalHandler_Current(m_pUISystemState->getStateJournal());
 }
 
 ISceneHandler* CUIEnvironment::CreateSceneHandler() 

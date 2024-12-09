@@ -41,6 +41,7 @@ Abstract: This is a stub class definition of CBuildExecution
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
+#include "libmcenv_journalhandler_historic.hpp"
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
@@ -491,6 +492,11 @@ std::string CBuildExecution::GetMetaDataString(const std::string & sKey)
 
 IJournalHandler* CBuildExecution::LoadAttachedJournal()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	std::lock_guard <std::mutex> lockGuard(m_Mutex);
+	std::string sJournalUUID = m_pExecution->GetJournalUUID();
+
+	auto pReader = m_pDataModel->CreateJournalReader (sJournalUUID);
+
+	return new CJournalHandler_Historic(pReader);
 
 }
