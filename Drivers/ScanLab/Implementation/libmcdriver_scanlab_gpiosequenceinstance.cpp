@@ -157,7 +157,7 @@ uint32_t CGPIOTask_WaitforInput::getMaxDelayInMilliseconds()
 
 uint32_t CGPIOTask_WaitforInput::getNeededListCapacity()
 {
-    return 4;
+    return 6;
 }
 
 void CGPIOTask_WaitforInput::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
@@ -174,12 +174,16 @@ void CGPIOTask_WaitforInput::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
     else {
         nMask0 = 1UL << m_nInputBit;
     }
-    
+
+    uint32_t nErrorVariableNo = 5;
+    uint32_t nErrorCode = 1;
 
     pSDK->n_list_repeat(nCardNo); // Repeat list
-    pSDK->n_list_jump_rel_cond(nCardNo, nMask1, nMask0, 3); 
+    pSDK->n_list_jump_rel_cond(nCardNo, nMask1, nMask0, 5); 
     pSDK->n_long_delay(nCardNo, 100); 
     pSDK->n_list_until(nCardNo, m_nMaxDelayInMilliseconds);
+    pSDK->n_set_free_variable_list(nCardNo, nErrorVariableNo, nErrorCode);
+    pSDK->n_set_end_of_list(nCardNo);
 
 }
 
