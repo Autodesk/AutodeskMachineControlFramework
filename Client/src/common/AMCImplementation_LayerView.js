@@ -55,6 +55,10 @@ class LayerViewImpl {
 		
 		this.renderNeedsUpdate = true;
 
+        this.linesCoordinates = [];
+        this.pointCoordinates = [];
+        this.numberOfPoints = 0;
+
 		this.updateTransform ();
 
     }
@@ -135,11 +139,17 @@ class LayerViewImpl {
             gridgeometry.setScaleXY(gridScale, gridScale);
         }
 
-        var layergeometry = this.glInstance.findElement("layerdata");
-        if (layergeometry) {
-            layergeometry.setPositionXY(this.transform.x + this.origin.x * this.transform.scaling, this.transform.y - this.origin.y  * this.transform.scaling);
-            layergeometry.setScaleXY(this.transform.scaling,  - this.transform.scaling);
+        var layerlinesgeometry = this.glInstance.findElement("layerdata_lines");
+        if (layerlinesgeometry) {
+            layerlinesgeometry.setPositionXY(this.transform.x + this.origin.x * this.transform.scaling, this.transform.y - this.origin.y  * this.transform.scaling);
+            layerlinesgeometry.setScaleXY(this.transform.scaling,  - this.transform.scaling);
         }
+
+        var layerpointsgeometry = this.glInstance.findElement("layerdata_points");
+        if (layerpointsgeometry) {
+            layerpointsgeometry.setPositionXY(this.transform.x + this.origin.x * this.transform.scaling, this.transform.y - this.origin.y  * this.transform.scaling);
+            layerpointsgeometry.setScaleXY(this.transform.scaling,  - this.transform.scaling);
+        } 
 
         var buildplategeometry = this.glInstance.findElement("buildplate");
         if (buildplategeometry) {
@@ -148,27 +158,30 @@ class LayerViewImpl {
         }
 		
 		this.renderNeedsUpdate = true;
-
     }
 
     loadLayer(segmentsArray) {
-
 		if (!this.glInstance) 
 			return;
 
         var segmentCount = segmentsArray.length;
         var segmentIndex;
-
-        var lines = [];
+        
+        this.linesCoordinates = [];
+        this.pointCoordinates = [];
+        this.segmentProperties = [];
+		
+		let vertexcolors = [];
 
         for (segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++) {
             var segment = segmentsArray[segmentIndex];
+			let segmentColor = segment.color;		
+			let segmentData = { laserpower: segment.laserpower, laserspeed: segment.laserspeed, profilename: segment.profilename  }
 
             if ((segment.type === "loop") || (segment.type === "polyline")) {
-
                 var pointCount = segment.points.length;
                 var pointIndex;
-
+				
                 var oldx = segment.points[0].x;
                 var oldy = segment.points[0].y;
 
@@ -176,16 +189,16 @@ class LayerViewImpl {
                     var x = segment.points[pointIndex].x;
                     var y = segment.points[pointIndex].y;
 
-                    lines.push(oldx, oldy, x, y);
+                    this.linesCoordinates.push(oldx, oldy, x, y);
+					this.segmentProperties.push (segmentData);
+					vertexcolors.push (segmentColor);
 
                     oldx = x;
                     oldy = y;
                 }
-
             }
 
             if (segment.type === "hatch") {
-
                 var lineCount = segment.points.length / 2;
                 var lineIndex;
 
@@ -195,24 +208,41 @@ class LayerViewImpl {
                     var x2 = segment.points[lineIndex * 2 + 1].x;
                     var y2 = segment.points[lineIndex * 2 + 1].y;
 
-                    lines.push(x1, y1, x2, y2);
-
+                    this.linesCoordinates.push(x1, y1, x2, y2);
+					this.segmentProperties.push (segmentData);
+					vertexcolors.push (segmentColor);
                 }
 
             }
-
         }
 
-        
-        this.glInstance.add2DLineGeometry("layerdata", lines, 60, 0.05, 0x000000);
-		this.updateTransform ();
-		this.RenderScene (true);
+        // Sample data for debugging (1000000 datapoints)
+        // this.pointCoordinates = [];
+        // let xpos, ypos;
 
+        // for (let i = 0; i < 100; i++) {
+        //     for (let j = 0; j < 100; j++) {
+        //         xpos = Math.random() * 20;
+        //         ypos = Math.random() * 20;
+        //         // xpos = i / 100 * 20.0;
+        //         // ypos = j / 100 * 20.0;
+
+        //         this.pointCoordinates.push(xpos, ypos);
+        //     }
+        // }
+
+        this.numberOfPoints = Math.round(this.pointCoordinates.length / 2);
+
+        this.glInstance.add2DLineGeometry("layerdata_lines", this.linesCoordinates, 60, 0.05, 0x000000, vertexcolors);
+        this.glInstance.add2DPointsGeometry("layerdata_points", this.pointCoordinates, 61, 0.1, 0xff0000);
+
+		this.updateTransform();
+		this.RenderScene(true);
     }
 
     Drag(deltaX, deltaY) {
 
-        console.log("dX: " + deltaX + " dY: " + deltaY);
+        // console.log("dX: " + deltaX + " dY: " + deltaY);
 
         this.transform.x = this.transform.x + deltaX;
         this.transform.y = this.transform.y + deltaY;
@@ -248,7 +278,7 @@ class LayerViewImpl {
         this.transform.x = this.transform.x - centerx;
         this.transform.y = this.transform.y - centery;
 
-		console.log("oldscaling: " + this.transform.scaling);
+		// console.log("oldscaling: " + this.transform.scaling);
 
         var oldScaling = this.transform.scaling;
         this.transform.scaling = oldScaling * factor;
@@ -258,7 +288,7 @@ class LayerViewImpl {
         if (this.transform.scaling > LAYERVIEW_MAXSCALING)
             this.transform.scaling = LAYERVIEW_MAXSCALING;
 
-		console.log("newscaling: " + this.transform.scaling);
+		// console.log("newscaling: " + this.transform.scaling);
 
         factor = this.transform.scaling / oldScaling;
 
@@ -268,7 +298,6 @@ class LayerViewImpl {
         this.updateTransform();
 		
     }
-		
 	
 	CenterOnRectangle (minx, miny, maxx, maxy)
 	{
@@ -305,7 +334,6 @@ class LayerViewImpl {
 		
 	}
 	
-	
     RenderScene (forceRender = false) 
 	{
 		if (forceRender) {
@@ -319,7 +347,6 @@ class LayerViewImpl {
 		
 	} 
 	
-
 	SetBuildPlateSVG (url) {
 		if (this.glInstance) {
 			if (url) {
@@ -328,8 +355,7 @@ class LayerViewImpl {
 				this.glInstance.removeElement ("buildplate");
 			}
 		}
-	}
-        
+	} 
 		
 	setOrigin (x, y)
 	{
@@ -339,9 +365,6 @@ class LayerViewImpl {
 		this.origin.x = x;
 		this.origin.y = y;
 	}
-	
-	
-
 }
 
 

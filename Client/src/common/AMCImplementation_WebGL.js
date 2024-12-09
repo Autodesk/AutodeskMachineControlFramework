@@ -98,7 +98,6 @@ class WebGLElement {
         }
     }
 	
-	
 	updateGLPosition () 
 	{
         if (this.glelement) {
@@ -110,22 +109,29 @@ class WebGLElement {
             this.glelement.scale.z = this.scale.z;
         }
 	}
-
-
 }
 
 class WebGLLinesElement extends WebGLElement {
 
-    constructor(lineData, zValue, lineThickness, lineColor) {
+    constructor(lineData, zValue, lineThickness, lineColor, vertexcolors) {
         super();
 
         let geometry = new THREE.BufferGeometry();
-        const material = new THREE.MeshBasicMaterial({
-            vertexColors: false,
-            color: lineColor
-        });
+        let material;
+
+		if (vertexcolors) {
+			material = new THREE.MeshBasicMaterial({
+				vertexColors: true
+			});
+		} else {
+			material = new THREE.MeshBasicMaterial({
+				vertexColors: false,
+				color: lineColor
+			});
+		}
 
         const positions = [];
+		const colors = [];
 
         const lineCount = lineData.length / 4;
 
@@ -150,18 +156,60 @@ class WebGLLinesElement extends WebGLElement {
                 positions.push(x2 - ux, y2 - uy, zValue);
                 positions.push(x1 - ux, y1 - uy, zValue);
                 positions.push(x1 + ux, y1 + uy, zValue);
+				
+				if (vertexcolors) {
+					
+					// Add colors for each vertex
+					const color = new THREE.Color(vertexcolors[i]); 
+					for (let j = 0; j < 6; j++) { 
+						colors.push(color.r, color.g, color.b);
+					}
+				}
             }
         }
 
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+		if (vertexcolors) {
+			geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); 
+		}
         geometry.computeBoundingSphere();
 
         this.glelement = new THREE.Mesh(geometry, material);
-
     }
-
 }
 
+class WebGLPointsElement extends WebGLElement {
+
+    constructor(pointsData, zValue, pointsRadius, pointsColor) {
+        super();
+
+        let geometry = new THREE.BufferGeometry();
+        const material = new THREE.MeshBasicMaterial({
+            vertexColors: false,
+            color: pointsColor
+        });
+
+        let numberOfPoints = pointsData.length / 2;
+
+        const vertices = [];
+
+        for (let i = 0; i < numberOfPoints; i++) {
+            vertices.push(
+                pointsData[i * 2] - pointsRadius / 2, pointsData[i * 2 + 1] - pointsRadius / 2, zValue,
+                pointsData[i * 2] - pointsRadius / 2, pointsData[i * 2 + 1] + pointsRadius / 2, zValue,
+                pointsData[i * 2] + pointsRadius / 2, pointsData[i * 2 + 1] + pointsRadius / 2, zValue,
+                pointsData[i * 2] - pointsRadius / 2, pointsData[i * 2 + 1] - pointsRadius / 2, zValue,
+                pointsData[i * 2] + pointsRadius / 2, pointsData[i * 2 + 1] + pointsRadius / 2, zValue,
+                pointsData[i * 2] + pointsRadius / 2, pointsData[i * 2 + 1] - pointsRadius / 2, zValue,
+            );
+        }
+
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.computeBoundingSphere();
+
+        this.glelement = new THREE.Mesh(geometry, material);
+    }
+}
 
 class WebGLBoxElement extends WebGLElement {
 
@@ -284,7 +332,6 @@ class WebGLBoxElement extends WebGLElement {
 
 }
 
-
 class WebGLMeshElement extends WebGLElement {
 
     constructor(applicationInstance, meshUUID, meshcolor) {
@@ -362,7 +409,6 @@ class WebGLMeshElement extends WebGLElement {
     }
 
 }
-
 
 class WebGLGridElement extends WebGLElement {
 
@@ -520,7 +566,6 @@ class WebGLSVGElement extends WebGLElement {
 
 }
 
-
 class WebGLAmbientLight extends WebGLElement {
 
     constructor (paramColor, paramIntensity) {
@@ -535,7 +580,6 @@ class WebGLAmbientLight extends WebGLElement {
 
 }
 
-
 class WebGLImpl {
 
     constructor() {
@@ -546,8 +590,8 @@ class WebGLImpl {
 		
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0xffffff);
-		
-		//this.raycaster = new THREE.Raycaster();
+
+		this.raycaster = new THREE.Raycaster();
 		//this.raycaster.params.Line.threshold = RAYCAST_LINE_THRESHOLD;
 
         this.renderElements = new Map();
@@ -568,8 +612,6 @@ class WebGLImpl {
         this.camera = new THREE.OrthographicCamera(0, dSizeX, 0, dSizeY, dNear, dFar);
         this.camera.position.z = dFar * 0.99;
     }
-
-
 
     setupOrthoView(paramSizeX, paramSizeY, paramNear, paramFar) 
 	{
@@ -607,12 +649,34 @@ class WebGLImpl {
 		this.camera.position.set( dX, dY, dZ );
 	}
 
-
     setupDOMElement(domelement) {
 		if (!domelement)
 			throw "No DOM Element to attach to";
 
         domelement.append(this.renderer.domElement);
+
+        // const rendererWindowPosition = this.renderer.domElement.getBoundingClientRect();
+        // console.log(rendererWindowPosition);
+
+        const infoboxDiv = document.createElement('div');
+        infoboxDiv.id = 'infobox_points';
+        infoboxDiv.style.display = 'none'
+        infoboxDiv.style.position = 'absolute';
+        infoboxDiv.style.top = 0;
+        infoboxDiv.style.left = 0;
+        infoboxDiv.style.zIndex = 100;
+        infoboxDiv.style.padding = '5px';
+        infoboxDiv.style.borderRadius = '5px';
+        infoboxDiv.style.fontFamily = 'Arial';
+        infoboxDiv.style.fontSize = '8pt';
+        infoboxDiv.style.fontWeight = 'bold';
+        infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+        infoboxDiv.style.color = 'white';
+        infoboxDiv.style.visibility = 'none';
+        infoboxDiv.innerText = '---';
+
+        this.renderer.domElement.parentElement.style.position = 'relative';
+        this.renderer.domElement.parentElement.appendChild(infoboxDiv);
     }
 
     resizeTo(sizex, sizey) {
@@ -636,6 +700,46 @@ class WebGLImpl {
             this.renderer.render(this.scene, this.camera);
         }
 
+    }
+
+    getRaycasterCollisions(mouseX, mouseY) {
+        const pointsMeshElement = this.findElement('layerdata_points');
+        let pointsMesh;
+        const linesMeshElement = this.findElement('layerdata_lines');
+        let linesMesh;
+
+        if (!pointsMeshElement || !pointsMeshElement.glelement || !linesMeshElement || !linesMeshElement.glelement ) {
+            return [-1, -1];
+        }
+        else {
+            pointsMesh = pointsMeshElement.glelement;
+            linesMesh = linesMeshElement.glelement;
+        }
+
+        const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
+        const rayDirection = new THREE.Vector3(0, 0, 1);
+
+        this.raycaster.ray.origin.copy(rayOrigin);
+        this.raycaster.ray.direction.copy(rayDirection);                
+
+        const collisionsPoints = this.raycaster.intersectObject(pointsMesh);
+        const collisionsLines = this.raycaster.intersectObject(linesMesh);
+
+        if (collisionsPoints.length > 0) {
+            // console.log(collisions.length + " mouse collisions with point mesh detected!");
+            // console.log(collisions[0].faceIndex);
+
+            return [0, collisionsPoints[0].faceIndex];
+        }
+        else if (collisionsLines.length > 0) {
+            // console.log(collisions.length + " mouse collisions with point mesh detected!");
+            // console.log(collisions[0].faceIndex);
+
+            return [1, collisionsLines[0].faceIndex];
+        }
+        else {
+            return [-1, -1];
+        }
     }
 
     hasElement(identifier) {
@@ -670,6 +774,36 @@ class WebGLImpl {
         return this.renderElements.get(identifier);
     }
 
+    getElementPosition(identifier) {
+        const element = this.findElement(identifier);
+
+        if (!element || !element.position) {
+            return null;
+        }
+
+        return element.position;
+    }
+
+    getElementEdgePositions(identifier) {
+        const element = this.findElement(identifier);
+
+        if (!element || !element.glelement.geometry.attributes.position.array) {
+            return null;
+        }
+
+        return element.glelement.geometry.attributes.position.array;
+    }
+
+    getElementScale(identifier) {
+        const element = this.findElement(identifier);
+
+        if (!element || !element.glelement.scale) {
+            return null;
+        }
+
+        return element.glelement.scale;
+    }
+
     addElement(identifier, renderElement) {
         if (!identifier)
             return;
@@ -701,17 +835,30 @@ class WebGLImpl {
         return gridElement;
     }
 
-    add2DLineGeometry(identifier, lineData, zValue, lineThickness, lineColor) {
+    add2DLineGeometry(identifier, lineData, zValue, lineThickness, lineColor, vertexcolors) {
         if (!identifier)
             return;
 		
 		this.removeElement (identifier);
 
-        let linesElement = new WebGLLinesElement(lineData, zValue, lineThickness, lineColor);
+        let linesElement = new WebGLLinesElement(lineData, zValue, lineThickness, lineColor, vertexcolors);
 
         this.addElement(identifier, linesElement);
 
         return linesElement;
+    }
+
+    add2DPointsGeometry(identifier, pointsData, zValue, pointsSize, pointsColor) {
+        if (!identifier)
+            return;
+		
+		this.removeElement (identifier);
+
+        let pointsElement = new WebGLPointsElement(pointsData, zValue, pointsSize, pointsColor);
+
+        this.addElement(identifier, pointsElement);
+
+        return pointsElement;
     }
 
     addSVGImage(identifier, url, zValue, fillShapes, showStrokes) {
@@ -778,7 +925,6 @@ class WebGLImpl {
 		
 		return meshElement;
 	}
-
 	
 	pick2DElement (x, y)
 	{		
@@ -897,7 +1043,6 @@ class WebGLImpl {
 				
 		return;
     }
-
 }
 
 export default WebGLImpl;
