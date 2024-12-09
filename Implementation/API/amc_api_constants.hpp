@@ -303,6 +303,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_POLYLINE "polyline"
 #define AMC_API_KEY_X "x"
 #define AMC_API_KEY_Y "y"
+#define AMC_API_KEY_LASERPOWER "laserpower"
+#define AMC_API_KEY_LASERSPEED "laserspeed"
+#define AMC_API_KEY_PARTID "partid"
+#define AMC_API_KEY_PROFILEID "profileid"
+#define AMC_API_KEY_PROFILENAME "profilename"
+#define AMC_API_KEY_LASERINDEX "laserindex"
+#define AMC_API_KEY_COLOR "color"
 
 #define AMC_API_KEY_STATUSINSTANCE_NAME "name"
 #define AMC_API_KEY_STATUSINSTANCE_STATE "state"

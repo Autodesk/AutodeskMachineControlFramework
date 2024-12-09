@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_toolpathlayerdata.hpp"
 #include "libmc_exceptiontypes.hpp"
 
+#include "common_utils.hpp"
+
 namespace AMC {
 
 
@@ -71,8 +73,8 @@ namespace AMC {
 		return m_sAttributeName;
 	}
 
-	CToolpathLayerProfile::CToolpathLayerProfile(const std::string& sUUID)
-		: m_sUUID (sUUID)
+	CToolpathLayerProfile::CToolpathLayerProfile(const std::string& sUUID, const std::string& sName)
+		: m_sUUID (sUUID), m_sName (sName)
 	{
 
 	}
@@ -86,6 +88,12 @@ namespace AMC {
 	{
 		return m_sUUID;
 	}
+
+	std::string CToolpathLayerProfile::getName()
+	{
+		return m_sName;
+	}
+
 
 	void CToolpathLayerProfile::addValue(const std::string& sNameSpace, const std::string& sValueName, const std::string& sValue)
 	{
@@ -117,6 +125,27 @@ namespace AMC {
 
 	}
 
+	double CToolpathLayerProfile::getDoubleValue(const std::string& sNameSpace, const std::string& sValueName)
+	{
+		return AMCCommon::CUtils::stringToDouble(getValue(sNameSpace, sValueName));
+	}
+
+	double CToolpathLayerProfile::getDoubleValueDef(const std::string& sNameSpace, const std::string& sValueName, double dDefaultValue)
+	{
+		return AMCCommon::CUtils::stringToDouble(getValueDef(sNameSpace, sValueName, std::to_string(dDefaultValue)));
+	}
+
+	int64_t CToolpathLayerProfile::getIntegerValue(const std::string& sNameSpace, const std::string& sValueName)
+	{
+		return AMCCommon::CUtils::stringToInteger(getValue(sNameSpace, sValueName));
+	}
+
+	int64_t CToolpathLayerProfile::getIntegerValueDef(const std::string& sNameSpace, const std::string& sValueName, int64_t nDefaultValue)
+	{
+		return AMCCommon::CUtils::stringToInteger(getValueDef(sNameSpace, sValueName, std::to_string (nDefaultValue)));
+	}
+
+
 	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName, std::vector<PToolpathCustomSegmentAttribute> customSegmentAttributes)
 		: m_dUnits (dUnits), m_nZValue (nZValue), m_sDebugName (sDebugName), m_CustomSegmentAttributes (customSegmentAttributes)
 	{
@@ -145,6 +174,7 @@ namespace AMC {
 			std::string sBuildItemUUID = p3MFLayer->GetSegmentBuildItemUUID(nSegmentIndex);
 			std::string sProfileUUID = p3MFLayer->GetSegmentDefaultProfileUUID(nSegmentIndex);
 			uint32_t nLocalPartID = p3MFLayer->GetSegmentPartID(nSegmentIndex);
+			uint32_t nLaserIndex = 0;
 
 			auto pSegment = &m_Segments[nSegmentIndex];
 			pSegment->m_PointCount = nPointCount;
@@ -153,6 +183,7 @@ namespace AMC {
 			pSegment->m_ProfileUUID = registerUUID (sProfileUUID);
 			pSegment->m_PartUUID = registerUUID (sBuildItemUUID);
 			pSegment->m_LocalPartID = nLocalPartID;
+			pSegment->m_LaserIndex = 0;
 			pSegment->m_HasOverrideFactors = 0;
 			if (m_CustomSegmentAttributes.size() > 0) {
 				pSegment->m_AttributeData = &m_SegmentAttributeData.at((size_t)nSegmentIndex * m_CustomSegmentAttributes.size());
@@ -466,6 +497,16 @@ namespace AMC {
 
 	}
 
+	uint32_t CToolpathLayerData::getSegmentLaserIndex(const uint32_t nSegmentIndex)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSEGMENTINDEX, m_sDebugName);
+
+		return m_Segments[nSegmentIndex].m_LaserIndex;
+
+	}
+
+
 
 	PToolpathLayerProfile CToolpathLayerData::getSegmentProfile(const uint32_t nSegmentIndex)
 	{
@@ -540,8 +581,9 @@ namespace AMC {
 		auto iIter = m_ProfileMap.find(sProfileUUID);
 		if (iIter == m_ProfileMap.end()) {
 
-			auto p3MFProfile = pToolpath->GetProfileUUID(sProfileUUID);
-			PToolpathLayerProfile pLayerProfile = std::make_shared<CToolpathLayerProfile> (sProfileUUID);
+			auto p3MFProfile = pToolpath->GetProfileByUUID(sProfileUUID);
+			std::string sProfileName = p3MFProfile->GetName();			
+			PToolpathLayerProfile pLayerProfile = std::make_shared<CToolpathLayerProfile> (sProfileUUID, sProfileName);
 
 			uint32_t nParameterCount = p3MFProfile->GetParameterCount();
 			for (uint32_t nParameterIndex = 0; nParameterIndex < nParameterCount; nParameterIndex++) {
@@ -783,6 +825,38 @@ namespace AMC {
 				break;
 			}
 		}
+	}
+
+
+	std::string CToolpathLayerData::getValueNameByType(const LibMCEnv::eToolpathProfileValueType eValueType)
+	{
+		switch (eValueType) {
+		case LibMCEnv::eToolpathProfileValueType::Speed:
+			return "laserspeed";
+		case LibMCEnv::eToolpathProfileValueType::LaserPower:
+			return "laserpower";
+		case LibMCEnv::eToolpathProfileValueType::LaserFocus:
+			return "laserfocus";
+		case LibMCEnv::eToolpathProfileValueType::JumpSpeed:
+			return "jumpspeed";
+		case LibMCEnv::eToolpathProfileValueType::ExtrusionFactor:
+			return "extrusionfactor";
+		case LibMCEnv::eToolpathProfileValueType::StartDelay:
+			return "startdelay";
+		case LibMCEnv::eToolpathProfileValueType::EndDelay:
+			return "enddelay";
+		case LibMCEnv::eToolpathProfileValueType::PolyDelay:
+			return "polydelay";
+		case LibMCEnv::eToolpathProfileValueType::JumpDelay:
+			return "jumpdelay";
+		case LibMCEnv::eToolpathProfileValueType::LaserOnDelay:
+			return "laserondelay";
+		case LibMCEnv::eToolpathProfileValueType::LaserOffDelay:
+			return "laseroffdelay";
+		default:
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPROFILEVALUETYPE, std::to_string ((int)eValueType));
+		}
+
 	}
 
 

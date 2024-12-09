@@ -60,8 +60,6 @@ protected:
 
 	AMC::PToolpathLayerData m_pToolpathLayerData;
 
-	static std::string getValueNameByType (const LibMCEnv::eToolpathProfileValueType eValueType);
-
 public:
 
 	CToolpathLayer(AMC::PToolpathLayerData pToolpathLayerData);

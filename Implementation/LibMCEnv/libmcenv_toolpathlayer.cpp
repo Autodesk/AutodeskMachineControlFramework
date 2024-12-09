@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_xmldocumentnode.hpp"
 
+#include "amc_toolpathlayerdata.hpp"
+
 // Include custom headers here.
 #include "Common/common_utils.hpp"
 
@@ -199,33 +201,28 @@ std::string CToolpathLayer::GetSegmentProfileValueDef(const LibMCEnv_uint32 nInd
 LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName) 
 {
 	auto pProfile = m_pToolpathLayerData->getSegmentProfile(nIndex);
-	std::string sValue = pProfile->getValue(sNamespace, sValueName);
-	return std::stod(sValue);
+	return pProfile->getDoubleValue(sNamespace, sValueName);
 
 }
 
 LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName, const LibMCEnv_double dDefaultValue) 
 {
 	auto pProfile = m_pToolpathLayerData->getSegmentProfile(nIndex);
-	std::string sValue = pProfile->getValueDef(sNamespace, sValueName, std::to_string (dDefaultValue));
-	return std::stod(sValue);
+	return pProfile->getDoubleValueDef(sNamespace, sValueName, dDefaultValue);
 
 }
 
 LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName) 
 {
 	auto pProfile = m_pToolpathLayerData->getSegmentProfile(nIndex);
-	std::string sValue = pProfile->getValue(sNamespace, sValueName);
-	return std::stoll(sValue);
+	return pProfile->getIntegerValue(sNamespace, sValueName);
 
 }
 
 LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName, const LibMCEnv_int64 nDefaultValue)
 {
 	auto pProfile = m_pToolpathLayerData->getSegmentProfile(nIndex);
-	std::string sValue = pProfile->getValueDef(sNamespace, sValueName, std::to_string(nDefaultValue));
-	return std::stoll(sValue);
-
+	return pProfile->getIntegerValueDef(sNamespace, sValueName, nDefaultValue);
 }
 
 bool CToolpathLayer::GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName) 
@@ -237,7 +234,8 @@ bool CToolpathLayer::GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, co
 		return true;
 	if (sTrimmedValue == "false")
 		return false;
-	return (std::stoll(sValue) != 0);
+
+	return (AMCCommon::CUtils::stringToInteger(sValue) != 0);
 }
 
 bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName, const bool bDefaultValue) 
@@ -255,40 +253,11 @@ bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex,
 		return true;
 	if (sTrimmedValue == "false")
 		return false;
-	return (std::stoll(sValue) != 0);
+
+	return (AMCCommon::CUtils::stringToInteger(sValue) != 0);
 
 }
 
-std::string CToolpathLayer::getValueNameByType(const LibMCEnv::eToolpathProfileValueType eValueType)
-{
-	switch (eValueType) {
-	case LibMCEnv::eToolpathProfileValueType::Speed:
-		return "laserspeed";
-	case LibMCEnv::eToolpathProfileValueType::LaserPower:
-		return "laserpower";
-	case LibMCEnv::eToolpathProfileValueType::LaserFocus:
-		return "laserfocus";
-	case LibMCEnv::eToolpathProfileValueType::JumpSpeed:
-		return "jumpspeed";
-	case LibMCEnv::eToolpathProfileValueType::ExtrusionFactor:
-		return "extrusionfactor";
-	case LibMCEnv::eToolpathProfileValueType::StartDelay:
-		return "startdelay";
-	case LibMCEnv::eToolpathProfileValueType::EndDelay:
-		return "enddelay";
-	case LibMCEnv::eToolpathProfileValueType::PolyDelay:
-		return "polydelay";
-	case LibMCEnv::eToolpathProfileValueType::JumpDelay:
-		return "jumpdelay";
-	case LibMCEnv::eToolpathProfileValueType::LaserOnDelay:
-		return "laserondelay";
-	case LibMCEnv::eToolpathProfileValueType::LaserOffDelay:
-		return "laseroffdelay";
-	default:
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPROFILEVALUETYPE);
-	}
-
-}
 
 LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType)
 {	
@@ -299,14 +268,14 @@ LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint3
 			return GetSegmentProfileTypedValue (nIndex, LibMCEnv::eToolpathProfileValueType::Speed);
 	}
 
-	std::string sValueName = getValueNameByType(eValueType);
+	std::string sValueName = AMC::CToolpathLayerData::getValueNameByType(eValueType);
 	return GetSegmentProfileDoubleValue(nIndex, "", sValueName);
 
 }
 
 LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue)
 {
-	std::string sValueName = getValueNameByType(eValueType);
+	std::string sValueName = AMC::CToolpathLayerData::getValueNameByType(eValueType);
 	return GetSegmentProfileDoubleValueDef(nIndex, "", sValueName, dDefaultValue);
 }
 

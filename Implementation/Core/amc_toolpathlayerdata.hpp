@@ -57,6 +57,7 @@ namespace AMC {
 		uint32_t m_ProfileUUID;
 		uint32_t m_PartUUID;
 		uint32_t m_LocalPartID;
+		uint32_t m_LaserIndex;
 		uint32_t m_HasOverrideFactors;
 		int64_t* m_AttributeData;
 	} sToolpathLayerSegment;
@@ -93,19 +94,25 @@ namespace AMC {
 	class CToolpathLayerProfile {
 		private:
 			std::string m_sUUID;
+			std::string m_sName;
 			std::map<std::pair<std::string, std::string>, std::string> m_ProfileValues;
 
 		public:
 
-			CToolpathLayerProfile(const std::string & sUUID);
+			CToolpathLayerProfile(const std::string & sUUID, const std::string & sName);
 			virtual ~CToolpathLayerProfile();
 
 			std::string getUUID();
+			std::string getName();
 			void addValue(const std::string & sNameSpace, const std::string & sValueName, const std::string & sValue);
 
 			bool hasValue(const std::string& sNameSpace, const std::string& sValueName);
 			std::string getValue(const std::string& sNameSpace, const std::string& sValueName);
 			std::string getValueDef(const std::string& sNameSpace, const std::string& sValueName, const std::string & sDefaultValue);
+			double getDoubleValue(const std::string& sNameSpace, const std::string& sValueName);
+			double getDoubleValueDef(const std::string& sNameSpace, const std::string& sValueName, double dDefaultValue);
+			int64_t getIntegerValue(const std::string& sNameSpace, const std::string& sValueName);
+			int64_t getIntegerValueDef(const std::string& sNameSpace, const std::string& sValueName, int64_t nDefaultValue);
 	};
 
 	typedef std::shared_ptr<CToolpathLayerProfile> PToolpathLayerProfile;
@@ -158,6 +165,7 @@ namespace AMC {
 		std::string getSegmentProfileUUID(const uint32_t nSegmentIndex);
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);
 		uint32_t getSegmentLocalPartID(const uint32_t nSegmentIndex);
+		uint32_t getSegmentLaserIndex(const uint32_t nSegmentIndex);
 		PToolpathLayerProfile getSegmentProfile(const uint32_t nSegmentIndex);
 
 		bool findCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sName, uint32_t& nAttributeID, LibMCEnv::eToolpathAttributeType & attributeType);
@@ -181,6 +189,9 @@ namespace AMC {
 		void storePointOverrides(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, double * pOverrideData);
 
 		void storeHatchOverrides(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, LibMCEnv::sHatch2DOverrides* pOverrideData);
+
+		static std::string getValueNameByType(const LibMCEnv::eToolpathProfileValueType eValueType);
+
 	};
 
 

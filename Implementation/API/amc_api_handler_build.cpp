@@ -162,10 +162,21 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 			auto pLayerData = pToolpath->readLayer((uint32_t)nLayerIndex);
 			auto dUnits = pLayerData->getUnits();
 
+			std::string sLaserPowerValueName = AMC::CToolpathLayerData::getValueNameByType(LibMCEnv::eToolpathProfileValueType::LaserPower);
+			std::string sLaserSpeedValueName = AMC::CToolpathLayerData::getValueNameByType(LibMCEnv::eToolpathProfileValueType::Speed);
+
 			auto nSegmentCount = pLayerData->getSegmentCount();
 			for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 				auto segmentType = pLayerData->getSegmentType(nSegmentIndex);
 				auto nPointCount = pLayerData->getSegmentPointCount(nSegmentIndex);
+
+				auto pProfile = pLayerData->getSegmentProfile (nSegmentIndex);
+				std::string sProfileName = pProfile->getName();
+				double dLaserPower = pProfile->getDoubleValueDef("", sLaserPowerValueName, 0.0);
+				double dLaserSpeed = pProfile->getDoubleValueDef("", sLaserSpeedValueName, 0.0);
+				uint32_t nColor = (nSegmentIndex * 2347328) & 0xFFFFFF;
+				uint32_t nPartID = pLayerData->getSegmentLocalPartID(nSegmentIndex);
+				uint32_t nLaserIndex = pLayerData->getSegmentLaserIndex(nSegmentIndex);
 
 				CJSONWriterObject segmentObject(writer);
 
@@ -202,7 +213,13 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 					}
 
 					segmentObject.addArray(AMC_API_KEY_POINTS, pointArray);
-
+					segmentObject.addDouble(AMC_API_KEY_LASERPOWER, dLaserPower);
+					segmentObject.addDouble(AMC_API_KEY_LASERSPEED, dLaserSpeed);
+					segmentObject.addInteger(AMC_API_KEY_PARTID, nPartID);
+					segmentObject.addString(AMC_API_KEY_PROFILENAME, sProfileName);
+					
+					segmentObject.addInteger(AMC_API_KEY_COLOR, nColor);
+					segmentObject.addInteger(AMC_API_KEY_LASERINDEX, nLaserIndex);
 
 				}
 
