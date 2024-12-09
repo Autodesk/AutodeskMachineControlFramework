@@ -409,6 +409,8 @@
 		<error name="COULDGETJOURNALSTREAMPOSITION" code="409" description="Could not get journal stream position." />	
 		<error name="INVALIDJOURNALFILEINDEX" code="410" description="Invalid journal file index." />	
 		<error name="JOURNALEXCEEDSMAXIMUMFILES" code="411" description="Journal exceeds maxium files." />	
+		<error name="COULDNOTFINDJOURNALUUID" code="412" description="Could not find journal UUID." />	
+		
 
 		
 	</errors>
@@ -744,7 +746,7 @@
 		</method>
 		
 		<method name="ReadChunkIntegerData" description="reads journal state data from disk.">
-			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write. Fails if chunk index is not found." />	
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to read. Fails if chunk index is not found." />	
 			<param name="IntegerData" type="class" class="JournalChunkIntegerData" pass="return" description="Journal Chunk Data Instance" />	
 		</method>		
 		
@@ -756,6 +758,25 @@
 			<param name="ChunkInterval" type="uint32" pass="return" description="The interval determines how often a session journal chunk is written to disk." />	
 		</method>
 				
+	</class>
+	
+	
+	    <!-- The JournalReader class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="JournalReader" parent="Base" description="Journaling Instance">
+
+		<method name="GetJournalUUID" description="retrieves the UUID of the journal.">
+			<param name="JournalUUID" type="string" pass="return" description="Journal UUID" />	
+		</method>
+		
+		<method name="GetStartTime" description="returns the start timestamp of the journal.">
+			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
+		</method>
+		
+		<method name="ReadChunkIntegerData" description="reads journal state data from disk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to read. Fails if chunk index is not found." />	
+			<param name="IntegerData" type="class" class="JournalChunkIntegerData" pass="return" description="Journal Chunk Data Instance" />	
+		</method>		
+						
 	</class>
 
     <!-- The StorageStream class is not thread safe and MUST ONLY be used in a single thread context... -->
@@ -1688,12 +1709,17 @@
 			<param name="BuildJobHandler" type="class" class="BuildJobHandler" pass="return" description="BuildJobHandler class instance." />	
 		</method>
 		
-		<method name="CreateNewLogSession" description="creates a global log session access class.">
+		<method name="CreateNewLogSession" description="creates a global log session class.">
 			<param name="LogSession" type="class" class="LogSession" pass="return" description="LogSession class instance." />	
 		</method>
 		
-		<method name="CreateJournalSession" description="creates a global journal session access class.">
+		<method name="CreateJournalSession" description="creates a global journal session class.">
 			<param name="JournalSession" type="class" class="JournalSession" pass="return" description="JournalSession class instance." />	
+		</method>
+
+		<method name="CreateJournalReader" description="creates an access instance to a past journal session. Fails if journal cannot be accessed.">
+			<param name="JournalUUID" type="string" pass="in" description="UUID of journal to load. UUID MUST NOT reference the current journaling session.." />	
+			<param name="JournalReader" type="class" class="JournalReader" pass="return" description="JournalReader class instance." />	
 		</method>
 
 		<method name="CreateAlertSession" description="creates a global alert session access class.">
