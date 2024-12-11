@@ -231,7 +231,7 @@ typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr) (Lib
 typedef LibMCEnvResult (*PLibMCEnvPNGImageData_GetSizeInPixelsPtr) (LibMCEnv_PNGImageData pPNGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
 
 /**
-* Retrieves encoded data stream of image object.
+* Retrieves encoded PNG data of image object.
 *
 * @param[in] pPNGImageData - PNGImageData instance.
 * @param[in] nPNGDataBufferSize - Number of elements in buffer
@@ -240,6 +240,15 @@ typedef LibMCEnvResult (*PLibMCEnvPNGImageData_GetSizeInPixelsPtr) (LibMCEnv_PNG
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvPNGImageData_GetPNGDataStreamPtr) (LibMCEnv_PNGImageData pPNGImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
+
+/**
+* Writes encoded PNG data into a stream object.
+*
+* @param[in] pPNGImageData - PNGImageData instance.
+* @param[in] pStream - Stream to write to.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageData_WriteToStreamPtr) (LibMCEnv_PNGImageData pPNGImageData, LibMCEnv_TempStreamWriter pStream);
 
 /*************************************************************************************************************************
  Class definition for JPEGImageStoreOptions
@@ -268,7 +277,7 @@ typedef LibMCEnvResult (*PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr) (Lib
 typedef LibMCEnvResult (*PLibMCEnvJPEGImageData_GetSizeInPixelsPtr) (LibMCEnv_JPEGImageData pJPEGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
 
 /**
-* Retrieves encoded data stream of image object.
+* Retrieves encoded JPEG data of image object.
 *
 * @param[in] pJPEGImageData - JPEGImageData instance.
 * @param[in] nJPEGDataBufferSize - Number of elements in buffer
@@ -277,6 +286,15 @@ typedef LibMCEnvResult (*PLibMCEnvJPEGImageData_GetSizeInPixelsPtr) (LibMCEnv_JP
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvJPEGImageData_GetJPEGDataStreamPtr) (LibMCEnv_JPEGImageData pJPEGImageData, const LibMCEnv_uint64 nJPEGDataBufferSize, LibMCEnv_uint64* pJPEGDataNeededCount, LibMCEnv_uint8 * pJPEGDataBuffer);
+
+/**
+* Writes encoded JPEG data into a stream object.
+*
+* @param[in] pJPEGImageData - JPEGImageData instance.
+* @param[in] pStream - Stream to write to.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJPEGImageData_WriteToStreamPtr) (LibMCEnv_JPEGImageData pJPEGImageData, LibMCEnv_TempStreamWriter pStream);
 
 /*************************************************************************************************************************
  Class definition for ImageData
@@ -9009,9 +9027,11 @@ typedef struct {
 	PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr m_PNGImageStoreOptions_SetStorageFormat;
 	PLibMCEnvPNGImageData_GetSizeInPixelsPtr m_PNGImageData_GetSizeInPixels;
 	PLibMCEnvPNGImageData_GetPNGDataStreamPtr m_PNGImageData_GetPNGDataStream;
+	PLibMCEnvPNGImageData_WriteToStreamPtr m_PNGImageData_WriteToStream;
 	PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr m_JPEGImageStoreOptions_ResetToDefaults;
 	PLibMCEnvJPEGImageData_GetSizeInPixelsPtr m_JPEGImageData_GetSizeInPixels;
 	PLibMCEnvJPEGImageData_GetJPEGDataStreamPtr m_JPEGImageData_GetJPEGDataStream;
+	PLibMCEnvJPEGImageData_WriteToStreamPtr m_JPEGImageData_WriteToStream;
 	PLibMCEnvImageData_GetPixelFormatPtr m_ImageData_GetPixelFormat;
 	PLibMCEnvImageData_ChangePixelFormatPtr m_ImageData_ChangePixelFormat;
 	PLibMCEnvImageData_GetDPIPtr m_ImageData_GetDPI;

@@ -73,6 +73,8 @@ public:
 
     void GetJPEGDataStream(LibMCEnv_uint64 nJPEGDataBufferSize, LibMCEnv_uint64* pJPEGDataNeededCount, LibMCEnv_uint8* pJPEGDataBuffer) override;
 
+    void WriteToStream(ITempStreamWriter* pStream) override;
+
     std::vector<uint8_t>& getJPEGStreamBuffer();
 
 };

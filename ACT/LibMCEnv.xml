@@ -511,9 +511,14 @@
 			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
 		</method>		
 
-		<method name="GetPNGDataStream" description="Retrieves encoded data stream of image object.">
+		<method name="GetPNGDataStream" description="Retrieves encoded PNG data of image object.">
 			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
 		</method>
+		
+		<method name="WriteToStream" description="Writes encoded PNG data into a stream object.">
+			<param name="Stream" type="class" class="TempStreamWriter" pass="in" description="Stream to write to." />
+		</method>
+		
 
 	</class>
 	
@@ -533,9 +538,14 @@
 			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
 		</method>		
 
-		<method name="GetJPEGDataStream" description="Retrieves encoded data stream of image object.">
+		<method name="GetJPEGDataStream" description="Retrieves encoded JPEG data of image object.">
 			<param name="JPEGData" type="basicarray" class="uint8" pass="out" description="JPEG Data stream." />
 		</method>
+
+		<method name="WriteToStream" description="Writes encoded JPEG data into a stream object.">
+			<param name="Stream" type="class" class="TempStreamWriter" pass="in" description="Stream to write to." />
+		</method>
+
 
 	</class>
 	

@@ -73,13 +73,13 @@ private:
 	size_t getBytesPerPixel();
 
 	
-	void writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
-	void writeToRawMemoryEx_GreyScale2bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
-	void writeToRawMemoryEx_GreyScale4bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
-	void writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
-	void writeToRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
-	void writeToRawMemoryEx_RGB24bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
-	void writeToRawMemoryEx_RGBA32bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
+	void writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLinePixelOffset);
+	void writeToRawMemoryEx_GreyScale2bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLinePixelOffset);
+	void writeToRawMemoryEx_GreyScale4bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLinePixelOffset);
+	void writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLinePixelOffset);
+	void writeToRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineByteOffset);
+	void writeToRawMemoryEx_RGB24bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineByteOffset);
+	void writeToRawMemoryEx_RGBA32bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineByteOffset);
 
 	void readFromRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, const uint8_t* pSource, uint32_t nYLineOffset);
 	void readFromRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, const uint8_t* pSource, uint32_t nYLineOffset);

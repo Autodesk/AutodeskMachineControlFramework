@@ -689,6 +689,35 @@ LibMCEnvResult libmcenv_pngimagedata_getpngdatastream(LibMCEnv_PNGImageData pPNG
 	}
 }
 
+LibMCEnvResult libmcenv_pngimagedata_writetostream(LibMCEnv_PNGImageData pPNGImageData, LibMCEnv_TempStreamWriter pStream)
+{
+	IBase* pIBaseClass = (IBase *)pPNGImageData;
+
+	try {
+		IBase* pIBaseClassStream = (IBase *)pStream;
+		ITempStreamWriter* pIStream = dynamic_cast<ITempStreamWriter*>(pIBaseClassStream);
+		if (!pIStream)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IPNGImageData* pIPNGImageData = dynamic_cast<IPNGImageData*>(pIBaseClass);
+		if (!pIPNGImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIPNGImageData->WriteToStream(pIStream);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for JPEGImageStoreOptions
@@ -761,6 +790,35 @@ LibMCEnvResult libmcenv_jpegimagedata_getjpegdatastream(LibMCEnv_JPEGImageData p
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pIJPEGImageData->GetJPEGDataStream(nJPEGDataBufferSize, pJPEGDataNeededCount, pJPEGDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_jpegimagedata_writetostream(LibMCEnv_JPEGImageData pJPEGImageData, LibMCEnv_TempStreamWriter pStream)
+{
+	IBase* pIBaseClass = (IBase *)pJPEGImageData;
+
+	try {
+		IBase* pIBaseClassStream = (IBase *)pStream;
+		ITempStreamWriter* pIStream = dynamic_cast<ITempStreamWriter*>(pIBaseClassStream);
+		if (!pIStream)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IJPEGImageData* pIJPEGImageData = dynamic_cast<IJPEGImageData*>(pIBaseClass);
+		if (!pIJPEGImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIJPEGImageData->WriteToStream(pIStream);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -26881,12 +26939,16 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_pngimagedata_getsizeinpixels;
 	if (sProcName == "libmcenv_pngimagedata_getpngdatastream") 
 		*ppProcAddress = (void*) &libmcenv_pngimagedata_getpngdatastream;
+	if (sProcName == "libmcenv_pngimagedata_writetostream") 
+		*ppProcAddress = (void*) &libmcenv_pngimagedata_writetostream;
 	if (sProcName == "libmcenv_jpegimagestoreoptions_resettodefaults") 
 		*ppProcAddress = (void*) &libmcenv_jpegimagestoreoptions_resettodefaults;
 	if (sProcName == "libmcenv_jpegimagedata_getsizeinpixels") 
 		*ppProcAddress = (void*) &libmcenv_jpegimagedata_getsizeinpixels;
 	if (sProcName == "libmcenv_jpegimagedata_getjpegdatastream") 
 		*ppProcAddress = (void*) &libmcenv_jpegimagedata_getjpegdatastream;
+	if (sProcName == "libmcenv_jpegimagedata_writetostream") 
+		*ppProcAddress = (void*) &libmcenv_jpegimagedata_writetostream;
 	if (sProcName == "libmcenv_imagedata_getpixelformat") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelformat;
 	if (sProcName == "libmcenv_imagedata_changepixelformat") 

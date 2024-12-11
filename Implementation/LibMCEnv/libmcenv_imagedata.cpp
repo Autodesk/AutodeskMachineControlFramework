@@ -430,7 +430,6 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 
 	std::vector<uint8_t> convertedPixelData;
 	uint64_t nTotalPixelCount = (uint64_t)m_nPixelCountX * (uint64_t)m_nPixelCountY;
-	uint32_t nRowSize = 0;
 
 	std::unique_ptr<CPNGImageData> pResult (new CPNGImageData (m_nPixelCountX, m_nPixelCountY));
 
@@ -440,22 +439,19 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 		switch (pngStorageFormat) {
 			case LibMCEnv::ePNGStorageFormat::BlackWhite1bit: 
 				convertedPixelData.resize(nTotalPixelCount);
-				nRowSize = (m_nPixelCountX + 7) / 8;
-				writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+				writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
 				break;
 
 			case LibMCEnv::ePNGStorageFormat::GreyScale2bit:
 				convertedPixelData.resize(nTotalPixelCount);
-				nRowSize = (m_nPixelCountX + 3) / 4;
-				writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+				writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 2);
 				break;
 
 			case LibMCEnv::ePNGStorageFormat::GreyScale4bit:
 				convertedPixelData.resize(nTotalPixelCount);
-				nRowSize = (m_nPixelCountX + 1) / 2;
-				writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+				writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 4);
 				break;
 
@@ -486,22 +482,19 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 		switch (pngStorageFormat) {
 		case LibMCEnv::ePNGStorageFormat::BlackWhite1bit:
 			convertedPixelData.resize(nTotalPixelCount);
-			nRowSize = (m_nPixelCountX + 7) / 8;
-			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
 			break;
 
 		case LibMCEnv::ePNGStorageFormat::GreyScale2bit:
 			convertedPixelData.resize(nTotalPixelCount);
-			nRowSize = (m_nPixelCountX + 3) / 4;
-			writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 2);
 			break;
 
 		case LibMCEnv::ePNGStorageFormat::GreyScale4bit:
 			convertedPixelData.resize(nTotalPixelCount);
-			nRowSize = (m_nPixelCountX + 1) / 2;
-			writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 4);
 			break;
 
@@ -531,22 +524,19 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 		switch (pngStorageFormat) {
 		case LibMCEnv::ePNGStorageFormat::BlackWhite1bit:
 			convertedPixelData.resize(nTotalPixelCount);
-			nRowSize = (m_nPixelCountX + 7) / 8;
-			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
 			break;
 
 		case LibMCEnv::ePNGStorageFormat::GreyScale2bit:
 			convertedPixelData.resize(nTotalPixelCount);
-			nRowSize = (m_nPixelCountX + 3) / 4;
-			writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 2);
 			break;
 
 		case LibMCEnv::ePNGStorageFormat::GreyScale4bit:
 			convertedPixelData.resize(nTotalPixelCount);
-			nRowSize = (m_nPixelCountX + 1) / 2;
-			writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 4);
 			break;
 
@@ -1248,7 +1238,7 @@ std::vector <uint8_t>& CImageData::getPixelData()
 	return *m_PixelData.get ();
 }
 
-void CImageData::writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset)
+void CImageData::writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLinePixelOffset)
 {
 	if ((nCountX <= 0) || (nCountY <= 0))
 		return;
@@ -1268,36 +1258,41 @@ void CImageData::writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nS
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
 
 	size_t nLineAddress = (size_t)nStartX + (size_t)nStartY * (size_t)m_nPixelCountX;
-	uint8_t* pLinePtr = pTarget;
+	size_t nLineBitPosition = 0;
 
 	switch (m_PixelFormat) {
 	case eImagePixelFormat::GreyScale8bit: {
 		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
 
-			size_t nPixelAddress = nLineAddress;
-			uint8_t* pPixelPtr = pLinePtr;
+			size_t nPixelSourceAddress = nLineAddress;
+			uint8_t* pPixelTargetPtr = &pTarget[nLineBitPosition / 8];
+			size_t nPixelTargetBitPosition = nLineBitPosition % 8;
 
 			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
-				uint8_t nGrayValue = m_PixelData->at(nPixelAddress);
-				nPixelAddress++;
+				uint8_t nGrayValue = m_PixelData->at(nPixelSourceAddress);
+				nPixelSourceAddress++;
 
-				uint8_t nGrayValue1bit = nGrayValue / 128;
+				uint32_t nPixelTargetMod = nPixelTargetBitPosition % 8;
+				nPixelTargetBitPosition++;
 
-				uint32_t nColumnMod = nColumn % 8;
-				if (nColumnMod == 0) {
-					*pPixelPtr = nGrayValue1bit;
+				uint8_t nBlackWhiteMask = 0;
+				if (nGrayValue >= 128)
+					nBlackWhiteMask = 1 << (7 - nPixelTargetMod);
+
+				if (nPixelTargetMod == 0) {
+					*pPixelTargetPtr = nBlackWhiteMask;
 
 				}
 				else {
-					*pPixelPtr |= nGrayValue1bit << nColumnMod;
+					*pPixelTargetPtr |= nBlackWhiteMask;
 				}
 
-				if (nColumnMod == 7)
-					pPixelPtr++;
+				if (nPixelTargetMod == 7)
+					pPixelTargetPtr++;
 
 			}
 
-			pLinePtr += nYLineOffset;
+			nLineBitPosition += nYLinePixelOffset;
 			nLineAddress += m_nPixelCountX;
 		}
 
@@ -1309,13 +1304,14 @@ void CImageData::writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nS
 	case eImagePixelFormat::RGB16bit: {
 		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
 
-			size_t nPixelAddress = nLineAddress;
-			uint8_t* pPixelPtr = pLinePtr;
+			size_t nPixelSourceAddress = nLineAddress;
+			uint8_t* pPixelTargetPtr = &pTarget[nLineBitPosition / 8];
+			size_t nPixelTargetBitPosition = nLineBitPosition % 8;
 
 			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 
-				uint32_t nLow = m_PixelData->at(nPixelAddress); nPixelAddress++;
-				uint32_t nHigh = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nLow = m_PixelData->at(nPixelSourceAddress); nPixelSourceAddress++;
+				uint32_t nHigh = m_PixelData->at(nPixelSourceAddress); nPixelSourceAddress++;
 				uint16_t nColor = nLow | (nHigh << 8);
 
 				uint32_t nRed = (nColor & 0x1f) << 3;
@@ -1324,22 +1320,26 @@ void CImageData::writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nS
 
 				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
 
-				uint8_t nGrayValue1bit = nGray / 128;
+				uint32_t nPixelTargetMod = nPixelTargetBitPosition % 8;
+				nPixelTargetBitPosition++;
 
-				uint32_t nColumnMod = nColumn % 8;
-				if (nColumnMod == 0) {
-					*pPixelPtr = nGrayValue1bit;
+				uint8_t nBlackWhiteMask = 0;
+				if (nGray >= 128)
+					nBlackWhiteMask = 1 << (7 - nPixelTargetMod);
+
+				if (nPixelTargetMod == 0) {
+					*pPixelTargetPtr = nBlackWhiteMask;
 
 				}
 				else {
-					*pPixelPtr |= nGrayValue1bit << nColumnMod;
+					*pPixelTargetPtr |= nBlackWhiteMask;
 				}
 
-				if (nColumnMod == 7)
-					pPixelPtr++;
+				if (nPixelTargetMod == 7)
+					pPixelTargetPtr++;
 			}
 
-			pLinePtr += nYLineOffset;
+			nLineBitPosition += nYLinePixelOffset;
 			nLineAddress += (size_t)m_nPixelCountX * 2;
 		}
 
@@ -1349,33 +1349,38 @@ void CImageData::writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nS
 	case eImagePixelFormat::RGB24bit: {
 		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
 
-			size_t nPixelAddress = nLineAddress;
-			uint8_t* pPixelPtr = pLinePtr;
+			size_t nPixelSourceAddress = nLineAddress;
+			uint8_t* pPixelTargetPtr = &pTarget[nLineBitPosition / 8];
+			size_t nPixelTargetBitPosition = nLineBitPosition % 8;
 
 			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 
-				uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
-				uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
-				uint32_t nBlue = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nRed = m_PixelData->at(nPixelSourceAddress); nPixelSourceAddress++;
+				uint32_t nGreen = m_PixelData->at(nPixelSourceAddress); nPixelSourceAddress++;
+				uint32_t nBlue = m_PixelData->at(nPixelSourceAddress); nPixelSourceAddress++;
 
 				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
 
-				uint8_t nGrayValue1bit = nGray / 128;
+				uint32_t nPixelTargetMod = nPixelTargetBitPosition % 8;
+				nPixelTargetBitPosition++;
 
-				uint32_t nColumnMod = nColumn % 8;
-				if (nColumnMod == 0) {
-					*pPixelPtr = nGrayValue1bit;
+				uint8_t nBlackWhiteMask = 0;
+				if (nGray >= 128)
+					nBlackWhiteMask = 1 << (7 - nPixelTargetMod);
+
+				if (nPixelTargetMod == 0) {
+					*pPixelTargetPtr = nBlackWhiteMask;
 
 				}
 				else {
-					*pPixelPtr |= nGrayValue1bit << nColumnMod;
+					*pPixelTargetPtr |= nBlackWhiteMask;
 				}
 
-				if (nColumnMod == 7)
-					pPixelPtr++;
+				if (nPixelTargetMod == 7)
+					pPixelTargetPtr++;
 			}
 
-			pLinePtr += nYLineOffset;
+			nLineBitPosition += nYLinePixelOffset;
 			nLineAddress += (size_t)m_nPixelCountX * 3;
 		}
 
@@ -1383,34 +1388,42 @@ void CImageData::writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nS
 	}
 
 	case eImagePixelFormat::RGBA32bit: {
-		size_t nPixelAddress = nLineAddress;
-		uint8_t* pPixelPtr = pLinePtr;
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+			size_t nPixelSourceAddress = nLineAddress;
+			uint8_t* pPixelTargetPtr = &pTarget[nLineBitPosition / 8];
+			size_t nPixelTargetBitPosition = nLineBitPosition % 8;
 
-		for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
 
-			uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
-			uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
-			uint32_t nBlue = m_PixelData->at(nPixelAddress); nPixelAddress++;
-			nPixelAddress++; // Ignore alpha
+				uint32_t nRed = m_PixelData->at(nPixelSourceAddress); nPixelSourceAddress++;
+				uint32_t nGreen = m_PixelData->at(nPixelSourceAddress); nPixelSourceAddress++;
+				uint32_t nBlue = m_PixelData->at(nPixelSourceAddress); nPixelSourceAddress++;
+				nPixelSourceAddress++; // Ignore alpha
 
-			uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
-			uint8_t nGrayValue1bit = nGray / 128;
+				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
 
-			uint32_t nColumnMod = nColumn % 8;
-			if (nColumnMod == 0) {
-				*pPixelPtr = nGrayValue1bit;
+				uint32_t nPixelTargetMod = nPixelTargetBitPosition % 8;
+				nPixelTargetBitPosition++;
 
+				uint8_t nBlackWhiteMask = 0;
+				if (nGray >= 128)
+					nBlackWhiteMask = 1 << (7 - nPixelTargetMod);
+
+				if (nPixelTargetMod == 0) {
+					*pPixelTargetPtr = nBlackWhiteMask;
+
+				}
+				else {
+					*pPixelTargetPtr |= nBlackWhiteMask;
+				}
+
+				if (nPixelTargetMod == 7)
+					pPixelTargetPtr++;
 			}
-			else {
-				*pPixelPtr |= nGrayValue1bit << nColumnMod;
-			}
 
-			if (nColumnMod == 7)
-				pPixelPtr++;
+			nLineBitPosition += nYLinePixelOffset;
+			nLineAddress += (size_t)m_nPixelCountX * 4;
 		}
-
-		pLinePtr += nYLineOffset;
-		nLineAddress += (size_t)m_nPixelCountX * 4;
 
 		break;
 	}

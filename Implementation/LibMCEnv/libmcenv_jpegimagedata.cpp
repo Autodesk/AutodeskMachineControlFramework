@@ -88,3 +88,13 @@ std::vector<uint8_t>& CJPEGImageData::getJPEGStreamBuffer()
     return m_JPEGStream;
 }
 
+
+
+void CJPEGImageData::WriteToStream(ITempStreamWriter* pStream)
+{
+    if (pStream == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    if (m_JPEGStream.size() > 0)
+        pStream->WriteData(m_JPEGStream.size(), m_JPEGStream.data());
+}

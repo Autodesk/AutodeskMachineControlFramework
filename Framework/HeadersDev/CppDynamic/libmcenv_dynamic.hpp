@@ -1164,6 +1164,7 @@ public:
 	
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void GetPNGDataStream(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline void WriteToStream(classParam<CTempStreamWriter> pStream);
 };
 	
 /*************************************************************************************************************************
@@ -1199,6 +1200,7 @@ public:
 	
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void GetJPEGDataStream(std::vector<LibMCEnv_uint8> & JPEGDataBuffer);
+	inline void WriteToStream(classParam<CTempStreamWriter> pStream);
 };
 	
 /*************************************************************************************************************************
@@ -2998,9 +3000,11 @@ public:
 		pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat = nullptr;
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_PNGImageData_GetPNGDataStream = nullptr;
+		pWrapperTable->m_PNGImageData_WriteToStream = nullptr;
 		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = nullptr;
 		pWrapperTable->m_JPEGImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_JPEGImageData_GetJPEGDataStream = nullptr;
+		pWrapperTable->m_JPEGImageData_WriteToStream = nullptr;
 		pWrapperTable->m_ImageData_GetPixelFormat = nullptr;
 		pWrapperTable->m_ImageData_ChangePixelFormat = nullptr;
 		pWrapperTable->m_ImageData_GetDPI = nullptr;
@@ -4013,6 +4017,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_PNGImageData_WriteToStream = (PLibMCEnvPNGImageData_WriteToStreamPtr) GetProcAddress(hLibrary, "libmcenv_pngimagedata_writetostream");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageData_WriteToStream = (PLibMCEnvPNGImageData_WriteToStreamPtr) dlsym(hLibrary, "libmcenv_pngimagedata_writetostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageData_WriteToStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = (PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagestoreoptions_resettodefaults");
 		#else // _WIN32
 		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = (PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr) dlsym(hLibrary, "libmcenv_jpegimagestoreoptions_resettodefaults");
@@ -4037,6 +4050,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JPEGImageData_GetJPEGDataStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JPEGImageData_WriteToStream = (PLibMCEnvJPEGImageData_WriteToStreamPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagedata_writetostream");
+		#else // _WIN32
+		pWrapperTable->m_JPEGImageData_WriteToStream = (PLibMCEnvJPEGImageData_WriteToStreamPtr) dlsym(hLibrary, "libmcenv_jpegimagedata_writetostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JPEGImageData_WriteToStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11395,6 +11417,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_pngimagedata_writetostream", (void**)&(pWrapperTable->m_PNGImageData_WriteToStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_WriteToStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_jpegimagestoreoptions_resettodefaults", (void**)&(pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -11405,6 +11431,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_jpegimagedata_getjpegdatastream", (void**)&(pWrapperTable->m_JPEGImageData_GetJPEGDataStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageData_GetJPEGDataStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jpegimagedata_writetostream", (void**)&(pWrapperTable->m_JPEGImageData_WriteToStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageData_WriteToStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelformat", (void**)&(pWrapperTable->m_ImageData_GetPixelFormat));
@@ -14878,7 +14908,7 @@ public:
 	}
 	
 	/**
-	* CPNGImageData::GetPNGDataStream - Retrieves encoded data stream of image object.
+	* CPNGImageData::GetPNGDataStream - Retrieves encoded PNG data of image object.
 	* @param[out] PNGDataBuffer - PNG Data stream.
 	*/
 	void CPNGImageData::GetPNGDataStream(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
@@ -14888,6 +14918,16 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetPNGDataStream(m_pHandle, 0, &elementsNeededPNGData, nullptr));
 		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
 		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetPNGDataStream(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+	}
+	
+	/**
+	* CPNGImageData::WriteToStream - Writes encoded PNG data into a stream object.
+	* @param[in] pStream - Stream to write to.
+	*/
+	void CPNGImageData::WriteToStream(classParam<CTempStreamWriter> pStream)
+	{
+		LibMCEnvHandle hStream = pStream.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_WriteToStream(m_pHandle, hStream));
 	}
 	
 	/**
@@ -14917,7 +14957,7 @@ public:
 	}
 	
 	/**
-	* CJPEGImageData::GetJPEGDataStream - Retrieves encoded data stream of image object.
+	* CJPEGImageData::GetJPEGDataStream - Retrieves encoded JPEG data of image object.
 	* @param[out] JPEGDataBuffer - JPEG Data stream.
 	*/
 	void CJPEGImageData::GetJPEGDataStream(std::vector<LibMCEnv_uint8> & JPEGDataBuffer)
@@ -14927,6 +14967,16 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_GetJPEGDataStream(m_pHandle, 0, &elementsNeededJPEGData, nullptr));
 		JPEGDataBuffer.resize((size_t) elementsNeededJPEGData);
 		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_GetJPEGDataStream(m_pHandle, elementsNeededJPEGData, &elementsWrittenJPEGData, JPEGDataBuffer.data()));
+	}
+	
+	/**
+	* CJPEGImageData::WriteToStream - Writes encoded JPEG data into a stream object.
+	* @param[in] pStream - Stream to write to.
+	*/
+	void CJPEGImageData::WriteToStream(classParam<CTempStreamWriter> pStream)
+	{
+		LibMCEnvHandle hStream = pStream.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_WriteToStream(m_pHandle, hStream));
 	}
 	
 	/**

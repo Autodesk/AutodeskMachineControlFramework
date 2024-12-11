@@ -496,12 +496,18 @@ public:
 	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
 
 	/**
-	* IPNGImageData::GetPNGDataStream - Retrieves encoded data stream of image object.
+	* IPNGImageData::GetPNGDataStream - Retrieves encoded PNG data of image object.
 	* @param[in] nPNGDataBufferSize - Number of elements in buffer
 	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
 	*/
 	virtual void GetPNGDataStream(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
+
+	/**
+	* IPNGImageData::WriteToStream - Writes encoded PNG data into a stream object.
+	* @param[in] pStream - Stream to write to.
+	*/
+	virtual void WriteToStream(ITempStreamWriter* pStream) = 0;
 
 };
 
@@ -538,12 +544,18 @@ public:
 	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
 
 	/**
-	* IJPEGImageData::GetJPEGDataStream - Retrieves encoded data stream of image object.
+	* IJPEGImageData::GetJPEGDataStream - Retrieves encoded JPEG data of image object.
 	* @param[in] nJPEGDataBufferSize - Number of elements in buffer
 	* @param[out] pJPEGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pJPEGDataBuffer - uint8 buffer of JPEG Data stream.
 	*/
 	virtual void GetJPEGDataStream(LibMCEnv_uint64 nJPEGDataBufferSize, LibMCEnv_uint64* pJPEGDataNeededCount, LibMCEnv_uint8 * pJPEGDataBuffer) = 0;
+
+	/**
+	* IJPEGImageData::WriteToStream - Writes encoded JPEG data into a stream object.
+	* @param[in] pStream - Stream to write to.
+	*/
+	virtual void WriteToStream(ITempStreamWriter* pStream) = 0;
 
 };
 
