@@ -2289,15 +2289,21 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 				nOIEPIDControlIndex = (uint32_t) pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "pidindex", 0);
 			}
 
-			int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
+			// Legacy fix: There might be 3MFs with double values as laser index (like 1.0000)
+			// Ensure that they are at least approximately installers
+			double dLaserIndexOfSegment = pLayer->GetSegmentProfileDoubleValueDef(nSegmentIndex, "", "laserindex", 0);
+			int64_t nLaserIndexOfSegment = (int64_t)round(dLaserIndexOfSegment);
+			if (abs(dLaserIndexOfSegment - double(nLaserIndexOfSegment)) > 0.001)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SEGMENTHASINVALIDLASERINDEX, "Segment has invalid laser index: " + std::to_string(dLaserIndexOfSegment));
+
 			int64_t nCurrentLaserIndex = GetLaserIndex();
 
-			if (nLaserIndexToDraw == 0) {
+			if (nLaserIndexOfSegment == 0) {
 				if (bFailIfNonAssignedDataExists)
 					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER, "Laser index has no assigned scanner: " + std::to_string(nLaserIndexToDraw));
 			}
 
-			if (nLaserIndexToDraw == nCurrentLaserIndex) {
+			if (nLaserIndexOfSegment == nCurrentLaserIndex) {
 
 				int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
 
