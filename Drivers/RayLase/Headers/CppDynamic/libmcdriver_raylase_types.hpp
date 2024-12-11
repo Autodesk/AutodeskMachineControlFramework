@@ -122,6 +122,7 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT 1015 /** A scanning timeout occured */
 #define LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS 1016 /** Cannot delete list in progress */
 #define LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED 1017 /** Raylase SDK not loaded */
+#define LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASINVALIDLASERINDEX 1018 /** Segment has invalid laser index */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -156,6 +157,7 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT: return "A scanning timeout occured";
     case LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS: return "Cannot delete list in progress";
     case LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED: return "Raylase SDK not loaded";
+    case LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASINVALIDLASERINDEX: return "Segment has invalid laser index";
     default: return "unknown error";
   }
 }

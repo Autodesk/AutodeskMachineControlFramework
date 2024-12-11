@@ -67,9 +67,7 @@
 		<error name="SCANNINGTIMEOUT" code="1015" description="A scanning timeout occured" />		
 		<error name="CANNOTDELETELISTLISTINPROGRESS" code="1016" description="Cannot delete list in progress" />				
 		<error name="RAYLASESDKNOTLOADED" code="1017" description="Raylase SDK not loaded" />		
-		
-		
-						
+		<error name="SEGMENTHASINVALIDLASERINDEX" code="1018" description="Segment has invalid laser index" />
 				
 	</errors>
 

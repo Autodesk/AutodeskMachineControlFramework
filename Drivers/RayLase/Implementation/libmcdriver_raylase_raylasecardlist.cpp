@@ -104,7 +104,14 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
         bool bDrawSegment = true;
 
         // Check for laser index in file.
-        int64_t nLaserIndexOfSegment = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
+
+        // Legacy fix: There might be 3MFs with double values as laser index (like 1.0000)
+        // Ensure that they are at least approximately installers
+        double dLaserIndexOfSegment = pLayer->GetSegmentProfileDoubleValueDef(nSegmentIndex, "", "laserindex", 0);
+        int64_t nLaserIndexOfSegment = (int64_t) round (dLaserIndexOfSegment);
+        if (abs (dLaserIndexOfSegment - double (nLaserIndexOfSegment)) > 0.001)
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASINVALIDLASERINDEX, "Segment has invalid laser index: " + std::to_string(dLaserIndexOfSegment));
+
         if (nLaserIndexOfSegment == 0) {
             if (bFailIfNonAssignedDataExists)
                 throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD, "Segment has no assigned card: " + std::to_string(nLaserIndexOfSegment));
