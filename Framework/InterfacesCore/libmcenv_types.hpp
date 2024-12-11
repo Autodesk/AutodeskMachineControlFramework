@@ -624,11 +624,12 @@ namespace LibMCEnv {
   enum class ePNGStorageFormat : LibMCEnv_int32 {
     Unknown = 0,
     BlackWhite1bit = 1,
-    GreyScale2bit = 2,
-    GreyScale4bit = 3,
-    GreyScale8bit = 4,
-    RGB24bit = 5,
-    RGBA32bit = 6
+    GreyScale1bit = 2,
+    GreyScale2bit = 3,
+    GreyScale4bit = 4,
+    GreyScale8bit = 5,
+    RGB24bit = 6,
+    RGBA32bit = 7
   };
   
   enum class eFieldSamplingMode : LibMCEnv_int32 {

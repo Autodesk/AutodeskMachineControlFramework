@@ -91,6 +91,8 @@ private:
 	void convertFromYUY2_RGB24bit(const uint8_t* pSource);
 	void convertFromYUY2_RGBA32bit(const uint8_t* pSource);
 
+	uint32_t encodeBlackWhitePalettePNG(std::vector<uint8_t>& pngBuffer, std::vector<uint8_t>& imageBuffer, uint32_t imageSizeX, uint32_t imageSizeY);
+
 protected:
 
 public:

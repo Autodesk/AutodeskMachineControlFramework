@@ -277,11 +277,12 @@
 	<enum name="PNGStorageFormat">
 		<option name="Unknown" value="0" />
 		<option name="BlackWhite1bit" value="1" />
-		<option name="GreyScale2bit" value="2" />
-		<option name="GreyScale4bit" value="3" />
-		<option name="GreyScale8bit" value="4" />
-		<option name="RGB24bit" value="5" />
-		<option name="RGBA32bit" value="6" />
+		<option name="GreyScale1bit" value="2" />
+		<option name="GreyScale2bit" value="3" />
+		<option name="GreyScale4bit" value="4" />
+		<option name="GreyScale8bit" value="5" />
+		<option name="RGB24bit" value="6" />
+		<option name="RGBA32bit" value="7" />
 	</enum>
 	
 	<enum name="FieldSamplingMode">

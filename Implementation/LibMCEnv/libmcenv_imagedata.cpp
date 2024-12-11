@@ -413,6 +413,32 @@ IPNGImageStoreOptions* CImageData::CreatePNGOptions()
 	return new CPNGImageStoreOptions();
 }
 
+uint32_t CImageData::encodeBlackWhitePalettePNG(std::vector<uint8_t>& pngBuffer, std::vector<uint8_t>& imageBuffer, uint32_t imageSizeX, uint32_t imageSizeY)
+{
+
+	lodepng::State state;
+
+	// Configure the color type to palette and set bit depth to 1
+	state.info_png.color.colortype = LCT_PALETTE;
+	state.info_png.color.bitdepth = 1;
+	state.info_raw.colortype = LCT_PALETTE;
+	state.info_raw.bitdepth = 1;
+
+	// Define the palette (black and white)
+	lodepng_palette_add(&state.info_png.color, 0, 0, 0, 255); // Black
+	lodepng_palette_add(&state.info_png.color, 255, 255, 255, 255); // White
+
+	// Ensure raw info also has the palette
+	lodepng_palette_add(&state.info_raw, 0, 0, 0, 255); // Black
+	lodepng_palette_add(&state.info_raw, 255, 255, 255, 255); // White
+
+	state.encoder.auto_convert = false;
+
+	// Encode the image
+	return lodepng::encode(pngBuffer, imageBuffer, imageSizeX, imageSizeY, state);
+}
+
+
 IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions)
 {
 	unsigned int errorCode = 0;
@@ -437,7 +463,15 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 	case eImagePixelFormat::GreyScale8bit:
 
 		switch (pngStorageFormat) {
-			case LibMCEnv::ePNGStorageFormat::BlackWhite1bit: 
+			case LibMCEnv::ePNGStorageFormat::BlackWhite1bit: {
+				convertedPixelData.resize(nTotalPixelCount);
+				writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
+				errorCode = encodeBlackWhitePalettePNG(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY);
+
+				break;
+			}
+
+			case LibMCEnv::ePNGStorageFormat::GreyScale1bit:
 				convertedPixelData.resize(nTotalPixelCount);
 				writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
@@ -483,6 +517,12 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 		case LibMCEnv::ePNGStorageFormat::BlackWhite1bit:
 			convertedPixelData.resize(nTotalPixelCount);
 			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
+			errorCode = encodeBlackWhitePalettePNG(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::GreyScale1bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
 			break;
 
@@ -523,6 +563,12 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 	case eImagePixelFormat::RGBA32bit:
 		switch (pngStorageFormat) {
 		case LibMCEnv::ePNGStorageFormat::BlackWhite1bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
+			errorCode = encodeBlackWhitePalettePNG(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::GreyScale1bit:
 			convertedPixelData.resize(nTotalPixelCount);
 			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
 			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
