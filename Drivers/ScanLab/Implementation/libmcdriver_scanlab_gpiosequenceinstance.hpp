@@ -223,6 +223,8 @@ private:
 
 	std::vector<PGPIOTask> m_Tasks;
 
+	bool m_bAutomaticSelection;
+
 public:
 
 	CGPIOSequenceInstance (const std::string & sIdentifier);
@@ -247,6 +249,11 @@ public:
 
 	void writeToSDKList (CScanLabSDK* pSDK, uint32_t nCardNo);
 
+	void enableAutomaticSelection();
+
+	void disableAutomaticSelection();
+
+	bool getAutomaticSelection();
 };
 
 typedef std::shared_ptr<CGPIOSequenceInstance> PGPIOSequenceInstance;

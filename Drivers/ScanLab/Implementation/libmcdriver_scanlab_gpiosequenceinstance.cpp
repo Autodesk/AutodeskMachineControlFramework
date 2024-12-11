@@ -292,7 +292,7 @@ void CGPIOTask_ConditionalGoToLabel::writeToSDKList(CScanLabSDK* pSDK, uint32_t 
 
 
 CGPIOSequenceInstance::CGPIOSequenceInstance(const std::string& sIdentifier)
-    : m_sIdentifier(sIdentifier), m_nListSize (0)
+    : m_sIdentifier(sIdentifier), m_nListSize (0), m_bAutomaticSelection (true)
 {
     if (sIdentifier.empty () || (sIdentifier.length () > GPIOSEQUENCE_MAXIDENTIFIERLENGTH))
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSEQUENCEIDENTIFIER);
@@ -370,4 +370,19 @@ void CGPIOSequenceInstance::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
        pTask->writeToSDKList(pSDK, nCardNo);
     }
 
+}
+
+void CGPIOSequenceInstance::enableAutomaticSelection()
+{
+    m_bAutomaticSelection = true;
+}
+
+void CGPIOSequenceInstance::disableAutomaticSelection()
+{
+    m_bAutomaticSelection = false;
+}
+
+bool CGPIOSequenceInstance::getAutomaticSelection()
+{
+    return m_bAutomaticSelection;
 }

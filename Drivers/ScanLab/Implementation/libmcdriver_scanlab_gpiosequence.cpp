@@ -97,10 +97,10 @@ void CGPIOSequence::ConditionalGoToLabel(const LibMCDriver_ScanLab_uint32 nInput
 
 void CGPIOSequence::EnableAutomaticSelection()
 {
-
+	m_pInstance->enableAutomaticSelection();
 }
 
 void CGPIOSequence::DisableAutomaticSelection()
 {
-
+	m_pInstance->disableAutomaticSelection();
 }

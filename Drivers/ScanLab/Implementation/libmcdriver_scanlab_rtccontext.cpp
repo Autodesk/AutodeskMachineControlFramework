@@ -2214,6 +2214,19 @@ void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNo
 	addLayerToListEx(pLayer, oieRecordingMode, nAttributeFilterID, nAttributeFilterValue, (float)dMaxLaserPowerInWatts, bFailIfNonAssignedDataExists);
 }
 
+void CRTCContext::addGPIOSequenceToList(const std::string& sSequenceName)
+{
+	auto iIter = m_GPIOSequences.find(sSequenceName);
+	if (iIter == m_GPIOSequences.end ())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDGPIOSEQUENCE, "Could not find GPIO sequence: " + sSequenceName);
+
+	auto pSequence = iIter->second;
+	if (pSequence->getAutomaticSelection () == false)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SELECTEDGPIOSEQUENCEISDISABLED, "Selected GPIO sequence is disabled: " + sSequenceName);
+
+	pSequence->writeToSDKList(m_pScanLabSDK.get(), m_CardNo);
+
+}
 
 void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordingMode oieRecordingMode, uint32_t nAttributeFilterID, int64_t nAttributeFilterValue, float fMaxLaserPowerInWatts, bool bFailIfNonAssignedDataExists)
 {
@@ -2262,6 +2275,12 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 		}
 
 		if (bDrawSegment && (nPointCount >= 2)) {
+
+			// Run GPIO Pre-Sequence
+			auto sPreSequence = pLayer->GetSegmentProfileValueDef(nSegmentIndex, "http://schemas.scanlab.com/gpiosequence/2025/01", "presequence", "");
+			if (!sPreSequence.empty()) {
+				addGPIOSequenceToList (sPreSequence);
+			}
 
 			// Update nLight AFX Mode if necessary
 			if (m_pNLightAFXSelectorInstance.get() != nullptr) {
@@ -2390,7 +2409,14 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 		}
 
+		// Run GPIO Post-Sequence
+		auto sPostSequence = pLayer->GetSegmentProfileValueDef(nSegmentIndex, "http://schemas.scanlab.com/gpiosequence/2025/01", "postsequence", "");
+		if (!sPostSequence.empty()) {
+			addGPIOSequenceToList(sPostSequence);
+		}
 	}
+
+
 
 	if (m_bEnableOIEPIDControl) {
 		SetOIEPIDMode(0);

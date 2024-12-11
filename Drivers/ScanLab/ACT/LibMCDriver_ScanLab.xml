@@ -179,6 +179,7 @@
 		<error name="INVALIDGPIOTASKDELAY" code="1127" description="Invalid GPIO Task Delay." />	
 		<error name="GPIOTASKDELAYMUSTBEMULTIPLEOF10" code="1128" description="GPIO Task Delay must be a multiple of 10." />	
 		<error name="SEGMENTHASINVALIDLASERINDEX" code="1129" description="Segment has invalid laser index" />
+		<error name="SELECTEDGPIOSEQUENCEISDISABLED" code="1130" description="Selected GPIO Sequence is disabled" />
 
 			
 	</errors>

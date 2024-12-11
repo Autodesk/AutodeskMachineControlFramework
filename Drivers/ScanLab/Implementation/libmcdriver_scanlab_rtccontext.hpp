@@ -144,6 +144,8 @@ protected:
 
 	void sendOIEMeasurementTag (uint32_t nCurrentVectorID);
 
+	void addGPIOSequenceToList (const std::string & sSequenceName);
+
 	void addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordingMode oieRecordingMode, uint32_t nAttributeFilterID, int64_t nAttributeFilterValue, float fMaxLaserPowerInWatts, bool bFailIfNonAssignedDataExists);
 
 	void updateLaserField(double dMinXInMM, double dMaxXInMM, double dMinYInMM, double dMaxYInMM);
