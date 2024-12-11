@@ -5543,7 +5543,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateDataTablePtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData);
 
 /**
-* retrieves if attached driver has data with the given identifier.
+* retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pIdentifier - identifier of the binary data in the driver package.
@@ -7612,6 +7612,16 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetIntegerParameterPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetBoolParameterPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
 /**
+* retrieves if the machine resources has data with the given identifier.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the machine resource package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasResourceDataPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
 * loads a plugin resource file into memory.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -8110,6 +8120,40 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LogOutPtr) (LibMCEnv_UIEnvironme
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ShowHintPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pHint, LibMCEnv_uint32 nTimeoutInMS);
+
+/**
+* retrieves if the machine resources has data with the given identifier.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the machine resource package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasResourceDataPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
+* loads a plugin resource file into memory.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - Number of elements in buffer
+* @param[out] pResourceDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pResourceDataBuffer - uint8  buffer of Resource Data Buffer.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LoadResourceDataPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
+
+/**
+* loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - size of the buffer (including trailing 0)
+* @param[out] pResourceDataNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pResourceDataBuffer -  buffer of Resource Data String., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LoadResourceStringPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const LibMCEnv_uint32 nResourceDataBufferSize, LibMCEnv_uint32* pResourceDataNeededChars, char * pResourceDataBuffer);
 
 /**
 * Shows a hint message in the user interface in a certain color.
@@ -9647,6 +9691,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetDoubleParameterPtr m_StateEnvironment_GetDoubleParameter;
 	PLibMCEnvStateEnvironment_GetIntegerParameterPtr m_StateEnvironment_GetIntegerParameter;
 	PLibMCEnvStateEnvironment_GetBoolParameterPtr m_StateEnvironment_GetBoolParameter;
+	PLibMCEnvStateEnvironment_HasResourceDataPtr m_StateEnvironment_HasResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceStringPtr m_StateEnvironment_LoadResourceString;
 	PLibMCEnvStateEnvironment_CreateEmptyImagePtr m_StateEnvironment_CreateEmptyImage;
@@ -9695,6 +9740,9 @@ typedef struct {
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
 	PLibMCEnvUIEnvironment_LogOutPtr m_UIEnvironment_LogOut;
 	PLibMCEnvUIEnvironment_ShowHintPtr m_UIEnvironment_ShowHint;
+	PLibMCEnvUIEnvironment_HasResourceDataPtr m_UIEnvironment_HasResourceData;
+	PLibMCEnvUIEnvironment_LoadResourceDataPtr m_UIEnvironment_LoadResourceData;
+	PLibMCEnvUIEnvironment_LoadResourceStringPtr m_UIEnvironment_LoadResourceString;
 	PLibMCEnvUIEnvironment_ShowHintColoredPtr m_UIEnvironment_ShowHintColored;
 	PLibMCEnvUIEnvironment_HideHintPtr m_UIEnvironment_HideHint;
 	PLibMCEnvUIEnvironment_StartStreamDownloadPtr m_UIEnvironment_StartStreamDownload;

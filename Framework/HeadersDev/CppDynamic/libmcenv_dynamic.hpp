@@ -2742,6 +2742,7 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline bool HasResourceData(const std::string & sIdentifier);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
@@ -2822,6 +2823,9 @@ public:
 	inline void ActivatePage(const std::string & sPageName);
 	inline void LogOut();
 	inline void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS);
+	inline bool HasResourceData(const std::string & sIdentifier);
+	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
+	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline void ShowHintColored(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS, const sColorRGB & Color, const sColorRGB & FontColor);
 	inline void HideHint();
 	inline void StartStreamDownload(const std::string & sUUID, const std::string & sFilename);
@@ -3676,6 +3680,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_HasResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
@@ -3724,6 +3729,9 @@ public:
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
 		pWrapperTable->m_UIEnvironment_LogOut = nullptr;
 		pWrapperTable->m_UIEnvironment_ShowHint = nullptr;
+		pWrapperTable->m_UIEnvironment_HasResourceData = nullptr;
+		pWrapperTable->m_UIEnvironment_LoadResourceData = nullptr;
+		pWrapperTable->m_UIEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_UIEnvironment_ShowHintColored = nullptr;
 		pWrapperTable->m_UIEnvironment_HideHint = nullptr;
 		pWrapperTable->m_UIEnvironment_StartStreamDownload = nullptr;
@@ -10143,6 +10151,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
@@ -10572,6 +10589,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_ShowHint == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasResourceData = (PLibMCEnvUIEnvironment_HasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasResourceData = (PLibMCEnvUIEnvironment_HasResourceDataPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LoadResourceData = (PLibMCEnvUIEnvironment_LoadResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LoadResourceData = (PLibMCEnvUIEnvironment_LoadResourceDataPtr) dlsym(hLibrary, "libmcenv_uienvironment_loadresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LoadResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LoadResourceString = (PLibMCEnvUIEnvironment_LoadResourceStringPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadresourcestring");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LoadResourceString = (PLibMCEnvUIEnvironment_LoadResourceStringPtr) dlsym(hLibrary, "libmcenv_uienvironment_loadresourcestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LoadResourceString == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -14079,6 +14123,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_HasResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -14269,6 +14317,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_showhint", (void**)&(pWrapperTable->m_UIEnvironment_ShowHint));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ShowHint == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasresourcedata", (void**)&(pWrapperTable->m_UIEnvironment_HasResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loadresourcedata", (void**)&(pWrapperTable->m_UIEnvironment_LoadResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loadresourcestring", (void**)&(pWrapperTable->m_UIEnvironment_LoadResourceString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadResourceString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_showhintcolored", (void**)&(pWrapperTable->m_UIEnvironment_ShowHintColored));
@@ -21578,7 +21638,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::MachineHasResourceData - retrieves if attached driver has data with the given identifier.
+	* CDriverEnvironment::MachineHasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
 	*/
@@ -24190,6 +24250,19 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	bool CStateEnvironment::HasResourceData(const std::string & sIdentifier)
+	{
+		bool resultHasResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasResourceData(m_pHandle, sIdentifier.c_str(), &resultHasResourceData));
+		
+		return resultHasResourceData;
+	}
+	
+	/**
 	* CStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
 	* @param[in] sResourceName - Name of the resource.
 	* @param[out] ResourceDataBuffer - Resource Data Buffer.
@@ -24892,6 +24965,49 @@ public:
 	void CUIEnvironment::ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ShowHint(m_pHandle, sHint.c_str(), nTimeoutInMS));
+	}
+	
+	/**
+	* CUIEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	bool CUIEnvironment::HasResourceData(const std::string & sIdentifier)
+	{
+		bool resultHasResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasResourceData(m_pHandle, sIdentifier.c_str(), &resultHasResourceData));
+		
+		return resultHasResourceData;
+	}
+	
+	/**
+	* CUIEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[out] ResourceDataBuffer - Resource Data Buffer.
+	*/
+	void CUIEnvironment::LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededResourceData = 0;
+		LibMCEnv_uint64 elementsWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), 0, &elementsNeededResourceData, nullptr));
+		ResourceDataBuffer.resize((size_t) elementsNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), elementsNeededResourceData, &elementsWrittenResourceData, ResourceDataBuffer.data()));
+	}
+	
+	/**
+	* CUIEnvironment::LoadResourceString - loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+	* @param[in] sResourceName - Name of the resource.
+	* @return Resource Data String.
+	*/
+	std::string CUIEnvironment::LoadResourceString(const std::string & sResourceName)
+	{
+		LibMCEnv_uint32 bytesNeededResourceData = 0;
+		LibMCEnv_uint32 bytesWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadResourceString(m_pHandle, sResourceName.c_str(), 0, &bytesNeededResourceData, nullptr));
+		std::vector<char> bufferResourceData(bytesNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadResourceString(m_pHandle, sResourceName.c_str(), bytesNeededResourceData, &bytesWrittenResourceData, &bufferResourceData[0]));
+		
+		return std::string(&bufferResourceData[0]);
 	}
 	
 	/**

@@ -445,6 +445,21 @@ bool CStateEnvironment::GetBoolParameter(const std::string& sParameterGroup, con
 	return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
+bool CStateEnvironment::HasResourceData(const std::string& sIdentifier)
+{
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourceEntry = pResourcePackage->findEntryByName(sIdentifier, false);
+
+	return (pResourceEntry.get() != nullptr);
+}
+
 
 void CStateEnvironment::LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer)
 {

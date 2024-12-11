@@ -4458,7 +4458,7 @@ public:
 	virtual bool DriverHasResourceData(const std::string & sIdentifier) = 0;
 
 	/**
-	* IDriverEnvironment::MachineHasResourceData - retrieves if attached driver has data with the given identifier.
+	* IDriverEnvironment::MachineHasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
 	*/
@@ -5952,6 +5952,13 @@ public:
 	virtual bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
+	* IStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	virtual bool HasResourceData(const std::string & sIdentifier) = 0;
+
+	/**
 	* IStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
 	* @param[in] sResourceName - Name of the resource.
 	* @param[in] nResourceDataBufferSize - Number of elements in buffer
@@ -6312,6 +6319,29 @@ public:
 	* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
 	*/
 	virtual void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS) = 0;
+
+	/**
+	* IUIEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	virtual bool HasResourceData(const std::string & sIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[in] nResourceDataBufferSize - Number of elements in buffer
+	* @param[out] pResourceDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+	*/
+	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
+
+	/**
+	* IUIEnvironment::LoadResourceString - loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+	* @param[in] sResourceName - Name of the resource.
+	* @return Resource Data String.
+	*/
+	virtual std::string LoadResourceString(const std::string & sResourceName) = 0;
 
 	/**
 	* IUIEnvironment::ShowHintColored - Shows a hint message in the user interface in a certain color.

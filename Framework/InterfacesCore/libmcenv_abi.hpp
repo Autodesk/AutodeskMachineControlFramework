@@ -5556,7 +5556,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createdatatable(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_driverhasresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData);
 
 /**
-* retrieves if attached driver has data with the given identifier.
+* retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pIdentifier - identifier of the binary data in the driver package.
@@ -7625,6 +7625,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getintegerparameter(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
 /**
+* retrieves if the machine resources has data with the given identifier.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the machine resource package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
 * loads a plugin resource file into memory.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -8123,6 +8133,40 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_logout(LibMCEnv_UIEnviro
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_showhint(LibMCEnv_UIEnvironment pUIEnvironment, const char * pHint, LibMCEnv_uint32 nTimeoutInMS);
+
+/**
+* retrieves if the machine resources has data with the given identifier.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the machine resource package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasresourcedata(LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
+* loads a plugin resource file into memory.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - Number of elements in buffer
+* @param[out] pResourceDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pResourceDataBuffer - uint8  buffer of Resource Data Buffer.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_loadresourcedata(LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
+
+/**
+* loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - size of the buffer (including trailing 0)
+* @param[out] pResourceDataNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pResourceDataBuffer -  buffer of Resource Data String., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_loadresourcestring(LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const LibMCEnv_uint32 nResourceDataBufferSize, LibMCEnv_uint32* pResourceDataNeededChars, char * pResourceDataBuffer);
 
 /**
 * Shows a hint message in the user interface in a certain color.

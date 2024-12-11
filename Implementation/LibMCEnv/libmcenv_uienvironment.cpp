@@ -984,4 +984,57 @@ void CUIEnvironment::AddExternalEventResultValue(const std::string& sReturnValue
     m_ExternalEventReturnValues.insert(std::make_pair (sReturnValueName, sReturnValue));
 }
 
+bool CUIEnvironment::HasResourceData(const std::string& sIdentifier)
+{
 
+    if (m_pUIHandler == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourceEntry = pResourcePackage->findEntryByName(sIdentifier, false);
+
+    return (pResourceEntry.get() != nullptr);
+}
+
+
+void CUIEnvironment::LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer)
+{
+    
+    if (m_pUIHandler == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+    auto nResourceSize = pResourceEntry->getSize();
+
+    if (pResourceDataNeededCount != nullptr)
+        *pResourceDataNeededCount = nResourceSize;
+
+    if (pResourceDataBuffer != nullptr) {
+        if (nResourceDataBufferSize < nResourceSize)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+        pResourcePackage->readEntryEx(sResourceName, pResourceDataBuffer, nResourceDataBufferSize);
+    }
+
+
+}
+
+std::string CUIEnvironment::LoadResourceString(const std::string& sResourceName)
+{
+    
+    if (m_pUIHandler == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    return pResourcePackage->readEntryUTF8String(sResourceName);
+}

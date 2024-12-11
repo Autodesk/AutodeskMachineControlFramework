@@ -143,6 +143,8 @@ public:
 
 	bool GetBoolParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
+	bool HasResourceData(const std::string& sIdentifier) override;
+
 	void LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer) override;
 
 	std::string LoadResourceString(const std::string& sResourceName) override;

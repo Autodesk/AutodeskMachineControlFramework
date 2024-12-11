@@ -3166,7 +3166,7 @@
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
 		</method>
 
-		<method name="MachineHasResourceData" description = "retrieves if attached driver has data with the given identifier.">
+		<method name="MachineHasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
 		</method>
@@ -4177,6 +4177,10 @@
 			<param name="Value" type="bool" pass="return" description="Value to set" />
 		</method>
 		
+		<method name="HasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />
+			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
+		</method>
 
 		<method name="LoadResourceData" description="loads a plugin resource file into memory.">
 			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
@@ -4429,7 +4433,22 @@
 			<param name="TimeoutInMS" type="uint32" pass="in" description="How many milliseconds the snackbar should be shown." />
 		</method>
 
-		<method name="ShowHintColored" description="Shows a hint message in the user interface in a certain color.">
+		<method name="HasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />
+			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
+		</method>
+
+		<method name="LoadResourceData" description="loads a plugin resource file into memory.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
+		</method>
+
+		<method name="LoadResourceString" description="loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="string" pass="return" description="Resource Data String." />
+		</method>
+
+		<method name="ShowHintColored" description="Shows a hint message in the user interface in a certain color.">		
 			<param name="Hint" type="string" pass="in" description="Hint to show." />
 			<param name="TimeoutInMS" type="uint32" pass="in" description="How many milliseconds the snackbar should be shown." />
 			<param name="Color" type="struct" class="ColorRGB" pass="in" description="Background color of hint." />
