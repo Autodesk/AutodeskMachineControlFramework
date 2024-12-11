@@ -41,6 +41,8 @@ Abstract: This is a stub class definition of CDriver_Raylase
 
 using namespace LibMCDriver_Raylase::Impl;
 
+#include <set>
+
 /*************************************************************************************************************************
  Class definition of CDriver_Raylase 
 **************************************************************************************************************************/
@@ -265,23 +267,30 @@ void CDriver_Raylase::DrawLayerMultiLaser(const std::string& sStreamUUID, const 
         executionLists.push_back(pList);
     }
 
-    bool allDone = false;
-    while (!allDone) {
-        allDone = true;
+    
+    std::set<CRaylaseCardList*> listsThatAreDone;
+
+    while (listsThatAreDone.size() < executionLists.size ()) {
+
         for (auto pList : executionLists) {
 
-            uint64_t nCurrentTime = m_pDriverEnvironment->GetGlobalTimerInMilliseconds();
-            if (nCurrentTime < nStartTime)
-                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING);
+            auto iFinishedIter = listsThatAreDone.find(pList.get());
+            if (iFinishedIter == listsThatAreDone.end()) {
 
-            uint64_t nMillisecondsPassed = nCurrentTime - nStartTime;
-            if (nMillisecondsPassed > nScanningTimeoutInMS)
-                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT);
 
-            bool listDone = pList->waitForExecution(100);
-            if (!listDone) {
-                allDone = false;
-                break;
+                uint64_t nCurrentTime = m_pDriverEnvironment->GetGlobalTimerInMilliseconds();
+                if (nCurrentTime < nStartTime)
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING);
+
+                uint64_t nMillisecondsPassed = nCurrentTime - nStartTime;
+                if (nMillisecondsPassed > nScanningTimeoutInMS)
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT);
+
+                bool listDone = pList->waitForExecution(100);
+                if (listDone) {
+                    listsThatAreDone.insert (pList.get ());
+                }
+
             }
         }        
     }
