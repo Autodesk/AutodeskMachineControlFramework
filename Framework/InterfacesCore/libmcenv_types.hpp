@@ -301,6 +301,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH 10204 /** JPEG color precision too high */
 #define LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG 10205 /** Could not decompress JPEG */
 #define LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE 10206 /** Could not store JPEG image */
+#define LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT 10207 /** Invalid PNG Export Format */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -514,6 +515,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEG color precision too high";
     case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "Could not decompress JPEG";
     case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
+    case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "Invalid PNG Export Format";
     default: return "unknown error";
   }
 }
@@ -617,6 +619,16 @@ namespace LibMCEnv {
     RGB24bit = 2,
     RGBA32bit = 3,
     RGB16bit = 4
+  };
+  
+  enum class ePNGStorageFormat : LibMCEnv_int32 {
+    Unknown = 0,
+    BlackWhite1bit = 1,
+    GreyScale2bit = 2,
+    GreyScale4bit = 3,
+    GreyScale8bit = 4,
+    RGB24bit = 5,
+    RGBA32bit = 6
   };
   
   enum class eFieldSamplingMode : LibMCEnv_int32 {
@@ -765,6 +777,7 @@ namespace LibMCEnv {
 typedef LibMCEnv::eAlertLevel eLibMCEnvAlertLevel;
 typedef LibMCEnv::eLogLevel eLibMCEnvLogLevel;
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
+typedef LibMCEnv::ePNGStorageFormat eLibMCEnvPNGStorageFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;

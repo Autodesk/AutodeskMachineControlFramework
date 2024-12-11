@@ -43,8 +43,17 @@ using namespace LibMCEnv::Impl;
  Class definition of CJPEGImageStoreOptions 
 **************************************************************************************************************************/
 
+CJPEGImageStoreOptions::CJPEGImageStoreOptions()
+{
+
+}
+
+CJPEGImageStoreOptions::~CJPEGImageStoreOptions()
+{
+
+}
+
 void CJPEGImageStoreOptions::ResetToDefaults()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 

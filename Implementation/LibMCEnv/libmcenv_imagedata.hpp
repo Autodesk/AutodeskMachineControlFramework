@@ -72,7 +72,11 @@ private:
 
 	size_t getBytesPerPixel();
 
-	void writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset); 
+	
+	void writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
+	void writeToRawMemoryEx_GreyScale2bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
+	void writeToRawMemoryEx_GreyScale4bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
+	void writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
 	void writeToRawMemoryEx_RGB16bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
 	void writeToRawMemoryEx_RGB24bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
 	void writeToRawMemoryEx_RGBA32bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset);
@@ -104,8 +108,8 @@ public:
 	static CImageData* createEmpty(const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat);
 
 	CImageData(std::vector<uint8_t> * pPixelData, const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY, eImagePixelFormat pixelFormat, bool bDoClear);
+	
 	virtual ~CImageData();
-
 
 	LibMCEnv::eImagePixelFormat GetPixelFormat() override;
 
@@ -121,7 +125,11 @@ public:
 
 	void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) override;
 
+	IPNGImageStoreOptions* CreatePNGOptions() override;
+
 	IPNGImageData* CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) override;
+
+	IJPEGImageStoreOptions* CreateJPEGOptions() override;
 
 	IJPEGImageData* CreateJPEGImage(IJPEGImageStoreOptions* pJPEGStorageOptions) override;
 

@@ -58,26 +58,12 @@ namespace Impl {
 class CJPEGImageStoreOptions : public virtual IJPEGImageStoreOptions, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+    CJPEGImageStoreOptions();
 
-
-	/**
-	* Public member functions to implement.
-	*/
+    virtual ~CJPEGImageStoreOptions();
 
 	void ResetToDefaults() override;
 

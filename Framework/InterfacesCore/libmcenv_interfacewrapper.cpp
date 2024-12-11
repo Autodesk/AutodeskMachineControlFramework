@@ -581,6 +581,56 @@ LibMCEnvResult libmcenv_pngimagestoreoptions_resettodefaults(LibMCEnv_PNGImageSt
 	}
 }
 
+LibMCEnvResult libmcenv_pngimagestoreoptions_getstorageformat(LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions, eLibMCEnvPNGStorageFormat * pPNGStorageFormat)
+{
+	IBase* pIBaseClass = (IBase *)pPNGImageStoreOptions;
+
+	try {
+		if (pPNGStorageFormat == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IPNGImageStoreOptions* pIPNGImageStoreOptions = dynamic_cast<IPNGImageStoreOptions*>(pIBaseClass);
+		if (!pIPNGImageStoreOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pPNGStorageFormat = pIPNGImageStoreOptions->GetStorageFormat();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_pngimagestoreoptions_setstorageformat(LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions, eLibMCEnvPNGStorageFormat ePNGStorageFormat)
+{
+	IBase* pIBaseClass = (IBase *)pPNGImageStoreOptions;
+
+	try {
+		IPNGImageStoreOptions* pIPNGImageStoreOptions = dynamic_cast<IPNGImageStoreOptions*>(pIBaseClass);
+		if (!pIPNGImageStoreOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIPNGImageStoreOptions->SetStorageFormat(ePNGStorageFormat);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for PNGImageData
@@ -915,6 +965,34 @@ LibMCEnvResult libmcenv_imagedata_resizeimage(LibMCEnv_ImageData pImageData, Lib
 	}
 }
 
+LibMCEnvResult libmcenv_imagedata_createpngoptions(LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions * pPNGStorageOptions)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (pPNGStorageOptions == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBasePNGStorageOptions(nullptr);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBasePNGStorageOptions = pIImageData->CreatePNGOptions();
+
+		*pPNGStorageOptions = (IBase*)(pBasePNGStorageOptions);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_imagedata_createpngimage(LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions pPNGStorageOptions, LibMCEnv_PNGImageData * pPNGImage)
 {
 	IBase* pIBaseClass = (IBase *)pImageData;
@@ -932,6 +1010,34 @@ LibMCEnvResult libmcenv_imagedata_createpngimage(LibMCEnv_ImageData pImageData, 
 		pBasePNGImage = pIImageData->CreatePNGImage(pIPNGStorageOptions);
 
 		*pPNGImage = (IBase*)(pBasePNGImage);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_createjpegoptions(LibMCEnv_ImageData pImageData, LibMCEnv_JPEGImageStoreOptions * pJPEGStorageOptions)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (pJPEGStorageOptions == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseJPEGStorageOptions(nullptr);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseJPEGStorageOptions = pIImageData->CreateJPEGOptions();
+
+		*pJPEGStorageOptions = (IBase*)(pBaseJPEGStorageOptions);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -26629,6 +26735,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_cryptocontext_normalizeuuidstring;
 	if (sProcName == "libmcenv_pngimagestoreoptions_resettodefaults") 
 		*ppProcAddress = (void*) &libmcenv_pngimagestoreoptions_resettodefaults;
+	if (sProcName == "libmcenv_pngimagestoreoptions_getstorageformat") 
+		*ppProcAddress = (void*) &libmcenv_pngimagestoreoptions_getstorageformat;
+	if (sProcName == "libmcenv_pngimagestoreoptions_setstorageformat") 
+		*ppProcAddress = (void*) &libmcenv_pngimagestoreoptions_setstorageformat;
 	if (sProcName == "libmcenv_pngimagedata_getsizeinpixels") 
 		*ppProcAddress = (void*) &libmcenv_pngimagedata_getsizeinpixels;
 	if (sProcName == "libmcenv_pngimagedata_getpngdatastream") 
@@ -26653,8 +26763,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_imagedata_getsizeinpixels;
 	if (sProcName == "libmcenv_imagedata_resizeimage") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_resizeimage;
+	if (sProcName == "libmcenv_imagedata_createpngoptions") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_createpngoptions;
 	if (sProcName == "libmcenv_imagedata_createpngimage") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_createpngimage;
+	if (sProcName == "libmcenv_imagedata_createjpegoptions") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_createjpegoptions;
 	if (sProcName == "libmcenv_imagedata_createjpegimage") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_createjpegimage;
 	if (sProcName == "libmcenv_imagedata_clear") 

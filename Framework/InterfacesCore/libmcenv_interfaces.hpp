@@ -465,6 +465,18 @@ public:
 	*/
 	virtual void ResetToDefaults() = 0;
 
+	/**
+	* IPNGImageStoreOptions::GetStorageFormat - Returns the PNG storage format.
+	* @return PNG Format of image
+	*/
+	virtual LibMCEnv::ePNGStorageFormat GetStorageFormat() = 0;
+
+	/**
+	* IPNGImageStoreOptions::SetStorageFormat - Sets the PNG storage format.
+	* @param[in] ePNGStorageFormat - new PNG Format of image
+	*/
+	virtual void SetStorageFormat(const LibMCEnv::ePNGStorageFormat ePNGStorageFormat) = 0;
+
 };
 
 typedef IBaseSharedPtr<IPNGImageStoreOptions> PIPNGImageStoreOptions;
@@ -592,11 +604,23 @@ public:
 	virtual void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
 
 	/**
+	* IImageData::CreatePNGOptions - Creates PNG Options for storing the PNG file.
+	* @return Encoding options for the image.
+	*/
+	virtual IPNGImageStoreOptions * CreatePNGOptions() = 0;
+
+	/**
 	* IImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
 	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
 	* @return Image data.
 	*/
 	virtual IPNGImageData * CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) = 0;
+
+	/**
+	* IImageData::CreateJPEGOptions - Creates PNG Options for storing the PNG file.
+	* @return Encoding options for the image.
+	*/
+	virtual IJPEGImageStoreOptions * CreateJPEGOptions() = 0;
 
 	/**
 	* IImageData::CreateJPEGImage - Creates JPEG Image out of the pixel data.

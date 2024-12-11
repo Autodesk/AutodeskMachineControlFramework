@@ -244,6 +244,8 @@
 		<error name="JPEGCOLORPRECISIONTOOHIGH" code="10204" description="JPEG color precision too high" />		
 		<error name="COULDNOTDECOMPRESSJPEG" code="10205" description="Could not decompress JPEG" />		
 		<error name="COULDNOTSTOREJPEGIMAGE" code="10206" description="Could not store JPEG image" />		
+		<error name="INVALIDPNGEXPORTFORMAT" code="10207" description="Invalid PNG Export Format" />		
+		
 	</errors>
 
 	<enum name="AlertLevel">
@@ -270,6 +272,16 @@
 		<option name="RGB24bit" value="2" />
 		<option name="RGBA32bit" value="3" />
 		<option name="RGB16bit" value="4" />
+	</enum>
+	
+	<enum name="PNGStorageFormat">
+		<option name="Unknown" value="0" />
+		<option name="BlackWhite1bit" value="1" />
+		<option name="GreyScale2bit" value="2" />
+		<option name="GreyScale4bit" value="3" />
+		<option name="GreyScale8bit" value="4" />
+		<option name="RGB24bit" value="5" />
+		<option name="RGBA32bit" value="6" />
 	</enum>
 	
 	<enum name="FieldSamplingMode">
@@ -478,8 +490,17 @@
 	<class name="PNGImageStoreOptions" parent="Base" description="Option class to parametrize saving of PNG Images.">
 	
 		<method name="ResetToDefaults" description="Resets Options to default.">
-		</method>	
+		</method>
 	
+		<method name="GetStorageFormat" description="Returns the PNG storage format.">
+			<param name="PNGStorageFormat" type="enum" class="PNGStorageFormat" pass="return" description="PNG Format of image" />		
+		</method>
+
+		<method name="SetStorageFormat" description="Sets the PNG storage format.">
+			<param name="PNGStorageFormat" type="enum" class="PNGStorageFormat" pass="in" description="new PNG Format of image" />		
+		</method>
+
+
 	</class>
 	
 	
@@ -552,10 +573,18 @@
 			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
 			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
 		</method>		
+				
+		<method name="CreatePNGOptions" description="Creates PNG Options for storing the PNG file.">		
+			<param name="PNGStorageOptions" type="class" class="PNGImageStoreOptions" pass="return" description="Encoding options for the image." />		
+		</method>
 
 		<method name="CreatePNGImage" description="Creates PNG Image out of the pixel data.">		
 			<param name="PNGStorageOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="Optional encoding options for the image." />		
 			<param name="PNGImage" type="class" class="PNGImageData" pass="return" description="Image data." />		
+		</method>
+
+		<method name="CreateJPEGOptions" description="Creates PNG Options for storing the PNG file.">		
+			<param name="JPEGStorageOptions" type="class" class="JPEGImageStoreOptions" pass="return" description="Encoding options for the image." />		
 		</method>
 
 		<method name="CreateJPEGImage" description="Creates JPEG Image out of the pixel data.">		

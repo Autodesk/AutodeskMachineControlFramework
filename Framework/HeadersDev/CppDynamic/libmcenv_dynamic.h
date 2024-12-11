@@ -198,6 +198,24 @@ typedef LibMCEnvResult (*PLibMCEnvCryptoContext_NormalizeUUIDStringPtr) (LibMCEn
 */
 typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr) (LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions);
 
+/**
+* Returns the PNG storage format.
+*
+* @param[in] pPNGImageStoreOptions - PNGImageStoreOptions instance.
+* @param[out] pPNGStorageFormat - PNG Format of image
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_GetStorageFormatPtr) (LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions, LibMCEnv::ePNGStorageFormat * pPNGStorageFormat);
+
+/**
+* Sets the PNG storage format.
+*
+* @param[in] pPNGImageStoreOptions - PNGImageStoreOptions instance.
+* @param[in] ePNGStorageFormat - new PNG Format of image
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr) (LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions, LibMCEnv::ePNGStorageFormat ePNGStorageFormat);
+
 /*************************************************************************************************************************
  Class definition for PNGImageData
 **************************************************************************************************************************/
@@ -333,6 +351,15 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_GetSizeInPixelsPtr) (LibMCEnv_ImageD
 typedef LibMCEnvResult (*PLibMCEnvImageData_ResizeImagePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
 
 /**
+* Creates PNG Options for storing the PNG file.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[out] pPNGStorageOptions - Encoding options for the image.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_CreatePNGOptionsPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions * pPNGStorageOptions);
+
+/**
 * Creates PNG Image out of the pixel data.
 *
 * @param[in] pImageData - ImageData instance.
@@ -341,6 +368,15 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_ResizeImagePtr) (LibMCEnv_ImageData 
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvImageData_CreatePNGImagePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions pPNGStorageOptions, LibMCEnv_PNGImageData * pPNGImage);
+
+/**
+* Creates PNG Options for storing the PNG file.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[out] pJPEGStorageOptions - Encoding options for the image.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_CreateJPEGOptionsPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_JPEGImageStoreOptions * pJPEGStorageOptions);
 
 /**
 * Creates JPEG Image out of the pixel data.
@@ -8925,6 +8961,8 @@ typedef struct {
 	PLibMCEnvCryptoContext_CreateUUIDPtr m_CryptoContext_CreateUUID;
 	PLibMCEnvCryptoContext_NormalizeUUIDStringPtr m_CryptoContext_NormalizeUUIDString;
 	PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr m_PNGImageStoreOptions_ResetToDefaults;
+	PLibMCEnvPNGImageStoreOptions_GetStorageFormatPtr m_PNGImageStoreOptions_GetStorageFormat;
+	PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr m_PNGImageStoreOptions_SetStorageFormat;
 	PLibMCEnvPNGImageData_GetSizeInPixelsPtr m_PNGImageData_GetSizeInPixels;
 	PLibMCEnvPNGImageData_GetPNGDataStreamPtr m_PNGImageData_GetPNGDataStream;
 	PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr m_JPEGImageStoreOptions_ResetToDefaults;
@@ -8937,7 +8975,9 @@ typedef struct {
 	PLibMCEnvImageData_GetSizeInMMPtr m_ImageData_GetSizeInMM;
 	PLibMCEnvImageData_GetSizeInPixelsPtr m_ImageData_GetSizeInPixels;
 	PLibMCEnvImageData_ResizeImagePtr m_ImageData_ResizeImage;
+	PLibMCEnvImageData_CreatePNGOptionsPtr m_ImageData_CreatePNGOptions;
 	PLibMCEnvImageData_CreatePNGImagePtr m_ImageData_CreatePNGImage;
+	PLibMCEnvImageData_CreateJPEGOptionsPtr m_ImageData_CreateJPEGOptions;
 	PLibMCEnvImageData_CreateJPEGImagePtr m_ImageData_CreateJPEGImage;
 	PLibMCEnvImageData_ClearPtr m_ImageData_Clear;
 	PLibMCEnvImageData_GetPixelPtr m_ImageData_GetPixel;

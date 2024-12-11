@@ -35,6 +35,8 @@ Abstract: This is a stub class definition of CImageData
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_pngimagedata.hpp"
 #include "libmcenv_jpegimagedata.hpp"
+#include "libmcenv_pngimagestoreoptions.hpp"
+#include "libmcenv_jpegimagestoreoptions.hpp"
 
 // Include custom headers here.
 #include "Libraries/LodePNG/lodepng.h"
@@ -405,24 +407,169 @@ void CImageData::ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nP
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
+
+IPNGImageStoreOptions* CImageData::CreatePNGOptions()
+{
+	return new CPNGImageStoreOptions();
+}
+
 IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions)
 {
-	unsigned int error = 0;
+	unsigned int errorCode = 0;
 
 	if (m_PixelData.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
+	if ((m_nPixelCountX == 0) || (m_nPixelCountY == 0))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
+
+	// Retrieve optional storage format
+	LibMCEnv::ePNGStorageFormat pngStorageFormat = LibMCEnv::ePNGStorageFormat::RGB24bit;
+	if (pPNGStorageOptions != nullptr)
+		pngStorageFormat = pPNGStorageOptions->GetStorageFormat();
+
+
+	std::vector<uint8_t> convertedPixelData;
+	uint64_t nTotalPixelCount = (uint64_t)m_nPixelCountX * (uint64_t)m_nPixelCountY;
+	uint32_t nRowSize = 0;
 
 	std::unique_ptr<CPNGImageData> pResult (new CPNGImageData (m_nPixelCountX, m_nPixelCountY));
 
 	switch (m_PixelFormat) {
 	case eImagePixelFormat::GreyScale8bit:
-		error = lodepng::encode(pResult->getPNGStreamBuffer (), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
+
+		switch (pngStorageFormat) {
+			case LibMCEnv::ePNGStorageFormat::BlackWhite1bit: 
+				convertedPixelData.resize(nTotalPixelCount);
+				nRowSize = (m_nPixelCountX + 7) / 8;
+				writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
+				break;
+
+			case LibMCEnv::ePNGStorageFormat::GreyScale2bit:
+				convertedPixelData.resize(nTotalPixelCount);
+				nRowSize = (m_nPixelCountX + 3) / 4;
+				writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 2);
+				break;
+
+			case LibMCEnv::ePNGStorageFormat::GreyScale4bit:
+				convertedPixelData.resize(nTotalPixelCount);
+				nRowSize = (m_nPixelCountX + 1) / 2;
+				writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 4);
+				break;
+
+			case LibMCEnv::ePNGStorageFormat::GreyScale8bit:
+				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
+				break;
+
+			case LibMCEnv::ePNGStorageFormat::RGB24bit:
+				convertedPixelData.resize(nTotalPixelCount * 3);
+				writeToRawMemoryEx_RGBA32bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX * 3);
+				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGB, 8);
+				break;
+
+			case LibMCEnv::ePNGStorageFormat::RGBA32bit:
+				convertedPixelData.resize(nTotalPixelCount * 4);
+				writeToRawMemoryEx_RGBA32bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX * 4);
+				errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGBA, 8);
+				break;
+
+			default:
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT);
+
+		}
+
 		break;
 	case eImagePixelFormat::RGB24bit:
-		error = lodepng::encode(pResult->getPNGStreamBuffer(), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGB, 8);
+
+		switch (pngStorageFormat) {
+		case LibMCEnv::ePNGStorageFormat::BlackWhite1bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			nRowSize = (m_nPixelCountX + 7) / 8;
+			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::GreyScale2bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			nRowSize = (m_nPixelCountX + 3) / 4;
+			writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 2);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::GreyScale4bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			nRowSize = (m_nPixelCountX + 1) / 2;
+			writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 4);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::GreyScale8bit:	
+			convertedPixelData.resize(nTotalPixelCount);
+			writeToRawMemoryEx_GreyScale8bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::RGB24bit:
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGB, 8);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::RGBA32bit:
+			convertedPixelData.resize(nTotalPixelCount * 4);
+			writeToRawMemoryEx_RGBA32bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX * 4);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGBA, 8);
+			break;
+
+		default:
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT);
+
+		}		
 		break;
+
 	case eImagePixelFormat::RGBA32bit:
-		error = lodepng::encode(pResult->getPNGStreamBuffer(), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGBA, 8);
+		switch (pngStorageFormat) {
+		case LibMCEnv::ePNGStorageFormat::BlackWhite1bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			nRowSize = (m_nPixelCountX + 7) / 8;
+			writeToRawMemoryEx_BlackWhite1bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 1);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::GreyScale2bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			nRowSize = (m_nPixelCountX + 3) / 4;
+			writeToRawMemoryEx_GreyScale2bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 2);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::GreyScale4bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			nRowSize = (m_nPixelCountX + 1) / 2;
+			writeToRawMemoryEx_GreyScale4bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), nRowSize);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 4);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::GreyScale8bit:
+			convertedPixelData.resize(nTotalPixelCount);
+			writeToRawMemoryEx_GreyScale8bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::RGB24bit:
+			convertedPixelData.resize(nTotalPixelCount * 3);
+			writeToRawMemoryEx_RGB24bit(0, 0, m_nPixelCountX, m_nPixelCountY, convertedPixelData.data(), m_nPixelCountX * 3);
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), convertedPixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGB, 8);
+			break;
+
+		case LibMCEnv::ePNGStorageFormat::RGBA32bit:
+			errorCode = lodepng::encode(pResult->getPNGStreamBuffer(), *m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_RGBA, 8);
+			break;
+
+		default:
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT);
+
+		}
 		break;
 
 	default:
@@ -430,13 +577,20 @@ IPNGImageData* CImageData::CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOpti
 
 	}
 
-	if (error)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE);
+	if (errorCode) {
+		std::string sErrorMessage (lodepng_error_text(errorCode));
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE, sErrorMessage);
+	}
 
 	if (pResult->getPNGStreamBuffer().empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTSTOREPNGIMAGE);
 
 	return pResult.release();
+}
+
+IJPEGImageStoreOptions* CImageData::CreateJPEGOptions()
+{
+	return new CJPEGImageStoreOptions();
 }
 
 IJPEGImageData* CImageData::CreateJPEGImage(IJPEGImageStoreOptions* pJPEGStorageOptions)
@@ -1094,6 +1248,502 @@ std::vector <uint8_t>& CImageData::getPixelData()
 	return *m_PixelData.get ();
 }
 
+void CImageData::writeToRawMemoryEx_BlackWhite1bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset)
+{
+	if ((nCountX <= 0) || (nCountY <= 0))
+		return;
+
+	if (m_PixelData.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
+	if (pTarget == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
+
+	if (nStartX >= m_nPixelCountX)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
+	if (nStartY >= m_nPixelCountY)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
+	if (((uint64_t)nStartX + nCountX) > m_nPixelCountX)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
+	if (((uint64_t)nStartY + nCountY) > m_nPixelCountY)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
+
+	size_t nLineAddress = (size_t)nStartX + (size_t)nStartY * (size_t)m_nPixelCountX;
+	uint8_t* pLinePtr = pTarget;
+
+	switch (m_PixelFormat) {
+	case eImagePixelFormat::GreyScale8bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+				uint8_t nGrayValue = m_PixelData->at(nPixelAddress);
+				nPixelAddress++;
+
+				uint8_t nGrayValue1bit = nGrayValue / 128;
+
+				uint32_t nColumnMod = nColumn % 8;
+				if (nColumnMod == 0) {
+					*pPixelPtr = nGrayValue1bit;
+
+				}
+				else {
+					*pPixelPtr |= nGrayValue1bit << nColumnMod;
+				}
+
+				if (nColumnMod == 7)
+					pPixelPtr++;
+
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += m_nPixelCountX;
+		}
+
+
+		break;
+	}
+
+
+	case eImagePixelFormat::RGB16bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+				uint32_t nLow = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nHigh = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint16_t nColor = nLow | (nHigh << 8);
+
+				uint32_t nRed = (nColor & 0x1f) << 3;
+				uint32_t nGreen = ((nColor >> 5) & 0x3f) << 2;
+				uint32_t nBlue = ((nColor >> 11) & 0x1f) << 3;
+
+				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+
+				uint8_t nGrayValue1bit = nGray / 128;
+
+				uint32_t nColumnMod = nColumn % 8;
+				if (nColumnMod == 0) {
+					*pPixelPtr = nGrayValue1bit;
+
+				}
+				else {
+					*pPixelPtr |= nGrayValue1bit << nColumnMod;
+				}
+
+				if (nColumnMod == 7)
+					pPixelPtr++;
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += (size_t)m_nPixelCountX * 2;
+		}
+
+		break;
+	}
+
+	case eImagePixelFormat::RGB24bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+				uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nBlue = m_PixelData->at(nPixelAddress); nPixelAddress++;
+
+				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+
+				uint8_t nGrayValue1bit = nGray / 128;
+
+				uint32_t nColumnMod = nColumn % 8;
+				if (nColumnMod == 0) {
+					*pPixelPtr = nGrayValue1bit;
+
+				}
+				else {
+					*pPixelPtr |= nGrayValue1bit << nColumnMod;
+				}
+
+				if (nColumnMod == 7)
+					pPixelPtr++;
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += (size_t)m_nPixelCountX * 3;
+		}
+
+		break;
+	}
+
+	case eImagePixelFormat::RGBA32bit: {
+		size_t nPixelAddress = nLineAddress;
+		uint8_t* pPixelPtr = pLinePtr;
+
+		for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+			uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			uint32_t nBlue = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			nPixelAddress++; // Ignore alpha
+
+			uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+			uint8_t nGrayValue1bit = nGray / 128;
+
+			uint32_t nColumnMod = nColumn % 8;
+			if (nColumnMod == 0) {
+				*pPixelPtr = nGrayValue1bit;
+
+			}
+			else {
+				*pPixelPtr |= nGrayValue1bit << nColumnMod;
+			}
+
+			if (nColumnMod == 7)
+				pPixelPtr++;
+		}
+
+		pLinePtr += nYLineOffset;
+		nLineAddress += (size_t)m_nPixelCountX * 4;
+
+		break;
+	}
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
+	}
+}
+
+void CImageData::writeToRawMemoryEx_GreyScale2bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset)
+{
+	if ((nCountX <= 0) || (nCountY <= 0))
+		return;
+
+	if (m_PixelData.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
+	if (pTarget == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
+
+	if (nStartX >= m_nPixelCountX)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
+	if (nStartY >= m_nPixelCountY)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
+	if (((uint64_t)nStartX + nCountX) > m_nPixelCountX)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
+	if (((uint64_t)nStartY + nCountY) > m_nPixelCountY)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
+
+	size_t nLineAddress = (size_t)nStartX + (size_t)nStartY * (size_t)m_nPixelCountX;
+	uint8_t* pLinePtr = pTarget;
+
+	switch (m_PixelFormat) {
+	case eImagePixelFormat::GreyScale8bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+				uint8_t nGrayValue = m_PixelData->at(nPixelAddress);
+				nPixelAddress++;
+
+				uint8_t nGrayValue2bit = nGrayValue / 64;
+
+				uint32_t nColumnMod = nColumn % 4;
+				if (nColumnMod == 0) {
+					*pPixelPtr = nGrayValue2bit;
+
+				}
+				else {
+					*pPixelPtr |= nGrayValue2bit << (nColumnMod * 2);
+				}
+
+				if (nColumnMod == 3)
+					pPixelPtr++;
+
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += m_nPixelCountX;
+		}
+
+
+		break;
+	}
+
+
+	case eImagePixelFormat::RGB16bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+				uint32_t nLow = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nHigh = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint16_t nColor = nLow | (nHigh << 8);
+
+				uint32_t nRed = (nColor & 0x1f) << 3;
+				uint32_t nGreen = ((nColor >> 5) & 0x3f) << 2;
+				uint32_t nBlue = ((nColor >> 11) & 0x1f) << 3;
+
+				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+
+				uint8_t nGrayValue2bit = nGray / 64;
+
+				uint32_t nColumnMod = nColumn % 4;
+				if (nColumnMod == 0) {
+					*pPixelPtr = nGrayValue2bit;
+
+				}
+				else {
+					*pPixelPtr |= nGrayValue2bit << (nColumnMod * 2);
+				}
+
+				if (nColumnMod == 3)
+					pPixelPtr++;
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += (size_t)m_nPixelCountX * 2;
+		}
+
+		break;
+	}
+
+	case eImagePixelFormat::RGB24bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+				uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nBlue = m_PixelData->at(nPixelAddress); nPixelAddress++;
+
+				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+
+				uint8_t nGrayValue2bit = nGray / 64;
+
+				uint32_t nColumnMod = nColumn % 4;
+				if (nColumnMod == 0) {
+					*pPixelPtr = nGrayValue2bit;
+
+				}
+				else {
+					*pPixelPtr |= nGrayValue2bit << (nColumnMod * 2);
+				}
+
+				if (nColumnMod == 3)
+					pPixelPtr++;
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += (size_t)m_nPixelCountX * 3;
+		}
+
+		break;
+	}
+
+	case eImagePixelFormat::RGBA32bit: {
+		size_t nPixelAddress = nLineAddress;
+		uint8_t* pPixelPtr = pLinePtr;
+
+		for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+			uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			uint32_t nBlue = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			nPixelAddress++; // Ignore alpha
+
+			uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+			uint8_t nGrayValue2bit = nGray / 64;
+
+			uint32_t nColumnMod = nColumn % 4;
+			if (nColumnMod == 0) {
+				*pPixelPtr = nGrayValue2bit;
+
+			}
+			else {
+				*pPixelPtr |= nGrayValue2bit << (nColumnMod * 2);
+			}
+
+			if (nColumnMod == 3)
+				pPixelPtr++;
+		}
+
+		pLinePtr += nYLineOffset;
+		nLineAddress += (size_t)m_nPixelCountX * 4;
+
+		break;
+	}
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
+	}
+}
+
+void CImageData::writeToRawMemoryEx_GreyScale4bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset)
+{
+	if ((nCountX <= 0) || (nCountY <= 0))
+		return;
+
+	if (m_PixelData.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
+	if (pTarget == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
+
+	if (nStartX >= m_nPixelCountX)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
+	if (nStartY >= m_nPixelCountY)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
+	if (((uint64_t)nStartX + nCountX) > m_nPixelCountX)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
+	if (((uint64_t)nStartY + nCountY) > m_nPixelCountY)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
+
+	size_t nLineAddress = (size_t)nStartX + (size_t)nStartY * (size_t)m_nPixelCountX;
+	uint8_t* pLinePtr = pTarget;
+
+	switch (m_PixelFormat) {
+	case eImagePixelFormat::GreyScale8bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+				uint8_t nGrayValue4Bit = m_PixelData->at(nPixelAddress) / 16;
+				nPixelAddress++;
+
+				if (nColumn % 2 == 0) {
+					*pPixelPtr = nGrayValue4Bit;
+				}
+				else {
+					*pPixelPtr |= (nGrayValue4Bit << 4);
+					pPixelPtr++;
+
+				}
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += m_nPixelCountX;
+		}
+
+
+		break;
+	}
+
+
+	case eImagePixelFormat::RGB16bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+				uint32_t nLow = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nHigh = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint16_t nColor = nLow | (nHigh << 8);
+
+				uint32_t nRed = (nColor & 0x1f) << 3;
+				uint32_t nGreen = ((nColor >> 5) & 0x3f) << 2;
+				uint32_t nBlue = ((nColor >> 11) & 0x1f) << 3;
+
+				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+
+				uint8_t nGrayValue4Bit = nGray / 16;
+				if (nColumn % 2 == 0) {
+					*pPixelPtr = nGrayValue4Bit;
+				}
+				else {
+					*pPixelPtr |= (nGrayValue4Bit << 4);
+					pPixelPtr++;
+				}
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += (size_t)m_nPixelCountX * 2;
+		}
+
+		break;
+	}
+
+	case eImagePixelFormat::RGB24bit: {
+		for (uint32_t nRow = 0; nRow < nCountY; nRow++) {
+
+			size_t nPixelAddress = nLineAddress;
+			uint8_t* pPixelPtr = pLinePtr;
+
+			for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+				uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
+				uint32_t nBlue = m_PixelData->at(nPixelAddress); nPixelAddress++;
+
+				uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+				uint8_t nGrayValue4Bit = nGray / 16;
+				if (nColumn % 2 == 0) {
+					*pPixelPtr = nGrayValue4Bit;
+				}
+				else {
+					*pPixelPtr |= (nGrayValue4Bit << 4);
+					pPixelPtr++;
+				}
+			}
+
+			pLinePtr += nYLineOffset;
+			nLineAddress += (size_t)m_nPixelCountX * 3;
+		}
+
+		break;
+	}
+
+	case eImagePixelFormat::RGBA32bit: {
+		size_t nPixelAddress = nLineAddress;
+		uint8_t* pPixelPtr = pLinePtr;
+
+		for (uint32_t nColumn = 0; nColumn < nCountX; nColumn++) {
+
+			uint32_t nRed = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			uint32_t nGreen = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			uint32_t nBlue = m_PixelData->at(nPixelAddress); nPixelAddress++;
+			nPixelAddress++; // Ignore alpha
+
+			uint8_t nGray = (uint8_t)((nRed + nGreen + nBlue) / 3);
+			uint8_t nGrayValue4Bit = nGray / 16;
+			if (nColumn % 2 == 0) {
+				*pPixelPtr = nGrayValue4Bit;
+			}
+			else {
+				*pPixelPtr |= (nGrayValue4Bit << 4);
+				pPixelPtr++;
+			}
+		}
+
+		pLinePtr += nYLineOffset;
+		nLineAddress += (size_t)m_nPixelCountX * 4;
+
+		break;
+	}
+
+	default:
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELFORMAT);
+
+	}
+}
 
 void CImageData::writeToRawMemoryEx_GreyScale8bit(uint32_t nStartX, uint32_t nStartY, uint32_t nCountX, uint32_t nCountY, uint8_t* pTarget, uint32_t nYLineOffset)
 {

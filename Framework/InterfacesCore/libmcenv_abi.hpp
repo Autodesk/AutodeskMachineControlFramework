@@ -211,6 +211,24 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_cryptocontext_normalizeuuidstring(LibM
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_pngimagestoreoptions_resettodefaults(LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions);
 
+/**
+* Returns the PNG storage format.
+*
+* @param[in] pPNGImageStoreOptions - PNGImageStoreOptions instance.
+* @param[out] pPNGStorageFormat - PNG Format of image
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_pngimagestoreoptions_getstorageformat(LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions, LibMCEnv::ePNGStorageFormat * pPNGStorageFormat);
+
+/**
+* Sets the PNG storage format.
+*
+* @param[in] pPNGImageStoreOptions - PNGImageStoreOptions instance.
+* @param[in] ePNGStorageFormat - new PNG Format of image
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_pngimagestoreoptions_setstorageformat(LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions, LibMCEnv::ePNGStorageFormat ePNGStorageFormat);
+
 /*************************************************************************************************************************
  Class definition for PNGImageData
 **************************************************************************************************************************/
@@ -346,6 +364,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_getsizeinpixels(LibMCEnv_Ima
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_resizeimage(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
 
 /**
+* Creates PNG Options for storing the PNG file.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[out] pPNGStorageOptions - Encoding options for the image.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_createpngoptions(LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions * pPNGStorageOptions);
+
+/**
 * Creates PNG Image out of the pixel data.
 *
 * @param[in] pImageData - ImageData instance.
@@ -354,6 +381,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_resizeimage(LibMCEnv_ImageDa
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_createpngimage(LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions pPNGStorageOptions, LibMCEnv_PNGImageData * pPNGImage);
+
+/**
+* Creates PNG Options for storing the PNG file.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[out] pJPEGStorageOptions - Encoding options for the image.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imagedata_createjpegoptions(LibMCEnv_ImageData pImageData, LibMCEnv_JPEGImageStoreOptions * pJPEGStorageOptions);
 
 /**
 * Creates JPEG Image out of the pixel data.

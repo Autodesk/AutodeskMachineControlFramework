@@ -614,6 +614,7 @@ public:
 			case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEGCOLORPRECISIONTOOHIGH";
 			case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "COULDNOTDECOMPRESSJPEG";
 			case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "COULDNOTSTOREJPEGIMAGE";
+			case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "INVALIDPNGEXPORTFORMAT";
 		}
 		return "UNKNOWN";
 	}
@@ -827,6 +828,7 @@ public:
 			case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEG color precision too high";
 			case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "Could not decompress JPEG";
 			case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
+			case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "Invalid PNG Export Format";
 		}
 		return "unknown error";
 	}
@@ -1142,6 +1144,8 @@ public:
 	}
 	
 	inline void ResetToDefaults();
+	inline ePNGStorageFormat GetStorageFormat();
+	inline void SetStorageFormat(const ePNGStorageFormat ePNGStorageFormat);
 };
 	
 /*************************************************************************************************************************
@@ -1218,7 +1222,9 @@ public:
 	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline PPNGImageStoreOptions CreatePNGOptions();
 	inline PPNGImageData CreatePNGImage(classParam<CPNGImageStoreOptions> pPNGStorageOptions);
+	inline PJPEGImageStoreOptions CreateJPEGOptions();
 	inline PJPEGImageData CreateJPEGImage(classParam<CJPEGImageStoreOptions> pJPEGStorageOptions);
 	inline void Clear(const LibMCEnv_uint32 nValue);
 	inline LibMCEnv_uint32 GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
@@ -2984,6 +2990,8 @@ public:
 		pWrapperTable->m_CryptoContext_CreateUUID = nullptr;
 		pWrapperTable->m_CryptoContext_NormalizeUUIDString = nullptr;
 		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = nullptr;
+		pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat = nullptr;
+		pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat = nullptr;
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_PNGImageData_GetPNGDataStream = nullptr;
 		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = nullptr;
@@ -2996,7 +3004,9 @@ public:
 		pWrapperTable->m_ImageData_GetSizeInMM = nullptr;
 		pWrapperTable->m_ImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_ImageData_ResizeImage = nullptr;
+		pWrapperTable->m_ImageData_CreatePNGOptions = nullptr;
 		pWrapperTable->m_ImageData_CreatePNGImage = nullptr;
+		pWrapperTable->m_ImageData_CreateJPEGOptions = nullptr;
 		pWrapperTable->m_ImageData_CreateJPEGImage = nullptr;
 		pWrapperTable->m_ImageData_Clear = nullptr;
 		pWrapperTable->m_ImageData_GetPixel = nullptr;
@@ -3959,6 +3969,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat = (PLibMCEnvPNGImageStoreOptions_GetStorageFormatPtr) GetProcAddress(hLibrary, "libmcenv_pngimagestoreoptions_getstorageformat");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat = (PLibMCEnvPNGImageStoreOptions_GetStorageFormatPtr) dlsym(hLibrary, "libmcenv_pngimagestoreoptions_getstorageformat");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat = (PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr) GetProcAddress(hLibrary, "libmcenv_pngimagestoreoptions_setstorageformat");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat = (PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr) dlsym(hLibrary, "libmcenv_pngimagestoreoptions_setstorageformat");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = (PLibMCEnvPNGImageData_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_pngimagedata_getsizeinpixels");
 		#else // _WIN32
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = (PLibMCEnvPNGImageData_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_pngimagedata_getsizeinpixels");
@@ -4067,12 +4095,30 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ImageData_CreatePNGOptions = (PLibMCEnvImageData_CreatePNGOptionsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createpngoptions");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_CreatePNGOptions = (PLibMCEnvImageData_CreatePNGOptionsPtr) dlsym(hLibrary, "libmcenv_imagedata_createpngoptions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_CreatePNGOptions == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ImageData_CreatePNGImage = (PLibMCEnvImageData_CreatePNGImagePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createpngimage");
 		#else // _WIN32
 		pWrapperTable->m_ImageData_CreatePNGImage = (PLibMCEnvImageData_CreatePNGImagePtr) dlsym(hLibrary, "libmcenv_imagedata_createpngimage");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageData_CreatePNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_CreateJPEGOptions = (PLibMCEnvImageData_CreateJPEGOptionsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createjpegoptions");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_CreateJPEGOptions = (PLibMCEnvImageData_CreateJPEGOptionsPtr) dlsym(hLibrary, "libmcenv_imagedata_createjpegoptions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_CreateJPEGOptions == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11289,6 +11335,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_pngimagestoreoptions_getstorageformat", (void**)&(pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_pngimagestoreoptions_setstorageformat", (void**)&(pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_pngimagedata_getsizeinpixels", (void**)&(pWrapperTable->m_PNGImageData_GetSizeInPixels));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetSizeInPixels == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -11337,8 +11391,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ResizeImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_imagedata_createpngoptions", (void**)&(pWrapperTable->m_ImageData_CreatePNGOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreatePNGOptions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_imagedata_createpngimage", (void**)&(pWrapperTable->m_ImageData_CreatePNGImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreatePNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_createjpegoptions", (void**)&(pWrapperTable->m_ImageData_CreateJPEGOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreateJPEGOptions == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_createjpegimage", (void**)&(pWrapperTable->m_ImageData_CreateJPEGImage));
@@ -14721,6 +14783,27 @@ public:
 	}
 	
 	/**
+	* CPNGImageStoreOptions::GetStorageFormat - Returns the PNG storage format.
+	* @return PNG Format of image
+	*/
+	ePNGStorageFormat CPNGImageStoreOptions::GetStorageFormat()
+	{
+		ePNGStorageFormat resultPNGStorageFormat = (ePNGStorageFormat) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageStoreOptions_GetStorageFormat(m_pHandle, &resultPNGStorageFormat));
+		
+		return resultPNGStorageFormat;
+	}
+	
+	/**
+	* CPNGImageStoreOptions::SetStorageFormat - Sets the PNG storage format.
+	* @param[in] ePNGStorageFormat - new PNG Format of image
+	*/
+	void CPNGImageStoreOptions::SetStorageFormat(const ePNGStorageFormat ePNGStorageFormat)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageStoreOptions_SetStorageFormat(m_pHandle, ePNGStorageFormat));
+	}
+	
+	/**
 	 * Method definitions for class CPNGImageData
 	 */
 	
@@ -14862,6 +14945,21 @@ public:
 	}
 	
 	/**
+	* CImageData::CreatePNGOptions - Creates PNG Options for storing the PNG file.
+	* @return Encoding options for the image.
+	*/
+	PPNGImageStoreOptions CImageData::CreatePNGOptions()
+	{
+		LibMCEnvHandle hPNGStorageOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_CreatePNGOptions(m_pHandle, &hPNGStorageOptions));
+		
+		if (!hPNGStorageOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPNGImageStoreOptions>(m_pWrapper, hPNGStorageOptions);
+	}
+	
+	/**
 	* CImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
 	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
 	* @return Image data.
@@ -14876,6 +14974,21 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CPNGImageData>(m_pWrapper, hPNGImage);
+	}
+	
+	/**
+	* CImageData::CreateJPEGOptions - Creates PNG Options for storing the PNG file.
+	* @return Encoding options for the image.
+	*/
+	PJPEGImageStoreOptions CImageData::CreateJPEGOptions()
+	{
+		LibMCEnvHandle hJPEGStorageOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_CreateJPEGOptions(m_pHandle, &hJPEGStorageOptions));
+		
+		if (!hJPEGStorageOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJPEGImageStoreOptions>(m_pWrapper, hJPEGStorageOptions);
 	}
 	
 	/**
