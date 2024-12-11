@@ -2300,7 +2300,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 			if (nLaserIndexOfSegment == 0) {
 				if (bFailIfNonAssignedDataExists)
-					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER, "Laser index has no assigned scanner: " + std::to_string(nLaserIndexToDraw));
+					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER, "Laser index has no assigned scanner: " + std::to_string(nLaserIndexOfSegment));
 			}
 
 			if (nLaserIndexOfSegment == nCurrentLaserIndex) {
