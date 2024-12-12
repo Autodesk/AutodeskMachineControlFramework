@@ -92,7 +92,7 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
     double dUnits = pLayer->GetUnits();
 
-    m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(m_ListHandle), "rlListAppendLaserOn");
+    m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(m_ListHandle), "rlListAppendLaserOff");
 
     uint32_t nSegmentCount = pLayer->GetSegmentCount();
     for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
@@ -172,6 +172,7 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
                     if (nPointIndex == 0) {
                         m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(m_ListHandle, dXinMicron, dYinMicron), "rlListAppendJumpAbs2D");
+                        m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(m_ListHandle), "rlListAppendLaserOn");
                     }
                     else {
                         m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(m_ListHandle, dXinMicron, dYinMicron), "rlListAppendMarkAbs2D");
@@ -179,6 +180,7 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
                 }
 
+                m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(m_ListHandle), "rlListAppendLaserOff");
 
                 break;
             }
@@ -216,8 +218,11 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                     }
 
                     m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(m_ListHandle, dX1inMicron, dY1inMicron), "rlListAppendJumpAbs2D");
+                    m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(m_ListHandle), "rlListAppendLaserOn");
                     m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(m_ListHandle, dX2inMicron, dY2inMicron), "rlListAppendMarkAbs2D");
                 }
+
+                m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(m_ListHandle), "rlListAppendLaserOff");
 
                 break;
             }
