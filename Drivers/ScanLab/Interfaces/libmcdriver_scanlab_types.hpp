@@ -233,6 +233,11 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_GPIOTASKDELAYMUSTBEMULTIPLEOF10 1128 /** GPIO Task Delay must be a multiple of 10. */
 #define LIBMCDRIVER_SCANLAB_ERROR_SEGMENTHASINVALIDLASERINDEX 1129 /** Segment has invalid laser index */
 #define LIBMCDRIVER_SCANLAB_ERROR_SELECTEDGPIOSEQUENCEISDISABLED 1130 /** Selected GPIO Sequence is disabled */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOINPUTBIT 1131 /** Invalid GPIO Input bit */
+#define LIBMCDRIVER_SCANLAB_ERROR_GPIOLABELNOTFOUND 1132 /** GPIO Label not found */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAME 1133 /** Invalid GPIO Label Name */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAMELENGTH 1134 /** Invalid GPIO Label Name Length */
+#define LIBMCDRIVER_SCANLAB_ERROR_EMPTYGPIOLABELNAME 1135 /** Empty GPIO Label Name */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -378,6 +383,11 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_GPIOTASKDELAYMUSTBEMULTIPLEOF10: return "GPIO Task Delay must be a multiple of 10.";
     case LIBMCDRIVER_SCANLAB_ERROR_SEGMENTHASINVALIDLASERINDEX: return "Segment has invalid laser index";
     case LIBMCDRIVER_SCANLAB_ERROR_SELECTEDGPIOSEQUENCEISDISABLED: return "Selected GPIO Sequence is disabled";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOINPUTBIT: return "Invalid GPIO Input bit";
+    case LIBMCDRIVER_SCANLAB_ERROR_GPIOLABELNOTFOUND: return "GPIO Label not found";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAME: return "Invalid GPIO Label Name";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAMELENGTH: return "Invalid GPIO Label Name Length";
+    case LIBMCDRIVER_SCANLAB_ERROR_EMPTYGPIOLABELNAME: return "Empty GPIO Label Name";
     default: return "unknown error";
   }
 }

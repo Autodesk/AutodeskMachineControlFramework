@@ -180,6 +180,13 @@
 		<error name="GPIOTASKDELAYMUSTBEMULTIPLEOF10" code="1128" description="GPIO Task Delay must be a multiple of 10." />	
 		<error name="SEGMENTHASINVALIDLASERINDEX" code="1129" description="Segment has invalid laser index" />
 		<error name="SELECTEDGPIOSEQUENCEISDISABLED" code="1130" description="Selected GPIO Sequence is disabled" />
+		<error name="INVALIDGPIOINPUTBIT" code="1131" description="Invalid GPIO Input bit" />
+		<error name="GPIOLABELNOTFOUND" code="1132" description="GPIO Label not found" />
+		<error name="INVALIDGPIOLABELNAME" code="1133" description="Invalid GPIO Label Name" />
+		<error name="INVALIDGPIOLABELNAMELENGTH" code="1134" description="Invalid GPIO Label Name Length" />
+		<error name="EMPTYGPIOLABELNAME" code="1135" description="Empty GPIO Label Name" />
+		
+		
 
 			
 	</errors>

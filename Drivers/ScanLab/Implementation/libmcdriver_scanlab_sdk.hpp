@@ -218,7 +218,8 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_repeat) (uint32_t nCardNo);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_until) (uint32_t nCardNo, uint32_t nNumberOfRepetitions);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_jump_rel_cond) (uint32_t nCardNo, uint32_t nMask1, uint32_t nMask0, int32_t nRelativeJumpPosition);
-		
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_jump_rel) (uint32_t nCardNo, int32_t nRelativeJumpPosition);
+
 		class CScanLabSDKJournal {
 		private:
 			std::map<std::string, uint32_t> m_DefinedVariables;
@@ -401,6 +402,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_list_repeat ptr_n_list_repeat = nullptr;
 			PScanLabPtr_n_list_until ptr_n_list_until = nullptr;
 			PScanLabPtr_n_list_jump_rel_cond ptr_n_list_jump_rel_cond = nullptr;
+			PScanLabPtr_n_list_jump_rel ptr_n_list_jump_rel = nullptr;
 
 			void resetFunctionPtrs ();
 		public:
@@ -577,6 +579,7 @@ namespace LibMCDriver_ScanLab {
 			void n_list_repeat (uint32_t nCardNo);
 			void n_list_until (uint32_t nCardNo, uint32_t nNumberOfRepetitions);
 			void n_list_jump_rel_cond (uint32_t nCardNo, uint32_t nMask1, uint32_t nMask0, int32_t nRelativeJumpPosition);
+			void n_list_jump_rel(uint32_t nCardNo, int32_t nRelativeJumpPosition);
 
 		};
 

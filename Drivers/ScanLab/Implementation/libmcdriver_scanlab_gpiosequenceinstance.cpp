@@ -37,13 +37,58 @@ Abstract: This is a stub class definition of CGPIOSequence
 using namespace LibMCDriver_ScanLab::Impl;
 
 #define GPIOSEQUENCE_MAXIDENTIFIERLENGTH 512
+#define GPIOSEQUENCE_MAXLABELLENGTH 128
 #define GPIOSEQUENCE_MAXDELAYINMS 120000000
 #define GPIOSEQUENCE_MAXINPUTBIT 15
 #define GPIOSEQUENCE_MAXOUTPUTBIT 15
 
-CGPIOTask::CGPIOTask(uint32_t nRelativeStartAddress)
-    : m_nRelativeStartAddress (nRelativeStartAddress)
+CGPIOLabels::CGPIOLabels()
 {
+
+}
+
+CGPIOLabels::~CGPIOLabels()
+{
+
+}
+
+void CGPIOLabels::checkLabelName(const std::string& sLabel)
+{
+    if (sLabel.empty())
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_EMPTYGPIOLABELNAME);
+
+    if (sLabel.length() > GPIOSEQUENCE_MAXLABELLENGTH)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAMELENGTH);
+
+    for (auto ch : sLabel) {
+        if (!(isalnum (ch) || (ch == '_') || (ch == '-')))
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAME, "Invalid GPIO Label name: " + sLabel);
+    }
+}
+
+void CGPIOLabels::addLabel(const std::string& sLabel, uint32_t nLabelAddress)
+{
+    checkLabelName(sLabel);
+
+    m_LabelStartAddresses.insert(std::make_pair (sLabel, nLabelAddress));
+}
+
+uint32_t CGPIOLabels::findLabelAddress(const std::string& sLabel)
+{
+    checkLabelName(sLabel);
+
+    auto iIter = m_LabelStartAddresses.find(sLabel);
+    if (iIter == m_LabelStartAddresses.end ())
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_GPIOLABELNOTFOUND, "GPIO Label not found: " + sLabel);
+
+    return iIter->second;
+}
+
+CGPIOTask::CGPIOTask(uint32_t nRelativeStartAddress, PGPIOLabels pLabels)
+    : m_nRelativeStartAddress (nRelativeStartAddress), m_pLabels (pLabels)
+{
+    if (pLabels.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
 }
 
@@ -52,8 +97,19 @@ CGPIOTask::~CGPIOTask()
 
 }
 
-CGPIOTask_Output::CGPIOTask_Output(uint32_t nRelativeStartAddress, const uint32_t nOutputBit, const bool bOutputValue)
-    : CGPIOTask (nRelativeStartAddress), m_nOutputBit (nOutputBit), m_bOutputValue (bOutputValue)
+uint32_t CGPIOTask::getRelativeStartAddress()
+{
+    return m_nRelativeStartAddress;
+}
+
+uint32_t CGPIOTask::findLabelAddress(const std::string& sLabel)
+{
+    return m_pLabels->findLabelAddress(sLabel);
+}
+
+
+CGPIOTask_Output::CGPIOTask_Output(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const uint32_t nOutputBit, const bool bOutputValue)
+    : CGPIOTask (nRelativeStartAddress, pLabels), m_nOutputBit (nOutputBit), m_bOutputValue (bOutputValue)
 {
 
 }
@@ -94,8 +150,8 @@ void CGPIOTask_Output::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
 
 
 
-CGPIOTask_Delay::CGPIOTask_Delay(uint32_t nRelativeStartAddress, const uint32_t nDelayInMilliseconds)
-    : CGPIOTask (nRelativeStartAddress), m_nDelayInMilliseconds (nDelayInMilliseconds)
+CGPIOTask_Delay::CGPIOTask_Delay(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const uint32_t nDelayInMilliseconds)
+    : CGPIOTask (nRelativeStartAddress, pLabels), m_nDelayInMilliseconds (nDelayInMilliseconds)
 {
     if ((nDelayInMilliseconds == 0) || (nDelayInMilliseconds > GPIOSEQUENCE_MAXDELAYINMS))
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOTASKDELAY);
@@ -127,11 +183,13 @@ void CGPIOTask_Delay::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
 }
 
 
-CGPIOTask_WaitforInput::CGPIOTask_WaitforInput(uint32_t nRelativeStartAddress, const uint32_t nInputBit, const bool bInputValue, const uint32_t nMaxDelayInMilliseconds)
-    : CGPIOTask (nRelativeStartAddress), m_nInputBit (nInputBit), m_bInputValue (bInputValue), m_nMaxDelayInMilliseconds (nMaxDelayInMilliseconds)
+CGPIOTask_WaitforInput::CGPIOTask_WaitforInput(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const uint32_t nInputBit, const bool bInputValue, const uint32_t nMaxDelayInMilliseconds)
+    : CGPIOTask (nRelativeStartAddress, pLabels), m_nInputBit (nInputBit), m_bInputValue (bInputValue), m_nMaxDelayInMilliseconds (nMaxDelayInMilliseconds)
 {
     if ((nMaxDelayInMilliseconds == 0) || (nMaxDelayInMilliseconds > GPIOSEQUENCE_MAXDELAYINMS))
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOTASKDELAY);
+    if (nInputBit > GPIOSEQUENCE_MAXINPUTBIT)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOINPUTBIT);
 
 }
 
@@ -188,10 +246,10 @@ void CGPIOTask_WaitforInput::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
 }
 
 
-CGPIOTask_Label::CGPIOTask_Label(uint32_t nRelativeStartAddress, const std::string& sLabelName, const uint32_t nMaxPasses)
-    : CGPIOTask (nRelativeStartAddress), m_sLabelName (sLabelName), m_nMaxPasses (nMaxPasses)
+CGPIOTask_Label::CGPIOTask_Label(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const std::string& sLabelName, const uint32_t nMaxPasses)
+    : CGPIOTask (nRelativeStartAddress, pLabels), m_sLabelName (sLabelName), m_nMaxPasses (nMaxPasses)
 {
-
+    pLabels->addLabel(sLabelName, nRelativeStartAddress);
 }
 
 CGPIOTask_Label::~CGPIOTask_Label()
@@ -222,8 +280,8 @@ void CGPIOTask_Label::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
 }
 
 
-CGPIOTask_GoToLabel::CGPIOTask_GoToLabel(uint32_t nRelativeStartAddress, const std::string& sLabelName)
-: CGPIOTask (nRelativeStartAddress), m_sLabelName (sLabelName)
+CGPIOTask_GoToLabel::CGPIOTask_GoToLabel(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const std::string& sLabelName)
+: CGPIOTask (nRelativeStartAddress, pLabels), m_sLabelName (sLabelName)
 {
 
 }
@@ -241,7 +299,7 @@ std::string CGPIOTask_GoToLabel::getLabelName()
 
 uint32_t CGPIOTask_GoToLabel::getNeededListCapacity()
 {
-    return 0;
+    return 1;
 }
 
 void CGPIOTask_GoToLabel::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
@@ -249,13 +307,20 @@ void CGPIOTask_GoToLabel::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
     if (pSDK == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
+    uint32_t nCurrentAddress = getRelativeStartAddress();
+    uint32_t nLabelAddress = findLabelAddress(m_sLabelName);
+
+    int32_t nRelativeJumpPosition = (int32_t)nLabelAddress - (int32_t)nCurrentAddress;
+    pSDK->n_list_jump_rel(nCardNo, nRelativeJumpPosition);
 }
 
 
-CGPIOTask_ConditionalGoToLabel::CGPIOTask_ConditionalGoToLabel(uint32_t nRelativeStartAddress, const uint32_t nInputBit, const bool bInputValue, const std::string& sLabelName)
-    : CGPIOTask (nRelativeStartAddress), m_nInputBit (nInputBit), m_bInputValue (bInputValue), m_sLabelName (sLabelName)
+CGPIOTask_ConditionalGoToLabel::CGPIOTask_ConditionalGoToLabel(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const uint32_t nInputBit, const bool bInputValue, const std::string& sLabelName)
+    : CGPIOTask (nRelativeStartAddress, pLabels), m_nInputBit (nInputBit), m_bInputValue (bInputValue), m_sLabelName (sLabelName)
 {
-    
+    if (nInputBit > GPIOSEQUENCE_MAXINPUTBIT)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOINPUTBIT);
+
 }
 
 CGPIOTask_ConditionalGoToLabel::~CGPIOTask_ConditionalGoToLabel()
@@ -285,8 +350,25 @@ uint32_t CGPIOTask_ConditionalGoToLabel::getNeededListCapacity()
 
 void CGPIOTask_ConditionalGoToLabel::writeToSDKList(CScanLabSDK* pSDK, uint32_t nCardNo)
 {
+
     if (pSDK == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+    uint32_t nMask1 = 0;
+    uint32_t nMask0 = 0;
+
+    if (m_bInputValue) {
+        nMask1 = 1UL << m_nInputBit;
+    }
+    else {
+        nMask0 = 1UL << m_nInputBit;
+    }
+
+    uint32_t nCurrentAddress = getRelativeStartAddress();
+    uint32_t nLabelAddress = findLabelAddress(m_sLabelName);
+
+    int32_t nRelativeJumpPosition = (int32_t)nLabelAddress - (int32_t)nCurrentAddress;
+    pSDK->n_list_jump_rel_cond(nCardNo, nMask1, nMask0, nRelativeJumpPosition);
 
 }
 
@@ -301,6 +383,8 @@ CGPIOSequenceInstance::CGPIOSequenceInstance(const std::string& sIdentifier)
         if (!(isalnum(ch) || (ch == '-') || (ch == '_')))
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSEQUENCEIDENTIFIER);
     }
+
+    m_pLabels = std::make_shared<CGPIOLabels>();
 
 }
 
@@ -322,7 +406,7 @@ void CGPIOSequenceInstance::Clear()
 
 void CGPIOSequenceInstance::AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue)
 {
-    auto pTask = std::make_shared<CGPIOTask_Output>(m_nListSize, nOutputBit, bOutputValue);
+    auto pTask = std::make_shared<CGPIOTask_Output>(m_nListSize, m_pLabels, nOutputBit, bOutputValue);
     m_nListSize += pTask->getNeededListCapacity();
     m_Tasks.push_back (pTask);
 }
@@ -330,7 +414,7 @@ void CGPIOSequenceInstance::AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBi
 
 void CGPIOSequenceInstance::AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMilliseconds)
 {
-    auto pTask = std::make_shared<CGPIOTask_Delay> (m_nListSize, nDelayInMilliseconds);
+    auto pTask = std::make_shared<CGPIOTask_Delay> (m_nListSize, m_pLabels, nDelayInMilliseconds);
     m_nListSize += pTask->getNeededListCapacity();
     m_Tasks.push_back(pTask);
 }
@@ -338,28 +422,28 @@ void CGPIOSequenceInstance::AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMi
 
 void CGPIOSequenceInstance::WaitforInput(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const LibMCDriver_ScanLab_uint32 nMaxDelayInMilliseconds)
 {
-    auto pTask = std::make_shared<CGPIOTask_WaitforInput> (m_nListSize, nInputBit, bInputValue, nMaxDelayInMilliseconds);
+    auto pTask = std::make_shared<CGPIOTask_WaitforInput> (m_nListSize, m_pLabels, nInputBit, bInputValue, nMaxDelayInMilliseconds);
     m_nListSize += pTask->getNeededListCapacity();
     m_Tasks.push_back(pTask);
 }
 
 void CGPIOSequenceInstance::AddLabel(const std::string& sLabelName, const LibMCDriver_ScanLab_uint32 nMaxPasses)
 {
-    auto pTask = std::make_shared<CGPIOTask_Label> (m_nListSize, sLabelName, nMaxPasses);
+    auto pTask = std::make_shared<CGPIOTask_Label> (m_nListSize, m_pLabels, sLabelName, nMaxPasses);
     m_nListSize += pTask->getNeededListCapacity();
     m_Tasks.push_back(pTask);
 }
 
 void CGPIOSequenceInstance::GoToLabel(const std::string& sLabelName)
 {
-    auto pTask = std::make_shared<CGPIOTask_GoToLabel> (m_nListSize, sLabelName);
+    auto pTask = std::make_shared<CGPIOTask_GoToLabel> (m_nListSize, m_pLabels, sLabelName);
     m_nListSize += pTask->getNeededListCapacity();
     m_Tasks.push_back(pTask);
 }
 
 void CGPIOSequenceInstance::ConditionalGoToLabel(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const std::string& sLabelName)
 {
-    auto pTask = std::make_shared<CGPIOTask_ConditionalGoToLabel>(m_nListSize, nInputBit, bInputValue, sLabelName);
+    auto pTask = std::make_shared<CGPIOTask_ConditionalGoToLabel>(m_nListSize, m_pLabels, nInputBit, bInputValue, sLabelName);
     m_nListSize += pTask->getNeededListCapacity();
     m_Tasks.push_back(pTask);
 }

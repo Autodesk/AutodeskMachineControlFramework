@@ -326,6 +326,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_list_repeat = (PScanLabPtr_n_list_repeat)_loadScanLabAddress(hLibrary, "n_list_repeat");
 	this->ptr_n_list_until = (PScanLabPtr_n_list_until)_loadScanLabAddress(hLibrary, "n_list_until");
 	this->ptr_n_list_jump_rel_cond = (PScanLabPtr_n_list_jump_rel_cond)_loadScanLabAddress(hLibrary, "n_list_jump_rel_cond");
+	this->ptr_n_list_jump_rel = (PScanLabPtr_n_list_jump_rel)_loadScanLabAddress(hLibrary, "n_list_jump_rel");
 
 
 	m_LibraryHandle = (void*) hLibrary;
@@ -550,6 +551,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_list_repeat = nullptr;
 	ptr_n_list_until = nullptr;
 	ptr_n_list_jump_rel_cond = nullptr;
+	ptr_n_list_jump_rel = nullptr;
 
 }
 
@@ -1737,6 +1739,14 @@ void CScanLabSDK::n_list_jump_rel_cond(uint32_t nCardNo, uint32_t nMask1, uint32
 		ptr_n_list_jump_rel_cond(nCardNo, nMask1, nMask0, nRelativeJumpPosition);
 }
 
+void CScanLabSDK::n_list_jump_rel(uint32_t nCardNo,  int32_t nRelativeJumpPosition)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_list_jump_rel", std::to_string(nCardNo) + ", " + std::to_string(nRelativeJumpPosition));
+
+	if (ptr_n_list_jump_rel != nullptr)
+		ptr_n_list_jump_rel(nCardNo, nRelativeJumpPosition);
+}
 
 
 void CScanLabSDK::setJournal(PScanLabSDKJournal pLogJournal)

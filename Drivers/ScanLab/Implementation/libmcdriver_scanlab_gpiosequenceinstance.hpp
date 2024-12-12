@@ -38,6 +38,8 @@ Abstract: This is the class declaration of CGPIOSequence
 #include "libmcdriver_scanlab_interfaces.hpp"
 #include "libmcdriver_scanlab_sdk.hpp"
 
+#include <map>
+
 namespace LibMCDriver_ScanLab {
 namespace Impl {
 
@@ -46,22 +48,49 @@ namespace Impl {
  Class declaration of CGPIOSequence 
 **************************************************************************************************************************/
 
+class CGPIOLabels
+{
+private:
+	std::map<std::string, uint32_t> m_LabelStartAddresses;
+
+public:
+
+	CGPIOLabels();
+
+	virtual ~CGPIOLabels();
+
+	void addLabel(const std::string & sLabel, uint32_t nLabelAddress);
+
+	uint32_t findLabelAddress(const std::string& sLabel);
+
+	static void checkLabelName(const std::string& sLabel);
+
+};
+
+typedef std::shared_ptr<CGPIOLabels> PGPIOLabels;
+
+
 
 class CGPIOTask
 {
 private:
 
 	uint32_t m_nRelativeStartAddress;
+	PGPIOLabels m_pLabels;
 
 public:
 
-	CGPIOTask(uint32_t nRelativeStartAddress);
+	CGPIOTask(uint32_t nRelativeStartAddress, PGPIOLabels pLabels);
 
 	virtual ~CGPIOTask();
 
 	virtual uint32_t getNeededListCapacity() = 0;
 
 	virtual void writeToSDKList (CScanLabSDK * pSDK, uint32_t nCardNo) = 0;
+
+	virtual uint32_t getRelativeStartAddress();
+
+	virtual uint32_t findLabelAddress(const std::string& sLabel);
 };
 
 
@@ -74,7 +103,7 @@ private:
 
 public:
 
-	CGPIOTask_Output(uint32_t nRelativeStartAddress, const uint32_t nOutputBit, const bool bOutputValue);
+	CGPIOTask_Output(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const uint32_t nOutputBit, const bool bOutputValue);
 
 	virtual ~CGPIOTask_Output();
 
@@ -98,7 +127,7 @@ private:
 
 public:
 
-	CGPIOTask_Delay(uint32_t nRelativeStartAddress, const uint32_t nDelayInMilliseconds);
+	CGPIOTask_Delay(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const uint32_t nDelayInMilliseconds);
 
 	virtual ~CGPIOTask_Delay();
 
@@ -120,7 +149,7 @@ private:
 	uint32_t m_nMaxDelayInMilliseconds;
 public:
 
-	CGPIOTask_WaitforInput(uint32_t nRelativeStartAddress, const uint32_t nInputBit, const bool bInputValue, const uint32_t nMaxDelayInMilliseconds);
+	CGPIOTask_WaitforInput(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const uint32_t nInputBit, const bool bInputValue, const uint32_t nMaxDelayInMilliseconds);
 
 	virtual ~CGPIOTask_WaitforInput();
 
@@ -147,7 +176,7 @@ private:
 
 public:
 
-	CGPIOTask_Label(uint32_t nRelativeStartAddress, const std::string& sLabelName, const uint32_t nMaxPasses);
+	CGPIOTask_Label(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const std::string& sLabelName, const uint32_t nMaxPasses);
 
 	virtual ~CGPIOTask_Label();
 
@@ -170,7 +199,7 @@ private:
 
 public:
 
-	CGPIOTask_GoToLabel(uint32_t nRelativeStartAddress, const std::string& sLabelName);
+	CGPIOTask_GoToLabel(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const std::string& sLabelName);
 
 	virtual ~CGPIOTask_GoToLabel();
 
@@ -195,7 +224,7 @@ private:
 
 public:
 
-	CGPIOTask_ConditionalGoToLabel(uint32_t nRelativeStartAddress, const uint32_t nInputBit, const bool bInputValue, const std::string& sLabelName);
+	CGPIOTask_ConditionalGoToLabel(uint32_t nRelativeStartAddress, PGPIOLabels pLabels, const uint32_t nInputBit, const bool bInputValue, const std::string& sLabelName);
 
 	virtual ~CGPIOTask_ConditionalGoToLabel();
 
@@ -224,6 +253,8 @@ private:
 	std::vector<PGPIOTask> m_Tasks;
 
 	bool m_bAutomaticSelection;
+
+	PGPIOLabels m_pLabels;
 
 public:
 
