@@ -127,7 +127,7 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
         if ((nPointCount >= 2) && bDrawSegment) {
 
-            bool bSegmentHasPowerPerVector = false; // pLayer->SegmentHasOverrideFactors(nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor::FactorF);
+            bool bSegmentHasPowerPerVector = pLayer->SegmentHasOverrideFactors(nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor::FactorF);
 
             double dJumpSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
             double dMarkSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
