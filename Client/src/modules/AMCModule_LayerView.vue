@@ -30,16 +30,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <template>
 	
-	<div v-if="(module.type == 'layerview')" style="width:100%; height:100%; display:block; overflow:hidden;">
-			
-			<div ref="layerViewDiv" style="width:100%;height:100%;" v-resize="onResize" @mousedown="onStartDragging" @mousemove="onDragging" @wheel="onMouseWheel">
+	<div v-if="(module.type == 'layerview')" class="layerview-container" @mousemove="onMouseMove" @mouseup="onStopDragging">
+			<div ref="layerViewDiv" class="layerview" v-resize="onResize" @mousedown="onStartDraggingRenderView" @wheel="onMouseWheel">
 			</div>
 								
+			<div class="button-container">			
+				<button class="rounded-button">Click 2</button>
+				<button class="rounded-button">Click 3</button>
+			</div>
+
+			<div class="layerview-slider-container">
+				<div class="layerview-slider" id="sliderDiv">
+					<div class="slider-thumb" id="sliderThumbDiv" @mousedown="onStartDraggingSlider">
+						0
+					</div>
+				</div>
+			</div>					
+										
 	</div>
 
 </template>
 
+
 <script>
+
 
 	const ZOOM_MARGIN = 10;
 
@@ -56,10 +70,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			glInstance: null,
 			LayerViewerInstance: null,
 			LayerIndex: 1,
-			dragging: false,
-			dragcurrentx: 0,
-			dragcurrenty: 0,
-			reloading: false
+			maxLayers: 100,
+			draggingRenderView: false,
+			draggingSlider: false,
+			draggingRenderViewCurrentX: 0,
+			draggingRenderViewCurrentY: 0,
+			draggingSliderCurrentY: 0,
+			sliderPosition: 0.0,
+			sliderPositionWhileMove: 0.0,
+			reloading: false,
 		
 		}),
 		
@@ -111,38 +130,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				}
 			},
 			
-			onStartDragging: function (event) {
-				this.dragging = true;
-				this.dragcurrentx = event.clientX;
-				this.dragcurrenty = event.clientY;
+			onStartDraggingRenderView: function (event) {
+				this.draggingRenderView = true;
+				this.draggingRenderViewCurrentX = event.clientX;
+				this.draggingRenderViewCurrentY = event.clientY;
 				
 				var boxRectangle = event.target.getBoundingClientRect();
 
 				var localX = ( event.clientX - boxRectangle.left );
 				var localY = ( event.clientY - boxRectangle.top );				  
 				
-				this.LayerViewerInstance.glInstance.pick2DElement (localX, localY);
+				this.LayerViewerInstance.glInstance.pick2DElement(localX, localY);
 			},
-			
+
+			onStartDraggingSlider: function (event) {
+				this.draggingSlider = true;
+				this.draggingSliderCurrentY = event.clientY;
+			},
+
 			onStopDragging: function () {
-				this.dragging = 0;
-				this.dragcurrentx = 0;
-				this.dragcurrenty = 0;
-			},
-			
-			onDragging: function () {
-				if (this.dragging) {
-				
-				var deltaX = event.clientX - this.dragcurrentx;
-				var deltaY = event.clientY - this.dragcurrenty;
-				this.dragcurrentx = event.clientX;
-				this.dragcurrenty = event.clientY;
-									
-				if (this.LayerViewerInstance) {
-					this.LayerViewerInstance.Drag (deltaX, deltaY);
-					this.LayerViewerInstance.RenderScene (true);
-				}
-				}
+				this.draggingRenderView = false;
+				this.draggingRenderViewCurrentX = 0;
+				this.draggingRenderViewCurrentY = 0;
+
+				this.draggingSlider = false;
+				this.sliderPositionWhileMove = this.sliderPosition;
 			},
 			
 			onMouseWheel: function (event) {
@@ -174,59 +186,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			},
 
 			onMouseMove: function (event) {
-				if (this.glInstance) {
+				if (!this.glInstance || !this.LayerViewerInstance) {
+					return;
+				}
+
+				if (this.draggingRenderView) {
+					const deltaX = event.clientX - this.draggingRenderViewCurrentX;
+					const deltaY = event.clientY - this.draggingRenderViewCurrentY;
+					this.draggingRenderViewCurrentX = event.clientX;
+					this.draggingRenderViewCurrentY = event.clientY;
+					
+					this.LayerViewerInstance.Drag(deltaX, deltaY);
+					this.LayerViewerInstance.RenderScene (true);
+				}
+				else if (this.draggingSlider) {
+					const sliderThumbDiv = document.getElementById('sliderThumbDiv');
+					const sliderHeight = document.getElementById('sliderDiv').getBoundingClientRect().height - sliderThumbDiv.offsetHeight;
+					
+					const deltaY = this.draggingSliderCurrentY - event.clientY;
+					
+					this.sliderPosition = this.sliderPositionWhileMove + deltaY / sliderHeight;
+					
+					if (this.sliderPosition < 0.0) {
+						this.sliderPosition = 0.0;
+					}
+					else if (this.sliderPosition > 1.0) {
+						this.sliderPosition = 1.0;
+					}
+
+					this.LayerIndex = Math.round(this.sliderPosition * this.maxLayers);
+
+					sliderThumbDiv.style.bottom = `${this.sliderPosition * (sliderHeight - sliderThumbDiv.offsetHeight) / sliderHeight * 100}%`;
+					sliderThumbDiv.innerText = this.LayerIndex;
+				}
+
+				if (this.LayerViewerInstance.pointCoordinates.length > 0) {
+					const infoboxDiv = document.getElementById('infobox_points');
+
+					if (!infoboxDiv) {
+						return;
+					}
+
 					const renderElementPosition = this.glInstance.renderer.domElement.getBoundingClientRect();
 					const mouseX = event.clientX - renderElementPosition.left;
 					const mouseY = event.clientY - renderElementPosition.top;
 
 					let [elementType, faceIndex] = this.glInstance.getRaycasterCollisions(mouseX, mouseY);
 
-					const infoboxDiv = document.getElementById('infobox_points');
-					if (infoboxDiv) {
 
-						if (elementType < 0) {
-							infoboxDiv.style.display = 'none';
-							infoboxDiv.innerText = '---';
-							return;
-						}
-
-						// console.log(elementType);
-						// console.log(faceIndex);
-
-						// Each datapoint consists of two triangles and two faceIDs. Only even IDs are of interest
-						if (faceIndex % 2 !== 0) {
-							faceIndex -= 1;
-						}
-
-						faceIndex = faceIndex / 2; // Ignore odd IDs
-					
-
-						// console.log("Collision with face index " + faceIndex);
-						if (elementType === 0) { // Point
-							const x = this.LayerViewerInstance.pointCoordinates[faceIndex * 2];
-							const y = this.LayerViewerInstance.pointCoordinates[faceIndex * 2 + 1];
-
-							infoboxDiv.innerText = `Point ID = ${faceIndex.toFixed(0)}\nX = ${x.toFixed(3)} mm\nY = ${y.toFixed(3)} mm`;
-							infoboxDiv.style.background = 'rgba(255, 0, 0, 0.7)';
-						}
-						else if (elementType === 1) { // Line
-							const x1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4];
-							const y1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 1];
-							const x2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 2];
-							const y2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 3];
-
-							const laserpower = this.LayerViewerInstance.segmentProperties[faceIndex].laserpower;
-							const laserspeed = this.LayerViewerInstance.segmentProperties[faceIndex].laserspeed;
-							const profilename = this.LayerViewerInstance.segmentProperties[faceIndex].profilename;
-
-							infoboxDiv.innerText = `Line ID = ${faceIndex.toFixed(0)}: ${profilename}\n${x1.toFixed(3)}/${y1.toFixed(3)} - ${x2.toFixed(3)}/${y2.toFixed(3)} mm\n ${laserpower.toFixed(3)} W / ${laserspeed.toFixed(3)} mm/s`;
-							infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
-						}
-						
-						infoboxDiv.style.display = 'flex';
-						infoboxDiv.style.left = `${mouseX}px`;
-						infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`;					
+					if (elementType < 0) {
+						infoboxDiv.style.display = 'none';
+						infoboxDiv.innerText = '---';
+						return;
 					}
+
+					// Each datapoint consists of two triangles and two faceIDs. Only even IDs are of interest
+					if (faceIndex % 2 !== 0) {
+						faceIndex -= 1;
+					}
+
+					faceIndex = faceIndex / 2; // Ignore odd IDs
+
+					// console.log("Collision with face index " + faceIndex);
+					if (elementType === 0) { // Point
+						const x = this.LayerViewerInstance.pointCoordinates[faceIndex * 2];
+						const y = this.LayerViewerInstance.pointCoordinates[faceIndex * 2 + 1];
+
+						infoboxDiv.innerText = `Point ID = ${faceIndex.toFixed(0)}\nX = ${x.toFixed(3)} mm\nY = ${y.toFixed(3)} mm`;
+						infoboxDiv.style.background = 'rgba(255, 0, 0, 0.7)';
+					}
+					else if (elementType === 1) { // Line
+						const x1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4];
+						const y1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 1];
+						const x2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 2];
+						const y2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 3];
+
+						infoboxDiv.innerText = `Line ID = ${faceIndex.toFixed(0)}\nX1 = ${x1.toFixed(3)} mm\nY1 = ${y1.toFixed(3)} mm\nX2 = ${x2.toFixed(3)} mm\nY2 = ${y2.toFixed(3)} mm`;
+						infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+					}
+					
+					infoboxDiv.style.display = 'flex';
+					infoboxDiv.style.left = `${mouseX}px`;
+					infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`;
 				}
 			}
 		},
@@ -242,8 +283,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 			if (!this.glInstance) {
 				this.glInstance = new WebGLImpl ();
-
-				window.addEventListener('mousemove', this.onMouseMove, false);
 
 				this.Application.storeWebGLInstance (this.glInstance);				
 				this.LayerViewerInstance = new LayerViewImpl (this.glInstance);				
@@ -277,8 +316,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						this.LayerViewerInstance.RenderScene (true);						
 					}
 				}
-				
-				window.addEventListener('mouseup', this.onStopDragging);
+							
 			})
 			
 			if (this.LayerViewerInstance)
@@ -287,3 +325,81 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	};
 	
 </script>
+
+<style>
+	.layerview-container {
+		position: relative;
+		width:100%;
+		height:100%;
+		display:block;
+		overflow:hidden;
+	}
+
+	.layerview {
+		width: 100%;
+		height: 100%
+	}
+
+	.button-container {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		display: flex;
+		gap: 5px;
+	}
+
+    .rounded-button {
+		display: flex;
+      	padding: 8px 20px;
+     	border: none;
+     	border-radius: 5px;
+     	background: rgba(0, 0, 0, 0.7);
+     	color: white;
+     	font-size: 16px;
+     	cursor: pointer;
+     	transition: background-color 0.3s ease;
+    }
+
+    .rounded-button:hover {
+      	background-color: rgba(0, 0, 0, 0.8);
+    }
+
+	.layerview-slider-container {
+      	position: absolute;
+		top: 0px;
+		right: 10px;
+		display: flex;
+  		flex-direction: column;
+		align-items: center;
+		gap: 5px;
+		height: 100%;
+		padding: 20px;
+    }
+
+    .layerview-slider {
+		flex: 1;
+      	position: relative;
+		height: 100%;
+  		width: 10px;
+		border-radius: 5px;
+		background: rgba(0, 0, 0, 0.4);
+    }
+
+	.slider-thumb {
+		position: absolute;
+		bottom: 0;
+		width: 40px;
+		height: 25px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: #ffffff;
+		font-size: 8pt;
+		font-weight: bold;
+		user-select: none;
+		transform: translateX(-15px);
+		background: #000000;
+		border-radius: 10px;
+		cursor: pointer;
+	}
+</style>
