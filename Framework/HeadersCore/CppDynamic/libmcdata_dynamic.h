@@ -514,6 +514,18 @@ typedef LibMCDataResult (*PLibMCDataJournalChunkIntegerData_GetValueDataPtr) (Li
 typedef LibMCDataResult (*PLibMCDataJournalSession_GetSessionUUIDPtr) (LibMCData_JournalSession pJournalSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
 
 /**
+* creates variable in journal DB.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] pName - Variable Name
+* @param[in] nID - Variable ID
+* @param[in] nIndex - Variable Index
+* @param[in] eDataType - Variable Data Type
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalSession_CreateVariableInJournalDBPtr) (LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, LibMCData::eParameterDataType eDataType);
+
+/**
 * writes detailed journal state data to disk.
 *
 * @param[in] pJournalSession - JournalSession instance.
@@ -2714,6 +2726,7 @@ typedef struct {
 	PLibMCDataJournalChunkIntegerData_GetTimeStampDataPtr m_JournalChunkIntegerData_GetTimeStampData;
 	PLibMCDataJournalChunkIntegerData_GetValueDataPtr m_JournalChunkIntegerData_GetValueData;
 	PLibMCDataJournalSession_GetSessionUUIDPtr m_JournalSession_GetSessionUUID;
+	PLibMCDataJournalSession_CreateVariableInJournalDBPtr m_JournalSession_CreateVariableInJournalDB;
 	PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr m_JournalSession_WriteJournalChunkIntegerData;
 	PLibMCDataJournalSession_ReadChunkIntegerDataPtr m_JournalSession_ReadChunkIntegerData;
 	PLibMCDataJournalSession_GetChunkCacheQuotaPtr m_JournalSession_GetChunkCacheQuota;

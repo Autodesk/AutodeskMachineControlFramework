@@ -410,8 +410,14 @@
 		<error name="INVALIDJOURNALFILEINDEX" code="410" description="Invalid journal file index." />	
 		<error name="JOURNALEXCEEDSMAXIMUMFILES" code="411" description="Journal exceeds maxium files." />	
 		<error name="COULDNOTFINDJOURNALUUID" code="412" description="Could not find journal UUID." />	
+		<error name="UNKNOWNDATATYPE" code="413" description="Unknown data type." />	
+		<error name="DUPLICATEJOURNALVARIABLEID" code="414" description="Duplicate journal variable ID." />	
+		<error name="DUPLICATEJOURNALVARIABLEINDEX" code="415" description="Duplicate journal variable index." />	
+		<error name="DUPLICATEJOURNALVARIABLENAME" code="416" description="Duplicate journal variable name." />	
+		<error name="DUPLICATEJOURNALFILEINDEX" code="417" description="Duplicate journal file index." />	
+		<error name="DUPLICATEJOURNALCHUNKINDEX" code="418" description="Duplicate journal chunk index." />	
+		<error name="JOURNALFILEINDEXNOTFOUND" code="419" description="Journal file index not found." />	
 		
-
 		
 	</errors>
 	
@@ -735,6 +741,14 @@
 		<method name="GetSessionUUID" description="retrieves the session UUID.">
 			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
 		</method>
+		
+		<method name="CreateVariableInJournalDB" description="creates variable in journal DB.">
+			<param name="Name" type="string" pass="in" description="Variable Name" />	
+			<param name="ID" type="uint32" pass="in" description="Variable ID" />	
+			<param name="Index" type="uint32" pass="in" description="Variable Index" />	
+			<param name="DataType" type="enum" class="ParameterDataType" pass="in" description="Variable Data Type" />	
+		</method>
+		
 
 		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	

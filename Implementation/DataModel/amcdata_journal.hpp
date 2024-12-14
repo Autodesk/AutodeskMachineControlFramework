@@ -126,6 +126,8 @@ namespace AMCData {
 
 		LibMCData_uint32 GetMaxLogEntryID();
 
+		void CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType);
+
 		void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32* pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64* pValueDataBuffer);
 
 		void ReadJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, uint64_t & nStartTimeStamp, uint64_t & nEndTimeStamp, std::vector<LibMCData::sJournalChunkVariableInfo> & variableInfo, std::vector<uint32_t> & timeStampData, std::vector<int64_t> & valueData);
@@ -160,6 +162,10 @@ namespace AMCData {
 		uint64_t getMaxMemoryQuotaInBytes ();
 
 		uint64_t getMaxChunkFileSizeQuotaInBytes ();
+
+		static std::string convertDataTypeToString(LibMCData::eParameterDataType dataType);
+
+		static LibMCData::eParameterDataType convertStringToDataType(const std::string & sValue);
 
 	};
 

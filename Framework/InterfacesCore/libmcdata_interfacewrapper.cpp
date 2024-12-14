@@ -1548,6 +1548,33 @@ LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMCData_JournalSession
 	}
 }
 
+LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, eLibMCDataParameterDataType eDataType)
+{
+	IBase* pIBaseClass = (IBase *)pJournalSession;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IJournalSession* pIJournalSession = dynamic_cast<IJournalSession*>(pIBaseClass);
+		if (!pIJournalSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIJournalSession->CreateVariableInJournalDB(sName, nID, nIndex, eDataType);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_journalsession_writejournalchunkintegerdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const sLibMCDataJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pJournalSession;
@@ -8552,6 +8579,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_journalchunkintegerdata_getvaluedata;
 	if (sProcName == "libmcdata_journalsession_getsessionuuid") 
 		*ppProcAddress = (void*) &libmcdata_journalsession_getsessionuuid;
+	if (sProcName == "libmcdata_journalsession_createvariableinjournaldb") 
+		*ppProcAddress = (void*) &libmcdata_journalsession_createvariableinjournaldb;
 	if (sProcName == "libmcdata_journalsession_writejournalchunkintegerdata") 
 		*ppProcAddress = (void*) &libmcdata_journalsession_writejournalchunkintegerdata;
 	if (sProcName == "libmcdata_journalsession_readchunkintegerdata") 

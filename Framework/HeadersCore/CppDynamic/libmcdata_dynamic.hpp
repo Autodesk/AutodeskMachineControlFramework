@@ -606,6 +606,13 @@ public:
 			case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "INVALIDJOURNALFILEINDEX";
 			case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "JOURNALEXCEEDSMAXIMUMFILES";
 			case LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID: return "COULDNOTFINDJOURNALUUID";
+			case LIBMCDATA_ERROR_UNKNOWNDATATYPE: return "UNKNOWNDATATYPE";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEID: return "DUPLICATEJOURNALVARIABLEID";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEINDEX: return "DUPLICATEJOURNALVARIABLEINDEX";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLENAME: return "DUPLICATEJOURNALVARIABLENAME";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX: return "DUPLICATEJOURNALFILEINDEX";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX: return "DUPLICATEJOURNALCHUNKINDEX";
+			case LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND: return "JOURNALFILEINDEXNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -955,6 +962,13 @@ public:
 			case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "Invalid journal file index.";
 			case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "Journal exceeds maxium files.";
 			case LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID: return "Could not find journal UUID.";
+			case LIBMCDATA_ERROR_UNKNOWNDATATYPE: return "Unknown data type.";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEID: return "Duplicate journal variable ID.";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEINDEX: return "Duplicate journal variable index.";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLENAME: return "Duplicate journal variable name.";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX: return "Duplicate journal file index.";
+			case LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX: return "Duplicate journal chunk index.";
+			case LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND: return "Journal file index not found.";
 		}
 		return "unknown error";
 	}
@@ -1326,6 +1340,7 @@ public:
 	}
 	
 	inline std::string GetSessionUUID();
+	inline void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const eParameterDataType eDataType);
 	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<LibMCData_uint32> & TimeStampDataBuffer, const CInputVector<LibMCData_int64> & ValueDataBuffer);
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 	inline LibMCData_uint64 GetChunkCacheQuota();
@@ -1955,6 +1970,7 @@ public:
 		pWrapperTable->m_JournalChunkIntegerData_GetTimeStampData = nullptr;
 		pWrapperTable->m_JournalChunkIntegerData_GetValueData = nullptr;
 		pWrapperTable->m_JournalSession_GetSessionUUID = nullptr;
+		pWrapperTable->m_JournalSession_CreateVariableInJournalDB = nullptr;
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_ReadChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_GetChunkCacheQuota = nullptr;
@@ -2556,6 +2572,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalSession_GetSessionUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_CreateVariableInJournalDB = (PLibMCDataJournalSession_CreateVariableInJournalDBPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_createvariableinjournaldb");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_CreateVariableInJournalDB = (PLibMCDataJournalSession_CreateVariableInJournalDBPtr) dlsym(hLibrary, "libmcdata_journalsession_createvariableinjournaldb");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_CreateVariableInJournalDB == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4471,6 +4496,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_GetSessionUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_journalsession_createvariableinjournaldb", (void**)&(pWrapperTable->m_JournalSession_CreateVariableInJournalDB));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_CreateVariableInJournalDB == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_journalsession_writejournalchunkintegerdata", (void**)&(pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5869,6 +5898,18 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetSessionUUID(m_pHandle, bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0]));
 		
 		return std::string(&bufferSessionUUID[0]);
+	}
+	
+	/**
+	* CJournalSession::CreateVariableInJournalDB - creates variable in journal DB.
+	* @param[in] sName - Variable Name
+	* @param[in] nID - Variable ID
+	* @param[in] nIndex - Variable Index
+	* @param[in] eDataType - Variable Data Type
+	*/
+	void CJournalSession::CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const eParameterDataType eDataType)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_CreateVariableInJournalDB(m_pHandle, sName.c_str(), nID, nIndex, eDataType));
 	}
 	
 	/**

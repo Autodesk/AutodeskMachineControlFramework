@@ -75,7 +75,7 @@ namespace AMC {
 			return m_sName;
 		}
 
-		virtual eStateJournalVariableType getType() = 0;
+		virtual LibMCData::eParameterDataType getType() = 0;
 
 		virtual double computeNumericSample(const uint64_t nTimeStampInMicroseconds)
 		{
@@ -95,9 +95,9 @@ namespace AMC {
 
 		}
 
-		virtual eStateJournalVariableType getType() 
+		virtual LibMCData::eParameterDataType getType()
 		{
-			return eStateJournalVariableType::vtBoolParameter;
+			return LibMCData::eParameterDataType::Bool;
 		}
 
 		void setValue_MicroSecond(const bool bValue, const uint64_t nAbsoluteTimeStampInMicroSeconds)
@@ -140,9 +140,9 @@ namespace AMC {
 		{
 		}
 
-		virtual eStateJournalVariableType getType()
+		virtual LibMCData::eParameterDataType getType()
 		{
-			return eStateJournalVariableType::vtIntegerParameter;
+			return LibMCData::eParameterDataType::Integer;
 		}
 
 		void setValue_MicroSecond(const int64_t nValue, const uint64_t nAbsoluteTimeStampInMicroSeconds)
@@ -189,9 +189,9 @@ namespace AMC {
 		{
 		}
 
-		virtual eStateJournalVariableType getType()
+		virtual LibMCData::eParameterDataType getType()
 		{
-			return eStateJournalVariableType::vtDoubleParameter;
+			return LibMCData::eParameterDataType::Double;
 		}
 
 		void setUnits(const double dUnits)
@@ -257,9 +257,9 @@ namespace AMC {
 		{
 		}
 
-		virtual eStateJournalVariableType getType()
+		virtual LibMCData::eParameterDataType getType()
 		{
-			return eStateJournalVariableType::vtStringParameter;
+			return LibMCData::eParameterDataType::String;
 		}
 
 		void setValue_MicroSecond(const std::string & sValue, const uint64_t nAbsoluteTimeStamp_MicroSecond)
@@ -313,7 +313,7 @@ namespace AMC {
 		CStateJournalImpl(PStateJournalStream pStream, AMCCommon::PChrono pGlobalChrono);
 		virtual ~CStateJournalImpl();
 
-		PStateJournalImplVariable generateVariable(const eStateJournalVariableType eVariableType, const std::string& sName);
+		PStateJournalImplVariable generateVariable(const LibMCData::eParameterDataType eVariableType, const std::string& sName);
 		PStateJournalImplVariable createAlias (const std::string& sName, const std::string& sSourceName);
 
 		void startRecording();
@@ -377,7 +377,7 @@ namespace AMC {
 	}
 
 
-	PStateJournalImplVariable CStateJournalImpl::generateVariable(const eStateJournalVariableType eVariableType, const std::string& sName)
+	PStateJournalImplVariable CStateJournalImpl::generateVariable(const LibMCData::eParameterDataType eVariableType, const std::string& sName)
 	{
 
 		if (m_JournalMode != eStateJournalMode::sjmInitialising)
@@ -390,20 +390,23 @@ namespace AMC {
 		uint32_t nVariableIndex = (uint32_t)m_VariableList.size();
 		uint32_t nVariableID = (uint32_t)(m_VariableList.size() + 1);
 
+		auto pCache = m_pStream->getCache();
+		pCache->createVariableInJournalDB (sName, nVariableID, nVariableIndex, eVariableType);
+
 		switch (eVariableType) {
-		case eStateJournalVariableType::vtBoolParameter:			
+		case LibMCData::eParameterDataType::Bool:
 			pVariable = std::make_shared<CStateJournalImplBoolVariable>(m_pStream.get(), nVariableID, nVariableIndex, sName);
 			break;
 
-		case eStateJournalVariableType::vtIntegerParameter:
+		case LibMCData::eParameterDataType::Integer:
 			pVariable = std::make_shared<CStateJournalImplIntegerVariable>(m_pStream.get(), nVariableID, nVariableIndex, sName);
 			break;
 
-		case eStateJournalVariableType::vtDoubleParameter:
+		case LibMCData::eParameterDataType::Double:
 			pVariable = std::make_shared<CStateJournalImplDoubleVariable>(m_pStream.get(), nVariableID, nVariableIndex, sName);
 			break;
 
-		case eStateJournalVariableType::vtStringParameter:
+		case LibMCData::eParameterDataType::String:
 			pVariable = std::make_shared<CStateJournalImplStringVariable>(m_pStream.get(), nVariableID, nVariableIndex, sName);
 			break;
 
@@ -669,7 +672,7 @@ namespace AMC {
 
 	uint32_t CStateJournal::registerBooleanValue(const std::string& sName, const bool bInitialValue)
 	{
-		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtBoolParameter, sName);
+		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Bool, sName);
 		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (pVariable);
 		if (pBoolVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a bool variable");
@@ -681,7 +684,7 @@ namespace AMC {
 
 	uint32_t CStateJournal::registerIntegerValue(const std::string& sName, const int64_t nInitialValue)
 	{
-		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtIntegerParameter, sName);		
+		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Integer, sName);
 		auto pIntegerVariable = std::dynamic_pointer_cast<CStateJournalImplIntegerVariable> (pVariable);
 		if (pIntegerVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a integer variable");
@@ -693,7 +696,7 @@ namespace AMC {
 
 	uint32_t CStateJournal::registerStringValue(const std::string& sName, const std::string & sInitialValue)
 	{
-		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtStringParameter, sName);	
+		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::String, sName);
 		auto pStringVariable = std::dynamic_pointer_cast<CStateJournalImplStringVariable> (pVariable);
 		if (pStringVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a string variable");
@@ -709,7 +712,7 @@ namespace AMC {
 		if ((dUnits < STATEJOURNAL_VARIABLE_MINUNITS) || (dUnits > STATEJOURNAL_VARIABLE_MAXUNITS))
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLEUNITS);
 
-		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtDoubleParameter, sName);
+		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Double, sName);
 		auto pDoubleVariable = std::dynamic_pointer_cast<CStateJournalImplDoubleVariable> (pVariable);
 		if (pDoubleVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);

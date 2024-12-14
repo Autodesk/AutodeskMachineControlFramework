@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CJournalReader
 
 // Include custom headers here.
 #include "amcdata_sqlhandler.hpp"
+#include <map>
 
 namespace LibMCData {
 namespace Impl {
@@ -54,6 +55,86 @@ namespace Impl {
 /*************************************************************************************************************************
  Class declaration of CJournalReader 
 **************************************************************************************************************************/
+
+class CJournalReaderVariable {
+private:
+    int64_t m_nVariableIndex;
+    int64_t m_nVariableID;
+    eParameterDataType m_VariableType;
+    std::string m_sVariableName;
+
+public:
+
+    CJournalReaderVariable(int64_t nVariableIndex, int64_t nVariableID, eParameterDataType variableType, const std::string& sVariableName);
+
+    virtual ~CJournalReaderVariable();
+
+    int64_t getVariableIndex ();
+
+    int64_t getVariableID ();
+
+    eParameterDataType getVariableType ();
+
+    std::string getVariableName ();
+};
+
+
+typedef std::shared_ptr<CJournalReaderVariable> PJournalReaderVariable;
+
+
+
+class CJournalReaderFile {
+private:
+    int64_t m_nFileIndex;
+    std::string m_sAbsoluteFileName;
+
+public:
+
+    CJournalReaderFile(int64_t nFileIndex, const std::string& sAbsoluteFileName);
+
+    virtual ~CJournalReaderFile();
+
+    int64_t getFileIndex ();
+
+    std::string getAbsoluteFileName ();
+
+};
+
+
+typedef std::shared_ptr<CJournalReaderFile> PJournalReaderFile;
+
+
+class CJournalReaderChunk {
+private:
+    int64_t m_nChunkIndex;
+    PJournalReaderFile m_pJournalDataFile;
+    int64_t m_nStartTimeStamp;
+    int64_t m_nEndTimeStamp;
+    int64_t m_nDataOffset;
+    int64_t m_nDataLength;
+
+public:
+
+    CJournalReaderChunk(int64_t nChunkIndex, PJournalReaderFile pJournalDataFile, int64_t nStartTimeStamp, int64_t nEndTimeStamp, int64_t nDataOffset, int64_t nDataLength);
+
+    virtual ~CJournalReaderChunk();
+
+    int64_t getChunkIndex ();
+
+    PJournalReaderFile getDataFile ();
+
+    int64_t getStartTimeStamp ();
+
+    int64_t getEndTimeStamp ();
+
+    int64_t getDataOffset ();
+
+    int64_t getDataLength ();
+
+};
+
+
+typedef std::shared_ptr<CJournalReaderChunk> PJournalReaderChunk;
 
 class CJournalReader : public virtual IJournalReader, public virtual CBase {
 private:
@@ -68,6 +149,17 @@ private:
     std::string m_sStartTime;
 
     int32_t m_nSchemaVersion;
+
+    std::map <std::string, PJournalReaderVariable> m_VariableNameMap;
+    std::map <int64_t, PJournalReaderVariable> m_VariableIndexMap;
+    std::map <int64_t, PJournalReaderVariable> m_VariableIDMap;
+    std::vector <PJournalReaderVariable> m_Variables;
+
+    std::map <int64_t, PJournalReaderFile> m_FileMap;
+    std::vector<PJournalReaderFile> m_Files;
+
+    std::map <int64_t, PJournalReaderChunk> m_ChunkMap;
+    std::vector<PJournalReaderChunk> m_Chunks;
 
 public:
 

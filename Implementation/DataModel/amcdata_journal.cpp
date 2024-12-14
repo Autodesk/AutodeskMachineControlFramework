@@ -345,6 +345,63 @@ namespace AMCData {
 
 	}
 
+
+	std::string CJournal::convertDataTypeToString(LibMCData::eParameterDataType dataType)
+	{
+		switch (dataType) {
+		case LibMCData::eParameterDataType::Bool:
+			return "bool";
+		case LibMCData::eParameterDataType::Integer:
+			return "integer";
+		case LibMCData::eParameterDataType::Double:
+			return "double";
+		case LibMCData::eParameterDataType::String:
+			return "string";
+		case LibMCData::eParameterDataType::UUID:
+			return "uuid";
+		default:
+			return "unknown";
+		}
+
+	}
+
+	LibMCData::eParameterDataType CJournal::convertStringToDataType(const std::string& sValue)
+	{
+		if (sValue == "bool")
+			return LibMCData::eParameterDataType::Bool;
+		if (sValue == "integer")
+			return LibMCData::eParameterDataType::Integer;
+		if (sValue == "double")
+			return LibMCData::eParameterDataType::Double;
+		if (sValue == "string")
+			return LibMCData::eParameterDataType::String;
+		if (sValue == "uuid")
+			return LibMCData::eParameterDataType::UUID;
+
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNDATATYPE, "Unknown data type: " + sValue);
+	}
+
+	void CJournal::CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
+
+		std::string sVariableType = convertDataTypeToString (eDataType);
+		std::string sQuery = "INSERT INTO journal_variables (name, variableid, variableindex, variabletype) VALUES (?, ?, ?, ?)";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setString(1, sName);
+		pStatement->setInt(2, nID);
+		pStatement->setInt(3, nIndex);
+		pStatement->setString(4, sVariableType);
+		pStatement->execute();
+		pStatement = nullptr;
+
+		m_LogID++;
+
+	}
+
+
+	
+
 	void CJournal::ReadJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, uint64_t & nStartTimeStamp, uint64_t & nEndTimeStamp, std::vector<LibMCData::sJournalChunkVariableInfo>& variableInfo, std::vector<uint32_t>& timeStampData, std::vector<int64_t>& valueData)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
@@ -737,6 +794,9 @@ namespace AMCData {
 	{
 		return (512ULL * 1024ULL * 1024ULL); // create many 512MB files on disk
 	}
+
+
+
 }
 
 

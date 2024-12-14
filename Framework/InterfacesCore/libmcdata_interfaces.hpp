@@ -668,6 +668,15 @@ public:
 	virtual std::string GetSessionUUID() = 0;
 
 	/**
+	* IJournalSession::CreateVariableInJournalDB - creates variable in journal DB.
+	* @param[in] sName - Variable Name
+	* @param[in] nID - Variable ID
+	* @param[in] nIndex - Variable Index
+	* @param[in] eDataType - Variable Data Type
+	*/
+	virtual void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType) = 0;
+
+	/**
 	* IJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
 	* @param[in] nChunkIndex - Index of the Chunk to write
 	* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)

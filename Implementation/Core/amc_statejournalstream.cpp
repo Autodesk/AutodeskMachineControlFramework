@@ -451,6 +451,14 @@ namespace AMC {
 		return m_nMemoryUsage;
 	}
 
+	void CStateJournalStreamCache::createVariableInJournalDB(const std::string& sName, uint32_t nVariableID, uint32_t nVariableIndex, LibMCData::eParameterDataType eVariableType)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_JournalSessionMutex);
+		m_pJournalSession->CreateVariableInJournalDB(sName, nVariableID, nVariableIndex, eVariableType);
+
+	}
+
+
 	void CStateJournalStreamCache::writeToJournal(PStateJournalStreamChunk_InMemory pChunk)
 	{
 		if (pChunk.get() == nullptr)
@@ -803,6 +811,14 @@ namespace AMC {
 			value = 0;
 
 	}
+
+	PStateJournalStreamCache CStateJournalStream::getCache()
+	{
+		return m_Cache;
+	}
+
+
+
 
 }
 

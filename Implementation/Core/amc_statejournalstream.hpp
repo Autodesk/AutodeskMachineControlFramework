@@ -171,6 +171,8 @@ namespace AMC {
 
 		PStateJournalStreamChunk_InMemory loadEntryFromJournal(uint32_t nTimeChunkIndex);
 
+		void createVariableInJournalDB(const std::string & sName, uint32_t nVariableID, uint32_t nVariableIndex, LibMCData::eParameterDataType eVariableType);
+
 	};
 
 	typedef std::shared_ptr<CStateJournalStreamCache> PStateJournalStreamCache;
@@ -225,6 +227,8 @@ namespace AMC {
 		void writeChunksToDiskThreaded();
 
 		void setVariableCount (size_t nVariableCount);
+
+		PStateJournalStreamCache getCache ();
 	};
 	typedef std::shared_ptr<CStateJournalStream> PStateJournalStream;
 

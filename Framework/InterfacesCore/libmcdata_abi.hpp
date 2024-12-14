@@ -527,6 +527,18 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalchunkintegerdata_getvaluedat
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMCData_JournalSession pJournalSession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
 
 /**
+* creates variable in journal DB.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] pName - Variable Name
+* @param[in] nID - Variable ID
+* @param[in] nIndex - Variable Index
+* @param[in] eDataType - Variable Data Type
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, LibMCData::eParameterDataType eDataType);
+
+/**
 * writes detailed journal state data to disk.
 *
 * @param[in] pJournalSession - JournalSession instance.

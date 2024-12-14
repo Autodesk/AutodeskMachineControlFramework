@@ -437,6 +437,13 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX 410 /** Invalid journal file index. */
 #define LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES 411 /** Journal exceeds maxium files. */
 #define LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID 412 /** Could not find journal UUID. */
+#define LIBMCDATA_ERROR_UNKNOWNDATATYPE 413 /** Unknown data type. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEID 414 /** Duplicate journal variable ID. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEINDEX 415 /** Duplicate journal variable index. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLENAME 416 /** Duplicate journal variable name. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX 417 /** Duplicate journal file index. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX 418 /** Duplicate journal chunk index. */
+#define LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND 419 /** Journal file index not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -786,6 +793,13 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "Invalid journal file index.";
     case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "Journal exceeds maxium files.";
     case LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID: return "Could not find journal UUID.";
+    case LIBMCDATA_ERROR_UNKNOWNDATATYPE: return "Unknown data type.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEID: return "Duplicate journal variable ID.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEINDEX: return "Duplicate journal variable index.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLENAME: return "Duplicate journal variable name.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX: return "Duplicate journal file index.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX: return "Duplicate journal chunk index.";
+    case LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND: return "Journal file index not found.";
     default: return "unknown error";
   }
 }
