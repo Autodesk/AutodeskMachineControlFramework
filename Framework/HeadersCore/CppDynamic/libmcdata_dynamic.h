@@ -568,7 +568,7 @@ typedef LibMCDataResult (*PLibMCDataJournalSession_GetChunkCacheQuotaPtr) (LibMC
 * @param[out] pChunkInterval - The interval determines how often a session journal chunk is written to disk.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataJournalSession_GetChunkIntervalInMicrosecondsPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkInterval);
+typedef LibMCDataResult (*PLibMCDataJournalSession_GetChunkIntervalInMicrosecondsPtr) (LibMCData_JournalSession pJournalSession, LibMCData_uint64 * pChunkInterval);
 
 /*************************************************************************************************************************
  Class definition for JournalReader
@@ -595,6 +595,15 @@ typedef LibMCDataResult (*PLibMCDataJournalReader_GetJournalUUIDPtr) (LibMCData_
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataJournalReader_GetStartTimePtr) (LibMCData_JournalReader pJournalReader, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* Get journal life time in microseconds.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[out] pLifeTime - Journal life time in microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalReader_GetLifeTimeInMicrosecondsPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint64 * pLifeTime);
 
 /**
 * reads journal state data from disk.
@@ -2733,6 +2742,7 @@ typedef struct {
 	PLibMCDataJournalSession_GetChunkIntervalInMicrosecondsPtr m_JournalSession_GetChunkIntervalInMicroseconds;
 	PLibMCDataJournalReader_GetJournalUUIDPtr m_JournalReader_GetJournalUUID;
 	PLibMCDataJournalReader_GetStartTimePtr m_JournalReader_GetStartTime;
+	PLibMCDataJournalReader_GetLifeTimeInMicrosecondsPtr m_JournalReader_GetLifeTimeInMicroseconds;
 	PLibMCDataJournalReader_ReadChunkIntegerDataPtr m_JournalReader_ReadChunkIntegerData;
 	PLibMCDataStorageStream_GetUUIDPtr m_StorageStream_GetUUID;
 	PLibMCDataStorageStream_GetTimeStampPtr m_StorageStream_GetTimeStamp;

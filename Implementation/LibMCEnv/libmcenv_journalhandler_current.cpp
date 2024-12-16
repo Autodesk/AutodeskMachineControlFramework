@@ -33,7 +33,7 @@ Abstract: This is a stub class definition of CJournalHandler_Current
 
 #include "libmcenv_journalhandler_current.hpp"
 #include "libmcenv_interfaceexception.hpp"
-#include "libmcenv_journalvariable.hpp"
+#include "libmcenv_journalvariable_current.hpp"
 
 // Include custom headers here.
 #include "libmcenv_datetime.hpp"
@@ -58,27 +58,34 @@ CJournalHandler_Current::~CJournalHandler_Current()
 }
 
 
-IJournalVariable * CJournalHandler_Current::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
-{
-	AMC::sStateJournalInterval interval;
-	m_pStateJournal->retrieveRecentInterval(nTimeDeltaInMicroseconds, interval);
-
-	return new CJournalVariable(m_pStateJournal, sVariableName, interval);
-}
-
 IJournalVariable* CJournalHandler_Current::RetrieveJournalVariableFromTimeInterval(const std::string& sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
 {
 	AMC::sStateJournalInterval interval;
 	interval.m_nStartTimeInMicroSeconds = nStartTimeInMicroseconds;
 	interval.m_nEndTimeInMicroSeconds = nEndTimeInMicroseconds;
 
-	return new CJournalVariable(m_pStateJournal, sVariableName, interval);
+	return new CJournalVariable_Current(m_pStateJournal, sVariableName, interval);
 }
 
 
 IDateTime* CJournalHandler_Current::GetStartTime()
 {
 	return CDateTime::makefromUTC(m_pStateJournal->getStartTimeAsUTC ());
+}
+
+
+IDateTime* CJournalHandler_Current::GetEndTime()
+{
+	std::unique_ptr<CDateTime> endTime (CDateTime::makefromUTC(m_pStateJournal->getStartTimeAsUTC()));
+
+	endTime->ShiftByMicroseconds(m_pStateJournal->getLifeTimeInMicroseconds());
+
+	return endTime.release();
+}
+
+LibMCEnv_uint64 CJournalHandler_Current::GetJournalLifeTimeInMicroseconds()
+{
+	return m_pStateJournal->getLifeTimeInMicroseconds();
 }
 
 ILogEntryList* CJournalHandler_Current::RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel)

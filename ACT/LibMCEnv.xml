@@ -3680,43 +3680,17 @@
 		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
 			<param name="RecordingEndInMicroSeconds" type="uint64" pass="return" description="End Timestamp of Recording in microseconds." />
 		</method>
-
-		<method name="ComputeFullAverage" description="Calculates the average value over the full available time interval.">
-			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
-		</method>
 		
-		<method name="ComputeAverage" description="Calculates the average value over a time interval. Fails if no data is available in this time interval.">
-			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
-			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in ms. MUST be larger than Timestamp." />
-			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />
-			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
-		</method>
-		
-		<method name="ComputeSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
+		<method name="ComputeDoubleSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
 			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
 			<param name="SampleValue" type="double" pass="return" description="Value of the variable at the time step." />
 		</method>
-
-		<method name="ComputeUniformAverageSamples" description="Retrieves sample values for an interval. Interval MUST be inside the available recording time.">
-			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
-			<param name="IntervalIncrement" type="uint64" pass="in" description="Sampling interval distance in microseconds. MUST be larger than 0." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time." />
-			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
-			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />			
-			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
-		</method>
-
-		<method name="ComputeEquidistantSamples" description="Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.">
-			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
-			<param name="IntervalIncrement" type="uint64" pass="in" description="Sampling interval distance in microseconds. MUST be larger than 0." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
-			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
-		</method>
-
-		<method name="ReceiveRawTimeStream" description="Retrieves the raw timestream data of the variable.">
-			<param name="TimeStreamEntries" type="structarray" class="TimeStreamEntry" pass="out" description="All change events of the variable in the accessed interval." />
-		</method>
 		
+		<method name="ComputeIntegerSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
+			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
+			<param name="SampleValue" type="int64" pass="return" description="Value of the variable at the time step in integer." />
+		</method>
+
 	</class>
 
 	<class name="Alert" parent="Base">
@@ -3802,12 +3776,6 @@
 
 
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
-
-		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
-			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
-			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
-		</method>
 				
 		<method name="RetrieveJournalVariableFromTimeInterval" description = "Retrieves the history of a given variable in the system journal for an arbitrary time interval.">
 			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
@@ -3820,6 +3788,14 @@
 			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
 		</method>
 	
+		<method name="GetEndTime" description="Retrieves the end time of the journal recording.">
+			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
+		</method>
+
+		<method name="GetJournalLifeTimeInMicroseconds" description="Retrieves the life time of the journal. Which is EndTime minus StartTime.">
+			<param name="LifeTimeInMicroseconds" type="uint64" pass="return" description="Life Time." />
+		</method>
+
 		<method name="RetrieveLogEntries" description="Retrieves the current log entries of the journal.">
 			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
 			<param name="MinLogLevel" type="enum" class="LogLevel" pass="out" description="Only entries with a log level that is higher than the given one are returned."/>

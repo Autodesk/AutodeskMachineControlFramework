@@ -6590,27 +6590,6 @@ typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetStartTimeStampPtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetEndTimeStampPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMicroSeconds);
 
 /**
-* Calculates the average value over the full available time interval.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pAverageValue - Average value of the variable.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeFullAveragePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_double * pAverageValue);
-
-/**
-* Calculates the average value over a time interval. Fails if no data is available in this time interval.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
-* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
-* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-* @param[out] pAverageValue - Average value of the variable.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeAveragePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, bool bClampInterval, LibMCEnv_double * pAverageValue);
-
-/**
 * Computes a single sample at a time. Fails if no data is available at this time value.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
@@ -6618,44 +6597,17 @@ typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeAveragePtr) (LibMCEnv_J
 * @param[out] pSampleValue - Value of the variable at the time step.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeSamplePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_double * pSampleValue);
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeDoubleSamplePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_double * pSampleValue);
 
 /**
-* Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+* Computes a single sample at a time. Fails if no data is available at this time value.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
-* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
-* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-* @param[out] pJournalSampling - Returns an instance with the sampling results.
+* @param[in] nTimeInMicroSeconds - Timestamp to check.
+* @param[out] pSampleValue - Value of the variable at the time step in integer.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling);
-
-/**
-* Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
-* @param[out] pJournalSampling - Returns an instance with the sampling results.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pJournalSampling);
-
-/**
-* Retrieves the raw timestream data of the variable.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nTimeStreamEntriesBufferSize - Number of elements in buffer
-* @param[out] pTimeStreamEntriesNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pTimeStreamEntriesBuffer - TimeStreamEntry  buffer of All change events of the variable in the accessed interval.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) (LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer);
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeIntegerSamplePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_int64 * pSampleValue);
 
 /*************************************************************************************************************************
  Class definition for Alert
@@ -6841,17 +6793,6 @@ typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetEntryTimePtr) (LibMCEnv_LogEnt
 **************************************************************************************************************************/
 
 /**
-* Retrieves the history of a given variable in the system journal.
-*
-* @param[in] pJournalHandler - JournalHandler instance.
-* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
-* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
-* @param[out] pJournalVariable - Journal Instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable);
-
-/**
 * Retrieves the history of a given variable in the system journal for an arbitrary time interval.
 *
 * @param[in] pJournalHandler - JournalHandler instance.
@@ -6871,6 +6812,24 @@ typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariableFromTime
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvJournalHandler_GetStartTimePtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Retrieves the end time of the journal recording.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pDateTimeInstance - DateTime Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_GetEndTimePtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Retrieves the life time of the journal. Which is EndTime minus StartTime.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pLifeTimeInMicroseconds - Life Time.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_GetJournalLifeTimeInMicrosecondsPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 * pLifeTimeInMicroseconds);
 
 /**
 * Retrieves the current log entries of the journal.
@@ -9620,12 +9579,8 @@ typedef struct {
 	PLibMCEnvJournalVariable_GetVariableNamePtr m_JournalVariable_GetVariableName;
 	PLibMCEnvJournalVariable_GetStartTimeStampPtr m_JournalVariable_GetStartTimeStamp;
 	PLibMCEnvJournalVariable_GetEndTimeStampPtr m_JournalVariable_GetEndTimeStamp;
-	PLibMCEnvJournalVariable_ComputeFullAveragePtr m_JournalVariable_ComputeFullAverage;
-	PLibMCEnvJournalVariable_ComputeAveragePtr m_JournalVariable_ComputeAverage;
-	PLibMCEnvJournalVariable_ComputeSamplePtr m_JournalVariable_ComputeSample;
-	PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr m_JournalVariable_ComputeUniformAverageSamples;
-	PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr m_JournalVariable_ComputeEquidistantSamples;
-	PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr m_JournalVariable_ReceiveRawTimeStream;
+	PLibMCEnvJournalVariable_ComputeDoubleSamplePtr m_JournalVariable_ComputeDoubleSample;
+	PLibMCEnvJournalVariable_ComputeIntegerSamplePtr m_JournalVariable_ComputeIntegerSample;
 	PLibMCEnvAlert_GetUUIDPtr m_Alert_GetUUID;
 	PLibMCEnvAlert_IsActivePtr m_Alert_IsActive;
 	PLibMCEnvAlert_GetAlertLevelPtr m_Alert_GetAlertLevel;
@@ -9642,9 +9597,10 @@ typedef struct {
 	PLibMCEnvLogEntryList_GetCountPtr m_LogEntryList_GetCount;
 	PLibMCEnvLogEntryList_GetEntryPtr m_LogEntryList_GetEntry;
 	PLibMCEnvLogEntryList_GetEntryTimePtr m_LogEntryList_GetEntryTime;
-	PLibMCEnvJournalHandler_RetrieveJournalVariablePtr m_JournalHandler_RetrieveJournalVariable;
 	PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr m_JournalHandler_RetrieveJournalVariableFromTimeInterval;
 	PLibMCEnvJournalHandler_GetStartTimePtr m_JournalHandler_GetStartTime;
+	PLibMCEnvJournalHandler_GetEndTimePtr m_JournalHandler_GetEndTime;
+	PLibMCEnvJournalHandler_GetJournalLifeTimeInMicrosecondsPtr m_JournalHandler_GetJournalLifeTimeInMicroseconds;
 	PLibMCEnvJournalHandler_RetrieveLogEntriesPtr m_JournalHandler_RetrieveLogEntries;
 	PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr m_JournalHandler_RetrieveLogEntriesFromTimeInterval;
 	PLibMCEnvJournalHandler_RetrieveAlertsPtr m_JournalHandler_RetrieveAlerts;

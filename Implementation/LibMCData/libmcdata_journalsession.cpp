@@ -88,7 +88,7 @@ LibMCData_uint64 CJournalSession::GetChunkCacheQuota()
     return m_pJournal->getMaxMemoryQuotaInBytes();
 }
 
-LibMCData_uint32 CJournalSession::GetChunkIntervalInMicroseconds()
+LibMCData_uint64 CJournalSession::GetChunkIntervalInMicroseconds()
 {
     return m_pJournal->getChunkIntervalInMicroseconds();
 }

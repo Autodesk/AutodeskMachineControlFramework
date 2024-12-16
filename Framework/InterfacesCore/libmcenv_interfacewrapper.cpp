@@ -19429,59 +19429,7 @@ LibMCEnvResult libmcenv_journalvariable_getendtimestamp(LibMCEnv_JournalVariable
 	}
 }
 
-LibMCEnvResult libmcenv_journalvariable_computefullaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_double * pAverageValue)
-{
-	IBase* pIBaseClass = (IBase *)pJournalVariable;
-
-	try {
-		if (pAverageValue == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
-		if (!pIJournalVariable)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pAverageValue = pIJournalVariable->ComputeFullAverage();
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, bool bClampInterval, LibMCEnv_double * pAverageValue)
-{
-	IBase* pIBaseClass = (IBase *)pJournalVariable;
-
-	try {
-		if (pAverageValue == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
-		if (!pIJournalVariable)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pAverageValue = pIJournalVariable->ComputeAverage(nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, bClampInterval);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_journalvariable_computesample(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_double * pSampleValue)
+LibMCEnvResult libmcenv_journalvariable_computedoublesample(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_double * pSampleValue)
 {
 	IBase* pIBaseClass = (IBase *)pJournalVariable;
 
@@ -19492,7 +19440,7 @@ LibMCEnvResult libmcenv_journalvariable_computesample(LibMCEnv_JournalVariable p
 		if (!pIJournalVariable)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pSampleValue = pIJournalVariable->ComputeSample(nTimeInMicroSeconds);
+		*pSampleValue = pIJournalVariable->ComputeDoubleSample(nTimeInMicroSeconds);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -19507,74 +19455,18 @@ LibMCEnvResult libmcenv_journalvariable_computesample(LibMCEnv_JournalVariable p
 	}
 }
 
-LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling)
+LibMCEnvResult libmcenv_journalvariable_computeintegersample(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_int64 * pSampleValue)
 {
 	IBase* pIBaseClass = (IBase *)pJournalVariable;
 
 	try {
-		if (pJournalSampling == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		IBase* pBaseJournalSampling(nullptr);
-		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
-		if (!pIJournalVariable)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pBaseJournalSampling = pIJournalVariable->ComputeUniformAverageSamples(nStartTimeInMicroSeconds, nIntervalIncrement, nNumberOfSamples, dMovingAverageDelta, bClampInterval);
-
-		*pJournalSampling = (IBase*)(pBaseJournalSampling);
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_journalvariable_computeequidistantsamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pJournalSampling)
-{
-	IBase* pIBaseClass = (IBase *)pJournalVariable;
-
-	try {
-		if (pJournalSampling == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		IBase* pBaseJournalSampling(nullptr);
-		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
-		if (!pIJournalVariable)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pBaseJournalSampling = pIJournalVariable->ComputeEquidistantSamples(nStartTimeInMicroSeconds, nIntervalIncrement, nNumberOfSamples);
-
-		*pJournalSampling = (IBase*)(pBaseJournalSampling);
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_journalvariable_receiverawtimestream(LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, sLibMCEnvTimeStreamEntry * pTimeStreamEntriesBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pJournalVariable;
-
-	try {
-		if ((!pTimeStreamEntriesBuffer) && !(pTimeStreamEntriesNeededCount))
+		if (pSampleValue == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		IJournalVariable* pIJournalVariable = dynamic_cast<IJournalVariable*>(pIBaseClass);
 		if (!pIJournalVariable)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIJournalVariable->ReceiveRawTimeStream(nTimeStreamEntriesBufferSize, pTimeStreamEntriesNeededCount, pTimeStreamEntriesBuffer);
+		*pSampleValue = pIJournalVariable->ComputeIntegerSample(nTimeInMicroSeconds);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -20180,37 +20072,6 @@ LibMCEnvResult libmcenv_logentrylist_getentrytime(LibMCEnv_LogEntryList pLogEntr
 /*************************************************************************************************************************
  Class implementation for JournalHandler
 **************************************************************************************************************************/
-LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable)
-{
-	IBase* pIBaseClass = (IBase *)pJournalHandler;
-
-	try {
-		if (pVariableName == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pJournalVariable == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableName(pVariableName);
-		IBase* pBaseJournalVariable(nullptr);
-		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
-		if (!pIJournalHandler)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pBaseJournalVariable = pIJournalHandler->RetrieveJournalVariable(sVariableName, nTimeDeltaInMicroseconds);
-
-		*pJournalVariable = (IBase*)(pBaseJournalVariable);
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCEnvResult libmcenv_journalhandler_retrievejournalvariablefromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable)
 {
 	IBase* pIBaseClass = (IBase *)pJournalHandler;
@@ -20257,6 +20118,60 @@ LibMCEnvResult libmcenv_journalhandler_getstarttime(LibMCEnv_JournalHandler pJou
 		pBaseDateTimeInstance = pIJournalHandler->GetStartTime();
 
 		*pDateTimeInstance = (IBase*)(pBaseDateTimeInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_getendtime(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pDateTimeInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseDateTimeInstance(nullptr);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseDateTimeInstance = pIJournalHandler->GetEndTime();
+
+		*pDateTimeInstance = (IBase*)(pBaseDateTimeInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_journalhandler_getjournallifetimeinmicroseconds(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 * pLifeTimeInMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pLifeTimeInMicroseconds == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pLifeTimeInMicroseconds = pIJournalHandler->GetJournalLifeTimeInMicroseconds();
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -28125,18 +28040,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_journalvariable_getstarttimestamp;
 	if (sProcName == "libmcenv_journalvariable_getendtimestamp") 
 		*ppProcAddress = (void*) &libmcenv_journalvariable_getendtimestamp;
-	if (sProcName == "libmcenv_journalvariable_computefullaverage") 
-		*ppProcAddress = (void*) &libmcenv_journalvariable_computefullaverage;
-	if (sProcName == "libmcenv_journalvariable_computeaverage") 
-		*ppProcAddress = (void*) &libmcenv_journalvariable_computeaverage;
-	if (sProcName == "libmcenv_journalvariable_computesample") 
-		*ppProcAddress = (void*) &libmcenv_journalvariable_computesample;
-	if (sProcName == "libmcenv_journalvariable_computeuniformaveragesamples") 
-		*ppProcAddress = (void*) &libmcenv_journalvariable_computeuniformaveragesamples;
-	if (sProcName == "libmcenv_journalvariable_computeequidistantsamples") 
-		*ppProcAddress = (void*) &libmcenv_journalvariable_computeequidistantsamples;
-	if (sProcName == "libmcenv_journalvariable_receiverawtimestream") 
-		*ppProcAddress = (void*) &libmcenv_journalvariable_receiverawtimestream;
+	if (sProcName == "libmcenv_journalvariable_computedoublesample") 
+		*ppProcAddress = (void*) &libmcenv_journalvariable_computedoublesample;
+	if (sProcName == "libmcenv_journalvariable_computeintegersample") 
+		*ppProcAddress = (void*) &libmcenv_journalvariable_computeintegersample;
 	if (sProcName == "libmcenv_alert_getuuid") 
 		*ppProcAddress = (void*) &libmcenv_alert_getuuid;
 	if (sProcName == "libmcenv_alert_isactive") 
@@ -28169,12 +28076,14 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_logentrylist_getentry;
 	if (sProcName == "libmcenv_logentrylist_getentrytime") 
 		*ppProcAddress = (void*) &libmcenv_logentrylist_getentrytime;
-	if (sProcName == "libmcenv_journalhandler_retrievejournalvariable") 
-		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalvariable;
 	if (sProcName == "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval") 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievejournalvariablefromtimeinterval;
 	if (sProcName == "libmcenv_journalhandler_getstarttime") 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_getstarttime;
+	if (sProcName == "libmcenv_journalhandler_getendtime") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_getendtime;
+	if (sProcName == "libmcenv_journalhandler_getjournallifetimeinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_getjournallifetimeinmicroseconds;
 	if (sProcName == "libmcenv_journalhandler_retrievelogentries") 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievelogentries;
 	if (sProcName == "libmcenv_journalhandler_retrievelogentriesfromtimeinterval") 

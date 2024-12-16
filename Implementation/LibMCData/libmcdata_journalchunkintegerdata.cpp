@@ -35,13 +35,15 @@ Abstract: This is a stub class definition of CJournalChunkIntegerData
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include "amcdata_journal.hpp"
 
 using namespace LibMCData::Impl;
 
 /*************************************************************************************************************************
  Class definition of CJournalChunkIntegerData 
 **************************************************************************************************************************/
+
+
 
 CJournalChunkIntegerData::CJournalChunkIntegerData(uint32_t nChunkIndex)
     : m_nChunkIndex (nChunkIndex),
@@ -143,3 +145,5 @@ void CJournalChunkIntegerData::setTimeInterval(uint64_t nStartTimeStamp, uint64_
     m_nStartTimeStamp = nStartTimeStamp;
     m_nEndTimeStamp = nEndTimeStamp;
 }
+
+

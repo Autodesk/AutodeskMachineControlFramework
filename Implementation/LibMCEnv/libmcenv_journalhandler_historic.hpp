@@ -45,6 +45,7 @@ Abstract: This is the class declaration of CJournalHandler
 #endif
 
 #include "libmcdata_dynamic.hpp"
+#include "amc_statejournalreader.hpp"
 #include <mutex>
 
 namespace LibMCEnv {
@@ -57,21 +58,21 @@ namespace Impl {
 
 class CJournalHandler_Historic : public virtual IJournalHandler, public virtual CBase {
 protected:
-
-    std::mutex m_JournalReaderMutex;
-    LibMCData::PJournalReader m_pJournalReader;
+    AMC::PStateJournalReader m_pJournalReader;
 
 public:
 
-    CJournalHandler_Historic(LibMCData::PJournalReader pJournalReader);
+    CJournalHandler_Historic(AMC::PStateJournalReader pJournalReader);
 
     virtual ~CJournalHandler_Historic();
-
-	IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
 
 	IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
 
     IDateTime* GetStartTime() override;
+
+    IDateTime* GetEndTime() override;
+
+    LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds() override;
 
 	ILogEntryList* RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
 

@@ -417,7 +417,18 @@
 		<error name="DUPLICATEJOURNALFILEINDEX" code="417" description="Duplicate journal file index." />	
 		<error name="DUPLICATEJOURNALCHUNKINDEX" code="418" description="Duplicate journal chunk index." />	
 		<error name="JOURNALFILEINDEXNOTFOUND" code="419" description="Journal file index not found." />	
-		
+		<error name="JOURNALCHUNKNOTFOUND" code="420" description="Journal chunk not found." />		
+		<error name="JOURNALREADERFILENOTOPEN" code="421" description="Journal chunk not found." />		
+		<error name="NEGATIVEJOURNALCHUNKINDEX" code="422" description="Negative journal chunk index" />		
+		<error name="NEGATIVEJOURNALFILEINDEX" code="423" description="Negative journal file index" />		
+		<error name="NEGATIVEJOURNALSTARTTIMESTAMP" code="424" description="Negative journal start time stamp" />
+		<error name="INVALIDJOURNALENDTIMESTAMP" code="425" description="Invalid journal end time stamp" />
+		<error name="NEGATIVEJOURNALDATAOFFSET" code="426" description="Negative journal data offset" />
+		<error name="NEGATIVEJOURNALDATALENGTH" code="427" description="Negative journal data length" />
+		<error name="JOURNALTIMESTAMPSNOTINCREASING" code="428" description="Journal time stamp is not increasing" />
+		<error name="NEGATIVEJOURNALVARIABLEINDEX" code="429" description="Negative journal variable index" />
+		<error name="NONPOSITIVEJOURNALVARIABLEID" code="430" description="Non-positive journal variable ID" />
+		<error name="EMPTYJOURNALVARIABLENAME" code="431" description="Empty journal variable name" />
 		
 	</errors>
 	
@@ -758,7 +769,7 @@
 			<param name="TimeStampData" type="basicarray" class="uint32" pass="in" description="Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData." />	
 			<param name="ValueData" type="basicarray" class="int64" pass="in" description="Integer values. Must have same cardinality as TimeStampData." />	
 		</method>
-		
+				
 		<method name="ReadChunkIntegerData" description="reads journal state data from disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to read. Fails if chunk index is not found." />	
 			<param name="IntegerData" type="class" class="JournalChunkIntegerData" pass="return" description="Journal Chunk Data Instance" />	
@@ -769,7 +780,7 @@
 		</method>
 		
 		<method name="GetChunkIntervalInMicroseconds" description="Returns the chunk interval of the session journal in Microseconds.">
-			<param name="ChunkInterval" type="uint32" pass="return" description="The interval determines how often a session journal chunk is written to disk." />	
+			<param name="ChunkInterval" type="uint64" pass="return" description="The interval determines how often a session journal chunk is written to disk." />	
 		</method>
 				
 	</class>
@@ -785,6 +796,10 @@
 		<method name="GetStartTime" description="returns the start timestamp of the journal.">
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
+
+		<method name="GetLifeTimeInMicroseconds" description="Get journal life time in microseconds.">
+			<param name="LifeTime" type="uint64" pass="return" description="Journal life time in microseconds." />	
+		</method>				
 		
 		<method name="ReadChunkIntegerData" description="reads journal state data from disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to read. Fails if chunk index is not found." />	

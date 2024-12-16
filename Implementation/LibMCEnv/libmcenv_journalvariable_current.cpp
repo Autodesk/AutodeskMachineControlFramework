@@ -27,63 +27,68 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CJournalSession
+Abstract: This is a stub class definition of CJournalVariable
 
 */
 
+#include "libmcenv_journalvariable_current.hpp"
+#include "libmcenv_interfaceexception.hpp"
+#include "amc_statejournal.hpp"
+#include "amc_statejournalstream.hpp"
 
-#ifndef __LIBMCDATA_JOURNALSESSION
-#define __LIBMCDATA_JOURNALSESSION
-
-#include "libmcdata_interfaces.hpp"
-
-// Parent classes
-#include "libmcdata_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
 
 // Include custom headers here.
-#include "amcdata_journal.hpp"
+#include <cmath>
 
-namespace LibMCData {
-namespace Impl {
-
+using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CJournalSession 
+ Class definition of CJournalVariable 
 **************************************************************************************************************************/
+CJournalVariable_Current::CJournalVariable_Current(AMC::PStateJournal pStateJournal, const std::string& sVariableName, AMC::sStateJournalInterval interval)
+    : m_pStateJournal (pStateJournal), m_sVariableName (sVariableName), m_Interval (interval)
+{
+    if (pStateJournal.get () == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (sVariableName.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME);
 
-class CJournalSession : public virtual IJournalSession, public virtual CBase {
-private:
 
-    AMCData::PJournal m_pJournal;
+    if (interval.m_nStartTimeInMicroSeconds >= interval.m_nEndTimeInMicroSeconds)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL);
 
-public:
+}
 
-    CJournalSession(AMCData::PJournal pJournalSession);
+CJournalVariable_Current::~CJournalVariable_Current()
+{
 
-    virtual ~CJournalSession();
+}
 
-    std::string GetSessionUUID() override;
+std::string CJournalVariable_Current::GetVariableName()
+{
+    return m_sVariableName;
+}
 
-    void CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType) override;
+LibMCEnv_uint64 CJournalVariable_Current::GetStartTimeStamp()
+{
+    return m_Interval.m_nStartTimeInMicroSeconds;
+}
 
-    void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32* pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64* pValueDataBuffer) override;
+LibMCEnv_uint64 CJournalVariable_Current::GetEndTimeStamp()
+{
+    return m_Interval.m_nEndTimeInMicroSeconds;
+}
 
-    IJournalChunkIntegerData* ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) override;
-    
-    LibMCData_uint64 GetChunkCacheQuota() override;
 
-    LibMCData_uint64 GetChunkIntervalInMicroseconds() override;
+LibMCEnv_double CJournalVariable_Current::ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
+{
+    return m_pStateJournal->computeSample(m_sVariableName, nTimeInMicroSeconds);
+}
 
-};
+LibMCEnv_int64 CJournalVariable_Current::ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
+{
+    return (int64_t) round (m_pStateJournal->computeSample(m_sVariableName, nTimeInMicroSeconds));
+}
 
-} // namespace Impl
-} // namespace LibMCData
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDATA_JOURNALSESSION
+

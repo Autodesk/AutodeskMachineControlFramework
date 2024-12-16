@@ -27,82 +27,62 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CJournalChunkIntegerData
+Abstract: This is the class declaration of CJournalVariable
 
 */
 
 
-#ifndef __LIBMCDATA_JOURNALCHUNKINTEGERDATA
-#define __LIBMCDATA_JOURNALCHUNKINTEGERDATA
+#ifndef __LIBMCENV_JOURNALVARIABLE_CURRENT
+#define __LIBMCENV_JOURNALVARIABLE_CURRENT
 
-#include "libmcdata_interfaces.hpp"
+#include "libmcenv_interfaces.hpp"
 
 // Parent classes
-#include "libmcdata_base.hpp"
+#include "libmcenv_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
+#include "amc_statejournal.hpp"
 
-
-namespace LibMCData {
+namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CJournalChunkIntegerData 
+ Class declaration of CJournalVariable 
 **************************************************************************************************************************/
 
-
-class CJournalChunkIntegerData : public virtual IJournalChunkIntegerData, public virtual CBase {
+class CJournalVariable_Current : public virtual IJournalVariable, public virtual CBase {
 private:
 
-	uint32_t m_nChunkIndex;
-
-	uint64_t m_nStartTimeStamp;
-
-	uint64_t m_nEndTimeStamp;
-
-	std::vector<LibMCData::sJournalChunkVariableInfo> m_VariableInfo;
-
-	std::vector<uint32_t> m_TimeStamps;
-
-	std::vector<int64_t> m_ValueData;
+    AMC::PStateJournal m_pStateJournal;
+    std::string m_sVariableName;
+    AMC::sStateJournalInterval m_Interval;
 
 public:
+    CJournalVariable_Current(AMC::PStateJournal pStateJournal, const std::string & sVariableName, AMC::sStateJournalInterval interval);
 
-	CJournalChunkIntegerData(uint32_t nChunkIndex);
+	virtual ~CJournalVariable_Current();
 
-	virtual ~CJournalChunkIntegerData();
+	std::string GetVariableName() override;
 
-	LibMCData_uint32 GetChunkIndex() override;
+	LibMCEnv_uint64 GetStartTimeStamp() override;
 
-	LibMCData_uint64 GetStartTimeStamp() override;
+	LibMCEnv_uint64 GetEndTimeStamp() override;
 
-	LibMCData_uint64 GetEndTimeStamp() override;
+    LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds) override;
 
-	void GetVariableInfo(LibMCData_uint64 nVariableInfoBufferSize, LibMCData_uint64* pVariableInfoNeededCount, LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer) override;
-
-	void GetTimeStampData(LibMCData_uint64 nTimeStampDataBufferSize, LibMCData_uint64* pTimeStampDataNeededCount, LibMCData_uint32 * pTimeStampDataBuffer) override;
-
-	void GetValueData(LibMCData_uint64 nValueDataBufferSize, LibMCData_uint64* pValueDataNeededCount, LibMCData_int64 * pValueDataBuffer) override;
-
-	std::vector<LibMCData::sJournalChunkVariableInfo> &getVariableInfoInternal();
-
-	std::vector<uint32_t>& getTimeStampsInternal ();
-
-	std::vector<int64_t>& getValueDataInternal();
-
-	void setTimeInterval(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp);
+    LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds) override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCData
+} // namespace LibMCEnv
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_JOURNALCHUNKINTEGERDATA
+#endif // __LIBMCENV_JOURNALVARIABLE_CURRENT

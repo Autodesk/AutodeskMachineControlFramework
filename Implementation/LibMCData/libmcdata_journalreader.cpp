@@ -35,6 +35,8 @@ Abstract: This is a stub class definition of CJournalReader
 #include "libmcdata_interfaceexception.hpp"
 #include "libmcdata_journalchunkintegerdata.hpp"
 
+#include "common_importstream_native.hpp"
+
 // Include custom headers here.
 #include "common_utils.hpp"
 #include "amcdata_sqlhandler_sqlite.hpp"
@@ -81,7 +83,7 @@ std::string CJournalReaderVariable::getVariableName()
 
 CJournalReaderFile::CJournalReaderFile(int64_t nFileIndex, const std::string& sAbsoluteFileName)
     : m_nFileIndex (nFileIndex), m_sAbsoluteFileName (sAbsoluteFileName)
-{
+{    
 
 }
 
@@ -99,6 +101,32 @@ std::string CJournalReaderFile::getAbsoluteFileName()
 {
     return m_sAbsoluteFileName;
 }
+
+
+void CJournalReaderFile::readBuffer(uint64_t nDataOffset, uint8_t* pBuffer, uint64_t nDataLength)
+{
+    if (m_pImportStream.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALREADERFILENOTOPEN);
+
+    std::lock_guard<std::mutex> lockGuard(std::mutex m_ImportStreamMutex);
+    m_pImportStream->seekPosition(nDataOffset, true);
+    m_pImportStream->readBuffer(pBuffer, nDataLength, true);
+
+}
+
+
+void CJournalReaderFile::ensureChunkFileIsOpen()
+{
+    if (m_pImportStream.get() == nullptr)
+        m_pImportStream = std::make_shared<AMCCommon::CImportStream_Native>(m_sAbsoluteFileName);
+}
+
+void CJournalReaderFile::closeChunkFile()
+{
+    m_pImportStream = nullptr;
+}
+
+
 
 CJournalReaderChunk::CJournalReaderChunk(int64_t nChunkIndex, PJournalReaderFile pJournalDataFile, int64_t nStartTimeStamp, int64_t nEndTimeStamp, int64_t nDataOffset, int64_t nDataLength)
     : m_nChunkIndex (nChunkIndex), 
@@ -153,7 +181,8 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
     : m_pSQLHandler (pSQLHandler), 
     m_sJournalUUID (AMCCommon::CUtils::normalizeUUIDString (sJournalUUID)), 
     m_sJournalBasePath (sJournalBasePath), 
-    m_nSchemaVersion (0)
+    m_nSchemaVersion (0),
+    m_nLifeTimeInMicroseconds (0)
 {
     if (pSQLHandler.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -180,6 +209,13 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
         int64_t nVariableID = pVariableStatement->getColumnInt64(2);
         std::string sVariableType = pVariableStatement->getColumnString(3);
         std::string sVariableName = pVariableStatement->getColumnString(4);
+
+        if (nVariableIndex < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX, "Negative journal variable index: " + std::to_string(nVariableIndex));
+        if (nVariableID < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID, "Non-positive journal variable ID: " + std::to_string(nVariableID));
+        if (sVariableName.empty ())
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME);
 
         auto variableType = AMCData::CJournal::convertStringToDataType(sVariableType);
         auto pVariable = std::make_shared<CJournalReaderVariable>(nVariableIndex, nVariableID, variableType, sVariableName);
@@ -211,6 +247,10 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
         int64_t nFileIndex = pFileStatement->getColumnInt64(1);
         std::string sFileName = pFileStatement->getColumnString(2);
 
+        if (nFileIndex < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NEGATIVEJOURNALFILEINDEX, "Negative journal file index: " + std::to_string(nFileIndex));
+
+
         std::string sAbsoluteFileName = m_sJournalBasePath + "/" + sFileName;
 
         auto pFile = std::make_shared<CJournalReaderFile>(nFileIndex, sAbsoluteFileName);
@@ -234,6 +274,24 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
         int64_t nEndTimeStamp = pChunkStatement->getColumnInt64(4);
         int64_t nDataOffset = pChunkStatement->getColumnInt64(5);
         int64_t nDataLength = pChunkStatement->getColumnInt64(6);
+
+        if (nChunkIndex < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NEGATIVEJOURNALCHUNKINDEX, "Negative journal chunk index: " + std::to_string(nChunkIndex));
+        if (nFileIndex < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NEGATIVEJOURNALFILEINDEX, "Negative journal file index: " + std::to_string(nFileIndex) + " (chunk #" + std::to_string(nChunkIndex) + ")");
+        if (nStartTimeStamp < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NEGATIVEJOURNALSTARTTIMESTAMP, "Negative journal start time stamp: " + std::to_string(nStartTimeStamp) + " (chunk #" + std::to_string(nChunkIndex) + ")");
+        if (nEndTimeStamp < nStartTimeStamp)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNALENDTIMESTAMP, "Invalid journal end time stamp: " + std::to_string(nEndTimeStamp) + " (chunk #" + std::to_string(nChunkIndex) + ")");
+        if (nDataOffset < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NEGATIVEJOURNALDATAOFFSET, "Negative journal data offset: " + std::to_string(nDataOffset) + " (chunk #" + std::to_string(nChunkIndex) + ")");
+        if (nDataLength < 0)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NEGATIVEJOURNALDATALENGTH, "Negative journal data length: " + std::to_string(nDataLength) + " (chunk #" + std::to_string(nChunkIndex) + ")");
+
+        if ((uint64_t)nStartTimeStamp < m_nLifeTimeInMicroseconds)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALTIMESTAMPSNOTINCREASING, "Journal timestamps not increasing: " + std::to_string(nStartTimeStamp) + " (chunk #" + std::to_string(nChunkIndex) + ")");
+
+        m_nLifeTimeInMicroseconds = nEndTimeStamp;
 
         auto iChunkIter = m_ChunkMap.find(nChunkIndex);
         if (iChunkIter != m_ChunkMap.end())
@@ -276,11 +334,23 @@ IJournalChunkIntegerData * CJournalReader::ReadChunkIntegerData(const LibMCData_
 {
     auto pResult = std::make_unique<CJournalChunkIntegerData>(nChunkIndex);
 
-    uint64_t nStartTimeStamp = 0;
-    uint64_t nEndTimeStamp = 0;
+    auto iChunkIter = m_ChunkMap.find(nChunkIndex);
+    if (iChunkIter == m_ChunkMap.end())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALCHUNKNOTFOUND);
 
-    pResult->setTimeInterval(nStartTimeStamp, nEndTimeStamp);
+    auto pChunk = iChunkIter->second;
+
+    pResult->setTimeInterval(pChunk->getStartTimeStamp (), pChunk->getEndTimeStamp());
+
+    auto pDataFile = pChunk->getDataFile();
+    pDataFile->ensureChunkFileIsOpen();
+    pDataFile->readJournalChunkIntegerData(pChunk->getDataOffset(), pChunk->getDataLength(), pResult->getVariableInfoInternal(), pResult->getTimeStampsInternal(), pResult->getValueDataInternal());
 
     return pResult.release();
+}
+
+LibMCData_uint64 CJournalReader::GetLifeTimeInMicroseconds()
+{
+    return m_nLifeTimeInMicroseconds;
 }
 

@@ -42,23 +42,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amcdata_sqlhandler.hpp"
 #include "common_exportstream_native.hpp"
 #include "libmcdata_types.hpp"
+#include "amcdata_journalchunkdatafile.hpp"
 
 namespace AMCData {
 
 	#define JOURNAL_MAXFILESPERSESSION 999999
 	#define JOURNAL_MAXFILEDIGITS 6
 
-	#define JOURNALSIGNATURE_INTEGERDATA_V1 0x83AC1001
-	
-	typedef struct {
-		uint32_t m_nSignature;
-		uint32_t m_nMemorySize;
-		uint32_t m_nVariableCount;
-		uint32_t m_nValueCount;
-		uint32_t m_nReserved[3];
-	} sJournalChunkHeader;
 
-	class CJournalFile {
+	class CActiveJournalFile : public CJournalChunkDataFile {
 	private:
 		std::fstream m_Stream;
 		std::mutex m_FileMutex;
@@ -67,19 +59,17 @@ namespace AMCData {
 		uint64_t m_nTotalSize;
 	public:
 
-		CJournalFile(const std::string & sFileName, uint32_t nFileIndex);
+		CActiveJournalFile(const std::string & sFileName, uint32_t nFileIndex);
 
-		virtual ~CJournalFile();
+		virtual ~CActiveJournalFile();
 
-		void prepareReading (uint64_t nReadPosition);
+		uint64_t retrieveWritePosition();
 
-		uint64_t prepareWriting();
-
-		void finishWriting();
+		void flushBuffers();
 
 		void writeBuffer (const void * pBuffer, size_t nSize);
 
-		void readBuffer(void* pBuffer, size_t nSize);
+		void readBuffer(uint64_t nDataOffset, uint8_t* pBuffer, uint64_t nDataLength) override;
 
 		uint32_t getFileIndex();
 
@@ -87,7 +77,7 @@ namespace AMCData {
 
 	};
 
-	typedef std::shared_ptr<CJournalFile> PJournalFile;
+	typedef std::shared_ptr<CActiveJournalFile> PActiveJournalFile;
 
 	class CJournal {
 	private:
@@ -102,11 +92,11 @@ namespace AMCData {
 		std::string m_sJournalBasePath;
 		std::string m_sChunkBaseName;
 		
-		std::vector<PJournalFile> m_JournalFiles;
+		std::vector<PActiveJournalFile> m_JournalFiles;
 
-		PJournalFile m_pCurrentJournalFile;
+		PActiveJournalFile m_pCurrentJournalFile;
 
-		PJournalFile createJournalFile();
+		PActiveJournalFile createJournalFile();
 
 	public:
 

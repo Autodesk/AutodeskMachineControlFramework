@@ -36,6 +36,8 @@ Abstract: This is the class declaration of CJournalReader
 #define __LIBMCDATA_JOURNALREADER
 
 #include "libmcdata_interfaces.hpp"
+#include "amcdata_journalchunkdatafile.hpp"
+#include "libmcdata_journalchunkintegerdata.hpp"
 
 // Parent classes
 #include "libmcdata_base.hpp"
@@ -45,8 +47,10 @@ Abstract: This is the class declaration of CJournalReader
 #endif
 
 // Include custom headers here.
+#include "common_importstream_native.hpp"
 #include "amcdata_sqlhandler.hpp"
 #include <map>
+#include <mutex>
 
 namespace LibMCData {
 namespace Impl {
@@ -83,10 +87,15 @@ typedef std::shared_ptr<CJournalReaderVariable> PJournalReaderVariable;
 
 
 
-class CJournalReaderFile {
+class CJournalReaderFile : public AMCData::CJournalChunkDataFile {
 private:
     int64_t m_nFileIndex;
     std::string m_sAbsoluteFileName;
+
+    std::mutex m_ImportStreamMutex;
+    AMCCommon::PImportStream m_pImportStream;
+
+   
 
 public:
 
@@ -97,6 +106,12 @@ public:
     int64_t getFileIndex ();
 
     std::string getAbsoluteFileName ();
+
+    void readBuffer(uint64_t nDataOffset, uint8_t* pBuffer, uint64_t nDataLength) override;
+
+    void ensureChunkFileIsOpen();
+
+    void closeChunkFile();
 
 };
 
@@ -147,6 +162,7 @@ private:
     std::string m_sJournalBasePath;
 
     std::string m_sStartTime;
+    uint32_t m_nLifeTimeInMicroseconds;
 
     int32_t m_nSchemaVersion;
 
@@ -169,7 +185,9 @@ public:
 
 	std::string GetJournalUUID() override;
 
-	std::string GetStartTime() override;
+    std::string GetStartTime() override;
+
+    LibMCData_uint64 GetLifeTimeInMicroseconds() override;
 
 	IJournalChunkIntegerData * ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) override;
 

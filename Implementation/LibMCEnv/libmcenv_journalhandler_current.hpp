@@ -72,6 +72,10 @@ public:
 
     IDateTime* GetStartTime() override;
 
+    IDateTime* GetEndTime() override;
+
+    LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds() override;
+
 	ILogEntryList* RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
 
 	ILogEntryList* RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;

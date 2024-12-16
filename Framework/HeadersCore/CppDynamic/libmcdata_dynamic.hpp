@@ -613,6 +613,18 @@ public:
 			case LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX: return "DUPLICATEJOURNALFILEINDEX";
 			case LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX: return "DUPLICATEJOURNALCHUNKINDEX";
 			case LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND: return "JOURNALFILEINDEXNOTFOUND";
+			case LIBMCDATA_ERROR_JOURNALCHUNKNOTFOUND: return "JOURNALCHUNKNOTFOUND";
+			case LIBMCDATA_ERROR_JOURNALREADERFILENOTOPEN: return "JOURNALREADERFILENOTOPEN";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALCHUNKINDEX: return "NEGATIVEJOURNALCHUNKINDEX";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALFILEINDEX: return "NEGATIVEJOURNALFILEINDEX";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALSTARTTIMESTAMP: return "NEGATIVEJOURNALSTARTTIMESTAMP";
+			case LIBMCDATA_ERROR_INVALIDJOURNALENDTIMESTAMP: return "INVALIDJOURNALENDTIMESTAMP";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALDATAOFFSET: return "NEGATIVEJOURNALDATAOFFSET";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALDATALENGTH: return "NEGATIVEJOURNALDATALENGTH";
+			case LIBMCDATA_ERROR_JOURNALTIMESTAMPSNOTINCREASING: return "JOURNALTIMESTAMPSNOTINCREASING";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX: return "NEGATIVEJOURNALVARIABLEINDEX";
+			case LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID: return "NONPOSITIVEJOURNALVARIABLEID";
+			case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "EMPTYJOURNALVARIABLENAME";
 		}
 		return "UNKNOWN";
 	}
@@ -969,6 +981,18 @@ public:
 			case LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX: return "Duplicate journal file index.";
 			case LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX: return "Duplicate journal chunk index.";
 			case LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND: return "Journal file index not found.";
+			case LIBMCDATA_ERROR_JOURNALCHUNKNOTFOUND: return "Journal chunk not found.";
+			case LIBMCDATA_ERROR_JOURNALREADERFILENOTOPEN: return "Journal chunk not found.";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALCHUNKINDEX: return "Negative journal chunk index";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALFILEINDEX: return "Negative journal file index";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALSTARTTIMESTAMP: return "Negative journal start time stamp";
+			case LIBMCDATA_ERROR_INVALIDJOURNALENDTIMESTAMP: return "Invalid journal end time stamp";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALDATAOFFSET: return "Negative journal data offset";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALDATALENGTH: return "Negative journal data length";
+			case LIBMCDATA_ERROR_JOURNALTIMESTAMPSNOTINCREASING: return "Journal time stamp is not increasing";
+			case LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX: return "Negative journal variable index";
+			case LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID: return "Non-positive journal variable ID";
+			case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name";
 		}
 		return "unknown error";
 	}
@@ -1344,7 +1368,7 @@ public:
 	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<LibMCData_uint32> & TimeStampDataBuffer, const CInputVector<LibMCData_int64> & ValueDataBuffer);
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 	inline LibMCData_uint64 GetChunkCacheQuota();
-	inline LibMCData_uint32 GetChunkIntervalInMicroseconds();
+	inline LibMCData_uint64 GetChunkIntervalInMicroseconds();
 };
 	
 /*************************************************************************************************************************
@@ -1363,6 +1387,7 @@ public:
 	
 	inline std::string GetJournalUUID();
 	inline std::string GetStartTime();
+	inline LibMCData_uint64 GetLifeTimeInMicroseconds();
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 };
 	
@@ -1977,6 +2002,7 @@ public:
 		pWrapperTable->m_JournalSession_GetChunkIntervalInMicroseconds = nullptr;
 		pWrapperTable->m_JournalReader_GetJournalUUID = nullptr;
 		pWrapperTable->m_JournalReader_GetStartTime = nullptr;
+		pWrapperTable->m_JournalReader_GetLifeTimeInMicroseconds = nullptr;
 		pWrapperTable->m_JournalReader_ReadChunkIntegerData = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
 		pWrapperTable->m_StorageStream_GetTimeStamp = nullptr;
@@ -2635,6 +2661,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalReader_GetStartTime == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetLifeTimeInMicroseconds = (PLibMCDataJournalReader_GetLifeTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getlifetimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetLifeTimeInMicroseconds = (PLibMCDataJournalReader_GetLifeTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_journalreader_getlifetimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetLifeTimeInMicroseconds == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4524,6 +4559,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetStartTime == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getlifetimeinmicroseconds", (void**)&(pWrapperTable->m_JournalReader_GetLifeTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetLifeTimeInMicroseconds == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_journalreader_readchunkintegerdata", (void**)&(pWrapperTable->m_JournalReader_ReadChunkIntegerData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_ReadChunkIntegerData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5958,9 +5997,9 @@ public:
 	* CJournalSession::GetChunkIntervalInMicroseconds - Returns the chunk interval of the session journal in Microseconds.
 	* @return The interval determines how often a session journal chunk is written to disk.
 	*/
-	LibMCData_uint32 CJournalSession::GetChunkIntervalInMicroseconds()
+	LibMCData_uint64 CJournalSession::GetChunkIntervalInMicroseconds()
 	{
-		LibMCData_uint32 resultChunkInterval = 0;
+		LibMCData_uint64 resultChunkInterval = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_GetChunkIntervalInMicroseconds(m_pHandle, &resultChunkInterval));
 		
 		return resultChunkInterval;
@@ -5998,6 +6037,18 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetStartTime(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
 		
 		return std::string(&bufferTimestamp[0]);
+	}
+	
+	/**
+	* CJournalReader::GetLifeTimeInMicroseconds - Get journal life time in microseconds.
+	* @return Journal life time in microseconds.
+	*/
+	LibMCData_uint64 CJournalReader::GetLifeTimeInMicroseconds()
+	{
+		LibMCData_uint64 resultLifeTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetLifeTimeInMicroseconds(m_pHandle, &resultLifeTime));
+		
+		return resultLifeTime;
 	}
 	
 	/**

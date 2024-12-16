@@ -101,6 +101,8 @@ namespace AMC {
 
 		std::string getStartTimeAsUTC();
 
+		uint64_t getLifeTimeInMicroseconds();
+
 	};
 
 	

@@ -581,7 +581,7 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkcachequota(L
 * @param[out] pChunkInterval - The interval determines how often a session journal chunk is written to disk.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkintervalinmicroseconds(LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkInterval);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getchunkintervalinmicroseconds(LibMCData_JournalSession pJournalSession, LibMCData_uint64 * pChunkInterval);
 
 /*************************************************************************************************************************
  Class definition for JournalReader
@@ -608,6 +608,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getjournaluuid(LibMCD
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getstarttime(LibMCData_JournalReader pJournalReader, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* Get journal life time in microseconds.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[out] pLifeTime - Journal life time in microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getlifetimeinmicroseconds(LibMCData_JournalReader pJournalReader, LibMCData_uint64 * pLifeTime);
 
 /**
 * reads journal state data from disk.

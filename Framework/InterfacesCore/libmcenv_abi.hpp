@@ -6603,27 +6603,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getstarttimestamp(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_getendtimestamp(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMicroSeconds);
 
 /**
-* Calculates the average value over the full available time interval.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pAverageValue - Average value of the variable.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computefullaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_double * pAverageValue);
-
-/**
-* Calculates the average value over a time interval. Fails if no data is available in this time interval.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
-* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
-* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-* @param[out] pAverageValue - Average value of the variable.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, bool bClampInterval, LibMCEnv_double * pAverageValue);
-
-/**
 * Computes a single sample at a time. Fails if no data is available at this time value.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
@@ -6631,44 +6610,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeaverage(LibMCEn
 * @param[out] pSampleValue - Value of the variable at the time step.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computesample(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_double * pSampleValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computedoublesample(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_double * pSampleValue);
 
 /**
-* Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+* Computes a single sample at a time. Fails if no data is available at this time value.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
-* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
-* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-* @param[out] pJournalSampling - Returns an instance with the sampling results.
+* @param[in] nTimeInMicroSeconds - Timestamp to check.
+* @param[out] pSampleValue - Value of the variable at the time step in integer.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeuniformaveragesamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling);
-
-/**
-* Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
-* @param[out] pJournalSampling - Returns an instance with the sampling results.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeequidistantsamples(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pJournalSampling);
-
-/**
-* Retrieves the raw timestream data of the variable.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nTimeStreamEntriesBufferSize - Number of elements in buffer
-* @param[out] pTimeStreamEntriesNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pTimeStreamEntriesBuffer - TimeStreamEntry  buffer of All change events of the variable in the accessed interval.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_receiverawtimestream(LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeintegersample(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_int64 * pSampleValue);
 
 /*************************************************************************************************************************
  Class definition for Alert
@@ -6854,17 +6806,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_logentrylist_getentrytime(LibMCEnv_Log
 **************************************************************************************************************************/
 
 /**
-* Retrieves the history of a given variable in the system journal.
-*
-* @param[in] pJournalHandler - JournalHandler instance.
-* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
-* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
-* @param[out] pJournalVariable - Journal Instance.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable);
-
-/**
 * Retrieves the history of a given variable in the system journal for an arbitrary time interval.
 *
 * @param[in] pJournalHandler - JournalHandler instance.
@@ -6884,6 +6825,24 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_getstarttime(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Retrieves the end time of the journal recording.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pDateTimeInstance - DateTime Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_getendtime(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Retrieves the life time of the journal. Which is EndTime minus StartTime.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pLifeTimeInMicroseconds - Life Time.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_getjournallifetimeinmicroseconds(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 * pLifeTimeInMicroseconds);
 
 /**
 * Retrieves the current log entries of the journal.

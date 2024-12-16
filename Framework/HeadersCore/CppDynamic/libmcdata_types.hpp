@@ -444,6 +444,18 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX 417 /** Duplicate journal file index. */
 #define LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX 418 /** Duplicate journal chunk index. */
 #define LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND 419 /** Journal file index not found. */
+#define LIBMCDATA_ERROR_JOURNALCHUNKNOTFOUND 420 /** Journal chunk not found. */
+#define LIBMCDATA_ERROR_JOURNALREADERFILENOTOPEN 421 /** Journal chunk not found. */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALCHUNKINDEX 422 /** Negative journal chunk index */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALFILEINDEX 423 /** Negative journal file index */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALSTARTTIMESTAMP 424 /** Negative journal start time stamp */
+#define LIBMCDATA_ERROR_INVALIDJOURNALENDTIMESTAMP 425 /** Invalid journal end time stamp */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALDATAOFFSET 426 /** Negative journal data offset */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALDATALENGTH 427 /** Negative journal data length */
+#define LIBMCDATA_ERROR_JOURNALTIMESTAMPSNOTINCREASING 428 /** Journal time stamp is not increasing */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX 429 /** Negative journal variable index */
+#define LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID 430 /** Non-positive journal variable ID */
+#define LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME 431 /** Empty journal variable name */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -800,6 +812,18 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX: return "Duplicate journal file index.";
     case LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX: return "Duplicate journal chunk index.";
     case LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND: return "Journal file index not found.";
+    case LIBMCDATA_ERROR_JOURNALCHUNKNOTFOUND: return "Journal chunk not found.";
+    case LIBMCDATA_ERROR_JOURNALREADERFILENOTOPEN: return "Journal chunk not found.";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALCHUNKINDEX: return "Negative journal chunk index";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALFILEINDEX: return "Negative journal file index";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALSTARTTIMESTAMP: return "Negative journal start time stamp";
+    case LIBMCDATA_ERROR_INVALIDJOURNALENDTIMESTAMP: return "Invalid journal end time stamp";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALDATAOFFSET: return "Negative journal data offset";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALDATALENGTH: return "Negative journal data length";
+    case LIBMCDATA_ERROR_JOURNALTIMESTAMPSNOTINCREASING: return "Journal time stamp is not increasing";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX: return "Negative journal variable index";
+    case LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID: return "Non-positive journal variable ID";
+    case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name";
     default: return "unknown error";
   }
 }

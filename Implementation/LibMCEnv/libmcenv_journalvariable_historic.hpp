@@ -32,8 +32,8 @@ Abstract: This is the class declaration of CJournalVariable
 */
 
 
-#ifndef __LIBMCENV_JOURNALVARIABLE
-#define __LIBMCENV_JOURNALVARIABLE
+#ifndef __LIBMCENV_JOURNALVARIABLE_HISTORIC
+#define __LIBMCENV_JOURNALVARIABLE_HISTORIC
 
 #include "libmcenv_interfaces.hpp"
 
@@ -45,6 +45,7 @@ Abstract: This is the class declaration of CJournalVariable
 #endif
 
 // Include custom headers here.
+#include "amc_statejournalreader.hpp"
 #include "amc_statejournal.hpp"
 
 namespace LibMCEnv {
@@ -55,17 +56,17 @@ namespace Impl {
  Class declaration of CJournalVariable 
 **************************************************************************************************************************/
 
-class CJournalVariable : public virtual IJournalVariable, public virtual CBase {
+class CJournalVariable_Historic : public virtual IJournalVariable, public virtual CBase {
 private:
 
-    AMC::PStateJournal m_pStateJournal;
     std::string m_sVariableName;
     AMC::sStateJournalInterval m_Interval;
+    AMC::PStateJournalReader m_pJournalReader;
 
 public:
-	CJournalVariable(AMC::PStateJournal pStateJournal, const std::string & sVariableName, AMC::sStateJournalInterval interval);
+    CJournalVariable_Historic(AMC::PStateJournalReader pJournalReader, const std::string& sVariableName, AMC::sStateJournalInterval interval);
 
-	virtual ~CJournalVariable();
+	virtual ~CJournalVariable_Historic();
 
 	std::string GetVariableName() override;
 
@@ -73,18 +74,9 @@ public:
 
 	LibMCEnv_uint64 GetEndTimeStamp() override;
 
-    LibMCEnv_double ComputeFullAverage() override;
+    LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds) override;
 
-    LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval) override;
-
-    LibMCEnv_double ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds) override;
-
-	IUniformJournalSampling* ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) override;
-
-	IUniformJournalSampling* ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples) override;
-
-    void ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry* pTimeStreamEntriesBuffer) override;
-
+    LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds) override;
 
 };
 
@@ -94,4 +86,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_JOURNALVARIABLE
+#endif // __LIBMCENV_JOURNALVARIABLE_HISTORIC

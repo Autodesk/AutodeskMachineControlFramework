@@ -707,7 +707,7 @@ public:
 	* IJournalSession::GetChunkIntervalInMicroseconds - Returns the chunk interval of the session journal in Microseconds.
 	* @return The interval determines how often a session journal chunk is written to disk.
 	*/
-	virtual LibMCData_uint32 GetChunkIntervalInMicroseconds() = 0;
+	virtual LibMCData_uint64 GetChunkIntervalInMicroseconds() = 0;
 
 };
 
@@ -731,6 +731,12 @@ public:
 	* @return Timestamp in ISO8601 UTC format
 	*/
 	virtual std::string GetStartTime() = 0;
+
+	/**
+	* IJournalReader::GetLifeTimeInMicroseconds - Get journal life time in microseconds.
+	* @return Journal life time in microseconds.
+	*/
+	virtual LibMCData_uint64 GetLifeTimeInMicroseconds() = 0;
 
 	/**
 	* IJournalReader::ReadChunkIntegerData - reads journal state data from disk.

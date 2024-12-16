@@ -5228,54 +5228,18 @@ public:
 	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
 
 	/**
-	* IJournalVariable::ComputeFullAverage - Calculates the average value over the full available time interval.
-	* @return Average value of the variable.
-	*/
-	virtual LibMCEnv_double ComputeFullAverage() = 0;
-
-	/**
-	* IJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
-	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
-	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-	* @return Average value of the variable.
-	*/
-	virtual LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval) = 0;
-
-	/**
-	* IJournalVariable::ComputeSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* IJournalVariable::ComputeDoubleSample - Computes a single sample at a time. Fails if no data is available at this time value.
 	* @param[in] nTimeInMicroSeconds - Timestamp to check.
 	* @return Value of the variable at the time step.
 	*/
-	virtual LibMCEnv_double ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
+	virtual LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
 
 	/**
-	* IJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-	* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
-	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
-	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-	* @return Returns an instance with the sampling results.
+	* IJournalVariable::ComputeIntegerSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* @param[in] nTimeInMicroSeconds - Timestamp to check.
+	* @return Value of the variable at the time step in integer.
 	*/
-	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
-
-	/**
-	* IJournalVariable::ComputeEquidistantSamples - Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-	* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
-	* @return Returns an instance with the sampling results.
-	*/
-	virtual IUniformJournalSampling * ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples) = 0;
-
-	/**
-	* IJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
-	* @param[in] nTimeStreamEntriesBufferSize - Number of elements in buffer
-	* @param[out] pTimeStreamEntriesNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pTimeStreamEntriesBuffer - TimeStreamEntry buffer of All change events of the variable in the accessed interval.
-	*/
-	virtual void ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer) = 0;
+	virtual LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
 
 };
 
@@ -5425,14 +5389,6 @@ typedef IBaseSharedPtr<ILogEntryList> PILogEntryList;
 class IJournalHandler : public virtual IBase {
 public:
 	/**
-	* IJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
-	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
-	* @return Journal Instance.
-	*/
-	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds) = 0;
-
-	/**
 	* IJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
 	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
@@ -5446,6 +5402,18 @@ public:
 	* @return DateTime Instance
 	*/
 	virtual IDateTime * GetStartTime() = 0;
+
+	/**
+	* IJournalHandler::GetEndTime - Retrieves the end time of the journal recording.
+	* @return DateTime Instance
+	*/
+	virtual IDateTime * GetEndTime() = 0;
+
+	/**
+	* IJournalHandler::GetJournalLifeTimeInMicroseconds - Retrieves the life time of the journal. Which is EndTime minus StartTime.
+	* @return Life Time.
+	*/
+	virtual LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds() = 0;
 
 	/**
 	* IJournalHandler::RetrieveLogEntries - Retrieves the current log entries of the journal.

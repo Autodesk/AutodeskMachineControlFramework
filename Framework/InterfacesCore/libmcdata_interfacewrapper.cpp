@@ -1659,7 +1659,7 @@ LibMCDataResult libmcdata_journalsession_getchunkcachequota(LibMCData_JournalSes
 	}
 }
 
-LibMCDataResult libmcdata_journalsession_getchunkintervalinmicroseconds(LibMCData_JournalSession pJournalSession, LibMCData_uint32 * pChunkInterval)
+LibMCDataResult libmcdata_journalsession_getchunkintervalinmicroseconds(LibMCData_JournalSession pJournalSession, LibMCData_uint64 * pChunkInterval)
 {
 	IBase* pIBaseClass = (IBase *)pJournalSession;
 
@@ -1772,6 +1772,32 @@ LibMCDataResult libmcdata_journalreader_getstarttime(LibMCData_JournalReader pJo
 				pTimestampBuffer[iTimestamp] = sTimestamp[iTimestamp];
 			pTimestampBuffer[sTimestamp.size()] = 0;
 		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_journalreader_getlifetimeinmicroseconds(LibMCData_JournalReader pJournalReader, LibMCData_uint64 * pLifeTime)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if (pLifeTime == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pLifeTime = pIJournalReader->GetLifeTimeInMicroseconds();
+
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
@@ -8593,6 +8619,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_journalreader_getjournaluuid;
 	if (sProcName == "libmcdata_journalreader_getstarttime") 
 		*ppProcAddress = (void*) &libmcdata_journalreader_getstarttime;
+	if (sProcName == "libmcdata_journalreader_getlifetimeinmicroseconds") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getlifetimeinmicroseconds;
 	if (sProcName == "libmcdata_journalreader_readchunkintegerdata") 
 		*ppProcAddress = (void*) &libmcdata_journalreader_readchunkintegerdata;
 	if (sProcName == "libmcdata_storagestream_getuuid") 
