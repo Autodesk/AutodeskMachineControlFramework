@@ -45,129 +45,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/common_exportstream_native.hpp"
 #include "libmcdata_dynamic.hpp"
 
-#define STATEJOURNAL_MAXTIMESTAMPDELTA  (256 * 1024 * 1024)
-
-#define STATEJOURNAL_COMMANDFLAG_TIMESTAMP 0x00000000UL 
-
-#define STATEJOURNAL_COMMANDFLAG_INTEGER 0x10000000UL
-#define STATEJOURNAL_COMMANDFLAG_INTEGER_POSITIVE 0x00000000UL
-#define STATEJOURNAL_COMMANDFLAG_INTEGER_NEGATIVE 0x08000000UL
-
-#define STATEJOURNAL_COMMANDFLAG_STRING 0x20000000UL
-
-#define STATEJOURNAL_COMMANDFLAG_DOUBLE 0x30000000UL
-#define STATEJOURNAL_COMMANDFLAG_DOUBLE_POSITIVE 0x00000000UL
-#define STATEJOURNAL_COMMANDFLAG_DOUBLE_NEGATIVE 0x08000000UL
-
-#define STATEJOURNAL_COMMANDFLAG_BOOL 0x40000000UL
-#define STATEJOURNAL_COMMANDFLAG_BOOL_FALSE 0x00000000UL
-#define STATEJOURNAL_COMMANDFLAG_BOOL_TRUE 0x08000000UL
-
-#define STATEJOURNAL_COMMANDFLAG_EVENT 0x50000000UL
-#define STATEJOURNAL_COMMANDFLAG_DEFINITION 0x60000000UL
-#define STATEJOURNAL_COMMANDFLAG_UNITS 0x70000000UL
-
+#include "amc_statejournalstreamcache.hpp"
 
 
 namespace AMC {
 
-
-	typedef struct _sJournalTimeStreamDoubleEntry {
-		uint64_t m_nTimeStampInMicroSeconds;
-		double m_dValue;
-	} sJournalTimeStreamDoubleEntry;
-
-	typedef struct _sJournalTimeStreamInt64Entry {
-		uint64_t m_nTimeStampInMicroSeconds;
-		int64_t m_nValue;
-	} sJournalTimeStreamInt64Entry;
-
-
-	typedef struct _sStateJournalInterval {
-		uint64_t m_nStartTimeInMicroSeconds;
-		uint64_t m_nEndTimeInMicroSeconds;
-	} sStateJournalInterval;
-
-	class CStateJournalStreamChunk
-	{
-	private:
-		AMC::PLogger m_pDebugLogger;
-
-	public:
-
-		// pDebugLogger may be null
-		CStateJournalStreamChunk(AMC::PLogger pDebugLogger);
-
-		virtual ~CStateJournalStreamChunk();
-
-		virtual uint64_t getStartTimeStampInMicroSeconds() = 0;
-
-		virtual uint64_t getEndTimeStampInMicroSeconds() = 0;
-
-		virtual uint64_t getChunkIndex() = 0;
-
-		virtual int64_t sampleIntegerData(const uint32_t nStorageIndex, const uint64_t nAbsoluteTimeStampInMicroseconds) = 0;
-		
-		void debugLog(const std::string & sDebugMessage);
-
-	};
-
 	class CStateJournalStreamChunk_Dynamic;
-	class CStateJournalStreamChunk_InMemory;
 	class CStateJournalStreamChunk_OnDisk;
 
-	typedef std::shared_ptr<CStateJournalStreamChunk> PStateJournalStreamChunk;
 	typedef std::shared_ptr<CStateJournalStreamChunk_Dynamic> PStateJournalStreamChunk_Dynamic;
-	typedef std::shared_ptr<CStateJournalStreamChunk_InMemory> PStateJournalStreamChunk_InMemory;
 	typedef std::shared_ptr<CStateJournalStreamChunk_OnDisk> PStateJournalStreamChunk_OnDisk;
 
-	class CStateJournalStreamCache
+
+	class CStateJournalStreamCache_Current : public CStateJournalStreamCache
 	{
 	private:
-
-		uint64_t m_nMemoryUsage;
-		uint64_t m_nMemoryQuota;
-
-		// Debug Logger Object, May be null
-		PLogger m_pDebugLogger;
-
-		// General Mutex for the cache
-		std::mutex m_CacheMutex;
 
 		// Special mutex for the journaling database session.
 		std::mutex m_JournalSessionMutex;
 		LibMCData::PJournalSession m_pJournalSession;
 
-		// Doubly linked list to store the cache entries in LRU order
-		std::list<std::pair<uint32_t, PStateJournalStreamChunk_InMemory>> m_CacheList;
-
-		// Hash map to store the mapping from time chunk index to list iterator
-		std::unordered_map<uint32_t, std::list<std::pair<uint32_t, PStateJournalStreamChunk_InMemory>>::iterator> m_CacheMap;
-
-		// Enforces the memory quota (no mutex protection)
-		void enforceMemoryQuotaInternal(uint64_t nAdditionalMemory);
-
-		// Removes an entry (no mutex protection)
-		void removeEntryInternal(uint32_t nTimeChunkIndex);
-
-		// Adds an in memory chunk entry (mutex protected)
-		void addEntry(PStateJournalStreamChunk_InMemory pChunk);
-
 	public:
 
-		CStateJournalStreamCache(uint64_t nMemoryQuota, LibMCData::PJournalSession pJournalSession, PLogger pDebugLogger);
+		CStateJournalStreamCache_Current(uint64_t nMemoryQuota, LibMCData::PJournalSession pJournalSession, PLogger pDebugLogger);
 
-		virtual ~CStateJournalStreamCache();
-
-		uint64_t getMemoryQuota();
-
-		uint64_t getCurrentMemoryUsage();
+		virtual ~CStateJournalStreamCache_Current();
 
 		void writeToJournal(PStateJournalStreamChunk_InMemory pChunk);
-
-		void removeEntry(uint32_t nTimeChunkIndex);
-
-		PStateJournalStreamChunk_InMemory retrieveEntry(uint32_t nTimeChunkIndex);
 
 		PStateJournalStreamChunk_InMemory loadEntryFromJournal(uint32_t nTimeChunkIndex);
 
@@ -175,7 +79,7 @@ namespace AMC {
 
 	};
 
-	typedef std::shared_ptr<CStateJournalStreamCache> PStateJournalStreamCache;
+	typedef std::shared_ptr<CStateJournalStreamCache_Current> PStateJournalStreamCache_Current;
 
 
 	class CStateJournalStream
@@ -188,7 +92,7 @@ namespace AMC {
 		PLogger m_pDebugLogger;
 
 		// Memory Stream Cache
-		PStateJournalStreamCache m_Cache;
+		PStateJournalStreamCache_Current m_Cache;
 
 		// Total list of chunks of the stream
 		std::vector<PStateJournalStreamChunk> m_ChunkTimeline;
@@ -228,7 +132,7 @@ namespace AMC {
 
 		void setVariableCount (size_t nVariableCount);
 
-		PStateJournalStreamCache getCache ();
+		PStateJournalStreamCache_Current getCache ();
 	};
 	typedef std::shared_ptr<CStateJournalStream> PStateJournalStream;
 
