@@ -55,7 +55,7 @@ namespace AMC {
 
 	double CStateJournalReader::computeSample(const std::string& sName, const uint64_t nTimeStamp)
 	{
-
+		return 0.0;
 	}
 
 	std::string CStateJournalReader::getStartTimeAsUTC()

@@ -66,8 +66,6 @@ public:
 
     virtual ~CJournalHandler_Current();
 
-	IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
-
 	IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
 
     IDateTime* GetStartTime() override;

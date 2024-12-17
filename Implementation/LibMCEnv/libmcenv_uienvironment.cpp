@@ -60,7 +60,6 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_buildexecution.hpp"
-#include "libmcenv_journalvariable.hpp"
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
 

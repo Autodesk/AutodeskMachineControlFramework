@@ -495,8 +495,8 @@ IJournalHandler* CBuildExecution::LoadAttachedJournal()
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
 	std::string sJournalUUID = m_pExecution->GetJournalUUID();
 
-	auto pReader = m_pDataModel->CreateJournalReader (sJournalUUID);
+	auto pDataReader = m_pDataModel->CreateJournalReader (sJournalUUID);
 
-	return new CJournalHandler_Historic(pReader);
+	return new CJournalHandler_Historic(std::make_shared<AMC::CStateJournalReader> (pDataReader));
 
 }

@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_imagedata.hpp"
-#include "libmcenv_journalvariable.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
