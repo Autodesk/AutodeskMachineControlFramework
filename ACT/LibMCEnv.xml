@@ -245,6 +245,8 @@
 		<error name="COULDNOTDECOMPRESSJPEG" code="10205" description="Could not decompress JPEG" />		
 		<error name="COULDNOTSTOREJPEGIMAGE" code="10206" description="Could not store JPEG image" />		
 		<error name="INVALIDPNGEXPORTFORMAT" code="10207" description="Invalid PNG Export Format" />		
+		<error name="INVALIDMEMORYCACHEQUOTA" code="10208" description="Invalid memory cache quota" />		
+		
 		
 	</errors>
 
@@ -2160,6 +2162,7 @@
 		</method>
 		
 		<method name="LoadAttachedJournal" description="Loads the journal that is associated with the build execution and returns an accessor instance.">
+			<param name="CacheMemoryQuotaInMegabytes" type="uint32" pass="in" description="Memory quota to use for cached reading in bytes. MUST be larger than 16 and smaller than 4096." />
 			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
 		</method>	
 		

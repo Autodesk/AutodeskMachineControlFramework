@@ -648,6 +648,8 @@
 		<error name="XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX" code="622" description="XML Namespace Definition contains empty prefix." />	
 		<error name="XMLNODECONTAINSAMBIGOUSCONTENTDATA" code="623" description="XML node contains ambiguous content data." />	
 		<error name="INVALIDPROFILEVALUETYPE" code="624" description="Invalid profile value type" />				
+		<error name="INVALIDJOURNALCHUNKTIMESTAMP" code="625" description="Invalid journal chunk time stamp" />		
+		<error name="OVERLAPPINGJOURNALCHUNKTIMESTAMP" code="626" description="Overlapping journal chunk time stamp" />
 					
 	</errors>
 	

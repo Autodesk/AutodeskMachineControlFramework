@@ -615,6 +615,49 @@ typedef LibMCDataResult (*PLibMCDataJournalReader_GetLifeTimeInMicrosecondsPtr) 
 */
 typedef LibMCDataResult (*PLibMCDataJournalReader_ReadChunkIntegerDataPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint32 nChunkIndex, LibMCData_JournalChunkIntegerData * pIntegerData);
 
+/**
+* Returns number of variables.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[out] pCount - Number of variables in journal.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalReader_GetVariableCountPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint32 * pCount);
+
+/**
+* Returns the information for a variable.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[in] nVariableIndex - Index of the variable.
+* @param[in] nVariableNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pVariableNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pVariableNameBuffer -  buffer of Name of the variable., may be NULL
+* @param[out] pVariableID - ID of the variable.
+* @param[out] pDataType - Data type of the variable.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalReader_GetVariableInformationPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint32 nVariableIndex, const LibMCData_uint32 nVariableNameBufferSize, LibMCData_uint32* pVariableNameNeededChars, char * pVariableNameBuffer, LibMCData_uint32 * pVariableID, LibMCData::eParameterDataType * pDataType);
+
+/**
+* Returns number of chunks.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[out] pCount - Number of chunks in journal.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalReader_GetChunkCountPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint32 * pCount);
+
+/**
+* Returns the information for a chunk.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[in] nChunkIndex - Index of the chunk.
+* @param[out] pStartTimeStamp - Start timestamp of the chunk in microseconds.
+* @param[out] pEndTimeStamp - End timestamp of the chunk in microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalReader_GetChunkInformationPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint32 nChunkIndex, LibMCData_uint64 * pStartTimeStamp, LibMCData_uint64 * pEndTimeStamp);
+
 /*************************************************************************************************************************
  Class definition for StorageStream
 **************************************************************************************************************************/
@@ -2744,6 +2787,10 @@ typedef struct {
 	PLibMCDataJournalReader_GetStartTimePtr m_JournalReader_GetStartTime;
 	PLibMCDataJournalReader_GetLifeTimeInMicrosecondsPtr m_JournalReader_GetLifeTimeInMicroseconds;
 	PLibMCDataJournalReader_ReadChunkIntegerDataPtr m_JournalReader_ReadChunkIntegerData;
+	PLibMCDataJournalReader_GetVariableCountPtr m_JournalReader_GetVariableCount;
+	PLibMCDataJournalReader_GetVariableInformationPtr m_JournalReader_GetVariableInformation;
+	PLibMCDataJournalReader_GetChunkCountPtr m_JournalReader_GetChunkCount;
+	PLibMCDataJournalReader_GetChunkInformationPtr m_JournalReader_GetChunkInformation;
 	PLibMCDataStorageStream_GetUUIDPtr m_StorageStream_GetUUID;
 	PLibMCDataStorageStream_GetTimeStampPtr m_StorageStream_GetTimeStamp;
 	PLibMCDataStorageStream_GetContextIdentifierPtr m_StorageStream_GetContextIdentifier;

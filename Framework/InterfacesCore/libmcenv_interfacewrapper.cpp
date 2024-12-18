@@ -10159,7 +10159,7 @@ LibMCEnvResult libmcenv_buildexecution_getmetadatastring(LibMCEnv_BuildExecution
 	}
 }
 
-LibMCEnvResult libmcenv_buildexecution_loadattachedjournal(LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_JournalHandler * pJournalHandler)
+LibMCEnvResult libmcenv_buildexecution_loadattachedjournal(LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes, LibMCEnv_JournalHandler * pJournalHandler)
 {
 	IBase* pIBaseClass = (IBase *)pBuildExecution;
 
@@ -10171,7 +10171,7 @@ LibMCEnvResult libmcenv_buildexecution_loadattachedjournal(LibMCEnv_BuildExecuti
 		if (!pIBuildExecution)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseJournalHandler = pIBuildExecution->LoadAttachedJournal();
+		pBaseJournalHandler = pIBuildExecution->LoadAttachedJournal(nCacheMemoryQuotaInMegabytes);
 
 		*pJournalHandler = (IBase*)(pBaseJournalHandler);
 		return LIBMCENV_SUCCESS;

@@ -38,12 +38,79 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdata_dynamic.hpp"
 #include "common_chrono.hpp"
+#include "amc_statejournalstreamcache.hpp"
 
 namespace AMC {
 
 
 	class CStateJournalReader;
 	typedef std::shared_ptr<CStateJournalReader> PStateJournalReader;
+
+	class CStateJournalStreamCache_Historic : public CStateJournalStreamCache
+	{
+	private:
+
+		CStateJournalReader* m_pOwner;
+
+	public:
+
+		CStateJournalStreamCache_Historic(uint64_t nMemoryQuota, CStateJournalReader* pOwner, PLogger pDebugLogger);
+
+		virtual ~CStateJournalStreamCache_Historic();
+		
+		PStateJournalStreamChunk_InMemory loadEntryFromJournal(uint32_t nTimeChunkIndex) override;
+
+	};
+
+	typedef std::shared_ptr<CStateJournalStreamCache_Historic> PStateJournalStreamCache_Historic;
+
+	class CStateJournalReaderVariable {
+	private:
+		uint32_t m_nVariableIndex;
+		std::string m_sVariableName;
+		uint32_t m_nVariableID;
+		LibMCData::eParameterDataType m_DataType;
+
+	public:
+
+		CStateJournalReaderVariable (uint32_t nVariableIndex, const std::string & sVariableName, uint32_t nVariableID, LibMCData::eParameterDataType dataType);
+
+		virtual ~CStateJournalReaderVariable();
+
+		uint32_t getVariableIndex ();
+
+		std::string getVariableName ();
+
+		uint32_t getVariableID ();
+
+		LibMCData::eParameterDataType getDataType ();
+
+	};
+
+	typedef std::shared_ptr<CStateJournalReaderVariable> PStateJournalReaderVariable;
+
+
+	class CStateJournalReaderChunk {
+	private:
+		uint32_t m_nChunkIndex;
+		uint64_t m_nStartTimeStamp;
+		uint64_t m_nEndTimeStamp;
+
+	public:
+
+		CStateJournalReaderChunk(uint32_t nChunkIndex, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp);
+
+		virtual ~CStateJournalReaderChunk();
+
+		uint32_t getChunkIndex();
+
+		uint64_t getStartTimeStamp ();
+
+		uint64_t getEndTimeStamp ();
+
+	};
+
+	typedef std::shared_ptr<CStateJournalReaderChunk> PStateJournalReaderChunk;
 
 
 	class CStateJournalReader {
@@ -52,10 +119,17 @@ namespace AMC {
 
 		std::mutex m_JournalReaderMutex;
 		LibMCData::PJournalReader m_pJournalReader;
+		PStateJournalStreamCache_Historic m_pStreamCache;
+
+		std::vector<PStateJournalReaderChunk> m_Chunks;
+		std::vector<PStateJournalReaderVariable> m_Variables;
+		std::map<std::string, PStateJournalReaderVariable> m_VariableNameMap;
+
+		PStateJournalReaderChunk findChunkForTimestamp(uint64_t targetTimestamp);
 
 	public:
 
-		CStateJournalReader (LibMCData::PJournalReader pReader);
+		CStateJournalReader (LibMCData::PJournalReader pReader, uint64_t nMemoryQuota, PLogger pDebugLogger);
 
 		virtual ~CStateJournalReader();
 
@@ -64,6 +138,8 @@ namespace AMC {
 		std::string getStartTimeAsUTC();
 
 		uint64_t getLifeTimeInMicroseconds();
+
+		LibMCData::PJournalChunkIntegerData readChunkIntegerData (uint32_t nChunkIndex);
 
 	};
 

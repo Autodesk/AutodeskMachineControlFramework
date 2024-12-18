@@ -625,6 +625,8 @@ public:
 			case LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX: return "NEGATIVEJOURNALVARIABLEINDEX";
 			case LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID: return "NONPOSITIVEJOURNALVARIABLEID";
 			case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "EMPTYJOURNALVARIABLENAME";
+			case LIBMCDATA_ERROR_INVALIDVARIABLEINDEX: return "INVALIDVARIABLEINDEX";
+			case LIBMCDATA_ERROR_INVALIDCHUNKINDEX: return "INVALIDCHUNKINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -993,6 +995,8 @@ public:
 			case LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX: return "Negative journal variable index";
 			case LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID: return "Non-positive journal variable ID";
 			case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name";
+			case LIBMCDATA_ERROR_INVALIDVARIABLEINDEX: return "Invalid variable index";
+			case LIBMCDATA_ERROR_INVALIDCHUNKINDEX: return "Invalid chunk index";
 		}
 		return "unknown error";
 	}
@@ -1389,6 +1393,10 @@ public:
 	inline std::string GetStartTime();
 	inline LibMCData_uint64 GetLifeTimeInMicroseconds();
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
+	inline LibMCData_uint32 GetVariableCount();
+	inline void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, eParameterDataType & eDataType);
+	inline LibMCData_uint32 GetChunkCount();
+	inline void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp);
 };
 	
 /*************************************************************************************************************************
@@ -2004,6 +2012,10 @@ public:
 		pWrapperTable->m_JournalReader_GetStartTime = nullptr;
 		pWrapperTable->m_JournalReader_GetLifeTimeInMicroseconds = nullptr;
 		pWrapperTable->m_JournalReader_ReadChunkIntegerData = nullptr;
+		pWrapperTable->m_JournalReader_GetVariableCount = nullptr;
+		pWrapperTable->m_JournalReader_GetVariableInformation = nullptr;
+		pWrapperTable->m_JournalReader_GetChunkCount = nullptr;
+		pWrapperTable->m_JournalReader_GetChunkInformation = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
 		pWrapperTable->m_StorageStream_GetTimeStamp = nullptr;
 		pWrapperTable->m_StorageStream_GetContextIdentifier = nullptr;
@@ -2679,6 +2691,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalReader_ReadChunkIntegerData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetVariableCount = (PLibMCDataJournalReader_GetVariableCountPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getvariablecount");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetVariableCount = (PLibMCDataJournalReader_GetVariableCountPtr) dlsym(hLibrary, "libmcdata_journalreader_getvariablecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetVariableCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetVariableInformation = (PLibMCDataJournalReader_GetVariableInformationPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getvariableinformation");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetVariableInformation = (PLibMCDataJournalReader_GetVariableInformationPtr) dlsym(hLibrary, "libmcdata_journalreader_getvariableinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetVariableInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetChunkCount = (PLibMCDataJournalReader_GetChunkCountPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getchunkcount");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetChunkCount = (PLibMCDataJournalReader_GetChunkCountPtr) dlsym(hLibrary, "libmcdata_journalreader_getchunkcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetChunkCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetChunkInformation = (PLibMCDataJournalReader_GetChunkInformationPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getchunkinformation");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetChunkInformation = (PLibMCDataJournalReader_GetChunkInformationPtr) dlsym(hLibrary, "libmcdata_journalreader_getchunkinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetChunkInformation == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4567,6 +4615,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_ReadChunkIntegerData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getvariablecount", (void**)&(pWrapperTable->m_JournalReader_GetVariableCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetVariableCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getvariableinformation", (void**)&(pWrapperTable->m_JournalReader_GetVariableInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetVariableInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getchunkcount", (void**)&(pWrapperTable->m_JournalReader_GetChunkCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetChunkCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getchunkinformation", (void**)&(pWrapperTable->m_JournalReader_GetChunkInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetChunkInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_storagestream_getuuid", (void**)&(pWrapperTable->m_StorageStream_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6065,6 +6129,58 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CJournalChunkIntegerData>(m_pWrapper, hIntegerData);
+	}
+	
+	/**
+	* CJournalReader::GetVariableCount - Returns number of variables.
+	* @return Number of variables in journal.
+	*/
+	LibMCData_uint32 CJournalReader::GetVariableCount()
+	{
+		LibMCData_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetVariableCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CJournalReader::GetVariableInformation - Returns the information for a variable.
+	* @param[in] nVariableIndex - Index of the variable.
+	* @param[out] sVariableName - Name of the variable.
+	* @param[out] nVariableID - ID of the variable.
+	* @param[out] eDataType - Data type of the variable.
+	*/
+	void CJournalReader::GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, eParameterDataType & eDataType)
+	{
+		LibMCData_uint32 bytesNeededVariableName = 0;
+		LibMCData_uint32 bytesWrittenVariableName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetVariableInformation(m_pHandle, nVariableIndex, 0, &bytesNeededVariableName, nullptr, &nVariableID, &eDataType));
+		std::vector<char> bufferVariableName(bytesNeededVariableName);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetVariableInformation(m_pHandle, nVariableIndex, bytesNeededVariableName, &bytesWrittenVariableName, &bufferVariableName[0], &nVariableID, &eDataType));
+		sVariableName = std::string(&bufferVariableName[0]);
+	}
+	
+	/**
+	* CJournalReader::GetChunkCount - Returns number of chunks.
+	* @return Number of chunks in journal.
+	*/
+	LibMCData_uint32 CJournalReader::GetChunkCount()
+	{
+		LibMCData_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetChunkCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CJournalReader::GetChunkInformation - Returns the information for a chunk.
+	* @param[in] nChunkIndex - Index of the chunk.
+	* @param[out] nStartTimeStamp - Start timestamp of the chunk in microseconds.
+	* @param[out] nEndTimeStamp - End timestamp of the chunk in microseconds.
+	*/
+	void CJournalReader::GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetChunkInformation(m_pHandle, nChunkIndex, &nStartTimeStamp, &nEndTimeStamp));
 	}
 	
 	/**

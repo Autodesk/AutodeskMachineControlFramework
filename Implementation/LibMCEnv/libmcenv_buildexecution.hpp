@@ -156,7 +156,7 @@ public:
 
 	std::string GetMetaDataString(const std::string & sKey) override;
 
-	IJournalHandler* LoadAttachedJournal() override;
+	IJournalHandler* LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes) override;
 
 };
 

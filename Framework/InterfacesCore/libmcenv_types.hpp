@@ -302,6 +302,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG 10205 /** Could not decompress JPEG */
 #define LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE 10206 /** Could not store JPEG image */
 #define LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT 10207 /** Invalid PNG Export Format */
+#define LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA 10208 /** Invalid memory cache quota */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -516,6 +517,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "Could not decompress JPEG";
     case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
     case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "Invalid PNG Export Format";
+    case LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA: return "Invalid memory cache quota";
     default: return "unknown error";
   }
 }

@@ -48,6 +48,9 @@ Abstract: This is a stub class definition of CBuildExecution
 
 using namespace LibMCEnv::Impl;
 
+#define CACHEMEMORYQUOTA_MINMEGABYTES 16
+#define CACHEMEMORYQUOTA_MAXMEGABYTES 4096
+
 /*************************************************************************************************************************
  Class definition of CBuildExecution 
 **************************************************************************************************************************/
@@ -490,13 +493,20 @@ std::string CBuildExecution::GetMetaDataString(const std::string & sKey)
 	return m_pExecution->GetMetaDataString(sKey);
 }
 
-IJournalHandler* CBuildExecution::LoadAttachedJournal()
+IJournalHandler* CBuildExecution::LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes)
 {
+
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
 	std::string sJournalUUID = m_pExecution->GetJournalUUID();
 
 	auto pDataReader = m_pDataModel->CreateJournalReader (sJournalUUID);
 
-	return new CJournalHandler_Historic(std::make_shared<AMC::CStateJournalReader> (pDataReader));
+	if ((nCacheMemoryQuotaInMegabytes < CACHEMEMORYQUOTA_MINMEGABYTES) ||
+		(nCacheMemoryQuotaInMegabytes > CACHEMEMORYQUOTA_MAXMEGABYTES))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA);
+
+	uint64_t nMemoryQuotaInBytes = ((uint64_t)nCacheMemoryQuotaInMegabytes) * 1024ULL;
+
+	return new CJournalHandler_Historic(std::make_shared<AMC::CStateJournalReader> (pDataReader, nMemoryQuotaInBytes, nullptr));
 
 }

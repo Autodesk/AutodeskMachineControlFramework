@@ -615,6 +615,7 @@ public:
 			case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "COULDNOTDECOMPRESSJPEG";
 			case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "COULDNOTSTOREJPEGIMAGE";
 			case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "INVALIDPNGEXPORTFORMAT";
+			case LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA: return "INVALIDMEMORYCACHEQUOTA";
 		}
 		return "UNKNOWN";
 	}
@@ -829,6 +830,7 @@ public:
 			case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "Could not decompress JPEG";
 			case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
 			case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "Invalid PNG Export Format";
+			case LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA: return "Invalid memory cache quota";
 		}
 		return "unknown error";
 	}
@@ -1857,7 +1859,7 @@ public:
 	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
-	inline PJournalHandler LoadAttachedJournal();
+	inline PJournalHandler LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes);
 };
 	
 /*************************************************************************************************************************
@@ -18993,12 +18995,13 @@ public:
 	
 	/**
 	* CBuildExecution::LoadAttachedJournal - Loads the journal that is associated with the build execution and returns an accessor instance.
+	* @param[in] nCacheMemoryQuotaInMegabytes - Memory quota to use for cached reading in bytes. MUST be larger than 16 and smaller than 4096.
 	* @return Journal instance.
 	*/
-	PJournalHandler CBuildExecution::LoadAttachedJournal()
+	PJournalHandler CBuildExecution::LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes)
 	{
 		LibMCEnvHandle hJournalHandler = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadAttachedJournal(m_pHandle, &hJournalHandler));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadAttachedJournal(m_pHandle, nCacheMemoryQuotaInMegabytes, &hJournalHandler));
 		
 		if (!hJournalHandler) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

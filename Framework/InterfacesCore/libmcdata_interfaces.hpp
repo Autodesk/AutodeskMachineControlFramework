@@ -745,6 +745,35 @@ public:
 	*/
 	virtual IJournalChunkIntegerData * ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) = 0;
 
+	/**
+	* IJournalReader::GetVariableCount - Returns number of variables.
+	* @return Number of variables in journal.
+	*/
+	virtual LibMCData_uint32 GetVariableCount() = 0;
+
+	/**
+	* IJournalReader::GetVariableInformation - Returns the information for a variable.
+	* @param[in] nVariableIndex - Index of the variable.
+	* @param[out] sVariableName - Name of the variable.
+	* @param[out] nVariableID - ID of the variable.
+	* @param[out] eDataType - Data type of the variable.
+	*/
+	virtual void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, LibMCData::eParameterDataType & eDataType) = 0;
+
+	/**
+	* IJournalReader::GetChunkCount - Returns number of chunks.
+	* @return Number of chunks in journal.
+	*/
+	virtual LibMCData_uint32 GetChunkCount() = 0;
+
+	/**
+	* IJournalReader::GetChunkInformation - Returns the information for a chunk.
+	* @param[in] nChunkIndex - Index of the chunk.
+	* @param[out] nStartTimeStamp - Start timestamp of the chunk in microseconds.
+	* @param[out] nEndTimeStamp - End timestamp of the chunk in microseconds.
+	*/
+	virtual void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp) = 0;
+
 };
 
 typedef IBaseSharedPtr<IJournalReader> PIJournalReader;

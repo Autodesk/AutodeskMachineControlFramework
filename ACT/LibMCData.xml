@@ -429,6 +429,10 @@
 		<error name="NEGATIVEJOURNALVARIABLEINDEX" code="429" description="Negative journal variable index" />
 		<error name="NONPOSITIVEJOURNALVARIABLEID" code="430" description="Non-positive journal variable ID" />
 		<error name="EMPTYJOURNALVARIABLENAME" code="431" description="Empty journal variable name" />
+		<error name="INVALIDVARIABLEINDEX" code="432" description="Invalid variable index" />
+		<error name="INVALIDCHUNKINDEX" code="433" description="Invalid chunk index" />
+		
+		
 		
 	</errors>
 	
@@ -805,7 +809,28 @@
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to read. Fails if chunk index is not found." />	
 			<param name="IntegerData" type="class" class="JournalChunkIntegerData" pass="return" description="Journal Chunk Data Instance" />	
 		</method>		
+
+		<method name="GetVariableCount" description="Returns number of variables.">
+			<param name="Count" type="uint32" pass="return" description="Number of variables in journal." />	
+		</method>				
+
+		<method name="GetVariableInformation" description="Returns the information for a variable.">
+			<param name="VariableIndex" type="uint32" pass="in" description="Index of the variable." />	
+			<param name="VariableName" type="string" pass="out" description="Name of the variable." />	
+			<param name="VariableID" type="uint32" pass="out" description="ID of the variable." />
+			<param name="DataType" type="enum" class="ParameterDataType" pass="out" description="Data type of the variable." />
+		</method>				
 						
+		<method name="GetChunkCount" description="Returns number of chunks.">
+			<param name="Count" type="uint32" pass="return" description="Number of chunks in journal." />	
+		</method>				
+
+		<method name="GetChunkInformation" description="Returns the information for a chunk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the chunk." />	
+			<param name="StartTimeStamp" type="uint64" pass="out" description="Start timestamp of the chunk in microseconds." />	
+			<param name="EndTimeStamp" type="uint64" pass="out" description="End timestamp of the chunk in microseconds." />	
+		</method>				
+
 	</class>
 
     <!-- The StorageStream class is not thread safe and MUST ONLY be used in a single thread context... -->

@@ -456,6 +456,8 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX 429 /** Negative journal variable index */
 #define LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID 430 /** Non-positive journal variable ID */
 #define LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME 431 /** Empty journal variable name */
+#define LIBMCDATA_ERROR_INVALIDVARIABLEINDEX 432 /** Invalid variable index */
+#define LIBMCDATA_ERROR_INVALIDCHUNKINDEX 433 /** Invalid chunk index */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -824,6 +826,8 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX: return "Negative journal variable index";
     case LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID: return "Non-positive journal variable ID";
     case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name";
+    case LIBMCDATA_ERROR_INVALIDVARIABLEINDEX: return "Invalid variable index";
+    case LIBMCDATA_ERROR_INVALIDCHUNKINDEX: return "Invalid chunk index";
     default: return "unknown error";
   }
 }

@@ -203,6 +203,8 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
 
     m_pJournalSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(sJournalFileName);
 
+    size_t nVariableCount = 0;
+
     auto pVariableStatement = m_pJournalSQLHandler->prepareStatement("SELECT variableindex, variableid, variabletype, name FROM journal_variables ORDER BY variableindex");
     while (pVariableStatement->nextRow()) {
         int64_t nVariableIndex = pVariableStatement->getColumnInt64(1);
@@ -236,8 +238,16 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
         m_VariableIDMap.insert(std::make_pair (nVariableID, pVariable));
         m_VariableIndexMap.insert(std::make_pair(nVariableIndex, pVariable));
         m_VariableNameMap.insert(std::make_pair(sVariableName, pVariable));
-        m_Variables.push_back(pVariable);
 
+        if (nVariableIndex >= nVariableCount)
+            nVariableCount = nVariableIndex + 1;
+
+    }
+
+    // Linearize Variable map
+    m_Variables.resize(nVariableCount);
+    for (auto iIndexIter : m_VariableIndexMap) {
+        m_Variables.at(iIndexIter.first) = iIndexIter.second;
     }
 
     pVariableStatement = nullptr;
@@ -265,6 +275,7 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
     }
     pFileStatement = nullptr;
 
+    size_t nChunkCount = 0;
 
     auto pChunkStatement = m_pJournalSQLHandler->prepareStatement("SELECT chunkindex, fileindex, starttimestamp, endtimestamp, dataoffset, datalength FROM journal_chunks ORDER BY chunkindex");
     while (pChunkStatement->nextRow()) {
@@ -303,11 +314,17 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
 
         auto pChunk = std::make_shared<CJournalReaderChunk>(nChunkIndex, iFileIter->second, nStartTimeStamp, nEndTimeStamp, nDataOffset, nDataLength);
         m_ChunkMap.insert(std::make_pair (nChunkIndex, pChunk));
-        m_Chunks.push_back(pChunk);
 
-
-
+        if (nChunkIndex >= nChunkCount)
+            nChunkCount = nChunkIndex + 1;
     }
+
+    // Linearize chunk map
+    m_Chunks.resize(nChunkCount);
+    for (auto iChunkIter : m_ChunkMap) {
+        m_Chunks.at(iChunkIter.first) = iChunkIter.second;
+    }
+
     pChunkStatement = nullptr;
 
 }
@@ -353,4 +370,51 @@ LibMCData_uint64 CJournalReader::GetLifeTimeInMicroseconds()
 {
     return m_nLifeTimeInMicroseconds;
 }
+
+LibMCData_uint32 CJournalReader::GetVariableCount()
+{
+    return (uint32_t)m_Variables.size();
+}
+
+void CJournalReader::GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string& sVariableName, LibMCData_uint32& nVariableID, LibMCData::eParameterDataType& eDataType)
+{
+    if (nVariableIndex >= m_Variables.size())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDVARIABLEINDEX);
+
+    auto pVariable = m_Variables.at(nVariableIndex);
+    if (pVariable.get() != nullptr) {
+        sVariableName = pVariable->getVariableName();
+        nVariableID = pVariable->getVariableID();
+        eDataType = pVariable->getVariableType();
+    }
+    else {
+        sVariableName = "";
+        nVariableID = 0;
+        eDataType = LibMCData::eParameterDataType::Unknown;
+
+    }
+}
+
+LibMCData_uint32 CJournalReader::GetChunkCount()
+{
+    return (uint32_t)m_Chunks.size();
+}
+
+void CJournalReader::GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64& nStartTimeStamp, LibMCData_uint64& nEndTimeStamp)
+{
+    if (nChunkIndex >= m_Chunks.size())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCHUNKINDEX);
+
+    auto pChunk = m_Chunks.at(nChunkIndex);
+    if (pChunk.get() != nullptr) {
+        nStartTimeStamp = pChunk->getStartTimeStamp();
+        nEndTimeStamp = pChunk->getEndTimeStamp();
+    }
+    else {
+        nStartTimeStamp = 0;
+        nEndTimeStamp = 0;
+    }
+}
+
+
 

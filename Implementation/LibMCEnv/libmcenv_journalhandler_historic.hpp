@@ -45,6 +45,8 @@ Abstract: This is the class declaration of CJournalHandler
 #endif
 
 #include "libmcdata_dynamic.hpp"
+#include "amc_statejournalstreamcache.hpp"
+
 #include "amc_statejournalreader.hpp"
 #include <mutex>
 

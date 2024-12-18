@@ -3546,10 +3546,11 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetMetaDataStringPtr) (LibMCEnv
 * Loads the journal that is associated with the build execution and returns an accessor instance.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] nCacheMemoryQuotaInMegabytes - Memory quota to use for cached reading in bytes. MUST be larger than 16 and smaller than 4096.
 * @param[out] pJournalHandler - Journal instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadAttachedJournalPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_JournalHandler * pJournalHandler);
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadAttachedJournalPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes, LibMCEnv_JournalHandler * pJournalHandler);
 
 /*************************************************************************************************************************
  Class definition for BuildExecutionIterator

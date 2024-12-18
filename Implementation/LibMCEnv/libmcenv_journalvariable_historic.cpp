@@ -80,12 +80,12 @@ LibMCEnv_uint64 CJournalVariable_Historic::GetEndTimeStamp()
 
 LibMCEnv_double CJournalVariable_Historic::ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_pJournalReader->computeSample(m_sVariableName, nTimeInMicroSeconds);
 }
 
 LibMCEnv_int64 CJournalVariable_Historic::ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return (int64_t) round (m_pJournalReader->computeSample(m_sVariableName, nTimeInMicroSeconds));
 }
 
 

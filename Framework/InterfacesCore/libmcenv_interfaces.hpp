@@ -2963,9 +2963,10 @@ public:
 
 	/**
 	* IBuildExecution::LoadAttachedJournal - Loads the journal that is associated with the build execution and returns an accessor instance.
+	* @param[in] nCacheMemoryQuotaInMegabytes - Memory quota to use for cached reading in bytes. MUST be larger than 16 and smaller than 4096.
 	* @return Journal instance.
 	*/
-	virtual IJournalHandler * LoadAttachedJournal() = 0;
+	virtual IJournalHandler * LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes) = 0;
 
 };
 

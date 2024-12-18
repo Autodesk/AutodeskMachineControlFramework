@@ -191,6 +191,15 @@ public:
 
 	IJournalChunkIntegerData * ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) override;
 
+    LibMCData_uint32 GetVariableCount() override;
+
+    void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string& sVariableName, LibMCData_uint32& nVariableID, LibMCData::eParameterDataType& eDataType) override;
+
+    LibMCData_uint32 GetChunkCount() override;
+
+    void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64& nStartTimeStamp, LibMCData_uint64& nEndTimeStamp) override;
+
+
 };
 
 } // namespace Impl

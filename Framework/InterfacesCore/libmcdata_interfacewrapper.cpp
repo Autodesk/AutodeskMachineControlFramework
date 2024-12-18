@@ -1839,6 +1839,138 @@ LibMCDataResult libmcdata_journalreader_readchunkintegerdata(LibMCData_JournalRe
 	}
 }
 
+LibMCDataResult libmcdata_journalreader_getvariablecount(LibMCData_JournalReader pJournalReader, LibMCData_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pCount = pIJournalReader->GetVariableCount();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nVariableIndex, const LibMCData_uint32 nVariableNameBufferSize, LibMCData_uint32* pVariableNameNeededChars, char * pVariableNameBuffer, LibMCData_uint32 * pVariableID, eLibMCDataParameterDataType * pDataType)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if ( (!pVariableNameBuffer) && !(pVariableNameNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pVariableID)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pDataType)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sVariableName("");
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pVariableNameBuffer == nullptr);
+		if (isCacheCall) {
+			pIJournalReader->GetVariableInformation(nVariableIndex, sVariableName, *pVariableID, *pDataType);
+
+			pIJournalReader->_setCache (new ParameterCache_3<std::string, LibMCData_uint32, LibMCData::eParameterDataType> (sVariableName, *pVariableID, *pDataType));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_3<std::string, LibMCData_uint32, LibMCData::eParameterDataType>*> (pIJournalReader->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sVariableName, *pVariableID, *pDataType);
+			pIJournalReader->_setCache (nullptr);
+		}
+		
+		if (pVariableNameNeededChars)
+			*pVariableNameNeededChars = (LibMCData_uint32) (sVariableName.size()+1);
+		if (pVariableNameBuffer) {
+			if (sVariableName.size() >= nVariableNameBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iVariableName = 0; iVariableName < sVariableName.size(); iVariableName++)
+				pVariableNameBuffer[iVariableName] = sVariableName[iVariableName];
+			pVariableNameBuffer[sVariableName.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_journalreader_getchunkcount(LibMCData_JournalReader pJournalReader, LibMCData_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pCount = pIJournalReader->GetChunkCount();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_journalreader_getchunkinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nChunkIndex, LibMCData_uint64 * pStartTimeStamp, LibMCData_uint64 * pEndTimeStamp)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if (!pStartTimeStamp)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pEndTimeStamp)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIJournalReader->GetChunkInformation(nChunkIndex, *pStartTimeStamp, *pEndTimeStamp);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for StorageStream
@@ -8623,6 +8755,14 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_journalreader_getlifetimeinmicroseconds;
 	if (sProcName == "libmcdata_journalreader_readchunkintegerdata") 
 		*ppProcAddress = (void*) &libmcdata_journalreader_readchunkintegerdata;
+	if (sProcName == "libmcdata_journalreader_getvariablecount") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getvariablecount;
+	if (sProcName == "libmcdata_journalreader_getvariableinformation") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getvariableinformation;
+	if (sProcName == "libmcdata_journalreader_getchunkcount") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getchunkcount;
+	if (sProcName == "libmcdata_journalreader_getchunkinformation") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getchunkinformation;
 	if (sProcName == "libmcdata_storagestream_getuuid") 
 		*ppProcAddress = (void*) &libmcdata_storagestream_getuuid;
 	if (sProcName == "libmcdata_storagestream_gettimestamp") 
