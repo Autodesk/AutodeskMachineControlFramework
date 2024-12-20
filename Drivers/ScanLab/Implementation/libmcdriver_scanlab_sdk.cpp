@@ -866,7 +866,7 @@ void CScanLabSDK::n_write_da_1(uint32_t nCardNo, uint32_t nValue)
 void CScanLabSDK::n_write_da_2(uint32_t nCardNo, uint32_t nValue)
 {
 	if (m_pLogJournal.get() != nullptr)
-		m_pLogJournal->logCall("ptr_n_write_da_2", std::to_string(nCardNo) + ", " + std::to_string(nValue));
+		m_pLogJournal->logCall("n_write_da_2", std::to_string(nCardNo) + ", " + std::to_string(nValue));
 
 	ptr_n_write_da_2(nCardNo, nValue);
 }
@@ -874,7 +874,7 @@ void CScanLabSDK::n_write_da_2(uint32_t nCardNo, uint32_t nValue)
 void CScanLabSDK::n_write_io_port_list(uint32_t nCardNo, uint32_t nValue)
 {
 	if (m_pLogJournal.get() != nullptr)
-		m_pLogJournal->logCall("ptr_n_write_io_port_list", std::to_string(nCardNo) + ", " + std::to_string(nValue));
+		m_pLogJournal->logCall("n_write_io_port_list", std::to_string(nCardNo) + ", " + std::to_string(nValue));
 
 	ptr_n_write_io_port_list(nCardNo, nValue);
 }
@@ -882,7 +882,7 @@ void CScanLabSDK::n_write_io_port_list(uint32_t nCardNo, uint32_t nValue)
 void CScanLabSDK::n_write_io_port_mask_list(uint32_t nCardNo, uint32_t nValue, uint32_t nMask)
 {
 	if (m_pLogJournal.get() != nullptr)
-		m_pLogJournal->logCall("ptr_n_write_io_port_mask_list", std::to_string(nCardNo) + ", " + std::to_string(nValue) + ", " + std::to_string(nMask));
+		m_pLogJournal->logCall("n_write_io_port_mask_list", std::to_string(nCardNo) + ", " + std::to_string(nValue) + ", " + std::to_string(nMask));
 
 	ptr_n_write_io_port_mask_list(nCardNo, nValue, nMask);
 }
