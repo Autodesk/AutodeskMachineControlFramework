@@ -76,13 +76,11 @@
   
   <driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
 	<driver name="raylase" library="driver_raylase" type="raylase"/>
-  <driver name="scanlabsmc" library="driver_scanlabsmc" type="scanlab-smc-0.6">
-    <preset name="smc_laser_1">
-			<general DynamicViolationReaction="WarningOnly" />
-    </preset>
-  </driver>
+  	  
+  <driver name="scanlabsmc_0_8" library="driver_scanlabsmc" type="scanlab-smc-0.8" />
+  <driver name="scanlabsmc_0_9" library="driver_scanlabsmc" type="scanlab-smc-0.9" />
 
-  <driver name="grpc" library="driver_grpc" type="libgrpc-1.0"/>
+	
 
   <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 
@@ -450,8 +448,9 @@
     <page name="buildhistory">
       <content name="executionlibrary" title="Build History">
         <executionlist loadingtext="Loading builds" entriesperpage="20" selectevent=""  thumbnail="thumbnail_default">
-          <button name="details" caption="Details" selectevent=""/>
-        </executionlist>
+          <button name="details" caption="Details" event=""/>
+		  <button name="loadjournal" caption="Load Journal" event="onloadhistoricjournal"/>
+		</executionlist>
       </content>
     </page>
 

@@ -43,7 +43,7 @@ LIBMC_IMPORTDRIVERCLASSES(ScanLabSMC, ScanLabSMC)
 __BEGINDRIVERIMPORT
 __IMPORTDRIVER(ScanLab_RTC6, "scanlab");
 __IMPORTDRIVER(Raylase, "raylase");
-__IMPORTDRIVER(ScanLabSMC, "scanlabsmc");
+__IMPORTDRIVER(ScanLabSMC, "scanlabsmc_0_9");
 __ENDDRIVERIMPORT
 
 
