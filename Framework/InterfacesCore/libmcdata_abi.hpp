@@ -534,9 +534,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMC
 * @param[in] nID - Variable ID
 * @param[in] nIndex - Variable Index
 * @param[in] eDataType - Variable Data Type
+* @param[in] dUnits - Unit factor, if DataType is Double. Will be ignored otherwise.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, LibMCData::eParameterDataType eDataType);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, LibMCData::eParameterDataType eDataType, LibMCData_double dUnits);
 
 /**
 * writes detailed journal state data to disk.
@@ -647,9 +648,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getvariablecount(LibM
 * @param[out] pVariableNameBuffer -  buffer of Name of the variable., may be NULL
 * @param[out] pVariableID - ID of the variable.
 * @param[out] pDataType - Data type of the variable.
+* @param[out] pUnits - Unit factor, if DataType is Double. Will be 0.0 otherwise.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nVariableIndex, const LibMCData_uint32 nVariableNameBufferSize, LibMCData_uint32* pVariableNameNeededChars, char * pVariableNameBuffer, LibMCData_uint32 * pVariableID, LibMCData::eParameterDataType * pDataType);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nVariableIndex, const LibMCData_uint32 nVariableNameBufferSize, LibMCData_uint32* pVariableNameNeededChars, char * pVariableNameBuffer, LibMCData_uint32 * pVariableID, LibMCData::eParameterDataType * pDataType, LibMCData_double * pUnits);
 
 /**
 * Returns number of chunks.

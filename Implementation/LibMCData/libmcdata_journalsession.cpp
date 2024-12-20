@@ -63,9 +63,9 @@ void CJournalSession::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunk
     m_pJournal->WriteJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nVariableInfoBufferSize, pVariableInfoBuffer, nTimeStampDataBufferSize, pTimeStampDataBuffer, nValueDataBufferSize, pValueDataBuffer);
 }
 
-void CJournalSession::CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType)
+void CJournalSession::CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType, const LibMCData_double dUnits)
 {
-    m_pJournal->CreateVariableInJournalDB(sName, nID, nIndex, eDataType);
+    m_pJournal->CreateVariableInJournalDB(sName, nID, nIndex, eDataType, dUnits);
 }
 
 

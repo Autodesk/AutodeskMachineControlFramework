@@ -762,6 +762,7 @@
 			<param name="ID" type="uint32" pass="in" description="Variable ID" />	
 			<param name="Index" type="uint32" pass="in" description="Variable Index" />	
 			<param name="DataType" type="enum" class="ParameterDataType" pass="in" description="Variable Data Type" />	
+			<param name="Units" type="double" pass="in" description="Unit factor, if DataType is Double. Will be ignored otherwise." />	
 		</method>
 		
 
@@ -819,6 +820,7 @@
 			<param name="VariableName" type="string" pass="out" description="Name of the variable." />	
 			<param name="VariableID" type="uint32" pass="out" description="ID of the variable." />
 			<param name="DataType" type="enum" class="ParameterDataType" pass="out" description="Data type of the variable." />
+			<param name="Units" type="double" pass="out" description="Unit factor, if DataType is Double. Will be 0.0 otherwise." />	
 		</method>				
 						
 		<method name="GetChunkCount" description="Returns number of chunks.">

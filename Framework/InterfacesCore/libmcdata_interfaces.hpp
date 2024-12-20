@@ -673,8 +673,9 @@ public:
 	* @param[in] nID - Variable ID
 	* @param[in] nIndex - Variable Index
 	* @param[in] eDataType - Variable Data Type
+	* @param[in] dUnits - Unit factor, if DataType is Double. Will be ignored otherwise.
 	*/
-	virtual void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType) = 0;
+	virtual void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType, const LibMCData_double dUnits) = 0;
 
 	/**
 	* IJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
@@ -757,8 +758,9 @@ public:
 	* @param[out] sVariableName - Name of the variable.
 	* @param[out] nVariableID - ID of the variable.
 	* @param[out] eDataType - Data type of the variable.
+	* @param[out] dUnits - Unit factor, if DataType is Double. Will be 0.0 otherwise.
 	*/
-	virtual void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, LibMCData::eParameterDataType & eDataType) = 0;
+	virtual void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, LibMCData::eParameterDataType & eDataType, LibMCData_double & dUnits) = 0;
 
 	/**
 	* IJournalReader::GetChunkCount - Returns number of chunks.

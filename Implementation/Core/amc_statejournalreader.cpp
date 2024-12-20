@@ -69,8 +69,8 @@ namespace AMC {
 	}
 
 
-	CStateJournalReaderVariable::CStateJournalReaderVariable(uint32_t nVariableIndex, const std::string& sVariableName, uint32_t nVariableID, LibMCData::eParameterDataType dataType)
-		: m_nVariableIndex (nVariableIndex), m_sVariableName (sVariableName), m_nVariableID (nVariableID), m_DataType (dataType)
+	CStateJournalReaderVariable::CStateJournalReaderVariable(uint32_t nVariableIndex, const std::string& sVariableName, uint32_t nVariableID, LibMCData::eParameterDataType dataType, double dUnits)
+		: m_nVariableIndex (nVariableIndex), m_sVariableName (sVariableName), m_nVariableID (nVariableID), m_DataType (dataType), m_dUnits (dUnits)
 	{
 
 	}
@@ -99,6 +99,12 @@ namespace AMC {
 	{
 		return m_DataType;
 	}
+
+	double CStateJournalReaderVariable::getUnits()
+	{
+		return m_dUnits;
+	}
+
 
 
 	CStateJournalReaderChunk::CStateJournalReaderChunk(uint32_t nChunkIndex, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp)
@@ -141,11 +147,12 @@ namespace AMC {
 		for (uint32_t nVariableIndex = 0; nVariableIndex < nVariableCount; nVariableIndex++) {
 			std::string sName;
 			uint32_t nID = 0;
+			double dUnits = 0.0;
 			LibMCData::eParameterDataType eDataType = LibMCData::eParameterDataType::Unknown;
 
-			m_pJournalReader->GetVariableInformation(nVariableIndex, sName, nID, eDataType);
+			m_pJournalReader->GetVariableInformation(nVariableIndex, sName, nID, eDataType, dUnits);
 
-			auto pVariable = std::make_shared<CStateJournalReaderVariable>(nVariableIndex, sName, nID, eDataType);
+			auto pVariable = std::make_shared<CStateJournalReaderVariable>(nVariableIndex, sName, nID, eDataType, dUnits);
 			m_Variables.push_back(pVariable);
 			if (!sName.empty()) {
 				m_VariableNameMap.insert(std::make_pair (sName, pVariable));
@@ -190,11 +197,14 @@ namespace AMC {
 		m_pStreamCache = nullptr;
 	}
 
-	double CStateJournalReader::computeSample(const std::string& sName, const uint64_t nTimeStamp)
+	double CStateJournalReader::computeDoubleSample(const std::string& sName, const uint64_t nTimeStamp)
 	{
 		auto iVariableIter = m_VariableNameMap.find(sName);
 		if (iVariableIter == m_VariableNameMap.end())
 			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND, sName);
+
+		auto pVariable = iVariableIter->second.get();
+		double dUnits = pVariable->getUnits();
 
 		auto pChunk = findChunkForTimestamp(nTimeStamp);
 		if (pChunk.get() != nullptr) {
@@ -202,12 +212,34 @@ namespace AMC {
 			if (pEntry.get() == nullptr)
 				pEntry = m_pStreamCache->loadEntryFromJournal(pChunk->getChunkIndex());
 
-			int64_t nIntegerData = pEntry->sampleIntegerData(iVariableIter->second->getVariableIndex(), nTimeStamp);
+			int64_t nIntegerData = pEntry->sampleIntegerData(pVariable->getVariableIndex(), nTimeStamp);
 
-			return (double)nIntegerData;			
+			return (double)(nIntegerData * dUnits);
 		}
 
 		return 0.0;
+	}
+
+	int64_t CStateJournalReader::computeIntegerSample(const std::string& sName, const uint64_t nTimeStamp)
+	{
+		auto iVariableIter = m_VariableNameMap.find(sName);
+		if (iVariableIter == m_VariableNameMap.end())
+			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND, sName);
+
+		auto pVariable = iVariableIter->second.get();
+
+		auto pChunk = findChunkForTimestamp(nTimeStamp);
+		if (pChunk.get() != nullptr) {
+			auto pEntry = m_pStreamCache->retrieveEntry(pChunk->getChunkIndex());
+			if (pEntry.get() == nullptr)
+				pEntry = m_pStreamCache->loadEntryFromJournal(pChunk->getChunkIndex());
+
+			int64_t nIntegerData = pEntry->sampleIntegerData(pVariable->getVariableIndex(), nTimeStamp);
+
+			return nIntegerData;
+		}
+
+		return 0;
 	}
 
 	std::string CStateJournalReader::getStartTimeAsUTC()

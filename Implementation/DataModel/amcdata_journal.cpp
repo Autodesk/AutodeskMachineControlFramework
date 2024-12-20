@@ -181,6 +181,7 @@ namespace AMCData {
 		sJournalVariablesQuery += "`variableindex` int UNIQUE NOT NULL, ";
 		sJournalVariablesQuery += "`variableid` int NOT NULL, ";
 		sJournalVariablesQuery += "`variabletype` text NOT NULL, ";
+		sJournalVariablesQuery += "`units` real DEFAULT 0, ";
 		sJournalVariablesQuery += "`name` text NOT NULL)";
 
 		auto pJournalVariablesStatement = m_pSQLHandler->prepareStatement(sJournalVariablesQuery);
@@ -387,17 +388,23 @@ namespace AMCData {
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNDATATYPE, "Unknown data type: " + sValue);
 	}
 
-	void CJournal::CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType)
+	void CJournal::CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType, double dUnits)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
 
 		std::string sVariableType = convertDataTypeToString (eDataType);
-		std::string sQuery = "INSERT INTO journal_variables (name, variableid, variableindex, variabletype) VALUES (?, ?, ?, ?)";
+		std::string sQuery = "INSERT INTO journal_variables (name, variableid, variableindex, variabletype, units) VALUES (?, ?, ?, ?, ?)";
 		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 		pStatement->setString(1, sName);
 		pStatement->setInt(2, nID);
 		pStatement->setInt(3, nIndex);
 		pStatement->setString(4, sVariableType);
+
+		if (eDataType == LibMCData::eParameterDataType::Double)
+			pStatement->setDouble(5, dUnits);
+		else
+			pStatement->setDouble(5, 0.0);
+
 		pStatement->execute();
 		pStatement = nullptr;
 

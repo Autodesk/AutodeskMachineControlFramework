@@ -75,7 +75,7 @@ namespace AMC {
 
 		PStateJournalStreamChunk_InMemory loadEntryFromJournal(uint32_t nTimeChunkIndex);
 
-		void createVariableInJournalDB(const std::string & sName, uint32_t nVariableID, uint32_t nVariableIndex, LibMCData::eParameterDataType eVariableType);
+		void createVariableInJournalDB(const std::string & sName, uint32_t nVariableID, uint32_t nVariableIndex, LibMCData::eParameterDataType eVariableType, double dUnits);
 
 	};
 

@@ -61,10 +61,10 @@ namespace AMC {
 	}
 
 
-	void CStateJournalStreamCache_Current::createVariableInJournalDB(const std::string& sName, uint32_t nVariableID, uint32_t nVariableIndex, LibMCData::eParameterDataType eVariableType)
+	void CStateJournalStreamCache_Current::createVariableInJournalDB(const std::string& sName, uint32_t nVariableID, uint32_t nVariableIndex, LibMCData::eParameterDataType eVariableType, double dUnits)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_JournalSessionMutex);
-		m_pJournalSession->CreateVariableInJournalDB(sName, nVariableID, nVariableIndex, eVariableType);
+		m_pJournalSession->CreateVariableInJournalDB(sName, nVariableID, nVariableIndex, eVariableType, dUnits);
 
 	}
 

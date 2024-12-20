@@ -66,10 +66,11 @@ private:
     int64_t m_nVariableID;
     eParameterDataType m_VariableType;
     std::string m_sVariableName;
+    double m_dUnits;
 
 public:
 
-    CJournalReaderVariable(int64_t nVariableIndex, int64_t nVariableID, eParameterDataType variableType, const std::string& sVariableName);
+    CJournalReaderVariable(int64_t nVariableIndex, int64_t nVariableID, eParameterDataType variableType, const std::string& sVariableName, double dUnits);
 
     virtual ~CJournalReaderVariable();
 
@@ -80,6 +81,8 @@ public:
     eParameterDataType getVariableType ();
 
     std::string getVariableName ();
+
+    double getUnits();
 };
 
 
@@ -193,7 +196,7 @@ public:
 
     LibMCData_uint32 GetVariableCount() override;
 
-    void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string& sVariableName, LibMCData_uint32& nVariableID, LibMCData::eParameterDataType& eDataType) override;
+    void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string& sVariableName, LibMCData_uint32& nVariableID, LibMCData::eParameterDataType& eDataType, LibMCData_double & dUnits) override;
 
     LibMCData_uint32 GetChunkCount() override;
 

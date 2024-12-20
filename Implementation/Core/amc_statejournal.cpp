@@ -314,7 +314,7 @@ namespace AMC {
 		CStateJournalImpl(PStateJournalStream pStream, AMCCommon::PChrono pGlobalChrono);
 		virtual ~CStateJournalImpl();
 
-		PStateJournalImplVariable generateVariable(const LibMCData::eParameterDataType eVariableType, const std::string& sName);
+		PStateJournalImplVariable generateVariable(const LibMCData::eParameterDataType eVariableType, const std::string& sName, double dUnits);
 		PStateJournalImplVariable createAlias (const std::string& sName, const std::string& sSourceName);
 
 		void startRecording();
@@ -381,7 +381,7 @@ namespace AMC {
 	}
 
 
-	PStateJournalImplVariable CStateJournalImpl::generateVariable(const LibMCData::eParameterDataType eVariableType, const std::string& sName)
+	PStateJournalImplVariable CStateJournalImpl::generateVariable(const LibMCData::eParameterDataType eVariableType, const std::string& sName, double dUnits)
 	{
 
 		if (m_JournalMode != eStateJournalMode::sjmInitialising)
@@ -395,7 +395,7 @@ namespace AMC {
 		uint32_t nVariableID = (uint32_t)(m_VariableList.size() + 1);
 
 		auto pCache = m_pStream->getCache();
-		pCache->createVariableInJournalDB (sName, nVariableID, nVariableIndex, eVariableType);
+		pCache->createVariableInJournalDB (sName, nVariableID, nVariableIndex, eVariableType, dUnits);
 
 		switch (eVariableType) {
 		case LibMCData::eParameterDataType::Bool:
@@ -406,9 +406,12 @@ namespace AMC {
 			pVariable = std::make_shared<CStateJournalImplIntegerVariable>(m_pStream.get(), nVariableID, nVariableIndex, sName);
 			break;
 
-		case LibMCData::eParameterDataType::Double:
-			pVariable = std::make_shared<CStateJournalImplDoubleVariable>(m_pStream.get(), nVariableID, nVariableIndex, sName);
+		case LibMCData::eParameterDataType::Double: {
+			auto pDoubleVariable = std::make_shared<CStateJournalImplDoubleVariable>(m_pStream.get(), nVariableID, nVariableIndex, sName);
+			pDoubleVariable->setUnits(dUnits);
+			pVariable = pDoubleVariable;
 			break;
+		}
 
 		case LibMCData::eParameterDataType::String:
 			pVariable = std::make_shared<CStateJournalImplStringVariable>(m_pStream.get(), nVariableID, nVariableIndex, sName);
@@ -694,7 +697,7 @@ namespace AMC {
 
 	uint32_t CStateJournal::registerBooleanValue(const std::string& sName, const bool bInitialValue)
 	{
-		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Bool, sName);
+		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Bool, sName, 0.0);
 		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (pVariable);
 		if (pBoolVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a bool variable");
@@ -706,7 +709,7 @@ namespace AMC {
 
 	uint32_t CStateJournal::registerIntegerValue(const std::string& sName, const int64_t nInitialValue)
 	{
-		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Integer, sName);
+		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Integer, sName, 0.0);
 		auto pIntegerVariable = std::dynamic_pointer_cast<CStateJournalImplIntegerVariable> (pVariable);
 		if (pIntegerVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a integer variable");
@@ -718,7 +721,7 @@ namespace AMC {
 
 	uint32_t CStateJournal::registerStringValue(const std::string& sName, const std::string & sInitialValue)
 	{
-		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::String, sName);
+		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::String, sName, 0.0);
 		auto pStringVariable = std::dynamic_pointer_cast<CStateJournalImplStringVariable> (pVariable);
 		if (pStringVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE, "variable " + sName + " is not a string variable");
@@ -734,12 +737,11 @@ namespace AMC {
 		if ((dUnits < STATEJOURNAL_VARIABLE_MINUNITS) || (dUnits > STATEJOURNAL_VARIABLE_MAXUNITS))
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLEUNITS);
 
-		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Double, sName);
+		auto pVariable = m_pImpl->generateVariable(LibMCData::eParameterDataType::Double, sName, dUnits);
 		auto pDoubleVariable = std::dynamic_pointer_cast<CStateJournalImplDoubleVariable> (pVariable);
 		if (pDoubleVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
 
-		pDoubleVariable->setUnits(dUnits);
 		pDoubleVariable->setInitialValue(dInitialValue);
 		return pVariable->getID();
 	}

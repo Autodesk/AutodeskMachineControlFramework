@@ -70,10 +70,11 @@ namespace AMC {
 		std::string m_sVariableName;
 		uint32_t m_nVariableID;
 		LibMCData::eParameterDataType m_DataType;
+		double m_dUnits;
 
 	public:
 
-		CStateJournalReaderVariable (uint32_t nVariableIndex, const std::string & sVariableName, uint32_t nVariableID, LibMCData::eParameterDataType dataType);
+		CStateJournalReaderVariable (uint32_t nVariableIndex, const std::string & sVariableName, uint32_t nVariableID, LibMCData::eParameterDataType dataType, double dUnits);
 
 		virtual ~CStateJournalReaderVariable();
 
@@ -84,6 +85,8 @@ namespace AMC {
 		uint32_t getVariableID ();
 
 		LibMCData::eParameterDataType getDataType ();
+
+		double getUnits();
 
 	};
 
@@ -133,8 +136,10 @@ namespace AMC {
 
 		virtual ~CStateJournalReader();
 
-		double computeSample(const std::string& sName, const uint64_t nTimeStamp);
-			
+		double computeDoubleSample(const std::string& sName, const uint64_t nTimeStamp);
+
+		int64_t computeIntegerSample(const std::string& sName, const uint64_t nTimeStamp);
+
 		std::string getStartTimeAsUTC();
 
 		uint64_t getLifeTimeInMicroseconds();

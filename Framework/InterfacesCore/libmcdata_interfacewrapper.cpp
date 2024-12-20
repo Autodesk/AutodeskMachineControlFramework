@@ -1548,7 +1548,7 @@ LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMCData_JournalSession
 	}
 }
 
-LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, eLibMCDataParameterDataType eDataType)
+LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, eLibMCDataParameterDataType eDataType, LibMCData_double dUnits)
 {
 	IBase* pIBaseClass = (IBase *)pJournalSession;
 
@@ -1560,7 +1560,7 @@ LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_Jou
 		if (!pIJournalSession)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIJournalSession->CreateVariableInJournalDB(sName, nID, nIndex, eDataType);
+		pIJournalSession->CreateVariableInJournalDB(sName, nID, nIndex, eDataType, dUnits);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -1865,7 +1865,7 @@ LibMCDataResult libmcdata_journalreader_getvariablecount(LibMCData_JournalReader
 	}
 }
 
-LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nVariableIndex, const LibMCData_uint32 nVariableNameBufferSize, LibMCData_uint32* pVariableNameNeededChars, char * pVariableNameBuffer, LibMCData_uint32 * pVariableID, eLibMCDataParameterDataType * pDataType)
+LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nVariableIndex, const LibMCData_uint32 nVariableNameBufferSize, LibMCData_uint32* pVariableNameNeededChars, char * pVariableNameBuffer, LibMCData_uint32 * pVariableID, eLibMCDataParameterDataType * pDataType, LibMCData_double * pUnits)
 {
 	IBase* pIBaseClass = (IBase *)pJournalReader;
 
@@ -1876,6 +1876,8 @@ LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_Journal
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (!pDataType)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pUnits)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sVariableName("");
 		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
 		if (!pIJournalReader)
@@ -1883,15 +1885,15 @@ LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_Journal
 		
 		bool isCacheCall = (pVariableNameBuffer == nullptr);
 		if (isCacheCall) {
-			pIJournalReader->GetVariableInformation(nVariableIndex, sVariableName, *pVariableID, *pDataType);
+			pIJournalReader->GetVariableInformation(nVariableIndex, sVariableName, *pVariableID, *pDataType, *pUnits);
 
-			pIJournalReader->_setCache (new ParameterCache_3<std::string, LibMCData_uint32, LibMCData::eParameterDataType> (sVariableName, *pVariableID, *pDataType));
+			pIJournalReader->_setCache (new ParameterCache_4<std::string, LibMCData_uint32, LibMCData::eParameterDataType, LibMCData_double> (sVariableName, *pVariableID, *pDataType, *pUnits));
 		}
 		else {
-			auto cache = dynamic_cast<ParameterCache_3<std::string, LibMCData_uint32, LibMCData::eParameterDataType>*> (pIJournalReader->_getCache ());
+			auto cache = dynamic_cast<ParameterCache_4<std::string, LibMCData_uint32, LibMCData::eParameterDataType, LibMCData_double>*> (pIJournalReader->_getCache ());
 			if (cache == nullptr)
 				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-			cache->retrieveData (sVariableName, *pVariableID, *pDataType);
+			cache->retrieveData (sVariableName, *pVariableID, *pDataType, *pUnits);
 			pIJournalReader->_setCache (nullptr);
 		}
 		

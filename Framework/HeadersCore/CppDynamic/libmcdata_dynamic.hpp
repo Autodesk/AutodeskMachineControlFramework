@@ -1368,7 +1368,7 @@ public:
 	}
 	
 	inline std::string GetSessionUUID();
-	inline void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const eParameterDataType eDataType);
+	inline void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const eParameterDataType eDataType, const LibMCData_double dUnits);
 	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<LibMCData_uint32> & TimeStampDataBuffer, const CInputVector<LibMCData_int64> & ValueDataBuffer);
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 	inline LibMCData_uint64 GetChunkCacheQuota();
@@ -1394,7 +1394,7 @@ public:
 	inline LibMCData_uint64 GetLifeTimeInMicroseconds();
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 	inline LibMCData_uint32 GetVariableCount();
-	inline void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, eParameterDataType & eDataType);
+	inline void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, eParameterDataType & eDataType, LibMCData_double & dUnits);
 	inline LibMCData_uint32 GetChunkCount();
 	inline void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp);
 };
@@ -6009,10 +6009,11 @@ public:
 	* @param[in] nID - Variable ID
 	* @param[in] nIndex - Variable Index
 	* @param[in] eDataType - Variable Data Type
+	* @param[in] dUnits - Unit factor, if DataType is Double. Will be ignored otherwise.
 	*/
-	void CJournalSession::CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const eParameterDataType eDataType)
+	void CJournalSession::CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const eParameterDataType eDataType, const LibMCData_double dUnits)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_CreateVariableInJournalDB(m_pHandle, sName.c_str(), nID, nIndex, eDataType));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_CreateVariableInJournalDB(m_pHandle, sName.c_str(), nID, nIndex, eDataType, dUnits));
 	}
 	
 	/**
@@ -6149,14 +6150,15 @@ public:
 	* @param[out] sVariableName - Name of the variable.
 	* @param[out] nVariableID - ID of the variable.
 	* @param[out] eDataType - Data type of the variable.
+	* @param[out] dUnits - Unit factor, if DataType is Double. Will be 0.0 otherwise.
 	*/
-	void CJournalReader::GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, eParameterDataType & eDataType)
+	void CJournalReader::GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, eParameterDataType & eDataType, LibMCData_double & dUnits)
 	{
 		LibMCData_uint32 bytesNeededVariableName = 0;
 		LibMCData_uint32 bytesWrittenVariableName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetVariableInformation(m_pHandle, nVariableIndex, 0, &bytesNeededVariableName, nullptr, &nVariableID, &eDataType));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetVariableInformation(m_pHandle, nVariableIndex, 0, &bytesNeededVariableName, nullptr, &nVariableID, &eDataType, &dUnits));
 		std::vector<char> bufferVariableName(bytesNeededVariableName);
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetVariableInformation(m_pHandle, nVariableIndex, bytesNeededVariableName, &bytesWrittenVariableName, &bufferVariableName[0], &nVariableID, &eDataType));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetVariableInformation(m_pHandle, nVariableIndex, bytesNeededVariableName, &bytesWrittenVariableName, &bufferVariableName[0], &nVariableID, &eDataType, &dUnits));
 		sVariableName = std::string(&bufferVariableName[0]);
 	}
 	

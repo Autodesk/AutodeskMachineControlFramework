@@ -49,8 +49,8 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 
-CJournalReaderVariable::CJournalReaderVariable(int64_t nVariableIndex, int64_t nVariableID, eParameterDataType variableType, const std::string& sVariableName)
-    : m_nVariableIndex (nVariableIndex), m_nVariableID (nVariableID), m_VariableType (variableType), m_sVariableName (sVariableName)
+CJournalReaderVariable::CJournalReaderVariable(int64_t nVariableIndex, int64_t nVariableID, eParameterDataType variableType, const std::string& sVariableName, double dUnits)
+    : m_nVariableIndex (nVariableIndex), m_nVariableID (nVariableID), m_VariableType (variableType), m_sVariableName (sVariableName), m_dUnits (dUnits)
 {
 
 }
@@ -78,6 +78,11 @@ LibMCData::eParameterDataType CJournalReaderVariable::getVariableType()
 std::string CJournalReaderVariable::getVariableName()
 {
     return m_sVariableName;
+}
+
+double CJournalReaderVariable::getUnits()
+{
+    return m_dUnits;
 }
 
 
@@ -108,7 +113,7 @@ void CJournalReaderFile::readBuffer(uint64_t nDataOffset, uint8_t* pBuffer, uint
     if (m_pImportStream.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALREADERFILENOTOPEN);
 
-    std::lock_guard<std::mutex> lockGuard(std::mutex m_ImportStreamMutex);
+    std::lock_guard<std::mutex> lockGuard(m_ImportStreamMutex);
     m_pImportStream->seekPosition(nDataOffset, true);
     m_pImportStream->readBuffer(pBuffer, nDataLength, true);
 
@@ -205,12 +210,13 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
 
     size_t nVariableCount = 0;
 
-    auto pVariableStatement = m_pJournalSQLHandler->prepareStatement("SELECT variableindex, variableid, variabletype, name FROM journal_variables ORDER BY variableindex");
+    auto pVariableStatement = m_pJournalSQLHandler->prepareStatement("SELECT variableindex, variableid, variabletype, name, units FROM journal_variables ORDER BY variableindex");
     while (pVariableStatement->nextRow()) {
         int64_t nVariableIndex = pVariableStatement->getColumnInt64(1);
         int64_t nVariableID = pVariableStatement->getColumnInt64(2);
         std::string sVariableType = pVariableStatement->getColumnString(3);
         std::string sVariableName = pVariableStatement->getColumnString(4);
+        double dUnits = pVariableStatement->getColumnDouble(5);
 
         if (nVariableIndex < 0)
             throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX, "Negative journal variable index: " + std::to_string(nVariableIndex));
@@ -220,7 +226,7 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
             throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME);
 
         auto variableType = AMCData::CJournal::convertStringToDataType(sVariableType);
-        auto pVariable = std::make_shared<CJournalReaderVariable>(nVariableIndex, nVariableID, variableType, sVariableName);
+        auto pVariable = std::make_shared<CJournalReaderVariable>(nVariableIndex, nVariableID, variableType, sVariableName, dUnits);
 
         auto iIDIter = m_VariableIDMap.find(nVariableID);
         if (iIDIter != m_VariableIDMap.end())
@@ -239,8 +245,8 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
         m_VariableIndexMap.insert(std::make_pair(nVariableIndex, pVariable));
         m_VariableNameMap.insert(std::make_pair(sVariableName, pVariable));
 
-        if (nVariableIndex >= nVariableCount)
-            nVariableCount = nVariableIndex + 1;
+        if (nVariableIndex >= (int64_t)nVariableCount)
+            nVariableCount = (uint64_t)nVariableIndex + 1;
 
     }
 
@@ -302,7 +308,7 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
         if ((uint64_t)nStartTimeStamp < m_nLifeTimeInMicroseconds)
             throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALTIMESTAMPSNOTINCREASING, "Journal timestamps not increasing: " + std::to_string(nStartTimeStamp) + " (chunk #" + std::to_string(nChunkIndex) + ")");
 
-        m_nLifeTimeInMicroseconds = nEndTimeStamp;
+        m_nLifeTimeInMicroseconds = (uint32_t)nEndTimeStamp;
 
         auto iChunkIter = m_ChunkMap.find(nChunkIndex);
         if (iChunkIter != m_ChunkMap.end())
@@ -315,8 +321,8 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
         auto pChunk = std::make_shared<CJournalReaderChunk>(nChunkIndex, iFileIter->second, nStartTimeStamp, nEndTimeStamp, nDataOffset, nDataLength);
         m_ChunkMap.insert(std::make_pair (nChunkIndex, pChunk));
 
-        if (nChunkIndex >= nChunkCount)
-            nChunkCount = nChunkIndex + 1;
+        if (nChunkIndex >= (int64_t)nChunkCount)
+            nChunkCount = (uint64_t)nChunkIndex + 1;
     }
 
     // Linearize chunk map
@@ -376,7 +382,7 @@ LibMCData_uint32 CJournalReader::GetVariableCount()
     return (uint32_t)m_Variables.size();
 }
 
-void CJournalReader::GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string& sVariableName, LibMCData_uint32& nVariableID, LibMCData::eParameterDataType& eDataType)
+void CJournalReader::GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string& sVariableName, LibMCData_uint32& nVariableID, LibMCData::eParameterDataType& eDataType, LibMCData_double & dUnits)
 {
     if (nVariableIndex >= m_Variables.size())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDVARIABLEINDEX);
@@ -384,13 +390,19 @@ void CJournalReader::GetVariableInformation(const LibMCData_uint32 nVariableInde
     auto pVariable = m_Variables.at(nVariableIndex);
     if (pVariable.get() != nullptr) {
         sVariableName = pVariable->getVariableName();
-        nVariableID = pVariable->getVariableID();
+        nVariableID = (uint32_t)pVariable->getVariableID();
         eDataType = pVariable->getVariableType();
+        if (eDataType == LibMCData::eParameterDataType::Double)
+            dUnits = pVariable->getUnits();
+        else
+            dUnits = 0.0;
+
     }
     else {
         sVariableName = "";
         nVariableID = 0;
         eDataType = LibMCData::eParameterDataType::Unknown;
+        dUnits = 0.0;
 
     }
 }
