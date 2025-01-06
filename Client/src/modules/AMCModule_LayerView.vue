@@ -78,6 +78,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			draggingSliderCurrentY: 0,
 			sliderPosition: 0.0,
 			sliderPositionWhileMove: 0.0,
+			lastMouseX: 0,
+			lastMouseY: 0,
 			reloading: false,
 		
 		}),
@@ -220,7 +222,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					sliderThumbDiv.innerText = this.LayerIndex;
 				}
 
-				if (this.LayerViewerInstance.pointCoordinates.length > 0) {
+				
 					const infoboxDiv = document.getElementById('infobox_points');
 
 					if (!infoboxDiv) {
@@ -235,10 +237,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 					if (elementType < 0) {
-						infoboxDiv.style.display = 'none';
-						infoboxDiv.innerText = '---';
-						return;
+					
+						let deltaX = this.lastMouseX - mouseX;
+						let deltaY = this.lastMouseY - mouseY;
+						
+						if ((Math.abs (deltaX) > 10) || (Math.abs (deltaY) > 10)) {
+					
+							infoboxDiv.style.display = 'none';
+							infoboxDiv.innerText = '---';
+							return;
+						}
+					} else {
+						this.lastMouseX = mouseX;
+						this.lastMouseY = mouseY;
 					}
+					
 
 					// Each datapoint consists of two triangles and two faceIDs. Only even IDs are of interest
 					if (faceIndex % 2 !== 0) {
@@ -249,27 +262,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 					// console.log("Collision with face index " + faceIndex);
 					if (elementType === 0) { // Point
-						const x = this.LayerViewerInstance.pointCoordinates[faceIndex * 2];
-						const y = this.LayerViewerInstance.pointCoordinates[faceIndex * 2 + 1];
+					
+						if (this.LayerViewerInstance.pointCoordinates.length > 0) {					
+							const x = this.LayerViewerInstance.pointCoordinates[faceIndex * 2];
+							const y = this.LayerViewerInstance.pointCoordinates[faceIndex * 2 + 1];
 
-						infoboxDiv.innerText = `Point ID = ${faceIndex.toFixed(0)}\nX = ${x.toFixed(3)} mm\nY = ${y.toFixed(3)} mm`;
-						infoboxDiv.style.background = 'rgba(255, 0, 0, 0.7)';
+							infoboxDiv.innerText = `Point ID = ${faceIndex.toFixed(0)}\nX = ${x.toFixed(3)} mm\nY = ${y.toFixed(3)} mm`;
+							infoboxDiv.style.background = 'rgba(255, 0, 0, 0.7)';
+						}
 					}
 					else if (elementType === 1) { // Line
-						const x1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4];
-						const y1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 1];
-						const x2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 2];
-						const y2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 3];
+						if (this.LayerViewerInstance.linesCoordinates.length > 0) {
+							const x1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4];
+							const y1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 1];
+							const x2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 2];
+							const y2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 3];
+							
+							const laserpower = this.LayerViewerInstance.segmentProperties[faceIndex].laserpower;
 
-						infoboxDiv.innerText = `Line ID = ${faceIndex.toFixed(0)}\nX1 = ${x1.toFixed(3)} mm\nY1 = ${y1.toFixed(3)} mm\nX2 = ${x2.toFixed(3)} mm\nY2 = ${y2.toFixed(3)} mm`;
-						infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+							infoboxDiv.innerText = `Line ID = ${faceIndex.toFixed(0)}\n${x1.toFixed(3)} / ${y1.toFixed(3)} - ${x2.toFixed(3)} / ${y2.toFixed(3)} mm\n${laserpower.toFixed(0)}W`;
+							infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+						}
 					}
 					
 					infoboxDiv.style.display = 'flex';
 					infoboxDiv.style.left = `${mouseX}px`;
 					infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`;
 				}
-			}
+			
 		},
 		
 		created () {
