@@ -641,6 +641,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDPROFILEVALUETYPE 624 /** Invalid profile value type */
 #define LIBMC_ERROR_INVALIDJOURNALCHUNKTIMESTAMP 625 /** Invalid journal chunk time stamp */
 #define LIBMC_ERROR_OVERLAPPINGJOURNALCHUNKTIMESTAMP 626 /** Overlapping journal chunk time stamp */
+#define LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS 627 /** Invalid toolpath layer thickness */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1194,6 +1195,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type";
     case LIBMC_ERROR_INVALIDJOURNALCHUNKTIMESTAMP: return "Invalid journal chunk time stamp";
     case LIBMC_ERROR_OVERLAPPINGJOURNALCHUNKTIMESTAMP: return "Overlapping journal chunk time stamp";
+    case LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS: return "Invalid toolpath layer thickness";
     default: return "unknown error";
   }
 }

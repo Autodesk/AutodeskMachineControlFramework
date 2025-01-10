@@ -650,6 +650,8 @@
 		<error name="INVALIDPROFILEVALUETYPE" code="624" description="Invalid profile value type" />				
 		<error name="INVALIDJOURNALCHUNKTIMESTAMP" code="625" description="Invalid journal chunk time stamp" />		
 		<error name="OVERLAPPINGJOURNALCHUNKTIMESTAMP" code="626" description="Overlapping journal chunk time stamp" />
+		<error name="INVALIDTOOLPATHLAYERTHICKNESS" code="627" description="Invalid toolpath layer thickness" />
+		
 					
 	</errors>
 	

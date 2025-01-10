@@ -83,6 +83,11 @@ APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, co
 			return APIHandler_BuildType::btListJobs;
 		}
 
+		if ((sParameterString.substr(0, 1) == "/") && (sParameterString.length() == 37)) {
+			paramUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(1));
+			return APIHandler_BuildType::btBuildJobDetails;
+		}
+
 		if (sParameterString.substr(0, 15) == "/listbuilddata/") {
 			paramUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(15));
 			return APIHandler_BuildType::btListBuildData;
@@ -306,6 +311,90 @@ void CAPIHandler_Build::handleListBuildDataRequest(CJSONWriter& writer, PAPIAuth
 }
 
 
+void CAPIHandler_Build::handleBuildJobDetailsRequest(CJSONWriter& writer, PAPIAuth pAuth, std::string& buildUUID)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto pDataModel = m_pSystemState->getDataModelInstance();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(buildUUID);
+
+	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBUUID, pBuildJob->GetUUID());
+	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBSTORAGESTREAM, pBuildJob->GetStorageStreamUUID());
+	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBNAME, pBuildJob->GetName());
+	writer.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBLAYERCOUNT, pBuildJob->GetLayerCount());
+
+	if (pBuildJob->HasThumbnailStream())
+		writer.addString(AMC_API_KEY_UPLOAD_ITEMBUILDTHUMBNAIL, pBuildJob->GetThumbnailStreamUUID());
+
+	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
+
+	auto pToolpathHandler = m_pSystemState->toolpathHandler();
+
+	auto pToolpath = pToolpathHandler->findToolpathEntity(sStreamUUID, false);
+	if (pToolpath == nullptr) {
+		pToolpath = pToolpathHandler->loadToolpathEntity(sStreamUUID);
+	}
+
+	uint32_t nPartCount = pToolpath->getPartCount();
+
+	CJSONWriterArray partJSONArray(writer);
+	for (uint32_t nPartIndex = 0; nPartIndex < nPartCount; nPartIndex++) {
+		auto pToolpathPart = pToolpath->getPart(nPartIndex);
+
+		CJSONWriterObject partJSON(writer);
+		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTUUID, pToolpathPart->getUUID());
+		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTNAME, pToolpathPart->getName());
+		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTNUMBER, pToolpathPart->getPartNumber());
+		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTGEOMETRYUUID, pToolpathPart->getMeshUUID());
+
+		partJSONArray.addObject(partJSON);
+
+	}
+
+	writer.addArray(AMC_API_KEY_UPLOAD_PARTARRAY, partJSONArray);
+
+	uint32_t nGlobalLayerThicknessInUnits = 0;
+	bool bLayerThicknessIsVariable = false;
+
+	double dUnits = pToolpath->getUnits();
+
+	uint32_t nLayerCount = pToolpath->getLayerCount();
+	CJSONWriterArray layerJSONArray(writer);
+	for (uint32_t nLayerIndex = 0; nLayerIndex < nLayerCount; nLayerIndex++) {
+		uint32_t nZMin = pToolpath->getLayerMinZInUnits(nLayerIndex);
+		uint32_t nZMax = pToolpath->getLayerZInUnits (nLayerIndex);
+
+		if (nZMin >= nZMax)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS, "Invalid toolpath layer thickness in job " + buildUUID + ", layer " + std::to_string (nLayerIndex));
+
+		uint32_t nLayerThickness = nZMax - nZMin;
+		if (nLayerIndex > 0) {
+			if (nGlobalLayerThicknessInUnits != nLayerThickness)
+				bLayerThicknessIsVariable = true;
+		}
+		else {
+			nGlobalLayerThicknessInUnits = nLayerThickness;
+		}
+
+		CJSONWriterObject layerJSON(writer);
+		layerJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDLAYERINDEX, nLayerIndex);
+		layerJSON.addDouble(AMC_API_KEY_UPLOAD_BUILDLAYERZMIN, nZMin * dUnits);
+		layerJSON.addDouble(AMC_API_KEY_UPLOAD_BUILDLAYERZMAX, nZMax * dUnits);
+		layerJSON.addDouble(AMC_API_KEY_UPLOAD_BUILDLAYERTHICKNESS, nLayerThickness * dUnits);
+
+		layerJSONArray.addObject(layerJSON);
+	}
+	writer.addArray(AMC_API_KEY_UPLOAD_LAYERARRAY, layerJSONArray);
+
+	//writer.addBoolean(AMC_API_KEY_UPLOAD_VARIABLELAYERTHICKNESS, bLayerThicknessIsVariable);
+	if (!bLayerThicknessIsVariable)
+		writer.addDouble(AMC_API_KEY_UPLOAD_BUILDGLOBALLAYERTHICKNESS, nGlobalLayerThicknessInUnits * dUnits);
+
+}
+
+
 PAPIResponse CAPIHandler_Build::handleGetBuildDataRequest(PAPIAuth pAuth, std::string& buildDataUUID)
 {
 	if (pAuth.get() == nullptr)
@@ -350,6 +439,10 @@ PAPIResponse CAPIHandler_Build::handleRequest(const std::string& sURI, const eAP
 
 	case APIHandler_BuildType::btGetBuildData:
 		return handleGetBuildDataRequest(pAuth, paramUUID);
+		break;
+
+	case APIHandler_BuildType::btBuildJobDetails:
+		handleBuildJobDetailsRequest(writer, pAuth, paramUUID);
 		break;
 
 	default:
