@@ -388,7 +388,7 @@ void CAPIHandler_Build::handleBuildJobDetailsRequest(CJSONWriter& writer, PAPIAu
 	}
 	writer.addArray(AMC_API_KEY_UPLOAD_LAYERARRAY, layerJSONArray);
 
-	//writer.addBoolean(AMC_API_KEY_UPLOAD_VARIABLELAYERTHICKNESS, bLayerThicknessIsVariable);
+	writer.addBoolean(AMC_API_KEY_UPLOAD_VARIABLELAYERTHICKNESS, bLayerThicknessIsVariable);
 	if (!bLayerThicknessIsVariable)
 		writer.addDouble(AMC_API_KEY_UPLOAD_BUILDGLOBALLAYERTHICKNESS, nGlobalLayerThicknessInUnits * dUnits);
 
