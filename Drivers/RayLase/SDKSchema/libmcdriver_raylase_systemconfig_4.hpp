@@ -40,21 +40,21 @@ class CRaylaseAPIField_rlSystemConfig_v4 : public CRaylaseAPIField {
     CRaylaseAPIField_rlSystemConfig_v4 ()
       : CRaylaseAPIField ("rlSystemConfig", 4, 184)
     {
-      registerVariable ("TimeZone.IdLen", 4, evtUint32);
-      registerVariable ("TimeZone.Id", 8, evtCharArray);
-      registerVariable ("EnableStandAloneMode", 136, evtBool);
-      registerVariable ("StandAloneListID", 140, evtInt32);
-      registerVariable ("StandAloneExecuteOnErrorListID", 144, evtInt32);
-      registerVariable ("ScannerMonitoring.Enabled", 148, evtBool);
-      registerVariable ("ScannerMonitoring.Command", 152, evtUint32);
-      registerVariable ("ScannerMonitoring.Mask", 156, evtUint32);
-      registerVariable ("ScannerMonitoring.GoodValue", 160, evtUint32);
-      registerVariable ("ScannerMonitoring.Period", 164, evtInt32);
-      registerVariable ("ScannerMonitoring.MinConsecutiveErrors", 168, evtInt32);
-      registerVariable ("ScannerMonitoring.ContinueOnError", 172, evtBool);
-      registerVariable ("ScannerMonitoring.GoodValue", 160, evtUint32);
-      registerVariable ("ScannerMonitoring.ScanHeadAxes0", 176, evtUint32);
-      registerVariable ("ScannerMonitoring.ScanHeadAxes1", 180, evtUint32);
+      registerVariable ("TimeZone.IdLen", 4, eRaylaseAPIVariableType::evtUint32);
+      registerVariable ("TimeZone.Id", 8, eRaylaseAPIVariableType::evtCharArray);
+      registerVariable ("EnableStandAloneMode", 136, eRaylaseAPIVariableType::evtBool);
+      registerVariable ("StandAloneListID", 140, eRaylaseAPIVariableType::evtInt32);
+      registerVariable ("StandAloneExecuteOnErrorListID", 144, eRaylaseAPIVariableType::evtInt32);
+      registerVariable ("ScannerMonitoring.Enabled", 148, eRaylaseAPIVariableType::evtBool);
+      registerVariable ("ScannerMonitoring.Command", 152, eRaylaseAPIVariableType::evtUint32);
+      registerVariable ("ScannerMonitoring.Mask", 156, eRaylaseAPIVariableType::evtUint32);
+      registerVariable ("ScannerMonitoring.GoodValue", 160, eRaylaseAPIVariableType::evtUint32);
+      registerVariable ("ScannerMonitoring.Period", 164, eRaylaseAPIVariableType::evtInt32);
+      registerVariable ("ScannerMonitoring.MinConsecutiveErrors", 168, eRaylaseAPIVariableType::evtInt32);
+      registerVariable ("ScannerMonitoring.ContinueOnError", 172, eRaylaseAPIVariableType::evtBool);
+      registerVariable ("ScannerMonitoring.GoodValue", 160, eRaylaseAPIVariableType::evtUint32);
+      registerVariable ("ScannerMonitoring.ScanHeadAxes0", 176, eRaylaseAPIVariableType::evtUint32);
+      registerVariable ("ScannerMonitoring.ScanHeadAxes1", 180, eRaylaseAPIVariableType::evtUint32);
     }
     
     virtual ~CRaylaseAPIField_rlSystemConfig_v4 ()

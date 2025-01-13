@@ -68,6 +68,25 @@
 		<error name="CANNOTDELETELISTLISTINPROGRESS" code="1016" description="Cannot delete list in progress" />				
 		<error name="RAYLASESDKNOTLOADED" code="1017" description="Raylase SDK not loaded" />		
 		<error name="SEGMENTHASINVALIDLASERINDEX" code="1018" description="Segment has invalid laser index" />
+		<error name="INVALIDAPIFIELDNAME" code="1019" description="Invalid API Field Name" />		
+		<error name="INVALIDAPIVARIABLENAME" code="1020" description="Invalid API Variable Name" />		
+		<error name="DUPLICATEAPIVARIABLENAME" code="1021" description="Duplicate API Variable Name" />		
+		<error name="INVALIDVARIABLEOFFSET" code="1022" description="Invalid Variable Offset" />
+		<error name="VARIABLEEXCEEDSBUFFER" code="1023" description="Variable Exceeds Buffer" />
+		<error name="VARIABLETYPENOTSUPPORTED" code="1024" description="Variable Type Not Supported" />
+		<error name="VARIABLENOTFOUND" code="1025" description="Variable not found" />
+		<error name="INTEGERVALUEOUTOFRANGE" code="1026" description="Integer Value out of range" />
+		<error name="VARIABLEISNOTOFTYPEINTEGER" code="1027" description="Variable is not of type integer" />
+		<error name="VARIABLEISNOTOFTYPEDOUBLE" code="1028" description="Variable is not of type double" />
+		<error name="VARIABLEISNOTOFTYPEBOOL" code="1029" description="Variable is not of type bool" />
+		<error name="VARIABLEISNOTOFTYPEENUM" code="1030" description="Variable is not of type enum" />
+		<error name="ENUMVALUEOUTOFRANGE" code="1031" description="Enum Value out of range" />
+		<error name="INVALIDFIELDDATASIZE" code="1032" description="Invalid field data size" />
+		
+		
+		
+		
+		
 				
 	</errors>
 

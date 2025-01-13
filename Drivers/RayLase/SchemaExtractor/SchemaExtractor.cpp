@@ -32,7 +32,9 @@ enum class eSchemaVariableType : uint32_t
 	evtDouble = 10,
 	evtCharArray = 11,
 	evtBool = 12,
-	evtEnum = 13
+	evtEnum8 = 13,
+	evtEnum16 = 14,
+	evtEnum32 = 15
 };
 
 class CSchemaDefinition
@@ -103,9 +105,21 @@ public:
 		registerVariable(sVariableName, eSchemaVariableType::evtBool, (void*)pMemberPtr);
 	}
 
-	void registerEnum(const std::string& sVariableName, uint32_t* pMemberPtr)
+	void registerEnum(const std::string& sVariableName, void* pMemberPtr, uint32_t nEnumSizeInBytes)
 	{
-		registerVariable(sVariableName, eSchemaVariableType::evtEnum, (void*)pMemberPtr);
+		switch (nEnumSizeInBytes) {
+		case 1:
+			registerVariable(sVariableName, eSchemaVariableType::evtEnum8, (void*)pMemberPtr);
+			break;
+		case 2:
+			registerVariable(sVariableName, eSchemaVariableType::evtEnum16, (void*)pMemberPtr);
+			break;
+		case 4:
+			registerVariable(sVariableName, eSchemaVariableType::evtEnum32, (void*)pMemberPtr);
+			break;
+		default:
+			throw std::runtime_error("invalid enum size: " + std::to_string(nEnumSizeInBytes));
+		}
 	}
 
 	void registerUint8(const std::string& sVariableName, uint8_t* pMemberPtr)
@@ -170,7 +184,9 @@ public:
 			case eSchemaVariableType::evtCharArray: return "chararray";
 			case eSchemaVariableType::evtDouble: return "double";
 			case eSchemaVariableType::evtFloat: return "float";
-			case eSchemaVariableType::evtEnum: return "enum";
+			case eSchemaVariableType::evtEnum8: return "enum8";
+			case eSchemaVariableType::evtEnum16: return "enum16";
+			case eSchemaVariableType::evtEnum32: return "enum32";
 			case eSchemaVariableType::evtUint8: return "uint8";
 			case eSchemaVariableType::evtUint16: return "uint16";
 			case eSchemaVariableType::evtUint32: return "uint32";
@@ -192,7 +208,9 @@ public:
 		case eSchemaVariableType::evtCharArray: return "evtCharArray";
 		case eSchemaVariableType::evtDouble: return "evtDouble";
 		case eSchemaVariableType::evtFloat: return "evtFloat";
-		case eSchemaVariableType::evtEnum: return "evtEnum";
+		case eSchemaVariableType::evtEnum8: return "evtEnum8";
+		case eSchemaVariableType::evtEnum16: return "evtEnum16";
+		case eSchemaVariableType::evtEnum32: return "evtEnum32";
 		case eSchemaVariableType::evtUint8: return "evtUint8";
 		case eSchemaVariableType::evtUint16: return "evtUint16";
 		case eSchemaVariableType::evtUint32: return "evtUint32";
@@ -247,7 +265,7 @@ public:
 			if (variableIter == m_Variables.end())
 				throw std::runtime_error("variable not found: " + variableName);
 
-			sStream << "      registerVariable (\"" << variableIter->first << "\", " << variableIter->second.second << ", "<< variableTypeToCppEnum (variableIter->second.first) << ");" << std::endl;
+			sStream << "      registerVariable (\"" << variableIter->first << "\", " << variableIter->second.second << ", eRaylaseAPIVariableType::"<< variableTypeToCppEnum (variableIter->second.first) << ");" << std::endl;
 
 		}
 		sStream << "    }" << std::endl;
@@ -323,7 +341,7 @@ public:
 		: CSchemaDefinition ("rlSystemConfig", pSystemConfig->ConfigVersion, (void*)pSystemConfig, sizeof (rlSystemConfig))
 	{
 		registerUint32("TimeZone.IdLen", &pSystemConfig->TimeZone.IdLen);
-		registerCharArray("TimeZone.Id", &pSystemConfig->TimeZone.Id[0]);
+		//registerCharArray("TimeZone.Id", &pSystemConfig->TimeZone.Id[0]);
 		registerBool("EnableStandAloneMode", &pSystemConfig->EnableStandAloneMode);
 		registerInt32("StandAloneListID", &pSystemConfig->StandAloneListID);
 		registerInt32("StandAloneExecuteOnErrorListID", &pSystemConfig->StandAloneExecuteOnErrorListID);
@@ -366,24 +384,24 @@ public:
 
 			registerVersionInfo(&pGpioConfig->Ports[nPortHeadIndex].Config.ConfigVersion);
 
-			registerEnum(sPortName + "Port", (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Port);
-			registerEnum(sPortName + "Config.IOLevel", (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Config.IOLevel);
+			registerEnum(sPortName + "Port", (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Port, sizeof (pGpioConfig->Ports[nPortHeadIndex].Port));
+			registerEnum(sPortName + "Config.IOLevel", (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Config.IOLevel, sizeof (pGpioConfig->Ports[nPortHeadIndex].Config.IOLevel));
 
 			uint32_t nPolaritiesArrayCount = (uint32_t)(sizeof(pGpioConfig->Ports[nPortHeadIndex].Config.Polarities) / sizeof(pGpioConfig->Ports[nPortHeadIndex].Config.Polarities[0]));
 			for (uint32_t nPolarityIndex = 0; nPolarityIndex < nPolaritiesArrayCount; nPolarityIndex++) {
-				registerEnum(sPortName + "Config.Polarity" + std::to_string(nPolarityIndex), (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Config.Polarities[nPolarityIndex]);
+				registerEnum(sPortName + "Config.Polarity" + std::to_string(nPolarityIndex), (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Config.Polarities[nPolarityIndex], sizeof (pGpioConfig->Ports[nPortHeadIndex].Config.Polarities[nPolarityIndex]));
 			}
 			registerUint32(sPortName + "Config.PolaritiesLen", &pGpioConfig->Ports[nPortHeadIndex].Config.PolaritiesLen);
 
 			uint32_t nDirectionsArrayCount = (uint32_t)(sizeof(pGpioConfig->Ports[nPortHeadIndex].Config.Directions) / sizeof(pGpioConfig->Ports[nPortHeadIndex].Config.Directions[0]));
 			for (uint32_t nDirectionsIndex = 0; nDirectionsIndex < nDirectionsArrayCount; nDirectionsIndex++) {
-				registerEnum(sPortName + "Config.Direction" + std::to_string(nDirectionsIndex), (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Config.Directions[nDirectionsIndex]);
+				registerEnum(sPortName + "Config.Direction" + std::to_string(nDirectionsIndex), (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Config.Directions[nDirectionsIndex], sizeof (pGpioConfig->Ports[nPortHeadIndex].Config.Directions[nDirectionsIndex]));
 			}
 			registerUint32(sPortName + "Config.DirectionsLen", &pGpioConfig->Ports[nPortHeadIndex].Config.DirectionsLen);
 
 			uint32_t nFunctionsArrayCount = (uint32_t)(sizeof(pGpioConfig->Ports[nPortHeadIndex].Config.Functions) / sizeof(pGpioConfig->Ports[nPortHeadIndex].Config.Functions[0]));
 			for (uint32_t nFunctionsIndex = 0; nFunctionsIndex < nFunctionsArrayCount; nFunctionsIndex++) {
-				registerEnum(sPortName + "Config.Function" + std::to_string(nFunctionsIndex), (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Config.Functions[nFunctionsIndex]);
+				registerEnum(sPortName + "Config.Function" + std::to_string(nFunctionsIndex), (uint32_t*)&pGpioConfig->Ports[nPortHeadIndex].Config.Functions[nFunctionsIndex], sizeof (pGpioConfig->Ports[nPortHeadIndex].Config.Functions[nFunctionsIndex]));
 			}
 			registerUint32(sPortName + "Config.FunctionsLen", &pGpioConfig->Ports[nPortHeadIndex].Config.FunctionsLen);
 
@@ -427,9 +445,9 @@ public:
 	CSchemaDefinition_LaserConfig(rlLaserConfig* pLaserConfig)
 		: CSchemaDefinition("rlLaserConfig", pLaserConfig->ConfigVersion, (void*)pLaserConfig, sizeof(rlLaserConfig))
 	{
-		registerEnum("FpsPolarity", (uint32_t*)&pLaserConfig->FpsPolarity);
-		registerEnum("GatePolarity", (uint32_t*)&pLaserConfig->GatePolarity);
-		registerEnum("LMPolarity", (uint32_t*)&pLaserConfig->LMPolarity);
+		registerEnum("FpsPolarity", (uint32_t*)&pLaserConfig->FpsPolarity, sizeof (pLaserConfig->FpsPolarity));
+		registerEnum("GatePolarity", (uint32_t*)&pLaserConfig->GatePolarity, sizeof (pLaserConfig->GatePolarity));
+		registerEnum("LMPolarity", (uint32_t*)&pLaserConfig->LMPolarity, sizeof (pLaserConfig->LMPolarity));
 		registerDouble("FpsStart", &pLaserConfig->FpsStart);
 		registerDouble("FpsWidth", &pLaserConfig->FpsWidth);
 		registerDouble("GateSetup", &pLaserConfig->GateSetup);
@@ -440,8 +458,8 @@ public:
 		registerDouble("PowerChangeSetup", &pLaserConfig->PowerChangeSetup);
 		registerDouble("PowerWriteDelay", &pLaserConfig->PowerWriteDelay);
 		registerDouble("PowerWriteWidth", &pLaserConfig->PowerWriteWidth);
-		registerEnum("HotPowerTarget", (uint32_t*)&pLaserConfig->HotPowerTarget);
-		registerEnum("HotPowerTarget1", (uint32_t*)&pLaserConfig->HotPowerTarget1);
+		registerEnum("HotPowerTarget", (uint32_t*)&pLaserConfig->HotPowerTarget, sizeof (pLaserConfig->HotPowerTarget));
+		registerEnum("HotPowerTarget1", (uint32_t*)&pLaserConfig->HotPowerTarget1, sizeof (pLaserConfig->HotPowerTarget1));
 		registerUint16("SimmerPower", &pLaserConfig->SimmerPower);
 		registerBool("EnableTickle", &pLaserConfig->EnableTickle);
 		registerDouble("TickleFrequency", &pLaserConfig->TickleFrequency);
@@ -499,7 +517,7 @@ public:
 
 		}
 		registerDouble("ScanHeadDelay", &pScannerConfig->ScanHeadDelay);
-		registerEnum("HeadFormat", (uint32_t*)&pScannerConfig->HeadFormat);
+		registerEnum("HeadFormat", (uint32_t*)&pScannerConfig->HeadFormat, sizeof (pScannerConfig->HeadFormat));
 		registerDouble("MaxMagnification", &pScannerConfig->MaxMagnification);
 
 	}
@@ -597,13 +615,13 @@ public:
 
 			registerVersionInfo(&pModule->ConfigVersion);
 			registerBool(sPrefix + "Enabled", &pModule->Enabled);
-			registerEnum(sPrefix + "SpiSyncMode", (uint32_t*)&pModule->SpiSyncMode);
+			registerEnum(sPrefix + "SpiSyncMode", (uint32_t*)&pModule->SpiSyncMode, sizeof (pModule->SpiSyncMode));
 			registerUint16(sPrefix + "BitsPerWord", &pModule->BitsPerWord);
 			registerDouble(sPrefix + "PreDelay", &pModule->PreDelay);
 			registerDouble(sPrefix + "PostDelay", &pModule->PostDelay);
 			registerDouble(sPrefix + "FrameDelay", &pModule->FrameDelay);
-			registerEnum(sPrefix + "OutputSource", (uint32_t*)&pModule->OutputSource);
-			registerEnum(sPrefix + "BitOrder", (uint32_t*)&pModule->BitOrder);
+			registerEnum(sPrefix + "OutputSource", (uint32_t*)&pModule->OutputSource, sizeof (pModule->OutputSource));
+			registerEnum(sPrefix + "BitOrder", (uint32_t*)&pModule->BitOrder, sizeof (pModule->BitOrder));
 			registerDouble(sPrefix + "ClockPeriod", &pModule->ClockPeriod);
 		}
 
