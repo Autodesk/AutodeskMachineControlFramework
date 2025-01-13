@@ -4394,6 +4394,25 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_RemovePtr) (LibMCEnv_XMLD
 typedef LibMCEnvResult (*PLibMCEnvJSONObject_HasMemberPtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pMemberExists);
 
 /**
+* Returns the number of members.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[out] pCount - returns the number of members.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetMemberCountPtr) (LibMCEnv_JSONObject pJSONObject, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns the name of a member by index.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] nIndex - Index of the member, 0-based. Fails if larger or equal than MemberCount
+* @param[in] pName - Name of the member.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetMemberNamePtr) (LibMCEnv_JSONObject pJSONObject, LibMCEnv_uint64 nIndex, const char * pName);
+
+/**
 * Returns the member type. Returns unknown, if the member does not exist.
 *
 * @param[in] pJSONObject - JSONObject instance.
@@ -4401,7 +4420,7 @@ typedef LibMCEnvResult (*PLibMCEnvJSONObject_HasMemberPtr) (LibMCEnv_JSONObject 
 * @param[out] pMemberType - The type of the member..
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetMemberTypePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv::eJSONObjectMemberType * pMemberType);
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetMemberTypePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv::eJSONObjectType * pMemberType);
 
 /**
 * Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
@@ -4454,6 +4473,233 @@ typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetBoolValuePtr) (LibMCEnv_JSONObje
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetObjectValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONObject * pValue);
+
+/**
+* Returns a member as object value. Fails if member is not of type Array.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetArrayValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONArray * pValue);
+
+/**
+* Removes a member with a specific name. Does nothing if Member does not exist.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_RemoveMemberPtr) (LibMCEnv_JSONObject pJSONObject, const char * pName);
+
+/**
+* Adds a member as string value. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[in] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, const char * pValue);
+
+/**
+* Adds a member as integer value. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddIntegerValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_int64 * pValue);
+
+/**
+* Adds a member as double value. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddDoubleValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_double * pValue);
+
+/**
+* Adds a member as bool value. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddBoolValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pValue);
+
+/**
+* Returns a member as object value. Returns empty object. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddObjectValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONObject * pValue);
+
+/**
+* Returns a member as object value. Returns empty array. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddArrayValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONArray * pValue);
+
+/*************************************************************************************************************************
+ Class definition for JSONArray
+**************************************************************************************************************************/
+
+/**
+* Returns the number of elements.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pCount - returns the number of elements.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetElementCountPtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns the element type. Returns unknown, if the element does not exist.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pElementType - The type of the element..
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetElementTypePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv::eJSONObjectType * pElementType);
+
+/**
+* Returns a element as string value. Fails if element is of type Array or Object. Returns true or false in terms of Boolean value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Element value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns a element as integer value. Fails if element is of type Array or Object, or a non-double string.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetIntegerValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv_int64 * pValue);
+
+/**
+* Returns a element as double value. Fails if element is of type Array or Object, or a non-integer string.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetDoubleValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv_double * pValue);
+
+/**
+* Returns a element as boolean value. Fails if element is of type Array or Object or Double.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetBoolValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, bool * pValue);
+
+/**
+* Returns a element as object value. Fails if element is not of type Object.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetObjectValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv_JSONObject * pValue);
+
+/**
+* Returns a element as object value. Fails if element is not of type Array.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetArrayValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv_JSONArray * pValue);
+
+/**
+* Removes an element with a specific index. Does nothing if Element does not exist.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_RemoveElementPtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex);
+
+/**
+* Adds an element as string value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddValuePtr) (LibMCEnv_JSONArray pJSONArray, const char * pValue);
+
+/**
+* Adds a member as integer value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddIntegerValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_int64 * pValue);
+
+/**
+* Adds a member as double value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddDoubleValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_double * pValue);
+
+/**
+* Adds a member as bool value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddBoolValuePtr) (LibMCEnv_JSONArray pJSONArray, bool * pValue);
+
+/**
+* Returns a member as object value. Returns empty object.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddObjectValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_JSONObject * pValue);
+
+/**
+* Returns a member as object value. Returns empty array.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddArrayValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_JSONArray * pValue);
 
 /*************************************************************************************************************************
  Class definition for XMLDocumentNode
@@ -8959,7 +9205,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetStartDateTimePtr) (LibMCEnv_U
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SleepPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nDelay);
 
 /**
-* Checks if an external event parameter exists
+* Checks if an external event parameter exists. DEPRECIATED, use GetExternalEventParameters instead.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
@@ -8969,7 +9215,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SleepPtr) (LibMCEnv_UIEnvironmen
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasExternalEventParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pParameterName, bool * pParameterExists);
 
 /**
-* Returns an external event parameter. Fails if it exists.
+* Returns an external event string parameter. Fails if it does not exists or is not of type string. DEPRECIATED, use GetExternalEventParameters instead.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
@@ -8981,7 +9227,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasExternalEventParameterPtr) (L
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetExternalEventParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pParameterName, const LibMCEnv_uint32 nParameterValueBufferSize, LibMCEnv_uint32* pParameterValueNeededChars, char * pParameterValueBuffer);
 
 /**
-* Adds a return value to return to the external event caller.
+* Adds a return string value to return to the external event caller. DEPRECIATED, use GetExternalEventParameters instead.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
 * @param[in] pReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
@@ -8989,6 +9235,24 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetExternalEventParameterPtr) (L
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_AddExternalEventResultValuePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, const char * pReturnValue);
+
+/**
+* Returns the external event parameters. This JSON Object was passed on from the external API.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pParameterValue - Parameter value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetExternalEventParametersPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JSONObject * pParameterValue);
+
+/**
+* Returns the external event results. This JSON Object will be passed on to an ext
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pParameterValue - Parameter value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetExternalEventResultsPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JSONObject * pParameterValue);
 
 /*************************************************************************************************************************
  Global functions
@@ -9451,12 +9715,37 @@ typedef struct {
 	PLibMCEnvXMLDocumentAttribute_SetBoolValuePtr m_XMLDocumentAttribute_SetBoolValue;
 	PLibMCEnvXMLDocumentAttribute_RemovePtr m_XMLDocumentAttribute_Remove;
 	PLibMCEnvJSONObject_HasMemberPtr m_JSONObject_HasMember;
+	PLibMCEnvJSONObject_GetMemberCountPtr m_JSONObject_GetMemberCount;
+	PLibMCEnvJSONObject_GetMemberNamePtr m_JSONObject_GetMemberName;
 	PLibMCEnvJSONObject_GetMemberTypePtr m_JSONObject_GetMemberType;
 	PLibMCEnvJSONObject_GetValuePtr m_JSONObject_GetValue;
 	PLibMCEnvJSONObject_GetIntegerValuePtr m_JSONObject_GetIntegerValue;
 	PLibMCEnvJSONObject_GetDoubleValuePtr m_JSONObject_GetDoubleValue;
 	PLibMCEnvJSONObject_GetBoolValuePtr m_JSONObject_GetBoolValue;
 	PLibMCEnvJSONObject_GetObjectValuePtr m_JSONObject_GetObjectValue;
+	PLibMCEnvJSONObject_GetArrayValuePtr m_JSONObject_GetArrayValue;
+	PLibMCEnvJSONObject_RemoveMemberPtr m_JSONObject_RemoveMember;
+	PLibMCEnvJSONObject_AddValuePtr m_JSONObject_AddValue;
+	PLibMCEnvJSONObject_AddIntegerValuePtr m_JSONObject_AddIntegerValue;
+	PLibMCEnvJSONObject_AddDoubleValuePtr m_JSONObject_AddDoubleValue;
+	PLibMCEnvJSONObject_AddBoolValuePtr m_JSONObject_AddBoolValue;
+	PLibMCEnvJSONObject_AddObjectValuePtr m_JSONObject_AddObjectValue;
+	PLibMCEnvJSONObject_AddArrayValuePtr m_JSONObject_AddArrayValue;
+	PLibMCEnvJSONArray_GetElementCountPtr m_JSONArray_GetElementCount;
+	PLibMCEnvJSONArray_GetElementTypePtr m_JSONArray_GetElementType;
+	PLibMCEnvJSONArray_GetValuePtr m_JSONArray_GetValue;
+	PLibMCEnvJSONArray_GetIntegerValuePtr m_JSONArray_GetIntegerValue;
+	PLibMCEnvJSONArray_GetDoubleValuePtr m_JSONArray_GetDoubleValue;
+	PLibMCEnvJSONArray_GetBoolValuePtr m_JSONArray_GetBoolValue;
+	PLibMCEnvJSONArray_GetObjectValuePtr m_JSONArray_GetObjectValue;
+	PLibMCEnvJSONArray_GetArrayValuePtr m_JSONArray_GetArrayValue;
+	PLibMCEnvJSONArray_RemoveElementPtr m_JSONArray_RemoveElement;
+	PLibMCEnvJSONArray_AddValuePtr m_JSONArray_AddValue;
+	PLibMCEnvJSONArray_AddIntegerValuePtr m_JSONArray_AddIntegerValue;
+	PLibMCEnvJSONArray_AddDoubleValuePtr m_JSONArray_AddDoubleValue;
+	PLibMCEnvJSONArray_AddBoolValuePtr m_JSONArray_AddBoolValue;
+	PLibMCEnvJSONArray_AddObjectValuePtr m_JSONArray_AddObjectValue;
+	PLibMCEnvJSONArray_AddArrayValuePtr m_JSONArray_AddArrayValue;
 	PLibMCEnvXMLDocumentNode_GetNamePtr m_XMLDocumentNode_GetName;
 	PLibMCEnvXMLDocumentNode_GetNameSpacePtr m_XMLDocumentNode_GetNameSpace;
 	PLibMCEnvXMLDocumentNode_GetTextContentPtr m_XMLDocumentNode_GetTextContent;
@@ -9875,6 +10164,8 @@ typedef struct {
 	PLibMCEnvUIEnvironment_HasExternalEventParameterPtr m_UIEnvironment_HasExternalEventParameter;
 	PLibMCEnvUIEnvironment_GetExternalEventParameterPtr m_UIEnvironment_GetExternalEventParameter;
 	PLibMCEnvUIEnvironment_AddExternalEventResultValuePtr m_UIEnvironment_AddExternalEventResultValue;
+	PLibMCEnvUIEnvironment_GetExternalEventParametersPtr m_UIEnvironment_GetExternalEventParameters;
+	PLibMCEnvUIEnvironment_GetExternalEventResultsPtr m_UIEnvironment_GetExternalEventResults;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

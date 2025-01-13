@@ -263,6 +263,11 @@ public:
 
 	void AddExternalEventResultValue(const std::string& sReturnValueName, const std::string& sReturnValue) override;
 
+	IJSONObject* GetExternalEventParameters() override;
+
+	IJSONObject* GetExternalEventResults() override;
+
+
 };
 
 } // namespace Impl

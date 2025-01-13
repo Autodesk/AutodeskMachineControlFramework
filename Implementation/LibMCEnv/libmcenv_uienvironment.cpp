@@ -983,6 +983,16 @@ void CUIEnvironment::AddExternalEventResultValue(const std::string& sReturnValue
     m_ExternalEventReturnValues.insert(std::make_pair (sReturnValueName, sReturnValue));
 }
 
+IJSONObject* CUIEnvironment::GetExternalEventParameters()
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IJSONObject* CUIEnvironment::GetExternalEventResults()
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
 bool CUIEnvironment::HasResourceData(const std::string& sIdentifier)
 {
 

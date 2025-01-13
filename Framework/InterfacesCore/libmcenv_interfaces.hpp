@@ -92,6 +92,7 @@ class IWorkingFileIterator;
 class IWorkingDirectory;
 class IXMLDocumentAttribute;
 class IJSONObject;
+class IJSONArray;
 class IXMLDocumentNode;
 class IXMLDocumentNodes;
 class IXMLDocument;
@@ -3597,11 +3598,24 @@ public:
 	virtual bool HasMember(const std::string & sName) = 0;
 
 	/**
+	* IJSONObject::GetMemberCount - Returns the number of members.
+	* @return returns the number of members.
+	*/
+	virtual LibMCEnv_uint64 GetMemberCount() = 0;
+
+	/**
+	* IJSONObject::GetMemberName - Returns the name of a member by index.
+	* @param[in] nIndex - Index of the member, 0-based. Fails if larger or equal than MemberCount
+	* @param[in] sName - Name of the member.
+	*/
+	virtual void GetMemberName(const LibMCEnv_uint64 nIndex, const std::string & sName) = 0;
+
+	/**
 	* IJSONObject::GetMemberType - Returns the member type. Returns unknown, if the member does not exist.
 	* @param[in] sName - Name of the member.
 	* @return The type of the member..
 	*/
-	virtual LibMCEnv::eJSONObjectMemberType GetMemberType(const std::string & sName) = 0;
+	virtual LibMCEnv::eJSONObjectType GetMemberType(const std::string & sName) = 0;
 
 	/**
 	* IJSONObject::GetValue - Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
@@ -3638,9 +3652,172 @@ public:
 	*/
 	virtual IJSONObject * GetObjectValue(const std::string & sName) = 0;
 
+	/**
+	* IJSONObject::GetArrayValue - Returns a member as object value. Fails if member is not of type Array.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual IJSONArray * GetArrayValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::RemoveMember - Removes a member with a specific name. Does nothing if Member does not exist.
+	* @param[in] sName - Name of the member.
+	*/
+	virtual void RemoveMember(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddValue - Adds a member as string value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @param[in] sValue - Member value.
+	*/
+	virtual void AddValue(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
+	* IJSONObject::AddIntegerValue - Adds a member as integer value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_int64 AddIntegerValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddDoubleValue - Adds a member as double value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_double AddDoubleValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddBoolValue - Adds a member as bool value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual bool AddBoolValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddObjectValue - Returns a member as object value. Returns empty object. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual IJSONObject * AddObjectValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddArrayValue - Returns a member as object value. Returns empty array. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual IJSONArray * AddArrayValue(const std::string & sName) = 0;
+
 };
 
 typedef IBaseSharedPtr<IJSONObject> PIJSONObject;
+
+
+/*************************************************************************************************************************
+ Class interface for JSONArray 
+**************************************************************************************************************************/
+
+class IJSONArray : public virtual IBase {
+public:
+	/**
+	* IJSONArray::GetElementCount - Returns the number of elements.
+	* @return returns the number of elements.
+	*/
+	virtual LibMCEnv_uint64 GetElementCount() = 0;
+
+	/**
+	* IJSONArray::GetElementType - Returns the element type. Returns unknown, if the element does not exist.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return The type of the element..
+	*/
+	virtual LibMCEnv::eJSONObjectType GetElementType(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetValue - Returns a element as string value. Fails if element is of type Array or Object. Returns true or false in terms of Boolean value.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual std::string GetValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetIntegerValue - Returns a element as integer value. Fails if element is of type Array or Object, or a non-double string.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetDoubleValue - Returns a element as double value. Fails if element is of type Array or Object, or a non-integer string.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual LibMCEnv_double GetDoubleValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetBoolValue - Returns a element as boolean value. Fails if element is of type Array or Object or Double.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual bool GetBoolValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetObjectValue - Returns a element as object value. Fails if element is not of type Object.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual IJSONObject * GetObjectValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetArrayValue - Returns a element as object value. Fails if element is not of type Array.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual IJSONArray * GetArrayValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::RemoveElement - Removes an element with a specific index. Does nothing if Element does not exist.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	*/
+	virtual void RemoveElement(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::AddValue - Adds an element as string value.
+	* @param[in] sValue - Member value.
+	*/
+	virtual void AddValue(const std::string & sValue) = 0;
+
+	/**
+	* IJSONArray::AddIntegerValue - Adds a member as integer value.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_int64 AddIntegerValue() = 0;
+
+	/**
+	* IJSONArray::AddDoubleValue - Adds a member as double value.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_double AddDoubleValue() = 0;
+
+	/**
+	* IJSONArray::AddBoolValue - Adds a member as bool value.
+	* @return Member value.
+	*/
+	virtual bool AddBoolValue() = 0;
+
+	/**
+	* IJSONArray::AddObjectValue - Returns a member as object value. Returns empty object.
+	* @return Member value.
+	*/
+	virtual IJSONObject * AddObjectValue() = 0;
+
+	/**
+	* IJSONArray::AddArrayValue - Returns a member as object value. Returns empty array.
+	* @return Member value.
+	*/
+	virtual IJSONArray * AddArrayValue() = 0;
+
+};
+
+typedef IBaseSharedPtr<IJSONArray> PIJSONArray;
 
 
 /*************************************************************************************************************************
@@ -6900,25 +7077,37 @@ public:
 	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
 
 	/**
-	* IUIEnvironment::HasExternalEventParameter - Checks if an external event parameter exists
+	* IUIEnvironment::HasExternalEventParameter - Checks if an external event parameter exists. DEPRECIATED, use GetExternalEventParameters instead.
 	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
 	* @return Flag if the parameter exists.
 	*/
 	virtual bool HasExternalEventParameter(const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetExternalEventParameter - Returns an external event parameter. Fails if it exists.
+	* IUIEnvironment::GetExternalEventParameter - Returns an external event string parameter. Fails if it does not exists or is not of type string. DEPRECIATED, use GetExternalEventParameters instead.
 	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
 	* @return Parameter value.
 	*/
 	virtual std::string GetExternalEventParameter(const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::AddExternalEventResultValue - Adds a return value to return to the external event caller.
+	* IUIEnvironment::AddExternalEventResultValue - Adds a return string value to return to the external event caller. DEPRECIATED, use GetExternalEventParameters instead.
 	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
 	* @param[in] sReturnValue - Return value.
 	*/
 	virtual void AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue) = 0;
+
+	/**
+	* IUIEnvironment::GetExternalEventParameters - Returns the external event parameters. This JSON Object was passed on from the external API.
+	* @return Parameter value.
+	*/
+	virtual IJSONObject * GetExternalEventParameters() = 0;
+
+	/**
+	* IUIEnvironment::GetExternalEventResults - Returns the external event results. This JSON Object will be passed on to an ext
+	* @return Parameter value.
+	*/
+	virtual IJSONObject * GetExternalEventResults() = 0;
 
 };
 

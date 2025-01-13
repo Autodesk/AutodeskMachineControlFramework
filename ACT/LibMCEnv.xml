@@ -269,7 +269,7 @@
 	</enum>	
 	
 	
-	<enum name="JSONObjectMemberType">
+	<enum name="JSONObjectType">
 		<option name="Unknown" value="0"/>
 		<option name="String" value="1"/>
 		<option name="Integer" value="2"/>
@@ -2597,9 +2597,18 @@
 			<param name="MemberExists" type="bool" pass="return" description="returns if a member with a specific name exists." />
 		</method>
 
+		<method name="GetMemberCount" description="Returns the number of members.">
+			<param name="Count" type="uint64" pass="return" description="returns the number of members." />
+		</method>
+
+		<method name="GetMemberName" description="Returns the name of a member by index.">
+			<param name="Index" type="uint64" pass="in" description="Index of the member, 0-based. Fails if larger or equal than MemberCount" />
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+		</method>
+
 		<method name="GetMemberType" description="Returns the member type. Returns unknown, if the member does not exist.">
 			<param name="Name" type="string" pass="in" description="Name of the member." />
-			<param name="MemberType" type="enum" class="JSONObjectMemberType" pass="return" description="The type of the member.." />
+			<param name="MemberType" type="enum" class="JSONObjectType" pass="return" description="The type of the member.." />
 		</method>
 
 		<method name="GetValue" description="Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.">
@@ -2627,8 +2636,118 @@
 			<param name="Value" type="class" class="JSONObject" pass="return" description="Member value." />
 		</method>
 
+		<method name="GetArrayValue" description="Returns a member as object value. Fails if member is not of type Array.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="class" class="JSONArray" pass="return" description="Member value." />
+		</method>
+
+		<method name="RemoveMember" description="Removes a member with a specific name. Does nothing if Member does not exist.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+		</method>
+
+		<method name="AddValue" description="Adds a member as string value. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="string" pass="in" description="Member value." />
+		</method>
+
+		<method name="AddIntegerValue" description="Adds a member as integer value. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="int64" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddDoubleValue" description="Adds a member as double value. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="double" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddBoolValue" description="Adds a member as bool value. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="bool" pass="return" description="Member value." />
+		</method>
+	
+		<method name="AddObjectValue" description="Returns a member as object value. Returns empty object. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="class" class="JSONObject" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddArrayValue" description="Returns a member as object value. Returns empty array. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="class" class="JSONArray" pass="return" description="Member value." />
+		</method>
+
 	</class>
 
+
+	<class name="JSONArray" parent="Base" description="A JSON Array.">
+
+		<method name="GetElementCount" description="Returns the number of elements.">
+			<param name="Count" type="uint64" pass="return" description="returns the number of elements." />
+		</method>
+
+		<method name="GetElementType" description="Returns the element type. Returns unknown, if the element does not exist.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="ElementType" type="enum" class="JSONObjectType" pass="return" description="The type of the element.." />
+		</method>
+
+		<method name="GetValue" description="Returns a element as string value. Fails if element is of type Array or Object. Returns true or false in terms of Boolean value.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="string" pass="return" description="Element value." />
+		</method>
+
+		<method name="GetIntegerValue" description="Returns a element as integer value. Fails if element is of type Array or Object, or a non-double string.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="int64" pass="return" description="Element value." />
+		</method>
+
+		<method name="GetDoubleValue" description="Returns a element as double value. Fails if element is of type Array or Object, or a non-integer string.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="double" pass="return" description="Element value." />
+		</method>
+	
+		<method name="GetBoolValue" description="Returns a element as boolean value. Fails if element is of type Array or Object or Double.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="bool" pass="return" description="Element value." />
+		</method>
+
+		<method name="GetObjectValue" description="Returns a element as object value. Fails if element is not of type Object.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="class" class="JSONObject" pass="return" description="Element value." />
+		</method>
+
+		<method name="GetArrayValue" description="Returns a element as object value. Fails if element is not of type Array.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="class" class="JSONArray" pass="return" description="Element value." />
+		</method>
+
+		<method name="RemoveElement" description="Removes an element with a specific index. Does nothing if Element does not exist.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+		</method>
+
+		<method name="AddValue" description="Adds an element as string value.">
+			<param name="Value" type="string" pass="in" description="Member value." />
+		</method>
+
+		<method name="AddIntegerValue" description="Adds a member as integer value.">
+			<param name="Value" type="int64" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddDoubleValue" description="Adds a member as double value.">
+			<param name="Value" type="double" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddBoolValue" description="Adds a member as bool value.">
+			<param name="Value" type="bool" pass="return" description="Member value." />
+		</method>
+	
+		<method name="AddObjectValue" description="Returns a member as object value. Returns empty object.">
+			<param name="Value" type="class" class="JSONObject" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddArrayValue" description="Returns a member as object value. Returns empty array.">
+			<param name="Value" type="class" class="JSONArray" pass="return" description="Member value." />
+		</method>
+
+	</class>
 
 	<class name="XMLDocumentNode" parent="Base" description="An XML document node.">
 
@@ -4870,19 +4989,27 @@
 			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
 		</method>
 
-		<method name="HasExternalEventParameter" description="Checks if an external event parameter exists">
+		<method name="HasExternalEventParameter" description="Checks if an external event parameter exists. DEPRECIATED, use GetExternalEventParameters instead.">
 			<param name="ParameterName" type="string" pass="in" description="The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
 			<param name="ParameterExists" type="bool" pass="return" description="Flag if the parameter exists." />
 		</method>
 		
-		<method name="GetExternalEventParameter" description="Returns an external event parameter. Fails if it exists.">
+		<method name="GetExternalEventParameter" description="Returns an external event string parameter. Fails if it does not exists or is not of type string. DEPRECIATED, use GetExternalEventParameters instead.">
 			<param name="ParameterName" type="string" pass="in" description="The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
 			<param name="ParameterValue" type="string" pass="return" description="Parameter value." />
 		</method>
 		
-		<method name="AddExternalEventResultValue" description="Adds a return value to return to the external event caller.">
+		<method name="AddExternalEventResultValue" description="Adds a return string value to return to the external event caller. DEPRECIATED, use GetExternalEventParameters instead.">
 			<param name="ReturnValueName" type="string" pass="in" description="The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
 			<param name="ReturnValue" type="string" pass="in" description="Return value." />
+		</method>
+		
+		<method name="GetExternalEventParameters" description="Returns the external event parameters. This JSON Object was passed on from the external API.">
+			<param name="ParameterValue" type="class" class="JSONObject" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetExternalEventResults" description="Returns the external event results. This JSON Object will be passed on to an ext">
+			<param name="ParameterValue" type="class" class="JSONObject" pass="return" description="Parameter value." />
 		</method>
 
 	</class>

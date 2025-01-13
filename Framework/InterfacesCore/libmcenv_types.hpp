@@ -564,6 +564,7 @@ typedef LibMCEnvHandle LibMCEnv_WorkingFileIterator;
 typedef LibMCEnvHandle LibMCEnv_WorkingDirectory;
 typedef LibMCEnvHandle LibMCEnv_XMLDocumentAttribute;
 typedef LibMCEnvHandle LibMCEnv_JSONObject;
+typedef LibMCEnvHandle LibMCEnv_JSONArray;
 typedef LibMCEnvHandle LibMCEnv_XMLDocumentNode;
 typedef LibMCEnvHandle LibMCEnv_XMLDocumentNodes;
 typedef LibMCEnvHandle LibMCEnv_XMLDocument;
@@ -616,7 +617,7 @@ namespace LibMCEnv {
     Unknown = 7
   };
   
-  enum class eJSONObjectMemberType : LibMCEnv_int32 {
+  enum class eJSONObjectType : LibMCEnv_int32 {
     Unknown = 0,
     String = 1,
     Integer = 2,
@@ -789,7 +790,7 @@ namespace LibMCEnv {
 // define legacy C-names for enums, structs and function types
 typedef LibMCEnv::eAlertLevel eLibMCEnvAlertLevel;
 typedef LibMCEnv::eLogLevel eLibMCEnvLogLevel;
-typedef LibMCEnv::eJSONObjectMemberType eLibMCEnvJSONObjectMemberType;
+typedef LibMCEnv::eJSONObjectType eLibMCEnvJSONObjectType;
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::ePNGStorageFormat eLibMCEnvPNGStorageFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
