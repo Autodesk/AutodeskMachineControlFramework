@@ -4393,6 +4393,82 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_setboolvalue(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_xmldocumentattribute_remove(LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute);
 
 /*************************************************************************************************************************
+ Class definition for JSONObject
+**************************************************************************************************************************/
+
+/**
+* Returns if a member with a specific name exist.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pMemberExists - returns if a member with a specific name exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jsonobject_hasmember(LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pMemberExists);
+
+/**
+* Returns the member type. Returns unknown, if the member does not exist.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pMemberType - The type of the member..
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jsonobject_getmembertype(LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv::eJSONObjectMemberType * pMemberType);
+
+/**
+* Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Member value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jsonobject_getvalue(LibMCEnv_JSONObject pJSONObject, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jsonobject_getintegervalue(LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_int64 * pValue);
+
+/**
+* Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jsonobject_getdoublevalue(LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_double * pValue);
+
+/**
+* Returns a member as boolean value. Fails if member is of type Array or Object or Double.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jsonobject_getboolvalue(LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pValue);
+
+/**
+* Returns a member as object value. Fails if member is not of type Object.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_jsonobject_getobjectvalue(LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONObject * pValue);
+
+/*************************************************************************************************************************
  Class definition for XMLDocumentNode
 **************************************************************************************************************************/
 

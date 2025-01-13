@@ -4380,6 +4380,82 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_SetBoolValuePtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_RemovePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute);
 
 /*************************************************************************************************************************
+ Class definition for JSONObject
+**************************************************************************************************************************/
+
+/**
+* Returns if a member with a specific name exist.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pMemberExists - returns if a member with a specific name exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_HasMemberPtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pMemberExists);
+
+/**
+* Returns the member type. Returns unknown, if the member does not exist.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pMemberType - The type of the member..
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetMemberTypePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv::eJSONObjectMemberType * pMemberType);
+
+/**
+* Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Member value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetIntegerValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_int64 * pValue);
+
+/**
+* Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetDoubleValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_double * pValue);
+
+/**
+* Returns a member as boolean value. Fails if member is of type Array or Object or Double.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetBoolValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pValue);
+
+/**
+* Returns a member as object value. Fails if member is not of type Object.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetObjectValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONObject * pValue);
+
+/*************************************************************************************************************************
  Class definition for XMLDocumentNode
 **************************************************************************************************************************/
 
@@ -9374,6 +9450,13 @@ typedef struct {
 	PLibMCEnvXMLDocumentAttribute_SetDoubleValuePtr m_XMLDocumentAttribute_SetDoubleValue;
 	PLibMCEnvXMLDocumentAttribute_SetBoolValuePtr m_XMLDocumentAttribute_SetBoolValue;
 	PLibMCEnvXMLDocumentAttribute_RemovePtr m_XMLDocumentAttribute_Remove;
+	PLibMCEnvJSONObject_HasMemberPtr m_JSONObject_HasMember;
+	PLibMCEnvJSONObject_GetMemberTypePtr m_JSONObject_GetMemberType;
+	PLibMCEnvJSONObject_GetValuePtr m_JSONObject_GetValue;
+	PLibMCEnvJSONObject_GetIntegerValuePtr m_JSONObject_GetIntegerValue;
+	PLibMCEnvJSONObject_GetDoubleValuePtr m_JSONObject_GetDoubleValue;
+	PLibMCEnvJSONObject_GetBoolValuePtr m_JSONObject_GetBoolValue;
+	PLibMCEnvJSONObject_GetObjectValuePtr m_JSONObject_GetObjectValue;
 	PLibMCEnvXMLDocumentNode_GetNamePtr m_XMLDocumentNode_GetName;
 	PLibMCEnvXMLDocumentNode_GetNameSpacePtr m_XMLDocumentNode_GetNameSpace;
 	PLibMCEnvXMLDocumentNode_GetTextContentPtr m_XMLDocumentNode_GetTextContent;

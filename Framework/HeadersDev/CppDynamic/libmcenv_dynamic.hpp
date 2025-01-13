@@ -96,6 +96,7 @@ class CWorkingFile;
 class CWorkingFileIterator;
 class CWorkingDirectory;
 class CXMLDocumentAttribute;
+class CJSONObject;
 class CXMLDocumentNode;
 class CXMLDocumentNodes;
 class CXMLDocument;
@@ -165,6 +166,7 @@ typedef CWorkingFile CLibMCEnvWorkingFile;
 typedef CWorkingFileIterator CLibMCEnvWorkingFileIterator;
 typedef CWorkingDirectory CLibMCEnvWorkingDirectory;
 typedef CXMLDocumentAttribute CLibMCEnvXMLDocumentAttribute;
+typedef CJSONObject CLibMCEnvJSONObject;
 typedef CXMLDocumentNode CLibMCEnvXMLDocumentNode;
 typedef CXMLDocumentNodes CLibMCEnvXMLDocumentNodes;
 typedef CXMLDocument CLibMCEnvXMLDocument;
@@ -234,6 +236,7 @@ typedef std::shared_ptr<CWorkingFile> PWorkingFile;
 typedef std::shared_ptr<CWorkingFileIterator> PWorkingFileIterator;
 typedef std::shared_ptr<CWorkingDirectory> PWorkingDirectory;
 typedef std::shared_ptr<CXMLDocumentAttribute> PXMLDocumentAttribute;
+typedef std::shared_ptr<CJSONObject> PJSONObject;
 typedef std::shared_ptr<CXMLDocumentNode> PXMLDocumentNode;
 typedef std::shared_ptr<CXMLDocumentNodes> PXMLDocumentNodes;
 typedef std::shared_ptr<CXMLDocument> PXMLDocument;
@@ -303,6 +306,7 @@ typedef PWorkingFile PLibMCEnvWorkingFile;
 typedef PWorkingFileIterator PLibMCEnvWorkingFileIterator;
 typedef PWorkingDirectory PLibMCEnvWorkingDirectory;
 typedef PXMLDocumentAttribute PLibMCEnvXMLDocumentAttribute;
+typedef PJSONObject PLibMCEnvJSONObject;
 typedef PXMLDocumentNode PLibMCEnvXMLDocumentNode;
 typedef PXMLDocumentNodes PLibMCEnvXMLDocumentNodes;
 typedef PXMLDocument PLibMCEnvXMLDocument;
@@ -984,6 +988,7 @@ private:
 	friend class CWorkingFileIterator;
 	friend class CWorkingDirectory;
 	friend class CXMLDocumentAttribute;
+	friend class CJSONObject;
 	friend class CXMLDocumentNode;
 	friend class CXMLDocumentNodes;
 	friend class CXMLDocument;
@@ -2049,6 +2054,29 @@ public:
 	inline void SetDoubleValue(const LibMCEnv_double dValue);
 	inline void SetBoolValue(const bool bValue);
 	inline void Remove();
+};
+	
+/*************************************************************************************************************************
+ Class CJSONObject 
+**************************************************************************************************************************/
+class CJSONObject : public CBase {
+public:
+	
+	/**
+	* CJSONObject::CJSONObject - Constructor for JSONObject class.
+	*/
+	CJSONObject(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool HasMember(const std::string & sName);
+	inline eJSONObjectMemberType GetMemberType(const std::string & sName);
+	inline std::string GetValue(const std::string & sName);
+	inline LibMCEnv_int64 GetIntegerValue(const std::string & sName);
+	inline LibMCEnv_double GetDoubleValue(const std::string & sName);
+	inline bool GetBoolValue(const std::string & sName);
+	inline PJSONObject GetObjectValue(const std::string & sName);
 };
 	
 /*************************************************************************************************************************
@@ -3386,6 +3414,13 @@ public:
 		pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetBoolValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_Remove = nullptr;
+		pWrapperTable->m_JSONObject_HasMember = nullptr;
+		pWrapperTable->m_JSONObject_GetMemberType = nullptr;
+		pWrapperTable->m_JSONObject_GetValue = nullptr;
+		pWrapperTable->m_JSONObject_GetIntegerValue = nullptr;
+		pWrapperTable->m_JSONObject_GetDoubleValue = nullptr;
+		pWrapperTable->m_JSONObject_GetBoolValue = nullptr;
+		pWrapperTable->m_JSONObject_GetObjectValue = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetName = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetNameSpace = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetTextContent = nullptr;
@@ -7493,6 +7528,69 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentAttribute_Remove == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_HasMember = (PLibMCEnvJSONObject_HasMemberPtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_hasmember");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_HasMember = (PLibMCEnvJSONObject_HasMemberPtr) dlsym(hLibrary, "libmcenv_jsonobject_hasmember");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_HasMember == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetMemberType = (PLibMCEnvJSONObject_GetMemberTypePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getmembertype");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetMemberType = (PLibMCEnvJSONObject_GetMemberTypePtr) dlsym(hLibrary, "libmcenv_jsonobject_getmembertype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetMemberType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetValue = (PLibMCEnvJSONObject_GetValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetValue = (PLibMCEnvJSONObject_GetValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetIntegerValue = (PLibMCEnvJSONObject_GetIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetIntegerValue = (PLibMCEnvJSONObject_GetIntegerValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetDoubleValue = (PLibMCEnvJSONObject_GetDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getdoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetDoubleValue = (PLibMCEnvJSONObject_GetDoubleValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getdoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetBoolValue = (PLibMCEnvJSONObject_GetBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetBoolValue = (PLibMCEnvJSONObject_GetBoolValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetObjectValue = (PLibMCEnvJSONObject_GetObjectValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getobjectvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetObjectValue = (PLibMCEnvJSONObject_GetObjectValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getobjectvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetObjectValue == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12932,6 +13030,34 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentattribute_remove", (void**)&(pWrapperTable->m_XMLDocumentAttribute_Remove));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_Remove == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_hasmember", (void**)&(pWrapperTable->m_JSONObject_HasMember));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_HasMember == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getmembertype", (void**)&(pWrapperTable->m_JSONObject_GetMemberType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetMemberType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getvalue", (void**)&(pWrapperTable->m_JSONObject_GetValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getintegervalue", (void**)&(pWrapperTable->m_JSONObject_GetIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getdoublevalue", (void**)&(pWrapperTable->m_JSONObject_GetDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getboolvalue", (void**)&(pWrapperTable->m_JSONObject_GetBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getobjectvalue", (void**)&(pWrapperTable->m_JSONObject_GetObjectValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetObjectValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getname", (void**)&(pWrapperTable->m_XMLDocumentNode_GetName));
@@ -20132,6 +20258,107 @@ public:
 	void CXMLDocumentAttribute::Remove()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentAttribute_Remove(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CJSONObject
+	 */
+	
+	/**
+	* CJSONObject::HasMember - Returns if a member with a specific name exist.
+	* @param[in] sName - Name of the member.
+	* @return returns if a member with a specific name exists.
+	*/
+	bool CJSONObject::HasMember(const std::string & sName)
+	{
+		bool resultMemberExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_HasMember(m_pHandle, sName.c_str(), &resultMemberExists));
+		
+		return resultMemberExists;
+	}
+	
+	/**
+	* CJSONObject::GetMemberType - Returns the member type. Returns unknown, if the member does not exist.
+	* @param[in] sName - Name of the member.
+	* @return The type of the member..
+	*/
+	eJSONObjectMemberType CJSONObject::GetMemberType(const std::string & sName)
+	{
+		eJSONObjectMemberType resultMemberType = (eJSONObjectMemberType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetMemberType(m_pHandle, sName.c_str(), &resultMemberType));
+		
+		return resultMemberType;
+	}
+	
+	/**
+	* CJSONObject::GetValue - Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	std::string CJSONObject::GetValue(const std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetValue(m_pHandle, sName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetValue(m_pHandle, sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CJSONObject::GetIntegerValue - Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	LibMCEnv_int64 CJSONObject::GetIntegerValue(const std::string & sName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetIntegerValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::GetDoubleValue - Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	LibMCEnv_double CJSONObject::GetDoubleValue(const std::string & sName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetDoubleValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::GetBoolValue - Returns a member as boolean value. Fails if member is of type Array or Object or Double.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	bool CJSONObject::GetBoolValue(const std::string & sName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetBoolValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::GetObjectValue - Returns a member as object value. Fails if member is not of type Object.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	PJSONObject CJSONObject::GetObjectValue(const std::string & sName)
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetObjectValue(m_pHandle, sName.c_str(), &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONObject>(m_pWrapper, hValue);
 	}
 	
 	/**

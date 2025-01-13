@@ -91,6 +91,7 @@ class IWorkingFile;
 class IWorkingFileIterator;
 class IWorkingDirectory;
 class IXMLDocumentAttribute;
+class IJSONObject;
 class IXMLDocumentNode;
 class IXMLDocumentNodes;
 class IXMLDocument;
@@ -3580,6 +3581,66 @@ public:
 };
 
 typedef IBaseSharedPtr<IXMLDocumentAttribute> PIXMLDocumentAttribute;
+
+
+/*************************************************************************************************************************
+ Class interface for JSONObject 
+**************************************************************************************************************************/
+
+class IJSONObject : public virtual IBase {
+public:
+	/**
+	* IJSONObject::HasMember - Returns if a member with a specific name exist.
+	* @param[in] sName - Name of the member.
+	* @return returns if a member with a specific name exists.
+	*/
+	virtual bool HasMember(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetMemberType - Returns the member type. Returns unknown, if the member does not exist.
+	* @param[in] sName - Name of the member.
+	* @return The type of the member..
+	*/
+	virtual LibMCEnv::eJSONObjectMemberType GetMemberType(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetValue - Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual std::string GetValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetIntegerValue - Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetDoubleValue - Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_double GetDoubleValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetBoolValue - Returns a member as boolean value. Fails if member is of type Array or Object or Double.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual bool GetBoolValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetObjectValue - Returns a member as object value. Fails if member is not of type Object.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual IJSONObject * GetObjectValue(const std::string & sName) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJSONObject> PIJSONObject;
 
 
 /*************************************************************************************************************************

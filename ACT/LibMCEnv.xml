@@ -267,6 +267,17 @@
 		<option name="Debug" value="6"/>
 		<option name="Unknown" value="7"/>
 	</enum>	
+	
+	
+	<enum name="JSONObjectMemberType">
+		<option name="Unknown" value="0"/>
+		<option name="String" value="1"/>
+		<option name="Integer" value="2"/>
+		<option name="Double" value="3"/>
+		<option name="Object" value="4"/>
+		<option name="Array" value="5"/>
+	</enum>	
+	
 		
 	<enum name="ImagePixelFormat">
 		<option name="Unknown" value="0" />
@@ -2576,6 +2587,46 @@
 		<method name="Remove" description="Removes the attribute from its parent node. All subsequent calls to the class will fail.">
 		</method>
 		
+	</class>
+
+
+	<class name="JSONObject" parent="Base" description="A JSON Object.">
+
+		<method name="HasMember" description="Returns if a member with a specific name exist.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="MemberExists" type="bool" pass="return" description="returns if a member with a specific name exists." />
+		</method>
+
+		<method name="GetMemberType" description="Returns the member type. Returns unknown, if the member does not exist.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="MemberType" type="enum" class="JSONObjectMemberType" pass="return" description="The type of the member.." />
+		</method>
+
+		<method name="GetValue" description="Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="string" pass="return" description="Member value." />
+		</method>
+
+		<method name="GetIntegerValue" description="Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="int64" pass="return" description="Member value." />
+		</method>
+
+		<method name="GetDoubleValue" description="Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="double" pass="return" description="Member value." />
+		</method>
+	
+		<method name="GetBoolValue" description="Returns a member as boolean value. Fails if member is of type Array or Object or Double.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="bool" pass="return" description="Member value." />
+		</method>
+
+		<method name="GetObjectValue" description="Returns a member as object value. Fails if member is not of type Object.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="class" class="JSONObject" pass="return" description="Member value." />
+		</method>
+
 	</class>
 
 
