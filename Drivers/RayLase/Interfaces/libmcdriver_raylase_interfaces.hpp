@@ -58,6 +58,7 @@ namespace Impl {
 class IBase;
 class IDriver;
 class IRaylaseCommandLog;
+class INLightDriverBoard;
 class IRaylaseCard;
 class IDriver_Raylase;
 
@@ -328,6 +329,28 @@ typedef IBaseSharedPtr<IRaylaseCommandLog> PIRaylaseCommandLog;
 
 
 /*************************************************************************************************************************
+ Class interface for NLightDriverBoard 
+**************************************************************************************************************************/
+
+class INLightDriverBoard : public virtual IBase {
+public:
+	/**
+	* INLightDriverBoard::InitializeBoard - Initializes the NLight Driver board.
+	*/
+	virtual void InitializeBoard() = 0;
+
+	/**
+	* INLightDriverBoard::SetNLightLaserMode - Sets the nLight Laser Mode. Board must have been initialized first.
+	* @param[in] nLaserMode - Sets the laser mode.
+	*/
+	virtual void SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode) = 0;
+
+};
+
+typedef IBaseSharedPtr<INLightDriverBoard> PINLightDriverBoard;
+
+
+/*************************************************************************************************************************
  Class interface for RaylaseCard 
 **************************************************************************************************************************/
 
@@ -366,9 +389,10 @@ public:
 	virtual void LaserOn() = 0;
 
 	/**
-	* IRaylaseCard::InitializeNLightDriverBoard - Initializes the NLight Driver board.
+	* IRaylaseCard::GetNLightDriverBoard - Returns the NLight Driver Board Handler class.
+	* @return NLight Driver Board Instance
 	*/
-	virtual void InitializeNLightDriverBoard() = 0;
+	virtual INLightDriverBoard * GetNLightDriverBoard() = 0;
 
 	/**
 	* IRaylaseCard::LaserOff - Turns the laser off.

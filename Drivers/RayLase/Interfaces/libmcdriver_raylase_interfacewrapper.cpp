@@ -367,6 +367,58 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecommandlog_retrieveasstring
 
 
 /*************************************************************************************************************************
+ Class implementation for NLightDriverBoard
+**************************************************************************************************************************/
+LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_initializeboard(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard)
+{
+	IBase* pIBaseClass = (IBase *)pNLightDriverBoard;
+
+	try {
+		INLightDriverBoard* pINLightDriverBoard = dynamic_cast<INLightDriverBoard*>(pIBaseClass);
+		if (!pINLightDriverBoard)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pINLightDriverBoard->InitializeBoard();
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_setnlightlasermode(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 nLaserMode)
+{
+	IBase* pIBaseClass = (IBase *)pNLightDriverBoard;
+
+	try {
+		INLightDriverBoard* pINLightDriverBoard = dynamic_cast<INLightDriverBoard*>(pIBaseClass);
+		if (!pINLightDriverBoard)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pINLightDriverBoard->SetNLightLaserMode(nLaserMode);
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for RaylaseCard
 **************************************************************************************************************************/
 LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_isconnected(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pIsConnected)
@@ -519,17 +571,21 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_laseron(LibMCDriver_Ra
 	}
 }
 
-LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_initializenlightdriverboard(LibMCDriver_Raylase_RaylaseCard pRaylaseCard)
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_getnlightdriverboard(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_NLightDriverBoard * pDriverBoard)
 {
 	IBase* pIBaseClass = (IBase *)pRaylaseCard;
 
 	try {
+		if (pDriverBoard == nullptr)
+			throw ELibMCDriver_RaylaseInterfaceException (LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		IBase* pBaseDriverBoard(nullptr);
 		IRaylaseCard* pIRaylaseCard = dynamic_cast<IRaylaseCard*>(pIBaseClass);
 		if (!pIRaylaseCard)
 			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
 		
-		pIRaylaseCard->InitializeNLightDriverBoard();
+		pBaseDriverBoard = pIRaylaseCard->GetNLightDriverBoard();
 
+		*pDriverBoard = (IBase*)(pBaseDriverBoard);
 		return LIBMCDRIVER_RAYLASE_SUCCESS;
 	}
 	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
@@ -1056,6 +1112,10 @@ LibMCDriver_RaylaseResult LibMCDriver_Raylase::Impl::LibMCDriver_Raylase_GetProc
 		*ppProcAddress = (void*) &libmcdriver_raylase_driver_queryparametersex;
 	if (sProcName == "libmcdriver_raylase_raylasecommandlog_retrieveasstring") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecommandlog_retrieveasstring;
+	if (sProcName == "libmcdriver_raylase_nlightdriverboard_initializeboard") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_nlightdriverboard_initializeboard;
+	if (sProcName == "libmcdriver_raylase_nlightdriverboard_setnlightlasermode") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_nlightdriverboard_setnlightlasermode;
 	if (sProcName == "libmcdriver_raylase_raylasecard_isconnected") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_isconnected;
 	if (sProcName == "libmcdriver_raylase_raylasecard_resettosystemdefaults") 
@@ -1068,8 +1128,8 @@ LibMCDriver_RaylaseResult LibMCDriver_Raylase::Impl::LibMCDriver_Raylase_GetProc
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_retrievelatestlog;
 	if (sProcName == "libmcdriver_raylase_raylasecard_laseron") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_laseron;
-	if (sProcName == "libmcdriver_raylase_raylasecard_initializenlightdriverboard") 
-		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_initializenlightdriverboard;
+	if (sProcName == "libmcdriver_raylase_raylasecard_getnlightdriverboard") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_getnlightdriverboard;
 	if (sProcName == "libmcdriver_raylase_raylasecard_laseroff") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_laseroff;
 	if (sProcName == "libmcdriver_raylase_raylasecard_armlaser") 

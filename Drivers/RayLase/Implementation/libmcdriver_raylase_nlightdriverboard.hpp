@@ -27,18 +27,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CRaylaseCard
+Abstract: This is the class declaration of CNLightDriverBoard
 
 */
 
 
-#ifndef __LIBMCDRIVER_RAYLASE_RAYLASECARD
-#define __LIBMCDRIVER_RAYLASE_RAYLASECARD
+#ifndef __LIBMCDRIVER_RAYLASE_NLIGHTDRIVERBOARD
+#define __LIBMCDRIVER_RAYLASE_NLIGHTDRIVERBOARD
 
 #include "libmcdriver_raylase_interfaces.hpp"
-#include "libmcdriver_raylase_sdk.hpp"
-#include "libmcdriver_raylase_raylasecardlist.hpp"
-#include "libmcdriver_raylase_raylasecardimpl.hpp"
 
 // Parent classes
 #include "libmcdriver_raylase_base.hpp"
@@ -48,6 +45,7 @@ Abstract: This is the class declaration of CRaylaseCard
 #endif
 
 // Include custom headers here.
+#include "libmcdriver_raylase_raylasecardimpl.hpp"
 
 
 namespace LibMCDriver_Raylase {
@@ -55,50 +53,23 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CRaylaseCard 
+ Class declaration of CNLightDriverBoard 
 **************************************************************************************************************************/
 
-class CRaylaseCard : public virtual IRaylaseCard, public virtual CBase {
+class CNLightDriverBoard : public virtual INLightDriverBoard, public virtual CBase {
 private:
-	PRaylaseCardImpl m_pRaylaseCardImpl;
+
+	PRaylaseCardImpl m_pCardImpl;
 
 public:
 
-	CRaylaseCard(PRaylaseCardImpl pRaylaseCardImpl);
+    CNLightDriverBoard(PRaylaseCardImpl pCardImpl);
 
-	virtual ~CRaylaseCard();
+    virtual ~CNLightDriverBoard();
 
-	bool IsConnected() override;
+	void InitializeBoard() override;
 
-	void ResetToSystemDefaults() override;
-
-	void EnableCommandLogging() override;
-
-	void DisableCommandLogging() override;
-
-	INLightDriverBoard* GetNLightDriverBoard() override;
-
-	IRaylaseCommandLog* RetrieveLatestLog() override;
-
-	void LaserOn() override;
-
-	void LaserOff() override;
-
-	void ArmLaser(const bool bShallBeArmed) override;
-
-	bool IsLaserArmed() override;
-
-	void EnablePilot(const bool bShallBeEnabled) override;
-
-	bool PilotIsEnabled() override;
-
-	void GetLaserStatus(bool & bPilotIsEnabled, bool & bLaserIsArmed, bool & bLaserAlarm) override;
-
-	void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex) override;
-
-	LibMCDriver_Raylase_uint32 GetAssignedLaserIndex() override;
-
-	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) override;
+	void SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode) override;
 
 };
 
@@ -108,4 +79,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_RAYLASE_RAYLASECARD
+#endif // __LIBMCDRIVER_RAYLASE_NLIGHTDRIVERBOARD

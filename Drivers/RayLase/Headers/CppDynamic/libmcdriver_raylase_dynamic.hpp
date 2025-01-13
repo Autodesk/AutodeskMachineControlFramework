@@ -63,6 +63,7 @@ class CWrapper;
 class CBase;
 class CDriver;
 class CRaylaseCommandLog;
+class CNLightDriverBoard;
 class CRaylaseCard;
 class CDriver_Raylase;
 
@@ -73,6 +74,7 @@ typedef CWrapper CLibMCDriver_RaylaseWrapper;
 typedef CBase CLibMCDriver_RaylaseBase;
 typedef CDriver CLibMCDriver_RaylaseDriver;
 typedef CRaylaseCommandLog CLibMCDriver_RaylaseRaylaseCommandLog;
+typedef CNLightDriverBoard CLibMCDriver_RaylaseNLightDriverBoard;
 typedef CRaylaseCard CLibMCDriver_RaylaseRaylaseCard;
 typedef CDriver_Raylase CLibMCDriver_RaylaseDriver_Raylase;
 
@@ -83,6 +85,7 @@ typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<CRaylaseCommandLog> PRaylaseCommandLog;
+typedef std::shared_ptr<CNLightDriverBoard> PNLightDriverBoard;
 typedef std::shared_ptr<CRaylaseCard> PRaylaseCard;
 typedef std::shared_ptr<CDriver_Raylase> PDriver_Raylase;
 
@@ -93,6 +96,7 @@ typedef PWrapper PLibMCDriver_RaylaseWrapper;
 typedef PBase PLibMCDriver_RaylaseBase;
 typedef PDriver PLibMCDriver_RaylaseDriver;
 typedef PRaylaseCommandLog PLibMCDriver_RaylaseRaylaseCommandLog;
+typedef PNLightDriverBoard PLibMCDriver_RaylaseNLightDriverBoard;
 typedef PRaylaseCard PLibMCDriver_RaylaseRaylaseCard;
 typedef PDriver_Raylase PLibMCDriver_RaylaseDriver_Raylase;
 
@@ -215,6 +219,7 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEENUM: return "VARIABLEISNOTOFTYPEENUM";
 			case LIBMCDRIVER_RAYLASE_ERROR_ENUMVALUEOUTOFRANGE: return "ENUMVALUEOUTOFRANGE";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDFIELDDATASIZE: return "INVALIDFIELDDATASIZE";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDNLIGHTLASERMODE: return "INVALIDNLIGHTLASERMODE";
 		}
 		return "UNKNOWN";
 	}
@@ -264,6 +269,7 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEENUM: return "Variable is not of type enum";
 			case LIBMCDRIVER_RAYLASE_ERROR_ENUMVALUEOUTOFRANGE: return "Enum Value out of range";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDFIELDDATASIZE: return "Invalid field data size";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDNLIGHTLASERMODE: return "Invalid nLight Laser Mode";
 		}
 		return "unknown error";
 	}
@@ -388,6 +394,7 @@ private:
 	friend class CBase;
 	friend class CDriver;
 	friend class CRaylaseCommandLog;
+	friend class CNLightDriverBoard;
 	friend class CRaylaseCard;
 	friend class CDriver_Raylase;
 
@@ -490,6 +497,24 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CNLightDriverBoard 
+**************************************************************************************************************************/
+class CNLightDriverBoard : public CBase {
+public:
+	
+	/**
+	* CNLightDriverBoard::CNLightDriverBoard - Constructor for NLightDriverBoard class.
+	*/
+	CNLightDriverBoard(CWrapper* pWrapper, LibMCDriver_RaylaseHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void InitializeBoard();
+	inline void SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode);
+};
+	
+/*************************************************************************************************************************
  Class CRaylaseCard 
 **************************************************************************************************************************/
 class CRaylaseCard : public CBase {
@@ -509,7 +534,7 @@ public:
 	inline void DisableCommandLogging();
 	inline PRaylaseCommandLog RetrieveLatestLog();
 	inline void LaserOn();
-	inline void InitializeNLightDriverBoard();
+	inline PNLightDriverBoard GetNLightDriverBoard();
 	inline void LaserOff();
 	inline void ArmLaser(const bool bShallBeArmed);
 	inline bool IsLaserArmed();
@@ -675,13 +700,15 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_RaylaseCommandLog_RetrieveAsString = nullptr;
+		pWrapperTable->m_NLightDriverBoard_InitializeBoard = nullptr;
+		pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode = nullptr;
 		pWrapperTable->m_RaylaseCard_IsConnected = nullptr;
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = nullptr;
 		pWrapperTable->m_RaylaseCard_EnableCommandLogging = nullptr;
 		pWrapperTable->m_RaylaseCard_DisableCommandLogging = nullptr;
 		pWrapperTable->m_RaylaseCard_RetrieveLatestLog = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOn = nullptr;
-		pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard = nullptr;
+		pWrapperTable->m_RaylaseCard_GetNLightDriverBoard = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOff = nullptr;
 		pWrapperTable->m_RaylaseCard_ArmLaser = nullptr;
 		pWrapperTable->m_RaylaseCard_IsLaserArmed = nullptr;
@@ -821,6 +848,24 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_NLightDriverBoard_InitializeBoard = (PLibMCDriver_RaylaseNLightDriverBoard_InitializeBoardPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_initializeboard");
+		#else // _WIN32
+		pWrapperTable->m_NLightDriverBoard_InitializeBoard = (PLibMCDriver_RaylaseNLightDriverBoard_InitializeBoardPtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_initializeboard");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightDriverBoard_InitializeBoard == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode = (PLibMCDriver_RaylaseNLightDriverBoard_SetNLightLaserModePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_setnlightlasermode");
+		#else // _WIN32
+		pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode = (PLibMCDriver_RaylaseNLightDriverBoard_SetNLightLaserModePtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_setnlightlasermode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RaylaseCard_IsConnected = (PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_isconnected");
 		#else // _WIN32
 		pWrapperTable->m_RaylaseCard_IsConnected = (PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_isconnected");
@@ -875,12 +920,12 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard = (PLibMCDriver_RaylaseRaylaseCard_InitializeNLightDriverBoardPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_initializenlightdriverboard");
+		pWrapperTable->m_RaylaseCard_GetNLightDriverBoard = (PLibMCDriver_RaylaseRaylaseCard_GetNLightDriverBoardPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_getnlightdriverboard");
 		#else // _WIN32
-		pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard = (PLibMCDriver_RaylaseRaylaseCard_InitializeNLightDriverBoardPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_initializenlightdriverboard");
+		pWrapperTable->m_RaylaseCard_GetNLightDriverBoard = (PLibMCDriver_RaylaseRaylaseCard_GetNLightDriverBoardPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_getnlightdriverboard");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard == nullptr)
+		if (pWrapperTable->m_RaylaseCard_GetNLightDriverBoard == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1152,6 +1197,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCommandLog_RetrieveAsString == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_initializeboard", (void**)&(pWrapperTable->m_NLightDriverBoard_InitializeBoard));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_InitializeBoard == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_setnlightlasermode", (void**)&(pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_isconnected", (void**)&(pWrapperTable->m_RaylaseCard_IsConnected));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_IsConnected == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1176,8 +1229,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_LaserOn == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_initializenlightdriverboard", (void**)&(pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_getnlightdriverboard", (void**)&(pWrapperTable->m_RaylaseCard_GetNLightDriverBoard));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_GetNLightDriverBoard == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_laseroff", (void**)&(pWrapperTable->m_RaylaseCard_LaserOff));
@@ -1387,6 +1440,27 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CNLightDriverBoard
+	 */
+	
+	/**
+	* CNLightDriverBoard::InitializeBoard - Initializes the NLight Driver board.
+	*/
+	void CNLightDriverBoard::InitializeBoard()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_InitializeBoard(m_pHandle));
+	}
+	
+	/**
+	* CNLightDriverBoard::SetNLightLaserMode - Sets the nLight Laser Mode. Board must have been initialized first.
+	* @param[in] nLaserMode - Sets the laser mode.
+	*/
+	void CNLightDriverBoard::SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_SetNLightLaserMode(m_pHandle, nLaserMode));
+	}
+	
+	/**
 	 * Method definitions for class CRaylaseCard
 	 */
 	
@@ -1450,11 +1524,18 @@ public:
 	}
 	
 	/**
-	* CRaylaseCard::InitializeNLightDriverBoard - Initializes the NLight Driver board.
+	* CRaylaseCard::GetNLightDriverBoard - Returns the NLight Driver Board Handler class.
+	* @return NLight Driver Board Instance
 	*/
-	void CRaylaseCard::InitializeNLightDriverBoard()
+	PNLightDriverBoard CRaylaseCard::GetNLightDriverBoard()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_InitializeNLightDriverBoard(m_pHandle));
+		LibMCDriver_RaylaseHandle hDriverBoard = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_GetNLightDriverBoard(m_pHandle, &hDriverBoard));
+		
+		if (!hDriverBoard) {
+			CheckError(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CNLightDriverBoard>(m_pWrapper, hDriverBoard);
 	}
 	
 	/**

@@ -143,6 +143,27 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecommandlog_retrieveasstring(LibMCDriver_Raylase_RaylaseCommandLog pRaylaseCommandLog, const LibMCDriver_Raylase_uint32 nLogStringBufferSize, LibMCDriver_Raylase_uint32* pLogStringNeededChars, char * pLogStringBuffer);
 
 /*************************************************************************************************************************
+ Class definition for NLightDriverBoard
+**************************************************************************************************************************/
+
+/**
+* Initializes the NLight Driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_initializeboard(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Sets the nLight Laser Mode. Board must have been initialized first.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @param[in] nLaserMode - Sets the laser mode.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_setnlightlasermode(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 nLaserMode);
+
+/*************************************************************************************************************************
  Class definition for RaylaseCard
 **************************************************************************************************************************/
 
@@ -197,12 +218,13 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_rayla
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_laseron(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
 
 /**
-* Initializes the NLight Driver board.
+* Returns the NLight Driver Board Handler class.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pDriverBoard - NLight Driver Board Instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_initializenlightdriverboard(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_getnlightdriverboard(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_NLightDriverBoard * pDriverBoard);
 
 /**
 * Turns the laser off.

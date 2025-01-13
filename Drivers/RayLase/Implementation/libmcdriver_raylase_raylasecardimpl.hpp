@@ -48,6 +48,26 @@ namespace Impl {
 class CRaylaseCardImpl;
 typedef std::shared_ptr<CRaylaseCardImpl> PRaylaseCardImpl;
 
+
+enum class eNlightDriverBoardIOPins : uint32_t {
+	PRO_START = 1 << 7,
+	PRO_B1 = 1 << 8,
+	PRO_B2 = 1 << 9,
+	PRO_B3 = 1 << 10,
+	PRO_B4 = 1 << 11,
+	PRO_B5 = 1 << 12,
+	PRO_B6 = 1 << 13,
+	PRO_B7 = 1 << 14,
+	SYSTEM_ON = 1 << 15,
+	ENABLE_PROFILE = 1 << 16,
+	ARM_LASER = 1 << 18,
+	CLEAR_ERROR = 1 << 19,
+	ENABLE_AIMING_LASER = 1 << 20,
+	ENABLE_EXTERNAL_CONTROL = 1 << 21,
+	ENABLE_24V = 1 << 22,
+	GATE_IN = 1 << 23
+};
+
 class CRaylaseCardImpl {
 private:
 
@@ -117,6 +137,11 @@ public:
 	PRaylaseCardList createNewList();
 
 	void abortListExecution();
+
+	void initializeNLightDriverBoard();
+
+	void setNLightLaserMode (uint32_t nLaserMode);
+
 };
 
 } // namespace Impl

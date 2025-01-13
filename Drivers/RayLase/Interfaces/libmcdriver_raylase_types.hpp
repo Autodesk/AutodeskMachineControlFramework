@@ -137,6 +137,7 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEENUM 1030 /** Variable is not of type enum */
 #define LIBMCDRIVER_RAYLASE_ERROR_ENUMVALUEOUTOFRANGE 1031 /** Enum Value out of range */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDFIELDDATASIZE 1032 /** Invalid field data size */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDNLIGHTLASERMODE 1033 /** Invalid nLight Laser Mode */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -186,6 +187,7 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEENUM: return "Variable is not of type enum";
     case LIBMCDRIVER_RAYLASE_ERROR_ENUMVALUEOUTOFRANGE: return "Enum Value out of range";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDFIELDDATASIZE: return "Invalid field data size";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDNLIGHTLASERMODE: return "Invalid nLight Laser Mode";
     default: return "unknown error";
   }
 }
@@ -197,6 +199,7 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Base;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCommandLog;
+typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_NLightDriverBoard;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCard;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver_Raylase;
 

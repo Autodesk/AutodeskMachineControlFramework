@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CRaylaseCard
 
 #include "libmcdriver_raylase_raylasecard.hpp"
 #include "libmcdriver_raylase_interfaceexception.hpp"
+#include "libmcdriver_raylase_nlightdriverboard.hpp"
 
 using namespace LibMCDriver_Raylase::Impl;
 
@@ -200,7 +201,8 @@ bool CRaylaseCard::IsConnected()
     return m_pRaylaseCardImpl->IsConnected();
 }
 
-void CRaylaseCard::InitializeNLightDriverBoard()
-{
 
+INLightDriverBoard* CRaylaseCard::GetNLightDriverBoard() 
+{
+    return new CNLightDriverBoard(m_pRaylaseCardImpl);
 }

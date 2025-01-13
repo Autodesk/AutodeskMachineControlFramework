@@ -130,6 +130,27 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_QueryParametersEx
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr) (LibMCDriver_Raylase_RaylaseCommandLog pRaylaseCommandLog, const LibMCDriver_Raylase_uint32 nLogStringBufferSize, LibMCDriver_Raylase_uint32* pLogStringNeededChars, char * pLogStringBuffer);
 
 /*************************************************************************************************************************
+ Class definition for NLightDriverBoard
+**************************************************************************************************************************/
+
+/**
+* Initializes the NLight Driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_InitializeBoardPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Sets the nLight Laser Mode. Board must have been initialized first.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @param[in] nLaserMode - Sets the laser mode.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_SetNLightLaserModePtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 nLaserMode);
+
+/*************************************************************************************************************************
  Class definition for RaylaseCard
 **************************************************************************************************************************/
 
@@ -184,12 +205,13 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_RetrieveLate
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
 
 /**
-* Initializes the NLight Driver board.
+* Returns the NLight Driver Board Handler class.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pDriverBoard - NLight Driver Board Instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_InitializeNLightDriverBoardPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetNLightDriverBoardPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_NLightDriverBoard * pDriverBoard);
 
 /**
 * Turns the laser off.
@@ -450,13 +472,15 @@ typedef struct {
 	PLibMCDriver_RaylaseDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_RaylaseDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr m_RaylaseCommandLog_RetrieveAsString;
+	PLibMCDriver_RaylaseNLightDriverBoard_InitializeBoardPtr m_NLightDriverBoard_InitializeBoard;
+	PLibMCDriver_RaylaseNLightDriverBoard_SetNLightLaserModePtr m_NLightDriverBoard_SetNLightLaserMode;
 	PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr m_RaylaseCard_IsConnected;
 	PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr m_RaylaseCard_ResetToSystemDefaults;
 	PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr m_RaylaseCard_EnableCommandLogging;
 	PLibMCDriver_RaylaseRaylaseCard_DisableCommandLoggingPtr m_RaylaseCard_DisableCommandLogging;
 	PLibMCDriver_RaylaseRaylaseCard_RetrieveLatestLogPtr m_RaylaseCard_RetrieveLatestLog;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr m_RaylaseCard_LaserOn;
-	PLibMCDriver_RaylaseRaylaseCard_InitializeNLightDriverBoardPtr m_RaylaseCard_InitializeNLightDriverBoard;
+	PLibMCDriver_RaylaseRaylaseCard_GetNLightDriverBoardPtr m_RaylaseCard_GetNLightDriverBoard;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOffPtr m_RaylaseCard_LaserOff;
 	PLibMCDriver_RaylaseRaylaseCard_ArmLaserPtr m_RaylaseCard_ArmLaser;
 	PLibMCDriver_RaylaseRaylaseCard_IsLaserArmedPtr m_RaylaseCard_IsLaserArmed;

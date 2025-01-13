@@ -82,10 +82,7 @@
 		<error name="VARIABLEISNOTOFTYPEENUM" code="1030" description="Variable is not of type enum" />
 		<error name="ENUMVALUEOUTOFRANGE" code="1031" description="Enum Value out of range" />
 		<error name="INVALIDFIELDDATASIZE" code="1032" description="Invalid field data size" />
-		
-		
-		
-		
+		<error name="INVALIDNLIGHTLASERMODE" code="1033" description="Invalid nLight Laser Mode" />
 		
 				
 	</errors>
@@ -168,6 +165,19 @@ Custom implementation
 	</class>
 
 
+
+	<class name="NLightDriverBoard" parent="Base" description="Object to control the nLight Driver board attached to a card.">
+
+		<method name="InitializeBoard" description="Initializes the NLight Driver board.">
+		</method>
+
+		<method name="SetNLightLaserMode" description="Sets the nLight Laser Mode. Board must have been initialized first.">
+			<param name="LaserMode" type="uint32" pass="in" description="Sets the laser mode." />
+		</method>
+
+	</class>
+
+
 	<class name="RaylaseCard" parent="Base" description="Object to control a raylase-card.">
 	
 		<method name="IsConnected" description="Checks if the card is connected.">
@@ -190,7 +200,8 @@ Custom implementation
 		<method name="LaserOn" description="Turns the laser on.">
 		</method>
 
-		<method name="InitializeNLightDriverBoard" description="Initializes the NLight Driver board.">
+		<method name="GetNLightDriverBoard" description="Returns the NLight Driver Board Handler class.">
+			<param name="DriverBoard" type="class" class="NLightDriverBoard" pass="return" description="NLight Driver Board Instance" />
 		</method>
 
 		<method name="LaserOff" description="Turns the laser off.">
