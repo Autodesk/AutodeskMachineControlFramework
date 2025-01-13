@@ -366,6 +366,11 @@ public:
 	virtual void LaserOn() = 0;
 
 	/**
+	* IRaylaseCard::InitializeNLightDriverBoard - Initializes the NLight Driver board.
+	*/
+	virtual void InitializeNLightDriverBoard() = 0;
+
+	/**
 	* IRaylaseCard::LaserOff - Turns the laser off.
 	*/
 	virtual void LaserOff() = 0;

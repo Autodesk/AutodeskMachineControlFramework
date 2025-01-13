@@ -190,6 +190,9 @@ Custom implementation
 		<method name="LaserOn" description="Turns the laser on.">
 		</method>
 
+		<method name="InitializeNLightDriverBoard" description="Initializes the NLight Driver board.">
+		</method>
+
 		<method name="LaserOff" description="Turns the laser off.">
 		</method>
 

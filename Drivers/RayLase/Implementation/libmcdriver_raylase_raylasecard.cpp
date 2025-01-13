@@ -199,3 +199,8 @@ bool CRaylaseCard::IsConnected()
 {
     return m_pRaylaseCardImpl->IsConnected();
 }
+
+void CRaylaseCard::InitializeNLightDriverBoard()
+{
+
+}

@@ -509,6 +509,7 @@ public:
 	inline void DisableCommandLogging();
 	inline PRaylaseCommandLog RetrieveLatestLog();
 	inline void LaserOn();
+	inline void InitializeNLightDriverBoard();
 	inline void LaserOff();
 	inline void ArmLaser(const bool bShallBeArmed);
 	inline bool IsLaserArmed();
@@ -680,6 +681,7 @@ public:
 		pWrapperTable->m_RaylaseCard_DisableCommandLogging = nullptr;
 		pWrapperTable->m_RaylaseCard_RetrieveLatestLog = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOn = nullptr;
+		pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOff = nullptr;
 		pWrapperTable->m_RaylaseCard_ArmLaser = nullptr;
 		pWrapperTable->m_RaylaseCard_IsLaserArmed = nullptr;
@@ -870,6 +872,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RaylaseCard_LaserOn == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard = (PLibMCDriver_RaylaseRaylaseCard_InitializeNLightDriverBoardPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_initializenlightdriverboard");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard = (PLibMCDriver_RaylaseRaylaseCard_InitializeNLightDriverBoardPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_initializenlightdriverboard");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1165,6 +1176,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_LaserOn == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_initializenlightdriverboard", (void**)&(pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_InitializeNLightDriverBoard == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_laseroff", (void**)&(pWrapperTable->m_RaylaseCard_LaserOff));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_LaserOff == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1432,6 +1447,14 @@ public:
 	void CRaylaseCard::LaserOn()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_LaserOn(m_pHandle));
+	}
+	
+	/**
+	* CRaylaseCard::InitializeNLightDriverBoard - Initializes the NLight Driver board.
+	*/
+	void CRaylaseCard::InitializeNLightDriverBoard()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_InitializeNLightDriverBoard(m_pHandle));
 	}
 	
 	/**

@@ -197,6 +197,14 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_rayla
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_laseron(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
 
 /**
+* Initializes the NLight Driver board.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_initializenlightdriverboard(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
 * Turns the laser off.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.

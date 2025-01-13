@@ -76,6 +76,8 @@ public:
 
 	void DisableCommandLogging() override;
 
+	void InitializeNLightDriverBoard() override;
+
 	IRaylaseCommandLog* RetrieveLatestLog() override;
 
 	void LaserOn() override;
