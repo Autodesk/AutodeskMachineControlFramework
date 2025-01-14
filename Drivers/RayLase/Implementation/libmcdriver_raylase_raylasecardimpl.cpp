@@ -277,18 +277,18 @@ void CRaylaseCardImpl::initializeNLightDriverBoard()
     m_pDriverEnvironment->LogMessage("Clearing flags...");
     uint32_t nClearFlags = (uint32_t)eNlightDriverBoardIOPins::ARM_LASER | (uint32_t)eNlightDriverBoardIOPins::ENABLE_AIMING_LASER | (uint32_t) eNlightDriverBoardIOPins::GATE_IN;
     m_pSDK->checkError(m_pSDK->rlGpioWrite(m_Handle, eRLIOPort::ioPortD, eRLPinAction::paClear, nClearFlags));
-    m_pDriverEnvironment->Sleep(10000);
+    m_pDriverEnvironment->Sleep(1000);
 
     m_pDriverEnvironment->LogMessage("Enabling external control");
     m_pSDK->checkError(m_pSDK->rlGpioWrite(m_Handle, eRLIOPort::ioPortD, eRLPinAction::paSet, (uint32_t)eNlightDriverBoardIOPins::ENABLE_EXTERNAL_CONTROL));
-    m_pDriverEnvironment->Sleep(20000);
-    m_pSDK->checkError(m_pSDK->rlGpioWrite(m_Handle, eRLIOPort::ioPortD, eRLPinAction::paClear, (uint32_t)eNlightDriverBoardIOPins::ENABLE_EXTERNAL_CONTROL));
+    m_pDriverEnvironment->Sleep(10000);
+    //m_pSDK->checkError(m_pSDK->rlGpioWrite(m_Handle, eRLIOPort::ioPortD, eRLPinAction::paClear, (uint32_t)eNlightDriverBoardIOPins::ENABLE_EXTERNAL_CONTROL));
 
     m_pDriverEnvironment->LogMessage("Setting system on..");
     m_pSDK->checkError(m_pSDK->rlGpioWrite(m_Handle, eRLIOPort::ioPortD, eRLPinAction::paClear, (uint32_t)eNlightDriverBoardIOPins::SYSTEM_ON));
     m_pDriverEnvironment->Sleep(3000);
     m_pSDK->checkError(m_pSDK->rlGpioWrite(m_Handle, eRLIOPort::ioPortD, eRLPinAction::paSet, (uint32_t)eNlightDriverBoardIOPins::SYSTEM_ON));
-    m_pDriverEnvironment->Sleep(10000);
+    m_pDriverEnvironment->Sleep(5000);
 
     m_pDriverEnvironment->LogMessage("Setting beam profile");
     setNLightLaserMode(5);
