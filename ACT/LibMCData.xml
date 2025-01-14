@@ -1433,6 +1433,11 @@
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
 		</method>
 
+		<method name="JobExists" description="Checks if a job with a specific UUID exists.">
+			<param name="JobUUID" type="string" pass="in" description="UUID String for the build job." />	
+			<param name="Exists" type="bool" pass="return" description="Build Job exists." />
+		</method>
+
 		<method name="RetrieveJob" description="Retrieves a job with a specific UUID.">
 			<param name="JobUUID" type="string" pass="in" description="UUID String for the build job. Must be an existing Job." />	
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />

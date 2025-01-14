@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,66 +29,90 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_TOOLPATHHANDLER
-#define __AMC_TOOLPATHHANDLER
-
-#include <memory>
-#include <map>
-#include <string>
-#include <set>
-
-#include "amc_toolpathentity.hpp"
 #include "amc_scatterplot.hpp"
-#include "libmcdata_dynamic.hpp"
+#include "libmc_exceptiontypes.hpp"
+#include "common_utils.hpp"
 
 namespace AMC {
 
-	
+	CScatterplot::CScatterplot(const std::string& sUUID)
+		: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
+	{
 
-	class CToolpathHandler;
-	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
+	}
 
-	class CToolpathHandler {
-	private:
-		
-		std::map<std::string, PToolpathEntity> m_Entities;
+	CScatterplot::~CScatterplot()
+	{
 
-		std::string m_sLib3MFPath;
-		Lib3MF::PWrapper m_pLib3MFWrapper;
+	}
 
-		LibMCData::PDataModel m_pDataModel;
+	std::string CScatterplot::getUUID()
+	{
+		return m_sUUID;
+	}
 
-		std::set<std::string> m_AttachmentRelationsToRead;
+	void CScatterplot::clearData()
+	{
+		m_PointEntries.clear();
+	}
 
-		std::map<std::string, PScatterplot> m_Scatterplots;
+	bool CScatterplot::isEmpty()
+	{
+		return m_PointEntries.empty ();
+	}
 
-	public:
+	uint64_t CScatterplot::getEntryCount()
+	{
+		return m_PointEntries.size();
+	}
 
-		CToolpathHandler(LibMCData::PDataModel pDataModel);
-		virtual ~CToolpathHandler();
+	std::vector<sScatterplotEntry>& CScatterplot::getEntries()
+	{
+		return m_PointEntries;
+	}
 
-		CToolpathEntity * findToolpathEntity(const std::string & sStreamUUID, bool bFailIfNotExistent);
-		CToolpathEntity* loadToolpathEntity(const std::string& sStreamUUID);
-		
-		void unloadToolpathEntity (const std::string& sStreamUUID);
-		void unloadAllEntities();
+	void CScatterplot::getBoundaries(double& dMinX, double& dMinY, double& dMaxX, double& dMaxY)
+	{
+		dMinX = m_dMinX;
+		dMinY = m_dMinY;
+		dMaxX = m_dMaxX;
+		dMaxY = m_dMaxY;
+	}
 
-		void setLibraryPath(const std::string& sLibraryName, const std::string sLibraryPath);
+	void CScatterplot::computeBoundaries()
+	{
+		size_t nPointCount = m_PointEntries.size();
+		if (nPointCount > 0) {
 
-		Lib3MF::PWrapper getLib3MFWrapper();
+			auto& point = m_PointEntries.at(0);
+			m_dMinX = point.m_dX;
+			m_dMinY = point.m_dY;
+			m_dMaxX = point.m_dX;
+			m_dMaxY = point.m_dY;
 
-		void registerAttachmentRelationsToRead(const std::string & sRelationShip);
+			for (size_t nIndex = 1; nIndex < nPointCount; nIndex++) {
+				auto& point = m_PointEntries.at(nIndex);
+				if (point.m_dX < m_dMinX)
+					m_dMinX = point.m_dX;
+				if (point.m_dY < m_dMinY)
+					m_dMinY = point.m_dY;
+				if (point.m_dX > m_dMaxX)
+					m_dMaxX = point.m_dX;
+				if (point.m_dY > m_dMaxY)
+					m_dMaxY = point.m_dY;
+			}
 
-		void unregisterAttachmentRelationsToRead(const std::string& sRelationShip);
 
-		void storeScatterplot (PScatterplot pScatterplot);
-		PScatterplot restoreScatterplot(const std::string & sUUID, bool bMustExist);
+		}
+		else {
+			m_dMinX = 0.0;
+			m_dMinY = 0.0;
+			m_dMaxX = 0.0;
+			m_dMaxY = 0.0;
 
-	};
+		}
+	}
 
-	
 }
 
-
-#endif //__AMC_TOOLPATHHANDLER
 

@@ -27,81 +27,62 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildJobHandler
+Abstract: This is the class declaration of CScatterPlot
 
 */
 
 
-#ifndef __LIBMCDATA_BUILDJOBHANDLER
-#define __LIBMCDATA_BUILDJOBHANDLER
+#ifndef __LIBMCENV_SCATTERPLOT
+#define __LIBMCENV_SCATTERPLOT
 
-#include "libmcdata_interfaces.hpp"
-#include <vector>
+#include "libmcenv_interfaces.hpp"
 
 // Parent classes
-#include "libmcdata_base.hpp"
-
+#include "libmcenv_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagestate.hpp"
+#include "amc_scatterplot.hpp"
 
-#include <mutex>
-#include <thread>
-
-
-namespace LibMCData {
+namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBuildJobHandler 
+ Class declaration of CScatterPlot 
 **************************************************************************************************************************/
 
-class CBuildJobHandler : public virtual IBuildJobHandler, public virtual CBase {
+class CScatterPlot : public virtual IScatterPlot, public virtual CBase {
 private:
 
-	AMCData::PSQLHandler m_pSQLHandler;
-    AMCData::PStorageState m_pStorageState;
-
-protected:
-
-
+	AMC::PScatterplot m_pScatterplotInstance;
 
 
 public:
 
+    CScatterPlot(AMC::PScatterplot pScatterplotInstance);
 
-    CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    virtual ~CScatterPlot();
 
-    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+	std::string GetUUID() override;
 
-    bool JobExists(const std::string& sJobUUID) override;
+	LibMCEnv_uint32 GetPointCount() override;
 
-	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
+	void GetPointPosition(const LibMCEnv_uint32 nPointIndex, LibMCEnv_double & dX, LibMCEnv_double & dY) override;
 
-	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;
+	void GetBoundaries(LibMCEnv_double & dMinX, LibMCEnv_double & dMinY, LibMCEnv_double & dMaxX, LibMCEnv_double & dMaxY) override;
 
-    IBuildJob* FindJobOfData(const std::string& sDataUUID) override;
-
-    std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
-
-    LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;
-
-    IBuildJobExecution* RetrieveJobExecution(const std::string& sExecutionUUID) override;
-
-    IBuildJobExecutionIterator* ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter) override;
+	void Release() override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCData
+} // namespace LibMCEnv
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_BUILDJOBHANDLER
+#endif // __LIBMCENV_SCATTERPLOT

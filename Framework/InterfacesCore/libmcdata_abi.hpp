@@ -1915,6 +1915,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobiterator_getcurrentjob(LibM
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserUUID, const char * pStorageStreamUUID, LibMCData_uint64 nAbsoluteTimeStamp, LibMCData_BuildJob * pJobInstance);
 
 /**
+* Checks if a job with a specific UUID exists.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[in] pJobUUID - UUID String for the build job.
+* @param[out] pExists - Build Job exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_jobexists(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, bool * pExists);
+
+/**
 * Retrieves a job with a specific UUID.
 *
 * @param[in] pBuildJobHandler - BuildJobHandler instance.

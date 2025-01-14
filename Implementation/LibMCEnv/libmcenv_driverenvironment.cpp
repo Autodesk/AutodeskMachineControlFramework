@@ -378,7 +378,7 @@ LibMCEnv::Impl::IXMLDocument* CDriverEnvironment::ParseXMLData(const LibMCEnv_ui
 
 IDataTable* CDriverEnvironment::CreateDataTable()
 {
-    return new CDataTable ();
+    return new CDataTable (m_pToolpathHandler);
 }
 
 IDiscreteFieldData2D* CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)

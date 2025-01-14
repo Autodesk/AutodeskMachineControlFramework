@@ -651,7 +651,7 @@
 		<error name="INVALIDJOURNALCHUNKTIMESTAMP" code="625" description="Invalid journal chunk time stamp" />		
 		<error name="OVERLAPPINGJOURNALCHUNKTIMESTAMP" code="626" description="Overlapping journal chunk time stamp" />
 		<error name="INVALIDTOOLPATHLAYERTHICKNESS" code="627" description="Invalid toolpath layer thickness" />
-		
+		<error name="SCATTERPLOTNOTFOUND" code="628" description="Scatter plot not found" />
 					
 	</errors>
 	

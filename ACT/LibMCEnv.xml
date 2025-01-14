@@ -246,7 +246,10 @@
 		<error name="COULDNOTSTOREJPEGIMAGE" code="10206" description="Could not store JPEG image" />		
 		<error name="INVALIDPNGEXPORTFORMAT" code="10207" description="Invalid PNG Export Format" />		
 		<error name="INVALIDMEMORYCACHEQUOTA" code="10208" description="Invalid memory cache quota" />		
-		
+		<error name="NOXAXISCOLUMNGIVEN" code="10209" description="No X Axis Column given" />		
+		<error name="NOYAXISCOLUMNGIVEN" code="10210" description="No Y Axis Column given" />		
+		<error name="INVALIDSCATTERPLOTPOINTINDEX" code="10211" description="Invalid scatter plot index." />		
+		<error name="SCATTERPLOTNOTFOUND" code="10212" description="Scatter plot not found" />		
 		
 	</errors>
 
@@ -752,6 +755,35 @@
 	
 	</class>
 	
+
+	<class name="ScatterPlot" parent="Base" description="A scatter plot object contains a in memory scatter plot of X/Y data..">
+		
+		<method name="GetUUID" description="Global UUID of the plot.">
+			<param name="UUID" type="string" pass="return" description="Scatter plot UUID." />
+		</method>
+	
+		<method name="GetPointCount" description="Returns the point count of the plot.">
+			<param name="PointCount" type="uint32" pass="return" description="Point Count of the plot" />
+		</method>
+
+		<method name="GetPointPosition" description="Returns the position of a data point.">
+			<param name="PointIndex" type="uint32" pass="in" description="Index of the point in the plot. 0-based. MUST be smaller than PointCount" />
+			<param name="X" type="double" pass="out" description="X value of the point in mm" />
+			<param name="Y" type="double" pass="out" description="Y value of the point in mm" />
+		</method>
+
+		<method name="GetBoundaries" description="Returns the bounding box of the scatter plot data. Returns 0/0-0/0 in case no points are available.">
+			<param name="MinX" type="double" pass="out" description="Minimum X value of the point in mm" />
+			<param name="MinY" type="double" pass="out" description="Minimum Y value of the point in mm" />
+			<param name="MaxX" type="double" pass="out" description="Maximum X value of the point in mm" />
+			<param name="MaxY" type="double" pass="out" description="Maximum Y value of the point in mm" />
+		</method>
+
+		<method name="Release" description="Release the scatter plot and clear its memory. All accessing code will lose access to the data.">
+		</method>
+
+	</class>
+
 	
 	<class name="DiscreteFieldData2DStoreOptions" parent="Base" description="Option class to parametrize saving of Field Data.">
 	
@@ -907,6 +939,57 @@
 
 	</class>
 	
+
+	<class name="DataTableScatterPlotOptions" parent="Base" description="Configurates the creation of scatter plots from the data table.">
+
+		<method name="SetXAxisColumn" description="Sets the column to use for the X Axis value. Column MUST exist.">
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the column. Must be alphanumeric and not empty." />
+			<param name="ScaleFactor" type="double" pass="in" description="Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters." />
+			<param name="OffsetFactor" type="double" pass="in" description="Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters." />
+		</method>
+
+		<method name="GetXAxisColumn" description="Returns the column to use for the X Axis value..">
+			<param name="ColumnIdentifier" type="string" pass="return" description="Identifier of the column. Empty if not set yet." />
+		</method>
+
+		<method name="GetXAxisScaling" description="Returns the scaling for the X Axis value..">
+			<param name="ScaleFactor" type="double" pass="return" description="Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0." />
+		</method>
+		
+		<method name="GetXAxisOffset" description="Returns the scaling for the X Axis value..">
+			<param name="OffsetFactor" type="double" pass="return" description="Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0." />
+		</method>
+
+		<method name="SetYAxisColumn" description="Sets the column to use for the Y Axis value. Column MUST exist.">
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the column. Must be alphanumeric and not empty." />
+			<param name="ScaleFactor" type="double" pass="in" description="Scale factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters." />
+			<param name="OffsetFactor" type="double" pass="in" description="Offset factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters." />
+		</method>
+
+		<method name="GetYAxisColumn" description="Returns the column to use for the X Axis value..">
+			<param name="ColumnIdentifier" type="string" pass="return" description="Identifier of the column. Empty if not set yet." />
+		</method>
+
+		<method name="GetYAxisScaling" description="Returns the scaling for the X Axis value..">
+			<param name="ScaleFactor" type="double" pass="return" description="Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0." />
+		</method>
+		
+		<method name="GetYAxisOffset" description="Returns the scaling for the X Axis value..">
+			<param name="OffsetFactor" type="double" pass="return" description="Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0." />
+		</method>
+
+		<method name="AddDataChannel" description="Adds a data channel. Column MUST exist.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Identifier of the channel. Must be alphanumeric and not empty." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the column to use. Must be alphanumeric and not empty." />
+			<param name="ScaleFactor" type="double" pass="in" description="Scale factor to use. The channel value will be computed as raw value times scale factor plus offset factor." />
+			<param name="OffsetFactor" type="double" pass="in" description="Offset factor to use. The channel value will be computed as raw value times scale factor plus offset factor." />
+			<param name="Color" type="uint32" pass="in" description="Base color to use." />
+		</method>
+
+	</class>
+	
+	
+	
 	<class name="DataTable" parent="Base" description="A in memory data table, streamable for example into a CSV file.">
 	
 		<method name="AddColumn" description="Adds a column to the data field.">
@@ -1026,6 +1109,15 @@
 
 		<method name="LoadFromStream" description="Loads the data table from a stream. Clears all existing data from the data table.">
 			<param name="Stream" type="class" class="StreamReader" pass="in" description="Stream read instance to read from." />
+		</method>
+		
+		<method name="CreateScatterPlotOptions" description="Creates an options object for scatter plot computation.">
+			<param name="ScatterPlotOptions" type="class" class="DataTableScatterPlotOptions" pass="return" description="DataTableScatterPlotOptions Instance" />
+		</method>
+		
+		<method name="CalculateScatterPlot" description="Creates a scatterplot from the data table according to its input parameters.">
+			<param name="ScatterPlotOptions" type="class" class="DataTableScatterPlotOptions" pass="in" description="ScatterPlot Options to use" />
+			<param name="ScatterPlot" type="class" class="ScatterPlot" pass="return" description="ScatterPlot Instance" />
 		</method>
 		
 	</class>

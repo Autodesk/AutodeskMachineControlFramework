@@ -50,7 +50,8 @@ namespace AMC {
 		utChart = 6,
 		utMeshGeometry = 7,
 		utMeshEdges = 8,
-		utDownload = 9
+		utDownload = 9,
+		utPointCloud = 10
 	};
 
 	class CAPIHandler_UI : public CAPIHandler {

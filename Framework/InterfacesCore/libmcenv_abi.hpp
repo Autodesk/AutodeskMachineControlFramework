@@ -635,6 +635,61 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_createimagefromrawyuy2data
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for ScatterPlot
+**************************************************************************************************************************/
+
+/**
+* Global UUID of the plot.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Scatter plot UUID., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scatterplot_getuuid(LibMCEnv_ScatterPlot pScatterPlot, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the point count of the plot.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @param[out] pPointCount - Point Count of the plot
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scatterplot_getpointcount(LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_uint32 * pPointCount);
+
+/**
+* Returns the position of a data point.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @param[in] nPointIndex - Index of the point in the plot. 0-based. MUST be smaller than PointCount
+* @param[out] pX - X value of the point in mm
+* @param[out] pY - Y value of the point in mm
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scatterplot_getpointposition(LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_uint32 nPointIndex, LibMCEnv_double * pX, LibMCEnv_double * pY);
+
+/**
+* Returns the bounding box of the scatter plot data. Returns 0/0-0/0 in case no points are available.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @param[out] pMinX - Minimum X value of the point in mm
+* @param[out] pMinY - Minimum Y value of the point in mm
+* @param[out] pMaxX - Maximum X value of the point in mm
+* @param[out] pMaxY - Maximum Y value of the point in mm
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scatterplot_getboundaries(LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_double * pMinX, LibMCEnv_double * pMinY, LibMCEnv_double * pMaxX, LibMCEnv_double * pMaxY);
+
+/**
+* Release the scatter plot and clear its memory. All accessing code will lose access to the data.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_scatterplot_release(LibMCEnv_ScatterPlot pScatterPlot);
+
+/*************************************************************************************************************************
  Class definition for DiscreteFieldData2DStoreOptions
 **************************************************************************************************************************/
 
@@ -923,6 +978,103 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablecsvwriteoptions_getseparator(
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablecsvwriteoptions_setseparator(LibMCEnv_DataTableCSVWriteOptions pDataTableCSVWriteOptions, const char * pSeparator);
 
 /*************************************************************************************************************************
+ Class definition for DataTableScatterPlotOptions
+**************************************************************************************************************************/
+
+/**
+* Sets the column to use for the X Axis value. Column MUST exist.
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] pColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+* @param[in] dScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+* @param[in] dOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_setxaxiscolumn(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor);
+
+/**
+* Returns the column to use for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] nColumnIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pColumnIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pColumnIdentifierBuffer -  buffer of Identifier of the column. Empty if not set yet., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_getxaxiscolumn(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const LibMCEnv_uint32 nColumnIdentifierBufferSize, LibMCEnv_uint32* pColumnIdentifierNeededChars, char * pColumnIdentifierBuffer);
+
+/**
+* Returns the scaling for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[out] pScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_getxaxisscaling(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pScaleFactor);
+
+/**
+* Returns the scaling for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[out] pOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_getxaxisoffset(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pOffsetFactor);
+
+/**
+* Sets the column to use for the Y Axis value. Column MUST exist.
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] pColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+* @param[in] dScaleFactor - Scale factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+* @param[in] dOffsetFactor - Offset factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_setyaxiscolumn(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor);
+
+/**
+* Returns the column to use for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] nColumnIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pColumnIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pColumnIdentifierBuffer -  buffer of Identifier of the column. Empty if not set yet., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_getyaxiscolumn(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const LibMCEnv_uint32 nColumnIdentifierBufferSize, LibMCEnv_uint32* pColumnIdentifierNeededChars, char * pColumnIdentifierBuffer);
+
+/**
+* Returns the scaling for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[out] pScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_getyaxisscaling(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pScaleFactor);
+
+/**
+* Returns the scaling for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[out] pOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_getyaxisoffset(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pOffsetFactor);
+
+/**
+* Adds a data channel. Column MUST exist.
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] pChannelIdentifier - Identifier of the channel. Must be alphanumeric and not empty.
+* @param[in] pColumnIdentifier - Identifier of the column to use. Must be alphanumeric and not empty.
+* @param[in] dScaleFactor - Scale factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+* @param[in] dOffsetFactor - Offset factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+* @param[in] nColor - Base color to use.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatablescatterplotoptions_adddatachannel(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pChannelIdentifier, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor, LibMCEnv_uint32 nColor);
+
+/*************************************************************************************************************************
  Class definition for DataTable
 **************************************************************************************************************************/
 
@@ -1190,6 +1342,25 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_writedatatostream(LibMCEnv_D
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_loadfromstream(LibMCEnv_DataTable pDataTable, LibMCEnv_StreamReader pStream);
+
+/**
+* Creates an options object for scatter plot computation.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pScatterPlotOptions - DataTableScatterPlotOptions Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_createscatterplotoptions(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableScatterPlotOptions * pScatterPlotOptions);
+
+/**
+* Creates a scatterplot from the data table according to its input parameters.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pScatterPlotOptions - ScatterPlot Options to use
+* @param[out] pScatterPlot - ScatterPlot Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_datatable_calculatescatterplot(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableScatterPlotOptions pScatterPlotOptions, LibMCEnv_ScatterPlot * pScatterPlot);
 
 /*************************************************************************************************************************
  Class definition for DataSeries

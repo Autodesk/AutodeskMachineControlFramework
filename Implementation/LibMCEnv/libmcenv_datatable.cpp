@@ -36,6 +36,8 @@ Abstract: This is a stub class definition of CDataTable
 
 #include "libmcenv_datatablewriteoptions.hpp"
 #include "libmcenv_datatablecsvwriteoptions.hpp"
+#include "libmcenv_datatablescatterplotoptions.hpp"
+#include "libmcenv_scatterplot.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -46,6 +48,7 @@ Abstract: This is a stub class definition of CDataTable
 #include <cmath>
 
 #include "amc_constants.hpp"
+#include "amc_scatterplot.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -245,6 +248,48 @@ public:
 		}
 	}
 
+	void fillScatterplotXCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+		auto & entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+		
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto & entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dX = m_Rows.at (nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dX = 0.0;
+			}
+		}
+		
+
+	}
+
+	void fillScatterplotYCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dY = m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dY = 0.0;
+			}
+		}
+
+	}
 
 };
 
@@ -367,6 +412,48 @@ public:
 		}
 	}
 
+	void fillScatterplotXCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dX = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dX = 0.0;
+			}
+		}
+
+
+	}
+
+	void fillScatterplotYCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dY = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dY = 0.0;
+			}
+		}
+
+	}
 
 };
 
@@ -479,6 +566,50 @@ public:
 			m_Rows.resize(0);
 		}
 	}
+
+	void fillScatterplotXCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dX = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dX = 0.0;
+			}
+		}
+
+
+	}
+
+	void fillScatterplotYCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dY = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dY = 0.0;
+			}
+		}
+
+	}
+
 
 };
 
@@ -600,7 +731,48 @@ public:
 		}
 	}
 
+	void fillScatterplotXCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dX = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dX = 0.0;
+			}
+		}
+
+
+	}
+
+	void fillScatterplotYCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dY = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dY = 0.0;
+			}
+		}
+
+	}
 };
 
 
@@ -722,7 +894,48 @@ public:
 		}
 	}
 
+	void fillScatterplotXCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dX = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dX = 0.0;
+			}
+		}
+
+
+	}
+
+	void fillScatterplotYCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) override
+	{
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+		auto& entries = pScatterplot->getEntries();
+		size_t entryCount = entries.size();
+		size_t rowCount = m_Rows.size();
+
+		for (size_t nIndex = 0; nIndex < entryCount; nIndex++) {
+			auto& entry = entries.at(nIndex);
+			if (nIndex < rowCount) {
+				entry.m_dY = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+			}
+			else {
+				entry.m_dY = 0.0;
+			}
+		}
+
+	}
 };
 
 CDataTableColumn::CDataTableColumn(const std::string& sIdentifier, const std::string& sDescription)
@@ -757,9 +970,11 @@ void CDataTableColumn::setDescription(const std::string& sDescription)
 }
 
 
-CDataTable::CDataTable()
-	: m_nMaxRowCount (0)
+CDataTable::CDataTable(AMC::PToolpathHandler pToolpathHandler)
+	: m_nMaxRowCount (0), m_pToolpathHandler (pToolpathHandler)
 {
+	if (pToolpathHandler.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
 
@@ -768,9 +983,9 @@ CDataTable::~CDataTable()
 
 }
 
-CDataTable* CDataTable::makeFromStream(IStreamReader * pStreamReader)
+CDataTable* CDataTable::makeFromStream(IStreamReader * pStreamReader, AMC::PToolpathHandler pToolpathHandler)
 {
-	auto pDataTable = std::make_unique<CDataTable>();
+	auto pDataTable = std::make_unique<CDataTable>(pToolpathHandler);
 	pDataTable->LoadFromStream(pStreamReader);
 	return pDataTable.release();
 }
@@ -1294,5 +1509,48 @@ void CDataTable::Clear()
 	m_ColumnMap.clear();
 
 	updateMaxRowCount();
+}
+
+IDataTableScatterPlotOptions* CDataTable::CreateScatterPlotOptions()
+{
+	return new CDataTableScatterPlotOptions();
+}
+
+IScatterPlot* CDataTable::CalculateScatterPlot(IDataTableScatterPlotOptions* pScatterPlotInput)
+{
+	if (pScatterPlotInput == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	std::string sNewUUID = AMCCommon::CUtils::createUUID();
+
+	uint32_t nPointCount = GetRowCount();
+
+	std::string sXAxisColumn = pScatterPlotInput->GetXAxisColumn();
+	if (sXAxisColumn.empty ())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOXAXISCOLUMNGIVEN);
+	double dXAxisScaleFactor = pScatterPlotInput->GetXAxisScaling();
+	double dXAxisOffset = pScatterPlotInput->GetXAxisOffset();
+
+	std::string sYAxisColumn = pScatterPlotInput->GetYAxisColumn();
+	if (sYAxisColumn.empty())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOYAXISCOLUMNGIVEN);
+	double dYAxisScaleFactor = pScatterPlotInput->GetYAxisScaling();
+	double dYAxisOffset = pScatterPlotInput->GetYAxisOffset();
+
+	auto pXAxisColumn = findColumn(sXAxisColumn, true);
+	auto pYAxisColumn = findColumn(sYAxisColumn, true);
+
+	auto pScatterPlotInstance = std::make_shared<AMC::CScatterplot>(sNewUUID);
+	auto& entries = pScatterPlotInstance->getEntries();
+	entries.resize(nPointCount);
+
+	pXAxisColumn->fillScatterplotXCoordinates(pScatterPlotInstance.get(), dXAxisScaleFactor, dXAxisOffset);
+	pYAxisColumn->fillScatterplotYCoordinates(pScatterPlotInstance.get(), dYAxisScaleFactor, dYAxisOffset);
+
+	pScatterPlotInstance->computeBoundaries();
+
+	m_pToolpathHandler->storeScatterplot(pScatterPlotInstance);
+
+	return new CScatterPlot (pScatterPlotInstance);
 }
 

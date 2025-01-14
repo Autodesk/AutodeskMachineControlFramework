@@ -27,81 +27,75 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildJobHandler
+Abstract: This is the class declaration of CDataTableScatterPlotOptions
 
 */
 
 
-#ifndef __LIBMCDATA_BUILDJOBHANDLER
-#define __LIBMCDATA_BUILDJOBHANDLER
+#ifndef __LIBMCENV_DATATABLESCATTERPLOTOPTIONS
+#define __LIBMCENV_DATATABLESCATTERPLOTOPTIONS
 
-#include "libmcdata_interfaces.hpp"
-#include <vector>
+#include "libmcenv_interfaces.hpp"
 
 // Parent classes
-#include "libmcdata_base.hpp"
-
+#include "libmcenv_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagestate.hpp"
-
-#include <mutex>
-#include <thread>
 
 
-namespace LibMCData {
+namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBuildJobHandler 
+ Class declaration of CDataTableScatterPlotOptions 
 **************************************************************************************************************************/
 
-class CBuildJobHandler : public virtual IBuildJobHandler, public virtual CBase {
+class CDataTableScatterPlotOptions : public virtual IDataTableScatterPlotOptions, public virtual CBase {
 private:
 
-	AMCData::PSQLHandler m_pSQLHandler;
-    AMCData::PStorageState m_pStorageState;
+	std::string m_sXAxisColumnIdentifier;
+	double m_dXAxisScaleFactor;
+	double m_dXAxisOffset;
 
-protected:
-
-
-
+	std::string m_sYAxisColumnIdentifier;
+	double m_dYAxisScaleFactor;
+	double m_dYAxisOffset;
 
 public:
 
+	CDataTableScatterPlotOptions();
 
-    CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+	virtual ~CDataTableScatterPlotOptions();
 
-    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
+	void SetXAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor) override;
 
-    bool JobExists(const std::string& sJobUUID) override;
+	std::string GetXAxisColumn() override;
 
-	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
+	LibMCEnv_double GetXAxisScaling() override;
 
-	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;
+	LibMCEnv_double GetXAxisOffset() override;
 
-    IBuildJob* FindJobOfData(const std::string& sDataUUID) override;
+	void SetYAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor) override;
 
-    std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
+	std::string GetYAxisColumn() override;
 
-    LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;
+	LibMCEnv_double GetYAxisScaling() override;
 
-    IBuildJobExecution* RetrieveJobExecution(const std::string& sExecutionUUID) override;
+	LibMCEnv_double GetYAxisOffset() override;
 
-    IBuildJobExecutionIterator* ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter) override;
+	void AddDataChannel(const std::string & sChannelIdentifier, const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor, const LibMCEnv_uint32 nColor) override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCData
+} // namespace LibMCEnv
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_BUILDJOBHANDLER
+#endif // __LIBMCENV_DATATABLESCATTERPLOTOPTIONS

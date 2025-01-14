@@ -1718,6 +1718,7 @@ public:
 	}
 	
 	inline PBuildJob CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserUUID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp);
+	inline bool JobExists(const std::string & sJobUUID);
 	inline PBuildJob RetrieveJob(const std::string & sJobUUID);
 	inline PBuildJob FindJobOfData(const std::string & sDataUUID);
 	inline PBuildJobIterator ListJobsByStatus(const eBuildJobStatus eStatus);
@@ -2129,6 +2130,7 @@ public:
 		pWrapperTable->m_BuildJob_RetrieveBuildJobExecutionsByStatus = nullptr;
 		pWrapperTable->m_BuildJobIterator_GetCurrentJob = nullptr;
 		pWrapperTable->m_BuildJobHandler_CreateJob = nullptr;
+		pWrapperTable->m_BuildJobHandler_JobExists = nullptr;
 		pWrapperTable->m_BuildJobHandler_RetrieveJob = nullptr;
 		pWrapperTable->m_BuildJobHandler_FindJobOfData = nullptr;
 		pWrapperTable->m_BuildJobHandler_ListJobsByStatus = nullptr;
@@ -3747,6 +3749,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJobHandler_JobExists = (PLibMCDataBuildJobHandler_JobExistsPtr) GetProcAddress(hLibrary, "libmcdata_buildjobhandler_jobexists");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobHandler_JobExists = (PLibMCDataBuildJobHandler_JobExistsPtr) dlsym(hLibrary, "libmcdata_buildjobhandler_jobexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobHandler_JobExists == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildJobHandler_RetrieveJob = (PLibMCDataBuildJobHandler_RetrieveJobPtr) GetProcAddress(hLibrary, "libmcdata_buildjobhandler_retrievejob");
 		#else // _WIN32
 		pWrapperTable->m_BuildJobHandler_RetrieveJob = (PLibMCDataBuildJobHandler_RetrieveJobPtr) dlsym(hLibrary, "libmcdata_buildjobhandler_retrievejob");
@@ -5081,6 +5092,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobhandler_createjob", (void**)&(pWrapperTable->m_BuildJobHandler_CreateJob));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobHandler_CreateJob == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobhandler_jobexists", (void**)&(pWrapperTable->m_BuildJobHandler_JobExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobHandler_JobExists == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobhandler_retrievejob", (void**)&(pWrapperTable->m_BuildJobHandler_RetrieveJob));
@@ -7794,6 +7809,19 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CBuildJob>(m_pWrapper, hJobInstance);
+	}
+	
+	/**
+	* CBuildJobHandler::JobExists - Checks if a job with a specific UUID exists.
+	* @param[in] sJobUUID - UUID String for the build job.
+	* @return Build Job exists.
+	*/
+	bool CBuildJobHandler::JobExists(const std::string & sJobUUID)
+	{
+		bool resultExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_JobExists(m_pHandle, sJobUUID.c_str(), &resultExists));
+		
+		return resultExists;
 	}
 	
 	/**

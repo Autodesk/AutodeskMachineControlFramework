@@ -65,10 +65,12 @@ class IJPEGImageData;
 class IImageData;
 class IImageLoader;
 class IVideoStream;
+class IScatterPlot;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
 class IDataTableWriteOptions;
 class IDataTableCSVWriteOptions;
+class IDataTableScatterPlotOptions;
 class IDataTable;
 class IDataSeries;
 class IDateTimeDifference;
@@ -833,6 +835,51 @@ typedef IBaseSharedPtr<IVideoStream> PIVideoStream;
 
 
 /*************************************************************************************************************************
+ Class interface for ScatterPlot 
+**************************************************************************************************************************/
+
+class IScatterPlot : public virtual IBase {
+public:
+	/**
+	* IScatterPlot::GetUUID - Global UUID of the plot.
+	* @return Scatter plot UUID.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IScatterPlot::GetPointCount - Returns the point count of the plot.
+	* @return Point Count of the plot
+	*/
+	virtual LibMCEnv_uint32 GetPointCount() = 0;
+
+	/**
+	* IScatterPlot::GetPointPosition - Returns the position of a data point.
+	* @param[in] nPointIndex - Index of the point in the plot. 0-based. MUST be smaller than PointCount
+	* @param[out] dX - X value of the point in mm
+	* @param[out] dY - Y value of the point in mm
+	*/
+	virtual void GetPointPosition(const LibMCEnv_uint32 nPointIndex, LibMCEnv_double & dX, LibMCEnv_double & dY) = 0;
+
+	/**
+	* IScatterPlot::GetBoundaries - Returns the bounding box of the scatter plot data. Returns 0/0-0/0 in case no points are available.
+	* @param[out] dMinX - Minimum X value of the point in mm
+	* @param[out] dMinY - Minimum Y value of the point in mm
+	* @param[out] dMaxX - Maximum X value of the point in mm
+	* @param[out] dMaxY - Maximum Y value of the point in mm
+	*/
+	virtual void GetBoundaries(LibMCEnv_double & dMinX, LibMCEnv_double & dMinY, LibMCEnv_double & dMaxX, LibMCEnv_double & dMaxY) = 0;
+
+	/**
+	* IScatterPlot::Release - Release the scatter plot and clear its memory. All accessing code will lose access to the data.
+	*/
+	virtual void Release() = 0;
+
+};
+
+typedef IBaseSharedPtr<IScatterPlot> PIScatterPlot;
+
+
+/*************************************************************************************************************************
  Class interface for DiscreteFieldData2DStoreOptions 
 **************************************************************************************************************************/
 
@@ -1072,6 +1119,79 @@ typedef IBaseSharedPtr<IDataTableCSVWriteOptions> PIDataTableCSVWriteOptions;
 
 
 /*************************************************************************************************************************
+ Class interface for DataTableScatterPlotOptions 
+**************************************************************************************************************************/
+
+class IDataTableScatterPlotOptions : public virtual IBase {
+public:
+	/**
+	* IDataTableScatterPlotOptions::SetXAxisColumn - Sets the column to use for the X Axis value. Column MUST exist.
+	* @param[in] sColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+	* @param[in] dOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+	*/
+	virtual void SetXAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor) = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetXAxisColumn - Returns the column to use for the X Axis value..
+	* @return Identifier of the column. Empty if not set yet.
+	*/
+	virtual std::string GetXAxisColumn() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetXAxisScaling - Returns the scaling for the X Axis value..
+	* @return Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+	*/
+	virtual LibMCEnv_double GetXAxisScaling() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetXAxisOffset - Returns the scaling for the X Axis value..
+	* @return Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+	*/
+	virtual LibMCEnv_double GetXAxisOffset() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::SetYAxisColumn - Sets the column to use for the Y Axis value. Column MUST exist.
+	* @param[in] sColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+	* @param[in] dOffsetFactor - Offset factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+	*/
+	virtual void SetYAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor) = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetYAxisColumn - Returns the column to use for the X Axis value..
+	* @return Identifier of the column. Empty if not set yet.
+	*/
+	virtual std::string GetYAxisColumn() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetYAxisScaling - Returns the scaling for the X Axis value..
+	* @return Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+	*/
+	virtual LibMCEnv_double GetYAxisScaling() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetYAxisOffset - Returns the scaling for the X Axis value..
+	* @return Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+	*/
+	virtual LibMCEnv_double GetYAxisOffset() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::AddDataChannel - Adds a data channel. Column MUST exist.
+	* @param[in] sChannelIdentifier - Identifier of the channel. Must be alphanumeric and not empty.
+	* @param[in] sColumnIdentifier - Identifier of the column to use. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+	* @param[in] dOffsetFactor - Offset factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+	* @param[in] nColor - Base color to use.
+	*/
+	virtual void AddDataChannel(const std::string & sChannelIdentifier, const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor, const LibMCEnv_uint32 nColor) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataTableScatterPlotOptions> PIDataTableScatterPlotOptions;
+
+
+/*************************************************************************************************************************
  Class interface for DataTable 
 **************************************************************************************************************************/
 
@@ -1260,6 +1380,19 @@ public:
 	* @param[in] pStream - Stream read instance to read from.
 	*/
 	virtual void LoadFromStream(IStreamReader* pStream) = 0;
+
+	/**
+	* IDataTable::CreateScatterPlotOptions - Creates an options object for scatter plot computation.
+	* @return DataTableScatterPlotOptions Instance
+	*/
+	virtual IDataTableScatterPlotOptions * CreateScatterPlotOptions() = 0;
+
+	/**
+	* IDataTable::CalculateScatterPlot - Creates a scatterplot from the data table according to its input parameters.
+	* @param[in] pScatterPlotOptions - ScatterPlot Options to use
+	* @return ScatterPlot Instance
+	*/
+	virtual IScatterPlot * CalculateScatterPlot(IDataTableScatterPlotOptions* pScatterPlotOptions) = 0;
 
 };
 

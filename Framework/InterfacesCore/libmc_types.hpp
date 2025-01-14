@@ -642,6 +642,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDJOURNALCHUNKTIMESTAMP 625 /** Invalid journal chunk time stamp */
 #define LIBMC_ERROR_OVERLAPPINGJOURNALCHUNKTIMESTAMP 626 /** Overlapping journal chunk time stamp */
 #define LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS 627 /** Invalid toolpath layer thickness */
+#define LIBMC_ERROR_SCATTERPLOTNOTFOUND 628 /** Scatter plot not found */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1196,6 +1197,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDJOURNALCHUNKTIMESTAMP: return "Invalid journal chunk time stamp";
     case LIBMC_ERROR_OVERLAPPINGJOURNALCHUNKTIMESTAMP: return "Overlapping journal chunk time stamp";
     case LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS: return "Invalid toolpath layer thickness";
+    case LIBMC_ERROR_SCATTERPLOTNOTFOUND: return "Scatter plot not found";
     default: return "unknown error";
   }
 }

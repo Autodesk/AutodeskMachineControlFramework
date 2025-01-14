@@ -1690,6 +1690,13 @@ public:
 	virtual IBuildJob * CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserUUID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
+	* IBuildJobHandler::JobExists - Checks if a job with a specific UUID exists.
+	* @param[in] sJobUUID - UUID String for the build job.
+	* @return Build Job exists.
+	*/
+	virtual bool JobExists(const std::string & sJobUUID) = 0;
+
+	/**
 	* IBuildJobHandler::RetrieveJob - Retrieves a job with a specific UUID.
 	* @param[in] sJobUUID - UUID String for the build job. Must be an existing Job.
 	* @return Build Job Instance.

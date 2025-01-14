@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_meshentity.hpp"
 #include "amc_meshhandler.hpp"
 #include "amc_dataserieshandler.hpp"
+#include "amc_scatterplot.hpp"
+#include "amc_toolpathhandler.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -125,6 +127,40 @@ public:
 	}
 
 };
+
+
+class CAPIRenderPointCloudResponse : public CAPIFixedFloatBufferResponse {
+private:
+
+public:
+
+	CAPIRenderPointCloudResponse(AMC::CScatterplot * pScatterplot)
+		: CAPIFixedFloatBufferResponse("application/binary")
+	{
+
+		
+		if (pScatterplot != nullptr) {
+			size_t nPointCount = pScatterplot->getEntryCount ();
+			resizeTo(nPointCount * 2); 
+
+			auto& entries = pScatterplot->getEntries();
+
+			for (size_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+
+				auto& entry = entries.at(nPointIndex);
+				
+				addFloat((float)entry.m_dX);
+				addFloat((float)entry.m_dY);
+
+			}
+
+		}
+
+
+	}
+
+};
+
 
 
 CAPIHandler_UI::CAPIHandler_UI(PSystemState pSystemState)
@@ -209,6 +245,13 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			if (sParameterString.substr(0, 11) == "/meshedges/") {
 				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(11));
 				return APIHandler_UIType::utMeshEdges;
+			}
+		}
+
+		if (sParameterString.length() == 48) {
+			if (sParameterString.substr(0, 12) == "/pointcloud/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(12));
+				return APIHandler_UIType::utPointCloud;
 			}
 		}
 
@@ -482,6 +525,11 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 		return std::make_shared<CAPIRenderEdgesResponse>(pMeshEntity.get());
 	}
 
+	case APIHandler_UIType::utPointCloud: {
+		auto pToolpathHandler = m_pSystemState->getToolpathHandlerInstance();
+		auto pScatterplot = pToolpathHandler->restoreScatterplot(sParameterUUID, false);
+		return std::make_shared<CAPIRenderPointCloudResponse>(pScatterplot.get ());
+	}
 
 	case APIHandler_UIType::utChart:
 		return handleChartRequest(sParameterUUID, pAuth);

@@ -1551,6 +1551,168 @@ LibMCEnvResult libmcenv_imageloader_createimagefromrawyuy2data(LibMCEnv_ImageLoa
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class implementation for ScatterPlot
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_scatterplot_getuuid(LibMCEnv_ScatterPlot pScatterPlot, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pScatterPlot;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		IScatterPlot* pIScatterPlot = dynamic_cast<IScatterPlot*>(pIBaseClass);
+		if (!pIScatterPlot)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pIScatterPlot->GetUUID();
+
+			pIScatterPlot->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIScatterPlot->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pIScatterPlot->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scatterplot_getpointcount(LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_uint32 * pPointCount)
+{
+	IBase* pIBaseClass = (IBase *)pScatterPlot;
+
+	try {
+		if (pPointCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IScatterPlot* pIScatterPlot = dynamic_cast<IScatterPlot*>(pIBaseClass);
+		if (!pIScatterPlot)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pPointCount = pIScatterPlot->GetPointCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scatterplot_getpointposition(LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_uint32 nPointIndex, LibMCEnv_double * pX, LibMCEnv_double * pY)
+{
+	IBase* pIBaseClass = (IBase *)pScatterPlot;
+
+	try {
+		if (!pX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IScatterPlot* pIScatterPlot = dynamic_cast<IScatterPlot*>(pIBaseClass);
+		if (!pIScatterPlot)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIScatterPlot->GetPointPosition(nPointIndex, *pX, *pY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scatterplot_getboundaries(LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_double * pMinX, LibMCEnv_double * pMinY, LibMCEnv_double * pMaxX, LibMCEnv_double * pMaxY)
+{
+	IBase* pIBaseClass = (IBase *)pScatterPlot;
+
+	try {
+		if (!pMinX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMinY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMaxX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pMaxY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IScatterPlot* pIScatterPlot = dynamic_cast<IScatterPlot*>(pIBaseClass);
+		if (!pIScatterPlot)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIScatterPlot->GetBoundaries(*pMinX, *pMinY, *pMaxX, *pMaxY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_scatterplot_release(LibMCEnv_ScatterPlot pScatterPlot)
+{
+	IBase* pIBaseClass = (IBase *)pScatterPlot;
+
+	try {
+		IScatterPlot* pIScatterPlot = dynamic_cast<IScatterPlot*>(pIBaseClass);
+		if (!pIScatterPlot)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIScatterPlot->Release();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for DiscreteFieldData2DStoreOptions
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_discretefielddata2dstoreoptions_resettodefaults(LibMCEnv_DiscreteFieldData2DStoreOptions pDiscreteFieldData2DStoreOptions)
@@ -2229,6 +2391,294 @@ LibMCEnvResult libmcenv_datatablecsvwriteoptions_setseparator(LibMCEnv_DataTable
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pIDataTableCSVWriteOptions->SetSeparator(sSeparator);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for DataTableScatterPlotOptions
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_datatablescatterplotoptions_setxaxiscolumn(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sColumnIdentifier(pColumnIdentifier);
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataTableScatterPlotOptions->SetXAxisColumn(sColumnIdentifier, dScaleFactor, dOffsetFactor);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablescatterplotoptions_getxaxiscolumn(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const LibMCEnv_uint32 nColumnIdentifierBufferSize, LibMCEnv_uint32* pColumnIdentifierNeededChars, char * pColumnIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if ( (!pColumnIdentifierBuffer) && !(pColumnIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sColumnIdentifier("");
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pColumnIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sColumnIdentifier = pIDataTableScatterPlotOptions->GetXAxisColumn();
+
+			pIDataTableScatterPlotOptions->_setCache (new ParameterCache_1<std::string> (sColumnIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDataTableScatterPlotOptions->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sColumnIdentifier);
+			pIDataTableScatterPlotOptions->_setCache (nullptr);
+		}
+		
+		if (pColumnIdentifierNeededChars)
+			*pColumnIdentifierNeededChars = (LibMCEnv_uint32) (sColumnIdentifier.size()+1);
+		if (pColumnIdentifierBuffer) {
+			if (sColumnIdentifier.size() >= nColumnIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iColumnIdentifier = 0; iColumnIdentifier < sColumnIdentifier.size(); iColumnIdentifier++)
+				pColumnIdentifierBuffer[iColumnIdentifier] = sColumnIdentifier[iColumnIdentifier];
+			pColumnIdentifierBuffer[sColumnIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablescatterplotoptions_getxaxisscaling(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pScaleFactor)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if (pScaleFactor == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pScaleFactor = pIDataTableScatterPlotOptions->GetXAxisScaling();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablescatterplotoptions_getxaxisoffset(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pOffsetFactor)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if (pOffsetFactor == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pOffsetFactor = pIDataTableScatterPlotOptions->GetXAxisOffset();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablescatterplotoptions_setyaxiscolumn(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sColumnIdentifier(pColumnIdentifier);
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataTableScatterPlotOptions->SetYAxisColumn(sColumnIdentifier, dScaleFactor, dOffsetFactor);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablescatterplotoptions_getyaxiscolumn(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const LibMCEnv_uint32 nColumnIdentifierBufferSize, LibMCEnv_uint32* pColumnIdentifierNeededChars, char * pColumnIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if ( (!pColumnIdentifierBuffer) && !(pColumnIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sColumnIdentifier("");
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pColumnIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sColumnIdentifier = pIDataTableScatterPlotOptions->GetYAxisColumn();
+
+			pIDataTableScatterPlotOptions->_setCache (new ParameterCache_1<std::string> (sColumnIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDataTableScatterPlotOptions->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sColumnIdentifier);
+			pIDataTableScatterPlotOptions->_setCache (nullptr);
+		}
+		
+		if (pColumnIdentifierNeededChars)
+			*pColumnIdentifierNeededChars = (LibMCEnv_uint32) (sColumnIdentifier.size()+1);
+		if (pColumnIdentifierBuffer) {
+			if (sColumnIdentifier.size() >= nColumnIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iColumnIdentifier = 0; iColumnIdentifier < sColumnIdentifier.size(); iColumnIdentifier++)
+				pColumnIdentifierBuffer[iColumnIdentifier] = sColumnIdentifier[iColumnIdentifier];
+			pColumnIdentifierBuffer[sColumnIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablescatterplotoptions_getyaxisscaling(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pScaleFactor)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if (pScaleFactor == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pScaleFactor = pIDataTableScatterPlotOptions->GetYAxisScaling();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablescatterplotoptions_getyaxisoffset(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pOffsetFactor)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if (pOffsetFactor == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pOffsetFactor = pIDataTableScatterPlotOptions->GetYAxisOffset();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatablescatterplotoptions_adddatachannel(LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pChannelIdentifier, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor, LibMCEnv_uint32 nColor)
+{
+	IBase* pIBaseClass = (IBase *)pDataTableScatterPlotOptions;
+
+	try {
+		if (pChannelIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pColumnIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sChannelIdentifier(pChannelIdentifier);
+		std::string sColumnIdentifier(pColumnIdentifier);
+		IDataTableScatterPlotOptions* pIDataTableScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClass);
+		if (!pIDataTableScatterPlotOptions)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDataTableScatterPlotOptions->AddDataChannel(sChannelIdentifier, sColumnIdentifier, dScaleFactor, dOffsetFactor, nColor);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -3008,6 +3458,67 @@ LibMCEnvResult libmcenv_datatable_loadfromstream(LibMCEnv_DataTable pDataTable, 
 		
 		pIDataTable->LoadFromStream(pIStream);
 
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatable_createscatterplotoptions(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableScatterPlotOptions * pScatterPlotOptions)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		if (pScatterPlotOptions == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseScatterPlotOptions(nullptr);
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseScatterPlotOptions = pIDataTable->CreateScatterPlotOptions();
+
+		*pScatterPlotOptions = (IBase*)(pBaseScatterPlotOptions);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_datatable_calculatescatterplot(LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableScatterPlotOptions pScatterPlotOptions, LibMCEnv_ScatterPlot * pScatterPlot)
+{
+	IBase* pIBaseClass = (IBase *)pDataTable;
+
+	try {
+		if (pScatterPlot == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassScatterPlotOptions = (IBase *)pScatterPlotOptions;
+		IDataTableScatterPlotOptions* pIScatterPlotOptions = dynamic_cast<IDataTableScatterPlotOptions*>(pIBaseClassScatterPlotOptions);
+		if (!pIScatterPlotOptions)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDCAST);
+		
+		IBase* pBaseScatterPlot(nullptr);
+		IDataTable* pIDataTable = dynamic_cast<IDataTable*>(pIBaseClass);
+		if (!pIDataTable)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseScatterPlot = pIDataTable->CalculateScatterPlot(pIScatterPlotOptions);
+
+		*pScatterPlot = (IBase*)(pBaseScatterPlot);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -27916,6 +28427,16 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_imageloader_createimagefromrawrgba32data;
 	if (sProcName == "libmcenv_imageloader_createimagefromrawyuy2data") 
 		*ppProcAddress = (void*) &libmcenv_imageloader_createimagefromrawyuy2data;
+	if (sProcName == "libmcenv_scatterplot_getuuid") 
+		*ppProcAddress = (void*) &libmcenv_scatterplot_getuuid;
+	if (sProcName == "libmcenv_scatterplot_getpointcount") 
+		*ppProcAddress = (void*) &libmcenv_scatterplot_getpointcount;
+	if (sProcName == "libmcenv_scatterplot_getpointposition") 
+		*ppProcAddress = (void*) &libmcenv_scatterplot_getpointposition;
+	if (sProcName == "libmcenv_scatterplot_getboundaries") 
+		*ppProcAddress = (void*) &libmcenv_scatterplot_getboundaries;
+	if (sProcName == "libmcenv_scatterplot_release") 
+		*ppProcAddress = (void*) &libmcenv_scatterplot_release;
 	if (sProcName == "libmcenv_discretefielddata2dstoreoptions_resettodefaults") 
 		*ppProcAddress = (void*) &libmcenv_discretefielddata2dstoreoptions_resettodefaults;
 	if (sProcName == "libmcenv_discretefielddata2d_getdpi") 
@@ -27966,6 +28487,24 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_datatablecsvwriteoptions_getseparator;
 	if (sProcName == "libmcenv_datatablecsvwriteoptions_setseparator") 
 		*ppProcAddress = (void*) &libmcenv_datatablecsvwriteoptions_setseparator;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_setxaxiscolumn") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_setxaxiscolumn;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_getxaxiscolumn") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_getxaxiscolumn;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_getxaxisscaling") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_getxaxisscaling;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_getxaxisoffset") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_getxaxisoffset;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_setyaxiscolumn") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_setyaxiscolumn;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_getyaxiscolumn") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_getyaxiscolumn;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_getyaxisscaling") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_getyaxisscaling;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_getyaxisoffset") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_getyaxisoffset;
+	if (sProcName == "libmcenv_datatablescatterplotoptions_adddatachannel") 
+		*ppProcAddress = (void*) &libmcenv_datatablescatterplotoptions_adddatachannel;
 	if (sProcName == "libmcenv_datatable_addcolumn") 
 		*ppProcAddress = (void*) &libmcenv_datatable_addcolumn;
 	if (sProcName == "libmcenv_datatable_removecolumn") 
@@ -28016,6 +28555,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_datatable_writedatatostream;
 	if (sProcName == "libmcenv_datatable_loadfromstream") 
 		*ppProcAddress = (void*) &libmcenv_datatable_loadfromstream;
+	if (sProcName == "libmcenv_datatable_createscatterplotoptions") 
+		*ppProcAddress = (void*) &libmcenv_datatable_createscatterplotoptions;
+	if (sProcName == "libmcenv_datatable_calculatescatterplot") 
+		*ppProcAddress = (void*) &libmcenv_datatable_calculatescatterplot;
 	if (sProcName == "libmcenv_dataseries_getname") 
 		*ppProcAddress = (void*) &libmcenv_dataseries_getname;
 	if (sProcName == "libmcenv_dataseries_getuuid") 

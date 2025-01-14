@@ -298,7 +298,7 @@ IDataTable* CBuild::LoadDataTableByIdentifier(const std::string& sIdentifier)
 	auto pStorageStream = pJobData->GetStorageStream();
 
 	auto pStreamReader = std::make_unique<CStreamReader>(pStorage, pStorageStream);
-	return CDataTable::makeFromStream(pStreamReader.get());
+	return CDataTable::makeFromStream(pStreamReader.get(), m_pToolpathHandler);
 }
 
 IDataTable* CBuild::LoadDataTableByUUID(const std::string& sDataUUID)
@@ -313,7 +313,7 @@ IDataTable* CBuild::LoadDataTableByUUID(const std::string& sDataUUID)
 	auto pStorageStream = pJobData->GetStorageStream();
 
 	auto pStreamReader = std::make_unique<CStreamReader> (pStorage, pStorageStream);
-	return CDataTable::makeFromStream (pStreamReader.get ());
+	return CDataTable::makeFromStream (pStreamReader.get (), m_pToolpathHandler);
 }
 
 std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::string& sName, IDataTable* pFieldDataInstance, IDataTableWriteOptions* pStoreOptions, const std::string& sUserUUID)

@@ -303,6 +303,10 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE 10206 /** Could not store JPEG image */
 #define LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT 10207 /** Invalid PNG Export Format */
 #define LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA 10208 /** Invalid memory cache quota */
+#define LIBMCENV_ERROR_NOXAXISCOLUMNGIVEN 10209 /** No X Axis Column given */
+#define LIBMCENV_ERROR_NOYAXISCOLUMNGIVEN 10210 /** No Y Axis Column given */
+#define LIBMCENV_ERROR_INVALIDSCATTERPLOTPOINTINDEX 10211 /** Invalid scatter plot index. */
+#define LIBMCENV_ERROR_SCATTERPLOTNOTFOUND 10212 /** Scatter plot not found */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -518,6 +522,10 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
     case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "Invalid PNG Export Format";
     case LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA: return "Invalid memory cache quota";
+    case LIBMCENV_ERROR_NOXAXISCOLUMNGIVEN: return "No X Axis Column given";
+    case LIBMCENV_ERROR_NOYAXISCOLUMNGIVEN: return "No Y Axis Column given";
+    case LIBMCENV_ERROR_INVALIDSCATTERPLOTPOINTINDEX: return "Invalid scatter plot index.";
+    case LIBMCENV_ERROR_SCATTERPLOTNOTFOUND: return "Scatter plot not found";
     default: return "unknown error";
   }
 }
@@ -537,10 +545,12 @@ typedef LibMCEnvHandle LibMCEnv_JPEGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageLoader;
 typedef LibMCEnvHandle LibMCEnv_VideoStream;
+typedef LibMCEnvHandle LibMCEnv_ScatterPlot;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
 typedef LibMCEnvHandle LibMCEnv_DataTableWriteOptions;
 typedef LibMCEnvHandle LibMCEnv_DataTableCSVWriteOptions;
+typedef LibMCEnvHandle LibMCEnv_DataTableScatterPlotOptions;
 typedef LibMCEnvHandle LibMCEnv_DataTable;
 typedef LibMCEnvHandle LibMCEnv_DataSeries;
 typedef LibMCEnvHandle LibMCEnv_DateTimeDifference;

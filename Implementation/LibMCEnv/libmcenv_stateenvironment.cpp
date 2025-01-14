@@ -606,7 +606,7 @@ LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLString(const std::strin
 
 IDataTable* CStateEnvironment::CreateDataTable()
 {
-	return new CDataTable();
+	return new CDataTable(m_pSystemState->getToolpathHandlerInstance ());
 }
 
 LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer)

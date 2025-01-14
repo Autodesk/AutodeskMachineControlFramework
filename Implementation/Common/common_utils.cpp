@@ -604,6 +604,40 @@ namespace AMCCommon {
 		return true;
 	}
 
+	bool CUtils::stringIsNonEmptyUUIDString(const std::string& sRawString)
+	{
+		std::string sTrimmedString = trimString(sRawString);
+		if (sTrimmedString.length() != 36)
+			return false;
+
+		bool bCharsAreAllZero = true;
+
+		size_t nIndex = 0;
+		for (char ch : sTrimmedString) {
+			char lowerChar = ::tolower(ch);
+
+			if ((nIndex == 8) || (nIndex == 13) || (nIndex == 18) || (nIndex == 23)) {
+				if (lowerChar != '-')
+					return false;
+			}
+			else {
+				bool bCharIsValid = (((lowerChar >= '0') && (lowerChar <= '9')) ||
+					((lowerChar >= 'a') && (lowerChar <= 'f')));
+				if (!bCharIsValid)
+					return false;
+
+				if (lowerChar != '0')
+					bCharsAreAllZero = false;
+			}
+
+			nIndex++;
+
+		}
+
+		return !bCharsAreAllZero;
+	}
+
+
 	std::string CUtils::normalizeUUIDString(const std::string & sRawString)
 	{
 		uint32_t nIndex = 0;

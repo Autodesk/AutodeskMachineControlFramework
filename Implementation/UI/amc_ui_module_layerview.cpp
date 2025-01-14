@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_toolpathhandler.hpp"
 
 #include "common_utils.hpp"
 
@@ -71,11 +72,13 @@ std::string CUIModule_LayerViewPlatformItem::findElementPathByUUID(const std::st
 	return "";
 }
 
+
+
 void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 	auto pGroup = pClientVariableHandler->findGroup(getItemPath (), true);
 
-	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData ();
+	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData ();	
 
 	if (m_SizeX.needsSync())
 		pGroup->setParameterValueByName(AMC_API_KEY_UI_SIZEX, m_SizeX.evaluateStringValue(pStateMachineData));
@@ -100,9 +103,29 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 	}
 
 	std::string sBuildUUID = pGroup->getParameterValueByName(AMC_API_KEY_UI_BUILDUUID);
+	std::string sScatterplotUUID = pGroup->getParameterValueByName(AMC_API_KEY_UI_SCATTERPLOTUUID);
 
 	object.addString(AMC_API_KEY_UI_BUILDUUID, sBuildUUID);
+	object.addString(AMC_API_KEY_UI_SCATTERPLOTUUID, sScatterplotUUID);
 	object.addInteger(AMC_API_KEY_UI_CURRENTLAYER, pGroup->getIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER));
+
+	uint32_t nLayerCount = 0;
+	if (AMCCommon::CUtils::stringIsNonEmptyUUIDString (sBuildUUID)) {
+		auto pToolpathHandler = m_pUIModuleEnvironment->toolpathHandler();
+		auto pDataModel = m_pUIModuleEnvironment->dataModel();
+		auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+
+		if (pBuildJobHandler->JobExists(sBuildUUID)) {
+			auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+			auto pToolpathEntity = pToolpathHandler->findToolpathEntity(pBuildJob->GetStorageStreamUUID(), false);
+			if (pToolpathEntity != nullptr) {
+				nLayerCount = pToolpathEntity->getLayerCount();
+			}
+		}
+
+	}
+	object.addInteger(AMC_API_KEY_UI_LAYERCOUNT, nLayerCount);
+
 
 }
 
@@ -116,12 +139,14 @@ void CUIModule_LayerViewPlatformItem::populateClientVariables(CParameterHandler*
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
 	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "layer view");
 	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_BUILDUUID, "Build UUID", AMCCommon::CUtils::createEmptyUUID());
+	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_SCATTERPLOTUUID, "Scatterplot UUID", AMCCommon::CUtils::createEmptyUUID());
 	pGroup->addNewIntParameter(AMC_API_KEY_UI_CURRENTLAYER, "Current layer index", 0);
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_SIZEX, "Platform size x", m_SizeX.evaluateNumberValue (pStateMachineData), 1.0);
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_SIZEY, "Platform size y", m_SizeY.evaluateNumberValue(pStateMachineData), 1.0);
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_ORIGINX, "Platform origin x", m_OriginX.evaluateNumberValue(pStateMachineData), 1.0);
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_ORIGINY, "Platform origin y", m_OriginY.evaluateNumberValue(pStateMachineData), 1.0);
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_BASEIMAGERESOURCE, "Platform base image", m_BaseImage.evaluateStringValue(pStateMachineData));
+
 
 }
 

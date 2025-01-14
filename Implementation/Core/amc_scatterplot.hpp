@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2020 Autodesk Inc.
+Copyright (C) 2023 Autodesk Inc.
 
 All rights reserved.
 
@@ -29,60 +29,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_TOOLPATHHANDLER
-#define __AMC_TOOLPATHHANDLER
+#ifndef __AMC_SCATTERPLOT
+#define __AMC_SCATTERPLOT
 
 #include <memory>
 #include <map>
 #include <string>
-#include <set>
-
-#include "amc_toolpathentity.hpp"
-#include "amc_scatterplot.hpp"
-#include "libmcdata_dynamic.hpp"
+#include <cstdint>
+#include <vector>
 
 namespace AMC {
 
-	
+	typedef struct _sScatterplotEntry {		
+		double m_dX;
+		double m_dY;
+	} sScatterplotEntry;
 
-	class CToolpathHandler;
-	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
 
-	class CToolpathHandler {
+	class CScatterplot;
+	typedef std::shared_ptr<CScatterplot> PScatterplot;
+
+	class CScatterplot {
 	private:
+
+		std::string m_sUUID;
 		
-		std::map<std::string, PToolpathEntity> m_Entities;
+		std::vector<sScatterplotEntry> m_PointEntries;
 
-		std::string m_sLib3MFPath;
-		Lib3MF::PWrapper m_pLib3MFWrapper;
-
-		LibMCData::PDataModel m_pDataModel;
-
-		std::set<std::string> m_AttachmentRelationsToRead;
-
-		std::map<std::string, PScatterplot> m_Scatterplots;
+		double m_dMinX;
+		double m_dMinY;
+		double m_dMaxX;
+		double m_dMaxY;
 
 	public:
 
-		CToolpathHandler(LibMCData::PDataModel pDataModel);
-		virtual ~CToolpathHandler();
+		CScatterplot(const std::string & sUUID);
 
-		CToolpathEntity * findToolpathEntity(const std::string & sStreamUUID, bool bFailIfNotExistent);
-		CToolpathEntity* loadToolpathEntity(const std::string& sStreamUUID);
+		virtual ~CScatterplot();
+
+		std::string getUUID();
+
+		void clearData();
+
+		bool isEmpty();
 		
-		void unloadToolpathEntity (const std::string& sStreamUUID);
-		void unloadAllEntities();
+		uint64_t getEntryCount();
 
-		void setLibraryPath(const std::string& sLibraryName, const std::string sLibraryPath);
+		std::vector<sScatterplotEntry> & getEntries ();
 
-		Lib3MF::PWrapper getLib3MFWrapper();
+		void getBoundaries(double& dMinX, double& dMinY, double& dMaxX, double& dMaxY);
 
-		void registerAttachmentRelationsToRead(const std::string & sRelationShip);
+		void computeBoundaries();
 
-		void unregisterAttachmentRelationsToRead(const std::string& sRelationShip);
-
-		void storeScatterplot (PScatterplot pScatterplot);
-		PScatterplot restoreScatterplot(const std::string & sUUID, bool bMustExist);
 
 	};
 
@@ -90,5 +88,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_TOOLPATHHANDLER
+#endif //__AMC_SCATTERPLOT
 

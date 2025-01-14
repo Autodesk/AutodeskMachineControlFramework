@@ -518,7 +518,7 @@ LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLData(const LibMCEnv_uint64
 
 IDataTable* CUIEnvironment::CreateDataTable()
 {
-    return new CDataTable();
+    return new CDataTable(m_pUISystemState->getToolpathHandler ());
 }
 
 

@@ -6041,6 +6041,35 @@ LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pB
 	}
 }
 
+LibMCDataResult libmcdata_buildjobhandler_jobexists(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, bool * pExists)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
+
+	try {
+		if (pJobUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pExists == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sJobUUID(pJobUUID);
+		IBuildJobHandler* pIBuildJobHandler = dynamic_cast<IBuildJobHandler*>(pIBaseClass);
+		if (!pIBuildJobHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pExists = pIBuildJobHandler->JobExists(sJobUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_buildjobhandler_retrievejob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, LibMCData_BuildJob * pJobInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
@@ -8991,6 +9020,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_buildjobiterator_getcurrentjob;
 	if (sProcName == "libmcdata_buildjobhandler_createjob") 
 		*ppProcAddress = (void*) &libmcdata_buildjobhandler_createjob;
+	if (sProcName == "libmcdata_buildjobhandler_jobexists") 
+		*ppProcAddress = (void*) &libmcdata_buildjobhandler_jobexists;
 	if (sProcName == "libmcdata_buildjobhandler_retrievejob") 
 		*ppProcAddress = (void*) &libmcdata_buildjobhandler_retrievejob;
 	if (sProcName == "libmcdata_buildjobhandler_findjobofdata") 

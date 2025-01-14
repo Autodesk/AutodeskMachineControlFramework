@@ -1902,6 +1902,16 @@ typedef LibMCDataResult (*PLibMCDataBuildJobIterator_GetCurrentJobPtr) (LibMCDat
 typedef LibMCDataResult (*PLibMCDataBuildJobHandler_CreateJobPtr) (LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserUUID, const char * pStorageStreamUUID, LibMCData_uint64 nAbsoluteTimeStamp, LibMCData_BuildJob * pJobInstance);
 
 /**
+* Checks if a job with a specific UUID exists.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[in] pJobUUID - UUID String for the build job.
+* @param[out] pExists - Build Job exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobHandler_JobExistsPtr) (LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, bool * pExists);
+
+/**
 * Retrieves a job with a specific UUID.
 *
 * @param[in] pBuildJobHandler - BuildJobHandler instance.
@@ -2906,6 +2916,7 @@ typedef struct {
 	PLibMCDataBuildJob_RetrieveBuildJobExecutionsByStatusPtr m_BuildJob_RetrieveBuildJobExecutionsByStatus;
 	PLibMCDataBuildJobIterator_GetCurrentJobPtr m_BuildJobIterator_GetCurrentJob;
 	PLibMCDataBuildJobHandler_CreateJobPtr m_BuildJobHandler_CreateJob;
+	PLibMCDataBuildJobHandler_JobExistsPtr m_BuildJobHandler_JobExists;
 	PLibMCDataBuildJobHandler_RetrieveJobPtr m_BuildJobHandler_RetrieveJob;
 	PLibMCDataBuildJobHandler_FindJobOfDataPtr m_BuildJobHandler_FindJobOfData;
 	PLibMCDataBuildJobHandler_ListJobsByStatusPtr m_BuildJobHandler_ListJobsByStatus;
