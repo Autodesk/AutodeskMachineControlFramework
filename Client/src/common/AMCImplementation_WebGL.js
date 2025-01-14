@@ -180,18 +180,27 @@ class WebGLLinesElement extends WebGLElement {
 
 class WebGLPointsElement extends WebGLElement {
 
-    constructor(pointsData, zValue, pointsRadius, pointsColor) {
+    constructor(pointsData, zValue, pointsRadius, pointsColor, vertexcolors) {
         super();
 
         let geometry = new THREE.BufferGeometry();
-        const material = new THREE.MeshBasicMaterial({
-            vertexColors: false,
-            color: pointsColor
-        });
+        let material;
+
+		if (vertexcolors) {
+			material = new THREE.MeshBasicMaterial({
+				vertexColors: true
+			});
+		} else {
+			material = new THREE.MeshBasicMaterial({
+				vertexColors: false,
+				color: pointsColor
+			});
+		}
 
         let numberOfPoints = pointsData.length / 2;
 
         const vertices = [];
+		const colors = [];
 
         for (let i = 0; i < numberOfPoints; i++) {
             vertices.push(
@@ -202,9 +211,21 @@ class WebGLPointsElement extends WebGLElement {
                 pointsData[i * 2] + pointsRadius / 2, pointsData[i * 2 + 1] + pointsRadius / 2, zValue,
                 pointsData[i * 2] + pointsRadius / 2, pointsData[i * 2 + 1] - pointsRadius / 2, zValue,
             );
+			
+			if (vertexcolors) {
+					
+					// Add colors for each vertex
+					const color = new THREE.Color(vertexcolors[i]); 
+					for (let j = 0; j < 6; j++) { 
+						colors.push(color.r, color.g, color.b);
+					}
+				}
         }
 
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+		if (vertexcolors) {
+			geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); 
+		}
         geometry.computeBoundingSphere();
 
         this.glelement = new THREE.Mesh(geometry, material);
@@ -848,13 +869,13 @@ class WebGLImpl {
         return linesElement;
     }
 
-    add2DPointsGeometry(identifier, pointsData, zValue, pointsSize, pointsColor) {
+    add2DPointsGeometry(identifier, pointsData, zValue, pointsSize, pointsColor, vertexcolors) {
         if (!identifier)
             return;
 		
 		this.removeElement (identifier);
 
-        let pointsElement = new WebGLPointsElement(pointsData, zValue, pointsSize, pointsColor);
+        let pointsElement = new WebGLPointsElement(pointsData, zValue, pointsSize, pointsColor, vertexcolors);
 
         this.addElement(identifier, pointsElement);
 

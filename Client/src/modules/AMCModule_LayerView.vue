@@ -35,8 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			</div>
 								
 			<div class="button-container">			
-				<button class="rounded-button">Click 2</button>
-				<button class="rounded-button">Click 3</button>
+				<button class="rounded-button" @click="onResetViewClick">
+					<v-icon left color="white">mdi-crop-free</v-icon>
+					Reset View
+				</button>
+				<button class="rounded-button" @click="onFitViewClick">
+					<v-icon left color="white">mdi-magnify-scan</v-icon>
+					Fit to path
+				</button>
 			</div>
 
 			<div class="layerview-slider-container">
@@ -70,7 +76,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			glInstance: null,
 			LayerViewerInstance: null,
 			LayerIndex: 1,
-			maxLayers: 100,
 			draggingRenderView: false,
 			draggingSlider: false,
 			draggingRenderViewCurrentX: 0,
@@ -96,6 +101,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				this.LayerViewerInstance.updateSize (domelement.clientWidth, domelement.clientHeight);
 				this.LayerViewerInstance.RenderScene (true);
 			},
+			
+			onResetViewClick: function () {
+				var platform = this.module.platform;
+
+				this.LayerViewerInstance.CenterOnRectangle (- ZOOM_MARGIN, - ZOOM_MARGIN, platform.sizex + ZOOM_MARGIN, platform.sizey + ZOOM_MARGIN);
+				this.LayerViewerInstance.RenderScene (true);
+			},
+
+			onFitViewClick: function () {
+				var platform = this.module.platform;
+				var pathBoundaries = this.LayerViewerInstance.getPathBoundaries();
+
+				const left = pathBoundaries.center.x - pathBoundaries.radius + platform.sizex / 2;
+				const right = pathBoundaries.center.x + pathBoundaries.radius + platform.sizex / 2;
+				const top = pathBoundaries.center.y - pathBoundaries.radius + platform.sizey / 2;
+				const bottom = pathBoundaries.center.y + pathBoundaries.radius + platform.sizey / 2;
+
+				this.LayerViewerInstance.CenterOnRectangle (left, top, right, bottom);
+				this.LayerViewerInstance.RenderScene (true);
+			},
+
+
 			
 			onLayerChanged: function () {
 			
@@ -127,7 +154,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 							//
 						});
 
-						
+
+						if (platform.scatterplotuuid != "00000000-0000-0000-0000-000000000000") {
+							
+
+								this.Application.axiosGetArrayBufferRequest("/ui/pointcloud/" + platform.scatterplotuuid)
+								.then(responseData => {
+									//alert ("pointcloud received")
+									let pointcoordinates = new Float32Array(responseData.data);
+									//alert ("pointcloud received: " + pointcoordinates.length)
+									
+									this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.002, 0xff0000);
+								
+									
+								})
+								.catch(err => {
+									if (err.response) {
+										console.log (err.response);
+									} else {
+										console.log ("fatal error while retrieving point cloud ");
+									}
+								});
+						}
 					}
 				}
 			},
@@ -202,6 +250,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					this.LayerViewerInstance.RenderScene (true);
 				}
 				else if (this.draggingSlider) {
+				
+					let maxLayers = 0;
+					if (this.module.platform) {
+						maxLayers = this.module.platform.layercount;
+					}
+
+				
 					const sliderThumbDiv = document.getElementById('sliderThumbDiv');
 					const sliderHeight = document.getElementById('sliderDiv').getBoundingClientRect().height - sliderThumbDiv.offsetHeight;
 					
@@ -216,7 +271,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						this.sliderPosition = 1.0;
 					}
 
-					this.LayerIndex = Math.round(this.sliderPosition * this.maxLayers);
+					this.LayerIndex = Math.round(this.sliderPosition * maxLayers);
 
 					sliderThumbDiv.style.bottom = `${this.sliderPosition * (sliderHeight - sliderThumbDiv.offsetHeight) / sliderHeight * 100}%`;
 					sliderThumbDiv.innerText = this.LayerIndex;
@@ -229,7 +284,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						return;
 					}
 
-					const renderElementPosition = this.glInstance.renderer.domElement.getBoundingClientRect();
+					/*const renderElementPosition = this.glInstance.renderer.domElement.getBoundingClientRect();
 					const mouseX = event.clientX - renderElementPosition.left;
 					const mouseY = event.clientY - renderElementPosition.top;
 
@@ -250,7 +305,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					} else {
 						this.lastMouseX = mouseX;
 						this.lastMouseY = mouseY;
-					}
+					} 
 					
 
 					// Each datapoint consists of two triangles and two faceIDs. Only even IDs are of interest
@@ -287,7 +342,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					
 					infoboxDiv.style.display = 'flex';
 					infoboxDiv.style.left = `${mouseX}px`;
-					infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`;
+					infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`; */
 				}
 			
 		},

@@ -56,7 +56,9 @@ class AMCApplicationItem_LayerView_Platform extends Common.AMCApplicationItem {
 		Assert.ObjectValue (updateJSON);		
 		
 		this.currentlayer = Assert.IntegerValue (updateJSON.currentlayer);
+		this.layercount = Assert.IntegerValue (updateJSON.layercount);
 		this.builduuid = Assert.OptionalUUIDValue (updateJSON.builduuid);
+		this.scatterplotuuid = Assert.OptionalUUIDValue (updateJSON.scatterplotuuid);
 		this.baseimageresource = Assert.OptionalUUIDValue (updateJSON.baseimageresource);
 		this.sizex = Assert.NumberValue (updateJSON.sizex);
 		this.sizey = Assert.NumberValue (updateJSON.sizey);

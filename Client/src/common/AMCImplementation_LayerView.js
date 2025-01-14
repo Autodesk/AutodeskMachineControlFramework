@@ -28,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-const LAYERVIEW_MINSCALING = 0.5;
-const LAYERVIEW_MAXSCALING = 125.0;
+const LAYERVIEW_MINSCALING = 0.4;
+const LAYERVIEW_MAXSCALING = 4000.0;
 
 class LayerViewImpl {
 
@@ -131,6 +131,14 @@ class LayerViewImpl {
                 gridScale = gridScale / 5.0;
             }
 
+            if (gridScale > 2.5) {
+                gridScale = gridScale / 5.0;
+            }
+
+            if (gridScale > 2.5) {
+                gridScale = gridScale / 5.0;
+            }
+
             var fullGridSize = gridScale * 25.0 * 5;
             var gridTranslationX = this.transform.x - Math.ceil((this.transform.x / fullGridSize)) * fullGridSize;
             var gridTranslationY = this.transform.y - Math.ceil((this.transform.y / fullGridSize)) * fullGridSize;
@@ -159,6 +167,13 @@ class LayerViewImpl {
 		
 		this.renderNeedsUpdate = true;
     }
+
+	getPathBoundaries() {
+		const pathBoundaries = this.glInstance.findElement("layerdata_points").glelement.geometry.boundingSphere;
+
+		return pathBoundaries;
+	}
+
 
     loadLayer(segmentsArray) {
 		if (!this.glInstance) 
@@ -216,25 +231,30 @@ class LayerViewImpl {
             }
         }
 
-        // Sample data for debugging (1000000 datapoints)
-        // this.pointCoordinates = [];
-        // let xpos, ypos;
+        /*// Sample data for debugging (1000000 datapoints)
+        this.pointCoordinates = [];
+        let xpos, ypos;
+		let pointcolors = [];
 
-        // for (let i = 0; i < 100; i++) {
-        //     for (let j = 0; j < 100; j++) {
-        //         xpos = Math.random() * 20;
-        //         ypos = Math.random() * 20;
-        //         // xpos = i / 100 * 20.0;
-        //         // ypos = j / 100 * 20.0;
+        for (let i = 0; i < 1000; i++) {
+             for (let j = 0; j < 1000; j++) {
+                 xpos = Math.random() * 200;
+                 ypos = Math.random() * 200;
+                 // xpos = i / 100 * 20.0;
+                 // ypos = j / 100 * 20.0;
 
-        //         this.pointCoordinates.push(xpos, ypos);
-        //     }
-        // }
+                 this.pointCoordinates.push(xpos, ypos);
+				 
+				 let red = Math.round (xpos / 200 * 255);
+				 let green = Math.round (ypos / 200 * 255);
+				 pointcolors.push (red + green * 256);
+             }
+         }
 
-        this.numberOfPoints = Math.round(this.pointCoordinates.length / 2);
-
+        this.numberOfPoints = Math.round(this.pointCoordinates.length / 2); */
+		
         this.glInstance.add2DLineGeometry("layerdata_lines", this.linesCoordinates, 60, 0.05, 0x000000, vertexcolors);
-        this.glInstance.add2DPointsGeometry("layerdata_points", this.pointCoordinates, 61, 0.1, 0xff0000);
+		//this.glInstance.add2DPointsGeometry("layerdata_points", this.pointCoordinates, 61, 0.1, 0xff0000, pointcolors);
 
 		this.updateTransform();
 		this.RenderScene(true);
