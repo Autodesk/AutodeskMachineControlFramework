@@ -37,16 +37,68 @@ Abstract: This is a stub class definition of CRaylaseCard
 
 using namespace LibMCDriver_Raylase::Impl;
 
+CRaylaseCoordinateTransform::CRaylaseCoordinateTransform()
+    : m_dM11(1.0), m_dM12(0.0), m_dM21(0.0), m_dM22(1.0),
+    m_dOffsetX(0.0), m_dOffsetY(0.0)
+{
 
-CRaylaseCardList::CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double dMaxLaserPowerInWatts)
+}
+
+CRaylaseCoordinateTransform::~CRaylaseCoordinateTransform()
+{
+
+}
+
+void CRaylaseCoordinateTransform::setRotationalCoordinateTransform(const double dM11, const double dM12, const double dM21, const double dM22)
+{
+    m_dM11 = dM11;
+    m_dM12 = dM12;
+    m_dM21 = dM21;
+    m_dM22 = dM22;
+}
+
+void CRaylaseCoordinateTransform::getRotationalCoordinateTransform(double& dM11, double& dM12, double& dM21, double& dM22)
+{
+    dM11 = m_dM11;
+    dM12 = m_dM12;
+    dM21 = m_dM21;
+    dM22 = m_dM22;
+}
+
+void CRaylaseCoordinateTransform::setTranslationalCoordinateTransform(const double dOffsetX, const double dOffsetY)
+{
+    m_dOffsetX = dOffsetX;
+    m_dOffsetY = dOffsetY;
+}
+
+void CRaylaseCoordinateTransform::getTranslationalCoordinateTransform(double& dOffsetX, double& dOffsetY)
+{
+    dOffsetX = m_dOffsetX;
+    dOffsetY = m_dOffsetY;
+}
+
+void CRaylaseCoordinateTransform::applyTransform(double& dX, double& dY)
+{
+    double dNewX = dX * m_dM11 + dY * m_dM12 + m_dOffsetX;
+    double dNewY = dX * m_dM21 + dY * m_dM22 + m_dOffsetY;
+
+    dX = dNewX;
+    dY = dNewY;
+}
+
+
+CRaylaseCardList::CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double dMaxLaserPowerInWatts, PRaylaseCoordinateTransform pCoordinateTransform)
     : m_pSDK(pSDK), 
     m_ListHandle(0), 
     m_CardHandle(cardHandle), 
     m_dMaxLaserPowerInWatts(dMaxLaserPowerInWatts),
-    m_nListIDOnCard (RAYLASE_LISTONCARDNOTSET)
+    m_nListIDOnCard (RAYLASE_LISTONCARDNOTSET),
+    m_pCoordinateTransform (pCoordinateTransform)
 
 {
     if (pSDK.get() == nullptr)
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+    if (pCoordinateTransform.get () == nullptr)
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
 
     m_ListHandle = m_pSDK->rlListAllocate(m_CardHandle);
@@ -106,7 +158,7 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
         // Check for laser index in file.
 
         // Legacy fix: There might be 3MFs with double values as laser index (like 1.0000)
-        // Ensure that they are at least approximately installers
+        // Ensure that they are at least approximately integers
         double dLaserIndexOfSegment = pLayer->GetSegmentProfileDoubleValueDef(nSegmentIndex, "", "laserindex", 0);
         int64_t nLaserIndexOfSegment = (int64_t) round (dLaserIndexOfSegment);
         if (abs (dLaserIndexOfSegment - double (nLaserIndexOfSegment)) > 0.001)
@@ -123,7 +175,17 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                 bDrawSegment = false;
         }
 
+        // Check if part is not to be ignored
+        std::string sSegmentPartUUID = pLayer->GetSegmentPartUUID(nSegmentIndex);
+        eRaylasePartIgnoreState ignoreState = eRaylasePartIgnoreState::pisDoNotIgnore;
 
+        auto iIgnoreIter = m_IgnorePartMap.find(sSegmentPartUUID);
+        if (iIgnoreIter != m_IgnorePartMap.end())
+            ignoreState = iIgnoreIter->second;
+
+        // If part should be completely ignored, do not draw it.
+        if (ignoreState == eRaylasePartIgnoreState::pisSkipPart)
+            bDrawSegment = false;
 
         if ((nPointCount >= 2) && bDrawSegment) {
 
@@ -139,6 +201,11 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
             m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(m_ListHandle, dMarkSpeedInMeterPerSecond), "rlListAppendMarkSpeed");
 
             double dBasePowerInWatts = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
+            if (ignoreState == eRaylasePartIgnoreState::pisNoPower) {
+                dBasePowerInWatts = false;
+                bSegmentHasPowerPerVector = false;
+            }
+
             if (!bSegmentHasPowerPerVector) {
                 appendPowerInWatts(dBasePowerInWatts);
             }
@@ -159,22 +226,32 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                 if (nPointCount != PointsInMM.size())
                     throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
 
-                for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+                uint32_t nPointLoopCount = nPointCount;
+                if (eSegmentType == LibMCEnv::eToolpathSegmentType::Loop)
+                    nPointLoopCount++;
+
+                for (uint32_t nPointLoopIndex = 0; nPointLoopIndex < nPointLoopCount; nPointLoopIndex++) {
+
+                    // Loops have one point more to draw
+                    uint32_t nPointIndex = nPointLoopIndex % nPointCount;
+
                     double dXinMM = (PointsInMM[nPointIndex].m_Coordinates[0]);
                     double dYinMM = (PointsInMM[nPointIndex].m_Coordinates[1]);
 
+                    m_pCoordinateTransform->applyTransform(dXinMM, dYinMM);
+
                     double dXinMicron = dXinMM * 1000.0;
                     double dYinMicron = dYinMM * 1000.0;
-
-                    if (bSegmentHasPowerPerVector) {
-                        appendPowerInWatts(dBasePowerInWatts * FactorOverrides.at (nPointIndex));
-                    }
 
                     if (nPointIndex == 0) {
                         m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(m_ListHandle, dXinMicron, dYinMicron), "rlListAppendJumpAbs2D");
                         m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(m_ListHandle), "rlListAppendLaserOn");
                     }
                     else {
+                        if (bSegmentHasPowerPerVector) {
+                            appendPowerInWatts(dBasePowerInWatts * FactorOverrides.at(nPointIndex));
+                        }
+
                         m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(m_ListHandle, dXinMicron, dYinMicron), "rlListAppendMarkAbs2D");
                     }
 
@@ -207,6 +284,9 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                     double dY1inMM = HatchesInMM[nHatchIndex].m_Y1;
                     double dX2inMM = HatchesInMM[nHatchIndex].m_X2;
                     double dY2inMM = HatchesInMM[nHatchIndex].m_Y2;
+
+                    m_pCoordinateTransform->applyTransform(dX1inMM, dY1inMM);
+                    m_pCoordinateTransform->applyTransform(dX2inMM, dY2inMM);
 
                     double dX1inMicron = dX1inMM * 1000.0;
                     double dY1inMicron = dY1inMM * 1000.0;
@@ -281,6 +361,20 @@ bool CRaylaseCardList::waitForExecution(uint32_t nTimeOutInMS)
 
     return done;
 
+}
+
+void CRaylaseCardList::setPartIgnoreState(const std::string& sUUID, eRaylasePartIgnoreState ignoreState)
+{
+    if (ignoreState == eRaylasePartIgnoreState::pisDoNotIgnore) {
+        m_IgnorePartMap.erase(sUUID);
+    } else {
+        m_IgnorePartMap.insert(std::make_pair (sUUID, ignoreState));
+    }
+}
+
+void CRaylaseCardList::clearPartIgnoreStates()
+{
+    m_IgnorePartMap.clear();
 }
 
 

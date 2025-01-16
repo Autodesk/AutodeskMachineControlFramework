@@ -38,12 +38,51 @@ Abstract: This is the class declaration of CRaylaseCard
 #include "libmcdriver_raylase_interfaces.hpp"
 #include "libmcdriver_raylase_sdk.hpp"
 
+#include <map>
 
 namespace LibMCDriver_Raylase {
 namespace Impl {
 
 #define RAYLASE_LISTONCARDNOTSET 0xffffffff
 #define RAYLASE_MAXLISTONCARDID 256
+
+	class CRaylaseCoordinateTransform
+	{
+	private:
+		double m_dM11;
+		double m_dM12;
+		double m_dM21;
+		double m_dM22;
+		double m_dOffsetX;
+		double m_dOffsetY;
+
+	public:
+
+		CRaylaseCoordinateTransform();
+
+		virtual ~CRaylaseCoordinateTransform();
+
+		void setRotationalCoordinateTransform(const double dM11, const double dM12, const double dM21, const double dM22);
+
+		void getRotationalCoordinateTransform(double& dM11, double& dM12, double& dM21, double& dM22);
+
+		void setTranslationalCoordinateTransform(const double dOffsetX, const double dOffsetY);
+
+		void getTranslationalCoordinateTransform(double& dOffsetX, double& dOffsetY);
+
+		void applyTransform (double & dX, double & dY);
+
+
+	};
+
+	typedef std::shared_ptr <CRaylaseCoordinateTransform> PRaylaseCoordinateTransform;
+
+	enum class eRaylasePartIgnoreState : uint32_t
+	{
+		pisDoNotIgnore = 0,
+		pisSkipPart = 1,
+		pisNoPower = 2
+	};
 
 class CRaylaseCardList
 {
@@ -53,9 +92,13 @@ class CRaylaseCardList
 		rlListHandle m_ListHandle;
 		double m_dMaxLaserPowerInWatts;
 		uint32_t m_nListIDOnCard;
+		PRaylaseCoordinateTransform m_pCoordinateTransform;
+
+		std::map<std::string, eRaylasePartIgnoreState> m_IgnorePartMap;
+
 	public:
 
-		CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double dMaxLaserPowerInWatts);
+		CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double dMaxLaserPowerInWatts, PRaylaseCoordinateTransform pCoordinateTransform);
 
 		virtual ~CRaylaseCardList();
 
@@ -71,6 +114,10 @@ class CRaylaseCardList
 		void executeList(uint32_t nListIDOnCard);
 
 		bool waitForExecution(uint32_t nTimeOutInMS);
+
+		void setPartIgnoreState(const std::string & sUUID, eRaylasePartIgnoreState ignoreState);
+
+		void clearPartIgnoreStates ();
 };
 
 typedef std::shared_ptr<CRaylaseCardList> PRaylaseCardList;
