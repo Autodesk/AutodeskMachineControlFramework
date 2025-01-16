@@ -168,11 +168,21 @@ Custom implementation
 
 	<class name="NLightDriverBoard" parent="Base" description="Object to control the nLight Driver board attached to a card.">
 
-		<method name="InitializeBoard" description="Initializes the NLight Driver board.">
+		<method name="InitializeLaser" description="Initializes the NLight laser via the driver board.">
 		</method>
 
-		<method name="SetNLightLaserMode" description="Sets the nLight Laser Mode. Board must have been initialized first.">
+		<method name="DisableLaser" description="Disables the NLight laser via the driver board.">
+		</method>
+		
+		<method name="ClearError" description="Clears any error state in the NLight laser via the driver board.">
+		</method>
+
+		<method name="SetLaserMode" description="Sets the nLight Laser Mode. Board must have been initialized first.">
 			<param name="LaserMode" type="uint32" pass="in" description="Sets the laser mode." />
+		</method>
+
+		<method name="HasError" description="Checks, if the laser is in an error state.">
+			<param name="ErrorState" type="bool" pass="return" description="Returns true if the laser is in an error state." />
 		</method>
 
 	</class>
@@ -243,7 +253,30 @@ Custom implementation
 			<param name="ScanningTimeoutInMS" type="uint32" pass="in" description="Maximum duration of the scanning process in milliseconds." />
 		</method>
 		
+		<method name="SetRotationalCoordinateTransform" description="Sets the rotational coordinate transform to use.">
+			<param name="M11" type="double" pass="in" description="Upper left field of the transformation matrix." />
+			<param name="M12" type="double" pass="in" description="Upper right field of the transformation matrix." />
+			<param name="M21" type="double" pass="in" description="Lower left field of the transformation matrix." />
+			<param name="M22" type="double" pass="in" description="Lower right field of the transformation matrix." />
+		</method>
+
+		<method name="GetRotationalCoordinateTransform" description="Returns the rotational coordinate transform in use. The default is the identity matrix.">
+			<param name="M11" type="double" pass="out" description="Upper left field of the transformation matrix." />
+			<param name="M12" type="double" pass="out" description="Upper right field of the transformation matrix." />
+			<param name="M21" type="double" pass="out" description="Lower left field of the transformation matrix." />
+			<param name="M22" type="double" pass="out" description="Lower right field of the transformation matrix." />
+		</method>
 	
+		<method name="SetTranslationalCoordinateTransform" description="Sets the translational coordinate transform to use.">
+			<param name="OffsetX" type="double" pass="in" description="Translation in X in mm." />
+			<param name="OffsetY" type="double" pass="in" description="Translation in Y in mm." />
+		</method>
+
+		<method name="GetTranslationalCoordinateTransform" description="Returns the translational coordinate transform in use. Default is 0/0">
+			<param name="OffsetX" type="double" pass="out" description="Translation in X in mm." />
+			<param name="OffsetY" type="double" pass="out" description="Translation in Y in mm." />
+		</method>
+
 	</class>
 
 

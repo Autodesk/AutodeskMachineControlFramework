@@ -335,15 +335,31 @@ typedef IBaseSharedPtr<IRaylaseCommandLog> PIRaylaseCommandLog;
 class INLightDriverBoard : public virtual IBase {
 public:
 	/**
-	* INLightDriverBoard::InitializeBoard - Initializes the NLight Driver board.
+	* INLightDriverBoard::InitializeLaser - Initializes the NLight laser via the driver board.
 	*/
-	virtual void InitializeBoard() = 0;
+	virtual void InitializeLaser() = 0;
 
 	/**
-	* INLightDriverBoard::SetNLightLaserMode - Sets the nLight Laser Mode. Board must have been initialized first.
+	* INLightDriverBoard::DisableLaser - Disables the NLight laser via the driver board.
+	*/
+	virtual void DisableLaser() = 0;
+
+	/**
+	* INLightDriverBoard::ClearError - Clears any error state in the NLight laser via the driver board.
+	*/
+	virtual void ClearError() = 0;
+
+	/**
+	* INLightDriverBoard::SetLaserMode - Sets the nLight Laser Mode. Board must have been initialized first.
 	* @param[in] nLaserMode - Sets the laser mode.
 	*/
-	virtual void SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode) = 0;
+	virtual void SetLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode) = 0;
+
+	/**
+	* INLightDriverBoard::HasError - Checks, if the laser is in an error state.
+	* @return Returns true if the laser is in an error state.
+	*/
+	virtual bool HasError() = 0;
 
 };
 
@@ -450,6 +466,38 @@ public:
 	* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 	*/
 	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) = 0;
+
+	/**
+	* IRaylaseCard::SetRotationalCoordinateTransform - Sets the rotational coordinate transform to use.
+	* @param[in] dM11 - Upper left field of the transformation matrix.
+	* @param[in] dM12 - Upper right field of the transformation matrix.
+	* @param[in] dM21 - Lower left field of the transformation matrix.
+	* @param[in] dM22 - Lower right field of the transformation matrix.
+	*/
+	virtual void SetRotationalCoordinateTransform(const LibMCDriver_Raylase_double dM11, const LibMCDriver_Raylase_double dM12, const LibMCDriver_Raylase_double dM21, const LibMCDriver_Raylase_double dM22) = 0;
+
+	/**
+	* IRaylaseCard::GetRotationalCoordinateTransform - Returns the rotational coordinate transform in use. The default is the identity matrix.
+	* @param[out] dM11 - Upper left field of the transformation matrix.
+	* @param[out] dM12 - Upper right field of the transformation matrix.
+	* @param[out] dM21 - Lower left field of the transformation matrix.
+	* @param[out] dM22 - Lower right field of the transformation matrix.
+	*/
+	virtual void GetRotationalCoordinateTransform(LibMCDriver_Raylase_double & dM11, LibMCDriver_Raylase_double & dM12, LibMCDriver_Raylase_double & dM21, LibMCDriver_Raylase_double & dM22) = 0;
+
+	/**
+	* IRaylaseCard::SetTranslationalCoordinateTransform - Sets the translational coordinate transform to use.
+	* @param[in] dOffsetX - Translation in X in mm.
+	* @param[in] dOffsetY - Translation in Y in mm.
+	*/
+	virtual void SetTranslationalCoordinateTransform(const LibMCDriver_Raylase_double dOffsetX, const LibMCDriver_Raylase_double dOffsetY) = 0;
+
+	/**
+	* IRaylaseCard::GetTranslationalCoordinateTransform - Returns the translational coordinate transform in use. Default is 0/0
+	* @param[out] dOffsetX - Translation in X in mm.
+	* @param[out] dOffsetY - Translation in Y in mm.
+	*/
+	virtual void GetTranslationalCoordinateTransform(LibMCDriver_Raylase_double & dOffsetX, LibMCDriver_Raylase_double & dOffsetY) = 0;
 
 };
 

@@ -54,14 +54,30 @@ CNLightDriverBoard::~CNLightDriverBoard()
 }
 
 
-void CNLightDriverBoard::InitializeBoard()
+void CNLightDriverBoard::InitializeLaser()
 {
-    m_pCardImpl->initializeNLightDriverBoard();
+    m_pCardImpl->initializeNLightLaser();
 }
 
-void CNLightDriverBoard::SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode)
+void CNLightDriverBoard::DisableLaser()
+{
+    m_pCardImpl->disableNLightLaser();
+}
+
+void CNLightDriverBoard::SetLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode)
 {
     m_pCardImpl->setNLightLaserMode (nLaserMode);
+}
+
+
+void CNLightDriverBoard::ClearError()
+{
+    m_pCardImpl->clearNLightError();
+}
+
+bool CNLightDriverBoard::HasError()
+{
+    return false; // TODO
 }
 
 

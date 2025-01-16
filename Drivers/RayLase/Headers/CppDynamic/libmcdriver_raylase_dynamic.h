@@ -134,12 +134,28 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCommandLog_Retrie
 **************************************************************************************************************************/
 
 /**
-* Initializes the NLight Driver board.
+* Initializes the NLight laser via the driver board.
 *
 * @param[in] pNLightDriverBoard - NLightDriverBoard instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_InitializeBoardPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_InitializeLaserPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Disables the NLight laser via the driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_DisableLaserPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Clears any error state in the NLight laser via the driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_ClearErrorPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
 
 /**
 * Sets the nLight Laser Mode. Board must have been initialized first.
@@ -148,7 +164,16 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_Initia
 * @param[in] nLaserMode - Sets the laser mode.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_SetNLightLaserModePtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 nLaserMode);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_SetLaserModePtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 nLaserMode);
+
+/**
+* Checks, if the laser is in an error state.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @param[out] pErrorState - Returns true if the laser is in an error state.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_HasErrorPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, bool * pErrorState);
 
 /*************************************************************************************************************************
  Class definition for RaylaseCard
@@ -296,6 +321,50 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetAssignedL
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
+
+/**
+* Sets the rotational coordinate transform to use.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] dM11 - Upper left field of the transformation matrix.
+* @param[in] dM12 - Upper right field of the transformation matrix.
+* @param[in] dM21 - Lower left field of the transformation matrix.
+* @param[in] dM22 - Lower right field of the transformation matrix.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_SetRotationalCoordinateTransformPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double dM11, LibMCDriver_Raylase_double dM12, LibMCDriver_Raylase_double dM21, LibMCDriver_Raylase_double dM22);
+
+/**
+* Returns the rotational coordinate transform in use. The default is the identity matrix.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pM11 - Upper left field of the transformation matrix.
+* @param[out] pM12 - Upper right field of the transformation matrix.
+* @param[out] pM21 - Lower left field of the transformation matrix.
+* @param[out] pM22 - Lower right field of the transformation matrix.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetRotationalCoordinateTransformPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double * pM11, LibMCDriver_Raylase_double * pM12, LibMCDriver_Raylase_double * pM21, LibMCDriver_Raylase_double * pM22);
+
+/**
+* Sets the translational coordinate transform to use.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] dOffsetX - Translation in X in mm.
+* @param[in] dOffsetY - Translation in Y in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_SetTranslationalCoordinateTransformPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double dOffsetX, LibMCDriver_Raylase_double dOffsetY);
+
+/**
+* Returns the translational coordinate transform in use. Default is 0/0
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pOffsetX - Translation in X in mm.
+* @param[out] pOffsetY - Translation in Y in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetTranslationalCoordinateTransformPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double * pOffsetX, LibMCDriver_Raylase_double * pOffsetY);
 
 /*************************************************************************************************************************
  Class definition for Driver_Raylase
@@ -472,8 +541,11 @@ typedef struct {
 	PLibMCDriver_RaylaseDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_RaylaseDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr m_RaylaseCommandLog_RetrieveAsString;
-	PLibMCDriver_RaylaseNLightDriverBoard_InitializeBoardPtr m_NLightDriverBoard_InitializeBoard;
-	PLibMCDriver_RaylaseNLightDriverBoard_SetNLightLaserModePtr m_NLightDriverBoard_SetNLightLaserMode;
+	PLibMCDriver_RaylaseNLightDriverBoard_InitializeLaserPtr m_NLightDriverBoard_InitializeLaser;
+	PLibMCDriver_RaylaseNLightDriverBoard_DisableLaserPtr m_NLightDriverBoard_DisableLaser;
+	PLibMCDriver_RaylaseNLightDriverBoard_ClearErrorPtr m_NLightDriverBoard_ClearError;
+	PLibMCDriver_RaylaseNLightDriverBoard_SetLaserModePtr m_NLightDriverBoard_SetLaserMode;
+	PLibMCDriver_RaylaseNLightDriverBoard_HasErrorPtr m_NLightDriverBoard_HasError;
 	PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr m_RaylaseCard_IsConnected;
 	PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr m_RaylaseCard_ResetToSystemDefaults;
 	PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr m_RaylaseCard_EnableCommandLogging;
@@ -490,6 +562,10 @@ typedef struct {
 	PLibMCDriver_RaylaseRaylaseCard_AssignLaserIndexPtr m_RaylaseCard_AssignLaserIndex;
 	PLibMCDriver_RaylaseRaylaseCard_GetAssignedLaserIndexPtr m_RaylaseCard_GetAssignedLaserIndex;
 	PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr m_RaylaseCard_DrawLayer;
+	PLibMCDriver_RaylaseRaylaseCard_SetRotationalCoordinateTransformPtr m_RaylaseCard_SetRotationalCoordinateTransform;
+	PLibMCDriver_RaylaseRaylaseCard_GetRotationalCoordinateTransformPtr m_RaylaseCard_GetRotationalCoordinateTransform;
+	PLibMCDriver_RaylaseRaylaseCard_SetTranslationalCoordinateTransformPtr m_RaylaseCard_SetTranslationalCoordinateTransform;
+	PLibMCDriver_RaylaseRaylaseCard_GetTranslationalCoordinateTransformPtr m_RaylaseCard_GetTranslationalCoordinateTransform;
 	PLibMCDriver_RaylaseDriver_Raylase_SetToSimulationModePtr m_Driver_Raylase_SetToSimulationMode;
 	PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr m_Driver_Raylase_IsSimulationMode;
 	PLibMCDriver_RaylaseDriver_Raylase_SetCustomSDKResourcePtr m_Driver_Raylase_SetCustomSDKResource;

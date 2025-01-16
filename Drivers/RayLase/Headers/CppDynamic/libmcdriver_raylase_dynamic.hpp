@@ -510,8 +510,11 @@ public:
 	{
 	}
 	
-	inline void InitializeBoard();
-	inline void SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode);
+	inline void InitializeLaser();
+	inline void DisableLaser();
+	inline void ClearError();
+	inline void SetLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode);
+	inline bool HasError();
 };
 	
 /*************************************************************************************************************************
@@ -544,6 +547,10 @@ public:
 	inline void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex);
 	inline LibMCDriver_Raylase_uint32 GetAssignedLaserIndex();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
+	inline void SetRotationalCoordinateTransform(const LibMCDriver_Raylase_double dM11, const LibMCDriver_Raylase_double dM12, const LibMCDriver_Raylase_double dM21, const LibMCDriver_Raylase_double dM22);
+	inline void GetRotationalCoordinateTransform(LibMCDriver_Raylase_double & dM11, LibMCDriver_Raylase_double & dM12, LibMCDriver_Raylase_double & dM21, LibMCDriver_Raylase_double & dM22);
+	inline void SetTranslationalCoordinateTransform(const LibMCDriver_Raylase_double dOffsetX, const LibMCDriver_Raylase_double dOffsetY);
+	inline void GetTranslationalCoordinateTransform(LibMCDriver_Raylase_double & dOffsetX, LibMCDriver_Raylase_double & dOffsetY);
 };
 	
 /*************************************************************************************************************************
@@ -700,8 +707,11 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_RaylaseCommandLog_RetrieveAsString = nullptr;
-		pWrapperTable->m_NLightDriverBoard_InitializeBoard = nullptr;
-		pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode = nullptr;
+		pWrapperTable->m_NLightDriverBoard_InitializeLaser = nullptr;
+		pWrapperTable->m_NLightDriverBoard_DisableLaser = nullptr;
+		pWrapperTable->m_NLightDriverBoard_ClearError = nullptr;
+		pWrapperTable->m_NLightDriverBoard_SetLaserMode = nullptr;
+		pWrapperTable->m_NLightDriverBoard_HasError = nullptr;
 		pWrapperTable->m_RaylaseCard_IsConnected = nullptr;
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = nullptr;
 		pWrapperTable->m_RaylaseCard_EnableCommandLogging = nullptr;
@@ -718,6 +728,10 @@ public:
 		pWrapperTable->m_RaylaseCard_AssignLaserIndex = nullptr;
 		pWrapperTable->m_RaylaseCard_GetAssignedLaserIndex = nullptr;
 		pWrapperTable->m_RaylaseCard_DrawLayer = nullptr;
+		pWrapperTable->m_RaylaseCard_SetRotationalCoordinateTransform = nullptr;
+		pWrapperTable->m_RaylaseCard_GetRotationalCoordinateTransform = nullptr;
+		pWrapperTable->m_RaylaseCard_SetTranslationalCoordinateTransform = nullptr;
+		pWrapperTable->m_RaylaseCard_GetTranslationalCoordinateTransform = nullptr;
 		pWrapperTable->m_Driver_Raylase_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_Raylase_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_Raylase_SetCustomSDKResource = nullptr;
@@ -848,21 +862,48 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_NLightDriverBoard_InitializeBoard = (PLibMCDriver_RaylaseNLightDriverBoard_InitializeBoardPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_initializeboard");
+		pWrapperTable->m_NLightDriverBoard_InitializeLaser = (PLibMCDriver_RaylaseNLightDriverBoard_InitializeLaserPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_initializelaser");
 		#else // _WIN32
-		pWrapperTable->m_NLightDriverBoard_InitializeBoard = (PLibMCDriver_RaylaseNLightDriverBoard_InitializeBoardPtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_initializeboard");
+		pWrapperTable->m_NLightDriverBoard_InitializeLaser = (PLibMCDriver_RaylaseNLightDriverBoard_InitializeLaserPtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_initializelaser");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_NLightDriverBoard_InitializeBoard == nullptr)
+		if (pWrapperTable->m_NLightDriverBoard_InitializeLaser == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode = (PLibMCDriver_RaylaseNLightDriverBoard_SetNLightLaserModePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_setnlightlasermode");
+		pWrapperTable->m_NLightDriverBoard_DisableLaser = (PLibMCDriver_RaylaseNLightDriverBoard_DisableLaserPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_disablelaser");
 		#else // _WIN32
-		pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode = (PLibMCDriver_RaylaseNLightDriverBoard_SetNLightLaserModePtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_setnlightlasermode");
+		pWrapperTable->m_NLightDriverBoard_DisableLaser = (PLibMCDriver_RaylaseNLightDriverBoard_DisableLaserPtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_disablelaser");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode == nullptr)
+		if (pWrapperTable->m_NLightDriverBoard_DisableLaser == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightDriverBoard_ClearError = (PLibMCDriver_RaylaseNLightDriverBoard_ClearErrorPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_clearerror");
+		#else // _WIN32
+		pWrapperTable->m_NLightDriverBoard_ClearError = (PLibMCDriver_RaylaseNLightDriverBoard_ClearErrorPtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_clearerror");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightDriverBoard_ClearError == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightDriverBoard_SetLaserMode = (PLibMCDriver_RaylaseNLightDriverBoard_SetLaserModePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_setlasermode");
+		#else // _WIN32
+		pWrapperTable->m_NLightDriverBoard_SetLaserMode = (PLibMCDriver_RaylaseNLightDriverBoard_SetLaserModePtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_setlasermode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightDriverBoard_SetLaserMode == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_NLightDriverBoard_HasError = (PLibMCDriver_RaylaseNLightDriverBoard_HasErrorPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_nlightdriverboard_haserror");
+		#else // _WIN32
+		pWrapperTable->m_NLightDriverBoard_HasError = (PLibMCDriver_RaylaseNLightDriverBoard_HasErrorPtr) dlsym(hLibrary, "libmcdriver_raylase_nlightdriverboard_haserror");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_NLightDriverBoard_HasError == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1007,6 +1048,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RaylaseCard_DrawLayer == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_SetRotationalCoordinateTransform = (PLibMCDriver_RaylaseRaylaseCard_SetRotationalCoordinateTransformPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_setrotationalcoordinatetransform");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_SetRotationalCoordinateTransform = (PLibMCDriver_RaylaseRaylaseCard_SetRotationalCoordinateTransformPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_setrotationalcoordinatetransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_SetRotationalCoordinateTransform == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_GetRotationalCoordinateTransform = (PLibMCDriver_RaylaseRaylaseCard_GetRotationalCoordinateTransformPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_getrotationalcoordinatetransform");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_GetRotationalCoordinateTransform = (PLibMCDriver_RaylaseRaylaseCard_GetRotationalCoordinateTransformPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_getrotationalcoordinatetransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_GetRotationalCoordinateTransform == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_SetTranslationalCoordinateTransform = (PLibMCDriver_RaylaseRaylaseCard_SetTranslationalCoordinateTransformPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_settranslationalcoordinatetransform");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_SetTranslationalCoordinateTransform = (PLibMCDriver_RaylaseRaylaseCard_SetTranslationalCoordinateTransformPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_settranslationalcoordinatetransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_SetTranslationalCoordinateTransform == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_GetTranslationalCoordinateTransform = (PLibMCDriver_RaylaseRaylaseCard_GetTranslationalCoordinateTransformPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_gettranslationalcoordinatetransform");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_GetTranslationalCoordinateTransform = (PLibMCDriver_RaylaseRaylaseCard_GetTranslationalCoordinateTransformPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_gettranslationalcoordinatetransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_GetTranslationalCoordinateTransform == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1197,12 +1274,24 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCommandLog_RetrieveAsString == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_initializeboard", (void**)&(pWrapperTable->m_NLightDriverBoard_InitializeBoard));
-		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_InitializeBoard == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_initializelaser", (void**)&(pWrapperTable->m_NLightDriverBoard_InitializeLaser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_InitializeLaser == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_setnlightlasermode", (void**)&(pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode));
-		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_SetNLightLaserMode == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_disablelaser", (void**)&(pWrapperTable->m_NLightDriverBoard_DisableLaser));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_DisableLaser == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_clearerror", (void**)&(pWrapperTable->m_NLightDriverBoard_ClearError));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_ClearError == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_setlasermode", (void**)&(pWrapperTable->m_NLightDriverBoard_SetLaserMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_SetLaserMode == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_nlightdriverboard_haserror", (void**)&(pWrapperTable->m_NLightDriverBoard_HasError));
+		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_HasError == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_isconnected", (void**)&(pWrapperTable->m_RaylaseCard_IsConnected));
@@ -1267,6 +1356,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_drawlayer", (void**)&(pWrapperTable->m_RaylaseCard_DrawLayer));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_DrawLayer == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_setrotationalcoordinatetransform", (void**)&(pWrapperTable->m_RaylaseCard_SetRotationalCoordinateTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_SetRotationalCoordinateTransform == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_getrotationalcoordinatetransform", (void**)&(pWrapperTable->m_RaylaseCard_GetRotationalCoordinateTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_GetRotationalCoordinateTransform == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_settranslationalcoordinatetransform", (void**)&(pWrapperTable->m_RaylaseCard_SetTranslationalCoordinateTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_SetTranslationalCoordinateTransform == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_gettranslationalcoordinatetransform", (void**)&(pWrapperTable->m_RaylaseCard_GetTranslationalCoordinateTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_GetTranslationalCoordinateTransform == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_settosimulationmode", (void**)&(pWrapperTable->m_Driver_Raylase_SetToSimulationMode));
@@ -1444,20 +1549,48 @@ public:
 	 */
 	
 	/**
-	* CNLightDriverBoard::InitializeBoard - Initializes the NLight Driver board.
+	* CNLightDriverBoard::InitializeLaser - Initializes the NLight laser via the driver board.
 	*/
-	void CNLightDriverBoard::InitializeBoard()
+	void CNLightDriverBoard::InitializeLaser()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_InitializeBoard(m_pHandle));
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_InitializeLaser(m_pHandle));
 	}
 	
 	/**
-	* CNLightDriverBoard::SetNLightLaserMode - Sets the nLight Laser Mode. Board must have been initialized first.
+	* CNLightDriverBoard::DisableLaser - Disables the NLight laser via the driver board.
+	*/
+	void CNLightDriverBoard::DisableLaser()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_DisableLaser(m_pHandle));
+	}
+	
+	/**
+	* CNLightDriverBoard::ClearError - Clears any error state in the NLight laser via the driver board.
+	*/
+	void CNLightDriverBoard::ClearError()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_ClearError(m_pHandle));
+	}
+	
+	/**
+	* CNLightDriverBoard::SetLaserMode - Sets the nLight Laser Mode. Board must have been initialized first.
 	* @param[in] nLaserMode - Sets the laser mode.
 	*/
-	void CNLightDriverBoard::SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode)
+	void CNLightDriverBoard::SetLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_SetNLightLaserMode(m_pHandle, nLaserMode));
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_SetLaserMode(m_pHandle, nLaserMode));
+	}
+	
+	/**
+	* CNLightDriverBoard::HasError - Checks, if the laser is in an error state.
+	* @return Returns true if the laser is in an error state.
+	*/
+	bool CNLightDriverBoard::HasError()
+	{
+		bool resultErrorState = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_HasError(m_pHandle, &resultErrorState));
+		
+		return resultErrorState;
 	}
 	
 	/**
@@ -1629,6 +1762,50 @@ public:
 	void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_DrawLayer(m_pHandle, sStreamUUID.c_str(), nLayerIndex, nScanningTimeoutInMS));
+	}
+	
+	/**
+	* CRaylaseCard::SetRotationalCoordinateTransform - Sets the rotational coordinate transform to use.
+	* @param[in] dM11 - Upper left field of the transformation matrix.
+	* @param[in] dM12 - Upper right field of the transformation matrix.
+	* @param[in] dM21 - Lower left field of the transformation matrix.
+	* @param[in] dM22 - Lower right field of the transformation matrix.
+	*/
+	void CRaylaseCard::SetRotationalCoordinateTransform(const LibMCDriver_Raylase_double dM11, const LibMCDriver_Raylase_double dM12, const LibMCDriver_Raylase_double dM21, const LibMCDriver_Raylase_double dM22)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_SetRotationalCoordinateTransform(m_pHandle, dM11, dM12, dM21, dM22));
+	}
+	
+	/**
+	* CRaylaseCard::GetRotationalCoordinateTransform - Returns the rotational coordinate transform in use. The default is the identity matrix.
+	* @param[out] dM11 - Upper left field of the transformation matrix.
+	* @param[out] dM12 - Upper right field of the transformation matrix.
+	* @param[out] dM21 - Lower left field of the transformation matrix.
+	* @param[out] dM22 - Lower right field of the transformation matrix.
+	*/
+	void CRaylaseCard::GetRotationalCoordinateTransform(LibMCDriver_Raylase_double & dM11, LibMCDriver_Raylase_double & dM12, LibMCDriver_Raylase_double & dM21, LibMCDriver_Raylase_double & dM22)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_GetRotationalCoordinateTransform(m_pHandle, &dM11, &dM12, &dM21, &dM22));
+	}
+	
+	/**
+	* CRaylaseCard::SetTranslationalCoordinateTransform - Sets the translational coordinate transform to use.
+	* @param[in] dOffsetX - Translation in X in mm.
+	* @param[in] dOffsetY - Translation in Y in mm.
+	*/
+	void CRaylaseCard::SetTranslationalCoordinateTransform(const LibMCDriver_Raylase_double dOffsetX, const LibMCDriver_Raylase_double dOffsetY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_SetTranslationalCoordinateTransform(m_pHandle, dOffsetX, dOffsetY));
+	}
+	
+	/**
+	* CRaylaseCard::GetTranslationalCoordinateTransform - Returns the translational coordinate transform in use. Default is 0/0
+	* @param[out] dOffsetX - Translation in X in mm.
+	* @param[out] dOffsetY - Translation in Y in mm.
+	*/
+	void CRaylaseCard::GetTranslationalCoordinateTransform(LibMCDriver_Raylase_double & dOffsetX, LibMCDriver_Raylase_double & dOffsetY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_GetTranslationalCoordinateTransform(m_pHandle, &dOffsetX, &dOffsetY));
 	}
 	
 	/**

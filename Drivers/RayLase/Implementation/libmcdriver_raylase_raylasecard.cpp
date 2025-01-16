@@ -44,6 +44,7 @@ using namespace LibMCDriver_Raylase::Impl;
 
 CRaylaseCard::CRaylaseCard(PRaylaseCardImpl pRaylaseCardImpl)
     : m_pRaylaseCardImpl (pRaylaseCardImpl)
+
 {
     if (pRaylaseCardImpl.get() == nullptr)
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
@@ -195,6 +196,31 @@ void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_
 	if (bVerbose)
     	pDriverEnvironment->LogMessage("Layer exposure finished");
 }
+
+void CRaylaseCard::SetRotationalCoordinateTransform(const LibMCDriver_Raylase_double dM11, const LibMCDriver_Raylase_double dM12, const LibMCDriver_Raylase_double dM21, const LibMCDriver_Raylase_double dM22)
+{
+    auto pTransform = m_pRaylaseCardImpl->getCoordinateTransform();
+    pTransform->setRotationalCoordinateTransform(dM11, dM12, dM21, dM22);
+}
+
+void CRaylaseCard::GetRotationalCoordinateTransform(LibMCDriver_Raylase_double& dM11, LibMCDriver_Raylase_double& dM12, LibMCDriver_Raylase_double& dM21, LibMCDriver_Raylase_double& dM22)
+{
+    auto pTransform = m_pRaylaseCardImpl->getCoordinateTransform();
+    pTransform->getRotationalCoordinateTransform(dM11, dM12, dM21, dM22);
+}
+
+void CRaylaseCard::SetTranslationalCoordinateTransform(const LibMCDriver_Raylase_double dOffsetX, const LibMCDriver_Raylase_double dOffsetY)
+{
+    auto pTransform = m_pRaylaseCardImpl->getCoordinateTransform();
+    pTransform->setTranslationalCoordinateTransform(dOffsetX, dOffsetY);
+}
+
+void CRaylaseCard::GetTranslationalCoordinateTransform(LibMCDriver_Raylase_double& dOffsetX, LibMCDriver_Raylase_double& dOffsetY)
+{
+    auto pTransform = m_pRaylaseCardImpl->getCoordinateTransform();
+    pTransform->getTranslationalCoordinateTransform(dOffsetX, dOffsetY);
+}
+
 
 bool CRaylaseCard::IsConnected()
 {

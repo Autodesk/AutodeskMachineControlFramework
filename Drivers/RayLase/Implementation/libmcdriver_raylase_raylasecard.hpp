@@ -100,6 +100,14 @@ public:
 
 	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) override;
 
+	void SetRotationalCoordinateTransform(const LibMCDriver_Raylase_double dM11, const LibMCDriver_Raylase_double dM12, const LibMCDriver_Raylase_double dM21, const LibMCDriver_Raylase_double dM22) override;
+
+	void GetRotationalCoordinateTransform(LibMCDriver_Raylase_double& dM11, LibMCDriver_Raylase_double& dM12, LibMCDriver_Raylase_double& dM21, LibMCDriver_Raylase_double& dM22) override;
+
+	void SetTranslationalCoordinateTransform(const LibMCDriver_Raylase_double dOffsetX, const LibMCDriver_Raylase_double dOffsetY) override;
+	
+	void GetTranslationalCoordinateTransform(LibMCDriver_Raylase_double& dOffsetX, LibMCDriver_Raylase_double& dOffsetY) override;
+
 };
 
 } // namespace Impl

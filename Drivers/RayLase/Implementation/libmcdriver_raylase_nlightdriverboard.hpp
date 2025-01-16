@@ -67,9 +67,15 @@ public:
 
     virtual ~CNLightDriverBoard();
 
-	void InitializeBoard() override;
+	void InitializeLaser() override;
 
-	void SetNLightLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode) override;
+	void DisableLaser() override;
+
+	void ClearError() override;
+
+	void SetLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode) override;
+
+	bool HasError() override;
 
 };
 

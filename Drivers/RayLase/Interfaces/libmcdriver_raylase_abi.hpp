@@ -147,12 +147,28 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_rayla
 **************************************************************************************************************************/
 
 /**
-* Initializes the NLight Driver board.
+* Initializes the NLight laser via the driver board.
 *
 * @param[in] pNLightDriverBoard - NLightDriverBoard instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_initializeboard(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_initializelaser(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Disables the NLight laser via the driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_disablelaser(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Clears any error state in the NLight laser via the driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_clearerror(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
 
 /**
 * Sets the nLight Laser Mode. Board must have been initialized first.
@@ -161,7 +177,16 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nligh
 * @param[in] nLaserMode - Sets the laser mode.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_setnlightlasermode(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 nLaserMode);
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_setlasermode(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 nLaserMode);
+
+/**
+* Checks, if the laser is in an error state.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @param[out] pErrorState - Returns true if the laser is in an error state.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_haserror(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, bool * pErrorState);
 
 /*************************************************************************************************************************
  Class definition for RaylaseCard
@@ -309,6 +334,50 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_rayla
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_drawlayer(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
+
+/**
+* Sets the rotational coordinate transform to use.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] dM11 - Upper left field of the transformation matrix.
+* @param[in] dM12 - Upper right field of the transformation matrix.
+* @param[in] dM21 - Lower left field of the transformation matrix.
+* @param[in] dM22 - Lower right field of the transformation matrix.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_setrotationalcoordinatetransform(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double dM11, LibMCDriver_Raylase_double dM12, LibMCDriver_Raylase_double dM21, LibMCDriver_Raylase_double dM22);
+
+/**
+* Returns the rotational coordinate transform in use. The default is the identity matrix.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pM11 - Upper left field of the transformation matrix.
+* @param[out] pM12 - Upper right field of the transformation matrix.
+* @param[out] pM21 - Lower left field of the transformation matrix.
+* @param[out] pM22 - Lower right field of the transformation matrix.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_getrotationalcoordinatetransform(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double * pM11, LibMCDriver_Raylase_double * pM12, LibMCDriver_Raylase_double * pM21, LibMCDriver_Raylase_double * pM22);
+
+/**
+* Sets the translational coordinate transform to use.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] dOffsetX - Translation in X in mm.
+* @param[in] dOffsetY - Translation in Y in mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_settranslationalcoordinatetransform(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double dOffsetX, LibMCDriver_Raylase_double dOffsetY);
+
+/**
+* Returns the translational coordinate transform in use. Default is 0/0
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pOffsetX - Translation in X in mm.
+* @param[out] pOffsetY - Translation in Y in mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_gettranslationalcoordinatetransform(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double * pOffsetX, LibMCDriver_Raylase_double * pOffsetY);
 
 /*************************************************************************************************************************
  Class definition for Driver_Raylase

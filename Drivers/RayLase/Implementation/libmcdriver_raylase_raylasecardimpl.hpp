@@ -92,6 +92,8 @@ private:
 	bool m_bSimulatedPilotIsArmed;
 	bool m_bSimulatedPilotIsAlarm;
 
+	PRaylaseCoordinateTransform m_pCoordinateTransform;
+
 public:
 	
 	static PRaylaseCardImpl connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment, LibMCEnv::PWorkingDirectory pWorkingDirectory);
@@ -138,9 +140,15 @@ public:
 
 	void abortListExecution();
 
-	void initializeNLightDriverBoard();
+	void initializeNLightLaser();
+
+	void disableNLightLaser();
+
+	void clearNLightError();
 
 	void setNLightLaserMode (uint32_t nLaserMode);
+
+	PRaylaseCoordinateTransform getCoordinateTransform();
 
 };
 
