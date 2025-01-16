@@ -169,9 +169,14 @@ class LayerViewImpl {
     }
 
 	getPathBoundaries() {
-		const pathBoundaries = this.glInstance.findElement("layerdata_points").glelement.geometry.boundingSphere;
+		let layerLines = this.glInstance.findElement("layerdata_lines");
+		if (layerLines) {
+			const pathBoundaries = layerLines.glelement.geometry.boundingSphere;
 
-		return pathBoundaries;
+			return pathBoundaries;
+		} else {
+			return null;
+		}
 	}
 
 

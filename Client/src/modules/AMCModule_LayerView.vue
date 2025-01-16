@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <template>
 	
-	<div v-if="(module.type == 'layerview')" class="layerview-container" @mousemove="onMouseMove" @mouseup="onStopDragging">
+	<div v-if="(module.type == 'layerview')" class="layerview-container" @mousemove="onMouseMove">
 			<div ref="layerViewDiv" class="layerview" v-resize="onResize" @mousedown="onStartDraggingRenderView" @wheel="onMouseWheel">
 			</div>
 								
@@ -75,14 +75,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		data: () => ({				
 			glInstance: null,
 			LayerViewerInstance: null,
-			LayerIndex: 1,
+			
+			sliderLayerIndex: 1,
+			sliderDragStartPosition: 0.0,
+			
 			draggingRenderView: false,
 			draggingSlider: false,
 			draggingRenderViewCurrentX: 0,
 			draggingRenderViewCurrentY: 0,
 			draggingSliderCurrentY: 0,
-			sliderPosition: 0.0,
-			sliderPositionWhileMove: 0.0,
 			lastMouseX: 0,
 			lastMouseY: 0,
 			reloading: false,
@@ -104,25 +105,62 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			onResetViewClick: function () {
 				var platform = this.module.platform;
-
-				this.LayerViewerInstance.CenterOnRectangle (- ZOOM_MARGIN, - ZOOM_MARGIN, platform.sizex + ZOOM_MARGIN, platform.sizey + ZOOM_MARGIN);
-				this.LayerViewerInstance.RenderScene (true);
+				
+				if (platform) {
+					this.LayerViewerInstance.CenterOnRectangle (- ZOOM_MARGIN, - ZOOM_MARGIN, platform.sizex + ZOOM_MARGIN, platform.sizey + ZOOM_MARGIN);
+					this.LayerViewerInstance.RenderScene (true);
+				}
 			},
 
 			onFitViewClick: function () {
-				var platform = this.module.platform;
-				var pathBoundaries = this.LayerViewerInstance.getPathBoundaries();
+				let platform = this.module.platform;
+				let pathBoundaries = this.LayerViewerInstance.getPathBoundaries();
 
-				const left = pathBoundaries.center.x - pathBoundaries.radius + platform.sizex / 2;
-				const right = pathBoundaries.center.x + pathBoundaries.radius + platform.sizex / 2;
-				const top = pathBoundaries.center.y - pathBoundaries.radius + platform.sizey / 2;
-				const bottom = pathBoundaries.center.y + pathBoundaries.radius + platform.sizey / 2;
+				if (pathBoundaries) {
 
-				this.LayerViewerInstance.CenterOnRectangle (left, top, right, bottom);
-				this.LayerViewerInstance.RenderScene (true);
+					const left = pathBoundaries.center.x - pathBoundaries.radius + platform.sizex / 2;
+					const right = pathBoundaries.center.x + pathBoundaries.radius + platform.sizex / 2;
+					const top = pathBoundaries.center.y - pathBoundaries.radius + platform.sizey / 2;
+					const bottom = pathBoundaries.center.y + pathBoundaries.radius + platform.sizey / 2;
+
+					this.LayerViewerInstance.CenterOnRectangle (left, top, right, bottom);
+					this.LayerViewerInstance.RenderScene (true);
+				} else {
+					this.onResetViewClick ();
+				}
+
 			},
 
+			updateSliderIndex: function (newSliderIndex) {
+						
+				let maxLayers = 0;
+				if (this.module.platform) {
+					maxLayers = this.module.platform.layercount;
+				}						
+					
+				if (typeof newSliderIndex === 'number') {
+				
+					if (Number.isInteger(newSliderIndex)) {
+									
+						if ((newSliderIndex >= 0) && (maxLayers > 0)) {
+							this.sliderLayerIndex = newSliderIndex;
+							const sliderDiv = document.getElementById('sliderDiv');
+							const sliderThumbDiv = document.getElementById('sliderThumbDiv');
+							if (sliderThumbDiv && sliderDiv) {
+								const sliderHeight = sliderDiv.getBoundingClientRect().height - sliderThumbDiv.offsetHeight;
 
+								let sliderPosition = newSliderIndex / maxLayers;
+								sliderThumbDiv.innerText = this.sliderLayerIndex;
+								sliderThumbDiv.style.bottom = `${sliderPosition * (sliderHeight - sliderThumbDiv.offsetHeight) / sliderHeight * 100}%`;
+							}
+							
+							
+						} else {
+							this.sliderLayerIndex = 0;
+						}
+					}
+				}
+			},
 			
 			onLayerChanged: function () {
 			
@@ -134,6 +172,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					
 						platform.displayed_layer = platform.currentlayer;
 						platform.displayed_build = platform.builduuid;
+						
+						this.updateSliderIndex (platform.displayed_layer);
 					
 						this.reloading = true;
 						this.Application.axiosPostRequest ("/build/toolpath", { "builduuid": platform.builduuid, "layerindex": platform.currentlayer })
@@ -194,8 +234,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			},
 
 			onStartDraggingSlider: function (event) {
-				this.draggingSlider = true;
-				this.draggingSliderCurrentY = event.clientY;
+				if (this.module.platform) {
+					this.draggingSlider = true;
+					this.draggingSliderCurrentY = event.clientY;
+
+					this.sliderDragStartPosition = this.sliderLayerIndex / this.module.platform.layercount;
+				}						 
+				
 			},
 
 			onStopDragging: function () {
@@ -203,8 +248,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				this.draggingRenderViewCurrentX = 0;
 				this.draggingRenderViewCurrentY = 0;
 
+				if (this.draggingSlider) {
+					if (this.module.platform) {
+						if (this.module.platform.displayed_layer != this.sliderLayerIndex) {
+							//alert ("Changed layer to " + this.sliderLayerIndex);
+						}
+					}
+				}
+		
 				this.draggingSlider = false;
-				this.sliderPositionWhileMove = this.sliderPosition;
 			},
 			
 			onMouseWheel: function (event) {
@@ -255,26 +307,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					if (this.module.platform) {
 						maxLayers = this.module.platform.layercount;
 					}
-
 				
 					const sliderThumbDiv = document.getElementById('sliderThumbDiv');
 					const sliderHeight = document.getElementById('sliderDiv').getBoundingClientRect().height - sliderThumbDiv.offsetHeight;
 					
 					const deltaY = this.draggingSliderCurrentY - event.clientY;
 					
-					this.sliderPosition = this.sliderPositionWhileMove + deltaY / sliderHeight;
+					let sliderPosition = this.sliderDragStartPosition + deltaY / sliderHeight;
 					
-					if (this.sliderPosition < 0.0) {
-						this.sliderPosition = 0.0;
+					if (sliderPosition < 0.0) {
+						sliderPosition = 0.0;
 					}
-					else if (this.sliderPosition > 1.0) {
-						this.sliderPosition = 1.0;
+					else if (sliderPosition > 1.0) {
+						sliderPosition = 1.0;
 					}
 
-					this.LayerIndex = Math.round(this.sliderPosition * maxLayers);
+					this.updateSliderIndex (Math.round(sliderPosition * maxLayers));
 
-					sliderThumbDiv.style.bottom = `${this.sliderPosition * (sliderHeight - sliderThumbDiv.offsetHeight) / sliderHeight * 100}%`;
-					sliderThumbDiv.innerText = this.LayerIndex;
 				}
 
 				
@@ -393,6 +442,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				}
 							
 			})
+			
+			window.addEventListener ("mouseup", this.onStopDragging);
 			
 			if (this.LayerViewerInstance)
 				this.LayerViewerInstance.RenderScene (true);
