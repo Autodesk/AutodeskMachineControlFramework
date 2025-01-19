@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_exceptiontypes.hpp"
 #include <iostream>
 #include <mutex>
+#include <cmath>
 
 namespace AMC {
 
@@ -214,7 +215,19 @@ namespace AMC {
 
 			int64_t nIntegerData = pEntry->sampleIntegerData(pVariable->getVariableIndex(), nTimeStamp);
 
-			return (double)(nIntegerData * dUnits);
+			switch (pVariable->getDataType()) {					
+			case LibMCData::eParameterDataType::Integer:
+				return (double)nIntegerData;
+
+			case LibMCData::eParameterDataType::Double:
+				return (double)(nIntegerData * dUnits);
+
+			case LibMCData::eParameterDataType::Bool:
+				return (double)nIntegerData;
+
+			default:
+				return 0.0;
+			}
 		}
 
 		return 0.0;
@@ -227,6 +240,7 @@ namespace AMC {
 			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND, sName);
 
 		auto pVariable = iVariableIter->second.get();
+		double dUnits = pVariable->getUnits();
 
 		auto pChunk = findChunkForTimestamp(nTimeStamp);
 		if (pChunk.get() != nullptr) {
@@ -236,7 +250,20 @@ namespace AMC {
 
 			int64_t nIntegerData = pEntry->sampleIntegerData(pVariable->getVariableIndex(), nTimeStamp);
 
-			return nIntegerData;
+			switch (pVariable->getDataType()) {					
+			case LibMCData::eParameterDataType::Integer:
+				return nIntegerData;
+
+			case LibMCData::eParameterDataType::Double:
+				return (int64_t) round(nIntegerData * dUnits);
+
+			case LibMCData::eParameterDataType::Bool:
+				return nIntegerData;
+
+			default:
+				return 0;
+			}
+			
 		}
 
 		return 0;
