@@ -59,6 +59,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCData::Impl;
 
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
+
 /*************************************************************************************************************************
  Class definition of CDataModel 
 **************************************************************************************************************************/
@@ -140,7 +143,7 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
 
     m_pJournal = std::make_shared<AMCData::CJournal> (sJournalBasePath, sJournalName, sJournalChunkBaseName, m_sSessionUUID);
 
-    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion, githash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     pStatement->setString(1, m_sSessionUUID);
     pStatement->setString(2, m_sStartTime);
     pStatement->setString(3, sJournalName);
@@ -148,6 +151,7 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     pStatement->setString(5, "");
     pStatement->setString(6, "");
     pStatement->setInt(7, m_pJournal->getSchemaVersion ());
+    pStatement->setString(8, __STRINGIZE_VALUE_OF(__GITHASH));
     pStatement->execute();
 
 }
