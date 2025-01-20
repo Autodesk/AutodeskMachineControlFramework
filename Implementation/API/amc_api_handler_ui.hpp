@@ -52,7 +52,7 @@ namespace AMC {
 		utMeshEdges = 8,
 		utDownload = 9,
 		utPointCloud = 10,
-		utModuleItemRequest = 11
+		utWidgetRequest = 11
 	};
 
 	class CAPIHandler_UI : public CAPIHandler {
@@ -60,7 +60,7 @@ namespace AMC {
 		
 		PSystemState m_pSystemState;
 
-		APIHandler_UIType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sParameterUUID, uint32_t & sParameterStateID);
+		APIHandler_UIType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sParameterUUID, std::string & sAdditionalParameter);
 
 		void handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth);
 		void handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth);
@@ -70,7 +70,7 @@ namespace AMC {
 		PAPIResponse handleDownloadRequest(const std::string& sParameterUUID, PAPIAuth pAuth);
 
 		void handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
-		void handleModuleItemRequest(CJSONWriter& writer, const std::string & sModuleItemUUID, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
+		void handleWidgetRequest(CJSONWriter& writer, const std::string & sWidgetUUID, const std::string& sRequestType, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 	public:
 

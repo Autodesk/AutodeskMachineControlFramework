@@ -646,6 +646,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_CUSTOMREQUESTNOTSUPPORTED 629 /** Custom request not supported */
 #define LIBMC_ERROR_MISSINGCUSTOMREQUESTTYPE 630 /** Missing custom request type */
 #define LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER 631 /** Missing custom request layer */
+#define LIBMC_ERROR_INVALIDCONTENTSTATEID 632 /** Invalid content state ID */
+#define LIBMC_ERROR_INVALIDWIDGETREQUEST 633 /** Invalid widget request */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1204,6 +1206,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_CUSTOMREQUESTNOTSUPPORTED: return "Custom request not supported";
     case LIBMC_ERROR_MISSINGCUSTOMREQUESTTYPE: return "Missing custom request type";
     case LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER: return "Missing custom request layer";
+    case LIBMC_ERROR_INVALIDCONTENTSTATEID: return "Invalid content state ID";
+    case LIBMC_ERROR_INVALIDWIDGETREQUEST: return "Invalid widget request";
     default: return "unknown error";
   }
 }

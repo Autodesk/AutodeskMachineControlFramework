@@ -149,23 +149,15 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 
 }
 
-void CUIModule_LayerViewPlatformItem::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
-{
-
-}
-
-void CUIModule_LayerViewPlatformItem::handleCustomRequest(CParameterHandler* pClientVariableHandler, const CAPIJSONRequest& request, CJSONWriter& response)
+void CUIModule_LayerViewPlatformItem::handleCustomRequest(CParameterHandler* pClientVariableHandler, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response) 
 {
 	if (pClientVariableHandler == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	std::string sRequestType = request.getNameString(AMC_API_KEY_UI_REQUESTTYPE, LIBMC_ERROR_MISSINGCUSTOMREQUESTTYPE);
-	if (sRequestType == "changelayer") {
-		uint64_t nLayer = request.getUint64(AMC_API_KEY_UI_TARGETLAYER, 0, UINT32_MAX, LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER);
+	if (requestType == "changelayer") {
+		uint64_t nLayer = requestData.getUint64(AMC_API_KEY_UI_TARGETLAYER, 0, UINT32_MAX, LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER);
 		auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
-		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER, nLayer);
-
-		
+		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER, nLayer);		
 	}
 
 }

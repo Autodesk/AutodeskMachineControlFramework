@@ -80,11 +80,10 @@ namespace AMC {
 
 		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
 
-		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler);
 
-		virtual void handleCustomRequest(CParameterHandler* pClientVariableHandler, const CAPIJSONRequest& request, CJSONWriter& response) override;
+		void handleCustomRequest(CParameterHandler* pClientVariableHandler, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response) override;
 
 		void setLabelExpressions (CUIExpression labelVisible, CUIExpression labelCaption, CUIExpression labelIcon);
 

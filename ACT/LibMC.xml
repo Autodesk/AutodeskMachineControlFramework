@@ -655,7 +655,9 @@
 		<error name="CUSTOMREQUESTNOTSUPPORTED" code="629" description="Custom request not supported" />
 		<error name="MISSINGCUSTOMREQUESTTYPE" code="630" description="Missing custom request type" />
 		<error name="MISSINGCUSTOMREQUESTLAYER" code="631" description="Missing custom request layer" />
-		
+		<error name="INVALIDCONTENTSTATEID" code="632" description="Invalid content state ID" />		
+		<error name="INVALIDWIDGETREQUEST" code="633" description="Invalid widget request" />		
+
 		
 					
 	</errors>
