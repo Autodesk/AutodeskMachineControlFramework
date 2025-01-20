@@ -34,7 +34,6 @@ Abstract: This is a stub class definition of CRaylaseCard
 #include "libmcdriver_raylase_raylasecard.hpp"
 #include "libmcdriver_raylase_interfaceexception.hpp"
 
-
 using namespace LibMCDriver_Raylase::Impl;
 
 CRaylaseCoordinateTransform::CRaylaseCoordinateTransform()
@@ -125,7 +124,10 @@ CRaylaseCardList::~CRaylaseCardList()
 
 void CRaylaseCardList::appendPowerInWatts(double dPowerInWatts)
 {
+
     double dPowerFactor = (dPowerInWatts / m_dMaxLaserPowerInWatts);
+    //std::cout << "appending power: " << dPowerFactor << std::endl;
+
     int32_t nPowerInUnits = (int32_t)(dPowerFactor * 65535.0);
     if (nPowerInUnits < 0)
         nPowerInUnits = 0;
@@ -177,19 +179,19 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
         // Check if part is not to be ignored
         std::string sSegmentPartUUID = pLayer->GetSegmentPartUUID(nSegmentIndex);
-        eRaylasePartIgnoreState ignoreState = eRaylasePartIgnoreState::pisDoNotIgnore;
+        //eRaylasePartIgnoreState ignoreState = eRaylasePartIgnoreState::pisDoNotIgnore;        
 
-        auto iIgnoreIter = m_IgnorePartMap.find(sSegmentPartUUID);
+        /*auto iIgnoreIter = m_IgnorePartMap.find(sSegmentPartUUID);
         if (iIgnoreIter != m_IgnorePartMap.end())
             ignoreState = iIgnoreIter->second;
 
         // If part should be completely ignored, do not draw it.
         if (ignoreState == eRaylasePartIgnoreState::pisSkipPart)
-            bDrawSegment = false;
+            bDrawSegment = false; */
 
         if ((nPointCount >= 2) && bDrawSegment) {
 
-            bool bSegmentHasPowerPerVector = pLayer->SegmentHasOverrideFactors(nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor::FactorF);
+            bool bSegmentHasPowerPerVector = false;// pLayer->SegmentHasOverrideFactors(nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor::FactorF);
 
             double dJumpSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
             double dMarkSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
@@ -201,13 +203,18 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
             m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(m_ListHandle, dMarkSpeedInMeterPerSecond), "rlListAppendMarkSpeed");
 
             double dBasePowerInWatts = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
-            if (ignoreState == eRaylasePartIgnoreState::pisNoPower) {
-                dBasePowerInWatts = false;
+            /*if (ignoreState == eRaylasePartIgnoreState::pisNoPower) {
+                dBasePowerInWatts = 0.0;
                 bSegmentHasPowerPerVector = false;
-            }
+            } */
 
             if (!bSegmentHasPowerPerVector) {
                 appendPowerInWatts(dBasePowerInWatts);
+                //std::cout << "segment power: " << dBasePowerInWatts << std::endl;
+            }
+            else {
+                //std::cout << "variable power: " << dBasePowerInWatts << std::endl;
+
             }
 
             switch (eSegmentType) {
@@ -248,9 +255,9 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                         m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(m_ListHandle), "rlListAppendLaserOn");
                     }
                     else {
-                        if (bSegmentHasPowerPerVector) {
+                        /*if (bSegmentHasPowerPerVector) {
                             appendPowerInWatts(dBasePowerInWatts * FactorOverrides.at(nPointIndex));
-                        }
+                        }*/
 
                         m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(m_ListHandle, dXinMicron, dYinMicron), "rlListAppendMarkAbs2D");
                     }
@@ -293,9 +300,9 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                     double dX2inMicron = dX2inMM * 1000.0;
                     double dY2inMicron = dY2inMM * 1000.0;
 
-                    if (bSegmentHasPowerPerVector) {
+                    /*if (bSegmentHasPowerPerVector) {
                         appendPowerInWatts(dBasePowerInWatts * FactorOverrides.at(nHatchIndex).m_Point1Override);
-                    }
+                    }*/
 
                     m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(m_ListHandle, dX1inMicron, dY1inMicron), "rlListAppendJumpAbs2D");
                     m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(m_ListHandle), "rlListAppendLaserOn");
