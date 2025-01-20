@@ -312,10 +312,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					}
 					
 					let requestObject = {
-						request: "changelayer",
 						targetlayer: targetLayer
 					}
-					this.Application.triggerModuleItemRequest (this.module.platform.uuid, requestObject);
+					this.Application.triggerWidgetRequest (this.module.platform.uuid, "changelayer", requestObject);
 				}
 			},
 			

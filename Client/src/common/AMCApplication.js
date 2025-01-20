@@ -842,16 +842,16 @@ export default class AMCApplication extends Common.AMCObject {
         });
     }
 
-    triggerModuleItemRequest (moduleitemuuid, requestJSON, executionCallback) {
+    triggerWidgetRequest (widgetuuid, requestType, requestJSON, executionCallback) {
 
 		
-        this.axiosPostRequest("/ui/moduleitem/" + Assert.UUIDValue (moduleitemuuid), Assert.ObjectValue (requestJSON))
-        .then(resultHandleModuleItemRequest => {
+        this.axiosPostRequest("/ui/widget/" + Assert.UUIDValue (widgetuuid) + "/" + Assert.StringValue (requestType), Assert.ObjectValue (requestJSON))
+        .then(resultHandleWidgetRequest => {
 			
-			if (resultHandleModuleItemRequest.data.actions) {
-				if (Array.isArray(resultHandleModuleItemRequest.data.actions)) {
+			if (resultHandleWidgetRequest.data.actions) {
+				if (Array.isArray(resultHandleWidgetRequest.data.actions)) {
 					let action;
-					for (action of resultHandleModuleItemRequest.data.actions) {
+					for (action of resultHandleWidgetRequest.data.actions) {
 						if (action.action === "activatemodaldialog") {
 							this.showDialog(action.dialogname);
 						}
