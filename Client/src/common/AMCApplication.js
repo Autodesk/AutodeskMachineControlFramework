@@ -842,6 +842,44 @@ export default class AMCApplication extends Common.AMCObject {
         });
     }
 
+    triggerModuleItemRequest (moduleitemuuid, requestJSON, executionCallback) {
+
+		
+        this.axiosPostRequest("/ui/moduleitem/" + Assert.UUIDValue (moduleitemuuid), Assert.ObjectValue (requestJSON))
+        .then(resultHandleModuleItemRequest => {
+			
+			if (resultHandleModuleItemRequest.data.actions) {
+				if (Array.isArray(resultHandleModuleItemRequest.data.actions)) {
+					let action;
+					for (action of resultHandleModuleItemRequest.data.actions) {
+						if (action.action === "activatemodaldialog") {
+							this.showDialog(action.dialogname);
+						}
+						if (action.action === "activatepage") {
+							this.changePage(action.pagename);
+						}
+						if (action.action === "closemodaldialog") {
+							this.closeAllDialogs();
+						}
+						if (action.action === "streamdownload") {
+							this.streamDownload(action.downloadticket);
+						}
+						
+						//this.updateContentItemResult(item.uuid, item);
+					}
+				}
+			}
+			
+			if (executionCallback) {
+				executionCallback ();
+			}				
+			
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    }
+
     assembleFormValues(formValueUUIDList) {
 		
 		

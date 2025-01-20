@@ -46,12 +46,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			</div>
 
 			<div class="layerview-slider-container">
-				<div class="layerview-slider" id="sliderDiv">
-					<div class="slider-thumb" id="sliderThumbDiv" @mousedown="onStartDraggingSlider">
-						0
-					</div>
-				</div>
-			</div>					
+                <div class="layerview-slider" id="sliderDiv">
+                    <div class="slider-thumb" id="sliderThumbDiv" @mousedown="onStartDraggingSlider">
+                        0
+                    </div>
+                </div>
+ 
+                <div class="layerbutton-container">
+                    <button class="rounded-button-small" @click="onPreviousLayerClick">
+                        <v-icon center size="17px" color="white">mdi-minus</v-icon>
+                    </button>
+                    <button class="rounded-button-small" @click="onNextLayerClick">
+                        <v-icon center size="17px" color="white">mdi-plus</v-icon>
+                    </button>
+                </div>
+            </div>  					
+			
+			<div class="layerview_label" v-if="getLabelVisible()">
+                <v-icon center size="16px" color="white">{{ getLabelIcon () }}</v-icon>
+                <div>{{ getLabelCaption () }}</div>
+            </div>
 										
 	</div>
 
@@ -87,12 +101,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			lastMouseX: 0,
 			lastMouseY: 0,
 			reloading: false,
+			showJumps: true,
+            showToolpath: true
 		
 		}),
 		
 		methods: {
 			onResize: function () {
-				var domelement = this.$refs.layerViewDiv; 
+				let domelement = this.$refs.layerViewDiv; 
 				if (!domelement) 
 					return;	
 					
@@ -103,31 +119,93 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				this.LayerViewerInstance.RenderScene (true);
 			},
 			
+			onToggleJumpsClick: function () {
+                this.showJumps = !this.showJumps;
+            },
+ 
+            onToggleToolpathClick: function () {
+                this.showToolpath = !this.showToolpath;
+            },
+
+			
 			onResetViewClick: function () {
-				var platform = this.module.platform;
+				let platform = this.module.platform;
 				
 				if (platform) {
 					this.LayerViewerInstance.CenterOnRectangle (- ZOOM_MARGIN, - ZOOM_MARGIN, platform.sizex + ZOOM_MARGIN, platform.sizey + ZOOM_MARGIN);
 					this.LayerViewerInstance.RenderScene (true);
 				}
 			},
+			
+			getLabelVisible: function ()
+			{
+				let platform = this.module.platform;
+				if (platform) {						
+					return platform.labelvisible;
+				} 
+			
+				return false;
+			},
+			
+			getLabelCaption: function ()
+			{
+				let platform = this.module.platform;
+				if (platform) {						
+					return platform.labelcaption;
+				} 
+			
+				return "";
+			},
+			
+			getLabelIcon: function ()
+			{
+				let platform = this.module.platform;
+				if (platform) {						
+					return platform.labelicon;
+				} 
+			
+				return "";
+			},
+			
+			onPreviousLayerClick: function () {
+			
+				if (this.sliderLayerIndex > 0) {
+					this.changeLayerTo (this.sliderLayerIndex - 1);				
+				}
+            },
+ 
+            onNextLayerClick: function () {
+				if (this.module.platform) {
+					let maxLayers = this.module.platform.layercount;
+					if (this.sliderLayerIndex < maxLayers - 1) {
+						this.changeLayerTo (this.sliderLayerIndex + 1);				
+					}
+				}						
+
+            },
 
 			onFitViewClick: function () {
 				let platform = this.module.platform;
 				let pathBoundaries = this.LayerViewerInstance.getPathBoundaries();
 
 				if (pathBoundaries) {
+				
+					if (pathBoundaries.radius > 0) {
 
-					const left = pathBoundaries.center.x - pathBoundaries.radius + platform.sizex / 2;
-					const right = pathBoundaries.center.x + pathBoundaries.radius + platform.sizex / 2;
-					const top = pathBoundaries.center.y - pathBoundaries.radius + platform.sizey / 2;
-					const bottom = pathBoundaries.center.y + pathBoundaries.radius + platform.sizey / 2;
+						const left = pathBoundaries.center.x - pathBoundaries.radius + platform.sizex / 2;
+						const right = pathBoundaries.center.x + pathBoundaries.radius + platform.sizex / 2;
+						const top = pathBoundaries.center.y - pathBoundaries.radius + platform.sizey / 2;
+						const bottom = pathBoundaries.center.y + pathBoundaries.radius + platform.sizey / 2;
 
-					this.LayerViewerInstance.CenterOnRectangle (left, top, right, bottom);
-					this.LayerViewerInstance.RenderScene (true);
-				} else {
-					this.onResetViewClick ();
+						this.LayerViewerInstance.CenterOnRectangle (left, top, right, bottom);
+						this.LayerViewerInstance.RenderScene (true);
+						return;
+					
+					}
+					
 				}
+
+				this.onResetViewClick ();
 
 			},
 
@@ -164,7 +242,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			onLayerChanged: function () {
 			
-				var platform = this.module.platform;
+				let platform = this.module.platform;
 				
 				if (platform) {
 									
@@ -220,15 +298,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				}
 			},
 			
+			changeLayerTo (targetLayer)
+			{
+				console.log ("Changing layer to: " + targetLayer);
+			
+				if (this.module.platform) {
+					let changeevent = this.module.platform.sliderchangeevent;
+					if (changeevent) {
+						let formValues = {};
+						formValues[this.module.platform.uuid] = targetLayer;
+						
+						this.Application.triggerUIEvent (this.module.platform.sliderchangeevent, this.module.platform.uuid, formValues);
+					}
+					
+					let requestObject = {
+						request: "changelayer",
+						targetlayer: targetLayer
+					}
+					this.Application.triggerModuleItemRequest (this.module.platform.uuid, requestObject);
+				}
+			},
+			
 			onStartDraggingRenderView: function (event) {
 				this.draggingRenderView = true;
 				this.draggingRenderViewCurrentX = event.clientX;
 				this.draggingRenderViewCurrentY = event.clientY;
 				
-				var boxRectangle = event.target.getBoundingClientRect();
+				let boxRectangle = event.target.getBoundingClientRect();
 
-				var localX = ( event.clientX - boxRectangle.left );
-				var localY = ( event.clientY - boxRectangle.top );				  
+				let localX = ( event.clientX - boxRectangle.left );
+				let localY = ( event.clientY - boxRectangle.top );				  
 				
 				this.LayerViewerInstance.glInstance.pick2DElement(localX, localY);
 			},
@@ -251,7 +350,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				if (this.draggingSlider) {
 					if (this.module.platform) {
 						if (this.module.platform.displayed_layer != this.sliderLayerIndex) {
-							//alert ("Changed layer to " + this.sliderLayerIndex);
+							this.changeLayerTo (this.sliderLayerIndex);
 						}
 					}
 				}
@@ -262,25 +361,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			onMouseWheel: function (event) {
 				event.preventDefault();
 				
-				var domelement = this.$refs.layerViewDiv;
+				let domelement = this.$refs.layerViewDiv;
 				if (!domelement) 
 					return;			
 				if (!this.LayerViewerInstance) 
 					return;
 
-				var deltaWheel = event.deltaY;
+				let deltaWheel = event.deltaY;
 				if (deltaWheel > 5)
 					deltaWheel = 5;
 				if (deltaWheel < -5)
 					deltaWheel = -5;
 					
-				var viewportX = event.clientX;
-				var viewportY = event.clientY;
-				var boxRectangle = domelement.getBoundingClientRect();
-				var localX = ( viewportX - boxRectangle.left );
-				var localY = ( viewportY - boxRectangle.top );				
+				let viewportX = event.clientX;
+				let viewportY = event.clientY;
+				let boxRectangle = domelement.getBoundingClientRect();
+				let localX = ( viewportX - boxRectangle.left );
+				let localY = ( viewportY - boxRectangle.top );				
 									
-				var scaleFactor = - deltaWheel * 1.5;
+				let scaleFactor = - deltaWheel * 1.5;
 				
 				this.LayerViewerInstance.ScaleRelative (Math.pow (1.03, scaleFactor), localX, localY);
 				this.LayerViewerInstance.RenderScene (true);
@@ -419,14 +518,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			this.$nextTick(() => {
 				const layerViewDiv = this.$refs.layerViewDiv;
 				if (layerViewDiv && this.glInstance) {						
-					var width = layerViewDiv.clientWidth;
-					var height = layerViewDiv.clientHeight;
+					let width = layerViewDiv.clientWidth;
+					let height = layerViewDiv.clientHeight;
 
 					if ((width > 0) && (height > 0)) {						
 						this.glInstance.setupDOMElement (layerViewDiv);														
 						this.LayerViewerInstance.updateSize (width, height);
 						
-						var platform = this.module.platform;
+						let platform = this.module.platform;
 
 						if (platform) {						
 							if (platform.baseimageresource) {
@@ -528,4 +627,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		border-radius: 10px;
 		cursor: pointer;
 	}
+	
+	
+	.layerview_label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0px !important;
+        padding: 4px 8px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 8pt;
+        background: rgba(0, 0, 0, 0.8);
+        gap: 2px;
+    }
+	
+	
+	.rounded-button-small {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1px;
+        border: none;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+ 
+    .rounded-button-small:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+ 
+    .layerbutton-container {
+        display: flex;
+        flex-direction: row;
+        gap: 1px;
+    }
+ 	
 </style>

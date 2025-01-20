@@ -64,6 +64,11 @@ class AMCApplicationItem_LayerView_Platform extends Common.AMCApplicationItem {
 		this.sizey = Assert.NumberValue (updateJSON.sizey);
 		this.originx = Assert.NumberValue (updateJSON.originx);
 		this.originy = Assert.NumberValue (updateJSON.originy);
+		this.labelvisible = Assert.IntegerValue (updateJSON.labelvisible);
+		this.labelcaption = Assert.StringValue (updateJSON.labelcaption);
+		this.labelicon = Assert.StringValue (updateJSON.labelicon);
+		this.sliderchangeevent = Assert.StringValue (updateJSON.sliderchangeevent);
+		this.sliderfixed = Assert.IntegerValue (updateJSON.sliderfixed);
 		
 		this.moduleInstance.callDataHasChanged ();
 	}
