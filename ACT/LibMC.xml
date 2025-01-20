@@ -652,6 +652,11 @@
 		<error name="OVERLAPPINGJOURNALCHUNKTIMESTAMP" code="626" description="Overlapping journal chunk time stamp" />
 		<error name="INVALIDTOOLPATHLAYERTHICKNESS" code="627" description="Invalid toolpath layer thickness" />
 		<error name="SCATTERPLOTNOTFOUND" code="628" description="Scatter plot not found" />
+		<error name="CUSTOMREQUESTNOTSUPPORTED" code="629" description="Custom request not supported" />
+		<error name="MISSINGCUSTOMREQUESTTYPE" code="630" description="Missing custom request type" />
+		<error name="MISSINGCUSTOMREQUESTLAYER" code="631" description="Missing custom request layer" />
+		
+		
 					
 	</errors>
 	
