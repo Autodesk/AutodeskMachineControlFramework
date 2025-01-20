@@ -162,7 +162,7 @@ public:
 #endif // _WIN32
 
 CServer::CServer(PServerIO pServerIO)
-	: m_pServerIO (pServerIO), m_pListeningServerInstance (nullptr)
+	: m_pServerIO (pServerIO), m_pListeningServerInstance (nullptr), m_nPort (0), m_bUseHTTPS (false), m_bServiceHasBeenStarted (false)
 {
 	if (pServerIO.get() == nullptr)
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "invalid parameter");
@@ -271,6 +271,10 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 		std::string sHostName = m_pServerConfiguration->getHostName();
 		uint32_t nPort = m_pServerConfiguration->getPort();
+
+		m_bUseHTTPS = m_pServerConfiguration->useSSL();
+		m_nPort = nPort;
+		m_sHostName = sHostName;
 
 		m_pContext->StartAllThreads();
 
@@ -467,6 +471,8 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 					sslsvr.Put("(.*?)", requestHandler);
 					sslsvr.Options("(.*?)", requestHandler);
 
+					m_bServiceHasBeenStarted = true;
+
 					m_pListeningServerInstance = &sslsvr;
 					sslsvr.listen(sHostName.c_str(), nPort);
 					m_pListeningServerInstance = nullptr;
@@ -495,6 +501,9 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 				svr.Put("(.*?)", requestHandler);
 				svr.Options("(.*?)", requestHandler);
 				m_pListeningServerInstance = &svr;
+
+				m_bServiceHasBeenStarted = true;
+
 				svr.listen(sHostName.c_str(), nPort);
 				m_pListeningServerInstance = nullptr;
 
@@ -536,5 +545,53 @@ void CServer::stopListening()
 		httplib::Server* pServerInstance = (httplib::Server*)m_pListeningServerInstance;
 		pServerInstance->stop();
 	}
+}
+
+std::string CServer::getServerURL()
+{
+	if (!m_bServiceHasBeenStarted)
+		throw std::runtime_error("service has not been started yet!");
+
+	std::string sIPAddress;
+	if (m_sHostName == "0.0.0.0") {
+		sIPAddress = "127.0.0.1";
+	}
+	else {
+
+#ifdef _WIN32
+
+		struct addrinfo hints = { 0 }, * res = nullptr;
+		hints.ai_family = AF_INET; // Use IPv4
+		hints.ai_socktype = SOCK_STREAM;
+
+		if (getaddrinfo(m_sHostName.c_str(), nullptr, &hints, &res) == 0)
+		{
+			char ipStr[INET_ADDRSTRLEN] = { 0 };
+			sockaddr_in* addr = (sockaddr_in*)res->ai_addr;
+			inet_ntop(AF_INET, &(addr->sin_addr), ipStr, sizeof(ipStr));
+			freeaddrinfo(res);
+			sIPAddress = std::string(ipStr);
+		}
+		else
+		{
+			throw std::runtime_error("Unable to resolve hostname " + m_sHostName);
+		}
+
+#else
+	sIPAddress = m_sHostName;
+#endif // _WIN32
+	}
+
+	if (m_bUseHTTPS) {
+		return "https://" + sIPAddress + ":" + std::to_string(m_nPort);
+	}
+	else {
+		return "http://" + sIPAddress + ":" + std::to_string(m_nPort);
+	}
+}
+
+bool CServer::getServiceHasBeenStarted()
+{
+	return m_bServiceHasBeenStarted;
 }
 

@@ -62,6 +62,7 @@ using namespace AMC;
 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
+
 #define FONTSIZE_AT_96DPI 18
 
 CServerWin32IO::CServerWin32IO()
@@ -163,6 +164,9 @@ void CServer_Win32::initInstance(int nCmdShow)
     if (m_hWnd == nullptr)
         throw std::runtime_error("invalid window instance");
 
+    // Store the server pointer in the window's user data
+    SetWindowLongPtrW((HWND)m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+
     ShowWindow((HWND) m_hWnd, nCmdShow);
     UpdateWindow((HWND)m_hWnd);
 
@@ -195,6 +199,41 @@ void* CServer_Win32::getAccelTable()
     return m_hAccelTable;
 }
 
+void launchBrowser(CServer_Win32 * pServer)
+{
+    try {
+        if (pServer != nullptr) {
+            // URL to open in the browser
+            std::wstring wsURL = AMCCommon::CUtils::UTF8toUTF16(pServer->getServerURL());
+
+            // Use ShellExecuteW to open the browser
+            HINSTANCE result = ShellExecuteW(nullptr, L"open", wsURL.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+
+            // Check the result
+            if ((uintptr_t)result <= 32) // Values less than or equal to 32 indicate an error
+            {
+                throw std::runtime_error("Failed to launch the browser.");
+            }
+        }
+        else {
+            throw std::runtime_error("internal error: could not access server object!");
+        }
+    }
+    
+    catch (std::exception& E) {
+        std::string sError(E.what());
+        std::wstring wsError;
+        if (AMCCommon::CUtils::UTF8StringIsValid(sError))
+            wsError = AMCCommon::CUtils::UTF8toUTF16(sError);
+
+        if (wsError.empty())
+            wsError = L"a unknown error occured!";
+
+        MessageBoxW(nullptr, wsError.c_str (), L"Error", MB_OK | MB_ICONERROR);
+    }
+
+
+}
 
 // Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -220,6 +259,8 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {   
     static HFONT fontHandle = nullptr;
+
+    CServer_Win32* pServer = reinterpret_cast<CServer_Win32*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 
     HINSTANCE hInst = (HINSTANCE)GetWindowLongPtrW(hWnd, GWLP_HINSTANCE);
 
@@ -262,6 +303,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // Add text to the window. 
         SendMessage(hwndListBox, WM_SETFONT, (WPARAM)fontHandle, 0);
 
+
         return 0;
 
     }
@@ -283,6 +325,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case IDM_EXIT:
             DestroyWindow(hWnd);
+            break;
+        case IDM_LAUNCHBROWSER:
+            launchBrowser(pServer);
             break;
         case ID_EDITCHILD:
         {
@@ -430,13 +475,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
+bool hasCommandLineArgument(LPWSTR lpCmdLine, const std::wstring& argument)
+{
+    // Convert the command line to a wstring for easier processing
+    std::wstring cmdLine(lpCmdLine);
+
+    // Check if the argument exists (case-sensitive comparison)
+    if (cmdLine.find(argument) != std::wstring::npos)
+    {
+        return true;
+    }
+    return false;
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+
+    bool bAutoOpenBrowser = hasCommandLineArgument(lpCmdLine, L"/openbrowser");
 
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 
@@ -449,6 +508,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    bool bServiceHasBeenStarted = false;
+
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
@@ -456,6 +517,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+        }
+
+        // Wait until service has been started to launch browser UI...
+        if (!bServiceHasBeenStarted) {
+            bServiceHasBeenStarted = pServer->getServiceHasBeenStarted();
+            if (bServiceHasBeenStarted) {
+                if (bAutoOpenBrowser)
+                    launchBrowser(pServer.get());
+            }
         }
     }
 
