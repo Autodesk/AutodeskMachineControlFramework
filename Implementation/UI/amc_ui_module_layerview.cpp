@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module.hpp"
 #include "amc_ui_module_item.hpp"
 #include "amc_ui_modulefactory.hpp"
+#include "amc_api_jsonrequest.hpp"
 
 #include "amc_ui_module_layerview.hpp"
 
@@ -50,7 +51,7 @@ using namespace AMC;
 
 
 
-CUIModule_LayerViewPlatformItem::CUIModule_LayerViewPlatformItem(const std::string& sItemPath, CUIExpression sizeX, CUIExpression sizeY, CUIExpression originX, CUIExpression originY, CUIExpression layerIndex, CUIExpression baseImage, PUIModuleEnvironment pUIModuleEnvironment)
+CUIModule_LayerViewPlatformItem::CUIModule_LayerViewPlatformItem (const std::string& sItemPath, CUIExpression sizeX, CUIExpression sizeY, CUIExpression originX, CUIExpression originY, CUIExpression layerIndex, CUIExpression baseImage, PUIModuleEnvironment pUIModuleEnvironment)
 	: CUIModuleItem(sItemPath), m_SizeX(sizeX), m_SizeY(sizeY), m_OriginX(originX), m_OriginY(originY), m_BaseImage(baseImage), m_pUIModuleEnvironment(pUIModuleEnvironment),
 	m_sUUID(AMCCommon::CUtils::createUUID()), m_LayerIndex(layerIndex)
 {
@@ -90,6 +91,16 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 		pGroup->setParameterValueByName(AMC_API_KEY_UI_ORIGINY, m_OriginY.evaluateStringValue(pStateMachineData));
 	if (m_LayerIndex.needsSync())
 		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER, m_LayerIndex.evaluateIntegerValue(pStateMachineData));
+	if (m_LabelVisible.needsSync())
+		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_LABELVISIBLE, m_LabelVisible.evaluateIntegerValue(pStateMachineData));
+	if (m_LabelCaption.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_LABELCAPTION, m_LabelCaption.evaluateStringValue(pStateMachineData));
+	if (m_LabelIcon.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_LABELICON, m_LabelIcon.evaluateStringValue(pStateMachineData));
+	if (m_SliderChangeEvent.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_SLIDERCHANGEEVENT, m_SliderChangeEvent.evaluateStringValue(pStateMachineData));
+	if (m_SliderFixed.needsSync())
+		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_SLIDERFIXED, m_SliderFixed.evaluateIntegerValue(pStateMachineData));
 
 	object.addDouble(AMC_API_KEY_UI_SIZEX, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_SIZEX));
 	object.addDouble(AMC_API_KEY_UI_SIZEY, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_SIZEY));
@@ -108,6 +119,7 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 	object.addString(AMC_API_KEY_UI_BUILDUUID, sBuildUUID);
 	object.addString(AMC_API_KEY_UI_SCATTERPLOTUUID, sScatterplotUUID);
 	object.addInteger(AMC_API_KEY_UI_CURRENTLAYER, pGroup->getIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER));
+	object.addInteger(AMC_API_KEY_UI_CURRENTLAYERCOUNTER, pGroup->getChangeCounterOf(AMC_API_KEY_UI_CURRENTLAYER));
 
 	uint32_t nLayerCount = 0;
 	if (AMCCommon::CUtils::stringIsNonEmptyUUIDString (sBuildUUID)) {
@@ -126,6 +138,14 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 	}
 	object.addInteger(AMC_API_KEY_UI_LAYERCOUNT, nLayerCount);
 
+	object.addInteger(AMC_API_KEY_UI_LABELVISIBLE, pGroup->getIntParameterValueByName(AMC_API_KEY_UI_LABELVISIBLE));
+	object.addString(AMC_API_KEY_UI_LABELCAPTION, pGroup->getParameterValueByName(AMC_API_KEY_UI_LABELCAPTION));
+	object.addString(AMC_API_KEY_UI_LABELICON, pGroup->getParameterValueByName(AMC_API_KEY_UI_LABELICON));
+
+	object.addString(AMC_API_KEY_UI_SLIDERCHANGEEVENT, pGroup->getParameterValueByName(AMC_API_KEY_UI_SLIDERCHANGEEVENT));
+	object.addInteger(AMC_API_KEY_UI_SLIDERFIXED, pGroup->getIntParameterValueByName(AMC_API_KEY_UI_SLIDERFIXED));
+
+
 
 }
 
@@ -133,6 +153,37 @@ void CUIModule_LayerViewPlatformItem::setEventPayloadValue(const std::string& sE
 {
 
 }
+
+void CUIModule_LayerViewPlatformItem::handleCustomRequest(CParameterHandler* pClientVariableHandler, const CAPIJSONRequest& request, CJSONWriter& response)
+{
+	if (pClientVariableHandler == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	std::string sRequestType = request.getNameString(AMC_API_KEY_UI_REQUESTTYPE, LIBMC_ERROR_MISSINGCUSTOMREQUESTTYPE);
+	if (sRequestType == "changelayer") {
+		uint64_t nLayer = request.getUint64(AMC_API_KEY_UI_TARGETLAYER, 0, UINT32_MAX, LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER);
+		auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER, nLayer);
+
+		
+	}
+
+}
+
+
+void CUIModule_LayerViewPlatformItem::setLabelExpressions(CUIExpression labelVisible, CUIExpression labelCaption, CUIExpression labelIcon)
+{
+	m_LabelVisible = labelVisible;
+	m_LabelCaption = labelCaption;
+	m_LabelIcon = labelIcon;
+}
+
+void CUIModule_LayerViewPlatformItem::setSliderExpressions(CUIExpression sliderChangeEvent, CUIExpression sliderFixed)
+{
+	m_SliderChangeEvent = sliderChangeEvent;
+	m_SliderFixed = sliderFixed;
+}
+
 
 void CUIModule_LayerViewPlatformItem::populateClientVariables(CParameterHandler* pClientVariableHandler)
 {
@@ -146,6 +197,11 @@ void CUIModule_LayerViewPlatformItem::populateClientVariables(CParameterHandler*
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_ORIGINX, "Platform origin x", m_OriginX.evaluateNumberValue(pStateMachineData), 1.0);
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_ORIGINY, "Platform origin y", m_OriginY.evaluateNumberValue(pStateMachineData), 1.0);
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_BASEIMAGERESOURCE, "Platform base image", m_BaseImage.evaluateStringValue(pStateMachineData));
+	pGroup->addNewIntParameter(AMC_API_KEY_UI_LABELVISIBLE, "Label is visible", m_LabelVisible.evaluateIntegerValue (pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_LABELCAPTION, "Label caption", m_LabelCaption.evaluateStringValue(pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_LABELICON, "Label icon", m_LabelIcon.evaluateStringValue(pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_SLIDERCHANGEEVENT, "Slider change event", m_SliderChangeEvent.evaluateStringValue(pStateMachineData));
+	pGroup->addNewIntParameter(AMC_API_KEY_UI_SLIDERFIXED, "Slider is fixed", m_SliderFixed.evaluateIntegerValue(pStateMachineData));
 
 
 }
@@ -177,6 +233,25 @@ CUIModule_LayerView::CUIModule_LayerView(pugi::xml_node& xmlNode, const std::str
 	CUIExpression layerIndex(platformNode, "layerindex", false);
 
 	m_PlatformItem = std::make_shared<CUIModule_LayerViewPlatformItem>(m_sModulePath, sizeX, sizeY, originX, originY, layerIndex, baseImage, pUIModuleEnvironment);
+
+	auto labelNode = xmlNode.child("label");
+	if (!labelNode.empty()) {
+		CUIExpression labelVisible(labelNode, "visible");
+		CUIExpression labelCaption(labelNode, "caption");
+		CUIExpression labelIcon(labelNode, "icon");
+
+		m_PlatformItem->setLabelExpressions(labelVisible, labelCaption, labelIcon);
+
+	}
+
+	auto sliderNode = xmlNode.child("slider");
+	if (!sliderNode.empty()) {
+		CUIExpression sliderChangeEvent(sliderNode, "changeevent");
+		CUIExpression sliderFixed(sliderNode, "fixed");
+
+		m_PlatformItem->setSliderExpressions(sliderChangeEvent, sliderFixed);
+
+	}
 
 }
 

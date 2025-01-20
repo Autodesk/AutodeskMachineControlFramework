@@ -439,6 +439,17 @@ namespace AMC {
 		return iIter->second->getOriginalPath();
 	}
 
+	uint64_t CParameterGroup::getChangeCounterOf(const std::string& sName)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		auto iIter = m_Parameters.find(sName);
+
+		if (iIter == m_Parameters.end())
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
+
+		return iIter->second->getChangeCounter();
+	}
+
 
 	void CParameterGroup::addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue)
 	{

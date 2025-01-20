@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath)
-		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType (eDataType), m_sOriginalPath (sOriginalPath)
+		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType (eDataType), m_sOriginalPath (sOriginalPath), m_nChangeCounter(1)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -51,7 +51,7 @@ namespace AMC {
 	}
 
 	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath), m_nChangeCounter(1)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -60,7 +60,7 @@ namespace AMC {
 	}
 
 	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath), m_nChangeCounter(1)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -69,7 +69,7 @@ namespace AMC {
 	}
 
 	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID, const std::string& sOriginalPath)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType), m_sOriginalPath (sOriginalPath), m_nChangeCounter(1)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -188,6 +188,11 @@ namespace AMC {
 		m_sPersistentUUID = "";
 	}
 
+	uint64_t CParameter_Valued::getChangeCounter()
+	{
+		return m_nChangeCounter;
+	}
+
 	void CParameter_Valued::setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp)
 	{
 		m_pPersistencyHandler = pPersistencyHandler;
@@ -225,7 +230,10 @@ namespace AMC {
 	void CParameter_Valued::setValueEx(const std::string& sValue, uint64_t nAbsoluteTimeStamp)
 	{
 		bool hasChanged = (sValue != m_sValue);
-		m_sValue = sValue;
+		if (hasChanged) {
+			m_nChangeCounter++;
+			m_sValue = sValue;
+		}
 
 		if (hasChanged && (m_pPersistencyHandler.get () != nullptr) && (!m_sPersistentUUID.empty ())) {
 			LibMCData::eParameterDataType eParameterType;

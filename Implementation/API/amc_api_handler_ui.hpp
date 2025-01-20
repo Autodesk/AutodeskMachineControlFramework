@@ -51,7 +51,8 @@ namespace AMC {
 		utMeshGeometry = 7,
 		utMeshEdges = 8,
 		utDownload = 9,
-		utPointCloud = 10
+		utPointCloud = 10,
+		utModuleItemRequest = 11
 	};
 
 	class CAPIHandler_UI : public CAPIHandler {
@@ -69,6 +70,7 @@ namespace AMC {
 		PAPIResponse handleDownloadRequest(const std::string& sParameterUUID, PAPIAuth pAuth);
 
 		void handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
+		void handleModuleItemRequest(CJSONWriter& writer, const std::string & sModuleItemUUID, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 	public:
 

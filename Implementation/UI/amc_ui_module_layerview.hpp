@@ -61,6 +61,12 @@ namespace AMC {
 		CUIExpression m_OriginY;
 		CUIExpression m_BaseImage;
 		CUIExpression m_LayerIndex;
+		CUIExpression m_LabelVisible;
+		CUIExpression m_LabelCaption;
+		CUIExpression m_LabelIcon;
+		CUIExpression m_SliderFixed;
+		CUIExpression m_SliderChangeEvent;
+
 		PUIModuleEnvironment m_pUIModuleEnvironment;
 		std::string m_sUUID;
 
@@ -78,6 +84,11 @@ namespace AMC {
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler);
 
+		virtual void handleCustomRequest(CParameterHandler* pClientVariableHandler, const CAPIJSONRequest& request, CJSONWriter& response) override;
+
+		void setLabelExpressions (CUIExpression labelVisible, CUIExpression labelCaption, CUIExpression labelIcon);
+
+		void setSliderExpressions(CUIExpression sliderChangeEvent, CUIExpression sliderFixed);
 	};
 
 

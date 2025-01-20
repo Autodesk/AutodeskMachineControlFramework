@@ -70,12 +70,12 @@ CAPIJSONImpl* CAPIJSONRequest::__construct(const uint8_t* pBodyData, const size_
 }
 
 
-bool CAPIJSONRequest::hasValue(const std::string& sKeyName)
+bool CAPIJSONRequest::hasValue(const std::string& sKeyName)  const
 {
 	return m_pImpl->m_Document.HasMember(sKeyName.c_str ());
 }
 
-std::string CAPIJSONRequest::getRawString(const std::string& sKeyName, uint32_t nErrorCode)
+std::string CAPIJSONRequest::getRawString(const std::string& sKeyName, uint32_t nErrorCode) const
 {
 	
 	if (!hasValue (sKeyName))
@@ -86,14 +86,14 @@ std::string CAPIJSONRequest::getRawString(const std::string& sKeyName, uint32_t 
 	return m_pImpl->m_Document[sKeyName.c_str()].GetString ();
 }
 
-std::string CAPIJSONRequest::getUUID(const std::string& sKeyName, uint32_t nErrorCode)
+std::string CAPIJSONRequest::getUUID(const std::string& sKeyName, uint32_t nErrorCode) const
 {
 	auto sRawString = getRawString(sKeyName, nErrorCode);
 	return AMCCommon::CUtils::normalizeUUIDString(sRawString);
 }
 
 
-std::string CAPIJSONRequest::getJSONObjectString(const std::string& sKeyName, uint32_t nErrorCode)
+std::string CAPIJSONRequest::getJSONObjectString(const std::string& sKeyName, uint32_t nErrorCode) const
 {
 	if (!hasValue(sKeyName))
 		throw ELibMCInterfaceException(nErrorCode);
@@ -108,7 +108,7 @@ std::string CAPIJSONRequest::getJSONObjectString(const std::string& sKeyName, ui
 }
 
 
-std::string CAPIJSONRequest::getNameString(const std::string& sKeyName, uint32_t nErrorCode)
+std::string CAPIJSONRequest::getNameString(const std::string& sKeyName, uint32_t nErrorCode) const
 {
 	auto sRawString = getRawString(sKeyName, nErrorCode);
 
@@ -124,8 +124,8 @@ std::string CAPIJSONRequest::getNameString(const std::string& sKeyName, uint32_t
 }
 
 
-uint64_t CAPIJSONRequest::getUint64(const std::string& sKeyName, const uint64_t nMinValue, const uint64_t nMaxValue, uint32_t nErrorCode)
-{
+uint64_t CAPIJSONRequest::getUint64(const std::string& sKeyName, const uint64_t nMinValue, const uint64_t nMaxValue, uint32_t nErrorCode) const
+{ 
 	if (!hasValue(sKeyName))
 		throw ELibMCInterfaceException(nErrorCode);
 	if (!m_pImpl->m_Document[sKeyName.c_str()].IsUint64())
@@ -139,7 +139,7 @@ uint64_t CAPIJSONRequest::getUint64(const std::string& sKeyName, const uint64_t 
 	return nValue;
 }
 
-std::string CAPIJSONRequest::getSHA256(const std::string& sKeyName, uint32_t nErrorCode)
+std::string CAPIJSONRequest::getSHA256(const std::string& sKeyName, uint32_t nErrorCode) const
 {
 	auto sNameString = getNameString(sKeyName, nErrorCode);
 

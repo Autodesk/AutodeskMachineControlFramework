@@ -76,6 +76,8 @@ namespace AMC {
 
 		virtual PParameter duplicate() override;
 
+		virtual uint64_t getChangeCounter() override;
+
 	};
 	
 }

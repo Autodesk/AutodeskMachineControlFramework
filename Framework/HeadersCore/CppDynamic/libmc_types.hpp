@@ -643,6 +643,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_OVERLAPPINGJOURNALCHUNKTIMESTAMP 626 /** Overlapping journal chunk time stamp */
 #define LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS 627 /** Invalid toolpath layer thickness */
 #define LIBMC_ERROR_SCATTERPLOTNOTFOUND 628 /** Scatter plot not found */
+#define LIBMC_ERROR_CUSTOMREQUESTNOTSUPPORTED 629 /** Custom request not supported */
+#define LIBMC_ERROR_MISSINGCUSTOMREQUESTTYPE 630 /** Missing custom request type */
+#define LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER 631 /** Missing custom request layer */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1198,6 +1201,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_OVERLAPPINGJOURNALCHUNKTIMESTAMP: return "Overlapping journal chunk time stamp";
     case LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS: return "Invalid toolpath layer thickness";
     case LIBMC_ERROR_SCATTERPLOTNOTFOUND: return "Scatter plot not found";
+    case LIBMC_ERROR_CUSTOMREQUESTNOTSUPPORTED: return "Custom request not supported";
+    case LIBMC_ERROR_MISSINGCUSTOMREQUESTTYPE: return "Missing custom request type";
+    case LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER: return "Missing custom request layer";
     default: return "unknown error";
   }
 }

@@ -264,6 +264,13 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			return APIHandler_UIType::utEvent;
 		}
 
+		if (sParameterString.length() == 48) {
+			if (sParameterString.substr(0, 12) == "/moduleitem/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(12));
+				return APIHandler_UIType::utModuleItemRequest;
+			}
+		}
+
 	}
 
 	return APIHandler_UIType::utUnknown;
@@ -297,7 +304,7 @@ bool CAPIHandler_UI::expectsRawBody(const std::string& sURI, const eAPIRequestTy
 	uint32_t nParameterStateID = 0;
 	auto uiType = parseRequest(sURI, requestType, sParameterUUID, nParameterStateID);
 
-	return (uiType == APIHandler_UIType::utEvent);
+	return (uiType == APIHandler_UIType::utEvent) || (uiType == APIHandler_UIType::utModuleItemRequest);
 
 }
 
@@ -485,6 +492,26 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 }
 
 
+void CAPIHandler_UI::handleModuleItemRequest(CJSONWriter& writer, const std::string& sModuleItemUUID, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pBodyData == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
+	//auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
+	auto pUIHandler = m_pSystemState->uiHandler();
+
+	auto pModuleItem = pUIHandler->findModuleItem(AMCCommon::CUtils::normalizeUUIDString(sModuleItemUUID));
+	if (pModuleItem.get () == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_MODULEITEMNOTFOUND, "Module item not found: " + sModuleItemUUID);
+
+	pModuleItem->handleCustomRequest (pAuth->getClientVariableHandler().get(), apiRequest, writer);
+
+}
+
 PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	std::string sParameterUUID;
@@ -536,6 +563,10 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 
 	case APIHandler_UIType::utEvent:
 		handleEventRequest (writer, pBodyData, nBodyDataSize, pAuth);
+		break;
+
+	case APIHandler_UIType::utModuleItemRequest:
+		handleModuleItemRequest (writer, sParameterUUID, pBodyData, nBodyDataSize, pAuth);
 		break;
 
 	default:

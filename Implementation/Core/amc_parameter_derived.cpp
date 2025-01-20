@@ -135,8 +135,12 @@ namespace AMC {
 		return m_pParameterGroup->getOriginalParameterPath(m_sSourceParameterName);
 	}
 
+	uint64_t CParameter_Derived::getChangeCounter()
+	{
+		return m_pParameterGroup->getChangeCounterOf (m_sSourceParameterName);
+	}
+
 
 
 }
-
 
