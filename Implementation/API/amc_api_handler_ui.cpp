@@ -267,7 +267,7 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 		if (sParameterString.length() >= 44) {
 			if (sParameterString.substr(0, 8) == "/widget/") {
 				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(8, 36));
-				uint32_t nParameterLength = sParameterString.length();
+				size_t nParameterLength = sParameterString.length();
 				if (nParameterLength > 44) {
 					if (sParameterString.substr(44, 1) != "/")
 						throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDWIDGETREQUEST, "Invalid widget request: " + sParameterString.substr(44));
@@ -548,7 +548,7 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 			if ((nStateID < 0) || (nStateID > INT32_MAX))
 				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCONTENTSTATEID, "Invalid content state id: " + sAdditionalParameter);
 		}
-		handleContentItemRequest(writer, sParameterUUID, pAuth, nStateID);
+		handleContentItemRequest(writer, sParameterUUID, pAuth, (uint32_t) nStateID);
 		break;
 	}
 
