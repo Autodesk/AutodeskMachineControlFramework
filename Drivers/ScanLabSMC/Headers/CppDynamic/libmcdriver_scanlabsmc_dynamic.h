@@ -252,6 +252,25 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_StopExecuti
 */
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_LoadSimulationDataPtr) (LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_DataTable pSimulationDataTable);
 
+/**
+* Returns a characteristic value of a job.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] eValueType - Type of job
+* @param[out] pValue - Characteristic Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_GetJobCharacteristicPtr) (LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType, LibMCDriver_ScanLabSMC_double * pValue);
+
+/**
+* Returns the duration of the job in seconds.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[out] pJobDuration - Duration in seconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_GetJobDurationPtr) (LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCDriver_ScanLabSMC_double * pJobDuration);
+
 /*************************************************************************************************************************
  Class definition for SMCConfiguration
 **************************************************************************************************************************/
@@ -794,6 +813,8 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCJob_WaitForExecutionPtr m_SMCJob_WaitForExecution;
 	PLibMCDriver_ScanLabSMCSMCJob_StopExecutionPtr m_SMCJob_StopExecution;
 	PLibMCDriver_ScanLabSMCSMCJob_LoadSimulationDataPtr m_SMCJob_LoadSimulationData;
+	PLibMCDriver_ScanLabSMCSMCJob_GetJobCharacteristicPtr m_SMCJob_GetJobCharacteristic;
+	PLibMCDriver_ScanLabSMCSMCJob_GetJobDurationPtr m_SMCJob_GetJobDuration;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetDynamicViolationReactionPtr m_SMCConfiguration_SetDynamicViolationReaction;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_GetDynamicViolationReactionPtr m_SMCConfiguration_GetDynamicViolationReaction;
 	PLibMCDriver_ScanLabSMCSMCConfiguration_SetWarnLevelPtr m_SMCConfiguration_SetWarnLevel;

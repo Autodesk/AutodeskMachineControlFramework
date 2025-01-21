@@ -435,6 +435,19 @@ public:
 	*/
 	virtual void LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable) = 0;
 
+	/**
+	* ISMCJob::GetJobCharacteristic - Returns a characteristic value of a job.
+	* @param[in] eValueType - Type of job
+	* @return Characteristic Value
+	*/
+	virtual LibMCDriver_ScanLabSMC_double GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType) = 0;
+
+	/**
+	* ISMCJob::GetJobDuration - Returns the duration of the job in seconds.
+	* @return Duration in seconds.
+	*/
+	virtual LibMCDriver_ScanLabSMC_double GetJobDuration() = 0;
+
 };
 
 typedef IBaseSharedPtr<ISMCJob> PISMCJob;

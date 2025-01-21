@@ -653,6 +653,58 @@ LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadsimulationdata(Li
 	}
 }
 
+LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_getjobcharacteristic(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, eLibMCDriver_ScanLabSMCJobCharacteristic eValueType, LibMCDriver_ScanLabSMC_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pSMCJob;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+		ISMCJob* pISMCJob = dynamic_cast<ISMCJob*>(pIBaseClass);
+		if (!pISMCJob)
+			throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+		
+		*pValue = pISMCJob->GetJobCharacteristic(eValueType);
+
+		return LIBMCDRIVER_SCANLABSMC_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabSMCInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabSMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_getjobduration(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCDriver_ScanLabSMC_double * pJobDuration)
+{
+	IBase* pIBaseClass = (IBase *)pSMCJob;
+
+	try {
+		if (pJobDuration == nullptr)
+			throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+		ISMCJob* pISMCJob = dynamic_cast<ISMCJob*>(pIBaseClass);
+		if (!pISMCJob)
+			throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+		
+		*pJobDuration = pISMCJob->GetJobDuration();
+
+		return LIBMCDRIVER_SCANLABSMC_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabSMCInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabSMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for SMCConfiguration
@@ -2040,6 +2092,10 @@ LibMCDriver_ScanLabSMCResult LibMCDriver_ScanLabSMC::Impl::LibMCDriver_ScanLabSM
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_stopexecution;
 	if (sProcName == "libmcdriver_scanlabsmc_smcjob_loadsimulationdata") 
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_loadsimulationdata;
+	if (sProcName == "libmcdriver_scanlabsmc_smcjob_getjobcharacteristic") 
+		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_getjobcharacteristic;
+	if (sProcName == "libmcdriver_scanlabsmc_smcjob_getjobduration") 
+		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_getjobduration;
 	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_setdynamicviolationreaction") 
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcconfiguration_setdynamicviolationreaction;
 	if (sProcName == "libmcdriver_scanlabsmc_smcconfiguration_getdynamicviolationreaction") 

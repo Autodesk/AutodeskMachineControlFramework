@@ -265,6 +265,25 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadsimulationdata(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_DataTable pSimulationDataTable);
 
+/**
+* Returns a characteristic value of a job.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] eValueType - Type of job
+* @param[out] pValue - Characteristic Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_getjobcharacteristic(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType, LibMCDriver_ScanLabSMC_double * pValue);
+
+/**
+* Returns the duration of the job in seconds.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[out] pJobDuration - Duration in seconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_getjobduration(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCDriver_ScanLabSMC_double * pJobDuration);
+
 /*************************************************************************************************************************
  Class definition for SMCConfiguration
 **************************************************************************************************************************/

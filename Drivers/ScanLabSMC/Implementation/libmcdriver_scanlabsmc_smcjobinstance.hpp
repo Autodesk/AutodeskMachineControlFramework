@@ -94,6 +94,11 @@ public:
 
 	void ReadSimulationFile (LibMCEnv::PDataTable pDataTable);
 
+	double GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType);
+
+	double GetJobDuration();
+
+
 };
 
 typedef std::shared_ptr<CSMCJobInstance> PSMCJobInstance;

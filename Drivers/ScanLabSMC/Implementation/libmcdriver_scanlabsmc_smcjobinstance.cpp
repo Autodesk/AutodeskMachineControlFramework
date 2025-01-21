@@ -37,6 +37,7 @@ Abstract: This is a stub class definition of CSMCJob
 #include "libmcdriver_scanlabsmc_smcsimulationparser.hpp"
 
 // Include custom headers here.
+#define SCANLABSMC_MICROSTEPSPERSECOND 100000
 
 #include <array>
 #include <thread>
@@ -244,6 +245,250 @@ void CSMCJobInstance::WaitForExecution(const LibMCDriver_ScanLabSMC_uint32 nTime
 
 void CSMCJobInstance::StopExecution()
 {
+
+}
+
+
+double CSMCJobInstance::GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType)
+{
+    double dResult = 0.0;
+
+    slsc_JobCharacteristic eKey;
+
+    switch (eValueType) {
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XVel_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XVel_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YVel_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YVel_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZVel_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZVel_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XVel_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XVel_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YVel_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YVel_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZVel_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZVel_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XAcc_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XAcc_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YAcc_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YAcc_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZAcc_ScanAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZAcc_ScanAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XAcc_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XAcc_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YAcc_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YAcc_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZAcc_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZAcc_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XJerk_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XJerk_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YJerk_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YJerk_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZJerk_StageAxis:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZJerk_StageAxis;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_ScanAxis_LaserOn:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_ScanAxis_LaserOn;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_ScanAxis_LaserOn:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_ScanAxis_LaserOn;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_ScanAxis_LaserOn:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_ScanAxis_LaserOn;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_StageAxis_LaserOn:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_StageAxis_LaserOn;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_StageAxis_LaserOn:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_StageAxis_LaserOn;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_StageAxis_LaserOn:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_StageAxis_LaserOn;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_ScanAxis_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_ScanAxis_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_ScanAxis_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_ScanAxis_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_ScanAxis_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_ScanAxis_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_ScanAxis_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_ScanAxis_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_ScanAxis_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_ScanAxis_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_ScanAxis_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_ScanAxis_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_ScanAxis_LaserOn_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_ScanAxis_LaserOn_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_ScanAxis_LaserOn_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_ScanAxis_LaserOn_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_ScanAxis_LaserOn_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_ScanAxis_LaserOn_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_ScanAxis_LaserOn_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_ScanAxis_LaserOn_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_ScanAxis_LaserOn_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_ScanAxis_LaserOn_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_ScanAxis_LaserOn_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_ScanAxis_LaserOn_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_StageAxis_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_StageAxis_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_StageAxis_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_StageAxis_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_StageAxis_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_StageAxis_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_StageAxis_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_StageAxis_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_StageAxis_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_StageAxis_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_StageAxis_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_StageAxis_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_StageAxis_LaserOn_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_StageAxis_LaserOn_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_StageAxis_LaserOn_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_StageAxis_LaserOn_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_StageAxis_LaserOn_Max:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_StageAxis_LaserOn_Max;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_XPos_StageAxis_LaserOn_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_XPos_StageAxis_LaserOn_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_YPos_StageAxis_LaserOn_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_YPos_StageAxis_LaserOn_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::Cart_ZPos_StageAxis_LaserOn_Min:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_Cart_ZPos_StageAxis_LaserOn_Min;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::InsertedSkywritings:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_InsertedSkywritings;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::MotionMicroSteps:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_MotionMicroSteps;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::MinimalMarkSpeed:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_MinimalMarkSpeed;
+            break;
+
+        case LibMCDriver_ScanLabSMC::eJobCharacteristic::MaximalMarkSpeed:
+            eKey = slsc_JobCharacteristic::slsc_JobCharacteristic_MaximalMarkSpeed;
+            break;
+
+        default: 
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC, "Invalid job characteristic: " + std::to_string ((int64_t) eKey));
+
+    }
+    
+    m_pSDK->slsc_ctrl_get_job_characteristic (m_pContextHandle->getHandle (), m_JobID, eKey, &dResult);
+
+    return dResult;
+}
+
+double CSMCJobInstance::GetJobDuration()
+{
+    return GetJobCharacteristic(LibMCDriver_ScanLabSMC::eJobCharacteristic::MotionMicroSteps) / (double)SCANLABSMC_MICROSTEPSPERSECOND;
 
 }
 

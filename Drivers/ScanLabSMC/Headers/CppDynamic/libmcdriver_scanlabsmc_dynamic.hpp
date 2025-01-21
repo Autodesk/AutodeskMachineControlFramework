@@ -226,6 +226,8 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_SMCTEMPLATEVERSIONMISMATCH: return "SMCTEMPLATEVERSIONMISMATCH";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMAJORVERSION: return "UNKNOWNSMCMAJORVERSION";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION: return "UNKNOWNSMCMINORVERSION";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC: return "INVALIDJOBCHARACTERISTIC";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTGETJOBCHARACTERISTIC: return "COULDNOTGETJOBCHARACTERISTIC";
 		}
 		return "UNKNOWN";
 	}
@@ -282,6 +284,8 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_SMCTEMPLATEVERSIONMISMATCH: return "SMC Template version mismatch.";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMAJORVERSION: return "Unknown SMC Major Version.";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION: return "Unknown SMC Minor Version.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC: return "Invalid job characteristic.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTGETJOBCHARACTERISTIC: return "Could not get job characteristic.";
 		}
 		return "unknown error";
 	}
@@ -518,6 +522,8 @@ public:
 	inline void WaitForExecution(const LibMCDriver_ScanLabSMC_uint32 nTimeOutInMilliseconds);
 	inline void StopExecution();
 	inline void LoadSimulationData(classParam<LibMCEnv::CDataTable> pSimulationDataTable);
+	inline LibMCDriver_ScanLabSMC_double GetJobCharacteristic(const eJobCharacteristic eValueType);
+	inline LibMCDriver_ScanLabSMC_double GetJobDuration();
 };
 	
 /*************************************************************************************************************************
@@ -753,6 +759,8 @@ public:
 		pWrapperTable->m_SMCJob_WaitForExecution = nullptr;
 		pWrapperTable->m_SMCJob_StopExecution = nullptr;
 		pWrapperTable->m_SMCJob_LoadSimulationData = nullptr;
+		pWrapperTable->m_SMCJob_GetJobCharacteristic = nullptr;
+		pWrapperTable->m_SMCJob_GetJobDuration = nullptr;
 		pWrapperTable->m_SMCConfiguration_SetDynamicViolationReaction = nullptr;
 		pWrapperTable->m_SMCConfiguration_GetDynamicViolationReaction = nullptr;
 		pWrapperTable->m_SMCConfiguration_SetWarnLevel = nullptr;
@@ -1023,6 +1031,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_SMCJob_LoadSimulationData == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SMCJob_GetJobCharacteristic = (PLibMCDriver_ScanLabSMCSMCJob_GetJobCharacteristicPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcjob_getjobcharacteristic");
+		#else // _WIN32
+		pWrapperTable->m_SMCJob_GetJobCharacteristic = (PLibMCDriver_ScanLabSMCSMCJob_GetJobCharacteristicPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcjob_getjobcharacteristic");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCJob_GetJobCharacteristic == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SMCJob_GetJobDuration = (PLibMCDriver_ScanLabSMCSMCJob_GetJobDurationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcjob_getjobduration");
+		#else // _WIN32
+		pWrapperTable->m_SMCJob_GetJobDuration = (PLibMCDriver_ScanLabSMCSMCJob_GetJobDurationPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcjob_getjobduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCJob_GetJobDuration == nullptr)
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1576,6 +1602,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCJob_LoadSimulationData == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcjob_getjobcharacteristic", (void**)&(pWrapperTable->m_SMCJob_GetJobCharacteristic));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCJob_GetJobCharacteristic == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcjob_getjobduration", (void**)&(pWrapperTable->m_SMCJob_GetJobDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCJob_GetJobDuration == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcconfiguration_setdynamicviolationreaction", (void**)&(pWrapperTable->m_SMCConfiguration_SetDynamicViolationReaction));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCConfiguration_SetDynamicViolationReaction == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2014,6 +2048,31 @@ public:
 	{
 		LibMCEnvHandle hSimulationDataTable = pSimulationDataTable.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_SMCJob_LoadSimulationData(m_pHandle, hSimulationDataTable));
+	}
+	
+	/**
+	* CSMCJob::GetJobCharacteristic - Returns a characteristic value of a job.
+	* @param[in] eValueType - Type of job
+	* @return Characteristic Value
+	*/
+	LibMCDriver_ScanLabSMC_double CSMCJob::GetJobCharacteristic(const eJobCharacteristic eValueType)
+	{
+		LibMCDriver_ScanLabSMC_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCJob_GetJobCharacteristic(m_pHandle, eValueType, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CSMCJob::GetJobDuration - Returns the duration of the job in seconds.
+	* @return Duration in seconds.
+	*/
+	LibMCDriver_ScanLabSMC_double CSMCJob::GetJobDuration()
+	{
+		LibMCDriver_ScanLabSMC_double resultJobDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCJob_GetJobDuration(m_pHandle, &resultJobDuration));
+		
+		return resultJobDuration;
 	}
 	
 	/**

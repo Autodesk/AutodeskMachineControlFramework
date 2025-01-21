@@ -156,6 +156,7 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8, const std::strin
 	this->slsc_ctrl_get_error = (PScanLabSMCPtr_slsc_ctrl_get_error)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_error");
 	this->slsc_ctrl_get_error_count = (PScanLabSMCPtr_slsc_ctrl_get_error_count)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_error_count");
 	this->slsc_ctrl_get_simulation_filename = (PScanLabSMCPtr_slsc_ctrl_get_simulation_filename)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_simulation_filename");
+	this->slsc_ctrl_get_job_characteristic = (PScanLabSMCPtr_slsc_ctrl_get_job_characteristic)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_job_characteristic");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -263,6 +264,8 @@ void CScanLabSMCSDK::resetFunctionPtrs()
 	slsc_ctrl_get_error = nullptr;
 	slsc_ctrl_get_error_count = nullptr;
 	slsc_ctrl_get_simulation_filename = nullptr;
+	slsc_ctrl_get_job_characteristic = nullptr;
+
 
 }
 
