@@ -117,7 +117,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             showToolpath: true,
 			loadingLayerData: false,
 			loadingScatterplot: false,
-			hoverOverData: false
+			hoverOverData: false,
+			viewed_platform_uuid: ""
 		
 		}),
 		
@@ -184,8 +185,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			onPreviousLayerClick: function () {
 			
-				if (this.sliderLayerIndex > 0) {
-					this.changeLayerTo (this.sliderLayerIndex - 1);				
+				if (this.module.platform) {		
+					if (this.sliderLayerIndex > 0) {
+						this.changeLayerTo (this.sliderLayerIndex - 1);				
+					}
 				}
             },
  
@@ -261,66 +264,76 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			},
 			
 			onLayerChanged: function () {
-			
+					
 				let platform = this.module.platform;
 				
 				if (platform) {
+				
+					if (this.viewed_platform_uuid === platform.uuid) {
 									
-					if ((platform.displayed_layer != platform.currentlayer) || (platform.displayed_build != platform.builduuid)) {
-					
-						platform.displayed_layer = platform.currentlayer;
-						platform.displayed_build = platform.builduuid;
+						if ((platform.displayed_layer != platform.currentlayer) || (platform.displayed_build != platform.builduuid)) {
 						
-						this.updateSliderIndex (platform.displayed_layer);
-					
-						this.loadingLayerData = true;
-						this.Application.axiosPostRequest ("/build/toolpath", { "builduuid": platform.builduuid, "layerindex": platform.currentlayer })
-							.then(layerJSON => {
+							platform.displayed_layer = platform.currentlayer;
+							platform.displayed_build = platform.builduuid;
 							
-							if (this.LayerViewerInstance) {
-								this.LayerViewerInstance.loadLayer (layerJSON.data.segments);				
-								this.LayerViewerInstance.RenderScene (true);
-							}
-							
-							this.loadingLayerData = false;
-						})
-						.catch(err => {
-							if (this.LayerViewerInstance) {
-								this.LayerViewerInstance.RenderScene (true);
-							}
-							this.loadingLayerData = false;
-							err;
-							//
-						});
-
-
-						if (platform.scatterplotuuid != "00000000-0000-0000-0000-000000000000") {
+							this.updateSliderIndex (platform.displayed_layer);
 						
-								this.loadingScatterplot = true;
-							
-								this.Application.axiosGetArrayBufferRequest("/ui/pointcloud/" + platform.scatterplotuuid)
-								.then(responseData => {
-									let pointcoordinates = new Float32Array(responseData.data);
-									
-									this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000);
+							this.loadingLayerData = true;
+							this.Application.axiosPostRequest ("/build/toolpath", { "builduuid": platform.builduuid, "layerindex": platform.currentlayer })
+								.then(layerJSON => {
 								
-								this.loadingScatterplot = false;
-									
-								})
-								.catch(err => {
-									if (err.response) {
-										console.log (err.response);
-									} else {
-										console.log ("fatal error while retrieving point cloud ");
-									}
-									
-									this.loadingScatterplot = false;
-								});
-						} else {
-						
-								this.loadingScatterplot = false;
-								this.LayerViewerInstance.glInstance.removeElement("layerdata_points");
+								if (this.LayerViewerInstance) {
+									this.LayerViewerInstance.loadLayer (layerJSON.data.segments);				
+									this.LayerViewerInstance.RenderScene (true);
+								}
+								
+								this.loadingLayerData = false;
+							})
+							.catch(err => {
+								if (this.LayerViewerInstance) {
+									this.LayerViewerInstance.RenderScene (true);
+								}
+								this.loadingLayerData = false;
+								err;
+								//
+							});
+
+
+							if (platform.scatterplotuuid != "00000000-0000-0000-0000-000000000000") {
 							
+									this.loadingScatterplot = true;
+								
+									this.Application.axiosGetArrayBufferRequest("/ui/pointcloud/" + platform.scatterplotuuid)
+									.then(responseData => {
+										let pointcoordinates = new Float32Array(responseData.data);
+										
+										if (this.LayerViewerInstance) {
+											this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000);										
+											this.LayerViewerInstance.RenderScene (true);
+										}
+									
+										this.loadingScatterplot = false;
+										
+									})
+									.catch(err => {
+										if (err.response) {
+											console.log (err.response);
+										} else {
+											console.log ("fatal error while retrieving point cloud ");
+										}
+										if (this.LayerViewerInstance) {
+											this.LayerViewerInstance.RenderScene (true);
+										}
+										
+										this.loadingScatterplot = false;
+									});
+							} else {
+							
+									this.loadingScatterplot = false;
+									this.LayerViewerInstance.glInstance.removeElement("layerdata_points");
+								
+							
+							}
 						
 						}
 					}
@@ -537,7 +550,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			}
 		},
 		
+		unmounted ()
+		{
+			this.viewed_platform_uuid = "";
+			if (this.module) {
+				this.module.onDataHasChanged = null;			
+				if (this.module.platform) {
+					this.module.platform.displayed_layer = 0;
+					this.module.platform.displayed_build = 0;
+				}
+			}
+		},
+		
 		mounted() {	
+			this.viewed_platform_uuid = "";
+			
+			if (this.module) {
+				this.module.onDataHasChanged = this.onLayerChanged;			
+				if (this.module.platform) {
+					this.module.platform.displayed_layer = 0;
+					this.module.platform.displayed_build = 0;
+				}
+			}
+		
 			this.$nextTick(() => {
 				const layerViewDiv = this.$refs.layerViewDiv;
 				if (layerViewDiv && this.glInstance) {						
@@ -557,9 +592,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						
 							this.LayerViewerInstance.setOrigin (platform.originx, platform.originy);
 							this.LayerViewerInstance.CenterOnRectangle (- ZOOM_MARGIN, - ZOOM_MARGIN, platform.sizex + ZOOM_MARGIN, platform.sizey + ZOOM_MARGIN);
+							this.viewed_platform_uuid = platform.uuid;
 						}
 						
-						this.LayerViewerInstance.RenderScene (true);						
+						this.LayerViewerInstance.RenderScene (true);												
 					}
 				}
 							
