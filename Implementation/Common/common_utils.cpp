@@ -404,7 +404,7 @@ namespace AMCCommon {
 				double dResult = stringToDouble(sString);
 
 				// And round it to a certain value
-				nResult = round(dResult);
+				nResult = (int64_t) round(dResult);
 
 				// Check if the value deviates from an integer...
 				if (abs (dResult - (double) nResult) > dAccuracy)
