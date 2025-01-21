@@ -14,6 +14,7 @@
 #include "include/ScannerAPI.h"
 #include "include/GpioAPI.h"
 #include "include/SfioAPI.h"
+#include "include/ProcessAPI.h"
 
 #define MAXMEMBERADDRESS (1024 * 1024)
 
@@ -321,9 +322,15 @@ public:
 		fStream << "#include <string>" << std::endl;
 		fStream << "#include <memory>" << std::endl;
 		fStream << "" << std::endl;
+		fStream << "namespace LibMCDriver_Raylase {" << std::endl;
+		fStream << "    namespace Impl {" << std::endl;
+		fStream << "" << std::endl;
 
+			
 		generateCppClass(fStream);
 
+		fStream << "    }" << std::endl;
+		fStream << "}" << std::endl;
 		fStream << "" << std::endl;
 		fStream << "#endif //__LIBMCDRIVER_RAYLASE_" + sHeaderSpaceName << std::endl;
 		fStream << "" << std::endl;
@@ -536,7 +543,54 @@ public:
 	CSchemaDefinition_ProcessVariables(rlProcessVariables* pProcessVariables)
 		: CSchemaDefinition("rlProcessVariables", pProcessVariables->ConfigVersion, (void*)pProcessVariables, sizeof(rlProcessVariables))
 	{
+		registerDouble("SpeedScale", &pProcessVariables->SpeedScale);
+		registerDouble("JumpSpeed", &pProcessVariables->JumpSpeed);
+		registerDouble("JumpDelay", &pProcessVariables->JumpDelay);
+		registerBool("EnableVariableJumpDelay", &pProcessVariables->EnableVariableJumpDelay);
+		registerDouble("MinJumpDelay", &pProcessVariables->MinJumpDelay);
+		registerDouble("JumpLengthLimit", &pProcessVariables->JumpLengthLimit);
+		registerDouble("MarkSpeed", &pProcessVariables->MarkSpeed);
+		registerDouble("MarkDelay", &pProcessVariables->MarkDelay);
+		registerDouble("MagnificationSpeed", &pProcessVariables->MagnificationSpeed);
+		registerDouble("MagnificationSpeed", &pProcessVariables->MagnificationSpeed);
+		registerBool("EnableVariablePolyDelay", &pProcessVariables->EnableVariablePolyDelay);
+		registerDouble("PolyDelay", &pProcessVariables->PolyDelay);
+		registerDouble("LaserOnDelay", &pProcessVariables->LaserOnDelay);
+		registerDouble("LaserOffDelay", &pProcessVariables->LaserOffDelay);
+		registerDouble("MaxDwellTime", &pProcessVariables->MaxDwellTime);
+		registerDouble("LmFrequency", &pProcessVariables->LmFrequency);
+		registerDouble("LmWidth", &pProcessVariables->LmWidth);
+		registerUint16("Power", &pProcessVariables->Power);
+		registerUint16("Power1", &pProcessVariables->Power1);
 
+		for (uint32_t nRow = 0; nRow < 3; nRow++)
+			for (uint32_t nColumn = 0; nColumn < 3; nColumn++)
+				registerDouble("Transformation.A" + std::to_string (nRow) + std::to_string (nColumn), &pProcessVariables->Transformation.A[nRow][nColumn]);
+
+		for (uint32_t nColumn = 0; nColumn < 3; nColumn++)
+			registerDouble("Transformation.b" + std::to_string(nColumn), &pProcessVariables->Transformation.b[nColumn]);
+		registerDouble("TileOffset", &pProcessVariables->TileOffset);
+		registerUint32("OnOffPatternCount", &pProcessVariables->OnOffPatternCount);
+		registerBool("EnableDashedLine", &pProcessVariables->EnableDashedLine);
+		registerDouble("EvaluationLeadTime", &pProcessVariables->EvaluationLeadTime);
+
+
+		registerVersionInfo(&pProcessVariables->Wobble.ConfigVersion);
+
+		registerEnum("SkyWriting.Mode", (uint32_t*)&pProcessVariables->SkyWriting.Mode, sizeof(pProcessVariables->SkyWriting.Mode));
+		registerDouble("SkyWriting.MinCoH", &pProcessVariables->SkyWriting.MinCoH);
+		registerDouble("SkyWriting.AccelerationDelay", &pProcessVariables->SkyWriting.AccelerationDelay);
+		registerDouble("SkyWriting.DecelerationDelay", &pProcessVariables->SkyWriting.DecelerationDelay);
+		registerDouble("SkyWriting.ExtensionTime", &pProcessVariables->SkyWriting.ExtensionTime);
+		registerDouble("SkyWriting.LaserOnDelay", &pProcessVariables->SkyWriting.LaserOnDelay);
+		registerDouble("SkyWriting.LaserOffDelay", &pProcessVariables->SkyWriting.LaserOffDelay);
+
+		registerDouble("Wobble.Amplitude.X", &pProcessVariables->Wobble.Amplitude.X);
+		registerDouble("Wobble.Amplitude.Y", &pProcessVariables->Wobble.Amplitude.Y);
+		registerDouble("Wobble.Frequency.X", &pProcessVariables->Wobble.Frequency.X);
+		registerDouble("Wobble.Frequency.Y", &pProcessVariables->Wobble.Frequency.Y);
+		registerDouble("Wobble.Phase.X", &pProcessVariables->Wobble.Phase.X);
+		registerDouble("Wobble.Phase.Y", &pProcessVariables->Wobble.Phase.Y);
 	}
 
 	virtual ~CSchemaDefinition_ProcessVariables()
@@ -657,7 +711,10 @@ int main()
 		rlScannerInitConfig(&scannerConfig);
 		CSchemaDefinition_ScannerConfig schema_ScannerConfig(&scannerConfig);
 
-		
+		rlProcessVariables processVariables;
+		rlProcessInitVariables(&processVariables);
+		CSchemaDefinition_ProcessVariables schema_ProcessConfig(&processVariables);
+
 		rlGpioConfig gpioConfig;
 		rlGpioInitConfig(&gpioConfig);
 		CSchemaDefinition_GpioConfig schema_GpioConfig(&gpioConfig);
@@ -673,6 +730,10 @@ int main()
 		std::string sLaserConfigFileName = "libmcdriver_raylase_laserconfig_" + std::to_string(schema_LaserConfig.getVersion()) + ".hpp";
 		std::cout << "writing " << sLaserConfigFileName << std::endl;
 		schema_LaserConfig.generateHppHeaderFile(sLaserConfigFileName);
+
+		std::string sProcessConfigFileName = "libmcdriver_raylase_processvariables_" + std::to_string(schema_LaserConfig.getVersion()) + ".hpp";
+		std::cout << "writing " << sProcessConfigFileName << std::endl;
+		schema_ProcessConfig.generateHppHeaderFile(sProcessConfigFileName);
 
 		std::string sScannerConfigFileName = "libmcdriver_raylase_scannerconfig_" + std::to_string(schema_ScannerConfig.getVersion()) + ".hpp";
 		std::cout << "writing " << sScannerConfigFileName << std::endl;

@@ -33,6 +33,9 @@ Abstract: This is a stub class definition of CRaylaseCard
 
 #include "libmcdriver_raylase_raylasecardimpl.hpp"
 #include "libmcdriver_raylase_interfaceexception.hpp"
+#include "libmcdriver_raylase_apifield.hpp"
+#include "../SDKSchema/libmcdriver_raylase_processvariables_8.hpp"
+#include "../SDKSchema/libmcdriver_raylase_laserconfig_8.hpp"
 
 
 using namespace LibMCDriver_Raylase::Impl;
@@ -101,6 +104,19 @@ void CRaylaseCardImpl::ResetToSystemDefaults()
         return;
 
     m_pSDK->checkError(m_pSDK->rlSystemResetToDefaults(m_Handle));
+/*
+    CRaylaseAPIField_rlLaserConfig_v8 laserConfig;
+    m_pSDK->checkError(m_pSDK->rlLaserInitConfig((rlLaserConfig*)laserConfig.getData()));
+    m_pSDK->checkError(m_pSDK->rlLaserGetConfig(m_Handle, (rlLaserConfig*)laserConfig.getData()));
+
+    uint32_t nCount = laserConfig.getVariableCount();
+    for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+        std::string sName = laserConfig.getVariableName(nIndex);
+        m_pDriverEnvironment->LogMessage("Laser Config:");
+        m_pDriverEnvironment->LogMessage(" -" + sName + ": " + laserConfig.getVariableValueAsString (sName));
+    }
+
+    */
 }
 
 void CRaylaseCardImpl::EnableCommandLogging()
@@ -380,6 +396,5 @@ PRaylaseCoordinateTransform CRaylaseCardImpl::getCoordinateTransform()
 {
     return m_pCoordinateTransform;
 }
-
 
 

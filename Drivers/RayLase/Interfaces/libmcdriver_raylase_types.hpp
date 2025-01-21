@@ -138,6 +138,7 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_ENUMVALUEOUTOFRANGE 1031 /** Enum Value out of range */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDFIELDDATASIZE 1032 /** Invalid field data size */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDNLIGHTLASERMODE 1033 /** Invalid nLight Laser Mode */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDVARIABLEINDEX 1034 /** Invalid Variable Index */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -188,6 +189,7 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_ENUMVALUEOUTOFRANGE: return "Enum Value out of range";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDFIELDDATASIZE: return "Invalid field data size";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDNLIGHTLASERMODE: return "Invalid nLight Laser Mode";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDVARIABLEINDEX: return "Invalid Variable Index";
     default: return "unknown error";
   }
 }

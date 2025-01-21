@@ -89,6 +89,12 @@ namespace LibMCDriver_Raylase {
 
 			size_t getOffset();
 
+			bool isBool();
+
+			bool isInteger();
+
+			bool isDouble();
+
 		};
 
 
@@ -100,6 +106,7 @@ namespace LibMCDriver_Raylase {
 
 			std::vector<uint8_t> m_Data;
 			std::unordered_map<std::string, CRaylaseAPIVariable> m_Variables;
+			std::vector<std::string> m_VariableNames;
 
 			CRaylaseAPIVariable& findVariable(const std::string& sVariableName);
 
@@ -136,6 +143,14 @@ namespace LibMCDriver_Raylase {
 			static uint32_t getVariableSize(eRaylaseAPIVariableType variableType);
 
 			static bool checkName(const std::string& sName);
+
+			uint32_t getVariableCount();
+
+			std::string getVariableName(uint32_t nIndex);
+
+			CRaylaseAPIVariable getVariable(uint32_t nIndex);
+
+			std::string getVariableValueAsString(const std::string& sName);
 
 		};
 

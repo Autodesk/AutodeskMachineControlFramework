@@ -83,6 +83,7 @@
 		<error name="ENUMVALUEOUTOFRANGE" code="1031" description="Enum Value out of range" />
 		<error name="INVALIDFIELDDATASIZE" code="1032" description="Invalid field data size" />
 		<error name="INVALIDNLIGHTLASERMODE" code="1033" description="Invalid nLight Laser Mode" />
+		<error name="INVALIDVARIABLEINDEX" code="1034" description="Invalid Variable Index" />
 		
 				
 	</errors>

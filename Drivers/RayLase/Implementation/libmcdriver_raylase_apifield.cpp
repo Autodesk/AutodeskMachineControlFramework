@@ -69,6 +69,34 @@ size_t CRaylaseAPIVariable::getOffset()
     return m_nOffset;
 }
 
+bool CRaylaseAPIVariable::isBool()
+{
+    return (m_Type == eRaylaseAPIVariableType::evtBool);
+
+}
+
+bool CRaylaseAPIVariable::isInteger()
+{
+    return (m_Type == eRaylaseAPIVariableType::evtEnum16) ||
+        (m_Type == eRaylaseAPIVariableType::evtEnum32) ||
+        (m_Type == eRaylaseAPIVariableType::evtEnum8) ||
+        (m_Type == eRaylaseAPIVariableType::evtUint8) ||
+        (m_Type == eRaylaseAPIVariableType::evtUint16) ||
+        (m_Type == eRaylaseAPIVariableType::evtUint32) ||
+        (m_Type == eRaylaseAPIVariableType::evtUint64) ||
+        (m_Type == eRaylaseAPIVariableType::evtInt8) ||
+        (m_Type == eRaylaseAPIVariableType::evtInt16) ||
+        (m_Type == eRaylaseAPIVariableType::evtInt32) ||
+        (m_Type == eRaylaseAPIVariableType::evtInt64);
+
+}
+
+bool CRaylaseAPIVariable::isDouble()
+{
+    return (m_Type == eRaylaseAPIVariableType::evtDouble) || (m_Type == eRaylaseAPIVariableType::evtFloat);
+}
+
+
 
 CRaylaseAPIField::CRaylaseAPIField(const std::string& sFieldName, uint32_t nSchemaVersion, size_t nDataSizeInBytes)
     : m_sFieldName (sFieldName), m_nSchemaVersion (nSchemaVersion)
@@ -105,6 +133,7 @@ void CRaylaseAPIField::registerVariable(const std::string& sVariableName, size_t
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_VARIABLEEXCEEDSBUFFER, "Variable exceeds buffer: " + std::to_string(nOffset));
 
     m_Variables.insert(std::make_pair(sVariableName, CRaylaseAPIVariable(sVariableName, nOffset, variableType)));
+    m_VariableNames.push_back(sVariableName);
 }
 
 std::string CRaylaseAPIField::getFieldName()
@@ -567,3 +596,36 @@ CRaylaseAPIVariable& CRaylaseAPIField::findVariable(const std::string& sVariable
 
 }
 
+uint32_t CRaylaseAPIField::getVariableCount()
+{
+    return (uint32_t)m_VariableNames.size();
+}
+
+std::string CRaylaseAPIField::getVariableName(uint32_t nIndex)
+{
+    if (nIndex >= m_VariableNames.size())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDVARIABLEINDEX);
+
+    return m_VariableNames.at(nIndex);
+}
+
+
+CRaylaseAPIVariable CRaylaseAPIField::getVariable(uint32_t nIndex)
+{
+    return findVariable(getVariableName(nIndex));
+
+}
+
+std::string CRaylaseAPIField::getVariableValueAsString(const std::string& sName)
+{
+    auto variable = findVariable(sName);
+    if (variable.isInteger())
+        return std::to_string(getInteger (sName));
+    if (variable.isBool())
+        return std::to_string(getBool(sName));
+    if (variable.isDouble())
+        return std::to_string(getDouble(sName));
+}
+
+
+ 

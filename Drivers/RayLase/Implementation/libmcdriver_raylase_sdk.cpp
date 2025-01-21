@@ -1360,8 +1360,58 @@ rlResult CRaylaseSDK::rlSystemGetCardSerialNumber(rlHandle handle, char* pBuffer
 }
  
 
-uint32_t CRaylaseSDK::rlGpioConfigMemorySize()
+rlResult CRaylaseSDK::rlLaserInitConfig(rlLaserConfig* pConfig)
 {
+	if (m_bEnableJournal) {
+		logJournal("rlLaserInitConfig (" + std::to_string((uintptr_t)pConfig) + ");");
+	}
+
+	return ptrLaserInitConfig(pConfig);
+
+}
+
+rlResult CRaylaseSDK::rlLaserLoadConfig(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlLaserLoadConfig (" + std::to_string((uintptr_t)handle) + ");");
+	}
+
+	return ptrLaserLoadConfig(handle);
+
+}
+
+rlResult CRaylaseSDK::rlLaserStoreConfig(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlLaserStoreConfig (" + std::to_string((uintptr_t)handle) + ");");
+	}
+
+	return ptrLaserStoreConfig(handle);
+
+}
+
+rlResult CRaylaseSDK::rlLaserGetConfig(rlHandle handle, rlLaserConfig* pConfig)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlLaserGetConfig (" + std::to_string((uintptr_t)handle) + ", " + std::to_string((uintptr_t)pConfig) + ");");
+	}
+
+	return ptrLaserGetConfig(handle, pConfig);
+}
+
+rlResult CRaylaseSDK::rlLaserSetConfig(rlHandle handle, rlLaserConfig* pConfig)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlLaserSetConfig (" + std::to_string((uintptr_t)handle) + ", " + std::to_string((uintptr_t)pConfig) + ");");
+	}
+
+	return ptrLaserSetConfig(handle, pConfig);
+
+}
+
+
+uint32_t CRaylaseSDK::rlGpioConfigMemorySize()
+{		
 	return 1024;
 }
 

@@ -41,7 +41,6 @@ class CRaylaseAPIField_rlSystemConfig_v4 : public CRaylaseAPIField {
       : CRaylaseAPIField ("rlSystemConfig", 4, 184)
     {
       registerVariable ("TimeZone.IdLen", 4, eRaylaseAPIVariableType::evtUint32);
-      registerVariable ("TimeZone.Id", 8, eRaylaseAPIVariableType::evtCharArray);
       registerVariable ("EnableStandAloneMode", 136, eRaylaseAPIVariableType::evtBool);
       registerVariable ("StandAloneListID", 140, eRaylaseAPIVariableType::evtInt32);
       registerVariable ("StandAloneExecuteOnErrorListID", 144, eRaylaseAPIVariableType::evtInt32);
