@@ -62,11 +62,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </div>
             </div>  					
 			
-			<div class="layerview_label" v-if="getLabelVisible()">
-                <v-icon center size="16px" color="white">{{ getLabelIcon () }}</v-icon>
-                <div>{{ getLabelCaption () }}</div>
+			<div class="label-container">
+                <div class="layertime-label" v-if="getLabelVisible()">
+                    <v-icon center size="16px" color="white">{{ getLabelIcon () }}</v-icon>
+					<div>{{ getLabelCaption () }}</div>
+                </div>
+ 
+                <div class="loading-label" v-if="loadingLayerData || loadingScatterplot">
+                    <v-icon class="loading-icon" center size="26px" color="white">mdi-loading</v-icon>
+                    <div class="loading-text">Loading layer data</div>
+                </div>
             </div>
-										
+													
 	</div>
 
 </template>
@@ -102,7 +109,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			lastMouseY: 0,
 			reloading: false,
 			showJumps: true,
-            showToolpath: true
+            showToolpath: true,
+			loadingLayerData: false,
+			loadingScatterplot: false,
 		
 		}),
 		
@@ -253,7 +262,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						
 						this.updateSliderIndex (platform.displayed_layer);
 					
-						this.reloading = true;
+						this.loadingLayerData = true;
 						this.Application.axiosPostRequest ("/build/toolpath", { "builduuid": platform.builduuid, "layerindex": platform.currentlayer })
 							.then(layerJSON => {
 							
@@ -262,28 +271,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 								this.LayerViewerInstance.RenderScene (true);
 							}
 							
-							this.reloading = false;
+							this.loadingLayerData = false;
 						})
 						.catch(err => {
 							if (this.LayerViewerInstance) {
 								this.LayerViewerInstance.RenderScene (true);
 							}
+							this.loadingLayerData = false;
 							err;
 							//
 						});
 
 
 						if (platform.scatterplotuuid != "00000000-0000-0000-0000-000000000000") {
+						
+								this.loadingScatterplot = true;
 							
-
 								this.Application.axiosGetArrayBufferRequest("/ui/pointcloud/" + platform.scatterplotuuid)
 								.then(responseData => {
-									//alert ("pointcloud received")
 									let pointcoordinates = new Float32Array(responseData.data);
-									//alert ("pointcloud received: " + pointcoordinates.length)
 									
-									this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.002, 0xff0000);
+									this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000);
 								
+								this.loadingScatterplot = false;
 									
 								})
 								.catch(err => {
@@ -292,7 +302,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 									} else {
 										console.log ("fatal error while retrieving point cloud ");
 									}
+									
+									this.loadingScatterplot = false;
 								});
+						} else {
+						
+								this.loadingScatterplot = false;
+								this.LayerViewerInstance.glInstance.removeElement("layerdata_points");
+							
+						
 						}
 					}
 				}
@@ -302,15 +320,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			{
 				console.log ("Changing layer to: " + targetLayer);
 			
-				if (this.module.platform) {
-					let changeevent = this.module.platform.sliderchangeevent;
-					if (changeevent) {
-						let formValues = {};
-						formValues[this.module.platform.uuid] = targetLayer;
-						
-						this.Application.triggerUIEvent (this.module.platform.sliderchangeevent, this.module.platform.uuid, formValues);
-					}
-					
+				if (this.module.platform) {					
 					let requestObject = {
 						targetlayer: targetLayer
 					}
@@ -587,6 +597,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     .rounded-button:hover {
       	background-color: rgba(0, 0, 0, 0.8);
     }
+	
+	.rounded-button-small {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1px;
+        border: none;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+ 
+    .rounded-button-small:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+	
+	.layerbutton-container {
+        display: flex;
+        flex-direction: row;
+        gap: 1px;
+    }
+ 
 
 	.layerview-slider-container {
       	position: absolute;
@@ -628,10 +662,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	}
 	
 	
-	.layerview_label {
+	.label-container {
         position: absolute;
         bottom: 10px;
         left: 10px;
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        height: 44px;
+    }
+ 
+    .layertime-label {      
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -645,29 +686,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         background: rgba(0, 0, 0, 0.8);
         gap: 2px;
     }
-	
-	
-	.rounded-button-small {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1px;
-        border: none;
-        border-radius: 5px;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
  
-    .rounded-button-small:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-    }
- 
-    .layerbutton-container {
+    .layertime-value {
         display: flex;
         flex-direction: row;
-        gap: 1px;
+        gap: 2px;
+    }
+ 
+    .loading-label {
+        display: flex;
+        flex-direction: row;
+        margin: 0px !important;
+        padding: 4px 8px;
+        border: none;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.8);
+        gap: 4px;
+    }
+ 
+    .loading-icon {
+        animation: spin 1s linear infinite;
+    }
+ 
+    .loading-text {
+        display: flex;
+        align-items: center;
+        color: white;
+        font-size: 9pt;
+    }
+ 
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
     }
  	
 </style>
