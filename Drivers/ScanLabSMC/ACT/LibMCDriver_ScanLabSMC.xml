@@ -92,6 +92,9 @@
 		<error name="UNKNOWNSMCMINORVERSION" code="1038" description="Unknown SMC Minor Version." />		
 		<error name="INVALIDJOBCHARACTERISTIC" code="1039" description="Invalid job characteristic." />		
 		<error name="COULDNOTGETJOBCHARACTERISTIC" code="1040" description="Could not get job characteristic." />		
+		<error name="JOBDURATIONHASNOTBEENPARSED" code="1041" description="Job duration has not been parsed." />		
+		<error name="COULDNOTSTOPJOBEXECUTION" code="1042" description="Could not stop job execution." />		
+		
 		
 											
 	</errors>

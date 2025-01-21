@@ -518,7 +518,7 @@ void CAPIHandler_UI::handleWidgetRequest(CJSONWriter& writer, const std::string&
 	if (pWidget.get () == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_MODULEITEMNOTFOUND, "Widget not found: " + sWidgetUUID);
 
-	pWidget->handleCustomRequest (pAuth->getClientVariableHandler().get(), sRequestType, apiRequest, writer);
+	pWidget->handleCustomRequest (pAuth, sRequestType, apiRequest, writer, pUIHandler);
 
 }
 

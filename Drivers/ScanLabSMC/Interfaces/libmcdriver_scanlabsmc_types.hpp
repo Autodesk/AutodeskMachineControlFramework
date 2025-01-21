@@ -146,6 +146,8 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION 1038 /** Unknown SMC Minor Version. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC 1039 /** Invalid job characteristic. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTGETJOBCHARACTERISTIC 1040 /** Could not get job characteristic. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_JOBDURATIONHASNOTBEENPARSED 1041 /** Job duration has not been parsed. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOPJOBEXECUTION 1042 /** Could not stop job execution. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -204,6 +206,8 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION: return "Unknown SMC Minor Version.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC: return "Invalid job characteristic.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTGETJOBCHARACTERISTIC: return "Could not get job characteristic.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_JOBDURATIONHASNOTBEENPARSED: return "Job duration has not been parsed.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOPJOBEXECUTION: return "Could not stop job execution.";
     default: return "unknown error";
   }
 }

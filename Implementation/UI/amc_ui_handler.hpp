@@ -92,27 +92,7 @@ namespace AMC {
 
 	
 
-	class CUIHandleEventResponse {
-	private:
-		uint32_t m_nErrorCode;
-		std::string m_sErrorMessage;
-
-		std::vector<PUIClientAction> m_clientActions;
-		std::map<std::string, std::string> m_returnValues;
-		
-	public:
-		CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::vector<PUIClientAction> & clientActions, const std::map<std::string, std::string> & returnValues);
-
-		uint32_t getErrorCode();
-
-		std::string getErrorMessage();
-
-		std::vector<PUIClientAction> & getClientActions ();
-
-		std::map<std::string, std::string>& getReturnValues();
-
-		static bool externalValueNameIsReserved (const std::string & sName);
-	};
+	
 
 	class CUIHandler : public CUIModule_UIEventHandler {
 	protected:

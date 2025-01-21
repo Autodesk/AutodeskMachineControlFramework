@@ -41,6 +41,8 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_Item, PUIModule_Item);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
+	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
+	amcDeclareDependingClass(CUIModule_UIEventHandler, PUIModule_UIEventHandler);
 
 	class CUIModuleItem {
 	protected:		
@@ -65,7 +67,7 @@ namespace AMC {
 
 		virtual void setEventPayloadValue (const std::string & sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler);
 
-		virtual void handleCustomRequest (CParameterHandler* pClientVariableHandler, const std::string & requestType,  const CAPIJSONRequest & requestData, CJSONWriter & response);
+		virtual void handleCustomRequest (PAPIAuth pAuth, const std::string & requestType,  const CAPIJSONRequest & requestData, CJSONWriter & response, CUIModule_UIEventHandler* pEventHandler);
 
 	};
 

@@ -36,6 +36,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
+	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
+
+	class CUIHandleEventResponse {
+	private:
+		uint32_t m_nErrorCode;
+		std::string m_sErrorMessage;
+
+		std::vector<PUIClientAction> m_clientActions;
+		std::map<std::string, std::string> m_returnValues;
+
+	public:
+		CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::vector<PUIClientAction>& clientActions, const std::map<std::string, std::string>& returnValues);
+
+		uint32_t getErrorCode();
+
+		std::string getErrorMessage();
+
+		std::vector<PUIClientAction>& getClientActions();
+
+		std::map<std::string, std::string>& getReturnValues();
+
+		static bool externalValueNameIsReserved(const std::string& sName);
+	};
 		
 	class CUIModule_ContentRegistry {
 	public:
@@ -52,6 +76,8 @@ namespace AMC {
 	public:
 
 		virtual void ensureUIEventExists(const std::string& sEventName) = 0;
+
+		virtual CUIHandleEventResponse handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sEventFormPayloadJSON, const std::string& sEventParameterJSON, PAPIAuth pAPIAuth) = 0;
 	};
 
 	

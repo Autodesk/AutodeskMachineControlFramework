@@ -83,7 +83,7 @@ namespace AMC {
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler);
 
-		void handleCustomRequest(CParameterHandler* pClientVariableHandler, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response) override;
+		void handleCustomRequest(PAPIAuth pAuth, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response, CUIModule_UIEventHandler* pEventHandler) override;
 
 		void setLabelExpressions (CUIExpression labelVisible, CUIExpression labelCaption, CUIExpression labelIcon);
 

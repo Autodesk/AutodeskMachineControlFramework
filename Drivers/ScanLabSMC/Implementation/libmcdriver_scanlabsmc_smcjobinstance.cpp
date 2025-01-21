@@ -50,7 +50,13 @@ using namespace LibMCDriver_ScanLabSMC::Impl;
 **************************************************************************************************************************/
 
 CSMCJobInstance::CSMCJobInstance(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode, LibMCEnv::PWorkingDirectory pWorkingDirectory, std::string sSimulationSubDirectory)
-    : m_pContextHandle(pContextHandle), m_JobID(0), m_bIsFinalized(false), m_pWorkingDirectory (pWorkingDirectory), m_sSimulationSubDirectory (sSimulationSubDirectory)
+    : m_pContextHandle(pContextHandle), 
+    m_JobID(0), 
+    m_bIsFinalized(false), 
+    m_pWorkingDirectory (pWorkingDirectory), 
+    m_sSimulationSubDirectory (sSimulationSubDirectory),
+    m_bHasJobDuration (false),
+    m_dJobDuration (0.0)
 {
 
     if (m_pWorkingDirectory.get() == nullptr)
@@ -245,7 +251,7 @@ void CSMCJobInstance::WaitForExecution(const LibMCDriver_ScanLabSMC_uint32 nTime
 
 void CSMCJobInstance::StopExecution()
 {
-
+    m_pSDK->checkError(m_pSDK->slsc_ctrl_stop(m_pContextHandle->getHandle()), LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOPJOBEXECUTION);
 }
 
 
@@ -477,7 +483,7 @@ double CSMCJobInstance::GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobC
             break;
 
         default: 
-            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC, "Invalid job characteristic: " + std::to_string ((int64_t) eKey));
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC, "Invalid job characteristic: " + std::to_string ((int64_t)eValueType));
 
     }
     
@@ -488,7 +494,10 @@ double CSMCJobInstance::GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobC
 
 double CSMCJobInstance::GetJobDuration()
 {
-    return GetJobCharacteristic(LibMCDriver_ScanLabSMC::eJobCharacteristic::MotionMicroSteps) / (double)SCANLABSMC_MICROSTEPSPERSECOND;
+    if (!m_bHasJobDuration)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_JOBDURATIONHASNOTBEENPARSED);
+
+    return m_dJobDuration;
 
 }
 
@@ -534,6 +543,9 @@ void CSMCJobInstance::ReadSimulationFile(LibMCEnv::PDataTable pDataTable)
     parser.readYValues(yValues);
     pDataTable->SetDoubleColumnValues("y", yValues);
     yValues.resize(0);
+
+    m_dJobDuration = (double)parser.getCount() / (double)SCANLABSMC_MICROSTEPSPERSECOND;
+    m_bHasJobDuration = true;
 }
 
 

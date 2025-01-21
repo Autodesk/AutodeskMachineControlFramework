@@ -66,7 +66,7 @@ void CUIModuleItem::setEventPayloadValue(const std::string& sEventName, const st
 
 }
 
-void CUIModuleItem::handleCustomRequest(CParameterHandler* pClientVariableHandler, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response)
+void CUIModuleItem::handleCustomRequest(PAPIAuth pAuth, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response, CUIModule_UIEventHandler* pEventHandler)
 {
 	throw ELibMCCustomException(LIBMC_ERROR_CUSTOMREQUESTNOTSUPPORTED, m_sItemPath);
 }

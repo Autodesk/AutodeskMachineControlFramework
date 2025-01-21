@@ -59,6 +59,9 @@ private:
 	slscJobID m_JobID;
 	bool m_bIsFinalized;
 
+	bool m_bHasJobDuration;
+	double m_dJobDuration;
+
 	void drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBufferSize, const LibMCDriver_ScanLabSMC::sPoint2D* pPointsBuffer, bool bIsClosed);
 
 public:

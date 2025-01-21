@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_layerview.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_api_auth.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_toolpathhandler.hpp"
@@ -114,9 +115,11 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 	}
 
 	std::string sBuildUUID = pGroup->getParameterValueByName(AMC_API_KEY_UI_BUILDUUID);
+	std::string sExecutionUUID = pGroup->getParameterValueByName(AMC_API_KEY_UI_EXECUTIONUUID);
 	std::string sScatterplotUUID = pGroup->getParameterValueByName(AMC_API_KEY_UI_SCATTERPLOTUUID);
 
 	object.addString(AMC_API_KEY_UI_BUILDUUID, sBuildUUID);
+	object.addString(AMC_API_KEY_UI_EXECUTIONUUID, sExecutionUUID);
 	object.addString(AMC_API_KEY_UI_SCATTERPLOTUUID, sScatterplotUUID);
 	object.addInteger(AMC_API_KEY_UI_CURRENTLAYER, pGroup->getIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER));
 	object.addInteger(AMC_API_KEY_UI_CURRENTLAYERCOUNTER, pGroup->getChangeCounterOf(AMC_API_KEY_UI_CURRENTLAYER));
@@ -149,15 +152,25 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 
 }
 
-void CUIModule_LayerViewPlatformItem::handleCustomRequest(CParameterHandler* pClientVariableHandler, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response) 
+void CUIModule_LayerViewPlatformItem::handleCustomRequest(PAPIAuth pAuth, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response, CUIModule_UIEventHandler* pEventHandler)
 {
-	if (pClientVariableHandler == nullptr)
+	if (pAuth == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pEventHandler == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	
+
+	auto pClientVariableHandler = pAuth->getClientVariableHandler();
 
 	if (requestType == "changelayer") {
 		uint64_t nLayer = requestData.getUint64(AMC_API_KEY_UI_TARGETLAYER, 0, UINT32_MAX, LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER);
 		auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
 		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER, nLayer);		
+
+		std::string sChangeEvent = pGroup->getParameterValueByName(AMC_API_KEY_UI_SLIDERCHANGEEVENT);
+		if (!sChangeEvent.empty()) {
+			pEventHandler->handleEvent(sChangeEvent, m_sUUID, "", "", pAuth);
+		}
 	}
 
 }
@@ -182,6 +195,7 @@ void CUIModule_LayerViewPlatformItem::populateClientVariables(CParameterHandler*
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
 	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "layer view");
 	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_BUILDUUID, "Build UUID", AMCCommon::CUtils::createEmptyUUID());
+	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_EXECUTIONUUID, "Execution UUID", AMCCommon::CUtils::createEmptyUUID());
 	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_SCATTERPLOTUUID, "Scatterplot UUID", AMCCommon::CUtils::createEmptyUUID());
 	pGroup->addNewIntParameter(AMC_API_KEY_UI_CURRENTLAYER, "Current layer index", 0);
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_SIZEX, "Platform size x", m_SizeX.evaluateNumberValue (pStateMachineData), 1.0);
