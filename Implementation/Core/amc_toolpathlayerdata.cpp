@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_utils.hpp"
 
+#include "amc_parametertype.hpp"
+
 namespace AMC {
 
 
@@ -137,12 +139,12 @@ namespace AMC {
 
 	int64_t CToolpathLayerProfile::getIntegerValue(const std::string& sNameSpace, const std::string& sValueName)
 	{
-		return AMCCommon::CUtils::stringToInteger(getValue(sNameSpace, sValueName));
+		return AMCCommon::CUtils::stringToIntegerWithAccuracy(getValue(sNameSpace, sValueName), PARAMETER_INTEGERACCURACY);
 	}
 
 	int64_t CToolpathLayerProfile::getIntegerValueDef(const std::string& sNameSpace, const std::string& sValueName, int64_t nDefaultValue)
 	{
-		return AMCCommon::CUtils::stringToInteger(getValueDef(sNameSpace, sValueName, std::to_string (nDefaultValue)));
+		return AMCCommon::CUtils::stringToIntegerWithAccuracy(getValueDef(sNameSpace, sValueName, std::to_string (nDefaultValue)), PARAMETER_INTEGERACCURACY);
 	}
 
 

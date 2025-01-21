@@ -68,6 +68,11 @@ namespace AMCCommon {
 		static std::string toLowerString(const std::string& sString);
 		static void splitString (const std::string& sString, const std::string & sDelimiter, std::vector<std::string> & stringVector);
 		static int64_t stringToInteger(const std::string& sString);
+
+		// Makes a string to an integer, but also accepts doubles that are only +/- dAccuracy "away" from an integer
+		// Fails if the value is more than "accuracy" away from an integer value.
+		static int64_t stringToIntegerWithAccuracy (const std::string& sString, double dAccuracy);
+
 		static double stringToDouble(const std::string& sString);
 		static bool stringToBool(const std::string& sString);
 

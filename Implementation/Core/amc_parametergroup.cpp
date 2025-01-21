@@ -533,7 +533,7 @@ namespace AMC {
 
 			int64_t nValue = 0;			
 			if (sDefaultValue.length() > 0)
-				nValue = AMCCommon::CUtils::stringToInteger(sDefaultValue);
+				nValue = AMCCommon::CUtils::stringToIntegerWithAccuracy(sDefaultValue, PARAMETER_INTEGERACCURACY);
 
 			addNewIntParameter(sName, sDescription, nValue);
 

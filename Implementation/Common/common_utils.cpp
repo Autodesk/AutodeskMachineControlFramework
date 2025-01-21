@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <thread>
 #include <cctype>
+#include <cmath>
 
 #include "crossguid/guid.hpp"
 #include "PicoSHA2/picosha2.h"
@@ -384,6 +385,41 @@ namespace AMCCommon {
 		}
 
 	}
+
+	int64_t CUtils::stringToIntegerWithAccuracy(const std::string& sString, double dAccuracy)
+	{
+		if (dAccuracy <= 0.0)
+			throw std::runtime_error("invalid integer accuracy: " + std::to_string (dAccuracy));
+
+		std::string trimmedString = trimString(sString);
+
+		try {
+
+			// try integer first...
+			size_t nConversionErrorIndex = 0;
+			int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
+
+			if (nConversionErrorIndex != trimmedString.length()) {
+				//If it is not a pure integer, try double parsing
+				double dResult = stringToDouble(sString);
+
+				// And round it to a certain value
+				nResult = round(dResult);
+
+				// Check if the value deviates from an integer...
+				if (abs (dResult - (double) nResult) > dAccuracy)
+					throw std::runtime_error("string deviates from integer value: " + sString);
+			}
+				
+
+			return nResult;
+		}
+		catch (...)
+		{
+			throw std::runtime_error("invalid integer string: " + sString);
+		}
+	}
+
 
 
 	bool CUtils::stringToBool(const std::string& sString)

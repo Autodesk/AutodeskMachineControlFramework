@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_xmldocumentnode.hpp"
 
 #include "amc_toolpathlayerdata.hpp"
-
+#include "amc_parametertype.hpp"
 // Include custom headers here.
 #include "Common/common_utils.hpp"
 
@@ -235,7 +235,7 @@ bool CToolpathLayer::GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, co
 	if (sTrimmedValue == "false")
 		return false;
 
-	return (AMCCommon::CUtils::stringToInteger(sValue) != 0);
+	return (AMCCommon::CUtils::stringToIntegerWithAccuracy(sValue, PARAMETER_INTEGERACCURACY) != 0);
 }
 
 bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string& sNamespace, const std::string& sValueName, const bool bDefaultValue) 
@@ -254,7 +254,7 @@ bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex,
 	if (sTrimmedValue == "false")
 		return false;
 
-	return (AMCCommon::CUtils::stringToInteger(sValue) != 0);
+	return (AMCCommon::CUtils::stringToIntegerWithAccuracy(sValue, PARAMETER_INTEGERACCURACY) != 0);
 
 }
 

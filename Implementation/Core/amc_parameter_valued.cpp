@@ -131,7 +131,7 @@ namespace AMC {
 
 	int64_t CParameter_Valued::getIntValue() const
 	{
-		return AMCCommon::CUtils::stringToInteger(m_sValue);
+		return AMCCommon::CUtils::stringToIntegerWithAccuracy(m_sValue, PARAMETER_INTEGERACCURACY);
 	}
 
 	void CParameter_Valued::setIntValue(const int64_t nValue, uint64_t nAbsoluteTimeStamp)

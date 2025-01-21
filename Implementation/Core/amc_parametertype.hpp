@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 
+#define PARAMETER_INTEGERACCURACY 0.001
+
 namespace AMC {
 
 	enum class eParameterDataType : int32_t {
