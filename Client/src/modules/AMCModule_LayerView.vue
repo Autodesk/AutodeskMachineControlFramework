@@ -43,6 +43,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					<v-icon left color="white">mdi-magnify-scan</v-icon>
 					Fit to path
 				</button>
+				<button class="rounded-button" @click="onToggleHoverClick">
+                    <v-icon v-if="hoverOverData" left size="20px" color="white">mdi-checkbox-outline</v-icon>
+                    <v-icon v-else left size="20px" color="white">mdi-checkbox-blank-outline</v-icon>
+                    Hover
+                </button>
 			</div>
 
 			<div class="layerview-slider-container">
@@ -112,6 +117,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             showToolpath: true,
 			loadingLayerData: false,
 			loadingScatterplot: false,
+			hoverOverData: false
 		
 		}),
 		
@@ -192,6 +198,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				}						
 
             },
+			
+			onToggleHoverClick: function ()
+			{
+				this.hoverOverData = !this.hoverOverData;
+			},
 
 			onFitViewClick: function () {
 				let platform = this.module.platform;
@@ -441,65 +452,68 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						return;
 					}
 
-					/*const renderElementPosition = this.glInstance.renderer.domElement.getBoundingClientRect();
-					const mouseX = event.clientX - renderElementPosition.left;
-					const mouseY = event.clientY - renderElementPosition.top;
+					if (this.hoverOverData) {
 
-					let [elementType, faceIndex] = this.glInstance.getRaycasterCollisions(mouseX, mouseY);
+						const renderElementPosition = this.glInstance.renderer.domElement.getBoundingClientRect();
+						const mouseX = event.clientX - renderElementPosition.left;
+						const mouseY = event.clientY - renderElementPosition.top;
+
+						let [elementType, faceIndex] = this.glInstance.getRaycasterCollisions(mouseX, mouseY);
 
 
-					if (elementType < 0) {
-					
-						let deltaX = this.lastMouseX - mouseX;
-						let deltaY = this.lastMouseY - mouseY;
+						if (elementType < 0) {
 						
-						if ((Math.abs (deltaX) > 10) || (Math.abs (deltaY) > 10)) {
-					
-							infoboxDiv.style.display = 'none';
-							infoboxDiv.innerText = '---';
-							return;
-						}
-					} else {
-						this.lastMouseX = mouseX;
-						this.lastMouseY = mouseY;
-					} 
-					
-
-					// Each datapoint consists of two triangles and two faceIDs. Only even IDs are of interest
-					if (faceIndex % 2 !== 0) {
-						faceIndex -= 1;
-					}
-
-					faceIndex = faceIndex / 2; // Ignore odd IDs
-
-					// console.log("Collision with face index " + faceIndex);
-					if (elementType === 0) { // Point
-					
-						if (this.LayerViewerInstance.pointCoordinates.length > 0) {					
-							const x = this.LayerViewerInstance.pointCoordinates[faceIndex * 2];
-							const y = this.LayerViewerInstance.pointCoordinates[faceIndex * 2 + 1];
-
-							infoboxDiv.innerText = `Point ID = ${faceIndex.toFixed(0)}\nX = ${x.toFixed(3)} mm\nY = ${y.toFixed(3)} mm`;
-							infoboxDiv.style.background = 'rgba(255, 0, 0, 0.7)';
-						}
-					}
-					else if (elementType === 1) { // Line
-						if (this.LayerViewerInstance.linesCoordinates.length > 0) {
-							const x1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4];
-							const y1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 1];
-							const x2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 2];
-							const y2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 3];
+							let deltaX = this.lastMouseX - mouseX;
+							let deltaY = this.lastMouseY - mouseY;
 							
-							const laserpower = this.LayerViewerInstance.segmentProperties[faceIndex].laserpower;
+							if ((Math.abs (deltaX) > 10) || (Math.abs (deltaY) > 10)) {
+						
+								infoboxDiv.style.display = 'none';
+								infoboxDiv.innerText = '---';
+								return;
+							}
+						} else {
+							this.lastMouseX = mouseX;
+							this.lastMouseY = mouseY;
+						} 
+						
 
-							infoboxDiv.innerText = `Line ID = ${faceIndex.toFixed(0)}\n${x1.toFixed(3)} / ${y1.toFixed(3)} - ${x2.toFixed(3)} / ${y2.toFixed(3)} mm\n${laserpower.toFixed(0)}W`;
-							infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+						// Each datapoint consists of two triangles and two faceIDs. Only even IDs are of interest
+						if (faceIndex % 2 !== 0) {
+							faceIndex -= 1;
 						}
+
+						faceIndex = faceIndex / 2; // Ignore odd IDs
+
+						// console.log("Collision with face index " + faceIndex);
+						if (elementType === 0) { // Point
+						
+							if (this.LayerViewerInstance.pointCoordinates.length > 0) {					
+								const x = this.LayerViewerInstance.pointCoordinates[faceIndex * 2];
+								const y = this.LayerViewerInstance.pointCoordinates[faceIndex * 2 + 1];
+
+								infoboxDiv.innerText = `Point ID = ${faceIndex.toFixed(0)}\nX = ${x.toFixed(3)} mm\nY = ${y.toFixed(3)} mm`;
+								infoboxDiv.style.background = 'rgba(255, 0, 0, 0.7)';
+							}
+						}
+						else if (elementType === 1) { // Line
+							if (this.LayerViewerInstance.linesCoordinates.length > 0) {
+								const x1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4];
+								const y1 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 1];
+								const x2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 2];
+								const y2 = this.LayerViewerInstance.linesCoordinates[faceIndex * 4 + 3];
+								
+								const laserpower = this.LayerViewerInstance.segmentProperties[faceIndex].laserpower;
+
+								infoboxDiv.innerText = `Line ID = ${faceIndex.toFixed(0)}\n${x1.toFixed(3)} / ${y1.toFixed(3)} - ${x2.toFixed(3)} / ${y2.toFixed(3)} mm\n${laserpower.toFixed(0)}W`;
+								infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+							}
+						}
+						
+						infoboxDiv.style.display = 'flex';
+						infoboxDiv.style.left = `${mouseX}px`;
+						infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`; 
 					}
-					
-					infoboxDiv.style.display = 'flex';
-					infoboxDiv.style.left = `${mouseX}px`;
-					infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`; */
 				}
 			
 		},
