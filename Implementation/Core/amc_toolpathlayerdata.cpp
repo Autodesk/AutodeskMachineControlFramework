@@ -75,8 +75,8 @@ namespace AMC {
 		return m_sAttributeName;
 	}
 
-	CToolpathLayerProfile::CToolpathLayerProfile(const std::string& sUUID, const std::string& sName)
-		: m_sUUID (sUUID), m_sName (sName)
+	CToolpathLayerProfile::CToolpathLayerProfile(const uint32_t nProfileIndex, const std::string& sUUID, const std::string& sName)
+		: m_sUUID (sUUID), m_sName (sName), m_nProfileIndex (nProfileIndex)
 	{
 
 	}
@@ -146,6 +146,12 @@ namespace AMC {
 	{
 		return AMCCommon::CUtils::stringToIntegerWithAccuracy(getValueDef(sNameSpace, sValueName, std::to_string (nDefaultValue)), PARAMETER_INTEGERACCURACY);
 	}
+
+	uint32_t CToolpathLayerProfile::getProfileIndex()
+	{
+		return m_nProfileIndex;
+	}
+
 
 
 	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName, std::vector<PToolpathCustomSegmentAttribute> customSegmentAttributes)
@@ -585,7 +591,7 @@ namespace AMC {
 
 			auto p3MFProfile = pToolpath->GetProfileByUUID(sProfileUUID);
 			std::string sProfileName = p3MFProfile->GetName();			
-			PToolpathLayerProfile pLayerProfile = std::make_shared<CToolpathLayerProfile> (sProfileUUID, sProfileName);
+			PToolpathLayerProfile pLayerProfile = std::make_shared<CToolpathLayerProfile> (m_ProfileMap.size (), sProfileUUID, sProfileName);
 
 			uint32_t nParameterCount = p3MFProfile->GetParameterCount();
 			for (uint32_t nParameterIndex = 0; nParameterIndex < nParameterCount; nParameterIndex++) {

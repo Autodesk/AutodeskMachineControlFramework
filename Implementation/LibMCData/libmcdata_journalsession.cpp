@@ -68,6 +68,12 @@ void CJournalSession::CreateVariableInJournalDB(const std::string& sName, const 
     m_pJournal->CreateVariableInJournalDB(sName, nID, nIndex, eDataType, dUnits);
 }
 
+void CJournalSession::CreateVariableAliasInJournalDB(const std::string& sAliasName, const std::string& sSourceName)
+{
+    m_pJournal->CreateVariableAliasInJournalDB(sAliasName, sSourceName);
+
+}
+
 
 IJournalChunkIntegerData* CJournalSession::ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex)
 {

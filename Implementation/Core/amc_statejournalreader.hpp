@@ -127,8 +127,11 @@ namespace AMC {
 		std::vector<PStateJournalReaderChunk> m_Chunks;
 		std::vector<PStateJournalReaderVariable> m_Variables;
 		std::map<std::string, PStateJournalReaderVariable> m_VariableNameMap;
+		std::map<std::string, PStateJournalReaderVariable> m_AliasNameMap;
 
 		PStateJournalReaderChunk findChunkForTimestamp(uint64_t targetTimestamp);
+
+		PStateJournalReaderVariable findVariable(const std::string & sVariableOrAliasName);
 
 	public:
 

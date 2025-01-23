@@ -540,6 +540,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_getsessionuuid(LibMC
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, LibMCData::eParameterDataType eDataType, LibMCData_double dUnits);
 
 /**
+* creates variable alias in journal DB.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] pAliasName - Alias Name
+* @param[in] pSourceName - Source Variable Name
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalsession_createvariablealiasinjournaldb(LibMCData_JournalSession pJournalSession, const char * pAliasName, const char * pSourceName);
+
+/**
 * writes detailed journal state data to disk.
 *
 * @param[in] pJournalSession - JournalSession instance.
@@ -652,6 +662,30 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getvariablecount(LibM
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nVariableIndex, const LibMCData_uint32 nVariableNameBufferSize, LibMCData_uint32* pVariableNameNeededChars, char * pVariableNameBuffer, LibMCData_uint32 * pVariableID, LibMCData::eParameterDataType * pDataType, LibMCData_double * pUnits);
+
+/**
+* Returns number of aliases.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[out] pCount - Number of aliases in journal.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getaliascount(LibMCData_JournalReader pJournalReader, LibMCData_uint32 * pCount);
+
+/**
+* Returns the information for a variable alias.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[in] nAliasIndex - Index of the alias.
+* @param[in] nAliasNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pAliasNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pAliasNameBuffer -  buffer of Name of the alias., may be NULL
+* @param[in] nSourceVariableNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSourceVariableNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSourceVariableNameBuffer -  buffer of Name of the variable., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_journalreader_getaliasinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nAliasIndex, const LibMCData_uint32 nAliasNameBufferSize, LibMCData_uint32* pAliasNameNeededChars, char * pAliasNameBuffer, const LibMCData_uint32 nSourceVariableNameBufferSize, LibMCData_uint32* pSourceVariableNameNeededChars, char * pSourceVariableNameBuffer);
 
 /**
 * Returns number of chunks.

@@ -678,6 +678,13 @@ public:
 	virtual void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType, const LibMCData_double dUnits) = 0;
 
 	/**
+	* IJournalSession::CreateVariableAliasInJournalDB - creates variable alias in journal DB.
+	* @param[in] sAliasName - Alias Name
+	* @param[in] sSourceName - Source Variable Name
+	*/
+	virtual void CreateVariableAliasInJournalDB(const std::string & sAliasName, const std::string & sSourceName) = 0;
+
+	/**
 	* IJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
 	* @param[in] nChunkIndex - Index of the Chunk to write
 	* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
@@ -761,6 +768,20 @@ public:
 	* @param[out] dUnits - Unit factor, if DataType is Double. Will be 0.0 otherwise.
 	*/
 	virtual void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, LibMCData::eParameterDataType & eDataType, LibMCData_double & dUnits) = 0;
+
+	/**
+	* IJournalReader::GetAliasCount - Returns number of aliases.
+	* @return Number of aliases in journal.
+	*/
+	virtual LibMCData_uint32 GetAliasCount() = 0;
+
+	/**
+	* IJournalReader::GetAliasInformation - Returns the information for a variable alias.
+	* @param[in] nAliasIndex - Index of the alias.
+	* @param[out] sAliasName - Name of the alias.
+	* @param[out] sSourceVariableName - Name of the variable.
+	*/
+	virtual void GetAliasInformation(const LibMCData_uint32 nAliasIndex, std::string & sAliasName, std::string & sSourceVariableName) = 0;
 
 	/**
 	* IJournalReader::GetChunkCount - Returns number of chunks.

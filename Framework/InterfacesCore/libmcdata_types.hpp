@@ -458,6 +458,10 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME 431 /** Empty journal variable name */
 #define LIBMCDATA_ERROR_INVALIDVARIABLEINDEX 432 /** Invalid variable index */
 #define LIBMCDATA_ERROR_INVALIDCHUNKINDEX 433 /** Invalid chunk index */
+#define LIBMCDATA_ERROR_UNKNOWNSOURCEJOURNALVARIABLENAME 434 /** Unknown source journal variable name */
+#define LIBMCDATA_ERROR_JOURNALVARIABLEALIASALREADYEXISTS 435 /** Journal variable alias already exists. */
+#define LIBMCDATA_ERROR_INVALIDALIASINDEX 436 /** Invalid alias index */
+#define LIBMCDATA_ERROR_SOURCEOFJOURNALALIASNOTFOUND 437 /** Source of Journal Alias not found */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -828,6 +832,10 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name";
     case LIBMCDATA_ERROR_INVALIDVARIABLEINDEX: return "Invalid variable index";
     case LIBMCDATA_ERROR_INVALIDCHUNKINDEX: return "Invalid chunk index";
+    case LIBMCDATA_ERROR_UNKNOWNSOURCEJOURNALVARIABLENAME: return "Unknown source journal variable name";
+    case LIBMCDATA_ERROR_JOURNALVARIABLEALIASALREADYEXISTS: return "Journal variable alias already exists.";
+    case LIBMCDATA_ERROR_INVALIDALIASINDEX: return "Invalid alias index";
+    case LIBMCDATA_ERROR_SOURCEOFJOURNALALIASNOTFOUND: return "Source of Journal Alias not found";
     default: return "unknown error";
   }
 }

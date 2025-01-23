@@ -179,7 +179,7 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 				std::string sProfileName = pProfile->getName();
 				double dLaserPower = pProfile->getDoubleValueDef("", sLaserPowerValueName, 0.0);
 				double dLaserSpeed = pProfile->getDoubleValueDef("", sLaserSpeedValueName, 0.0);
-				uint32_t nColor = (nSegmentIndex * 2347328) & 0xFFFFFF;
+				uint32_t nColor = ((pProfile->getProfileIndex () + 1) * 12347328) & 0xFFFFFF;
 				uint32_t nPartID = pLayerData->getSegmentLocalPartID(nSegmentIndex);
 				uint32_t nLaserIndex = pLayerData->getSegmentLaserIndex(nSegmentIndex);
 

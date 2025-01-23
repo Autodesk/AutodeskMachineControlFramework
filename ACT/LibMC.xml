@@ -657,6 +657,8 @@
 		<error name="MISSINGCUSTOMREQUESTLAYER" code="631" description="Missing custom request layer" />
 		<error name="INVALIDCONTENTSTATEID" code="632" description="Invalid content state ID" />		
 		<error name="INVALIDWIDGETREQUEST" code="633" description="Invalid widget request" />		
+		<error name="SOURCEVARIABLENOTFOUND" code="634" description="Source variable not found" />
+		
 
 		
 					

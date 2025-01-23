@@ -188,6 +188,14 @@ namespace AMCData {
 		pJournalVariablesStatement->execute();
 		pJournalVariablesStatement = nullptr;
 
+		std::string sJournalVariableAliasesQuery = "CREATE TABLE `journal_variablealiases` (";
+		sJournalVariableAliasesQuery += "`aliasname` text NOT NULL UNIQUE,";
+		sJournalVariableAliasesQuery += "`sourcename` text NOT NULL)";
+
+		auto pJournalVariableAliasesStatement = m_pSQLHandler->prepareStatement(sJournalVariableAliasesQuery);
+		pJournalVariableAliasesStatement->execute();
+		pJournalVariableAliasesStatement = nullptr;
+
 		std::string sJournalQuery = "CREATE TABLE `journal_chunks` (";
 		sJournalQuery += "`chunkindex` int DEFAULT 0, ";
 		sJournalQuery += "`fileindex` int DEFAULT 0, ";
@@ -388,11 +396,49 @@ namespace AMCData {
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNDATATYPE, "Unknown data type: " + sValue);
 	}
 
+
+	void CJournal::CreateVariableAliasInJournalDB(const std::string& sAliasName, const std::string& sSourceName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
+
+		auto pTransaction = m_pSQLHandler->beginTransaction();
+
+		bool bSourceExists = false;
+
+		std::string sCheckQuery = "SELECT name FROM journal_variables WHERE name=? OR name=?";
+		auto pCheckStatement = pTransaction->prepareStatement(sCheckQuery);
+		pCheckStatement->setString(1, sSourceName);
+		pCheckStatement->setString(2, sAliasName);
+		while (pCheckStatement->nextRow()) {
+			std::string sName = pCheckStatement->getColumnString(1);
+			if (sName == sSourceName)
+				bSourceExists = true;
+			if (sName == sAliasName)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALVARIABLEALIASALREADYEXISTS, "Journal variable alias already exists: " + sAliasName);
+		}
+		
+		if (!bSourceExists)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNSOURCEJOURNALVARIABLENAME, "Unknown source journal variable name: " + sSourceName);
+
+		pCheckStatement = nullptr;
+
+		std::string sQuery = "INSERT INTO journal_variablealiases (aliasname, sourcename) VALUES (?, ?)";
+		auto pStatement = pTransaction->prepareStatement(sQuery);
+		pStatement->setString(1, sAliasName);
+		pStatement->setString(2, sSourceName);
+
+		pStatement->execute();
+		pStatement = nullptr;
+
+		pTransaction->commit();
+
+	}
+
 	void CJournal::CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType, double dUnits)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
 
-		std::string sVariableType = convertDataTypeToString (eDataType);
+		std::string sVariableType = convertDataTypeToString(eDataType);
 		std::string sQuery = "INSERT INTO journal_variables (name, variableid, variableindex, variabletype, units) VALUES (?, ?, ?, ?, ?)";
 		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
 		pStatement->setString(1, sName);
@@ -408,10 +454,8 @@ namespace AMCData {
 		pStatement->execute();
 		pStatement = nullptr;
 
-		m_LogID++;
 
 	}
-
 
 	
 

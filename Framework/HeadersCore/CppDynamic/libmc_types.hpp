@@ -648,6 +648,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER 631 /** Missing custom request layer */
 #define LIBMC_ERROR_INVALIDCONTENTSTATEID 632 /** Invalid content state ID */
 #define LIBMC_ERROR_INVALIDWIDGETREQUEST 633 /** Invalid widget request */
+#define LIBMC_ERROR_SOURCEVARIABLENOTFOUND 634 /** Source variable not found */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1208,6 +1209,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER: return "Missing custom request layer";
     case LIBMC_ERROR_INVALIDCONTENTSTATEID: return "Invalid content state ID";
     case LIBMC_ERROR_INVALIDWIDGETREQUEST: return "Invalid widget request";
+    case LIBMC_ERROR_SOURCEVARIABLENOTFOUND: return "Source variable not found";
     default: return "unknown error";
   }
 }

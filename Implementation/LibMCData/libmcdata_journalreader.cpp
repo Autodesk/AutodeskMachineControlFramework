@@ -86,6 +86,35 @@ double CJournalReaderVariable::getUnits()
 }
 
 
+
+CJournalReaderAlias::CJournalReaderAlias(const std::string& sAliasName, PJournalReaderVariable pSourceVariable)
+    : m_sAliasName (sAliasName), m_pSourceVariable (pSourceVariable)
+{
+    if (pSourceVariable.get())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+}
+
+CJournalReaderAlias::~CJournalReaderAlias()
+{
+
+}
+
+std::string CJournalReaderAlias::getAliasName()
+{
+    return m_sAliasName;
+}
+
+PJournalReaderVariable CJournalReaderAlias::getSourceVariable()
+{
+    return m_pSourceVariable;
+}
+
+std::string CJournalReaderAlias::getSourceVariableName()
+{
+    return m_pSourceVariable->getVariableName();
+}
+
 CJournalReaderFile::CJournalReaderFile(int64_t nFileIndex, const std::string& sAbsoluteFileName)
     : m_nFileIndex (nFileIndex), m_sAbsoluteFileName (sAbsoluteFileName)
 {    
@@ -249,6 +278,22 @@ CJournalReader::CJournalReader(AMCData::PSQLHandler pSQLHandler, const std::stri
             nVariableCount = (uint64_t)nVariableIndex + 1;
 
     }
+
+    auto pAliasStatement = m_pJournalSQLHandler->prepareStatement("SELECT aliasname, sourcename FROM journal_variablealiases ORDER BY aliasname");
+    while (pAliasStatement->nextRow()) {
+        std::string sAliasName = pAliasStatement->getColumnString(1);
+        std::string sSourceName = pAliasStatement->getColumnString(2);
+
+        auto iIter = m_VariableNameMap.find(sSourceName);
+        if (iIter == m_VariableNameMap.end ())
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SOURCEOFJOURNALALIASNOTFOUND, "Source of variable alias not found: " + sSourceName);
+
+        auto pAlias = std::make_shared<CJournalReaderAlias>(sAliasName, iIter->second);
+        m_Aliases.push_back(pAlias);
+        m_AliasNameMap.insert(std::make_pair (sAliasName, pAlias));
+
+    }
+
 
     // Linearize Variable map
     m_Variables.resize(nVariableCount);
@@ -428,5 +473,21 @@ void CJournalReader::GetChunkInformation(const LibMCData_uint32 nChunkIndex, Lib
     }
 }
 
+LibMCData_uint32 CJournalReader::GetAliasCount()
+{
+    return (uint32_t)m_Aliases.size();
+}
+
+void CJournalReader::GetAliasInformation(const LibMCData_uint32 nAliasIndex, std::string& sAliasName, std::string& sSourceVariableName)
+{
+    if (nAliasIndex >= m_Aliases.size())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDALIASINDEX);
+
+    auto pAlias = m_Aliases.at(nAliasIndex);
+
+    sAliasName = pAlias->getAliasName ();
+    sSourceVariableName = pAlias->getSourceVariableName ();
+
+}
 
 

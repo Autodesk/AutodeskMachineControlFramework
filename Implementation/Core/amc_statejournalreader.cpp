@@ -160,6 +160,19 @@ namespace AMC {
 			}
 		}
 
+		uint32_t nAliasCount = m_pJournalReader->GetAliasCount();
+		for (uint32_t nAliasIndex = 0; nAliasIndex < nAliasCount; nAliasIndex++) {
+			std::string sAliasName;
+			std::string sSourceVariableName;
+			m_pJournalReader->GetAliasInformation(nAliasIndex, sAliasName, sSourceVariableName);
+
+			auto iIter = m_VariableNameMap.find(sSourceVariableName);
+			if (iIter == m_VariableNameMap.end())
+				throw ELibMCInterfaceException(LIBMC_ERROR_SOURCEVARIABLENOTFOUND, "Source variable not found: " + sSourceVariableName);
+			
+			m_AliasNameMap.insert (std::make_pair (sAliasName, iIter->second));
+		}
+
 
 		uint64_t nCurrentTimeStamp = 0;
 		uint32_t nChunkCount = m_pJournalReader->GetChunkCount();
@@ -198,13 +211,24 @@ namespace AMC {
 		m_pStreamCache = nullptr;
 	}
 
+	PStateJournalReaderVariable CStateJournalReader::findVariable(const std::string& sVariableOrAliasName)
+	{
+		auto iVariableIter = m_VariableNameMap.find(sVariableOrAliasName);
+		if (iVariableIter != m_VariableNameMap.end()) 
+			return iVariableIter->second;
+		
+		auto iAliasIter = m_AliasNameMap.find(sVariableOrAliasName);
+		if (iAliasIter != m_AliasNameMap.end())
+			return iAliasIter->second;
+
+		throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND, sVariableOrAliasName);
+
+	}
+
+
 	double CStateJournalReader::computeDoubleSample(const std::string& sName, const uint64_t nTimeStamp)
 	{
-		auto iVariableIter = m_VariableNameMap.find(sName);
-		if (iVariableIter == m_VariableNameMap.end())
-			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND, sName);
-
-		auto pVariable = iVariableIter->second.get();
+		auto pVariable = findVariable(sName);
 		double dUnits = pVariable->getUnits();
 
 		auto pChunk = findChunkForTimestamp(nTimeStamp);
@@ -235,11 +259,7 @@ namespace AMC {
 
 	int64_t CStateJournalReader::computeIntegerSample(const std::string& sName, const uint64_t nTimeStamp)
 	{
-		auto iVariableIter = m_VariableNameMap.find(sName);
-		if (iVariableIter == m_VariableNameMap.end())
-			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLENOTFOUND, sName);
-
-		auto pVariable = iVariableIter->second.get();
+		auto pVariable = findVariable(sName);
 		double dUnits = pVariable->getUnits();
 
 		auto pChunk = findChunkForTimestamp(nTimeStamp);

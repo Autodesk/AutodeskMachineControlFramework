@@ -1575,6 +1575,36 @@ LibMCDataResult libmcdata_journalsession_createvariableinjournaldb(LibMCData_Jou
 	}
 }
 
+LibMCDataResult libmcdata_journalsession_createvariablealiasinjournaldb(LibMCData_JournalSession pJournalSession, const char * pAliasName, const char * pSourceName)
+{
+	IBase* pIBaseClass = (IBase *)pJournalSession;
+
+	try {
+		if (pAliasName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pSourceName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sAliasName(pAliasName);
+		std::string sSourceName(pSourceName);
+		IJournalSession* pIJournalSession = dynamic_cast<IJournalSession*>(pIBaseClass);
+		if (!pIJournalSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIJournalSession->CreateVariableAliasInJournalDB(sAliasName, sSourceName);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_journalsession_writejournalchunkintegerdata(LibMCData_JournalSession pJournalSession, LibMCData_uint32 nChunkIndex, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nVariableInfoBufferSize, const sLibMCDataJournalChunkVariableInfo * pVariableInfoBuffer, LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pJournalSession;
@@ -1905,6 +1935,92 @@ LibMCDataResult libmcdata_journalreader_getvariableinformation(LibMCData_Journal
 			for (size_t iVariableName = 0; iVariableName < sVariableName.size(); iVariableName++)
 				pVariableNameBuffer[iVariableName] = sVariableName[iVariableName];
 			pVariableNameBuffer[sVariableName.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_journalreader_getaliascount(LibMCData_JournalReader pJournalReader, LibMCData_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pCount = pIJournalReader->GetAliasCount();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_journalreader_getaliasinformation(LibMCData_JournalReader pJournalReader, LibMCData_uint32 nAliasIndex, const LibMCData_uint32 nAliasNameBufferSize, LibMCData_uint32* pAliasNameNeededChars, char * pAliasNameBuffer, const LibMCData_uint32 nSourceVariableNameBufferSize, LibMCData_uint32* pSourceVariableNameNeededChars, char * pSourceVariableNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pJournalReader;
+
+	try {
+		if ( (!pAliasNameBuffer) && !(pAliasNameNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pSourceVariableNameBuffer) && !(pSourceVariableNameNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sAliasName("");
+		std::string sSourceVariableName("");
+		IJournalReader* pIJournalReader = dynamic_cast<IJournalReader*>(pIBaseClass);
+		if (!pIJournalReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pAliasNameBuffer == nullptr) || (pSourceVariableNameBuffer == nullptr);
+		if (isCacheCall) {
+			pIJournalReader->GetAliasInformation(nAliasIndex, sAliasName, sSourceVariableName);
+
+			pIJournalReader->_setCache (new ParameterCache_2<std::string, std::string> (sAliasName, sSourceVariableName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_2<std::string, std::string>*> (pIJournalReader->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sAliasName, sSourceVariableName);
+			pIJournalReader->_setCache (nullptr);
+		}
+		
+		if (pAliasNameNeededChars)
+			*pAliasNameNeededChars = (LibMCData_uint32) (sAliasName.size()+1);
+		if (pAliasNameBuffer) {
+			if (sAliasName.size() >= nAliasNameBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iAliasName = 0; iAliasName < sAliasName.size(); iAliasName++)
+				pAliasNameBuffer[iAliasName] = sAliasName[iAliasName];
+			pAliasNameBuffer[sAliasName.size()] = 0;
+		}
+		if (pSourceVariableNameNeededChars)
+			*pSourceVariableNameNeededChars = (LibMCData_uint32) (sSourceVariableName.size()+1);
+		if (pSourceVariableNameBuffer) {
+			if (sSourceVariableName.size() >= nSourceVariableNameBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iSourceVariableName = 0; iSourceVariableName < sSourceVariableName.size(); iSourceVariableName++)
+				pSourceVariableNameBuffer[iSourceVariableName] = sSourceVariableName[iSourceVariableName];
+			pSourceVariableNameBuffer[sSourceVariableName.size()] = 0;
 		}
 		return LIBMCDATA_SUCCESS;
 	}
@@ -8770,6 +8886,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_journalsession_getsessionuuid;
 	if (sProcName == "libmcdata_journalsession_createvariableinjournaldb") 
 		*ppProcAddress = (void*) &libmcdata_journalsession_createvariableinjournaldb;
+	if (sProcName == "libmcdata_journalsession_createvariablealiasinjournaldb") 
+		*ppProcAddress = (void*) &libmcdata_journalsession_createvariablealiasinjournaldb;
 	if (sProcName == "libmcdata_journalsession_writejournalchunkintegerdata") 
 		*ppProcAddress = (void*) &libmcdata_journalsession_writejournalchunkintegerdata;
 	if (sProcName == "libmcdata_journalsession_readchunkintegerdata") 
@@ -8790,6 +8908,10 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_journalreader_getvariablecount;
 	if (sProcName == "libmcdata_journalreader_getvariableinformation") 
 		*ppProcAddress = (void*) &libmcdata_journalreader_getvariableinformation;
+	if (sProcName == "libmcdata_journalreader_getaliascount") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getaliascount;
+	if (sProcName == "libmcdata_journalreader_getaliasinformation") 
+		*ppProcAddress = (void*) &libmcdata_journalreader_getaliasinformation;
 	if (sProcName == "libmcdata_journalreader_getchunkcount") 
 		*ppProcAddress = (void*) &libmcdata_journalreader_getchunkcount;
 	if (sProcName == "libmcdata_journalreader_getchunkinformation") 

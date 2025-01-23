@@ -377,6 +377,10 @@ namespace AMC {
 
 		auto pVariable = iIter->second;
 		m_VariableAliasMap.insert(std::make_pair(sName, pVariable));
+
+		auto pCache = m_pStream->getCache();
+		pCache->createVariableAliasInJournalDB(sName, pVariable->getName());
+
 		return pVariable;
 	}
 

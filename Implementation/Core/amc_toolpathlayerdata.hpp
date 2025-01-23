@@ -93,13 +93,14 @@ namespace AMC {
 
 	class CToolpathLayerProfile {
 		private:
+			uint32_t m_nProfileIndex;
 			std::string m_sUUID;
 			std::string m_sName;
 			std::map<std::pair<std::string, std::string>, std::string> m_ProfileValues;
 
 		public:
 
-			CToolpathLayerProfile(const std::string & sUUID, const std::string & sName);
+			CToolpathLayerProfile(const uint32_t nProfileIndex,  const std::string& sUUID, const std::string& sName);
 			virtual ~CToolpathLayerProfile();
 
 			std::string getUUID();
@@ -113,6 +114,8 @@ namespace AMC {
 			double getDoubleValueDef(const std::string& sNameSpace, const std::string& sValueName, double dDefaultValue);
 			int64_t getIntegerValue(const std::string& sNameSpace, const std::string& sValueName);
 			int64_t getIntegerValueDef(const std::string& sNameSpace, const std::string& sValueName, int64_t nDefaultValue);
+
+			uint32_t getProfileIndex();
 	};
 
 	typedef std::shared_ptr<CToolpathLayerProfile> PToolpathLayerProfile;

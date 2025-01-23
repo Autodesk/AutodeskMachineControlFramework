@@ -77,6 +77,8 @@ namespace AMC {
 
 		void createVariableInJournalDB(const std::string & sName, uint32_t nVariableID, uint32_t nVariableIndex, LibMCData::eParameterDataType eVariableType, double dUnits);
 
+		void createVariableAliasInJournalDB(const std::string & sAliasName, const std::string & sSourceVariableName);
+
 	};
 
 	typedef std::shared_ptr<CStateJournalStreamCache_Current> PStateJournalStreamCache_Current;

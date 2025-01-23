@@ -86,7 +86,35 @@ public:
 };
 
 
+
+
 typedef std::shared_ptr<CJournalReaderVariable> PJournalReaderVariable;
+
+
+
+class CJournalReaderAlias {
+private:
+    std::string m_sAliasName;
+    PJournalReaderVariable m_pSourceVariable;
+
+public:
+
+    CJournalReaderAlias(const std::string & sAliasName, PJournalReaderVariable pSourceVariable);
+
+    virtual ~CJournalReaderAlias();
+
+    std::string getAliasName();
+
+    PJournalReaderVariable getSourceVariable ();
+
+    std::string getSourceVariableName();
+
+};
+
+
+
+
+typedef std::shared_ptr<CJournalReaderAlias> PJournalReaderAlias;
 
 
 
@@ -174,6 +202,9 @@ private:
     std::map <int64_t, PJournalReaderVariable> m_VariableIDMap;
     std::vector <PJournalReaderVariable> m_Variables;
 
+    std::vector <PJournalReaderAlias> m_Aliases;
+    std::map <std::string, PJournalReaderAlias> m_AliasNameMap;
+
     std::map <int64_t, PJournalReaderFile> m_FileMap;
     std::vector<PJournalReaderFile> m_Files;
 
@@ -202,6 +233,9 @@ public:
 
     void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64& nStartTimeStamp, LibMCData_uint64& nEndTimeStamp) override;
 
+    LibMCData_uint32 GetAliasCount() override;
+
+    void GetAliasInformation(const LibMCData_uint32 nAliasIndex, std::string& sAliasName, std::string& sSourceVariableName) override;
 
 };
 

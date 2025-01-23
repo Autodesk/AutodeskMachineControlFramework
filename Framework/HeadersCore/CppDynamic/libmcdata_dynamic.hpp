@@ -627,6 +627,10 @@ public:
 			case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "EMPTYJOURNALVARIABLENAME";
 			case LIBMCDATA_ERROR_INVALIDVARIABLEINDEX: return "INVALIDVARIABLEINDEX";
 			case LIBMCDATA_ERROR_INVALIDCHUNKINDEX: return "INVALIDCHUNKINDEX";
+			case LIBMCDATA_ERROR_UNKNOWNSOURCEJOURNALVARIABLENAME: return "UNKNOWNSOURCEJOURNALVARIABLENAME";
+			case LIBMCDATA_ERROR_JOURNALVARIABLEALIASALREADYEXISTS: return "JOURNALVARIABLEALIASALREADYEXISTS";
+			case LIBMCDATA_ERROR_INVALIDALIASINDEX: return "INVALIDALIASINDEX";
+			case LIBMCDATA_ERROR_SOURCEOFJOURNALALIASNOTFOUND: return "SOURCEOFJOURNALALIASNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -997,6 +1001,10 @@ public:
 			case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name";
 			case LIBMCDATA_ERROR_INVALIDVARIABLEINDEX: return "Invalid variable index";
 			case LIBMCDATA_ERROR_INVALIDCHUNKINDEX: return "Invalid chunk index";
+			case LIBMCDATA_ERROR_UNKNOWNSOURCEJOURNALVARIABLENAME: return "Unknown source journal variable name";
+			case LIBMCDATA_ERROR_JOURNALVARIABLEALIASALREADYEXISTS: return "Journal variable alias already exists.";
+			case LIBMCDATA_ERROR_INVALIDALIASINDEX: return "Invalid alias index";
+			case LIBMCDATA_ERROR_SOURCEOFJOURNALALIASNOTFOUND: return "Source of Journal Alias not found";
 		}
 		return "unknown error";
 	}
@@ -1369,6 +1377,7 @@ public:
 	
 	inline std::string GetSessionUUID();
 	inline void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const eParameterDataType eDataType, const LibMCData_double dUnits);
+	inline void CreateVariableAliasInJournalDB(const std::string & sAliasName, const std::string & sSourceName);
 	inline void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sJournalChunkVariableInfo> & VariableInfoBuffer, const CInputVector<LibMCData_uint32> & TimeStampDataBuffer, const CInputVector<LibMCData_int64> & ValueDataBuffer);
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 	inline LibMCData_uint64 GetChunkCacheQuota();
@@ -1395,6 +1404,8 @@ public:
 	inline PJournalChunkIntegerData ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex);
 	inline LibMCData_uint32 GetVariableCount();
 	inline void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, eParameterDataType & eDataType, LibMCData_double & dUnits);
+	inline LibMCData_uint32 GetAliasCount();
+	inline void GetAliasInformation(const LibMCData_uint32 nAliasIndex, std::string & sAliasName, std::string & sSourceVariableName);
 	inline LibMCData_uint32 GetChunkCount();
 	inline void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp);
 };
@@ -2005,6 +2016,7 @@ public:
 		pWrapperTable->m_JournalChunkIntegerData_GetValueData = nullptr;
 		pWrapperTable->m_JournalSession_GetSessionUUID = nullptr;
 		pWrapperTable->m_JournalSession_CreateVariableInJournalDB = nullptr;
+		pWrapperTable->m_JournalSession_CreateVariableAliasInJournalDB = nullptr;
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_ReadChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalSession_GetChunkCacheQuota = nullptr;
@@ -2015,6 +2027,8 @@ public:
 		pWrapperTable->m_JournalReader_ReadChunkIntegerData = nullptr;
 		pWrapperTable->m_JournalReader_GetVariableCount = nullptr;
 		pWrapperTable->m_JournalReader_GetVariableInformation = nullptr;
+		pWrapperTable->m_JournalReader_GetAliasCount = nullptr;
+		pWrapperTable->m_JournalReader_GetAliasInformation = nullptr;
 		pWrapperTable->m_JournalReader_GetChunkCount = nullptr;
 		pWrapperTable->m_JournalReader_GetChunkInformation = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
@@ -2624,6 +2638,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JournalSession_CreateVariableAliasInJournalDB = (PLibMCDataJournalSession_CreateVariableAliasInJournalDBPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_createvariablealiasinjournaldb");
+		#else // _WIN32
+		pWrapperTable->m_JournalSession_CreateVariableAliasInJournalDB = (PLibMCDataJournalSession_CreateVariableAliasInJournalDBPtr) dlsym(hLibrary, "libmcdata_journalsession_createvariablealiasinjournaldb");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalSession_CreateVariableAliasInJournalDB == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = (PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr) GetProcAddress(hLibrary, "libmcdata_journalsession_writejournalchunkintegerdata");
 		#else // _WIN32
 		pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData = (PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr) dlsym(hLibrary, "libmcdata_journalsession_writejournalchunkintegerdata");
@@ -2711,6 +2734,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalReader_GetVariableInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetAliasCount = (PLibMCDataJournalReader_GetAliasCountPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getaliascount");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetAliasCount = (PLibMCDataJournalReader_GetAliasCountPtr) dlsym(hLibrary, "libmcdata_journalreader_getaliascount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetAliasCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalReader_GetAliasInformation = (PLibMCDataJournalReader_GetAliasInformationPtr) GetProcAddress(hLibrary, "libmcdata_journalreader_getaliasinformation");
+		#else // _WIN32
+		pWrapperTable->m_JournalReader_GetAliasInformation = (PLibMCDataJournalReader_GetAliasInformationPtr) dlsym(hLibrary, "libmcdata_journalreader_getaliasinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalReader_GetAliasInformation == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4594,6 +4635,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_CreateVariableInJournalDB == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_journalsession_createvariablealiasinjournaldb", (void**)&(pWrapperTable->m_JournalSession_CreateVariableAliasInJournalDB));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_CreateVariableAliasInJournalDB == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_journalsession_writejournalchunkintegerdata", (void**)&(pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalSession_WriteJournalChunkIntegerData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4632,6 +4677,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_journalreader_getvariableinformation", (void**)&(pWrapperTable->m_JournalReader_GetVariableInformation));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetVariableInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getaliascount", (void**)&(pWrapperTable->m_JournalReader_GetAliasCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetAliasCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_journalreader_getaliasinformation", (void**)&(pWrapperTable->m_JournalReader_GetAliasInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalReader_GetAliasInformation == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_journalreader_getchunkcount", (void**)&(pWrapperTable->m_JournalReader_GetChunkCount));
@@ -6032,6 +6085,16 @@ public:
 	}
 	
 	/**
+	* CJournalSession::CreateVariableAliasInJournalDB - creates variable alias in journal DB.
+	* @param[in] sAliasName - Alias Name
+	* @param[in] sSourceName - Source Variable Name
+	*/
+	void CJournalSession::CreateVariableAliasInJournalDB(const std::string & sAliasName, const std::string & sSourceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalSession_CreateVariableAliasInJournalDB(m_pHandle, sAliasName.c_str(), sSourceName.c_str()));
+	}
+	
+	/**
 	* CJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
 	* @param[in] nChunkIndex - Index of the Chunk to write
 	* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
@@ -6175,6 +6238,38 @@ public:
 		std::vector<char> bufferVariableName(bytesNeededVariableName);
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetVariableInformation(m_pHandle, nVariableIndex, bytesNeededVariableName, &bytesWrittenVariableName, &bufferVariableName[0], &nVariableID, &eDataType, &dUnits));
 		sVariableName = std::string(&bufferVariableName[0]);
+	}
+	
+	/**
+	* CJournalReader::GetAliasCount - Returns number of aliases.
+	* @return Number of aliases in journal.
+	*/
+	LibMCData_uint32 CJournalReader::GetAliasCount()
+	{
+		LibMCData_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetAliasCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CJournalReader::GetAliasInformation - Returns the information for a variable alias.
+	* @param[in] nAliasIndex - Index of the alias.
+	* @param[out] sAliasName - Name of the alias.
+	* @param[out] sSourceVariableName - Name of the variable.
+	*/
+	void CJournalReader::GetAliasInformation(const LibMCData_uint32 nAliasIndex, std::string & sAliasName, std::string & sSourceVariableName)
+	{
+		LibMCData_uint32 bytesNeededAliasName = 0;
+		LibMCData_uint32 bytesWrittenAliasName = 0;
+		LibMCData_uint32 bytesNeededSourceVariableName = 0;
+		LibMCData_uint32 bytesWrittenSourceVariableName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetAliasInformation(m_pHandle, nAliasIndex, 0, &bytesNeededAliasName, nullptr, 0, &bytesNeededSourceVariableName, nullptr));
+		std::vector<char> bufferAliasName(bytesNeededAliasName);
+		std::vector<char> bufferSourceVariableName(bytesNeededSourceVariableName);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalReader_GetAliasInformation(m_pHandle, nAliasIndex, bytesNeededAliasName, &bytesWrittenAliasName, &bufferAliasName[0], bytesNeededSourceVariableName, &bytesWrittenSourceVariableName, &bufferSourceVariableName[0]));
+		sAliasName = std::string(&bufferAliasName[0]);
+		sSourceVariableName = std::string(&bufferSourceVariableName[0]);
 	}
 	
 	/**

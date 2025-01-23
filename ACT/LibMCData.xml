@@ -431,9 +431,11 @@
 		<error name="EMPTYJOURNALVARIABLENAME" code="431" description="Empty journal variable name" />
 		<error name="INVALIDVARIABLEINDEX" code="432" description="Invalid variable index" />
 		<error name="INVALIDCHUNKINDEX" code="433" description="Invalid chunk index" />
-		
-		
-		
+		<error name="UNKNOWNSOURCEJOURNALVARIABLENAME" code="434" description="Unknown source journal variable name" />
+		<error name="JOURNALVARIABLEALIASALREADYEXISTS" code="435" description="Journal variable alias already exists." />
+		<error name="INVALIDALIASINDEX" code="436" description="Invalid alias index" />
+		<error name="SOURCEOFJOURNALALIASNOTFOUND" code="437" description="Source of Journal Alias not found" />
+
 	</errors>
 	
 		
@@ -765,6 +767,13 @@
 			<param name="Units" type="double" pass="in" description="Unit factor, if DataType is Double. Will be ignored otherwise." />	
 		</method>
 		
+		<method name="CreateVariableAliasInJournalDB" description="creates variable alias in journal DB.">
+			<param name="AliasName" type="string" pass="in" description="Alias Name" />	
+			<param name="SourceName" type="string" pass="in" description="Source Variable Name" />	
+		</method>
+
+		
+		
 
 		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
@@ -823,6 +832,16 @@
 			<param name="Units" type="double" pass="out" description="Unit factor, if DataType is Double. Will be 0.0 otherwise." />	
 		</method>				
 						
+		<method name="GetAliasCount" description="Returns number of aliases.">
+			<param name="Count" type="uint32" pass="return" description="Number of aliases in journal." />	
+		</method>				
+
+		<method name="GetAliasInformation" description="Returns the information for a variable alias.">
+			<param name="AliasIndex" type="uint32" pass="in" description="Index of the alias." />	
+			<param name="AliasName" type="string" pass="out" description="Name of the alias." />	
+			<param name="SourceVariableName" type="string" pass="out" description="Name of the variable." />	
+		</method>				
+
 		<method name="GetChunkCount" description="Returns number of chunks.">
 			<param name="Count" type="uint32" pass="return" description="Number of chunks in journal." />	
 		</method>				

@@ -527,6 +527,16 @@ typedef LibMCDataResult (*PLibMCDataJournalSession_GetSessionUUIDPtr) (LibMCData
 typedef LibMCDataResult (*PLibMCDataJournalSession_CreateVariableInJournalDBPtr) (LibMCData_JournalSession pJournalSession, const char * pName, LibMCData_uint32 nID, LibMCData_uint32 nIndex, LibMCData::eParameterDataType eDataType, LibMCData_double dUnits);
 
 /**
+* creates variable alias in journal DB.
+*
+* @param[in] pJournalSession - JournalSession instance.
+* @param[in] pAliasName - Alias Name
+* @param[in] pSourceName - Source Variable Name
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalSession_CreateVariableAliasInJournalDBPtr) (LibMCData_JournalSession pJournalSession, const char * pAliasName, const char * pSourceName);
+
+/**
 * writes detailed journal state data to disk.
 *
 * @param[in] pJournalSession - JournalSession instance.
@@ -639,6 +649,30 @@ typedef LibMCDataResult (*PLibMCDataJournalReader_GetVariableCountPtr) (LibMCDat
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataJournalReader_GetVariableInformationPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint32 nVariableIndex, const LibMCData_uint32 nVariableNameBufferSize, LibMCData_uint32* pVariableNameNeededChars, char * pVariableNameBuffer, LibMCData_uint32 * pVariableID, LibMCData::eParameterDataType * pDataType, LibMCData_double * pUnits);
+
+/**
+* Returns number of aliases.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[out] pCount - Number of aliases in journal.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalReader_GetAliasCountPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint32 * pCount);
+
+/**
+* Returns the information for a variable alias.
+*
+* @param[in] pJournalReader - JournalReader instance.
+* @param[in] nAliasIndex - Index of the alias.
+* @param[in] nAliasNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pAliasNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pAliasNameBuffer -  buffer of Name of the alias., may be NULL
+* @param[in] nSourceVariableNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSourceVariableNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSourceVariableNameBuffer -  buffer of Name of the variable., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataJournalReader_GetAliasInformationPtr) (LibMCData_JournalReader pJournalReader, LibMCData_uint32 nAliasIndex, const LibMCData_uint32 nAliasNameBufferSize, LibMCData_uint32* pAliasNameNeededChars, char * pAliasNameBuffer, const LibMCData_uint32 nSourceVariableNameBufferSize, LibMCData_uint32* pSourceVariableNameNeededChars, char * pSourceVariableNameBuffer);
 
 /**
 * Returns number of chunks.
@@ -2791,6 +2825,7 @@ typedef struct {
 	PLibMCDataJournalChunkIntegerData_GetValueDataPtr m_JournalChunkIntegerData_GetValueData;
 	PLibMCDataJournalSession_GetSessionUUIDPtr m_JournalSession_GetSessionUUID;
 	PLibMCDataJournalSession_CreateVariableInJournalDBPtr m_JournalSession_CreateVariableInJournalDB;
+	PLibMCDataJournalSession_CreateVariableAliasInJournalDBPtr m_JournalSession_CreateVariableAliasInJournalDB;
 	PLibMCDataJournalSession_WriteJournalChunkIntegerDataPtr m_JournalSession_WriteJournalChunkIntegerData;
 	PLibMCDataJournalSession_ReadChunkIntegerDataPtr m_JournalSession_ReadChunkIntegerData;
 	PLibMCDataJournalSession_GetChunkCacheQuotaPtr m_JournalSession_GetChunkCacheQuota;
@@ -2801,6 +2836,8 @@ typedef struct {
 	PLibMCDataJournalReader_ReadChunkIntegerDataPtr m_JournalReader_ReadChunkIntegerData;
 	PLibMCDataJournalReader_GetVariableCountPtr m_JournalReader_GetVariableCount;
 	PLibMCDataJournalReader_GetVariableInformationPtr m_JournalReader_GetVariableInformation;
+	PLibMCDataJournalReader_GetAliasCountPtr m_JournalReader_GetAliasCount;
+	PLibMCDataJournalReader_GetAliasInformationPtr m_JournalReader_GetAliasInformation;
 	PLibMCDataJournalReader_GetChunkCountPtr m_JournalReader_GetChunkCount;
 	PLibMCDataJournalReader_GetChunkInformationPtr m_JournalReader_GetChunkInformation;
 	PLibMCDataStorageStream_GetUUIDPtr m_StorageStream_GetUUID;

@@ -726,6 +726,7 @@ public:
 			case LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER: return "MISSINGCUSTOMREQUESTLAYER";
 			case LIBMC_ERROR_INVALIDCONTENTSTATEID: return "INVALIDCONTENTSTATEID";
 			case LIBMC_ERROR_INVALIDWIDGETREQUEST: return "INVALIDWIDGETREQUEST";
+			case LIBMC_ERROR_SOURCEVARIABLENOTFOUND: return "SOURCEVARIABLENOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -1286,6 +1287,7 @@ public:
 			case LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER: return "Missing custom request layer";
 			case LIBMC_ERROR_INVALIDCONTENTSTATEID: return "Invalid content state ID";
 			case LIBMC_ERROR_INVALIDWIDGETREQUEST: return "Invalid widget request";
+			case LIBMC_ERROR_SOURCEVARIABLENOTFOUND: return "Source variable not found";
 		}
 		return "unknown error";
 	}

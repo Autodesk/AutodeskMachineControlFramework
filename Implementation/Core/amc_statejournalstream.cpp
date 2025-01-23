@@ -68,6 +68,14 @@ namespace AMC {
 
 	}
 
+	void CStateJournalStreamCache_Current::createVariableAliasInJournalDB(const std::string& sAliasName, const std::string& sSourceVariableName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_JournalSessionMutex);
+		m_pJournalSession->CreateVariableAliasInJournalDB(sAliasName, sSourceVariableName);
+
+	}
+
+
 
 	void CStateJournalStreamCache_Current::writeToJournal(PStateJournalStreamChunk_InMemory pChunk)
 	{
