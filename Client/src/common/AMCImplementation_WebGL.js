@@ -613,7 +613,6 @@ class WebGLImpl {
         this.scene.background = new THREE.Color(0xffffff);
 
 		this.raycaster = new THREE.Raycaster();
-		//this.raycaster.params.Line.threshold = RAYCAST_LINE_THRESHOLD;
 
         this.renderElements = new Map();
 		
@@ -723,46 +722,33 @@ class WebGLImpl {
 
     }
 
-    getRaycasterCollisions(mouseX, mouseY) {
-        const pointsMeshElement = this.findElement('layerdata_points');
-        let pointsMesh;
-        const linesMeshElement = this.findElement('layerdata_lines');
-        let linesMesh;
+	getRaycasterCollisions(elementidentifier, mouseX, mouseY) {
+		
+		let elementMesh = this.findElement (elementidentifier);
+		
+		if (!elementMesh) 
+			return -1;
+			
+		if (!elementMesh.glelement) 
+			return -1;
+			
+		const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
+		const rayDirection = new THREE.Vector3(0, 0, 1);
 
-        if (!pointsMeshElement || !pointsMeshElement.glelement || !linesMeshElement || !linesMeshElement.glelement ) {
-            return [-1, -1];
-        }
-        else {
-            pointsMesh = pointsMeshElement.glelement;
-            linesMesh = linesMeshElement.glelement;
-        }
+		this.raycaster.ray.origin.copy(rayOrigin);
+		this.raycaster.ray.direction.copy(rayDirection);                
 
-        const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
-        const rayDirection = new THREE.Vector3(0, 0, 1);
-
-        this.raycaster.ray.origin.copy(rayOrigin);
-        this.raycaster.ray.direction.copy(rayDirection);                
-
-        const collisionsPoints = this.raycaster.intersectObject(pointsMesh);
-        const collisionsLines = this.raycaster.intersectObject(linesMesh);
-
-        if (collisionsPoints.length > 0) {
-            // console.log(collisions.length + " mouse collisions with point mesh detected!");
-            // console.log(collisions[0].faceIndex);
-
-            return [0, collisionsPoints[0].faceIndex];
-        }
-        else if (collisionsLines.length > 0) {
-            // console.log(collisions.length + " mouse collisions with point mesh detected!");
-            // console.log(collisions[0].faceIndex);
-
-            return [1, collisionsLines[0].faceIndex];
-        }
-        else {
-            return [-1, -1];
-        }
-    }
-
+		//console.log ("sending raycast at " + mouseX + "/" + mouseY);
+		const collisionsPoints = this.raycaster.intersectObject(elementMesh.glelement);
+		
+		if (collisionsPoints.length > 0) {
+			return collisionsPoints[0].faceIndex;
+		} else {
+			return -1;
+		}						
+					
+	}
+	
     hasElement(identifier) {
         if (!identifier)
             return false;

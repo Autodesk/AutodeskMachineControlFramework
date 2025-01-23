@@ -167,6 +167,22 @@ class LayerViewImpl {
 		
 		this.renderNeedsUpdate = true;
     }
+	
+	
+	checkLinesCollision (mouseX, mouseY)
+	{
+		let faceIndex = this.glInstance.getRaycasterCollisions ('layerdata_lines', mouseX, mouseY);
+		if (faceIndex < 0)
+			return -1;
+		
+		if (faceIndex % 2 !== 0) {
+			return (faceIndex - 1) / 2;
+		} else {
+			return faceIndex / 2;
+		}
+	}
+	
+
 
 	getPathBoundaries() {
 		let layerLines = this.glInstance.findElement("layerdata_lines");
