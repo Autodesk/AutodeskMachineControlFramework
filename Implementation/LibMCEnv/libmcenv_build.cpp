@@ -560,7 +560,7 @@ IBuildExecutionIterator* CBuild::ListExecutionsByStatus(const LibMCEnv::eBuildEx
 	auto pIterator = pBuildJob->RetrieveBuildJobExecutionsByStatus(eLibMCDataStatus, sJournalUUIDFilter);
 	while (pIterator->MoveNext()) {
 		auto pExecutionData = pIterator->GetCurrentJobExecution();
-		pResult->AddBuildExecution(std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono));
+		pResult->AddBuildExecution(std::make_shared<CBuildExecution>(pExecutionData, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono, m_pStateJournal));
 	}
 
 	return pResult.release();

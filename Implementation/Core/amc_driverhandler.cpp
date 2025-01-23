@@ -108,7 +108,7 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	auto pParameterGroup = std::make_shared<CParameterGroup>(m_pGlobalChrono);
 	pParameterGroup->setJournal(m_pStateJournal, sName);
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_pMeshHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, sName);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_pMeshHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, sName, m_pStateJournal);
 
 	pInternalEnvironment->setIsInitializing(true);
 
