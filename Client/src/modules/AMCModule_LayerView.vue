@@ -46,7 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				<button class="rounded-button" @click="onToggleHoverClick">
                     <v-icon v-if="hoverOverData" left size="20px" color="white">mdi-checkbox-outline</v-icon>
                     <v-icon v-else left size="20px" color="white">mdi-checkbox-blank-outline</v-icon>
-                    Hover
+
+                    Tooltips
                 </button>
 			</div>
 
@@ -117,8 +118,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             showToolpath: true,
 			loadingLayerData: false,
 			loadingScatterplot: false,
-			hoverOverData: false,
-			viewed_platform_uuid: ""
+			hoverOverData: false
 		
 		}),
 		
@@ -263,14 +263,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				}
 			},
 			
-			onLayerChanged: function () {
-					
+			onLayerChanged: function (sender) {
+
+				let module = this.module;				
 				let platform = this.module.platform;
-				
-				if (platform) {
-				
-					if (this.viewed_platform_uuid === platform.uuid) {
-									
+				if (platform && sender) {
+
+					if (module.isActive () && (sender.uuid === module.uuid)) {
+																								
 						if ((platform.displayed_layer != platform.currentlayer) || (platform.displayed_build != platform.builduuid)) {
 						
 							platform.displayed_layer = platform.currentlayer;
@@ -309,6 +309,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 										
 										if (this.LayerViewerInstance) {
 											this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000);										
+											this.LayerViewerInstance.updateTransform ();
 											this.LayerViewerInstance.RenderScene (true);
 										}
 									
@@ -532,7 +533,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		},
 		
 		created () {
-			this.module.onDataHasChanged = this.onLayerChanged;			
+			this.module.onDataHasChanged = null;			
 			if (this.module.platform) {
 				this.module.platform.displayed_layer = 0;
 				this.module.platform.displayed_build = 0;
@@ -552,7 +553,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 		unmounted ()
 		{
-			this.viewed_platform_uuid = "";
 			if (this.module) {
 				this.module.onDataHasChanged = null;			
 				if (this.module.platform) {
@@ -563,7 +563,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		},
 		
 		mounted() {	
-			this.viewed_platform_uuid = "";
+	
 			
 			if (this.module) {
 				this.module.onDataHasChanged = this.onLayerChanged;			

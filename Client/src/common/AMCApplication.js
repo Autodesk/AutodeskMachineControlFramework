@@ -416,45 +416,49 @@ export default class AMCApplication extends Common.AMCObject {
 			return;
 
         item.refresh = false;
-
-        let headers = {}
-        let authToken = this.API.authToken;
-
-        if (authToken != Common.nullToken ())
-            headers.Authorization = "Bearer " + authToken;
-
-		let stateidstring = "";
-		if (item.stateid > 0)
-			stateidstring = "/" + item.stateid;
 		
-        let url = this.API.baseURL + "/ui/contentitem/" + Assert.UUIDValue (item.uuid) + stateidstring;
-        Axios({
-            method: "GET",
-            "headers": headers,
-            url: url
-        })
-        .then(resultJSON => {
-						
-			if (resultJSON.data) {
-				if (resultJSON.data.content) {
-					item.updateFromJSON (resultJSON.data.content);					
-				}				
-			}
-						
-            this.unsuccessfulUpdateCounter = 0;
-            item.setRefreshFlag ();
+		if (item.isActive ()) {
 
-        })
-        .catch(err => {
+			let headers = {}
+			let authToken = this.API.authToken;
 
-            this.unsuccessfulUpdateCounter = this.unsuccessfulUpdateCounter + 1;
-            if (this.unsuccessfulUpdateCounter > 5) {
-                this.setStatusToError(err.message);
-            } else {
-                item.setRefreshFlag ();
-            }
+			if (authToken != Common.nullToken ())
+				headers.Authorization = "Bearer " + authToken;
 
-        });
+			let stateidstring = "";
+			if (item.stateid > 0)
+				stateidstring = "/" + item.stateid;
+			
+			let url = this.API.baseURL + "/ui/contentitem/" + Assert.UUIDValue (item.uuid) + stateidstring;
+			Axios({
+				method: "GET",
+				"headers": headers,
+				url: url
+			})
+			.then(resultJSON => {
+							
+				if (resultJSON.data) {
+					if (resultJSON.data.content) {
+						item.updateFromJSON (resultJSON.data.content);					
+					}				
+				}
+							
+				this.unsuccessfulUpdateCounter = 0;
+				item.setRefreshFlag ();
+
+			})
+			.catch(err => {
+
+				this.unsuccessfulUpdateCounter = this.unsuccessfulUpdateCounter + 1;
+				if (this.unsuccessfulUpdateCounter > 5) {
+					this.setStatusToError(err.message);
+				} else {
+					item.setRefreshFlag ();
+				}
+
+			});
+		
+		}
 
     }
 
@@ -467,10 +471,8 @@ export default class AMCApplication extends Common.AMCObject {
 
 			for ([uuid, item] of this.AppContent.ItemMap) {
 									
-				if (item.refresh) {
-					uuid;
-					this.updateContentItem(item);
-				}
+				uuid;
+				this.updateContentItem(item);
 			}
 		
 		}
@@ -745,6 +747,8 @@ export default class AMCApplication extends Common.AMCObject {
 		
 		if (this.AppState.appResizeEvent)
 			this.AppState.appResizeEvent ();
+		
+		this.updateContentItems ();
 
     }
 
@@ -770,7 +774,8 @@ export default class AMCApplication extends Common.AMCObject {
 		if (this.AppState.appResizeEvent)
 			this.AppState.appResizeEvent ();
 		
-
+		this.updateContentItems ();
+		
     }
 	
 	streamDownload (downloadticketuuid) 
@@ -1016,6 +1021,15 @@ export default class AMCApplication extends Common.AMCObject {
 			"hash": passwordHash
 		}
 		
+	}
+	
+	pageIsActive (page)
+	{
+		if (page) {
+			return page.name === this.AppState.activePage;
+		}
+		
+		return false;
 	}
 
 
