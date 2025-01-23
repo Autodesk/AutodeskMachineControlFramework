@@ -356,6 +356,22 @@ bool CUIExpression::evaluateBoolValue(PStateMachineData pStateMachineData)
 	return evaluateBoolValue(pStateMachineData.get ());
 }
 
+std::string CUIExpression::evaluateUUIDValue(CStateMachineData* pStateMachineData)
+{
+	std::string sValue = evaluateStringValue(pStateMachineData);
+
+	if (AMCCommon::CUtils::stringIsUUIDString(sValue))
+		return AMCCommon::CUtils::normalizeUUIDString(sValue);
+
+	return AMCCommon::CUtils::createEmptyUUID();
+	
+}
+
+std::string CUIExpression::evaluateUUIDValue(PStateMachineData pStateMachineData)
+{
+	return evaluateUUIDValue(pStateMachineData.get());
+}
+
 
 void CUIExpression::checkExpressionSyntax(CStateMachineData* pStateMachineData)
 {

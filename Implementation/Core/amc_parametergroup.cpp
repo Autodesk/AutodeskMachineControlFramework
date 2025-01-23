@@ -221,6 +221,26 @@ namespace AMC {
 		return iIter->second->getBoolValue();
 	}
 
+	std::string CParameterGroup::getUUIDParameterValueByIndex(const uint32_t nIndex)
+	{
+		std::string sValue = getParameterValueByIndex(nIndex);
+		if (AMCCommon::CUtils::stringIsUUIDString(sValue))
+			return AMCCommon::CUtils::normalizeUUIDString(sValue);
+
+		return AMCCommon::CUtils::createEmptyUUID();
+	}
+
+	std::string CParameterGroup::getUUIDParameterValueByName(const std::string& sName)
+	{
+		std::string sValue = getParameterValueByName(sName);
+		if (AMCCommon::CUtils::stringIsUUIDString(sValue))
+			return AMCCommon::CUtils::normalizeUUIDString(sValue);
+
+		return AMCCommon::CUtils::createEmptyUUID();
+	}
+
+
+
 
 	eParameterDataType CParameterGroup::getParameterDataTypeByIndex(const uint32_t nIndex)
 	{
@@ -243,6 +263,7 @@ namespace AMC {
 
 		return iIter->second->getDataType();
 	}
+
 
 
 	void CParameterGroup::setParameterValueByIndex(const uint32_t nIndex, const std::string& sValue)

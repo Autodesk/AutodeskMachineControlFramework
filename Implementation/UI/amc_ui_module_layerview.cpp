@@ -103,6 +103,14 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 	if (m_SliderFixed.needsSync())
 		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_SLIDERFIXED, m_SliderFixed.evaluateIntegerValue(pStateMachineData));
 
+	if (m_BuildUUID.needsSync ())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_BUILDUUID, m_BuildUUID.evaluateStringValue(pStateMachineData));
+	if (m_ExecutionUUID.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_EXECUTIONUUID, m_ExecutionUUID.evaluateStringValue(pStateMachineData));
+	if (m_ScatterplotUUID.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_SCATTERPLOTUUID, m_ScatterplotUUID.evaluateStringValue(pStateMachineData));
+
+
 	object.addDouble(AMC_API_KEY_UI_SIZEX, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_SIZEX));
 	object.addDouble(AMC_API_KEY_UI_SIZEY, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_SIZEY));
 	object.addDouble(AMC_API_KEY_UI_ORIGINX, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_ORIGINX));
@@ -114,9 +122,9 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 		object.addString(AMC_API_KEY_UI_BASEIMAGERESOURCE, pResourceEntry->getUUID());
 	}
 
-	std::string sBuildUUID = pGroup->getParameterValueByName(AMC_API_KEY_UI_BUILDUUID);
-	std::string sExecutionUUID = pGroup->getParameterValueByName(AMC_API_KEY_UI_EXECUTIONUUID);
-	std::string sScatterplotUUID = pGroup->getParameterValueByName(AMC_API_KEY_UI_SCATTERPLOTUUID);
+	std::string sBuildUUID = pGroup->getUUIDParameterValueByName(AMC_API_KEY_UI_BUILDUUID);
+	std::string sExecutionUUID = pGroup->getUUIDParameterValueByName(AMC_API_KEY_UI_EXECUTIONUUID);
+	std::string sScatterplotUUID = pGroup->getUUIDParameterValueByName(AMC_API_KEY_UI_SCATTERPLOTUUID);
 
 	object.addString(AMC_API_KEY_UI_BUILDUUID, sBuildUUID);
 	object.addString(AMC_API_KEY_UI_EXECUTIONUUID, sExecutionUUID);
@@ -189,14 +197,21 @@ void CUIModule_LayerViewPlatformItem::setSliderExpressions(CUIExpression sliderC
 	m_SliderFixed = sliderFixed;
 }
 
+void CUIModule_LayerViewPlatformItem::setBuildReference(CUIExpression buildUUID, CUIExpression executionUUID, CUIExpression scatterplotUUID)
+{
+	m_BuildUUID = buildUUID;
+	m_ExecutionUUID = executionUUID;
+	m_ScatterplotUUID = scatterplotUUID;
+}
+
 
 void CUIModule_LayerViewPlatformItem::populateClientVariables(CParameterHandler* pClientVariableHandler)
 {
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
 	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "layer view");
-	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_BUILDUUID, "Build UUID", AMCCommon::CUtils::createEmptyUUID());
-	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_EXECUTIONUUID, "Execution UUID", AMCCommon::CUtils::createEmptyUUID());
-	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_SCATTERPLOTUUID, "Scatterplot UUID", AMCCommon::CUtils::createEmptyUUID());
+	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_BUILDUUID, "Build UUID", m_BuildUUID.evaluateUUIDValue(pStateMachineData));
+	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_EXECUTIONUUID, "Execution UUID", m_ExecutionUUID.evaluateUUIDValue(pStateMachineData));
+	pGroup->addNewUUIDParameter(AMC_API_KEY_UI_SCATTERPLOTUUID, "Scatterplot UUID", m_ScatterplotUUID.evaluateUUIDValue(pStateMachineData));
 	pGroup->addNewIntParameter(AMC_API_KEY_UI_CURRENTLAYER, "Current layer index", 0);
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_SIZEX, "Platform size x", m_SizeX.evaluateNumberValue (pStateMachineData), 1.0);
 	pGroup->addNewDoubleParameter(AMC_API_KEY_UI_SIZEY, "Platform size y", m_SizeY.evaluateNumberValue(pStateMachineData), 1.0);
@@ -238,6 +253,7 @@ CUIModule_LayerView::CUIModule_LayerView(pugi::xml_node& xmlNode, const std::str
 	CUIExpression baseImage(platformNode, "baseimage");
 	CUIExpression layerIndex(platformNode, "layerindex", false);
 
+
 	m_PlatformItem = std::make_shared<CUIModule_LayerViewPlatformItem>(m_sModulePath, sizeX, sizeY, originX, originY, layerIndex, baseImage, pUIModuleEnvironment);
 
 	auto labelNode = xmlNode.child("label");
@@ -248,6 +264,14 @@ CUIModule_LayerView::CUIModule_LayerView(pugi::xml_node& xmlNode, const std::str
 
 		m_PlatformItem->setLabelExpressions(labelVisible, labelCaption, labelIcon);
 
+	}
+
+	auto referencesNode = xmlNode.child("references");
+	if (!referencesNode.empty()) {
+		CUIExpression buildUUID(platformNode, "builduuid", false);
+		CUIExpression executionUUID(platformNode, "executionuuid", false);
+		CUIExpression scatterplotUUID(platformNode, "scatterplotuuid", false);
+		m_PlatformItem->setBuildReference(buildUUID, executionUUID, scatterplotUUID);
 	}
 
 	auto sliderNode = xmlNode.child("slider");

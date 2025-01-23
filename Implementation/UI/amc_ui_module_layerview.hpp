@@ -66,6 +66,9 @@ namespace AMC {
 		CUIExpression m_LabelIcon;
 		CUIExpression m_SliderFixed;
 		CUIExpression m_SliderChangeEvent;
+		CUIExpression m_BuildUUID;
+		CUIExpression m_ExecutionUUID;
+		CUIExpression m_ScatterplotUUID;
 
 		PUIModuleEnvironment m_pUIModuleEnvironment;
 		std::string m_sUUID;
@@ -84,6 +87,8 @@ namespace AMC {
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler);
 
 		void handleCustomRequest(PAPIAuth pAuth, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response, CUIModule_UIEventHandler* pEventHandler) override;
+
+		void setBuildReference(CUIExpression buildUUID, CUIExpression executionUUID, CUIExpression scatterplotUUID);
 
 		void setLabelExpressions (CUIExpression labelVisible, CUIExpression labelCaption, CUIExpression labelIcon);
 

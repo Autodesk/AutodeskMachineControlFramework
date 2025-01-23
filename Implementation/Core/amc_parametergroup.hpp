@@ -121,6 +121,8 @@ namespace AMC {
 		int64_t getIntParameterValueByName(const std::string& sName);
 		bool getBoolParameterValueByIndex(const uint32_t nIndex);
 		bool getBoolParameterValueByName(const std::string& sName);
+		std::string getUUIDParameterValueByIndex(const uint32_t nIndex);
+		std::string getUUIDParameterValueByName(const std::string& sName);
 
 		eParameterDataType getParameterDataTypeByIndex(const uint32_t nIndex);
 		eParameterDataType getParameterDataTypeByName(const std::string& sName);
