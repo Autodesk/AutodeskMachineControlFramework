@@ -42,6 +42,7 @@ Abstract: This is a stub class definition of CBuildExecution
 #include "libmcenv_datatable.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
 #include "libmcenv_journalhandler_historic.hpp"
+#include "libmcenv_journalhandler_current.hpp"
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
@@ -54,12 +55,14 @@ using namespace LibMCEnv::Impl;
 /*************************************************************************************************************************
  Class definition of CBuildExecution 
 **************************************************************************************************************************/
-CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono)
+CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono, AMC::PStateJournal pStateJournal)
 	: m_pExecution (pExecution), 
 	m_pDataModel (pDataModel), 
 	m_pToolpathHandler (pToolpathHandler), 
 	m_pMeshHandler (pMeshHandler),
-	m_pGlobalChrono (pGlobalChrono)
+	m_pGlobalChrono (pGlobalChrono),
+	m_pStateJournal (pStateJournal)
+	
 {
 	if (pExecution.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -69,6 +72,8 @@ CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMC
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pMeshHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pStateJournal.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 	// Cache Execution UUID
 	m_sExecutionUUID = m_pExecution->GetExecutionUUID();
@@ -76,6 +81,7 @@ CBuildExecution::CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMC
 
 CBuildExecution::~CBuildExecution()
 {
+	m_pStateJournal = nullptr;
 	m_pExecution = nullptr;
 	m_pDataModel = nullptr;
 	m_pToolpathHandler = nullptr;
@@ -86,7 +92,7 @@ CBuildExecution* CBuildExecution::makeFrom(CBuildExecution* pBuildExecution)
 	if (pBuildExecution == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	return new CBuildExecution(pBuildExecution->m_pExecution, pBuildExecution->m_pDataModel, pBuildExecution->m_pToolpathHandler, pBuildExecution->m_pMeshHandler, pBuildExecution->m_pGlobalChrono);
+	return new CBuildExecution(pBuildExecution->m_pExecution, pBuildExecution->m_pDataModel, pBuildExecution->m_pToolpathHandler, pBuildExecution->m_pMeshHandler, pBuildExecution->m_pGlobalChrono, pBuildExecution->m_pStateJournal);
 }
 
 std::shared_ptr<CBuildExecution> CBuildExecution::makeSharedFrom(CBuildExecution* pBuildExecution)
@@ -110,7 +116,7 @@ std::string CBuildExecution::GetBuildUUID()
 IBuild * CBuildExecution::GetBuild()
 {
 	std::string sBuildUUID = GetBuildUUID();
-	return new CBuild(m_pDataModel, sBuildUUID, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
+	return new CBuild(m_pDataModel, sBuildUUID, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono, m_pStateJournal);
 }
 
 LibMCEnv::eBuildExecutionStatus CBuildExecution::GetExecutionStatus()
@@ -497,16 +503,27 @@ IJournalHandler* CBuildExecution::LoadAttachedJournal(const LibMCEnv_uint32 nCac
 {
 
 	std::lock_guard <std::mutex> lockGuard(m_Mutex);
-	std::string sJournalUUID = m_pExecution->GetJournalUUID();
+	std::string sJournalUUIDToLoad = AMCCommon::CUtils::normalizeUUIDString (m_pExecution->GetJournalUUID());
 
-	auto pDataReader = m_pDataModel->CreateJournalReader (sJournalUUID);
+	auto pActiveJournalSession = m_pDataModel->CreateJournalSession();
+	std::string sActiveJournalUUID = AMCCommon::CUtils::normalizeUUIDString(pActiveJournalSession->GetSessionUUID());
 
-	if ((nCacheMemoryQuotaInMegabytes < CACHEMEMORYQUOTA_MINMEGABYTES) ||
-		(nCacheMemoryQuotaInMegabytes > CACHEMEMORYQUOTA_MAXMEGABYTES))
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA);
 
-	uint64_t nMemoryQuotaInBytes = ((uint64_t)nCacheMemoryQuotaInMegabytes) * 1024ULL;
+	if (sJournalUUIDToLoad == sActiveJournalUUID) {
+		return new CJournalHandler_Current(m_pStateJournal);
+	}
+	else {
 
-	return new CJournalHandler_Historic(std::make_shared<AMC::CStateJournalReader> (pDataReader, nMemoryQuotaInBytes, nullptr));
+		auto pDataReader = m_pDataModel->CreateJournalReader(sJournalUUIDToLoad);
+
+		if ((nCacheMemoryQuotaInMegabytes < CACHEMEMORYQUOTA_MINMEGABYTES) ||
+			(nCacheMemoryQuotaInMegabytes > CACHEMEMORYQUOTA_MAXMEGABYTES))
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA);
+
+		uint64_t nMemoryQuotaInBytes = ((uint64_t)nCacheMemoryQuotaInMegabytes) * 1024ULL;
+
+		return new CJournalHandler_Historic(std::make_shared<AMC::CStateJournalReader>(pDataReader, nMemoryQuotaInBytes, nullptr));
+
+	}
 
 }

@@ -200,7 +200,7 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getMeshHandlerInstance(), m_pSystemState->getGlobalChronoInstance ());
+	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getMeshHandlerInstance(), m_pSystemState->getGlobalChronoInstance (), m_pSystemState->getStateJournalInstance ());
 }
 
 bool CStateEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
@@ -226,7 +226,7 @@ IBuildExecution* CStateEnvironment::GetBuildExecution(const std::string& sExecut
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
-	return new CBuildExecution(pBuildExecution, pDataModel, m_pSystemState->getToolpathHandlerInstance(), m_pSystemState->getMeshHandlerInstance (), m_pSystemState->getGlobalChronoInstance());
+	return new CBuildExecution(pBuildExecution, pDataModel, m_pSystemState->getToolpathHandlerInstance(), m_pSystemState->getMeshHandlerInstance (), m_pSystemState->getGlobalChronoInstance(), m_pSystemState->getStateJournalInstance ());
 
 }
 
