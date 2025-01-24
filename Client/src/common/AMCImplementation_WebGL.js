@@ -109,6 +109,7 @@ class WebGLElement {
             this.glelement.scale.z = this.scale.z;
         }
 	}
+		
 }
 
 class WebGLLinesElement extends WebGLElement {
@@ -176,6 +177,34 @@ class WebGLLinesElement extends WebGLElement {
 
         this.glelement = new THREE.Mesh(geometry, material);
     }
+	
+	intersectRay (mouseX, mouseY, raycaster) {
+		if (!raycaster)
+			return -1;
+		if (!this.glelement)
+			return -1;
+		
+		const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
+		const rayDirection = new THREE.Vector3(0, 0, 1);
+
+		raycaster.ray.origin.copy(rayOrigin);
+		raycaster.ray.direction.copy(rayDirection);                
+		
+		const collisionsPoints = raycaster.intersectObject(this.glelement);
+		
+		if (collisionsPoints.length > 0) {
+			let faceIndex = collisionsPoints[0].faceIndex;
+			if (faceIndex % 2 !== 0) {
+				return (faceIndex - 1) / 2;
+			} else {
+				return faceIndex / 2;
+			}
+			
+		} else {
+			return -1;
+		}		
+
+	}
 }
 
 class WebGLPointsElement extends WebGLElement {
@@ -231,6 +260,169 @@ class WebGLPointsElement extends WebGLElement {
         this.glelement = new THREE.Mesh(geometry, material);
     }
 }
+
+
+class WebGLLocalizedPointsElement extends WebGLElement {
+
+    constructor(pointsData, zValue, pointsRadius, pointsColor, vertexcolors, originx, originy, quadsizex, quadsizey, quadcountx, quadcounty) {
+        super();
+		
+		this.quadgeometries = [];
+		this.quadmaterials = [];
+		this.glelements = [];
+		this.xcoordinates = [];
+		this.ycoordinates = [];
+		
+		this.originx = originx;
+		this.originy = originy;
+		this.quadsizex = quadsizex;
+		this.quadsizey = quadsizey;
+		this.quadcountx = quadcountx;
+		this.quadcounty = quadcounty;
+		this.quadcount = quadcountx * quadcounty;
+		
+		let group = new THREE.Group();
+		
+		for (let quadindex = 0; quadindex < this.quadcount; quadindex++) {
+			this.xcoordinates[quadindex] = [];
+			this.ycoordinates[quadindex] = [];
+		}
+			
+
+
+        let numberOfPoints = pointsData.length / 2;
+
+        for (let i = 0; i < numberOfPoints; i++) {
+			let x = pointsData[i * 2];
+			let y = pointsData[i * 2 + 1];
+			
+			let quadx = Math.floor ( (x - originx) / quadsizex);
+			let quady = Math.floor ( (y - originy) / quadsizey);
+			
+			if (quadx < 0) quadx = 0;
+			if (quady < 0) quady = 0;
+			if (quadx >= quadcountx) quadx = quadcountx - 1;
+			if (quady >= quadcounty) quady = quadcounty - 1;
+			
+			let quadindex = quadx + quady * quadcountx;
+			this.xcoordinates[quadindex].push (x);
+			this.ycoordinates[quadindex].push (y)	
+		}
+		
+		
+		for (let quadindex = 0; quadindex < this.quadcount; quadindex++) {
+			
+			let xcoordinates = this.xcoordinates[quadindex];
+			let ycoordinates = this.ycoordinates[quadindex];
+			if ((xcoordinates.length > 0) && (xcoordinates.length === ycoordinates.length)) {
+				
+				let pointcount = xcoordinates.length;
+				
+				this.quadgeometries[quadindex] = new THREE.BufferGeometry();
+				if (vertexcolors) {
+					this.quadmaterials [quadindex] = new THREE.MeshBasicMaterial({
+						vertexColors: true
+					});
+				} else {
+					this.quadmaterials [quadindex] = new THREE.MeshBasicMaterial({
+						vertexColors: false,
+						color: /*pointsColor +*/ Math.round (Math.random ()*10000000)
+					});
+				}
+				
+				let vertices = [];
+				for (let i = 0; i < pointcount; i++) {
+					let x = xcoordinates[i];
+					let y = ycoordinates[i];
+					vertices.push(
+						x - pointsRadius / 2, y - pointsRadius / 2, zValue,
+						x - pointsRadius / 2, y + pointsRadius / 2, zValue,
+						x + pointsRadius / 2, y + pointsRadius / 2, zValue,
+						x - pointsRadius / 2, y - pointsRadius / 2, zValue,
+						x + pointsRadius / 2, y + pointsRadius / 2, zValue,
+						x + pointsRadius / 2, y - pointsRadius / 2, zValue,
+					);
+				}
+				
+				
+				this.quadgeometries[quadindex].setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+				//if (vertexcolors) {
+					//this.quadgeometries[quadindex].setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); 
+				//}
+				this.quadgeometries[quadindex].computeBoundingSphere();
+
+				this.glelements[quadindex] = new THREE.Mesh(this.quadgeometries[quadindex], this.quadmaterials [quadindex]);
+			
+				group.add(this.glelements[quadindex]);
+				
+			}
+								
+
+			this.glelement = group;
+	
+			
+			
+
+            /*
+			
+			if (vertexcolors) {
+					
+					// Add colors for each vertex
+					const color = new THREE.Color(vertexcolors[i]); 
+					for (let j = 0; j < 6; j++) { 
+						colors.push(color.r, color.g, color.b);
+					}
+				} */
+        }
+
+        
+    }
+	
+	
+	intersectRay (mouseX, mouseY, raycaster) {
+		if (!raycaster)
+			return -1;
+		if (!this.glelement)
+			return -1;
+		
+		let quadx = Math.floor ( (mouseX - this.originx) / this.quadsizex);
+		let quady = Math.floor ( (mouseY - this.originy) / this.quadsizey);
+			
+		if (quadx < 0) quadx = 0;
+		if (quady < 0) quady = 0;
+		if (quadx >= this.quadcountx) quadx = this.quadcountx - 1;
+		if (quady >= this.quadcounty) quady = this.quadcounty - 1;
+		
+		let quadindex = quadx + quady * this.quadcountx;
+		if (this.glelements[quadindex]) {
+		
+			const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
+			const rayDirection = new THREE.Vector3(0, 0, 1);
+
+			raycaster.ray.origin.copy(rayOrigin);
+			raycaster.ray.direction.copy(rayDirection);                
+			
+			const collisionsPoints = raycaster.intersectObject(this.glelements[quadindex]);
+			
+			if (collisionsPoints.length > 0) {
+				let faceIndex = collisionsPoints[0].faceIndex;
+				if (faceIndex % 2 !== 0) {
+					return (faceIndex - 1) / 2;
+				} else {
+					return faceIndex / 2;
+				}
+				
+			} else {
+				return -1;
+			}		
+		}
+		
+		return -1;
+
+	}
+
+}
+
 
 class WebGLBoxElement extends WebGLElement {
 
@@ -731,22 +923,13 @@ class WebGLImpl {
 			
 		if (!elementMesh.glelement) 
 			return -1;
-			
-		const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
-		const rayDirection = new THREE.Vector3(0, 0, 1);
-
-		this.raycaster.ray.origin.copy(rayOrigin);
-		this.raycaster.ray.direction.copy(rayDirection);                
-
-		//console.log ("sending raycast at " + mouseX + "/" + mouseY);
-		const collisionsPoints = this.raycaster.intersectObject(elementMesh.glelement);
+						
+		if (elementMesh.intersectRay) {
+			return elementMesh.intersectRay (mouseX, mouseY, this.raycaster);
+		}
 		
-		if (collisionsPoints.length > 0) {
-			return collisionsPoints[0].faceIndex;
-		} else {
-			return -1;
-		}						
-					
+		return -1;
+							
 	}
 	
     hasElement(identifier) {
@@ -867,6 +1050,20 @@ class WebGLImpl {
 
         return pointsElement;
     }
+
+    add2DLocalizedPointsGeometry(identifier, pointsData, zValue, pointsRadius, pointsColor, vertexcolors, originx, originy, quadsizex, quadsizey, quadcountx, quadcounty) {
+        if (!identifier)
+            return;
+		
+		this.removeElement (identifier);
+
+        let pointsElement = new WebGLLocalizedPointsElement(pointsData, zValue, pointsRadius, pointsColor, vertexcolors, originx, originy, quadsizex, quadsizey, quadcountx, quadcounty);
+
+        this.addElement(identifier, pointsElement);
+
+        return pointsElement;
+    }
+	
 
     addSVGImage(identifier, url, zValue, fillShapes, showStrokes) {
         if (!identifier)

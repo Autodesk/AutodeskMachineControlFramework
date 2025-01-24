@@ -53,12 +53,12 @@ class LayerViewImpl {
             y: 0
         }
 		
+		this.lineScaleLevel = 0;
 		this.renderNeedsUpdate = true;
 
+		this.layerSegmentsArray = null;
         this.linesCoordinates = [];
-        this.pointCoordinates = [];
-        this.numberOfPoints = 0;
-
+        
 		this.updateTransform ();
 
     }
@@ -114,30 +114,45 @@ class LayerViewImpl {
         var gridgeometry = this.glInstance.findElement("grid");
         if (gridgeometry) {
             var gridScale = this.transform.scaling;
+			var lineScaleLevel = 1;
 
             if (gridScale < 0.5) {
                 gridScale = gridScale * 5.0;
+				lineScaleLevel = 0.8;
             }
 
             if (gridScale > 2.5) {
                 gridScale = gridScale / 5.0;
+				lineScaleLevel = 0.4;
             }
 
             if (gridScale > 2.5) {
                 gridScale = gridScale / 5.0;
+				lineScaleLevel = 0.25;
             }
 
             if (gridScale > 2.5) {
                 gridScale = gridScale / 5.0;
+				lineScaleLevel = 0.125;
             }
 
             if (gridScale > 2.5) {
                 gridScale = gridScale / 5.0;
+				lineScaleLevel = 0.06;
             }
 
             if (gridScale > 2.5) {
                 gridScale = gridScale / 5.0;
+				lineScaleLevel = 0.02;
             }
+						
+            if (gridScale > 2.5) {
+                gridScale = gridScale / 5.0;
+				lineScaleLevel = 0.01;
+            }
+			
+			console.log ("line scale level: " + lineScaleLevel);
+			this.updateLineScaleLevel (lineScaleLevel);
 
             var fullGridSize = gridScale * 25.0 * 5;
             var gridTranslationX = this.transform.x - Math.ceil((this.transform.x / fullGridSize)) * fullGridSize;
@@ -168,20 +183,24 @@ class LayerViewImpl {
 		this.renderNeedsUpdate = true;
     }
 	
-	
-	checkLinesCollision (mouseX, mouseY)
+	updateLineScaleLevel (newLineScaleLevel)
 	{
-		let faceIndex = this.glInstance.getRaycasterCollisions ('layerdata_lines', mouseX, mouseY);
-		if (faceIndex < 0)
-			return -1;
-		
-		if (faceIndex % 2 !== 0) {
-			return (faceIndex - 1) / 2;
-		} else {
-			return faceIndex / 2;
+		if (newLineScaleLevel != this.lineScaleLevel) {
+			
+			this.lineScaleLevel = newLineScaleLevel;
+			
+			this.updateLoadedLayer ();
+
+			this.updateTransform();
+			this.RenderScene(true);		
+			
+			
 		}
 	}
 	
+	
+	
+
 
 
 	getPathBoundaries() {
@@ -197,14 +216,26 @@ class LayerViewImpl {
 
 
     loadLayer(segmentsArray) {
+		this.layerSegmentsArray = segmentsArray;
+		this.updateLoadedLayer ();
+
+		this.updateTransform();
+		this.RenderScene(true);		
+		
+	}
+	
+	updateLoadedLayer () {
 		if (!this.glInstance) 
 			return;
+		
+		if (!this.layerSegmentsArray)
+			return;
 
+		let segmentsArray = this.layerSegmentsArray;
         var segmentCount = segmentsArray.length;
         var segmentIndex;
         
         this.linesCoordinates = [];
-        this.pointCoordinates = [];
         this.segmentProperties = [];
 		
 		let vertexcolors = [];
@@ -251,34 +282,18 @@ class LayerViewImpl {
 
             }
         }
-
-        /*// Sample data for debugging (1000000 datapoints)
-        this.pointCoordinates = [];
-        let xpos, ypos;
-		let pointcolors = [];
-
-        for (let i = 0; i < 1000; i++) {
-             for (let j = 0; j < 1000; j++) {
-                 xpos = Math.random() * 200;
-                 ypos = Math.random() * 200;
-                 // xpos = i / 100 * 20.0;
-                 // ypos = j / 100 * 20.0;
-
-                 this.pointCoordinates.push(xpos, ypos);
-				 
-				 let red = Math.round (xpos / 200 * 255);
-				 let green = Math.round (ypos / 200 * 255);
-				 pointcolors.push (red + green * 256);
-             }
-         }
-
-        this.numberOfPoints = Math.round(this.pointCoordinates.length / 2); */
 		
-        this.glInstance.add2DLineGeometry("layerdata_lines", this.linesCoordinates, 60, 0.05, 0x000000, vertexcolors);
-		//this.glInstance.add2DPointsGeometry("layerdata_points", this.pointCoordinates, 61, 0.1, 0xff0000, pointcolors);
+        var layerLinesObject = this.glInstance.scene.getObjectByName("layerdata_lines");
+        if (layerLinesObject)
+            this.glInstance.scene.remove(layerLinesObject);
+		
+		
+		let thickness = this.lineScaleLevel * 0.3;
+		
+		console.log ("rebulding layer preview with thickness: " + thickness);
+		
+        this.glInstance.add2DLineGeometry("layerdata_lines", this.linesCoordinates, 60, thickness, 0x000000, vertexcolors);
 
-		this.updateTransform();
-		this.RenderScene(true);
     }
 
     Drag(deltaX, deltaY) {

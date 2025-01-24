@@ -308,7 +308,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 										let pointcoordinates = new Float32Array(responseData.data);
 										
 										if (this.LayerViewerInstance) {
-											this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000);										
+											//this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000);										
+											this.LayerViewerInstance.glInstance.add2DLocalizedPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000, false, -200, -200, 2, 2, 400, 400);										
 											this.LayerViewerInstance.updateTransform ();
 											this.LayerViewerInstance.RenderScene (true);
 										}
@@ -472,7 +473,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						const mouseX = event.clientX - renderElementPosition.left;
 						const mouseY = event.clientY - renderElementPosition.top;
 
-						let lineIndex = this.LayerViewerInstance.checkLinesCollision (mouseX, mouseY);
+						let pointIndex = this.LayerViewerInstance.glInstance.getRaycasterCollisions ("layerdata_points", mouseX, mouseY);
+						if (pointIndex > 0) {
+							alert (pointIndex);
+						}		
+
+						let lineIndex = this.LayerViewerInstance.glInstance.getRaycasterCollisions ("layerdata_lines", mouseX, mouseY);
 						if (lineIndex < 0) {
 						
 							let deltaX = this.lastMouseX - mouseX;
