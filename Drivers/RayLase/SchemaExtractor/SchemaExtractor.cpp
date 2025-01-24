@@ -552,7 +552,6 @@ public:
 		registerDouble("MarkSpeed", &pProcessVariables->MarkSpeed);
 		registerDouble("MarkDelay", &pProcessVariables->MarkDelay);
 		registerDouble("MagnificationSpeed", &pProcessVariables->MagnificationSpeed);
-		registerDouble("MagnificationSpeed", &pProcessVariables->MagnificationSpeed);
 		registerBool("EnableVariablePolyDelay", &pProcessVariables->EnableVariablePolyDelay);
 		registerDouble("PolyDelay", &pProcessVariables->PolyDelay);
 		registerDouble("LaserOnDelay", &pProcessVariables->LaserOnDelay);

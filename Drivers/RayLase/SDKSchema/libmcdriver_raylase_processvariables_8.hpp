@@ -52,7 +52,6 @@ namespace LibMCDriver_Raylase {
                 registerVariable("MarkSpeed", 56, eRaylaseAPIVariableType::evtDouble);
                 registerVariable("MarkDelay", 64, eRaylaseAPIVariableType::evtDouble);
                 registerVariable("MagnificationSpeed", 72, eRaylaseAPIVariableType::evtDouble);
-                registerVariable("MagnificationSpeed", 72, eRaylaseAPIVariableType::evtDouble);
                 registerVariable("EnableVariablePolyDelay", 80, eRaylaseAPIVariableType::evtBool);
                 registerVariable("PolyDelay", 88, eRaylaseAPIVariableType::evtDouble);
                 registerVariable("LaserOnDelay", 96, eRaylaseAPIVariableType::evtDouble);
