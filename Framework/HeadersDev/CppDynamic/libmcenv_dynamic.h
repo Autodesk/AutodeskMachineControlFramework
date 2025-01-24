@@ -1436,11 +1436,12 @@ typedef LibMCEnvResult (*PLibMCEnvDataSeries_SetAllEntriesPtr) (LibMCEnv_DataSer
 *
 * @param[in] pDataSeries - DataSeries instance.
 * @param[in] pJournalVariable - Journal variable to sample.
-* @param[in] nNumberOfSamples - Number of samples to generate.
-* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+* @param[in] nStartTimeStamp - Start time stamp to sample. MUST be smaller than end time stamp.
+* @param[in] nEndTimeStamp - End time stamp to sample. MUST be larger than start time stamp.
+* @param[in] nNumberOfSamples - Number of samples to generate. MUST be greater than 1.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvDataSeries_SampleJournalVariablePtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta);
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_SampleJournalVariablePtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeStamp, LibMCEnv_uint64 nEndTimeStamp, LibMCEnv_uint32 nNumberOfSamples);
 
 /**
 * Returns the incrementing change version of the data series.
@@ -7066,24 +7067,6 @@ typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetVariableNamePtr) (LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
-* Returns the beginning time stamp of the available data point.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pRecordingStartInMicroSeconds - Start Timestamp of Recording in microseconds.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetStartTimeStampPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingStartInMicroSeconds);
-
-/**
-* Returns the beginning time stamp of the available data point.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pRecordingEndInMicroSeconds - End Timestamp of Recording in microseconds.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetEndTimeStampPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMicroSeconds);
-
-/**
 * Computes a single sample at a time. Fails if no data is available at this time value.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
@@ -7287,16 +7270,14 @@ typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetEntryTimePtr) (LibMCEnv_LogEnt
 **************************************************************************************************************************/
 
 /**
-* Retrieves the history of a given variable in the system journal for an arbitrary time interval.
+* Retrieves the history of a given variable in the system journal.
 *
 * @param[in] pJournalHandler - JournalHandler instance.
 * @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
-* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
-* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
 * @param[out] pJournalVariable - Journal Instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable);
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_JournalVariable * pJournalVariable);
 
 /**
 * Retrieves the reference start time of the journal.
@@ -10137,8 +10118,6 @@ typedef struct {
 	PLibMCEnvUniformJournalSampling_GetSamplePtr m_UniformJournalSampling_GetSample;
 	PLibMCEnvUniformJournalSampling_GetAllSamplesPtr m_UniformJournalSampling_GetAllSamples;
 	PLibMCEnvJournalVariable_GetVariableNamePtr m_JournalVariable_GetVariableName;
-	PLibMCEnvJournalVariable_GetStartTimeStampPtr m_JournalVariable_GetStartTimeStamp;
-	PLibMCEnvJournalVariable_GetEndTimeStampPtr m_JournalVariable_GetEndTimeStamp;
 	PLibMCEnvJournalVariable_ComputeDoubleSamplePtr m_JournalVariable_ComputeDoubleSample;
 	PLibMCEnvJournalVariable_ComputeIntegerSamplePtr m_JournalVariable_ComputeIntegerSample;
 	PLibMCEnvAlert_GetUUIDPtr m_Alert_GetUUID;
@@ -10157,7 +10136,7 @@ typedef struct {
 	PLibMCEnvLogEntryList_GetCountPtr m_LogEntryList_GetCount;
 	PLibMCEnvLogEntryList_GetEntryPtr m_LogEntryList_GetEntry;
 	PLibMCEnvLogEntryList_GetEntryTimePtr m_LogEntryList_GetEntryTime;
-	PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr m_JournalHandler_RetrieveJournalVariableFromTimeInterval;
+	PLibMCEnvJournalHandler_RetrieveJournalVariablePtr m_JournalHandler_RetrieveJournalVariable;
 	PLibMCEnvJournalHandler_GetStartTimePtr m_JournalHandler_GetStartTime;
 	PLibMCEnvJournalHandler_GetEndTimePtr m_JournalHandler_GetEndTime;
 	PLibMCEnvJournalHandler_GetJournalLifeTimeInMicrosecondsPtr m_JournalHandler_GetJournalLifeTimeInMicroseconds;

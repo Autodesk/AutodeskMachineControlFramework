@@ -126,10 +126,10 @@ void CRaylaseAPIField::registerVariable(const std::string& sVariableName, size_t
     if (iIter != m_Variables.end ())
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_DUPLICATEAPIVARIABLENAME, "Duplicate API Variable Name: " + sVariableName);
 
-    if (nOffset >= m_Variables.size())
+    if (nOffset >= m_Data.size())
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDVARIABLEOFFSET, "Invalid variable offset: " + std::to_string (nOffset));
 
-    if (nOffset + getVariableSize (variableType) > m_Variables.size())
+    if (nOffset + getVariableSize (variableType) > m_Data.size())
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_VARIABLEEXCEEDSBUFFER, "Variable exceeds buffer: " + std::to_string(nOffset));
 
     m_Variables.insert(std::make_pair(sVariableName, CRaylaseAPIVariable(sVariableName, nOffset, variableType)));
@@ -441,6 +441,31 @@ int64_t CRaylaseAPIField::getInteger(const std::string& sVariableName)
         return (int64_t)*pSource;
     }
 
+    case eRaylaseAPIVariableType::evtEnum8: {
+        if (nOffset + sizeof(uint8_t) > m_Data.size())
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_VARIABLEEXCEEDSBUFFER, "Variable exceeds buffer: " + sVariableName);
+
+        uint8_t* pSource = (uint8_t*)&m_Data.at(nOffset);
+        return (int64_t)*pSource;
+    }
+
+    case eRaylaseAPIVariableType::evtEnum16: {
+        if (nOffset + sizeof(uint16_t) > m_Data.size())
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_VARIABLEEXCEEDSBUFFER, "Variable exceeds buffer: " + sVariableName);
+
+        uint16_t* pSource = (uint16_t*)&m_Data.at(nOffset);
+        return (int64_t)*pSource;
+    }
+
+    case eRaylaseAPIVariableType::evtEnum32: {
+        if (nOffset + sizeof(uint32_t) > m_Data.size())
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_VARIABLEEXCEEDSBUFFER, "Variable exceeds buffer: " + sVariableName);
+
+        uint32_t* pSource = (uint32_t*)&m_Data.at(nOffset);
+        return (int32_t)*pSource;
+    }
+
+
     default:
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEINTEGER, "Variable is not of type integer: " + sVariableName);
 
@@ -625,6 +650,8 @@ std::string CRaylaseAPIField::getVariableValueAsString(const std::string& sName)
         return std::to_string(getBool(sName));
     if (variable.isDouble())
         return std::to_string(getDouble(sName));
+
+    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_VARIABLENOTFOUND, "Variable not found: " + sName);
 }
 
 

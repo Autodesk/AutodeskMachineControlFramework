@@ -1409,6 +1409,100 @@ rlResult CRaylaseSDK::rlLaserSetConfig(rlHandle handle, rlLaserConfig* pConfig)
 
 }
 
+rlResult CRaylaseSDK::rlProcessInitVariables(rlProcessVariables* pVariables)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlProcessInitVariables (" + std::to_string((uintptr_t)pVariables) + ");");
+	}
+
+	return ptrProcessInitVariables(pVariables);
+}
+
+rlResult CRaylaseSDK::rlProcessLoadVariables(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlProcessLoadVariables (" + std::to_string((uintptr_t)handle) + ");");
+	}
+
+	return ptrProcessLoadVariables(handle);
+}
+
+rlResult CRaylaseSDK::rlProcessStoreVariables(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlProcessStoreVariables (" + std::to_string((uintptr_t)handle) + ");");
+	}
+
+	return ptrProcessStoreVariables(handle);
+
+}
+
+rlResult CRaylaseSDK::rlProcessGetVariables(rlHandle handle, rlProcessVariables* pVariables)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlProcessGetVariables (" + std::to_string((uintptr_t)handle) + ");");
+	}
+
+	return ptrProcessGetVariables(handle, pVariables);
+}
+
+rlResult CRaylaseSDK::rlProcessSetVariables(rlHandle handle, rlProcessVariables* pVariables)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlProcessSetVariables (" + std::to_string((uintptr_t)handle) + ");");
+	}
+
+	return ptrProcessSetVariables(handle, pVariables);
+
+}
+
+rlResult CRaylaseSDK::rlScannerInitConfig(rlScannerConfig* pConfig)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlScannerInitConfig (" + std::to_string((uintptr_t)pConfig) + ");");
+	}
+
+	return ptrScannerInitConfig(pConfig);
+
+}
+
+rlResult CRaylaseSDK::rlScannerSetConfig(rlHandle handle, rlScannerConfig* pConfig)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlScannerSetConfig (" + std::to_string((uintptr_t)handle) + ", " + std::to_string((uintptr_t)pConfig) + ");");
+	}
+
+	return ptrScannerSetConfig(handle, pConfig);
+
+}
+
+rlResult CRaylaseSDK::rlScannerGetConfig(rlHandle handle, rlScannerConfig* pConfig)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlScannerGetConfig (" + std::to_string((uintptr_t)handle) + ", " + std::to_string((uintptr_t)pConfig) + ");");
+	}
+
+	return ptrScannerGetConfig(handle, pConfig);
+
+}
+
+rlResult CRaylaseSDK::rlScannerLoadConfig(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlScannerLoadConfig (" + std::to_string((uintptr_t)handle) + ");");
+	}
+
+	return ptrScannerLoadConfig(handle);
+}
+
+rlResult CRaylaseSDK::rlScannerStoreConfig(rlHandle handle)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlScannerStoreConfig (" + std::to_string((uintptr_t)handle) + ");");
+	}
+
+	return ptrScannerStoreConfig(handle);
+}
 
 uint32_t CRaylaseSDK::rlGpioConfigMemorySize()
 {		

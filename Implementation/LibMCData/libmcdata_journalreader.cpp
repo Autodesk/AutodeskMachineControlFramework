@@ -90,7 +90,7 @@ double CJournalReaderVariable::getUnits()
 CJournalReaderAlias::CJournalReaderAlias(const std::string& sAliasName, PJournalReaderVariable pSourceVariable)
     : m_sAliasName (sAliasName), m_pSourceVariable (pSourceVariable)
 {
-    if (pSourceVariable.get())
+    if (pSourceVariable.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
 }

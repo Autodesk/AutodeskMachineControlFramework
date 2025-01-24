@@ -1507,7 +1507,7 @@ public:
 	inline LibMCEnv_uint64 GetMaximum();
 	inline void GetAllEntries(std::vector<sTimeStreamEntry> & EntryArrayBuffer);
 	inline void SetAllEntries(const CInputVector<sTimeStreamEntry> & EntryArrayBuffer);
-	inline void SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta);
+	inline void SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples);
 	inline LibMCEnv_uint32 GetVersion();
 	inline void IncreaseVersion();
 };
@@ -2681,8 +2681,6 @@ public:
 	}
 	
 	inline std::string GetVariableName();
-	inline LibMCEnv_uint64 GetStartTimeStamp();
-	inline LibMCEnv_uint64 GetEndTimeStamp();
 	inline LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
 	inline LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
 };
@@ -2765,7 +2763,7 @@ public:
 	{
 	}
 	
-	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
+	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName);
 	inline PDateTime GetStartTime();
 	inline PDateTime GetEndTime();
 	inline LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds();
@@ -3780,8 +3778,6 @@ public:
 		pWrapperTable->m_UniformJournalSampling_GetSample = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetAllSamples = nullptr;
 		pWrapperTable->m_JournalVariable_GetVariableName = nullptr;
-		pWrapperTable->m_JournalVariable_GetStartTimeStamp = nullptr;
-		pWrapperTable->m_JournalVariable_GetEndTimeStamp = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeDoubleSample = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeIntegerSample = nullptr;
 		pWrapperTable->m_Alert_GetUUID = nullptr;
@@ -3800,7 +3796,7 @@ public:
 		pWrapperTable->m_LogEntryList_GetCount = nullptr;
 		pWrapperTable->m_LogEntryList_GetEntry = nullptr;
 		pWrapperTable->m_LogEntryList_GetEntryTime = nullptr;
-		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = nullptr;
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
 		pWrapperTable->m_JournalHandler_GetStartTime = nullptr;
 		pWrapperTable->m_JournalHandler_GetEndTime = nullptr;
 		pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds = nullptr;
@@ -9956,24 +9952,6 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_GetStartTimeStamp = (PLibMCEnvJournalVariable_GetStartTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getstarttimestamp");
-		#else // _WIN32
-		pWrapperTable->m_JournalVariable_GetStartTimeStamp = (PLibMCEnvJournalVariable_GetStartTimeStampPtr) dlsym(hLibrary, "libmcenv_journalvariable_getstarttimestamp");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_GetStartTimeStamp == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_GetEndTimeStamp = (PLibMCEnvJournalVariable_GetEndTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getendtimestamp");
-		#else // _WIN32
-		pWrapperTable->m_JournalVariable_GetEndTimeStamp = (PLibMCEnvJournalVariable_GetEndTimeStampPtr) dlsym(hLibrary, "libmcenv_journalvariable_getendtimestamp");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_JournalVariable_ComputeDoubleSample = (PLibMCEnvJournalVariable_ComputeDoubleSamplePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computedoublesample");
 		#else // _WIN32
 		pWrapperTable->m_JournalVariable_ComputeDoubleSample = (PLibMCEnvJournalVariable_ComputeDoubleSamplePtr) dlsym(hLibrary, "libmcenv_journalvariable_computedoublesample");
@@ -10136,12 +10114,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval");
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
 		#else // _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval");
+		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = (PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalvariable");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval == nullptr)
+		if (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -14584,14 +14562,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetVariableName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_getstarttimestamp", (void**)&(pWrapperTable->m_JournalVariable_GetStartTimeStamp));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetStartTimeStamp == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_getendtimestamp", (void**)&(pWrapperTable->m_JournalVariable_GetEndTimeStamp));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_computedoublesample", (void**)&(pWrapperTable->m_JournalVariable_ComputeDoubleSample));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeDoubleSample == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -14664,8 +14634,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetEntryTime == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariablefromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariable", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_getstarttime", (void**)&(pWrapperTable->m_JournalHandler_GetStartTime));
@@ -17106,13 +17076,14 @@ public:
 	/**
 	* CDataSeries::SampleJournalVariable - Samples a journal variable.
 	* @param[in] pJournalVariable - Journal variable to sample.
-	* @param[in] nNumberOfSamples - Number of samples to generate.
-	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	* @param[in] nStartTimeStamp - Start time stamp to sample. MUST be smaller than end time stamp.
+	* @param[in] nEndTimeStamp - End time stamp to sample. MUST be larger than start time stamp.
+	* @param[in] nNumberOfSamples - Number of samples to generate. MUST be greater than 1.
 	*/
-	void CDataSeries::SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta)
+	void CDataSeries::SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples)
 	{
 		LibMCEnvHandle hJournalVariable = pJournalVariable.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_SampleJournalVariable(m_pHandle, hJournalVariable, nNumberOfSamples, dMovingAverageDelta));
+		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_SampleJournalVariable(m_pHandle, hJournalVariable, nStartTimeStamp, nEndTimeStamp, nNumberOfSamples));
 	}
 	
 	/**
@@ -24369,30 +24340,6 @@ public:
 	}
 	
 	/**
-	* CJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return Start Timestamp of Recording in microseconds.
-	*/
-	LibMCEnv_uint64 CJournalVariable::GetStartTimeStamp()
-	{
-		LibMCEnv_uint64 resultRecordingStartInMicroSeconds = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetStartTimeStamp(m_pHandle, &resultRecordingStartInMicroSeconds));
-		
-		return resultRecordingStartInMicroSeconds;
-	}
-	
-	/**
-	* CJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return End Timestamp of Recording in microseconds.
-	*/
-	LibMCEnv_uint64 CJournalVariable::GetEndTimeStamp()
-	{
-		LibMCEnv_uint64 resultRecordingEndInMicroSeconds = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetEndTimeStamp(m_pHandle, &resultRecordingEndInMicroSeconds));
-		
-		return resultRecordingEndInMicroSeconds;
-	}
-	
-	/**
 	* CJournalVariable::ComputeDoubleSample - Computes a single sample at a time. Fails if no data is available at this time value.
 	* @param[in] nTimeInMicroSeconds - Timestamp to check.
 	* @return Value of the variable at the time step.
@@ -24659,16 +24606,14 @@ public:
 	 */
 	
 	/**
-	* CJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
+	* CJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
-	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
 	* @return Journal Instance.
 	*/
-	PJournalVariable CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+	PJournalVariable CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName)
 	{
 		LibMCEnvHandle hJournalVariable = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariableFromTimeInterval(m_pHandle, sVariableName.c_str(), nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hJournalVariable));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), &hJournalVariable));
 		
 		if (!hJournalVariable) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

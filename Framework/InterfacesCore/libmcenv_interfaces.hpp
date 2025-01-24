@@ -1458,10 +1458,11 @@ public:
 	/**
 	* IDataSeries::SampleJournalVariable - Samples a journal variable.
 	* @param[in] pJournalVariable - Journal variable to sample.
-	* @param[in] nNumberOfSamples - Number of samples to generate.
-	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	* @param[in] nStartTimeStamp - Start time stamp to sample. MUST be smaller than end time stamp.
+	* @param[in] nEndTimeStamp - End time stamp to sample. MUST be larger than start time stamp.
+	* @param[in] nNumberOfSamples - Number of samples to generate. MUST be greater than 1.
 	*/
-	virtual void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta) = 0;
+	virtual void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples) = 0;
 
 	/**
 	* IDataSeries::GetVersion - Returns the incrementing change version of the data series.
@@ -5588,18 +5589,6 @@ public:
 	virtual std::string GetVariableName() = 0;
 
 	/**
-	* IJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return Start Timestamp of Recording in microseconds.
-	*/
-	virtual LibMCEnv_uint64 GetStartTimeStamp() = 0;
-
-	/**
-	* IJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return End Timestamp of Recording in microseconds.
-	*/
-	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
-
-	/**
 	* IJournalVariable::ComputeDoubleSample - Computes a single sample at a time. Fails if no data is available at this time value.
 	* @param[in] nTimeInMicroSeconds - Timestamp to check.
 	* @return Value of the variable at the time step.
@@ -5761,13 +5750,11 @@ typedef IBaseSharedPtr<ILogEntryList> PILogEntryList;
 class IJournalHandler : public virtual IBase {
 public:
 	/**
-	* IJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
+	* IJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
-	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
 	* @return Journal Instance.
 	*/
-	virtual IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
+	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName) = 0;
 
 	/**
 	* IJournalHandler::GetStartTime - Retrieves the reference start time of the journal.

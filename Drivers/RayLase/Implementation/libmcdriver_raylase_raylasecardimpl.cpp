@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CRaylaseCard
 #include "libmcdriver_raylase_apifield.hpp"
 #include "../SDKSchema/libmcdriver_raylase_processvariables_8.hpp"
 #include "../SDKSchema/libmcdriver_raylase_laserconfig_8.hpp"
+#include "../SDKSchema/libmcdriver_raylase_scannerconfig_12.hpp"
 
 
 using namespace LibMCDriver_Raylase::Impl;
@@ -104,19 +105,48 @@ void CRaylaseCardImpl::ResetToSystemDefaults()
         return;
 
     m_pSDK->checkError(m_pSDK->rlSystemResetToDefaults(m_Handle));
-/*
-    CRaylaseAPIField_rlLaserConfig_v8 laserConfig;
+
+    /*CRaylaseAPIField_rlLaserConfig_v8 laserConfig;
     m_pSDK->checkError(m_pSDK->rlLaserInitConfig((rlLaserConfig*)laserConfig.getData()));
     m_pSDK->checkError(m_pSDK->rlLaserGetConfig(m_Handle, (rlLaserConfig*)laserConfig.getData()));
 
-    uint32_t nCount = laserConfig.getVariableCount();
-    for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+    CRaylaseAPIField_rlProcessVariables_v17 processVariables;
+    m_pSDK->checkError(m_pSDK->rlProcessInitVariables((rlProcessVariables*)processVariables.getData()));
+    m_pSDK->checkError(m_pSDK->rlProcessGetVariables(m_Handle, (rlProcessVariables*)processVariables.getData()));
+
+    CRaylaseAPIField_rlScannerConfig_v12 scannerConfig;
+    m_pSDK->checkError(m_pSDK->rlScannerInitConfig((rlScannerConfig*)scannerConfig.getData()));
+    m_pSDK->checkError(m_pSDK->rlScannerGetConfig(m_Handle, (rlScannerConfig*)scannerConfig.getData()));
+
+    laserConfig.setDouble("FpsStart", 40.0);
+
+    m_pSDK->checkError(m_pSDK->rlScannerSetConfig(m_Handle, (rlScannerConfig*)scannerConfig.getData()));
+    m_pSDK->checkError(m_pSDK->rlScannerStoreConfig(m_Handle));
+    m_pSDK->checkError(m_pSDK->rlScannerGetConfig(m_Handle, (rlScannerConfig*)scannerConfig.getData()));
+
+
+    m_pDriverEnvironment->LogMessage("Laser Config:");
+    uint32_t nLaserCount = laserConfig.getVariableCount();
+    for (uint32_t nIndex = 0; nIndex < nLaserCount; nIndex++) {
         std::string sName = laserConfig.getVariableName(nIndex);
-        m_pDriverEnvironment->LogMessage("Laser Config:");
         m_pDriverEnvironment->LogMessage(" -" + sName + ": " + laserConfig.getVariableValueAsString (sName));
+    } 
+
+    m_pDriverEnvironment->LogMessage("Process Config:");
+    uint32_t nProcessCount = processVariables.getVariableCount();
+    for (uint32_t nIndex = 0; nIndex < nProcessCount; nIndex++) {
+        std::string sName = processVariables.getVariableName(nIndex);
+        m_pDriverEnvironment->LogMessage(" -" + sName + ": " + processVariables.getVariableValueAsString(sName));
     }
 
+    m_pDriverEnvironment->LogMessage("Scanner Config:");
+    uint32_t nScannerCount = scannerConfig.getVariableCount();
+    for (uint32_t nIndex = 0; nIndex < nScannerCount; nIndex++) {
+        std::string sName = scannerConfig.getVariableName(nIndex);
+        m_pDriverEnvironment->LogMessage(" -" + sName + ": " + scannerConfig.getVariableValueAsString(sName));
+    }
     */
+
 }
 
 void CRaylaseCardImpl::EnableCommandLogging()
