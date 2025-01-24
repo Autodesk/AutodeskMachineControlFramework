@@ -286,6 +286,9 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 		for (let quadindex = 0; quadindex < this.quadcount; quadindex++) {
 			this.xcoordinates[quadindex] = [];
 			this.ycoordinates[quadindex] = [];
+			this.quadgeometries[quadindex] = [];
+			this.quadmaterials[quadindex] = [];
+			this.glelements[quadindex] = [];			
 		}
 			
 
