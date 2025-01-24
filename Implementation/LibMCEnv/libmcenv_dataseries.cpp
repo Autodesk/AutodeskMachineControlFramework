@@ -174,6 +174,7 @@ void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, cons
 	uint64_t nDeltaTime = nEndTimeStamp - nStartTimeStamp;
 
 	if (nDeltaTime > 0) {
+		//auto pSampling = pJournalVariableImpl->ComputeUniformAverageSamples(nStartTimeStamp, nEndTimeStamp, nNumberOfSamples, dMovingAverageDelta, true);
 		entries.resize(nNumberOfSamples);
 
 		for (uint32_t nIndex = 0; nIndex < nNumberOfSamples; nIndex++) {
