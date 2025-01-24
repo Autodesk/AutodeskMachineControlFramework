@@ -272,6 +272,7 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 		this.glelements = [];
 		this.xcoordinates = [];
 		this.ycoordinates = [];
+		this.pointids = [];
 		
 		this.originx = originx;
 		this.originy = originy;
@@ -286,9 +287,10 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 		for (let quadindex = 0; quadindex < this.quadcount; quadindex++) {
 			this.xcoordinates[quadindex] = [];
 			this.ycoordinates[quadindex] = [];
-			this.quadgeometries[quadindex] = [];
-			this.quadmaterials[quadindex] = [];
-			this.glelements[quadindex] = [];			
+			this.pointids[quadindex] = [];
+			this.quadgeometries[quadindex] = null;
+			this.quadmaterials[quadindex] = null;
+			this.glelements[quadindex] = null;			
 		}
 			
 
@@ -309,7 +311,8 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 			
 			let quadindex = quadx + quady * quadcountx;
 			this.xcoordinates[quadindex].push (x);
-			this.ycoordinates[quadindex].push (y)	
+			this.ycoordinates[quadindex].push (y);
+			this.pointids[quadindex].push (i);
 		}
 		
 		
@@ -388,8 +391,13 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 		if (!this.glelement)
 			return -1;
 		
-		let quadx = Math.floor ( (mouseX - this.originx) / this.quadsizex);
-		let quady = Math.floor ( (mouseY - this.originy) / this.quadsizey);
+		let localmouseX = (mouseX - this.position.x) / this.scale.x;
+		let localmouseY = (mouseY - this.position.y) / this.scale.y;
+		
+		console.log (mouseX + " " + mouseY + ": " + localmouseX + " " + localmouseY);
+		
+		let quadx = Math.floor ( (localmouseX - this.originx) / this.quadsizex);
+		let quady = Math.floor ( (localmouseY - this.originy) / this.quadsizey);
 			
 		if (quadx < 0) quadx = 0;
 		if (quady < 0) quady = 0;
@@ -397,7 +405,8 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 		if (quady >= this.quadcounty) quady = this.quadcounty - 1;
 		
 		let quadindex = quadx + quady * this.quadcountx;
-		if (this.glelements[quadindex]) {
+		let quadglelement = this.glelements[quadindex];
+		if (quadglelement) {
 		
 			const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
 			const rayDirection = new THREE.Vector3(0, 0, 1);
@@ -405,15 +414,20 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 			raycaster.ray.origin.copy(rayOrigin);
 			raycaster.ray.direction.copy(rayDirection);                
 			
-			const collisionsPoints = raycaster.intersectObject(this.glelements[quadindex]);
+			const collisionsPoints = raycaster.intersectObject(quadglelement);
 			
 			if (collisionsPoints.length > 0) {
 				let faceIndex = collisionsPoints[0].faceIndex;
+				let localPointIndex;
 				if (faceIndex % 2 !== 0) {
-					return (faceIndex - 1) / 2;
+					localPointIndex = (faceIndex - 1) / 2;
 				} else {
-					return faceIndex / 2;
+					localPointIndex = faceIndex / 2;
 				}
+				
+				let pointID = this.pointids[quadindex][localPointIndex];
+				
+				return pointID;
 				
 			} else {
 				return -1;

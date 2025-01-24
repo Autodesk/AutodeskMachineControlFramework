@@ -309,7 +309,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 										
 										if (this.LayerViewerInstance) {
 											//this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000);										
-											this.LayerViewerInstance.glInstance.add2DLocalizedPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000, false, -200, -200, 2, 2, 400, 400);										
+											this.LayerViewerInstance.glInstance.add2DLocalizedPointsGeometry("layerdata_points", pointcoordinates, 61, this.LayerViewerInstance.lineScaleLevel * 0.01, 0xff0000, false, -200, -200, 2, 2, 400, 400);										
 											this.LayerViewerInstance.updateTransform ();
 											this.LayerViewerInstance.RenderScene (true);
 										}
@@ -474,45 +474,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						const mouseY = event.clientY - renderElementPosition.top;
 
 						let pointIndex = this.LayerViewerInstance.glInstance.getRaycasterCollisions ("layerdata_points", mouseX, mouseY);
-						if (pointIndex > 0) {
-							alert (pointIndex);
-						}		
-
-						let lineIndex = this.LayerViewerInstance.glInstance.getRaycasterCollisions ("layerdata_lines", mouseX, mouseY);
-						if (lineIndex < 0) {
-						
-							let deltaX = this.lastMouseX - mouseX;
-							let deltaY = this.lastMouseY - mouseY;
-							
-							if ((Math.abs (deltaX) > 10) || (Math.abs (deltaY) > 10)) {
-						
-								infoboxDiv.style.display = 'none';
-								infoboxDiv.innerText = '---';
-								return;
-								
-							}
-						
-						} else {
+						if (pointIndex >= 0) {
 							this.lastMouseX = mouseX;
 							this.lastMouseY = mouseY;
-							
-							if (this.LayerViewerInstance.linesCoordinates.length > 0) {
-								const x1 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4];
-								const y1 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4 + 1];
-								const x2 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4 + 2];
-								const y2 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4 + 3];
-								
-								const laserpower = this.LayerViewerInstance.segmentProperties[lineIndex].laserpower;
-
-								infoboxDiv.innerText = `Line ID = ${lineIndex.toFixed(0)}\n${x1.toFixed(3)} / ${y1.toFixed(3)} - ${x2.toFixed(3)} / ${y2.toFixed(3)} mm\n${laserpower.toFixed(0)}W`;
-								infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
-							}
-							
+							infoboxDiv.innerText = `Point ID = ${pointIndex.toFixed(0)}\n`;
+							infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
 							infoboxDiv.style.display = 'flex';
 							infoboxDiv.style.left = `${mouseX}px`;
 							infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`; 
 							
-						} 
+						} else {		 
+
+							let lineIndex = this.LayerViewerInstance.glInstance.getRaycasterCollisions ("layerdata_lines", mouseX, mouseY);
+							if (lineIndex >= 0) {
+
+								this.lastMouseX = mouseX;
+								this.lastMouseY = mouseY;
+								
+								if (this.LayerViewerInstance.linesCoordinates.length > 0) {
+									const x1 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4];
+									const y1 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4 + 1];
+									const x2 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4 + 2];
+									const y2 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4 + 3];
+									
+									const laserpower = this.LayerViewerInstance.segmentProperties[lineIndex].laserpower;
+
+									infoboxDiv.innerText = `Line ID = ${lineIndex.toFixed(0)}\n${x1.toFixed(3)} / ${y1.toFixed(3)} - ${x2.toFixed(3)} / ${y2.toFixed(3)} mm\n${laserpower.toFixed(0)}W`;
+									infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+								}
+								
+								infoboxDiv.style.display = 'flex';
+								infoboxDiv.style.left = `${mouseX}px`;
+								infoboxDiv.style.top = `${mouseY - infoboxDiv.getBoundingClientRect().height}px`; 
+							
+							} else {
+							
+								let deltaX = this.lastMouseX - mouseX;
+								let deltaY = this.lastMouseY - mouseY;
+								
+								if ((Math.abs (deltaX) > 10) || (Math.abs (deltaY) > 10)) {
+							
+									infoboxDiv.style.display = 'none';
+									infoboxDiv.innerText = '---';
+									return;
+									
+								}
+								
+							} 
+						
+						}
 									
 
 	
