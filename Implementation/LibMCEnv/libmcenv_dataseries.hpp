@@ -81,8 +81,8 @@ public:
 
 	void SetAllEntries(const LibMCEnv_uint64 nEntryArrayBufferSize, const LibMCEnv::sTimeStreamEntry * pEntryArrayBuffer) override;
 
-	void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta) override;
-
+	void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples) override;
+	
 	LibMCEnv_uint32 GetVersion() override;
 
 	void IncreaseVersion() override;

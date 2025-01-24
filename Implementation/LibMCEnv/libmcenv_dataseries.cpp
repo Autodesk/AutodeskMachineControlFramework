@@ -152,7 +152,7 @@ void CDataSeries::SetAllEntries(const LibMCEnv_uint64 nEntryArrayBufferSize, con
 	}
 }
 
-void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta)
+void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples) 
 {
 	m_pDataSeries->increaseVersion();
 	auto& entries = m_pDataSeries->getEntries();
@@ -168,12 +168,12 @@ void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, cons
 	if (pJournalVariableImpl == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 
-	uint64_t nStartTimeStamp = pJournalVariableImpl->GetStartTimeStamp();
-	uint64_t nEndTimeStamp = pJournalVariableImpl->GetEndTimeStamp();
+	if (nEndTimeStamp < nStartTimeStamp)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL);
+
 	uint64_t nDeltaTime = nEndTimeStamp - nStartTimeStamp;
 
 	if (nDeltaTime > 0) {
-		//auto pSampling = pJournalVariableImpl->ComputeUniformAverageSamples(nStartTimeStamp, nEndTimeStamp, nNumberOfSamples, dMovingAverageDelta, true);
 		entries.resize(nNumberOfSamples);
 
 		for (uint32_t nIndex = 0; nIndex < nNumberOfSamples; nIndex++) {

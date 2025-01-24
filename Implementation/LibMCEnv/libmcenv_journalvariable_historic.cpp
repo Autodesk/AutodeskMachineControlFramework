@@ -43,17 +43,14 @@ using namespace LibMCEnv::Impl;
 /*************************************************************************************************************************
  Class definition of CJournalVariable 
 **************************************************************************************************************************/
-CJournalVariable_Historic::CJournalVariable_Historic(AMC::PStateJournalReader pJournalReader, const std::string& sVariableName, AMC::sStateJournalInterval interval)
-    : m_pJournalReader (pJournalReader), m_sVariableName (sVariableName), m_Interval (interval)
+CJournalVariable_Historic::CJournalVariable_Historic(AMC::PStateJournalReader pJournalReader, const std::string& sVariableName)
+    : m_pJournalReader (pJournalReader), m_sVariableName (sVariableName)
 {
     if (pJournalReader.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
     if (sVariableName.empty())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYJOURNALVARIABLENAME);
-
-    if (interval.m_nStartTimeInMicroSeconds >= interval.m_nEndTimeInMicroSeconds)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL);
 
 }
 
@@ -66,17 +63,6 @@ std::string CJournalVariable_Historic::GetVariableName()
 {
     return m_sVariableName;
 }
-
-LibMCEnv_uint64 CJournalVariable_Historic::GetStartTimeStamp()
-{
-    return m_Interval.m_nStartTimeInMicroSeconds;
-}
-
-LibMCEnv_uint64 CJournalVariable_Historic::GetEndTimeStamp()
-{
-    return m_Interval.m_nEndTimeInMicroSeconds;
-}
-
 
 LibMCEnv_double CJournalVariable_Historic::ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
 {

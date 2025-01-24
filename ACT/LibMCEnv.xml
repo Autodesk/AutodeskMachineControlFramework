@@ -1157,8 +1157,9 @@
 		
 		<method name="SampleJournalVariable" description="Samples a journal variable.">
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="in" description="Journal variable to sample." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to generate." />
-			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
+			<param name="StartTimeStamp" type="uint64" pass="in" description="Start time stamp to sample. MUST be smaller than end time stamp." />
+			<param name="EndTimeStamp" type="uint64" pass="in" description="End time stamp to sample. MUST be larger than start time stamp." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to generate. MUST be greater than 1." />
 		</method>
 		
 		<method name="GetVersion" description="Returns the incrementing change version of the data series.">
@@ -3937,15 +3938,7 @@
 		<method name="GetVariableName" description="returns the name of the recorded variable.">
 			<param name="Name" type="string" pass="return" description="Path or name." />
 		</method>
-		
-		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
-			<param name="RecordingStartInMicroSeconds" type="uint64" pass="return" description="Start Timestamp of Recording in microseconds." />
-		</method>
-	
-		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
-			<param name="RecordingEndInMicroSeconds" type="uint64" pass="return" description="End Timestamp of Recording in microseconds." />
-		</method>
-		
+					
 		<method name="ComputeDoubleSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
 			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
 			<param name="SampleValue" type="double" pass="return" description="Value of the variable at the time step." />
@@ -4042,10 +4035,8 @@
 
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
 				
-		<method name="RetrieveJournalVariableFromTimeInterval" description = "Retrieves the history of a given variable in the system journal for an arbitrary time interval.">
+		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
 			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval." />
-			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
 						

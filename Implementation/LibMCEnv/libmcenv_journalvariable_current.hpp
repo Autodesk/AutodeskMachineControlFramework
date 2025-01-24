@@ -60,18 +60,13 @@ private:
 
     AMC::PStateJournal m_pStateJournal;
     std::string m_sVariableName;
-    AMC::sStateJournalInterval m_Interval;
 
 public:
-    CJournalVariable_Current(AMC::PStateJournal pStateJournal, const std::string & sVariableName, AMC::sStateJournalInterval interval);
+    CJournalVariable_Current(AMC::PStateJournal pStateJournal, const std::string & sVariableName);
 
 	virtual ~CJournalVariable_Current();
 
 	std::string GetVariableName() override;
-
-	LibMCEnv_uint64 GetStartTimeStamp() override;
-
-	LibMCEnv_uint64 GetEndTimeStamp() override;
 
     LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds) override;
 

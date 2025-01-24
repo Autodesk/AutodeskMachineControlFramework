@@ -60,19 +60,14 @@ class CJournalVariable_Historic : public virtual IJournalVariable, public virtua
 private:
 
     std::string m_sVariableName;
-    AMC::sStateJournalInterval m_Interval;
     AMC::PStateJournalReader m_pJournalReader;
 
 public:
-    CJournalVariable_Historic(AMC::PStateJournalReader pJournalReader, const std::string& sVariableName, AMC::sStateJournalInterval interval);
+    CJournalVariable_Historic(AMC::PStateJournalReader pJournalReader, const std::string& sVariableName);
 
 	virtual ~CJournalVariable_Historic();
 
 	std::string GetVariableName() override;
-
-	LibMCEnv_uint64 GetStartTimeStamp() override;
-
-	LibMCEnv_uint64 GetEndTimeStamp() override;
 
     LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds) override;
 

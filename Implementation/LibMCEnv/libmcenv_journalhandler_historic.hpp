@@ -68,7 +68,7 @@ public:
 
     virtual ~CJournalHandler_Historic();
 
-	IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
+    IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName) override;
 
     IDateTime* GetStartTime() override;
 

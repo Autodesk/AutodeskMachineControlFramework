@@ -58,13 +58,9 @@ CJournalHandler_Current::~CJournalHandler_Current()
 }
 
 
-IJournalVariable* CJournalHandler_Current::RetrieveJournalVariableFromTimeInterval(const std::string& sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+IJournalVariable* CJournalHandler_Current::RetrieveJournalVariable(const std::string& sVariableName)
 {
-	AMC::sStateJournalInterval interval;
-	interval.m_nStartTimeInMicroSeconds = nStartTimeInMicroseconds;
-	interval.m_nEndTimeInMicroSeconds = nEndTimeInMicroseconds;
-
-	return new CJournalVariable_Current(m_pStateJournal, sVariableName, interval);
+	return new CJournalVariable_Current(m_pStateJournal, sVariableName);
 }
 
 
