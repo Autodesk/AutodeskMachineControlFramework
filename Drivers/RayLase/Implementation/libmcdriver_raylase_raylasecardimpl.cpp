@@ -104,9 +104,12 @@ void CRaylaseCardImpl::ResetToSystemDefaults()
     if (m_bSimulationMode)
         return;
 
-    m_pSDK->checkError(m_pSDK->rlSystemResetToDefaults(m_Handle));
+    //m_pSDK->checkError(m_pSDK->rlSystemResetToDefaults(m_Handle));
+    m_pSDK->checkError(m_pSDK->rlScannerLoadConfig(m_Handle));
+    m_pSDK->checkError(m_pSDK->rlLaserLoadConfig(m_Handle));
+    m_pSDK->checkError(m_pSDK->rlProcessLoadVariables(m_Handle));
 
-    /*CRaylaseAPIField_rlLaserConfig_v8 laserConfig;
+    CRaylaseAPIField_rlLaserConfig_v8 laserConfig;
     m_pSDK->checkError(m_pSDK->rlLaserInitConfig((rlLaserConfig*)laserConfig.getData()));
     m_pSDK->checkError(m_pSDK->rlLaserGetConfig(m_Handle, (rlLaserConfig*)laserConfig.getData()));
 
@@ -118,11 +121,11 @@ void CRaylaseCardImpl::ResetToSystemDefaults()
     m_pSDK->checkError(m_pSDK->rlScannerInitConfig((rlScannerConfig*)scannerConfig.getData()));
     m_pSDK->checkError(m_pSDK->rlScannerGetConfig(m_Handle, (rlScannerConfig*)scannerConfig.getData()));
 
-    laserConfig.setDouble("FpsStart", 40.0);
+    /*laserConfig.setDouble("FpsStart", 40.0);
 
     m_pSDK->checkError(m_pSDK->rlScannerSetConfig(m_Handle, (rlScannerConfig*)scannerConfig.getData()));
     m_pSDK->checkError(m_pSDK->rlScannerStoreConfig(m_Handle));
-    m_pSDK->checkError(m_pSDK->rlScannerGetConfig(m_Handle, (rlScannerConfig*)scannerConfig.getData()));
+    m_pSDK->checkError(m_pSDK->rlScannerGetConfig(m_Handle, (rlScannerConfig*)scannerConfig.getData())); */
 
 
     m_pDriverEnvironment->LogMessage("Laser Config:");
@@ -145,7 +148,7 @@ void CRaylaseCardImpl::ResetToSystemDefaults()
         std::string sName = scannerConfig.getVariableName(nIndex);
         m_pDriverEnvironment->LogMessage(" -" + sName + ": " + scannerConfig.getVariableValueAsString(sName));
     }
-    */
+    
 
 }
 
