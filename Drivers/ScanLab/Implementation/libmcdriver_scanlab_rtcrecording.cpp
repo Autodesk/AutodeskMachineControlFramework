@@ -165,3 +165,9 @@ double CRTCRecording::BacktransformRawZCoordinate(const int32_t nRawCoordinateZ)
 	return m_pInstance->backtransformRawZCoordinate(nRawCoordinateZ);
 
 }
+
+void CRTCRecording::AddTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY)
+{
+	m_pInstance->addTargetPositionsToDataTable(pDataTable, sColumnIdentifierX, sColumnDescriptionX, sColumnIdentifierY, sColumnDescriptionY);
+}
+

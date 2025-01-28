@@ -101,6 +101,8 @@ public:
 
 	double BacktransformRawZCoordinate(const int32_t nRawCoordinateZ) override;
 
+	void AddTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY) override;
+
 };
 
 } // namespace Impl

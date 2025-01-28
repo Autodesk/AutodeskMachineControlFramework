@@ -1376,6 +1376,47 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_backtransformrawzcoor
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addtargetpositionstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifierX, const char * pColumnDescriptionX, const char * pColumnIdentifierY, const char * pColumnDescriptionY)
+{
+	IBase* pIBaseClass = (IBase *)pRTCRecording;
+
+	try {
+		if (pColumnIdentifierX == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pColumnDescriptionX == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pColumnIdentifierY == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pColumnDescriptionY == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		LibMCEnv::PDataTable pIDataTable = std::make_shared<LibMCEnv::CDataTable>(CWrapper::sPLibMCEnvWrapper.get(), pDataTable);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDataTable.get());
+		if (!pIDataTable)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		std::string sColumnIdentifierX(pColumnIdentifierX);
+		std::string sColumnDescriptionX(pColumnDescriptionX);
+		std::string sColumnIdentifierY(pColumnIdentifierY);
+		std::string sColumnDescriptionY(pColumnDescriptionY);
+		IRTCRecording* pIRTCRecording = dynamic_cast<IRTCRecording*>(pIBaseClass);
+		if (!pIRTCRecording)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCRecording->AddTargetPositionsToDataTable(pIDataTable, sColumnIdentifierX, sColumnDescriptionX, sColumnIdentifierY, sColumnDescriptionY);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for GPIOSequence
@@ -7279,6 +7320,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_addbacktransformedzpositionstodatatable;
 	if (sProcName == "libmcdriver_scanlab_rtcrecording_backtransformrawzcoordinate") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_backtransformrawzcoordinate;
+	if (sProcName == "libmcdriver_scanlab_rtcrecording_addtargetpositionstodatatable") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcrecording_addtargetpositionstodatatable;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_getidentifier") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_gpiosequence_getidentifier;
 	if (sProcName == "libmcdriver_scanlab_gpiosequence_clear") 

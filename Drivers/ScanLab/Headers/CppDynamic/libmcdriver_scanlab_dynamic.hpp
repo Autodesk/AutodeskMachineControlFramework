@@ -807,6 +807,7 @@ public:
 	inline void BacktransformRawXYCoordinates(const LibMCDriver_ScanLab_int32 nRawCoordinateX, const LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double & dBacktransformedX, LibMCDriver_ScanLab_double & dBacktransformedY);
 	inline void AddBacktransformedZPositionsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifierZ, const std::string & sColumnDescriptionZ);
 	inline LibMCDriver_ScanLab_double BacktransformRawZCoordinate(const LibMCDriver_ScanLab_int32 nRawCoordinateZ);
+	inline void AddTargetPositionsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifierX, const std::string & sColumnDescriptionX, const std::string & sColumnIdentifierY, const std::string & sColumnDescriptionY);
 };
 	
 /*************************************************************************************************************************
@@ -1304,6 +1305,7 @@ public:
 		pWrapperTable->m_RTCRecording_BacktransformRawXYCoordinates = nullptr;
 		pWrapperTable->m_RTCRecording_AddBacktransformedZPositionsToDataTable = nullptr;
 		pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate = nullptr;
+		pWrapperTable->m_RTCRecording_AddTargetPositionsToDataTable = nullptr;
 		pWrapperTable->m_GPIOSequence_GetIdentifier = nullptr;
 		pWrapperTable->m_GPIOSequence_Clear = nullptr;
 		pWrapperTable->m_GPIOSequence_AddOutput = nullptr;
@@ -1972,6 +1974,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_AddTargetPositionsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddTargetPositionsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_addtargetpositionstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_AddTargetPositionsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddTargetPositionsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_addtargetpositionstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_AddTargetPositionsToDataTable == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4182,6 +4193,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_addtargetpositionstodatatable", (void**)&(pWrapperTable->m_RTCRecording_AddTargetPositionsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_AddTargetPositionsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_getidentifier", (void**)&(pWrapperTable->m_GPIOSequence_GetIdentifier));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GPIOSequence_GetIdentifier == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5605,6 +5620,20 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_BacktransformRawZCoordinate(m_pHandle, nRawCoordinateZ, &resultBacktransformedZ));
 		
 		return resultBacktransformedZ;
+	}
+	
+	/**
+	* CRTCRecording::AddTargetPositionsToDataTable - Writes target positions to a data table as double columns. Fails if Channels of types Target X and Target Y do not both exist.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierX - Identifier of the X Column.
+	* @param[in] sColumnDescriptionX - Description of the X Column.
+	* @param[in] sColumnIdentifierY - Identifier of the X Column.
+	* @param[in] sColumnDescriptionY - Description of the X Column.
+	*/
+	void CRTCRecording::AddTargetPositionsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifierX, const std::string & sColumnDescriptionX, const std::string & sColumnIdentifierY, const std::string & sColumnDescriptionY)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_AddTargetPositionsToDataTable(m_pHandle, hDataTable, sColumnIdentifierX.c_str(), sColumnDescriptionX.c_str(), sColumnIdentifierY.c_str(), sColumnDescriptionY.c_str()));
 	}
 	
 	/**

@@ -578,6 +578,13 @@ Custom implementation
 			<param name="BacktransformedZ" type="double" pass="return" description="Backtransformed Z coordinate in mm." />
 		</method>
 
+		<method name="AddTargetPositionsToDataTable" description="Writes target positions to a data table as double columns. Fails if Channels of types Target X and Target Y do not both exist.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to. Coordinates will be stored in mm." />
+			<param name="ColumnIdentifierX" type="string" pass="in" description="Identifier of the X Column." />
+			<param name="ColumnDescriptionX" type="string" pass="in" description="Description of the X Column." />
+			<param name="ColumnIdentifierY" type="string" pass="in" description="Identifier of the X Column." />
+			<param name="ColumnDescriptionY" type="string" pass="in" description="Description of the X Column." />
+		</method>
 		
 	</class>
 

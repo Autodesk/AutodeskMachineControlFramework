@@ -603,8 +603,6 @@ void CRTCRecordingInstance::getAllRecordEntries(const std::string& sChannelName,
 void CRTCRecordingInstance::enableRecording(uint32_t nPeriod)
 {
 
-
-
 	std::array<uint32_t, RTC_CHANNELCOUNT> rtcChannels;
 	for (uint32_t nIndex = 0; nIndex < RTC_CHANNELCOUNT; nIndex++) {
 		auto pChannel = m_Channels.at(nIndex);
@@ -913,6 +911,65 @@ double CRTCRecordingInstance::backtransformRawZCoordinate(const int32_t nRawCoor
 	m_pSDK->checkError(m_pSDK->transform(&nCoordinateZ, &nDummy, m_HeadTransform.data(), 1));
 
 	return (double)nCoordinateZ / m_dZCorrectionFactor;
+
+}
+
+void CRTCRecordingInstance::addTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	PRTCRecordingChannel pChannelX = nullptr;
+	PRTCRecordingChannel pChannelY = nullptr;
+
+	for (auto iIter : m_ChannelMap) {
+		auto channelType = iIter.second->getChannelType();
+		if (channelType == eRTCChannelType::ChannelTargetX)
+			pChannelX = iIter.second;
+		if (channelType == eRTCChannelType::ChannelTargetY)
+			pChannelY = iIter.second;
+	}
+
+	if (pChannelX.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXNOTRECORDED);
+	if (pChannelY.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELYNOTRECORDED);
+
+	pDataTable->AddColumn(sColumnIdentifierX, sColumnDescriptionX, LibMCEnv::eDataTableColumnType::DoubleColumn);
+	pDataTable->AddColumn(sColumnIdentifierY, sColumnDescriptionY, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	uint64_t nRecordCount = pChannelX->getRecordCount();
+	if (nRecordCount != pChannelY->getRecordCount())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXANDYRECORDCOUNTMISMATCH);
+
+	if (nRecordCount > 0) {
+		std::vector<int32_t> bufferX;
+		std::vector<int32_t> bufferY;
+		uint64_t nNeededEntries = 0;
+
+		bufferX.resize(nRecordCount);
+		pChannelX->getAllRecordEntries(nRecordCount, &nNeededEntries, bufferX.data());
+
+		bufferY.resize(nRecordCount);
+		pChannelY->getAllRecordEntries(nRecordCount, &nNeededEntries, bufferY.data());
+
+		std::vector<double> coordXinmm;
+		std::vector<double> coordYinmm;
+
+		coordXinmm.resize(nRecordCount);
+		coordYinmm.resize(nRecordCount);
+
+		for (uint64_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+			int32_t nX = bufferX.at(nIndex);
+			int32_t nY = bufferY.at(nIndex);
+
+			coordXinmm.at(nIndex) = (double)nX / m_dXYCorrectionFactor;
+			coordYinmm.at(nIndex) = (double)nY / m_dXYCorrectionFactor;
+		}
+
+		pDataTable->SetDoubleColumnValues(sColumnIdentifierX, coordXinmm);
+		pDataTable->SetDoubleColumnValues(sColumnIdentifierY, coordYinmm);
+	}
 
 }
 

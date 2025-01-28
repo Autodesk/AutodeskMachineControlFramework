@@ -537,6 +537,19 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcre
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_backtransformrawzcoordinate(LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCDriver_ScanLab_int32 nRawCoordinateZ, LibMCDriver_ScanLab_double * pBacktransformedZ);
 
+/**
+* Writes target positions to a data table as double columns. Fails if Channels of types Target X and Target Y do not both exist.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+* @param[in] pColumnIdentifierX - Identifier of the X Column.
+* @param[in] pColumnDescriptionX - Description of the X Column.
+* @param[in] pColumnIdentifierY - Identifier of the X Column.
+* @param[in] pColumnDescriptionY - Description of the X Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addtargetpositionstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifierX, const char * pColumnDescriptionX, const char * pColumnIdentifierY, const char * pColumnDescriptionY);
+
 /*************************************************************************************************************************
  Class definition for GPIOSequence
 **************************************************************************************************************************/

@@ -524,6 +524,19 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddBacktran
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_BacktransformRawZCoordinatePtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCDriver_ScanLab_int32 nRawCoordinateZ, LibMCDriver_ScanLab_double * pBacktransformedZ);
 
+/**
+* Writes target positions to a data table as double columns. Fails if Channels of types Target X and Target Y do not both exist.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+* @param[in] pColumnIdentifierX - Identifier of the X Column.
+* @param[in] pColumnDescriptionX - Description of the X Column.
+* @param[in] pColumnIdentifierY - Identifier of the X Column.
+* @param[in] pColumnDescriptionY - Description of the X Column.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddTargetPositionsToDataTablePtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifierX, const char * pColumnDescriptionX, const char * pColumnIdentifierY, const char * pColumnDescriptionY);
+
 /*************************************************************************************************************************
  Class definition for GPIOSequence
 **************************************************************************************************************************/
@@ -2874,6 +2887,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCRecording_BacktransformRawXYCoordinatesPtr m_RTCRecording_BacktransformRawXYCoordinates;
 	PLibMCDriver_ScanLabRTCRecording_AddBacktransformedZPositionsToDataTablePtr m_RTCRecording_AddBacktransformedZPositionsToDataTable;
 	PLibMCDriver_ScanLabRTCRecording_BacktransformRawZCoordinatePtr m_RTCRecording_BacktransformRawZCoordinate;
+	PLibMCDriver_ScanLabRTCRecording_AddTargetPositionsToDataTablePtr m_RTCRecording_AddTargetPositionsToDataTable;
 	PLibMCDriver_ScanLabGPIOSequence_GetIdentifierPtr m_GPIOSequence_GetIdentifier;
 	PLibMCDriver_ScanLabGPIOSequence_ClearPtr m_GPIOSequence_Clear;
 	PLibMCDriver_ScanLabGPIOSequence_AddOutputPtr m_GPIOSequence_AddOutput;

@@ -762,6 +762,16 @@ public:
 	*/
 	virtual LibMCDriver_ScanLab_double BacktransformRawZCoordinate(const LibMCDriver_ScanLab_int32 nRawCoordinateZ) = 0;
 
+	/**
+	* IRTCRecording::AddTargetPositionsToDataTable - Writes target positions to a data table as double columns. Fails if Channels of types Target X and Target Y do not both exist.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierX - Identifier of the X Column.
+	* @param[in] sColumnDescriptionX - Description of the X Column.
+	* @param[in] sColumnIdentifierY - Identifier of the X Column.
+	* @param[in] sColumnDescriptionY - Description of the X Column.
+	*/
+	virtual void AddTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifierX, const std::string & sColumnDescriptionX, const std::string & sColumnIdentifierY, const std::string & sColumnDescriptionY) = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCRecording> PIRTCRecording;
