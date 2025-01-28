@@ -337,6 +337,7 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 				}
 				
 				let vertices = [];
+				let colors = [];
 				for (let i = 0; i < pointcount; i++) {
 					let x = xcoordinates[i];
 					let y = ycoordinates[i];
@@ -348,13 +349,22 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 						x + pointsRadius / 2, y + pointsRadius / 2, zValue,
 						x + pointsRadius / 2, y - pointsRadius / 2, zValue,
 					);
+					
+					if (vertexcolors) {
+						let pointid = this.pointids[quadindex][i];
+						const color = new THREE.Color(vertexcolors[pointid]); 
+						for (let j = 0; j < 6; j++) { 
+							colors.push(color.r, color.g, color.b);
+						}
+					}
+
 				}
 				
 				
 				this.quadgeometries[quadindex].setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-				//if (vertexcolors) {
-					//this.quadgeometries[quadindex].setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); 
-				//}
+				if (vertexcolors) {
+					this.quadgeometries[quadindex].setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); 
+				}
 				this.quadgeometries[quadindex].computeBoundingSphere();
 
 				this.glelements[quadindex] = new THREE.Mesh(this.quadgeometries[quadindex], this.quadmaterials [quadindex]);

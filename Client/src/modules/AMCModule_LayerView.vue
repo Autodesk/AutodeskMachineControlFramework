@@ -43,11 +43,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					<v-icon left color="white">mdi-magnify-scan</v-icon>
 					Fit to path
 				</button>
-				<button class="rounded-button" @click="onToggleHoverClick">
+				<!--<button class="rounded-button" @click="onToggleHoverClick">
                     <v-icon v-if="hoverOverData" left size="20px" color="white">mdi-checkbox-outline</v-icon>
                     <v-icon v-else left size="20px" color="white">mdi-checkbox-blank-outline</v-icon>
                     Tooltips
-                </button>
+                </button>-->
 				
 				<button class="rounded-button" @click="onToggleToolpathClick">
                     <v-icon v-if="LayerViewerInstance.toolpathVisible" left size="20px" color="white">mdi-checkbox-outline</v-icon>
@@ -55,11 +55,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     Toolpath
                 </button>
 				
-				<!--<button class="rounded-button" @click="onToggleJumpsClick">
-                    <v-icon v-if="showJumps" left size="20px" color="white">mdi-checkbox-outline</v-icon>
-                    <v-icon v-else left size="20px" color="white">mdi-checkbox-blank-outline</v-icon>
-                    Jumps
-                </button>-->
+				<button class="rounded-button" @click="onToggleColorModeClick">
+                    <v-icon left size="20px" color="white">mdi-palette</v-icon>
+                    {{ getColorModeCaption () }}
+                </button>
 
 			</div>
 
@@ -149,6 +148,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			onToggleJumpsClick: function () {
                 this.showJumps = !this.showJumps;
             },
+			
+			onToggleColorModeClick: function () {
+				if (this.LayerViewerInstance.layerPointsMode == "time") {
+					this.LayerViewerInstance.setColorMode ("velocity");
+				} 
+				else if (this.LayerViewerInstance.layerPointsMode == "velocity") {
+					this.LayerViewerInstance.setColorMode ("uniform");			
+				} else {				
+					this.LayerViewerInstance.setColorMode ("time");
+				}
+				
+			},			 
  
             onToggleToolpathClick: function () {
                 this.LayerViewerInstance.toolpathVisible = !this.LayerViewerInstance.toolpathVisible;
@@ -213,6 +224,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				}						
 
             },
+			
+			getColorModeCaption () {
+				if (this.LayerViewerInstance.layerPointsMode == "time") {
+					return "Color: Timing";
+				} 
+
+				if (this.LayerViewerInstance.layerPointsMode == "velocity") {
+					return "Color: Velocity";
+				} 
+				
+				return "Color: Uniform";
+			},
 			
 			onToggleHoverClick: function ()
 			{
@@ -495,8 +518,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 							if (pointPosition) {
 								infoCaption += `Position: ${pointPosition.x.toFixed(4)}/${pointPosition.y.toFixed(4)} mm\n`;
 							}
-							if (pointVelocity) {
-								infoCaption += `Velocity: ${pointVelocity.v.toFixed(4)} mm/s\n`;
+							if (pointVelocity > 0.0) {
+								infoCaption += `Velocity: ${pointVelocity.toFixed(4)} mm/s\n`;
 							}
 							if (pointAcceleration) {
 								let accelerationinmeterspersecondsquared = pointAcceleration.a / 1000.0;
