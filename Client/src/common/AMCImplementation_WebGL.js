@@ -332,7 +332,7 @@ class WebGLLocalizedPointsElement extends WebGLElement {
 				} else {
 					this.quadmaterials [quadindex] = new THREE.MeshBasicMaterial({
 						vertexColors: false,
-						color: /*pointsColor +*/ Math.round (Math.random ()*10000000)
+						color: pointsColor
 					});
 				}
 				

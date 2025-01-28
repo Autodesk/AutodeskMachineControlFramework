@@ -46,9 +46,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				<button class="rounded-button" @click="onToggleHoverClick">
                     <v-icon v-if="hoverOverData" left size="20px" color="white">mdi-checkbox-outline</v-icon>
                     <v-icon v-else left size="20px" color="white">mdi-checkbox-blank-outline</v-icon>
-
                     Tooltips
                 </button>
+				
+				<button class="rounded-button" @click="onToggleToolpathClick">
+                    <v-icon v-if="LayerViewerInstance.toolpathVisible" left size="20px" color="white">mdi-checkbox-outline</v-icon>
+                    <v-icon v-else left size="20px" color="white">mdi-checkbox-blank-outline</v-icon>
+                    Toolpath
+                </button>
+				
+				<!--<button class="rounded-button" @click="onToggleJumpsClick">
+                    <v-icon v-if="showJumps" left size="20px" color="white">mdi-checkbox-outline</v-icon>
+                    <v-icon v-else left size="20px" color="white">mdi-checkbox-blank-outline</v-icon>
+                    Jumps
+                </button>-->
+
 			</div>
 
 			<div class="layerview-slider-container">
@@ -115,10 +127,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			lastMouseY: 0,
 			reloading: false,
 			showJumps: true,
-            showToolpath: true,
 			loadingLayerData: false,
 			loadingScatterplot: false,
-			hoverOverData: false
+			hoverOverData: true
 		
 		}),
 		
@@ -140,7 +151,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             },
  
             onToggleToolpathClick: function () {
-                this.showToolpath = !this.showToolpath;
+                this.LayerViewerInstance.toolpathVisible = !this.LayerViewerInstance.toolpathVisible;
+				this.LayerViewerInstance.updateLoadedLayer ();
             },
 
 			
@@ -302,16 +314,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 							if (platform.scatterplotuuid != "00000000-0000-0000-0000-000000000000") {
 							
 									this.loadingScatterplot = true;
+									this.LayerViewerInstance.glInstance.removeElement("layerdata_points");
 								
 									this.Application.axiosGetArrayBufferRequest("/ui/pointcloud/" + platform.scatterplotuuid)
 									.then(responseData => {
 										let pointcoordinates = new Float32Array(responseData.data);
 										
 										if (this.LayerViewerInstance) {
-											//this.LayerViewerInstance.glInstance.add2DPointsGeometry("layerdata_points", pointcoordinates, 61, 0.003, 0xff0000);										
-											this.LayerViewerInstance.glInstance.add2DLocalizedPointsGeometry("layerdata_points", pointcoordinates, 61, this.LayerViewerInstance.lineScaleLevel * 0.01, 0xff0000, false, -200, -200, 2, 2, 400, 400);										
-											this.LayerViewerInstance.updateTransform ();
-											this.LayerViewerInstance.RenderScene (true);
+											this.LayerViewerInstance.loadPoints (pointcoordinates);
 										}
 									
 										this.loadingScatterplot = false;
@@ -475,9 +485,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 						let pointIndex = this.LayerViewerInstance.glInstance.getRaycasterCollisions ("layerdata_points", mouseX, mouseY);
 						if (pointIndex >= 0) {
+						
+							let pointPosition = this.LayerViewerInstance.getPointPosition (pointIndex);
+							let pointVelocity = this.LayerViewerInstance.getPointVelocity (pointIndex);
+							let pointAcceleration = this.LayerViewerInstance.getPointAcceleration (pointIndex);
+							let pointJerk = this.LayerViewerInstance.getPointJerk (pointIndex);
+							
+							let infoCaption = `Point ID = ${pointIndex.toFixed(0)}\n`;
+							if (pointPosition) {
+								infoCaption += `Position: ${pointPosition.x.toFixed(4)}/${pointPosition.y.toFixed(4)} mm\n`;
+							}
+							if (pointVelocity) {
+								infoCaption += `Velocity: ${pointVelocity.v.toFixed(4)} mm/s\n`;
+							}
+							if (pointAcceleration) {
+								let accelerationinmeterspersecondsquared = pointAcceleration.a / 1000.0;
+								infoCaption += `Acceleration: ${accelerationinmeterspersecondsquared.toFixed(4)} m/s²\n`;
+							}
+
+							if (pointJerk) {
+								let jerkinmeterspersecondsquared = pointJerk.j / 1000000.0;
+								infoCaption += `Jerk: ${jerkinmeterspersecondsquared.toFixed(4)} km/s³\n`;
+							}
+
+						
 							this.lastMouseX = mouseX;
 							this.lastMouseY = mouseY;
-							infoboxDiv.innerText = `Point ID = ${pointIndex.toFixed(0)}\n`;
+							infoboxDiv.innerText = infoCaption;
 							infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
 							infoboxDiv.style.display = 'flex';
 							infoboxDiv.style.left = `${mouseX}px`;
@@ -498,8 +532,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 									const y2 = this.LayerViewerInstance.linesCoordinates[lineIndex * 4 + 3];
 									
 									const laserpower = this.LayerViewerInstance.segmentProperties[lineIndex].laserpower;
+									const laserspeed = this.LayerViewerInstance.segmentProperties[lineIndex].laserspeed;
 
-									infoboxDiv.innerText = `Line ID = ${lineIndex.toFixed(0)}\n${x1.toFixed(3)} / ${y1.toFixed(3)} - ${x2.toFixed(3)} / ${y2.toFixed(3)} mm\n${laserpower.toFixed(0)}W`;
+									let infoCaption = `Line ID = ${lineIndex.toFixed(0)}\n${x1.toFixed(3)} / ${y1.toFixed(3)} - ${x2.toFixed(3)} / ${y2.toFixed(3)} mm\n`;
+									infoCaption += `${laserpower.toFixed(0)}W / ${laserspeed.toFixed (1)} mm/s`;
+									infoboxDiv.innerText = infoCaption;
 									infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
 								}
 								

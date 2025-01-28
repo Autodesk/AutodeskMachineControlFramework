@@ -57,7 +57,11 @@ class LayerViewImpl {
 		this.renderNeedsUpdate = true;
 
 		this.layerSegmentsArray = null;
+		this.layerPointsArray = null;
         this.linesCoordinates = [];
+		
+		this.toolpathVisible = true;
+		this.pointsVisible = true;
         
 		this.updateTransform ();
 
@@ -190,6 +194,7 @@ class LayerViewImpl {
 			this.lineScaleLevel = newLineScaleLevel;
 			
 			this.updateLoadedLayer ();
+			this.updateLayerPoints ();
 
 			this.updateTransform();
 			this.RenderScene(true);		
@@ -224,75 +229,184 @@ class LayerViewImpl {
 		
 	}
 	
+    loadPoints(pointsArray) {
+		this.layerPointsArray = pointsArray;
+		this.updateLayerPoints ();		
+	}
+	
+	updateLayerPoints () {
+		if (!this.glInstance) 
+			return;
+
+		this.glInstance.removeElement("layerdata_points");
+		
+		if (this.layerPointsArray && this.pointsVisible) {
+			this.glInstance.add2DLocalizedPointsGeometry("layerdata_points", this.layerPointsArray, 61, this.lineScaleLevel * 0.06, 0x00d0ff, false, -200, -200, 2, 2, 400, 400);
+			this.updateTransform ();
+			this.RenderScene (true);
+		}
+	}
+		
+	getPointPosition (pointIndex)
+	{
+		if (this.layerPointsArray) {
+			if (pointIndex >= 0) {
+				let arrayIndex = pointIndex * 2;
+				if (arrayIndex + 1 < this.layerPointsArray.length) {
+					let xPosition = this.layerPointsArray[arrayIndex];
+					let yPosition = this.layerPointsArray[arrayIndex + 1];
+					return { x: xPosition, y: yPosition }
+				}
+			}
+
+		}
+		
+		return null;
+					
+	}
+
+	getPointVelocity (pointIndex)
+	{
+		let dT = 1 / 100000;
+		
+		if (this.layerPointsArray) {
+			if (pointIndex > 0) {
+				let arrayIndex = pointIndex * 2;
+				if (arrayIndex + 3 < this.layerPointsArray.length) {
+					let vX = (this.layerPointsArray[arrayIndex + 2] - this.layerPointsArray[arrayIndex - 2]) / (2 * dT);
+					let vY = (this.layerPointsArray[arrayIndex + 3] - this.layerPointsArray[arrayIndex - 1]) / (2 * dT);
+					let velocity = Math.sqrt (vX * vX + vY * vY);
+					return { vx: vX,  vy: vY, v: velocity }
+				}
+			}
+
+		}
+		
+		return null;
+					
+	}
+
+	getPointAcceleration (pointIndex)
+	{
+		let dT = 1 / 100000; 
+		
+		if (this.layerPointsArray) {
+			if (pointIndex > 0) {
+				let arrayIndex = pointIndex * 2;
+				if (arrayIndex + 3 < this.layerPointsArray.length) {
+					let aX = (this.layerPointsArray[arrayIndex + 2] - 2 * this.layerPointsArray[arrayIndex] + this.layerPointsArray[arrayIndex - 2]) / (dT * dT);
+					let aY = (this.layerPointsArray[arrayIndex + 3] - 2 * this.layerPointsArray[arrayIndex + 1] + this.layerPointsArray[arrayIndex - 1]) / (dT * dT);
+					let accel = Math.sqrt (aX * aX + aY * aY);
+					return { ax: aX,  ay: aY, a: accel }
+				}
+			}
+
+		} 
+		
+		return null;
+					
+	}
+
+
+	getPointJerk (pointIndex)
+	{
+		let dT = 1 / 100000;
+		
+		if (this.layerPointsArray) {
+			if (pointIndex > 1) {
+				let arrayIndex = pointIndex * 2;
+				if (arrayIndex + 5 < this.layerPointsArray.length) {
+					let aXPrev = (this.layerPointsArray[arrayIndex] - 2 * this.layerPointsArray[arrayIndex - 2] + this.layerPointsArray[arrayIndex - 4]) / (dT * dT);
+					let aYPrev = (this.layerPointsArray[arrayIndex + 1] - 2 * this.layerPointsArray[arrayIndex - 1] + this.layerPointsArray[arrayIndex - 3]) / (dT * dT);
+					let aXNext = (this.layerPointsArray[arrayIndex + 2] - 2 * this.layerPointsArray[arrayIndex] + this.layerPointsArray[arrayIndex - 2]) / (dT * dT);
+					let aYNext = (this.layerPointsArray[arrayIndex + 3] - 2 * this.layerPointsArray[arrayIndex + 1] + this.layerPointsArray[arrayIndex - 1]) / (dT * dT);
+					let jX = (aXNext - aXPrev) / (2 * dT);
+					let jY = (aYNext - aYPrev) / (2 * dT);
+					let jerk = Math.sqrt (jX * jX + jY * jY);
+					return { jx: jX,  jy: jY, j: jerk }
+				}
+			}
+
+		}
+		
+		return null;
+					
+	}
+
 	updateLoadedLayer () {
 		if (!this.glInstance) 
 			return;
 		
-		if (!this.layerSegmentsArray)
-			return;
-
-		let segmentsArray = this.layerSegmentsArray;
-        var segmentCount = segmentsArray.length;
-        var segmentIndex;
-        
-        this.linesCoordinates = [];
-        this.segmentProperties = [];
+        this.glInstance.removeElement("layerdata_lines");
 		
-		let vertexcolors = [];
-
-        for (segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++) {
-            var segment = segmentsArray[segmentIndex];
-			let segmentColor = segment.color;		
-			let segmentData = { laserpower: segment.laserpower, laserspeed: segment.laserspeed, profilename: segment.profilename  }
-
-            if ((segment.type === "loop") || (segment.type === "polyline")) {
-                var pointCount = segment.points.length;
-                var pointIndex;
+		if (this.layerSegmentsArray && this.toolpathVisible) {
 				
-                var oldx = segment.points[0].x;
-                var oldy = segment.points[0].y;
+			let segmentsArray = this.layerSegmentsArray;
+			var segmentCount = segmentsArray.length;
+			var segmentIndex;
+			
+			this.linesCoordinates = [];
+			this.segmentProperties = [];
+			
+			let vertexcolors = [];
 
-                for (pointIndex = 1; pointIndex < pointCount; pointIndex++) {
-                    var x = segment.points[pointIndex].x;
-                    var y = segment.points[pointIndex].y;
+			for (segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++) {
+				var segment = segmentsArray[segmentIndex];
+				let segmentColor = segment.color;		
+				let segmentData = { laserpower: segment.laserpower, laserspeed: segment.laserspeed, profilename: segment.profilename  }
 
-                    this.linesCoordinates.push(oldx, oldy, x, y);
-					this.segmentProperties.push (segmentData);
-					vertexcolors.push (segmentColor);
+				if ((segment.type === "loop") || (segment.type === "polyline")) {
+					var pointCount = segment.points.length;
+					var pointIndex;
+					
+					var oldx = segment.points[0].x;
+					var oldy = segment.points[0].y;
 
-                    oldx = x;
-                    oldy = y;
-                }
-            }
+					for (pointIndex = 1; pointIndex < pointCount; pointIndex++) {
+						var x = segment.points[pointIndex].x;
+						var y = segment.points[pointIndex].y;
 
-            if (segment.type === "hatch") {
-                var lineCount = segment.points.length / 2;
-                var lineIndex;
+						this.linesCoordinates.push(oldx, oldy, x, y);
+						this.segmentProperties.push (segmentData);
+						vertexcolors.push (segmentColor);
 
-                for (lineIndex = 0; lineIndex < lineCount; lineIndex++) {
-                    var x1 = segment.points[lineIndex * 2].x;
-                    var y1 = segment.points[lineIndex * 2].y;
-                    var x2 = segment.points[lineIndex * 2 + 1].x;
-                    var y2 = segment.points[lineIndex * 2 + 1].y;
+						oldx = x;
+						oldy = y;
+					}
+				}
 
-                    this.linesCoordinates.push(x1, y1, x2, y2);
-					this.segmentProperties.push (segmentData);
-					vertexcolors.push (segmentColor);
-                }
+				if (segment.type === "hatch") {
+					var lineCount = segment.points.length / 2;
+					var lineIndex;
 
-            }
-        }
-		
-        var layerLinesObject = this.glInstance.scene.getObjectByName("layerdata_lines");
-        if (layerLinesObject)
-            this.glInstance.scene.remove(layerLinesObject);
-		
-		
-		let thickness = this.lineScaleLevel * 0.3;
-		
-		console.log ("rebulding layer preview with thickness: " + thickness);
-		
-        this.glInstance.add2DLineGeometry("layerdata_lines", this.linesCoordinates, 60, thickness, 0x000000, vertexcolors);
+					for (lineIndex = 0; lineIndex < lineCount; lineIndex++) {
+						var x1 = segment.points[lineIndex * 2].x;
+						var y1 = segment.points[lineIndex * 2].y;
+						var x2 = segment.points[lineIndex * 2 + 1].x;
+						var y2 = segment.points[lineIndex * 2 + 1].y;
+
+						this.linesCoordinates.push(x1, y1, x2, y2);
+						this.segmentProperties.push (segmentData);
+						vertexcolors.push (segmentColor);
+					}
+
+				}
+			}
+			
+			var layerLinesObject = this.glInstance.scene.getObjectByName("layerdata_lines");
+			if (layerLinesObject)
+				this.glInstance.scene.remove(layerLinesObject);
+			
+			
+			let thickness = this.lineScaleLevel * 0.3;
+			
+			console.log ("rebulding layer preview with thickness: " + thickness);
+			
+			this.glInstance.add2DLineGeometry("layerdata_lines", this.linesCoordinates, 60, thickness, 0x000000, vertexcolors);
+		}
+
+		this.updateTransform();
+		this.RenderScene(true);		
 
     }
 
