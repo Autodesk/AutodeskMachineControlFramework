@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 
 #include "common_importstream_native.hpp"
@@ -241,8 +243,16 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+        std::string sGitHash(__STRINGIZE_VALUE_OF(__GITHASH));
+        std::string sDate(__DATE__);
+        std::wstring wsGitHash(sGitHash.begin(), sGitHash.end());
+        std::wstring wsDate(sDate.begin(), sDate.end());
+        std::wstring wsCaption = L"Build " + wsGitHash + L" / " + wsDate;
+
+        SetDlgItemTextW(hDlg, IDC_BUILD_TEXT, wsCaption.c_str () );
         return (INT_PTR)TRUE;
+    }
 
     case WM_COMMAND:
         if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
