@@ -115,8 +115,6 @@ protected:
 	bool m_bEnableLineSubdivision;
 	double m_dLineSubdivisionThreshold;
 
-	std::vector<uint8_t> m_HeadTransform;
-
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
@@ -324,7 +322,9 @@ public:
 	
 	void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) override;
 
-	IRTCRecording* PrepareRecording(const bool bKeepInMemory) override;
+	bool CheckScanheadConnection() override;
+
+	IRTCRecording* PrepareRecording(const bool bKeepInMemory, const bool bEnableScanheadFeedback, const bool bEnableBacktransformation) override;
 
 	bool HasRecording(const std::string& sUUID) override;
 

@@ -1766,11 +1766,31 @@ void CRTCContext::SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11,
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
 
-IRTCRecording* CRTCContext::PrepareRecording(const bool bKeepInMemory)
+bool CRTCContext::CheckScanheadConnection()
+{
+	uint32_t nHeadNoXY = 1;
+	uint32_t nHeadNoZ = 2;
+	
+	uint32_t HeadStatus1 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoXY);
+	if ((HeadStatus1 & RTC6_BITFLAG_SCANHEADSTATUS_POWERFLAG) == 0)
+	{
+		return false;
+	}
+
+	uint32_t HeadStatus2 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoZ);
+	if ((HeadStatus2 & RTC6_BITFLAG_SCANHEADSTATUS_POWERFLAG) == 0)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+IRTCRecording* CRTCContext::PrepareRecording(const bool bKeepInMemory, const bool bEnableScanheadFeedback, const bool bEnableBacktransformation)
 {
 	auto pCryptoContext = m_pDriverEnvironment->CreateCryptoContext();
 	std::string sUUID = pCryptoContext->CreateUUID();
-	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, RTC_CHUNKSIZE_DEFAULT);
+	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, m_dZCorrectionFactor, RTC_CHUNKSIZE_DEFAULT, bEnableScanheadFeedback, bEnableBacktransformation);
 
 	if (bKeepInMemory)
 		m_Recordings.insert(std::make_pair (pInstance->getUUID(), pInstance));

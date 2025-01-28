@@ -361,31 +361,6 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcjo
 **************************************************************************************************************************/
 
 /**
-* Returns if the scan head connection is checked when recording
-*
-* @param[in] pRTCRecording - RTCRecording instance.
-* @param[out] pValue - If true, the Scanhead connection will be checked for an error when recording.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled(LibMCDriver_ScanLab_RTCRecording pRTCRecording, bool * pValue);
-
-/**
-* Enables the Scanhead connection check. The check is enabled by default.
-*
-* @param[in] pRTCRecording - RTCRecording instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
-
-/**
-* Disables the Scanhead connection check.
-*
-* @param[in] pRTCRecording - RTCRecording instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck(LibMCDriver_ScanLab_RTCRecording pRTCRecording);
-
-/**
 * Clears all recording data and channels.
 *
 * @param[in] pRTCRecording - RTCRecording instance.
@@ -398,7 +373,7 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcre
 *
 * @param[in] pRTCRecording - RTCRecording instance.
 * @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique.
-* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined.
+* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined. Fails if channel type is already recorded. Fails if scan head feedback is not enabled and channel type is ChannelCurrentXRaw, ChannelCurrentYRaw or ChannelCurrentZ.
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addchannel(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCDriver_ScanLab::eRTCChannelType eChannelType);
@@ -515,6 +490,52 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcre
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLab_double dScaleFactor, LibMCDriver_ScanLab_double dOffset);
+
+/**
+* Writes backtransformed positions to a data table as double columns. Fails if Channels of types Raw X and Raw Y do not both exist or positional backtransformation is not enabled.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+* @param[in] pColumnIdentifierX - Identifier of the X Column.
+* @param[in] pColumnDescriptionX - Description of the X Column.
+* @param[in] pColumnIdentifierY - Identifier of the X Column.
+* @param[in] pColumnDescriptionY - Description of the X Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addbacktransformedxypositionstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifierX, const char * pColumnDescriptionX, const char * pColumnIdentifierY, const char * pColumnDescriptionY);
+
+/**
+* Backtransforms raw coordinates in X and Y. Fails if positional backtransformation is not enabled.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] nRawCoordinateX - Raw X coordinate.
+* @param[in] nRawCoordinateY - Raw Y coordinate.
+* @param[out] pBacktransformedX - Backtransformed X coordinate in mm.
+* @param[out] pBacktransformedY - Backtransformed Y coordinate in mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_backtransformrawxycoordinates(LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCDriver_ScanLab_int32 nRawCoordinateX, LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double * pBacktransformedX, LibMCDriver_ScanLab_double * pBacktransformedY);
+
+/**
+* Writes backtransformed Z positions to a data table as double column. Fails if Channels of types Raw Z does exist or positional backtransformation is not enabled.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+* @param[in] pColumnIdentifierZ - Identifier of the Z Column.
+* @param[in] pColumnDescriptionZ - Description of the Z Column.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_addbacktransformedzpositionstodatatable(LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifierZ, const char * pColumnDescriptionZ);
+
+/**
+* Backtransforms raw Z coordinate. Fails if positional backtransformation is not enabled.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] nRawCoordinateZ - Raw coordinates in Z.
+* @param[out] pBacktransformedZ - Backtransformed Z coordinate in mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcrecording_backtransformrawzcoordinate(LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCDriver_ScanLab_int32 nRawCoordinateZ, LibMCDriver_ScanLab_double * pBacktransformedZ);
 
 /*************************************************************************************************************************
  Class definition for GPIOSequence
@@ -1713,14 +1734,25 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_settransformationmatrix(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dM11, LibMCDriver_ScanLab_double dM12, LibMCDriver_ScanLab_double dM21, LibMCDriver_ScanLab_double dM22);
 
 /**
+* Checks if Scanhead is connected.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pScanheadIsConnected - Returns, if the scanhead 1 is connected to the RTC card.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_checkscanheadconnection(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pScanheadIsConnected);
+
+/**
 * Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance.
+* @param[in] bEnableScanheadFeedback - If true, the Scanhead feedback will be enabled. If false, scanner feedback signal channel types are not available.
+* @param[in] bEnableBacktransformation - If true, the Scanhead backtransformation is read out from the RTC card. If false, scanhead position backtransformation is not enabled.
 * @param[out] pRecordingInstance - Recording instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bKeepInMemory, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_preparerecording(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bKeepInMemory, bool bEnableScanheadFeedback, bool bEnableBacktransformation, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
 
 /**
 * Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.

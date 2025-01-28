@@ -344,6 +344,13 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAME: return "INVALIDGPIOLABELNAME";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAMELENGTH: return "INVALIDGPIOLABELNAMELENGTH";
 			case LIBMCDRIVER_SCANLAB_ERROR_EMPTYGPIOLABELNAME: return "EMPTYGPIOLABELNAME";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANHEADCHANNELNEEDSFEEDBACKENABLED: return "SCANHEADCHANNELNEEDSFEEDBACKENABLED";
+			case LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPEISALREADYRECORDED: return "CHANNELTYPEISALREADYRECORDED";
+			case LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED: return "BACKTRANSFORMATIONISNOTENABLED";
+			case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXNOTRECORDED: return "RTCCHANNELXNOTRECORDED";
+			case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELYNOTRECORDED: return "RTCCHANNELYNOTRECORDED";
+			case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELZNOTRECORDED: return "RTCCHANNELZNOTRECORDED";
+			case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXANDYRECORDCOUNTMISMATCH: return "RTCCHANNELXANDYRECORDCOUNTMISMATCH";
 		}
 		return "UNKNOWN";
 	}
@@ -494,6 +501,13 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAME: return "Invalid GPIO Label Name";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAMELENGTH: return "Invalid GPIO Label Name Length";
 			case LIBMCDRIVER_SCANLAB_ERROR_EMPTYGPIOLABELNAME: return "Empty GPIO Label Name";
+			case LIBMCDRIVER_SCANLAB_ERROR_SCANHEADCHANNELNEEDSFEEDBACKENABLED: return "Scanhead channel needs feedback enabled.";
+			case LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPEISALREADYRECORDED: return "Channel type is already recorded.";
+			case LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED: return "Backtransformation is not enabled.";
+			case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXNOTRECORDED: return "RTC Channel X not recorded.";
+			case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELYNOTRECORDED: return "RTC Channel Y not recorded.";
+			case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELZNOTRECORDED: return "RTC Channel Z not recorded.";
+			case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXANDYRECORDCOUNTMISMATCH: return "RTC X and Y record count mismatch.";
 		}
 		return "unknown error";
 	}
@@ -776,9 +790,6 @@ public:
 	{
 	}
 	
-	inline bool ScanheadConnectionCheckIsEnabled();
-	inline void EnableScanheadConnectionCheck();
-	inline void DisableScanheadConnectionCheck();
 	inline void Clear();
 	inline void AddChannel(const std::string & sChannelName, const eRTCChannelType eChannelType);
 	inline void RemoveChannel(const std::string & sChannelName);
@@ -792,6 +803,10 @@ public:
 	inline void ExecuteListWithRecording();
 	inline void AddRecordsToDataTable(const std::string & sChannelName, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription);
 	inline void AddScaledRecordsToDataTable(const std::string & sChannelName, classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset);
+	inline void AddBacktransformedXYPositionsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifierX, const std::string & sColumnDescriptionX, const std::string & sColumnIdentifierY, const std::string & sColumnDescriptionY);
+	inline void BacktransformRawXYCoordinates(const LibMCDriver_ScanLab_int32 nRawCoordinateX, const LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double & dBacktransformedX, LibMCDriver_ScanLab_double & dBacktransformedY);
+	inline void AddBacktransformedZPositionsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifierZ, const std::string & sColumnDescriptionZ);
+	inline LibMCDriver_ScanLab_double BacktransformRawZCoordinate(const LibMCDriver_ScanLab_int32 nRawCoordinateZ);
 };
 	
 /*************************************************************************************************************************
@@ -958,7 +973,8 @@ public:
 	inline void SetTransformationScale(const LibMCDriver_ScanLab_double dScaleFactor);
 	inline void SetTransformationOffset(const LibMCDriver_ScanLab_int32 nOffsetX, const LibMCDriver_ScanLab_int32 nOffsetY);
 	inline void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22);
-	inline PRTCRecording PrepareRecording(const bool bKeepInMemory);
+	inline bool CheckScanheadConnection();
+	inline PRTCRecording PrepareRecording(const bool bKeepInMemory, const bool bEnableScanheadFeedback, const bool bEnableBacktransformation);
 	inline bool HasRecording(const std::string & sUUID);
 	inline PRTCRecording FindRecording(const std::string & sUUID);
 	inline void EnableTimelagCompensation(const LibMCDriver_ScanLab_uint32 nTimeLagXYInMicroseconds, const LibMCDriver_ScanLab_uint32 nTimeLagZInMicroseconds);
@@ -1271,9 +1287,6 @@ public:
 		pWrapperTable->m_RTCJob_AddMarkMovement = nullptr;
 		pWrapperTable->m_RTCJob_AddTimedMarkMovement = nullptr;
 		pWrapperTable->m_RTCJob_AddFreeVariable = nullptr;
-		pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled = nullptr;
-		pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck = nullptr;
-		pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck = nullptr;
 		pWrapperTable->m_RTCRecording_Clear = nullptr;
 		pWrapperTable->m_RTCRecording_AddChannel = nullptr;
 		pWrapperTable->m_RTCRecording_RemoveChannel = nullptr;
@@ -1287,6 +1300,10 @@ public:
 		pWrapperTable->m_RTCRecording_ExecuteListWithRecording = nullptr;
 		pWrapperTable->m_RTCRecording_AddRecordsToDataTable = nullptr;
 		pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable = nullptr;
+		pWrapperTable->m_RTCRecording_AddBacktransformedXYPositionsToDataTable = nullptr;
+		pWrapperTable->m_RTCRecording_BacktransformRawXYCoordinates = nullptr;
+		pWrapperTable->m_RTCRecording_AddBacktransformedZPositionsToDataTable = nullptr;
+		pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate = nullptr;
 		pWrapperTable->m_GPIOSequence_GetIdentifier = nullptr;
 		pWrapperTable->m_GPIOSequence_Clear = nullptr;
 		pWrapperTable->m_GPIOSequence_AddOutput = nullptr;
@@ -1405,6 +1422,7 @@ public:
 		pWrapperTable->m_RTCContext_SetTransformationScale = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationOffset = nullptr;
 		pWrapperTable->m_RTCContext_SetTransformationMatrix = nullptr;
+		pWrapperTable->m_RTCContext_CheckScanheadConnection = nullptr;
 		pWrapperTable->m_RTCContext_PrepareRecording = nullptr;
 		pWrapperTable->m_RTCContext_HasRecording = nullptr;
 		pWrapperTable->m_RTCContext_FindRecording = nullptr;
@@ -1804,33 +1822,6 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled = (PLibMCDriver_ScanLabRTCRecording_ScanheadConnectionCheckIsEnabledPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled");
-		#else // _WIN32
-		pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled = (PLibMCDriver_ScanLabRTCRecording_ScanheadConnectionCheckIsEnabledPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled == nullptr)
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck = (PLibMCDriver_ScanLabRTCRecording_EnableScanheadConnectionCheckPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck");
-		#else // _WIN32
-		pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck = (PLibMCDriver_ScanLabRTCRecording_EnableScanheadConnectionCheckPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck == nullptr)
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck = (PLibMCDriver_ScanLabRTCRecording_DisableScanheadConnectionCheckPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck");
-		#else // _WIN32
-		pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck = (PLibMCDriver_ScanLabRTCRecording_DisableScanheadConnectionCheckPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck == nullptr)
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_RTCRecording_Clear = (PLibMCDriver_ScanLabRTCRecording_ClearPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_clear");
 		#else // _WIN32
 		pWrapperTable->m_RTCRecording_Clear = (PLibMCDriver_ScanLabRTCRecording_ClearPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_clear");
@@ -1945,6 +1936,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_AddBacktransformedXYPositionsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddBacktransformedXYPositionsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_addbacktransformedxypositionstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_AddBacktransformedXYPositionsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddBacktransformedXYPositionsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_addbacktransformedxypositionstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_AddBacktransformedXYPositionsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_BacktransformRawXYCoordinates = (PLibMCDriver_ScanLabRTCRecording_BacktransformRawXYCoordinatesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_backtransformrawxycoordinates");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_BacktransformRawXYCoordinates = (PLibMCDriver_ScanLabRTCRecording_BacktransformRawXYCoordinatesPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_backtransformrawxycoordinates");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_BacktransformRawXYCoordinates == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_AddBacktransformedZPositionsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddBacktransformedZPositionsToDataTablePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_addbacktransformedzpositionstodatatable");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_AddBacktransformedZPositionsToDataTable = (PLibMCDriver_ScanLabRTCRecording_AddBacktransformedZPositionsToDataTablePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_addbacktransformedzpositionstodatatable");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_AddBacktransformedZPositionsToDataTable == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate = (PLibMCDriver_ScanLabRTCRecording_BacktransformRawZCoordinatePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcrecording_backtransformrawzcoordinate");
+		#else // _WIN32
+		pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate = (PLibMCDriver_ScanLabRTCRecording_BacktransformRawZCoordinatePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcrecording_backtransformrawzcoordinate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3007,6 +3034,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_SetTransformationMatrix == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_CheckScanheadConnection = (PLibMCDriver_ScanLabRTCContext_CheckScanheadConnectionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_checkscanheadconnection");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_CheckScanheadConnection = (PLibMCDriver_ScanLabRTCContext_CheckScanheadConnectionPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_checkscanheadconnection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_CheckScanheadConnection == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4078,18 +4114,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCJob_AddFreeVariable == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_scanheadconnectioncheckisenabled", (void**)&(pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_ScanheadConnectionCheckIsEnabled == nullptr) )
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_enablescanheadconnectioncheck", (void**)&(pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_EnableScanheadConnectionCheck == nullptr) )
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_disablescanheadconnectioncheck", (void**)&(pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_DisableScanheadConnectionCheck == nullptr) )
-			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_clear", (void**)&(pWrapperTable->m_RTCRecording_Clear));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_Clear == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4140,6 +4164,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_addscaledrecordstodatatable", (void**)&(pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_AddScaledRecordsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_addbacktransformedxypositionstodatatable", (void**)&(pWrapperTable->m_RTCRecording_AddBacktransformedXYPositionsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_AddBacktransformedXYPositionsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_backtransformrawxycoordinates", (void**)&(pWrapperTable->m_RTCRecording_BacktransformRawXYCoordinates));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_BacktransformRawXYCoordinates == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_addbacktransformedzpositionstodatatable", (void**)&(pWrapperTable->m_RTCRecording_AddBacktransformedZPositionsToDataTable));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_AddBacktransformedZPositionsToDataTable == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcrecording_backtransformrawzcoordinate", (void**)&(pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCRecording_BacktransformRawZCoordinate == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_gpiosequence_getidentifier", (void**)&(pWrapperTable->m_GPIOSequence_GetIdentifier));
@@ -4612,6 +4652,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_settransformationmatrix", (void**)&(pWrapperTable->m_RTCContext_SetTransformationMatrix));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetTransformationMatrix == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_checkscanheadconnection", (void**)&(pWrapperTable->m_RTCContext_CheckScanheadConnection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_CheckScanheadConnection == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_preparerecording", (void**)&(pWrapperTable->m_RTCContext_PrepareRecording));
@@ -5366,34 +5410,6 @@ public:
 	 */
 	
 	/**
-	* CRTCRecording::ScanheadConnectionCheckIsEnabled - Returns if the scan head connection is checked when recording
-	* @return If true, the Scanhead connection will be checked for an error when recording.
-	*/
-	bool CRTCRecording::ScanheadConnectionCheckIsEnabled()
-	{
-		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_ScanheadConnectionCheckIsEnabled(m_pHandle, &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CRTCRecording::EnableScanheadConnectionCheck - Enables the Scanhead connection check. The check is enabled by default.
-	*/
-	void CRTCRecording::EnableScanheadConnectionCheck()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_EnableScanheadConnectionCheck(m_pHandle));
-	}
-	
-	/**
-	* CRTCRecording::DisableScanheadConnectionCheck - Disables the Scanhead connection check.
-	*/
-	void CRTCRecording::DisableScanheadConnectionCheck()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_DisableScanheadConnectionCheck(m_pHandle));
-	}
-	
-	/**
 	* CRTCRecording::Clear - Clears all recording data and channels.
 	*/
 	void CRTCRecording::Clear()
@@ -5404,7 +5420,7 @@ public:
 	/**
 	* CRTCRecording::AddChannel - Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.
 	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique.
-	* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined.
+	* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined. Fails if channel type is already recorded. Fails if scan head feedback is not enabled and channel type is ChannelCurrentXRaw, ChannelCurrentYRaw or ChannelCurrentZ.
 	*/
 	void CRTCRecording::AddChannel(const std::string & sChannelName, const eRTCChannelType eChannelType)
 	{
@@ -5538,6 +5554,57 @@ public:
 	{
 		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_AddScaledRecordsToDataTable(m_pHandle, sChannelName.c_str(), hDataTable, sColumnIdentifier.c_str(), sColumnDescription.c_str(), dScaleFactor, dOffset));
+	}
+	
+	/**
+	* CRTCRecording::AddBacktransformedXYPositionsToDataTable - Writes backtransformed positions to a data table as double columns. Fails if Channels of types Raw X and Raw Y do not both exist or positional backtransformation is not enabled.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierX - Identifier of the X Column.
+	* @param[in] sColumnDescriptionX - Description of the X Column.
+	* @param[in] sColumnIdentifierY - Identifier of the X Column.
+	* @param[in] sColumnDescriptionY - Description of the X Column.
+	*/
+	void CRTCRecording::AddBacktransformedXYPositionsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifierX, const std::string & sColumnDescriptionX, const std::string & sColumnIdentifierY, const std::string & sColumnDescriptionY)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_AddBacktransformedXYPositionsToDataTable(m_pHandle, hDataTable, sColumnIdentifierX.c_str(), sColumnDescriptionX.c_str(), sColumnIdentifierY.c_str(), sColumnDescriptionY.c_str()));
+	}
+	
+	/**
+	* CRTCRecording::BacktransformRawXYCoordinates - Backtransforms raw coordinates in X and Y. Fails if positional backtransformation is not enabled.
+	* @param[in] nRawCoordinateX - Raw X coordinate.
+	* @param[in] nRawCoordinateY - Raw Y coordinate.
+	* @param[out] dBacktransformedX - Backtransformed X coordinate in mm.
+	* @param[out] dBacktransformedY - Backtransformed Y coordinate in mm.
+	*/
+	void CRTCRecording::BacktransformRawXYCoordinates(const LibMCDriver_ScanLab_int32 nRawCoordinateX, const LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double & dBacktransformedX, LibMCDriver_ScanLab_double & dBacktransformedY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_BacktransformRawXYCoordinates(m_pHandle, nRawCoordinateX, nRawCoordinateY, &dBacktransformedX, &dBacktransformedY));
+	}
+	
+	/**
+	* CRTCRecording::AddBacktransformedZPositionsToDataTable - Writes backtransformed Z positions to a data table as double column. Fails if Channels of types Raw Z does exist or positional backtransformation is not enabled.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierZ - Identifier of the Z Column.
+	* @param[in] sColumnDescriptionZ - Description of the Z Column.
+	*/
+	void CRTCRecording::AddBacktransformedZPositionsToDataTable(classParam<LibMCEnv::CDataTable> pDataTable, const std::string & sColumnIdentifierZ, const std::string & sColumnDescriptionZ)
+	{
+		LibMCEnvHandle hDataTable = pDataTable.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_AddBacktransformedZPositionsToDataTable(m_pHandle, hDataTable, sColumnIdentifierZ.c_str(), sColumnDescriptionZ.c_str()));
+	}
+	
+	/**
+	* CRTCRecording::BacktransformRawZCoordinate - Backtransforms raw Z coordinate. Fails if positional backtransformation is not enabled.
+	* @param[in] nRawCoordinateZ - Raw coordinates in Z.
+	* @return Backtransformed Z coordinate in mm.
+	*/
+	LibMCDriver_ScanLab_double CRTCRecording::BacktransformRawZCoordinate(const LibMCDriver_ScanLab_int32 nRawCoordinateZ)
+	{
+		LibMCDriver_ScanLab_double resultBacktransformedZ = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCRecording_BacktransformRawZCoordinate(m_pHandle, nRawCoordinateZ, &resultBacktransformedZ));
+		
+		return resultBacktransformedZ;
 	}
 	
 	/**
@@ -6799,14 +6866,28 @@ public:
 	}
 	
 	/**
+	* CRTCContext::CheckScanheadConnection - Checks if Scanhead is connected.
+	* @return Returns, if the scanhead 1 is connected to the RTC card.
+	*/
+	bool CRTCContext::CheckScanheadConnection()
+	{
+		bool resultScanheadIsConnected = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_CheckScanheadConnection(m_pHandle, &resultScanheadIsConnected));
+		
+		return resultScanheadIsConnected;
+	}
+	
+	/**
 	* CRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 	* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance.
+	* @param[in] bEnableScanheadFeedback - If true, the Scanhead feedback will be enabled. If false, scanner feedback signal channel types are not available.
+	* @param[in] bEnableBacktransformation - If true, the Scanhead backtransformation is read out from the RTC card. If false, scanhead position backtransformation is not enabled.
 	* @return Recording instance.
 	*/
-	PRTCRecording CRTCContext::PrepareRecording(const bool bKeepInMemory)
+	PRTCRecording CRTCContext::PrepareRecording(const bool bKeepInMemory, const bool bEnableScanheadFeedback, const bool bEnableBacktransformation)
 	{
 		LibMCDriver_ScanLabHandle hRecordingInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_PrepareRecording(m_pHandle, bKeepInMemory, &hRecordingInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_PrepareRecording(m_pHandle, bKeepInMemory, bEnableScanheadFeedback, bEnableBacktransformation, &hRecordingInstance));
 		
 		if (!hRecordingInstance) {
 			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);

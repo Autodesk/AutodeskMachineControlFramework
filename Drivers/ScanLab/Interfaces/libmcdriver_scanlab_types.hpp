@@ -238,6 +238,13 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAME 1133 /** Invalid GPIO Label Name */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAMELENGTH 1134 /** Invalid GPIO Label Name Length */
 #define LIBMCDRIVER_SCANLAB_ERROR_EMPTYGPIOLABELNAME 1135 /** Empty GPIO Label Name */
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANHEADCHANNELNEEDSFEEDBACKENABLED 1136 /** Scanhead channel needs feedback enabled. */
+#define LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPEISALREADYRECORDED 1137 /** Channel type is already recorded. */
+#define LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED 1138 /** Backtransformation is not enabled. */
+#define LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXNOTRECORDED 1139 /** RTC Channel X not recorded. */
+#define LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELYNOTRECORDED 1140 /** RTC Channel Y not recorded. */
+#define LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELZNOTRECORDED 1141 /** RTC Channel Z not recorded. */
+#define LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXANDYRECORDCOUNTMISMATCH 1142 /** RTC X and Y record count mismatch. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -388,6 +395,13 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAME: return "Invalid GPIO Label Name";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDGPIOLABELNAMELENGTH: return "Invalid GPIO Label Name Length";
     case LIBMCDRIVER_SCANLAB_ERROR_EMPTYGPIOLABELNAME: return "Empty GPIO Label Name";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANHEADCHANNELNEEDSFEEDBACKENABLED: return "Scanhead channel needs feedback enabled.";
+    case LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPEISALREADYRECORDED: return "Channel type is already recorded.";
+    case LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED: return "Backtransformation is not enabled.";
+    case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXNOTRECORDED: return "RTC Channel X not recorded.";
+    case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELYNOTRECORDED: return "RTC Channel Y not recorded.";
+    case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELZNOTRECORDED: return "RTC Channel Z not recorded.";
+    case LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXANDYRECORDCOUNTMISMATCH: return "RTC X and Y record count mismatch.";
     default: return "unknown error";
   }
 }
@@ -445,12 +459,14 @@ namespace LibMCDriver_ScanLab {
   */
   enum class eRTCChannelType : LibMCDriver_ScanLab_int32 {
     ChannelUndefined = 0, /** Undefined or invalid channel */
-    ChannelCurrentXRaw = 1, /** Raw X Value of the Scan Head (RTC Channel 1, StatusAX) */
-    ChannelCurrentYRaw = 2, /** Raw Y Value of the Scan Head (RTC Channel 2, StatusAY) */
-    ChannelCurrentZRaw = 4, /** Raw Z Value of the Scan Head (RTC Channel 4, StatusBX) */
-    ChannelTargetXRaw = 7, /** Target X Value of the Scan Head (RTC Channel 7, SampleX) */
-    ChannelTargetYRaw = 8, /** Target Y Value of the Scan Head (RTC Channel 8, SampleY) */
-    ChannelTargetZRaw = 9, /** Target Z Value of the Scan Head (RTC Channel 9, SampleZ) */
+    ChannelCurrentXRaw = 1, /** Raw X Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 1, StatusAX) */
+    ChannelCurrentYRaw = 2, /** Raw Y Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 2, StatusAY) */
+    ChannelCurrentZRaw = 4, /** Raw Z Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 4, StatusBX) */
+    ChannelTargetX = 7, /** Target X Value of the Scan Head. */
+    ChannelTargetY = 8, /** Target Y Value of the Scan Head. */
+    ChannelTargetZ = 9, /** Target Z Value of the Scan Head. */
+    ChannelTargetXTransformed = 20, /** Target X Value of the Scan Head transformed with the correction file (RTC Channel 20, SampleX) */
+    ChannelTargetYTransformed = 21, /** Target Y Value of the Scan Head transformed with the correction file (RTC Channel 21, SampleY) */
     ChannelAutoLaserControlMode = 24, /** Control Parameter of AutoLaserControl (RTC Channel 24) */
     ChannelVectorControlMode = 31, /** Control Parameter of VectorControl (RTC Channel 31) */
     ChannelDefocus = 32, /** Defocus setting (RTC Channel 32) */
@@ -479,13 +495,7 @@ namespace LibMCDriver_ScanLab {
     ChannelScaledEncoderY = 56, /** Scaled Encoder Value for Y Axis (RTC Channel 56) */
     ChannelScaledEncoderZ = 57, /** Scaled Encoder Value for Z Axis (RTC Channel 57) */
     ChannelRS232 = 58, /** RS232 Channel Value (RTC Channel 58) */
-    ChannelLaserOn = 100, /** Laser On Value (RTC Channel 0, LASERON) */
-    ChannelCurrentXBacktransformed = 101, /** Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX) */
-    ChannelCurrentYBacktransformed = 102, /** Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY) */
-    ChannelCurrentZBacktransformed = 104, /** Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX) */
-    ChannelTargetXBacktransformed = 107, /** Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX) */
-    ChannelTargetYBacktransformed = 108, /** Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY) */
-    ChannelTargetZBacktransformed = 109 /** Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ) */
+    ChannelLaserOn = 100 /** Laser On Value (RTC Channel 0, LASERON) */
   };
   
   /**

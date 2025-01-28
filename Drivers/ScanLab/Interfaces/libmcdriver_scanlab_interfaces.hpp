@@ -637,22 +637,6 @@ typedef IBaseSharedPtr<IRTCJob> PIRTCJob;
 class IRTCRecording : public virtual IBase {
 public:
 	/**
-	* IRTCRecording::ScanheadConnectionCheckIsEnabled - Returns if the scan head connection is checked when recording
-	* @return If true, the Scanhead connection will be checked for an error when recording.
-	*/
-	virtual bool ScanheadConnectionCheckIsEnabled() = 0;
-
-	/**
-	* IRTCRecording::EnableScanheadConnectionCheck - Enables the Scanhead connection check. The check is enabled by default.
-	*/
-	virtual void EnableScanheadConnectionCheck() = 0;
-
-	/**
-	* IRTCRecording::DisableScanheadConnectionCheck - Disables the Scanhead connection check.
-	*/
-	virtual void DisableScanheadConnectionCheck() = 0;
-
-	/**
 	* IRTCRecording::Clear - Clears all recording data and channels.
 	*/
 	virtual void Clear() = 0;
@@ -660,7 +644,7 @@ public:
 	/**
 	* IRTCRecording::AddChannel - Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.
 	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique.
-	* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined.
+	* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined. Fails if channel type is already recorded. Fails if scan head feedback is not enabled and channel type is ChannelCurrentXRaw, ChannelCurrentYRaw or ChannelCurrentZ.
 	*/
 	virtual void AddChannel(const std::string & sChannelName, const LibMCDriver_ScanLab::eRTCChannelType eChannelType) = 0;
 
@@ -743,6 +727,40 @@ public:
 	* @param[in] dOffset - Offset that the raw value is scaled with.
 	*/
 	virtual void AddScaledRecordsToDataTable(const std::string & sChannelName, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset) = 0;
+
+	/**
+	* IRTCRecording::AddBacktransformedXYPositionsToDataTable - Writes backtransformed positions to a data table as double columns. Fails if Channels of types Raw X and Raw Y do not both exist or positional backtransformation is not enabled.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierX - Identifier of the X Column.
+	* @param[in] sColumnDescriptionX - Description of the X Column.
+	* @param[in] sColumnIdentifierY - Identifier of the X Column.
+	* @param[in] sColumnDescriptionY - Description of the X Column.
+	*/
+	virtual void AddBacktransformedXYPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifierX, const std::string & sColumnDescriptionX, const std::string & sColumnIdentifierY, const std::string & sColumnDescriptionY) = 0;
+
+	/**
+	* IRTCRecording::BacktransformRawXYCoordinates - Backtransforms raw coordinates in X and Y. Fails if positional backtransformation is not enabled.
+	* @param[in] nRawCoordinateX - Raw X coordinate.
+	* @param[in] nRawCoordinateY - Raw Y coordinate.
+	* @param[out] dBacktransformedX - Backtransformed X coordinate in mm.
+	* @param[out] dBacktransformedY - Backtransformed Y coordinate in mm.
+	*/
+	virtual void BacktransformRawXYCoordinates(const LibMCDriver_ScanLab_int32 nRawCoordinateX, const LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double & dBacktransformedX, LibMCDriver_ScanLab_double & dBacktransformedY) = 0;
+
+	/**
+	* IRTCRecording::AddBacktransformedZPositionsToDataTable - Writes backtransformed Z positions to a data table as double column. Fails if Channels of types Raw Z does exist or positional backtransformation is not enabled.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierZ - Identifier of the Z Column.
+	* @param[in] sColumnDescriptionZ - Description of the Z Column.
+	*/
+	virtual void AddBacktransformedZPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifierZ, const std::string & sColumnDescriptionZ) = 0;
+
+	/**
+	* IRTCRecording::BacktransformRawZCoordinate - Backtransforms raw Z coordinate. Fails if positional backtransformation is not enabled.
+	* @param[in] nRawCoordinateZ - Raw coordinates in Z.
+	* @return Backtransformed Z coordinate in mm.
+	*/
+	virtual LibMCDriver_ScanLab_double BacktransformRawZCoordinate(const LibMCDriver_ScanLab_int32 nRawCoordinateZ) = 0;
 
 };
 
@@ -1602,11 +1620,19 @@ public:
 	virtual void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) = 0;
 
 	/**
+	* IRTCContext::CheckScanheadConnection - Checks if Scanhead is connected.
+	* @return Returns, if the scanhead 1 is connected to the RTC card.
+	*/
+	virtual bool CheckScanheadConnection() = 0;
+
+	/**
 	* IRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 	* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance.
+	* @param[in] bEnableScanheadFeedback - If true, the Scanhead feedback will be enabled. If false, scanner feedback signal channel types are not available.
+	* @param[in] bEnableBacktransformation - If true, the Scanhead backtransformation is read out from the RTC card. If false, scanhead position backtransformation is not enabled.
 	* @return Recording instance.
 	*/
-	virtual IRTCRecording * PrepareRecording(const bool bKeepInMemory) = 0;
+	virtual IRTCRecording * PrepareRecording(const bool bKeepInMemory, const bool bEnableScanheadFeedback, const bool bEnableBacktransformation) = 0;
 
 	/**
 	* IRTCContext::HasRecording - Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.

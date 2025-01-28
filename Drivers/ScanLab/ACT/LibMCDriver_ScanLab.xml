@@ -185,10 +185,14 @@
 		<error name="INVALIDGPIOLABELNAME" code="1133" description="Invalid GPIO Label Name" />
 		<error name="INVALIDGPIOLABELNAMELENGTH" code="1134" description="Invalid GPIO Label Name Length" />
 		<error name="EMPTYGPIOLABELNAME" code="1135" description="Empty GPIO Label Name" />
-		
-		
-
-			
+		<error name="SCANHEADCHANNELNEEDSFEEDBACKENABLED" code="1136" description="Scanhead channel needs feedback enabled." />
+		<error name="CHANNELTYPEISALREADYRECORDED" code="1137" description="Channel type is already recorded." />
+		<error name="BACKTRANSFORMATIONISNOTENABLED" code="1138" description="Backtransformation is not enabled." />
+		<error name="RTCCHANNELXNOTRECORDED" code="1139" description="RTC Channel X not recorded." />
+		<error name="RTCCHANNELYNOTRECORDED" code="1140" description="RTC Channel Y not recorded." />
+		<error name="RTCCHANNELZNOTRECORDED" code="1141" description="RTC Channel Z not recorded." />
+		<error name="RTCCHANNELXANDYRECORDCOUNTMISMATCH" code="1142" description="RTC X and Y record count mismatch." />
+							
 	</errors>
 
 
@@ -220,12 +224,14 @@
 
 	<enum name="RTCChannelType" description="Channel type to record. See RTC Documentation set_trigger for details.">
 	   <option name="ChannelUndefined" value="0" description="Undefined or invalid channel" />	   
-	   <option name="ChannelCurrentXRaw" value="1" description="Raw X Value of the Scan Head (RTC Channel 1, StatusAX)"  />
-	   <option name="ChannelCurrentYRaw" value="2" description="Raw Y Value of the Scan Head (RTC Channel 2, StatusAY)" />
-	   <option name="ChannelCurrentZRaw" value="4" description="Raw Z Value of the Scan Head (RTC Channel 4, StatusBX)" />
-	   <option name="ChannelTargetXRaw" value="7" description="Target X Value of the Scan Head (RTC Channel 7, SampleX)" />
-	   <option name="ChannelTargetYRaw" value="8" description="Target Y Value of the Scan Head (RTC Channel 8, SampleY)" />
-	   <option name="ChannelTargetZRaw" value="9" description="Target Z Value of the Scan Head (RTC Channel 9, SampleZ)" />
+	   <option name="ChannelCurrentXRaw" value="1" description="Raw X Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 1, StatusAX)"  />
+	   <option name="ChannelCurrentYRaw" value="2" description="Raw Y Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 2, StatusAY)" />
+	   <option name="ChannelCurrentZRaw" value="4" description="Raw Z Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 4, StatusBX)" />
+	   <option name="ChannelTargetX" value="7" description="Target X Value of the Scan Head." />
+	   <option name="ChannelTargetY" value="8" description="Target Y Value of the Scan Head." />
+	   <option name="ChannelTargetZ" value="9" description="Target Z Value of the Scan Head." />
+	   <option name="ChannelTargetXTransformed" value="20" description="Target X Value of the Scan Head transformed with the correction file (RTC Channel 20, SampleX)" />
+	   <option name="ChannelTargetYTransformed" value="21" description="Target Y Value of the Scan Head transformed with the correction file (RTC Channel 21, SampleY)" />
 	   <option name="ChannelAutoLaserControlMode" value="24" description="Control Parameter of AutoLaserControl (RTC Channel 24)" />
 	   <option name="ChannelVectorControlMode" value="31" description="Control Parameter of VectorControl (RTC Channel 31)" />
 	   <option name="ChannelDefocus" value="32" description="Defocus setting (RTC Channel 32)" />
@@ -255,12 +261,6 @@
 	   <option name="ChannelScaledEncoderZ" value="57" description="Scaled Encoder Value for Z Axis (RTC Channel 57)" />
 	   <option name="ChannelRS232" value="58" description="RS232 Channel Value (RTC Channel 58)" />	   
 	   <option name="ChannelLaserOn" value="100" description="Laser On Value (RTC Channel 0, LASERON)" />
-	   <option name="ChannelCurrentXBacktransformed" value="101" description="Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX)"  />
-	   <option name="ChannelCurrentYBacktransformed" value="102" description="Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY)" />
-	   <option name="ChannelCurrentZBacktransformed" value="104" description="Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX)" />
-	   <option name="ChannelTargetXBacktransformed" value="107" description="Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX)" />
-	   <option name="ChannelTargetYBacktransformed" value="108" description="Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY)" />
-	   <option name="ChannelTargetZBacktransformed" value="109" description="Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ)" />
 
 	</enum>
 	
@@ -487,23 +487,13 @@ Custom implementation
 	</class>
 
 	<class name="RTCRecording" parent="Base" description="A recording instance for an RTC Job..">
-
-		<method name="ScanheadConnectionCheckIsEnabled" description="Returns if the scan head connection is checked when recording">
-			<param name="Value" type="bool" pass="return" description="If true, the Scanhead connection will be checked for an error when recording." />
-		</method>	
-		
-		<method name="EnableScanheadConnectionCheck" description="Enables the Scanhead connection check. The check is enabled by default.">
-		</method>	
-
-		<method name="DisableScanheadConnectionCheck" description="Disables the Scanhead connection check.">
-		</method>	
-		
+				
 		<method name="Clear" description="Clears all recording data and channels.">
 		</method>	
 		
 		<method name="AddChannel" description="Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.">
 			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique." />
-			<param name="ChannelType" type="enum" class="RTCChannelType" pass="in" description="Channel type enum. MUST NOT be Undefined." />
+			<param name="ChannelType" type="enum" class="RTCChannelType" pass="in" description="Channel type enum. MUST NOT be Undefined. Fails if channel type is already recorded. Fails if scan head feedback is not enabled and channel type is ChannelCurrentXRaw, ChannelCurrentYRaw or ChannelCurrentZ." />
 		</method>	
 
 		<method name="RemoveChannel" description="Removes a new channel from the recording and all recorded data of that channel. Does nothing if channel does not exist. ">
@@ -551,7 +541,7 @@ Custom implementation
 			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
 			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
 			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
-		</method>	
+		</method>
 		
 		<method name="AddScaledRecordsToDataTable" description="Writes a certain channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset. Fails if Channel does not exist.">
 			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
@@ -562,6 +552,32 @@ Custom implementation
 			<param name="Offset" type="double" pass="in" description="Offset that the raw value is scaled with." />
 		</method>	
 		
+		<method name="AddBacktransformedXYPositionsToDataTable" description="Writes backtransformed positions to a data table as double columns. Fails if Channels of types Raw X and Raw Y do not both exist or positional backtransformation is not enabled.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to. Coordinates will be stored in mm." />
+			<param name="ColumnIdentifierX" type="string" pass="in" description="Identifier of the X Column." />
+			<param name="ColumnDescriptionX" type="string" pass="in" description="Description of the X Column." />
+			<param name="ColumnIdentifierY" type="string" pass="in" description="Identifier of the X Column." />
+			<param name="ColumnDescriptionY" type="string" pass="in" description="Description of the X Column." />
+		</method>
+		
+		<method name="BacktransformRawXYCoordinates" description="Backtransforms raw coordinates in X and Y. Fails if positional backtransformation is not enabled.">
+			<param name="RawCoordinateX" type="int32" pass="in" description="Raw X coordinate." />
+			<param name="RawCoordinateY" type="int32" pass="in" description="Raw Y coordinate." />
+			<param name="BacktransformedX" type="double" pass="out" description="Backtransformed X coordinate in mm." />
+			<param name="BacktransformedY" type="double" pass="out" description="Backtransformed Y coordinate in mm." />
+		</method>
+		
+		<method name="AddBacktransformedZPositionsToDataTable" description="Writes backtransformed Z positions to a data table as double column. Fails if Channels of types Raw Z does exist or positional backtransformation is not enabled.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to. Coordinates will be stored in mm." />
+			<param name="ColumnIdentifierZ" type="string" pass="in" description="Identifier of the Z Column." />
+			<param name="ColumnDescriptionZ" type="string" pass="in" description="Description of the Z Column." />
+		</method>
+		
+		<method name="BacktransformRawZCoordinate" description="Backtransforms raw Z coordinate. Fails if positional backtransformation is not enabled.">
+			<param name="RawCoordinateZ" type="int32" pass="in" description="Raw coordinates in Z." />
+			<param name="BacktransformedZ" type="double" pass="return" description="Backtransformed Z coordinate in mm." />
+		</method>
+
 		
 	</class>
 
@@ -1159,8 +1175,14 @@ Custom implementation
 			<param name="M22" type="double" pass="in" description="Lower right field of the transformation matrix" />
 		</method>
 
+		<method name="CheckScanheadConnection" description="Checks if Scanhead is connected.">
+			<param name="ScanheadIsConnected" type="bool" pass="return" description="Returns, if the scanhead 1 is connected to the RTC card." />
+		</method>
+
 		<method name="PrepareRecording" description="Prepares recording of position data of the RTC Card. This needs to be called before any list is started.">
 			<param name="KeepInMemory" type="bool" pass="in" description="If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance." />
+			<param name="EnableScanheadFeedback" type="bool" pass="in" description="If true, the Scanhead feedback will be enabled. If false, scanner feedback signal channel types are not available." />
+			<param name="EnableBacktransformation" type="bool" pass="in" description="If true, the Scanhead backtransformation is read out from the RTC card. If false, scanhead position backtransformation is not enabled." />
 			<param name="RecordingInstance" type="class" class="RTCRecording" pass="return" description="Recording instance." />		
 		</method>
 
