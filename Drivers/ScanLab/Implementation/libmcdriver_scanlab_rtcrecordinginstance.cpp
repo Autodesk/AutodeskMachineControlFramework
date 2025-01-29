@@ -704,8 +704,20 @@ void CRTCRecordingInstance::executeListWithRecording()
 		}
 		else if (MesPosition < LastPosition)
 		{
-			readRecordedDataBlockFromRTC(LastPosition, nMaxMESPosition);
-			LastPosition = 0;
+			if (MesPosition > nMaxMESPosition)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW, "data recording interval overflow: MesPosition exceeds Max MES Position");
+
+			uint32_t nBytesToRead = nMaxMESPosition - LastPosition;
+			if (nBytesToRead > Increment) {
+				readRecordedDataBlockFromRTC(LastPosition, LastPosition + Increment);
+				LastPosition += Increment;
+			}
+			else {
+				readRecordedDataBlockFromRTC(LastPosition, nMaxMESPosition);
+				LastPosition = 0;
+
+			}
+
 		}
 		else {
 			if (!MesBusy) {
