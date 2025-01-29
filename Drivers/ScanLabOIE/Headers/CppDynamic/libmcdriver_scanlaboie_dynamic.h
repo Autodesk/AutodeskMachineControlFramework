@@ -812,6 +812,15 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_IsLogged
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_IsStreamingPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue);
 
 /**
+* Returns the last measurement tag that has been retrieved.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[out] pMeasurementTag - Measurement Tag that has been retrieved last.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_GetReceivedMeasurementTagPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTag);
+
+/**
 * Returns if the connected RTC is busy.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
@@ -1085,6 +1094,7 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEOIEDevice_ClearCurrentRecordingPtr m_OIEDevice_ClearCurrentRecording;
 	PLibMCDriver_ScanLabOIEOIEDevice_IsLoggedInPtr m_OIEDevice_IsLoggedIn;
 	PLibMCDriver_ScanLabOIEOIEDevice_IsStreamingPtr m_OIEDevice_IsStreaming;
+	PLibMCDriver_ScanLabOIEOIEDevice_GetReceivedMeasurementTagPtr m_OIEDevice_GetReceivedMeasurementTag;
 	PLibMCDriver_ScanLabOIEOIEDevice_RTCIsBusyPtr m_OIEDevice_RTCIsBusy;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_GetDriverTypePtr m_Driver_ScanLab_OIE_GetDriverType;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr m_Driver_ScanLab_OIE_SetDependencyResourceNames;

@@ -70,6 +70,12 @@ namespace AMCData {
 
 				break;
 			}
+			case 15: {
+				std::string sSchemaVersionAddQuery = "ALTER TABLE `journals` ADD `githash` varchar ( 64 ) DEFAULT NULL";
+				pTransaction->executeStatement(sSchemaVersionAddQuery);
+
+				break;
+			}
 		}
 
 	}

@@ -429,6 +429,25 @@ public:
 	*/
 	virtual void StopExecution() = 0;
 
+	/**
+	* ISMCJob::LoadSimulationData - Reads the SMC Simulation data into a data table.
+	* @param[in] pSimulationDataTable - Data table object to read the simulation into.
+	*/
+	virtual void LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable) = 0;
+
+	/**
+	* ISMCJob::GetJobCharacteristic - Returns a characteristic value of a job.
+	* @param[in] eValueType - Type of job
+	* @return Characteristic Value
+	*/
+	virtual LibMCDriver_ScanLabSMC_double GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType) = 0;
+
+	/**
+	* ISMCJob::GetJobDuration - Returns the duration of the job in seconds.
+	* @return Duration in seconds.
+	*/
+	virtual LibMCDriver_ScanLabSMC_double GetJobDuration() = 0;
+
 };
 
 typedef IBaseSharedPtr<ISMCJob> PISMCJob;
@@ -502,6 +521,36 @@ public:
 	virtual void SetCorrectionFileResource(const std::string & sResourceName) = 0;
 
 	/**
+	* ISMCConfiguration::SetConfigurationTemplate - Sets the SMC Configuration Template. Currently supported version is 0.9.
+	* @param[in] sTemplateXML - Value to set.
+	*/
+	virtual void SetConfigurationTemplate(const std::string & sTemplateXML) = 0;
+
+	/**
+	* ISMCConfiguration::SetConfigurationTemplateResource - Sets the SMC Configuration Template from resource data. Currently supported version is 0.9.
+	* @param[in] sResourceName - Resource name to load.
+	*/
+	virtual void SetConfigurationTemplateResource(const std::string & sResourceName) = 0;
+
+	/**
+	* ISMCConfiguration::GetConfigurationTemplate - Returns the current SMC Configuration Template. Currently supported version is 0.9.
+	* @return Value to set.
+	*/
+	virtual std::string GetConfigurationTemplate() = 0;
+
+	/**
+	* ISMCConfiguration::SetSimulationSubDirectory - Set the simulation subdirectory name. MUST be an alphanumeric string with _ and .
+	* @param[in] sSubDirectory - New simulation subdirectory name. Default is Simulations
+	*/
+	virtual void SetSimulationSubDirectory(const std::string & sSubDirectory) = 0;
+
+	/**
+	* ISMCConfiguration::GetSimulationSubDirectory - Returns the simulation subdirectory name
+	* @return Returns the simulation subdirectory name.
+	*/
+	virtual std::string GetSimulationSubDirectory() = 0;
+
+	/**
 	* ISMCConfiguration::SetFirmware - Sets card firmware from binary data.
 	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
 	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
@@ -564,6 +613,12 @@ public:
 	* @return Returns serial number of board.
 	*/
 	virtual LibMCDriver_ScanLabSMC_uint32 GetSerialNumber() = 0;
+
+	/**
+	* ISMCContext::GetSimulationSubDirectory - Returns the simulation subdirectory name
+	* @return Returns the simulation subdirectory name.
+	*/
+	virtual std::string GetSimulationSubDirectory() = 0;
 
 	/**
 	* ISMCContext::GetLaserIndex - Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.

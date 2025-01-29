@@ -60,6 +60,8 @@ class IDriver;
 class IUARTConnection;
 class IRTCJob;
 class IRTCRecording;
+class IGPIOSequence;
+class INLightAFXProfileSelector;
 class IRTCContext;
 class IRTCSelector;
 class IDriver_ScanLab;
@@ -635,22 +637,6 @@ typedef IBaseSharedPtr<IRTCJob> PIRTCJob;
 class IRTCRecording : public virtual IBase {
 public:
 	/**
-	* IRTCRecording::ScanheadConnectionCheckIsEnabled - Returns if the scan head connection is checked when recording
-	* @return If true, the Scanhead connection will be checked for an error when recording.
-	*/
-	virtual bool ScanheadConnectionCheckIsEnabled() = 0;
-
-	/**
-	* IRTCRecording::EnableScanheadConnectionCheck - Enables the Scanhead connection check. The check is enabled by default.
-	*/
-	virtual void EnableScanheadConnectionCheck() = 0;
-
-	/**
-	* IRTCRecording::DisableScanheadConnectionCheck - Disables the Scanhead connection check.
-	*/
-	virtual void DisableScanheadConnectionCheck() = 0;
-
-	/**
 	* IRTCRecording::Clear - Clears all recording data and channels.
 	*/
 	virtual void Clear() = 0;
@@ -658,7 +644,7 @@ public:
 	/**
 	* IRTCRecording::AddChannel - Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.
 	* @param[in] sChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique.
-	* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined.
+	* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined. Fails if channel type is already recorded. Fails if scan head feedback is not enabled and channel type is ChannelCurrentXRaw, ChannelCurrentYRaw or ChannelCurrentZ.
 	*/
 	virtual void AddChannel(const std::string & sChannelName, const LibMCDriver_ScanLab::eRTCChannelType eChannelType) = 0;
 
@@ -742,9 +728,220 @@ public:
 	*/
 	virtual void AddScaledRecordsToDataTable(const std::string & sChannelName, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset) = 0;
 
+	/**
+	* IRTCRecording::AddBacktransformedXYPositionsToDataTable - Writes backtransformed positions to a data table as double columns. Fails if Channels of types Raw X and Raw Y do not both exist or positional backtransformation is not enabled.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierX - Identifier of the X Column.
+	* @param[in] sColumnDescriptionX - Description of the X Column.
+	* @param[in] sColumnIdentifierY - Identifier of the X Column.
+	* @param[in] sColumnDescriptionY - Description of the X Column.
+	*/
+	virtual void AddBacktransformedXYPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifierX, const std::string & sColumnDescriptionX, const std::string & sColumnIdentifierY, const std::string & sColumnDescriptionY) = 0;
+
+	/**
+	* IRTCRecording::BacktransformRawXYCoordinates - Backtransforms raw coordinates in X and Y. Fails if positional backtransformation is not enabled.
+	* @param[in] nRawCoordinateX - Raw X coordinate.
+	* @param[in] nRawCoordinateY - Raw Y coordinate.
+	* @param[out] dBacktransformedX - Backtransformed X coordinate in mm.
+	* @param[out] dBacktransformedY - Backtransformed Y coordinate in mm.
+	*/
+	virtual void BacktransformRawXYCoordinates(const LibMCDriver_ScanLab_int32 nRawCoordinateX, const LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double & dBacktransformedX, LibMCDriver_ScanLab_double & dBacktransformedY) = 0;
+
+	/**
+	* IRTCRecording::AddBacktransformedZPositionsToDataTable - Writes backtransformed Z positions to a data table as double column. Fails if Channels of types Raw Z does exist or positional backtransformation is not enabled.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierZ - Identifier of the Z Column.
+	* @param[in] sColumnDescriptionZ - Description of the Z Column.
+	*/
+	virtual void AddBacktransformedZPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifierZ, const std::string & sColumnDescriptionZ) = 0;
+
+	/**
+	* IRTCRecording::BacktransformRawZCoordinate - Backtransforms raw Z coordinate. Fails if positional backtransformation is not enabled.
+	* @param[in] nRawCoordinateZ - Raw coordinates in Z.
+	* @return Backtransformed Z coordinate in mm.
+	*/
+	virtual LibMCDriver_ScanLab_double BacktransformRawZCoordinate(const LibMCDriver_ScanLab_int32 nRawCoordinateZ) = 0;
+
+	/**
+	* IRTCRecording::AddTargetPositionsToDataTable - Writes target positions to a data table as double columns. Fails if Channels of types Target X and Target Y do not both exist.
+	* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+	* @param[in] sColumnIdentifierX - Identifier of the X Column.
+	* @param[in] sColumnDescriptionX - Description of the X Column.
+	* @param[in] sColumnIdentifierY - Identifier of the X Column.
+	* @param[in] sColumnDescriptionY - Description of the X Column.
+	*/
+	virtual void AddTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifierX, const std::string & sColumnDescriptionX, const std::string & sColumnIdentifierY, const std::string & sColumnDescriptionY) = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCRecording> PIRTCRecording;
+
+
+/*************************************************************************************************************************
+ Class interface for GPIOSequence 
+**************************************************************************************************************************/
+
+class IGPIOSequence : public virtual IBase {
+public:
+	/**
+	* IGPIOSequence::GetIdentifier - Returns the identifier of the GPIO Sequence.
+	* @return Returns identifier string
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* IGPIOSequence::Clear - Clears all sequence steps.
+	*/
+	virtual void Clear() = 0;
+
+	/**
+	* IGPIOSequence::AddOutput - Adds the writing of an output pin.
+	* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+	* @param[in] bOutputValue - If true, bit will be set, if false bit will be cleared.
+	*/
+	virtual void AddOutput(const LibMCDriver_ScanLab_uint32 nOutputBit, const bool bOutputValue) = 0;
+
+	/**
+	* IGPIOSequence::AddDelay - Adds a delay to the GPIO Sequence.
+	* @param[in] nDelayInMilliseconds - Delay in milliseconds.
+	*/
+	virtual void AddDelay(const LibMCDriver_ScanLab_uint32 nDelayInMilliseconds) = 0;
+
+	/**
+	* IGPIOSequence::WaitforInput - Waits for an input pin to reach a certain value.
+	* @param[in] nInputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+	* @param[in] bInputValue - If true, the wait is for the bit becoming 1, if false, the wait is for the bit becoming 0.
+	* @param[in] nMaxDelayInMilliseconds - Sets the maximum time it is allowed to take. Fails, if MaxDelay is 0.
+	*/
+	virtual void WaitforInput(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const LibMCDriver_ScanLab_uint32 nMaxDelayInMilliseconds) = 0;
+
+	/**
+	* IGPIOSequence::AddLabel - Adds a label to the current sequence position.
+	* @param[in] sLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+	* @param[in] nMaxPasses - Maximum number of times this label can be passed. Triggers an error if the label is passed more often.
+	*/
+	virtual void AddLabel(const std::string & sLabelName, const LibMCDriver_ScanLab_uint32 nMaxPasses) = 0;
+
+	/**
+	* IGPIOSequence::GoToLabel - Jumps to a label. Fails if label does not exist.
+	* @param[in] sLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+	*/
+	virtual void GoToLabel(const std::string & sLabelName) = 0;
+
+	/**
+	* IGPIOSequence::ConditionalGoToLabel - Jumps to a label, if a certain input pin is set or cleared. Fails if label does not exist. Does nothing, if the input condition is not fulfilled.
+	* @param[in] nInputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+	* @param[in] bInputValue - If true, the jump is for the bit becoming 1, if false, the jump is for the bit becoming 0.
+	* @param[in] sLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+	*/
+	virtual void ConditionalGoToLabel(const LibMCDriver_ScanLab_uint32 nInputBit, const bool bInputValue, const std::string & sLabelName) = 0;
+
+	/**
+	* IGPIOSequence::EnableAutomaticSelection - Enables the GPIOSequence inside the DrawLayer Routine. The Sequence ID will be taken out of the build profile in this case.
+	*/
+	virtual void EnableAutomaticSelection() = 0;
+
+	/**
+	* IGPIOSequence::DisableAutomaticSelection - Disables the GPIOSequence selection.
+	*/
+	virtual void DisableAutomaticSelection() = 0;
+
+};
+
+typedef IBaseSharedPtr<IGPIOSequence> PIGPIOSequence;
+
+
+/*************************************************************************************************************************
+ Class interface for NLightAFXProfileSelector 
+**************************************************************************************************************************/
+
+class INLightAFXProfileSelector : public virtual IBase {
+public:
+	/**
+	* INLightAFXProfileSelector::SetControlOutputPins - Sets the control output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+	* @param[in] nStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+	*/
+	virtual void SetControlOutputPins(const LibMCDriver_ScanLab_uint32 nEnableDigitalOutputBit, const LibMCDriver_ScanLab_uint32 nStartDigitalOutputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetControlOutputPins - Returns the control output pin mapping for the nLight AFX Laser.
+	* @param[out] nEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+	* @param[out] nStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+	*/
+	virtual void GetControlOutputPins(LibMCDriver_ScanLab_uint32 & nEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 & nStartDigitalOutputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::SetSelectionOutputPins - Sets the selection output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+	* @param[in] nStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+	* @param[in] nStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+	*/
+	virtual void SetSelectionOutputPins(const LibMCDriver_ScanLab_uint32 nStartIndexSelection0OutputBit, const LibMCDriver_ScanLab_uint32 nStartIndexSelection1OutputBit, const LibMCDriver_ScanLab_uint32 nStartIndexSelection2OutputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetSelectionOutputPins - Returns the selection output pin mapping for the nLight AFX Laser.
+	* @param[out] nStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+	* @param[out] nStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+	* @param[out] nStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+	*/
+	virtual void GetSelectionOutputPins(LibMCDriver_ScanLab_uint32 & nStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 & nStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 & nStartIndexSelection2OutputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::SetAcknowledgeInputPin - Sets the acknowledge pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+	* @param[in] nSelectionAcknowledgeInputBit - RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY). MUST be between 0 and 15. Default is 0.
+	*/
+	virtual void SetAcknowledgeInputPin(const LibMCDriver_ScanLab_uint32 nSelectionAcknowledgeInputBit) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetAcknowledgeInputPin - Returns the acknowledge pin mapping for the nLight AFX Laser.
+	* @return RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY).
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetAcknowledgeInputPin() = 0;
+
+	/**
+	* INLightAFXProfileSelector::SetSelectionDelay - Sets the delay that is added for the AFX Mode selection to be transfered. Call will fail if profile selection is enabled.
+	* @param[in] nSelectionDelayInMilliseconds - Selection Delay in milliseconds. Default is 30.
+	*/
+	virtual void SetSelectionDelay(const LibMCDriver_ScanLab_uint32 nSelectionDelayInMilliseconds) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetSelectionDelay - Returns the delay that is added for the AFX Mode selection to transfered.
+	* @return Selection Delay in milliseconds. Default is 30.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetSelectionDelay() = 0;
+
+	/**
+	* INLightAFXProfileSelector::SetAcknowledgeTimeout - Sets the timeout that the AFX Mode selection will wait to be applied. Call will fail if profile selection is enabled.
+	* @param[in] nAcknowledgeInMilliseconds - Acknowledge Timeout in Milliseconds. Default is 500.
+	*/
+	virtual void SetAcknowledgeTimeout(const LibMCDriver_ScanLab_uint32 nAcknowledgeInMilliseconds) = 0;
+
+	/**
+	* INLightAFXProfileSelector::GetAcknowledgeTimeout - Returns the timeout that the AFX Mode selection will wait to be applied.
+	* @return Acknowledge Timeout in Milliseconds. Default is 500.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetAcknowledgeTimeout() = 0;
+
+	/**
+	* INLightAFXProfileSelector::EnableAutomaticSelection - Enables the AFX Mode selection inside the DrawLayer Routine. The Laser Mode will be taken out of the build profile in this case.
+	*/
+	virtual void EnableAutomaticSelection() = 0;
+
+	/**
+	* INLightAFXProfileSelector::DisableAutomaticSelection - Disables the AFX Mode selection.
+	*/
+	virtual void DisableAutomaticSelection() = 0;
+
+	/**
+	* INLightAFXProfileSelector::AddCustomSelection - Adds a custom selection cycle to the currenly open list.
+	* @param[in] nAFXModeIndex - AFX Mode index to set. MUST be between 0 and 7.
+	*/
+	virtual void AddCustomSelection(const LibMCDriver_ScanLab_uint32 nAFXModeIndex) = 0;
+
+};
+
+typedef IBaseSharedPtr<INLightAFXProfileSelector> PINLightAFXProfileSelector;
 
 
 /*************************************************************************************************************************
@@ -1073,6 +1270,20 @@ public:
 	virtual LibMCDriver_ScanLab_uint32 GetTimeStamp() = 0;
 
 	/**
+	* IRTCContext::GetRTCChannel - Returns an RTC Channel in real time. The signal register is instantly read and directly passed back to the caller.
+	* @param[in] eChannelType - Internal RTC Channel type. See SCANLAB RTC Documentation for set_trigger for a proper explanation.
+	* @return Internal Value of that signal.
+	*/
+	virtual LibMCDriver_ScanLab_int32 GetRTCChannel(const LibMCDriver_ScanLab::eRTCChannelType eChannelType) = 0;
+
+	/**
+	* IRTCContext::GetRTCInternalValue - Returns an internal RTC value by RTC Signal ID. The signal register is instantly read and directly passed back to the caller.
+	* @param[in] nInternalSignalID - Internal RTC Signal ID. See SCANLAB RTC Documentation for set_trigger for a proper explanation. Some values are mapped from the enum definition of RTCChannelType.
+	* @return Internal Value of that signal.
+	*/
+	virtual LibMCDriver_ScanLab_int32 GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID) = 0;
+
+	/**
 	* IRTCContext::StopExecution - Stops the execution of the current list immediately.
 	*/
 	virtual void StopExecution() = 0;
@@ -1229,6 +1440,19 @@ public:
 	virtual void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2) = 0;
 
 	/**
+	* IRTCContext::AddWriteDigitalIOList - Adds the change of all 16 digital IO Ports to the current open list.
+	* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+	*/
+	virtual void AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput) = 0;
+
+	/**
+	* IRTCContext::AddWriteMaskedDigitalIOList - Adds the change a subset of 16 digital IO Ports to the current open list.
+	* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+	* @param[in] nOutputMask - Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535.
+	*/
+	virtual void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) = 0;
+
+	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
 	*/
 	virtual void EnableOIE() = 0;
@@ -1237,6 +1461,39 @@ public:
 	* IRTCContext::DisableOIE - Writes an OIE disabling command block to the open list.
 	*/
 	virtual void DisableOIE() = 0;
+
+	/**
+	* IRTCContext::CreateNLightAFXBeamProfileSelector - Creates an nLight AFX Beam Selector instance. If called multiple times, the same instance will be returned.
+	* @return nLight Profile selector instance.
+	*/
+	virtual INLightAFXProfileSelector * CreateNLightAFXBeamProfileSelector() = 0;
+
+	/**
+	* IRTCContext::AddGPIOSequence - Adds a GPIO Sequence. Fails if Sequence with the same identifier already exists.
+	* @param[in] sIdentifier - Identifier for the sequence.
+	* @return GPIOSequence instance.
+	*/
+	virtual IGPIOSequence * AddGPIOSequence(const std::string & sIdentifier) = 0;
+
+	/**
+	* IRTCContext::WriteGPIOSequenceToList - Writes a GPIO Sequence to the current list. Fails if sequence does not exist.
+	* @param[in] sIdentifier - Identifier for the sequence.
+	*/
+	virtual void WriteGPIOSequenceToList(const std::string & sIdentifier) = 0;
+
+	/**
+	* IRTCContext::FindGPIOSequence - Finds a GPIO Sequence. 
+	* @param[in] sIdentifier - Identifier for the sequence.
+	* @param[in] bMustExist - If true, the call fails if Sequence with the identifier does not exist.
+	* @return GPIOSequence instance. Returns null, if MustExist is fales and a sequence with the identifier does not exist.
+	*/
+	virtual IGPIOSequence * FindGPIOSequence(const std::string & sIdentifier, const bool bMustExist) = 0;
+
+	/**
+	* IRTCContext::DeleteGPIOSequence - Deletes a GPIO Sequence. Does nothing if Sequence with the identifier does not exists.
+	* @param[in] sIdentifier - Identifier for the sequence.
+	*/
+	virtual void DeleteGPIOSequence(const std::string & sIdentifier) = 0;
 
 	/**
 	* IRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
@@ -1284,6 +1541,12 @@ public:
 	* IRTCContext::DisableOIEMeasurementTagging - Disables OIE Measurement tagging.
 	*/
 	virtual void DisableOIEMeasurementTagging() = 0;
+
+	/**
+	* IRTCContext::GetOIEMaxMeasurementTag - Returns the current maximum measurement tag that has been sent to the OIE.
+	* @return Measurement Tag that has been sent to the OIE.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 GetOIEMaxMeasurementTag() = 0;
 
 	/**
 	* IRTCContext::MapOIEMeasurementTag - Maps an OIE Measurement tag back to the original scan parameters.
@@ -1367,11 +1630,19 @@ public:
 	virtual void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) = 0;
 
 	/**
+	* IRTCContext::CheckScanheadConnection - Checks if Scanhead is connected.
+	* @return Returns, if the scanhead 1 is connected to the RTC card.
+	*/
+	virtual bool CheckScanheadConnection() = 0;
+
+	/**
 	* IRTCContext::PrepareRecording - Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 	* @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance.
+	* @param[in] bEnableScanheadFeedback - If true, the Scanhead feedback will be enabled. If false, scanner feedback signal channel types are not available.
+	* @param[in] bEnableBacktransformation - If true, the Scanhead backtransformation is read out from the RTC card. If false, scanhead position backtransformation is not enabled.
 	* @return Recording instance.
 	*/
-	virtual IRTCRecording * PrepareRecording(const bool bKeepInMemory) = 0;
+	virtual IRTCRecording * PrepareRecording(const bool bKeepInMemory, const bool bEnableScanheadFeedback, const bool bEnableBacktransformation) = 0;
 
 	/**
 	* IRTCContext::HasRecording - Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.

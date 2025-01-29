@@ -46,7 +46,8 @@ namespace AMC {
 		btListJobs = 2,
 		btToolpath = 3,
 		btListBuildData = 4,
-		btGetBuildData = 5
+		btGetBuildData = 5,
+		btBuildJobDetails = 6
 
 	};
 
@@ -62,6 +63,8 @@ namespace AMC {
 		void handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth);
 		void handleListBuildDataRequest(CJSONWriter& writer, PAPIAuth pAuth, std::string& buildUUID);
 		PAPIResponse handleGetBuildDataRequest(PAPIAuth pAuth, std::string& buildDataUUID);
+		void handleBuildJobDetailsRequest(CJSONWriter& writer, PAPIAuth pAuth, std::string& buildUUID);
+
 
 	public:
 

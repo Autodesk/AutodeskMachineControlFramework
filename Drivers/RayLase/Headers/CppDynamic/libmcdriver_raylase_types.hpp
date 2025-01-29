@@ -114,6 +114,31 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT 1007 /** Invalid point count */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER 1008 /** Invalid laser power */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK 1009 /** Invalid Raylase SDK */
+#define LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX 1010 /** Assigned duplicate laser index */
+#define LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED 1011 /** No laser indices have been assigned */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID 1012 /** Invalid list ID */
+#define LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD 1013 /** Segment has no assigned card. */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING 1014 /** Invalid system timing */
+#define LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT 1015 /** A scanning timeout occured */
+#define LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS 1016 /** Cannot delete list in progress */
+#define LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED 1017 /** Raylase SDK not loaded */
+#define LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASINVALIDLASERINDEX 1018 /** Segment has invalid laser index */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDAPIFIELDNAME 1019 /** Invalid API Field Name */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDAPIVARIABLENAME 1020 /** Invalid API Variable Name */
+#define LIBMCDRIVER_RAYLASE_ERROR_DUPLICATEAPIVARIABLENAME 1021 /** Duplicate API Variable Name */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDVARIABLEOFFSET 1022 /** Invalid Variable Offset */
+#define LIBMCDRIVER_RAYLASE_ERROR_VARIABLEEXCEEDSBUFFER 1023 /** Variable Exceeds Buffer */
+#define LIBMCDRIVER_RAYLASE_ERROR_VARIABLETYPENOTSUPPORTED 1024 /** Variable Type Not Supported */
+#define LIBMCDRIVER_RAYLASE_ERROR_VARIABLENOTFOUND 1025 /** Variable not found */
+#define LIBMCDRIVER_RAYLASE_ERROR_INTEGERVALUEOUTOFRANGE 1026 /** Integer Value out of range */
+#define LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEINTEGER 1027 /** Variable is not of type integer */
+#define LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEDOUBLE 1028 /** Variable is not of type double */
+#define LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEBOOL 1029 /** Variable is not of type bool */
+#define LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEENUM 1030 /** Variable is not of type enum */
+#define LIBMCDRIVER_RAYLASE_ERROR_ENUMVALUEOUTOFRANGE 1031 /** Enum Value out of range */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDFIELDDATASIZE 1032 /** Invalid field data size */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDNLIGHTLASERMODE 1033 /** Invalid nLight Laser Mode */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDVARIABLEINDEX 1034 /** Invalid Variable Index */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -140,6 +165,31 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER: return "Invalid laser power";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK: return "Invalid Raylase SDK";
+    case LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX: return "Assigned duplicate laser index";
+    case LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED: return "No laser indices have been assigned";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLISTID: return "Invalid list ID";
+    case LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASNOASSIGNEDCARD: return "Segment has no assigned card.";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING: return "Invalid system timing";
+    case LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT: return "A scanning timeout occured";
+    case LIBMCDRIVER_RAYLASE_ERROR_CANNOTDELETELISTLISTINPROGRESS: return "Cannot delete list in progress";
+    case LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED: return "Raylase SDK not loaded";
+    case LIBMCDRIVER_RAYLASE_ERROR_SEGMENTHASINVALIDLASERINDEX: return "Segment has invalid laser index";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDAPIFIELDNAME: return "Invalid API Field Name";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDAPIVARIABLENAME: return "Invalid API Variable Name";
+    case LIBMCDRIVER_RAYLASE_ERROR_DUPLICATEAPIVARIABLENAME: return "Duplicate API Variable Name";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDVARIABLEOFFSET: return "Invalid Variable Offset";
+    case LIBMCDRIVER_RAYLASE_ERROR_VARIABLEEXCEEDSBUFFER: return "Variable Exceeds Buffer";
+    case LIBMCDRIVER_RAYLASE_ERROR_VARIABLETYPENOTSUPPORTED: return "Variable Type Not Supported";
+    case LIBMCDRIVER_RAYLASE_ERROR_VARIABLENOTFOUND: return "Variable not found";
+    case LIBMCDRIVER_RAYLASE_ERROR_INTEGERVALUEOUTOFRANGE: return "Integer Value out of range";
+    case LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEINTEGER: return "Variable is not of type integer";
+    case LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEDOUBLE: return "Variable is not of type double";
+    case LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEBOOL: return "Variable is not of type bool";
+    case LIBMCDRIVER_RAYLASE_ERROR_VARIABLEISNOTOFTYPEENUM: return "Variable is not of type enum";
+    case LIBMCDRIVER_RAYLASE_ERROR_ENUMVALUEOUTOFRANGE: return "Enum Value out of range";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDFIELDDATASIZE: return "Invalid field data size";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDNLIGHTLASERMODE: return "Invalid nLight Laser Mode";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDVARIABLEINDEX: return "Invalid Variable Index";
     default: return "unknown error";
   }
 }
@@ -150,6 +200,8 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
 
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Base;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver;
+typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCommandLog;
+typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_NLightDriverBoard;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCard;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver_Raylase;
 

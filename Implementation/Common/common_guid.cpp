@@ -39,6 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wincrypt.h>
 #endif
 
+#ifdef _WIN32
+#include <ShlObj_core.h>
+#endif
+
+
 #include "crossguid/guid.hpp"
 #include "PicoSHA2/picosha2.h"
 #include "common_utils.hpp"
@@ -141,5 +146,28 @@ namespace AMCCommon {
 	}
 
 
+	std::string CUtils::getCurrentUserHomeDirectory()
+	{
+#ifdef _WIN32
+		PWSTR roamingAppDataPath = nullptr;
+		if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_DEFAULT, 0, &roamingAppDataPath) == S_OK) {
+
+			if (roamingAppDataPath == nullptr)
+				throw std::runtime_error("could not return user home directory");
+
+			std::wstring sHomeDirectoryW(roamingAppDataPath);
+			CoTaskMemFree(roamingAppDataPath);
+
+			return UTF16toUTF8(sHomeDirectoryW);
+		}
+		else
+			throw std::runtime_error("could not return user home directory");
+
+#else
+		throw std::runtime_error("getCurrentUserHomeDirectory not implemented");
+
+#endif
+
+	}
 
 }

@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <common_utils.hpp>
 
+#define SCHEMA_PROPRIETARYTOOLPATHATTACHMENT "http://schemas.microsoft.com/3dmanufacturing/2019/05/proprietarytoolpath"
+
 namespace AMC {
 
 	CToolpathEntity::CToolpathEntity(LibMCData::PDataModel pDataModel, const std::string& sStorageStreamUUID, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName, bool bAllowEmptyToolpath, const std::set<std::string>& attachmentRelationsToRead)
@@ -62,6 +64,7 @@ namespace AMC {
 		m_p3MFReader = m_p3MFModel->QueryReader("3mf");
 		for (std::string sRelationToRead : attachmentRelationsToRead)
 			m_p3MFReader->AddRelationToRead(sRelationToRead);
+		m_p3MFReader->AddRelationToRead(SCHEMA_PROPRIETARYTOOLPATHATTACHMENT);
 
 		m_p3MFReader->ReadFromPersistentSource(m_pPersistentSource.get ());
 
@@ -135,13 +138,27 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		if (m_pToolpath.get() != nullptr) {
-			auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+			auto nZValue = m_pToolpath->GetLayerZMax(nLayerIndex);
 
 			return nZValue;
 		}
 
 		return 0;
 	}
+
+	uint32_t CToolpathEntity::getLayerMinZInUnits(uint32_t nLayerIndex)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		if (m_pToolpath.get() != nullptr) {
+			auto nZValue = m_pToolpath->GetLayerZMin(nLayerIndex);
+
+			return nZValue;
+		}
+
+		return 0;
+
+	}
+
 
 	PToolpathLayerData CToolpathEntity::readLayer(uint32_t nLayerIndex)
 	{
@@ -153,7 +170,7 @@ namespace AMC {
 		double dUnits = m_pToolpath->GetUnits();
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
-		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+		auto nZValue = m_pToolpath->GetLayerZMax(nLayerIndex);
 		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName, m_CustomSegmentAttributes);
 	}
 
@@ -337,10 +354,10 @@ namespace AMC {
 
 		switch (eAttributeType) {
 		case LibMCEnv::eToolpathAttributeType::Integer: 
-			m_pToolpath->RegisterCustomIntegerAttribute (sNameSpace, sAttributeName);
+			m_pToolpath->RegisterCustomIntegerSegmentAttribute (sNameSpace, sAttributeName);
 			break;
 		case LibMCEnv::eToolpathAttributeType::Double:
-			m_pToolpath->RegisterCustomDoubleAttribute (sNameSpace, sAttributeName);
+			m_pToolpath->RegisterCustomDoubleSegmentAttribute (sNameSpace, sAttributeName);
 			break;
 		default: 
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDSEGMENTATTRIBUTETYPE, "invalid segment attribute type of " + sNameSpace + "/" + sAttributeName);

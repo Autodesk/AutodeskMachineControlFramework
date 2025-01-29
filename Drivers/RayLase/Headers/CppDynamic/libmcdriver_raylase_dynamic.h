@@ -115,6 +115,67 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_QueryParametersPt
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_QueryParametersExPtr) (LibMCDriver_Raylase_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
+ Class definition for RaylaseCommandLog
+**************************************************************************************************************************/
+
+/**
+* Returns the log as  string.
+*
+* @param[in] pRaylaseCommandLog - RaylaseCommandLog instance.
+* @param[in] nLogStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pLogStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pLogStringBuffer -  buffer of Retrieved log string., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr) (LibMCDriver_Raylase_RaylaseCommandLog pRaylaseCommandLog, const LibMCDriver_Raylase_uint32 nLogStringBufferSize, LibMCDriver_Raylase_uint32* pLogStringNeededChars, char * pLogStringBuffer);
+
+/*************************************************************************************************************************
+ Class definition for NLightDriverBoard
+**************************************************************************************************************************/
+
+/**
+* Initializes the NLight laser via the driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_InitializeLaserPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Disables the NLight laser via the driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_DisableLaserPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Clears any error state in the NLight laser via the driver board.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_ClearErrorPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard);
+
+/**
+* Sets the nLight Laser Mode. Board must have been initialized first.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @param[in] nLaserMode - Sets the laser mode.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_SetLaserModePtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 nLaserMode);
+
+/**
+* Checks, if the laser is in an error state.
+*
+* @param[in] pNLightDriverBoard - NLightDriverBoard instance.
+* @param[out] pErrorState - Returns true if the laser is in an error state.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_HasErrorPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, bool * pErrorState);
+
+/*************************************************************************************************************************
  Class definition for RaylaseCard
 **************************************************************************************************************************/
 
@@ -128,14 +189,6 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_QueryParametersEx
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pIsConnected);
 
 /**
-* Disconnects and unregisters the card.
-*
-* @param[in] pRaylaseCard - RaylaseCard instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
-
-/**
 * Resets the card settings to system defaults.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
@@ -144,12 +197,46 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DisconnectPt
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
 
 /**
+* Enables Command logging for the Raylase SDK interface.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Disables Command logging for the Raylase SDK interface.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DisableCommandLoggingPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Retrieves the last Raylase SDK command log. Fails if Command logging was never enabled.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pRaylaseLogInstance - Instance of connected card.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_RetrieveLatestLogPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_RaylaseCommandLog * pRaylaseLogInstance);
+
+/**
 * Turns the laser on.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
+* Returns the NLight Driver Board Handler class.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pDriverBoard - NLight Driver Board Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetNLightDriverBoardPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_NLightDriverBoard * pDriverBoard);
 
 /**
 * Turns the laser off.
@@ -207,14 +294,77 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_PilotIsEnabl
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetLaserStatusPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pPilotIsEnabled, bool * pLaserIsArmed, bool * pLaserAlarm);
 
 /**
+* Assigns a laser index to the card.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] nLaserIndex - Laser index to assign. This will map to the laser indices given in the build file. 0 means no assignment.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_AssignLaserIndexPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 nLaserIndex);
+
+/**
+* Returns the assigned laser index to the card. Default value is 0 (unassigned).
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pLaserIndex - Assigned laser index. This will map to the laser indices given in the build file. 0 means no assignment.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetAssignedLaserIndexPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 * pLaserIndex);
+
+/**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
 * @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 * @param[in] nLayerIndex - Layer index of the build file.
+* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
+
+/**
+* Sets the rotational coordinate transform to use.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] dM11 - Upper left field of the transformation matrix.
+* @param[in] dM12 - Upper right field of the transformation matrix.
+* @param[in] dM21 - Lower left field of the transformation matrix.
+* @param[in] dM22 - Lower right field of the transformation matrix.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_SetRotationalCoordinateTransformPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double dM11, LibMCDriver_Raylase_double dM12, LibMCDriver_Raylase_double dM21, LibMCDriver_Raylase_double dM22);
+
+/**
+* Returns the rotational coordinate transform in use. The default is the identity matrix.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pM11 - Upper left field of the transformation matrix.
+* @param[out] pM12 - Upper right field of the transformation matrix.
+* @param[out] pM21 - Lower left field of the transformation matrix.
+* @param[out] pM22 - Lower right field of the transformation matrix.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetRotationalCoordinateTransformPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double * pM11, LibMCDriver_Raylase_double * pM12, LibMCDriver_Raylase_double * pM21, LibMCDriver_Raylase_double * pM22);
+
+/**
+* Sets the translational coordinate transform to use.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] dOffsetX - Translation in X in mm.
+* @param[in] dOffsetY - Translation in Y in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_SetTranslationalCoordinateTransformPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double dOffsetX, LibMCDriver_Raylase_double dOffsetY);
+
+/**
+* Returns the translational coordinate transform in use. Default is 0/0
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pOffsetX - Translation in X in mm.
+* @param[out] pOffsetY - Translation in Y in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetTranslationalCoordinateTransformPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_double * pOffsetX, LibMCDriver_Raylase_double * pOffsetY);
 
 /*************************************************************************************************************************
  Class definition for Driver_Raylase
@@ -276,6 +426,37 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_ConnectBy
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_GetConnectedCardPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
+
+/**
+* Retrieves.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pCardName - Name of scanner card to retrieve.
+* @param[out] pCardExistsAndIsConnected - Returns true if card exists, false otherwise.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_CardExistsPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, bool * pCardExistsAndIsConnected);
+
+/**
+* Disconnects and unregisters a card. Does nothing if card does not exist.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pCardName - Name of scanner card to disconnect. Card will be removed from driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_DisconnectCardPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName);
+
+/**
+* Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
+* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pStreamUUID, LibMCDriver_Raylase_uint32 nLayerIndex, bool bFailIfNonAssignedDataExists, LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 
 /*************************************************************************************************************************
  Global functions
@@ -359,23 +540,41 @@ typedef struct {
 	PLibMCDriver_RaylaseDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_RaylaseDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_RaylaseDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
+	PLibMCDriver_RaylaseRaylaseCommandLog_RetrieveAsStringPtr m_RaylaseCommandLog_RetrieveAsString;
+	PLibMCDriver_RaylaseNLightDriverBoard_InitializeLaserPtr m_NLightDriverBoard_InitializeLaser;
+	PLibMCDriver_RaylaseNLightDriverBoard_DisableLaserPtr m_NLightDriverBoard_DisableLaser;
+	PLibMCDriver_RaylaseNLightDriverBoard_ClearErrorPtr m_NLightDriverBoard_ClearError;
+	PLibMCDriver_RaylaseNLightDriverBoard_SetLaserModePtr m_NLightDriverBoard_SetLaserMode;
+	PLibMCDriver_RaylaseNLightDriverBoard_HasErrorPtr m_NLightDriverBoard_HasError;
 	PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr m_RaylaseCard_IsConnected;
-	PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr m_RaylaseCard_Disconnect;
 	PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr m_RaylaseCard_ResetToSystemDefaults;
+	PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr m_RaylaseCard_EnableCommandLogging;
+	PLibMCDriver_RaylaseRaylaseCard_DisableCommandLoggingPtr m_RaylaseCard_DisableCommandLogging;
+	PLibMCDriver_RaylaseRaylaseCard_RetrieveLatestLogPtr m_RaylaseCard_RetrieveLatestLog;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr m_RaylaseCard_LaserOn;
+	PLibMCDriver_RaylaseRaylaseCard_GetNLightDriverBoardPtr m_RaylaseCard_GetNLightDriverBoard;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOffPtr m_RaylaseCard_LaserOff;
 	PLibMCDriver_RaylaseRaylaseCard_ArmLaserPtr m_RaylaseCard_ArmLaser;
 	PLibMCDriver_RaylaseRaylaseCard_IsLaserArmedPtr m_RaylaseCard_IsLaserArmed;
 	PLibMCDriver_RaylaseRaylaseCard_EnablePilotPtr m_RaylaseCard_EnablePilot;
 	PLibMCDriver_RaylaseRaylaseCard_PilotIsEnabledPtr m_RaylaseCard_PilotIsEnabled;
 	PLibMCDriver_RaylaseRaylaseCard_GetLaserStatusPtr m_RaylaseCard_GetLaserStatus;
+	PLibMCDriver_RaylaseRaylaseCard_AssignLaserIndexPtr m_RaylaseCard_AssignLaserIndex;
+	PLibMCDriver_RaylaseRaylaseCard_GetAssignedLaserIndexPtr m_RaylaseCard_GetAssignedLaserIndex;
 	PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr m_RaylaseCard_DrawLayer;
+	PLibMCDriver_RaylaseRaylaseCard_SetRotationalCoordinateTransformPtr m_RaylaseCard_SetRotationalCoordinateTransform;
+	PLibMCDriver_RaylaseRaylaseCard_GetRotationalCoordinateTransformPtr m_RaylaseCard_GetRotationalCoordinateTransform;
+	PLibMCDriver_RaylaseRaylaseCard_SetTranslationalCoordinateTransformPtr m_RaylaseCard_SetTranslationalCoordinateTransform;
+	PLibMCDriver_RaylaseRaylaseCard_GetTranslationalCoordinateTransformPtr m_RaylaseCard_GetTranslationalCoordinateTransform;
 	PLibMCDriver_RaylaseDriver_Raylase_SetToSimulationModePtr m_Driver_Raylase_SetToSimulationMode;
 	PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr m_Driver_Raylase_IsSimulationMode;
 	PLibMCDriver_RaylaseDriver_Raylase_SetCustomSDKResourcePtr m_Driver_Raylase_SetCustomSDKResource;
 	PLibMCDriver_RaylaseDriver_Raylase_LoadSDKPtr m_Driver_Raylase_LoadSDK;
 	PLibMCDriver_RaylaseDriver_Raylase_ConnectByIPPtr m_Driver_Raylase_ConnectByIP;
 	PLibMCDriver_RaylaseDriver_Raylase_GetConnectedCardPtr m_Driver_Raylase_GetConnectedCard;
+	PLibMCDriver_RaylaseDriver_Raylase_CardExistsPtr m_Driver_Raylase_CardExists;
+	PLibMCDriver_RaylaseDriver_Raylase_DisconnectCardPtr m_Driver_Raylase_DisconnectCard;
+	PLibMCDriver_RaylaseDriver_Raylase_DrawLayerMultiLaserPtr m_Driver_Raylase_DrawLayerMultiLaser;
 	PLibMCDriver_RaylaseGetVersionPtr m_GetVersion;
 	PLibMCDriver_RaylaseGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_RaylaseReleaseInstancePtr m_ReleaseInstance;

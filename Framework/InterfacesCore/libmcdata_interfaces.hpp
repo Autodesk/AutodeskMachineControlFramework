@@ -61,7 +61,9 @@ class ILogSession;
 class IAlert;
 class IAlertIterator;
 class IAlertSession;
+class IJournalChunkIntegerData;
 class IJournalSession;
+class IJournalReader;
 class IStorageStream;
 class IStorageZIPWriter;
 class IStorage;
@@ -601,6 +603,59 @@ typedef IBaseSharedPtr<IAlertSession> PIAlertSession;
 
 
 /*************************************************************************************************************************
+ Class interface for JournalChunkIntegerData 
+**************************************************************************************************************************/
+
+class IJournalChunkIntegerData : public virtual IBase {
+public:
+	/**
+	* IJournalChunkIntegerData::GetChunkIndex - Returns index of chunk.
+	* @return Index of the Chunk
+	*/
+	virtual LibMCData_uint32 GetChunkIndex() = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetStartTimeStamp - Returns start time stamp of chunk.
+	* @return Start Timestamp of the chunk (in microseconds)
+	*/
+	virtual LibMCData_uint64 GetStartTimeStamp() = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetEndTimeStamp - Returns start end stamp of chunk.
+	* @return End Timestamp of the chunk (in microseconds)
+	*/
+	virtual LibMCData_uint64 GetEndTimeStamp() = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetVariableInfo - Returns the variable information array.
+	* @param[in] nVariableInfoBufferSize - Number of elements in buffer
+	* @param[out] pVariableInfoNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pVariableInfoBuffer - JournalChunkVariableInfo buffer of Variable information array. References TimeStamps and Values.
+	*/
+	virtual void GetVariableInfo(LibMCData_uint64 nVariableInfoBufferSize, LibMCData_uint64* pVariableInfoNeededCount, LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer) = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetTimeStampData - Returns the timestamp data.
+	* @param[in] nTimeStampDataBufferSize - Number of elements in buffer
+	* @param[out] pTimeStampDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTimeStampDataBuffer - uint32 buffer of Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+	*/
+	virtual void GetTimeStampData(LibMCData_uint64 nTimeStampDataBufferSize, LibMCData_uint64* pTimeStampDataNeededCount, LibMCData_uint32 * pTimeStampDataBuffer) = 0;
+
+	/**
+	* IJournalChunkIntegerData::GetValueData - Returns the timestamp data.
+	* @param[in] nValueDataBufferSize - Number of elements in buffer
+	* @param[out] pValueDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValueDataBuffer - int64 buffer of Integer values. Must have same cardinality as TimeStampData.
+	*/
+	virtual void GetValueData(LibMCData_uint64 nValueDataBufferSize, LibMCData_uint64* pValueDataNeededCount, LibMCData_int64 * pValueDataBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalChunkIntegerData> PIJournalChunkIntegerData;
+
+
+/*************************************************************************************************************************
  Class interface for JournalSession 
 **************************************************************************************************************************/
 
@@ -613,32 +668,138 @@ public:
 	virtual std::string GetSessionUUID() = 0;
 
 	/**
+	* IJournalSession::CreateVariableInJournalDB - creates variable in journal DB.
+	* @param[in] sName - Variable Name
+	* @param[in] nID - Variable ID
+	* @param[in] nIndex - Variable Index
+	* @param[in] eDataType - Variable Data Type
+	* @param[in] dUnits - Unit factor, if DataType is Double. Will be ignored otherwise.
+	*/
+	virtual void CreateVariableInJournalDB(const std::string & sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType, const LibMCData_double dUnits) = 0;
+
+	/**
+	* IJournalSession::CreateVariableAliasInJournalDB - creates variable alias in journal DB.
+	* @param[in] sAliasName - Alias Name
+	* @param[in] sSourceName - Source Variable Name
+	*/
+	virtual void CreateVariableAliasInJournalDB(const std::string & sAliasName, const std::string & sSourceName) = 0;
+
+	/**
 	* IJournalSession::WriteJournalChunkIntegerData - writes detailed journal state data to disk.
 	* @param[in] nChunkIndex - Index of the Chunk to write
 	* @param[in] nStartTimeStamp - Start Timestamp of the chunk (in microseconds)
 	* @param[in] nEndTimeStamp - End Timestamp of the chunk (in microseconds)
 	* @param[in] nVariableInfoBufferSize - Number of elements in buffer
-	* @param[in] pVariableInfoBuffer - Variable information.
-	* @param[in] nEntryDataBufferSize - Number of elements in buffer
-	* @param[in] pEntryDataBuffer - Entry bulk data.
+	* @param[in] pVariableInfoBuffer - Variable information array. References TimeStamps and Values.
+	* @param[in] nTimeStampDataBufferSize - Number of elements in buffer
+	* @param[in] pTimeStampDataBuffer - Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData.
+	* @param[in] nValueDataBufferSize - Number of elements in buffer
+	* @param[in] pValueDataBuffer - Integer values. Must have same cardinality as TimeStampData.
 	*/
-	virtual void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry * pEntryDataBuffer) = 0;
+	virtual void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo * pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32 * pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64 * pValueDataBuffer) = 0;
 
 	/**
-	* IJournalSession::GetChunkCapacity - Returns the chunk capacity of the session journal.
+	* IJournalSession::ReadChunkIntegerData - reads journal state data from disk.
+	* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
+	* @return Journal Chunk Data Instance
+	*/
+	virtual IJournalChunkIntegerData * ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) = 0;
+
+	/**
+	* IJournalSession::GetChunkCacheQuota - Returns the chunk cache quota size in bytes.
 	* @return Maximum Chunk Capacity in Journal in Bytes
 	*/
-	virtual LibMCData_uint32 GetChunkCapacity() = 0;
+	virtual LibMCData_uint64 GetChunkCacheQuota() = 0;
 
 	/**
-	* IJournalSession::GetFlushInterval - Returns the flush interval of the session journal.
-	* @return The interval determines how often a session journal chunk is written to disk. In Seconds.
+	* IJournalSession::GetChunkIntervalInMicroseconds - Returns the chunk interval of the session journal in Microseconds.
+	* @return The interval determines how often a session journal chunk is written to disk.
 	*/
-	virtual LibMCData_uint32 GetFlushInterval() = 0;
+	virtual LibMCData_uint64 GetChunkIntervalInMicroseconds() = 0;
 
 };
 
 typedef IBaseSharedPtr<IJournalSession> PIJournalSession;
+
+
+/*************************************************************************************************************************
+ Class interface for JournalReader 
+**************************************************************************************************************************/
+
+class IJournalReader : public virtual IBase {
+public:
+	/**
+	* IJournalReader::GetJournalUUID - retrieves the UUID of the journal.
+	* @return Journal UUID
+	*/
+	virtual std::string GetJournalUUID() = 0;
+
+	/**
+	* IJournalReader::GetStartTime - returns the start timestamp of the journal.
+	* @return Timestamp in ISO8601 UTC format
+	*/
+	virtual std::string GetStartTime() = 0;
+
+	/**
+	* IJournalReader::GetLifeTimeInMicroseconds - Get journal life time in microseconds.
+	* @return Journal life time in microseconds.
+	*/
+	virtual LibMCData_uint64 GetLifeTimeInMicroseconds() = 0;
+
+	/**
+	* IJournalReader::ReadChunkIntegerData - reads journal state data from disk.
+	* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
+	* @return Journal Chunk Data Instance
+	*/
+	virtual IJournalChunkIntegerData * ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex) = 0;
+
+	/**
+	* IJournalReader::GetVariableCount - Returns number of variables.
+	* @return Number of variables in journal.
+	*/
+	virtual LibMCData_uint32 GetVariableCount() = 0;
+
+	/**
+	* IJournalReader::GetVariableInformation - Returns the information for a variable.
+	* @param[in] nVariableIndex - Index of the variable.
+	* @param[out] sVariableName - Name of the variable.
+	* @param[out] nVariableID - ID of the variable.
+	* @param[out] eDataType - Data type of the variable.
+	* @param[out] dUnits - Unit factor, if DataType is Double. Will be 0.0 otherwise.
+	*/
+	virtual void GetVariableInformation(const LibMCData_uint32 nVariableIndex, std::string & sVariableName, LibMCData_uint32 & nVariableID, LibMCData::eParameterDataType & eDataType, LibMCData_double & dUnits) = 0;
+
+	/**
+	* IJournalReader::GetAliasCount - Returns number of aliases.
+	* @return Number of aliases in journal.
+	*/
+	virtual LibMCData_uint32 GetAliasCount() = 0;
+
+	/**
+	* IJournalReader::GetAliasInformation - Returns the information for a variable alias.
+	* @param[in] nAliasIndex - Index of the alias.
+	* @param[out] sAliasName - Name of the alias.
+	* @param[out] sSourceVariableName - Name of the variable.
+	*/
+	virtual void GetAliasInformation(const LibMCData_uint32 nAliasIndex, std::string & sAliasName, std::string & sSourceVariableName) = 0;
+
+	/**
+	* IJournalReader::GetChunkCount - Returns number of chunks.
+	* @return Number of chunks in journal.
+	*/
+	virtual LibMCData_uint32 GetChunkCount() = 0;
+
+	/**
+	* IJournalReader::GetChunkInformation - Returns the information for a chunk.
+	* @param[in] nChunkIndex - Index of the chunk.
+	* @param[out] nStartTimeStamp - Start timestamp of the chunk in microseconds.
+	* @param[out] nEndTimeStamp - End timestamp of the chunk in microseconds.
+	*/
+	virtual void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJournalReader> PIJournalReader;
 
 
 /*************************************************************************************************************************
@@ -1550,6 +1711,13 @@ public:
 	virtual IBuildJob * CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserUUID, const std::string & sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
 
 	/**
+	* IBuildJobHandler::JobExists - Checks if a job with a specific UUID exists.
+	* @param[in] sJobUUID - UUID String for the build job.
+	* @return Build Job exists.
+	*/
+	virtual bool JobExists(const std::string & sJobUUID) = 0;
+
+	/**
 	* IBuildJobHandler::RetrieveJob - Retrieves a job with a specific UUID.
 	* @param[in] sJobUUID - UUID String for the build job. Must be an existing Job.
 	* @return Build Job Instance.
@@ -2015,16 +2183,23 @@ public:
 	virtual IBuildJobHandler * CreateBuildJobHandler() = 0;
 
 	/**
-	* IDataModel::CreateNewLogSession - creates a global log session access class.
+	* IDataModel::CreateNewLogSession - creates a global log session class.
 	* @return LogSession class instance.
 	*/
 	virtual ILogSession * CreateNewLogSession() = 0;
 
 	/**
-	* IDataModel::CreateJournalSession - creates a global journal session access class.
+	* IDataModel::CreateJournalSession - creates a global journal session class.
 	* @return JournalSession class instance.
 	*/
 	virtual IJournalSession * CreateJournalSession() = 0;
+
+	/**
+	* IDataModel::CreateJournalReader - creates an access instance to a past journal session. Fails if journal cannot be accessed.
+	* @param[in] sJournalUUID - UUID of journal to load. UUID MUST NOT reference the current journaling session..
+	* @return JournalReader class instance.
+	*/
+	virtual IJournalReader * CreateJournalReader(const std::string & sJournalUUID) = 0;
 
 	/**
 	* IDataModel::CreateAlertSession - creates a global alert session access class.

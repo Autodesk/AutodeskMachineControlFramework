@@ -177,6 +177,7 @@ typedef void * LibMCDriver_OPCUA_pvoid;
 #define LIBMCDRIVER_OPCUA_ERROR_RECEIVEDINVALIDPACKETLENGTH 1079 /** Received invalid packet length. */
 #define LIBMCDRIVER_OPCUA_ERROR_COULDNOTWRITETOPAYLOAD 1080 /** Could not write to payload. */
 #define LIBMCDRIVER_OPCUA_ERROR_INVALIDPAYLOADADDRESS 1081 /** Invalid payload address. */
+#define LIBMCDRIVER_OPCUA_ERROR_COULDNOTCREATEOPCUACLIENT 1082 /** Could not create OPCUA Client. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_OPCUA
@@ -266,6 +267,7 @@ inline const char * LIBMCDRIVER_OPCUA_GETERRORSTRING (LibMCDriver_OPCUAResult nE
     case LIBMCDRIVER_OPCUA_ERROR_RECEIVEDINVALIDPACKETLENGTH: return "Received invalid packet length.";
     case LIBMCDRIVER_OPCUA_ERROR_COULDNOTWRITETOPAYLOAD: return "Could not write to payload.";
     case LIBMCDRIVER_OPCUA_ERROR_INVALIDPAYLOADADDRESS: return "Invalid payload address.";
+    case LIBMCDRIVER_OPCUA_ERROR_COULDNOTCREATEOPCUACLIENT: return "Could not create OPCUA Client.";
     default: return "unknown error";
   }
 }
@@ -276,14 +278,43 @@ inline const char * LIBMCDRIVER_OPCUA_GETERRORSTRING (LibMCDriver_OPCUAResult nE
 
 typedef LibMCDriver_OPCUAHandle LibMCDriver_OPCUA_Base;
 typedef LibMCDriver_OPCUAHandle LibMCDriver_OPCUA_Driver;
-typedef LibMCDriver_OPCUAHandle LibMCDriver_OPCUA_PLCCommand;
-typedef LibMCDriver_OPCUAHandle LibMCDriver_OPCUA_PLCCommandList;
 typedef LibMCDriver_OPCUAHandle LibMCDriver_OPCUA_Driver_OPCUA;
 
 namespace LibMCDriver_OPCUA {
 
+  /*************************************************************************************************************************
+   Declaration of enums
+  **************************************************************************************************************************/
+  
+  enum class eUAIntegerType : LibMCDriver_OPCUA_int32 {
+    Unknown = 0,
+    UAUInt8 = 1,
+    UAUInt16 = 2,
+    UAUInt32 = 3,
+    UAUInt64 = 4,
+    UAInt8 = 5,
+    UAInt16 = 6,
+    UAInt32 = 7,
+    UAInt64 = 8
+  };
+  
+  enum class eUADoubleType : LibMCDriver_OPCUA_int32 {
+    Unknown = 0,
+    UAFloat32 = 1,
+    UADouble64 = 2
+  };
+  
+  enum class eUASecurityMode : LibMCDriver_OPCUA_int32 {
+    None = 0,
+    Sign = 1,
+    SignAndEncrypt = 2
+  };
+  
 } // namespace LibMCDriver_OPCUA;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCDriver_OPCUA::eUAIntegerType eLibMCDriver_OPCUAUAIntegerType;
+typedef LibMCDriver_OPCUA::eUADoubleType eLibMCDriver_OPCUAUADoubleType;
+typedef LibMCDriver_OPCUA::eUASecurityMode eLibMCDriver_OPCUAUASecurityMode;
 
 #endif // __LIBMCDRIVER_OPCUA_TYPES_HEADER_CPP

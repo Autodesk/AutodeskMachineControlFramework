@@ -45,8 +45,8 @@ Abstract: This is the class declaration of CRTCRecording
 
 #define RTC_CHANNELCOUNT 8
 #define RTC_CHUNKSIZE_MIN 1024
-#define RTC_CHUNKSIZE_MAX (1024 * 1024)
-#define RTC_CHUNKSIZE_DEFAULT 100000
+#define RTC_CHUNKSIZE_MAX (1024 * 1024 * 16)
+#define RTC_CHUNKSIZE_DEFAULT (1024 * 1024)
 
 
 namespace LibMCDriver_ScanLab {
@@ -146,8 +146,13 @@ private:
 	PScanLabSDK m_pSDK;
 
 	size_t m_nChunkSize;
-	double m_dCorrectionFactor;
-	bool m_bScanHeadConnectionCheckEnabled;
+	double m_dXYCorrectionFactor;
+	double m_dZCorrectionFactor;
+
+	bool m_bEnableScanheadFeedback;
+	bool m_bEnableBacktransformation;
+
+	std::vector<uint8_t> m_HeadTransform;
 
 	std::map<std::string, PRTCRecordingChannel> m_ChannelMap;
 
@@ -163,15 +168,11 @@ private:
 
 public:
 
-	CRTCRecordingInstance(const std::string & sUUID, PScanLabSDK pSDK, uint32_t cardNo, double dCorrectionFactor, size_t nChunkSize);
+	CRTCRecordingInstance(const std::string & sUUID, PScanLabSDK pSDK, uint32_t cardNo, double dXYCorrectionFactor, double dZCorrectionFactor, size_t nChunkSize, bool bEnableScanheadFeedback, bool bEnableBacktransformation);
 
 	virtual ~CRTCRecordingInstance();
 	
 	std::string getUUID ();
-
-	bool getScanheadConnectionCheckIsEnabled();
-
-	void setScanheadConnectionCheckIsEnabled(bool bValue);
 
 	void clear();
 
@@ -199,6 +200,16 @@ public:
 
 	void addScaledRecordsToDataTable(const std::string & sChannelName, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset);
 
+	void addBacktransformedXYPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY);
+
+	void backtransformRawXYCoordinates(const int32_t nRawCoordinateX, const int32_t nRawCoordinateY, double& dBacktransformedX, double& dBacktransformedY);
+
+	void addBacktransformedZPositionToDataTable (LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierZ, const std::string& sColumnDescriptionZ);
+
+	double backtransformRawZCoordinate(const int32_t nRawCoordinateZ);
+
+	void addTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY);
+	
 };
 
 

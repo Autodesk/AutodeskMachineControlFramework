@@ -112,6 +112,17 @@ IBuildJob * CBuildJobHandler::RetrieveJob(const std::string & sJobUUID)
     return CBuildJob::makeFromDatabase(sJobUUID, m_pSQLHandler, m_pStorageState);
 }
 
+bool CBuildJobHandler::JobExists(const std::string& sJobUUID)
+{
+    if (sJobUUID.empty())
+        return false;
+
+    std::string sQuery = "SELECT uuid FROM buildjobs WHERE uuid=?";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString (sJobUUID));
+    return (pStatement->nextRow());
+}
+
 IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus)
 {
 

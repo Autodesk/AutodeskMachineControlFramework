@@ -164,8 +164,35 @@
 		<error name="COULDNOTFINDRECORDING" code="1112" description="Could not find recording." />		
 		<error name="INVALIDCHANNELTYPE" code="1113" description="Invalid channel type." />	
 		<error name="INVALIDRTCRECORDINGFREQUENCY" code="1114" description="Invalid RTC recording frequency." />	
-
-
+		<error name="INVALIDDIGITALOUTPUTVALUE" code="1115" description="Invalid digital output value." />	
+		<error name="INVALIDDIGITALOUTPUTMASK" code="1116" description="Invalid digital output mask." />			
+		<error name="CANNOTCHANGENLIGHTSETTINGSWHILEENABLED" code="1117" description="Cannot change nLight settings while enabled." />	
+		<error name="INVALIDNLIGHTCONTROLPIN" code="1118" description="Invalid nLight Control Pin." />	
+		<error name="INVALIDNLIGHTSELECTIONPIN" code="1119" description="Invalid nLight Selection Pin." />	
+		<error name="INVALIDNLIGHTINPUTPIN" code="1120" description="Invalid nLight Input Pin." />	
+		<error name="INVALIDNLIGHTAFXSELECTIONDELAY" code="1121" description="Invalid nLight AFX Selection Delay." />	
+		<error name="INVALIDNLIGHTAFXACKNOWLEDGETIMEOUT" code="1122" description="Invalid nLight AFX Selection Timeout." />			
+		<error name="INVALIDNLIGHTAFXMODE" code="1123" description="Invalid nLight AFX Mode." />	
+		<error name="INVALIDSEQUENCEIDENTIFIER" code="1124" description="Invalid sequence identifier." />	
+		<error name="DUPLICATEGPIOSEQUENCEIDENTIFIER" code="1125" description="Duplicate GPIO Sequence Identifier." />	
+		<error name="COULDNOTFINDGPIOSEQUENCE" code="1126" description="Duplicate GPIO Sequence Identifier." />	
+		<error name="INVALIDGPIOTASKDELAY" code="1127" description="Invalid GPIO Task Delay." />	
+		<error name="GPIOTASKDELAYMUSTBEMULTIPLEOF10" code="1128" description="GPIO Task Delay must be a multiple of 10." />	
+		<error name="SEGMENTHASINVALIDLASERINDEX" code="1129" description="Segment has invalid laser index" />
+		<error name="SELECTEDGPIOSEQUENCEISDISABLED" code="1130" description="Selected GPIO Sequence is disabled" />
+		<error name="INVALIDGPIOINPUTBIT" code="1131" description="Invalid GPIO Input bit" />
+		<error name="GPIOLABELNOTFOUND" code="1132" description="GPIO Label not found" />
+		<error name="INVALIDGPIOLABELNAME" code="1133" description="Invalid GPIO Label Name" />
+		<error name="INVALIDGPIOLABELNAMELENGTH" code="1134" description="Invalid GPIO Label Name Length" />
+		<error name="EMPTYGPIOLABELNAME" code="1135" description="Empty GPIO Label Name" />
+		<error name="SCANHEADCHANNELNEEDSFEEDBACKENABLED" code="1136" description="Scanhead channel needs feedback enabled." />
+		<error name="CHANNELTYPEISALREADYRECORDED" code="1137" description="Channel type is already recorded." />
+		<error name="BACKTRANSFORMATIONISNOTENABLED" code="1138" description="Backtransformation is not enabled." />
+		<error name="RTCCHANNELXNOTRECORDED" code="1139" description="RTC Channel X not recorded." />
+		<error name="RTCCHANNELYNOTRECORDED" code="1140" description="RTC Channel Y not recorded." />
+		<error name="RTCCHANNELZNOTRECORDED" code="1141" description="RTC Channel Z not recorded." />
+		<error name="RTCCHANNELXANDYRECORDCOUNTMISMATCH" code="1142" description="RTC X and Y record count mismatch." />
+							
 	</errors>
 
 
@@ -197,12 +224,14 @@
 
 	<enum name="RTCChannelType" description="Channel type to record. See RTC Documentation set_trigger for details.">
 	   <option name="ChannelUndefined" value="0" description="Undefined or invalid channel" />	   
-	   <option name="ChannelCurrentXRaw" value="1" description="Raw X Value of the Scan Head (RTC Channel 1, StatusAX)"  />
-	   <option name="ChannelCurrentYRaw" value="2" description="Raw Y Value of the Scan Head (RTC Channel 2, StatusAY)" />
-	   <option name="ChannelCurrentZRaw" value="4" description="Raw Z Value of the Scan Head (RTC Channel 4, StatusBX)" />
-	   <option name="ChannelTargetXRaw" value="7" description="Target X Value of the Scan Head (RTC Channel 7, SampleX)" />
-	   <option name="ChannelTargetYRaw" value="8" description="Target Y Value of the Scan Head (RTC Channel 8, SampleY)" />
-	   <option name="ChannelTargetZRaw" value="9" description="Target Z Value of the Scan Head (RTC Channel 9, SampleZ)" />
+	   <option name="ChannelCurrentXRaw" value="1" description="Raw X Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 1, StatusAX)"  />
+	   <option name="ChannelCurrentYRaw" value="2" description="Raw Y Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 2, StatusAY)" />
+	   <option name="ChannelCurrentZRaw" value="4" description="Raw Z Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 4, StatusBX)" />
+	   <option name="ChannelTargetX" value="7" description="Target X Value of the Scan Head." />
+	   <option name="ChannelTargetY" value="8" description="Target Y Value of the Scan Head." />
+	   <option name="ChannelTargetZ" value="9" description="Target Z Value of the Scan Head." />
+	   <option name="ChannelTargetXTransformed" value="20" description="Target X Value of the Scan Head transformed with the correction file (RTC Channel 20, SampleX)" />
+	   <option name="ChannelTargetYTransformed" value="21" description="Target Y Value of the Scan Head transformed with the correction file (RTC Channel 21, SampleY)" />
 	   <option name="ChannelAutoLaserControlMode" value="24" description="Control Parameter of AutoLaserControl (RTC Channel 24)" />
 	   <option name="ChannelVectorControlMode" value="31" description="Control Parameter of VectorControl (RTC Channel 31)" />
 	   <option name="ChannelDefocus" value="32" description="Defocus setting (RTC Channel 32)" />
@@ -232,12 +261,6 @@
 	   <option name="ChannelScaledEncoderZ" value="57" description="Scaled Encoder Value for Z Axis (RTC Channel 57)" />
 	   <option name="ChannelRS232" value="58" description="RS232 Channel Value (RTC Channel 58)" />	   
 	   <option name="ChannelLaserOn" value="100" description="Laser On Value (RTC Channel 0, LASERON)" />
-	   <option name="ChannelCurrentXBacktransformed" value="101" description="Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX)"  />
-	   <option name="ChannelCurrentYBacktransformed" value="102" description="Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY)" />
-	   <option name="ChannelCurrentZBacktransformed" value="104" description="Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX)" />
-	   <option name="ChannelTargetXBacktransformed" value="107" description="Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX)" />
-	   <option name="ChannelTargetYBacktransformed" value="108" description="Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY)" />
-	   <option name="ChannelTargetZBacktransformed" value="109" description="Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ)" />
 
 	</enum>
 	
@@ -464,23 +487,13 @@ Custom implementation
 	</class>
 
 	<class name="RTCRecording" parent="Base" description="A recording instance for an RTC Job..">
-
-		<method name="ScanheadConnectionCheckIsEnabled" description="Returns if the scan head connection is checked when recording">
-			<param name="Value" type="bool" pass="return" description="If true, the Scanhead connection will be checked for an error when recording." />
-		</method>	
-		
-		<method name="EnableScanheadConnectionCheck" description="Enables the Scanhead connection check. The check is enabled by default.">
-		</method>	
-
-		<method name="DisableScanheadConnectionCheck" description="Disables the Scanhead connection check.">
-		</method>	
-		
+				
 		<method name="Clear" description="Clears all recording data and channels.">
 		</method>	
 		
 		<method name="AddChannel" description="Adds a new channel to record. Fails if more than 8 channels are recorded. Fails if recording has been already started.">
 			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique." />
-			<param name="ChannelType" type="enum" class="RTCChannelType" pass="in" description="Channel type enum. MUST NOT be Undefined." />
+			<param name="ChannelType" type="enum" class="RTCChannelType" pass="in" description="Channel type enum. MUST NOT be Undefined. Fails if channel type is already recorded. Fails if scan head feedback is not enabled and channel type is ChannelCurrentXRaw, ChannelCurrentYRaw or ChannelCurrentZ." />
 		</method>	
 
 		<method name="RemoveChannel" description="Removes a new channel from the recording and all recorded data of that channel. Does nothing if channel does not exist. ">
@@ -528,7 +541,7 @@ Custom implementation
 			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to." />
 			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the Column." />
 			<param name="ColumnDescription" type="string" pass="in" description="Description of the Column." />
-		</method>	
+		</method>
 		
 		<method name="AddScaledRecordsToDataTable" description="Writes a certain channel to a data table as double columns, while linearly transforming the values. The DataTable will be filled with the transform RawValue times ScaleFactor + Offset. Fails if Channel does not exist.">
 			<param name="ChannelName" type="string" pass="in" description="Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores." />
@@ -539,7 +552,150 @@ Custom implementation
 			<param name="Offset" type="double" pass="in" description="Offset that the raw value is scaled with." />
 		</method>	
 		
+		<method name="AddBacktransformedXYPositionsToDataTable" description="Writes backtransformed positions to a data table as double columns. Fails if Channels of types Raw X and Raw Y do not both exist or positional backtransformation is not enabled.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to. Coordinates will be stored in mm." />
+			<param name="ColumnIdentifierX" type="string" pass="in" description="Identifier of the X Column." />
+			<param name="ColumnDescriptionX" type="string" pass="in" description="Description of the X Column." />
+			<param name="ColumnIdentifierY" type="string" pass="in" description="Identifier of the X Column." />
+			<param name="ColumnDescriptionY" type="string" pass="in" description="Description of the X Column." />
+		</method>
 		
+		<method name="BacktransformRawXYCoordinates" description="Backtransforms raw coordinates in X and Y. Fails if positional backtransformation is not enabled.">
+			<param name="RawCoordinateX" type="int32" pass="in" description="Raw X coordinate." />
+			<param name="RawCoordinateY" type="int32" pass="in" description="Raw Y coordinate." />
+			<param name="BacktransformedX" type="double" pass="out" description="Backtransformed X coordinate in mm." />
+			<param name="BacktransformedY" type="double" pass="out" description="Backtransformed Y coordinate in mm." />
+		</method>
+		
+		<method name="AddBacktransformedZPositionsToDataTable" description="Writes backtransformed Z positions to a data table as double column. Fails if Channels of types Raw Z does exist or positional backtransformation is not enabled.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to. Coordinates will be stored in mm." />
+			<param name="ColumnIdentifierZ" type="string" pass="in" description="Identifier of the Z Column." />
+			<param name="ColumnDescriptionZ" type="string" pass="in" description="Description of the Z Column." />
+		</method>
+		
+		<method name="BacktransformRawZCoordinate" description="Backtransforms raw Z coordinate. Fails if positional backtransformation is not enabled.">
+			<param name="RawCoordinateZ" type="int32" pass="in" description="Raw coordinates in Z." />
+			<param name="BacktransformedZ" type="double" pass="return" description="Backtransformed Z coordinate in mm." />
+		</method>
+
+		<method name="AddTargetPositionsToDataTable" description="Writes target positions to a data table as double columns. Fails if Channels of types Target X and Target Y do not both exist.">
+			<param name="DataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table instance to write to. Coordinates will be stored in mm." />
+			<param name="ColumnIdentifierX" type="string" pass="in" description="Identifier of the X Column." />
+			<param name="ColumnDescriptionX" type="string" pass="in" description="Description of the X Column." />
+			<param name="ColumnIdentifierY" type="string" pass="in" description="Identifier of the X Column." />
+			<param name="ColumnDescriptionY" type="string" pass="in" description="Description of the X Column." />
+		</method>
+		
+	</class>
+
+
+	<class name="GPIOSequence" parent="Base" description="IO Sequence to replay on the RTC GPIOs">
+
+		<method name="GetIdentifier" description="Returns the identifier of the GPIO Sequence.">
+			<param name="Identifier" type="string" pass="return" description="Returns identifier string" />
+		</method>
+
+		<method name="Clear" description="Clears all sequence steps.">
+		</method>
+
+		<method name="AddOutput" description="Adds the writing of an output pin.">
+			<param name="OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index. MUST be between 0 and 15." />
+			<param name="OutputValue" type="bool" pass="in" description="If true, bit will be set, if false bit will be cleared." />
+		</method>
+
+		<method name="AddDelay" description="Adds a delay to the GPIO Sequence.">
+			<param name="DelayInMilliseconds" type="uint32" pass="in" description="Delay in milliseconds." />
+		</method>
+
+		<method name="WaitforInput" description="Waits for an input pin to reach a certain value.">
+			<param name="InputBit" type="uint32" pass="in" description="RTC Digital Output Bit index. MUST be between 0 and 15." />
+			<param name="InputValue" type="bool" pass="in" description="If true, the wait is for the bit becoming 1, if false, the wait is for the bit becoming 0." />
+			<param name="MaxDelayInMilliseconds" type="uint32" pass="in" description="Sets the maximum time it is allowed to take. Fails, if MaxDelay is 0." />
+		</method>
+
+		<method name="AddLabel" description="Adds a label to the current sequence position.">
+			<param name="LabelName" type="string" pass="in" description="Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. "/>
+			<param name="MaxPasses" type="uint32" pass="in" description="Maximum number of times this label can be passed. Triggers an error if the label is passed more often." />
+		</method>
+
+		<method name="GoToLabel" description="Jumps to a label. Fails if label does not exist.">
+			<param name="LabelName" type="string" pass="in" description="Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. "/>
+		</method>
+
+		<method name="ConditionalGoToLabel" description="Jumps to a label, if a certain input pin is set or cleared. Fails if label does not exist. Does nothing, if the input condition is not fulfilled.">
+			<param name="InputBit" type="uint32" pass="in" description="RTC Digital Output Bit index. MUST be between 0 and 15." />
+			<param name="InputValue" type="bool" pass="in" description="If true, the jump is for the bit becoming 1, if false, the jump is for the bit becoming 0." />
+			<param name="LabelName" type="string" pass="in" description="Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. "/>
+		</method>
+		
+		<method name="EnableAutomaticSelection" description="Enables the GPIOSequence inside the DrawLayer Routine. The Sequence ID will be taken out of the build profile in this case.">
+		</method>
+		
+		<method name="DisableAutomaticSelection" description="Disables the GPIOSequence selection.">
+		</method>
+
+
+	</class>
+
+
+	<class name="NLightAFXProfileSelector" parent="Base" description="Profile selector for nLight AFX Laser">
+
+		<method name="SetControlOutputPins" description="Sets the control output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.">
+			<param name="EnableDigitalOutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0." />
+			<param name="StartDigitalOutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1" />
+		</method>
+		
+		<method name="GetControlOutputPins" description="Returns the control output pin mapping for the nLight AFX Laser.">
+			<param name="EnableDigitalOutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0." />
+			<param name="StartDigitalOutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1" />
+		</method>
+
+		<method name="SetSelectionOutputPins" description="Sets the selection output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.">
+			<param name="StartIndexSelection0OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2." />
+			<param name="StartIndexSelection1OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3." />
+			<param name="StartIndexSelection2OutputBit" type="uint32" pass="in" description="RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4." />		
+		</method>
+		
+		<method name="GetSelectionOutputPins" description="Returns the selection output pin mapping for the nLight AFX Laser.">
+			<param name="StartIndexSelection0OutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2." />
+			<param name="StartIndexSelection1OutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3." />
+			<param name="StartIndexSelection2OutputBit" type="uint32" pass="out" description="RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4." />		
+		</method>
+
+		<method name="SetAcknowledgeInputPin" description="Sets the acknowledge pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.">
+			<param name="SelectionAcknowledgeInputBit" type="uint32" pass="in" description="RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY). MUST be between 0 and 15. Default is 0." />
+		</method>
+
+		<method name="GetAcknowledgeInputPin" description="Returns the acknowledge pin mapping for the nLight AFX Laser.">
+			<param name="SelectionAcknowledgeInputBit" type="uint32" pass="return" description="RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY)." />
+		</method>
+
+		<method name="SetSelectionDelay" description="Sets the delay that is added for the AFX Mode selection to be transfered. Call will fail if profile selection is enabled.">
+			<param name="SelectionDelayInMilliseconds" type="uint32" pass="in" description="Selection Delay in milliseconds. Default is 30." />
+		</method>
+
+		<method name="GetSelectionDelay" description="Returns the delay that is added for the AFX Mode selection to transfered.">
+			<param name="SelectionDelayInMilliseconds" type="uint32" pass="return" description="Selection Delay in milliseconds. Default is 30." />
+		</method>
+
+		<method name="SetAcknowledgeTimeout" description="Sets the timeout that the AFX Mode selection will wait to be applied. Call will fail if profile selection is enabled.">
+			<param name="AcknowledgeInMilliseconds" type="uint32" pass="in" description="Acknowledge Timeout in Milliseconds. Default is 500." />
+		</method>
+
+		<method name="GetAcknowledgeTimeout" description="Returns the timeout that the AFX Mode selection will wait to be applied.">
+			<param name="AcknowledgeTimeoutInMilliseconds" type="uint32" pass="return" description="Acknowledge Timeout in Milliseconds. Default is 500." />
+		</method>
+
+		<method name="EnableAutomaticSelection" description="Enables the AFX Mode selection inside the DrawLayer Routine. The Laser Mode will be taken out of the build profile in this case.">
+		</method>
+		
+		<method name="DisableAutomaticSelection" description="Disables the AFX Mode selection.">
+		</method>
+
+		<method name="AddCustomSelection" description="Adds a custom selection cycle to the currenly open list.">
+			<param name="AFXModeIndex" type="uint32" pass="in" description="AFX Mode index to set. MUST be between 0 and 7." />
+		</method>
+
 	</class>
 
 	<class name="RTCContext" parent="Base" description="Context of the RTC Controller Card">
@@ -770,6 +926,16 @@ Custom implementation
 			<param name="TimeStamp" type="uint32" pass="return" description="TimeStamp Value." />
 		</method>	
 
+		<method name="GetRTCChannel" description="Returns an RTC Channel in real time. The signal register is instantly read and directly passed back to the caller.">
+			<param name="ChannelType" type="enum" class="RTCChannelType" pass="in" description="Internal RTC Channel type. See SCANLAB RTC Documentation for set_trigger for a proper explanation." />
+			<param name="Value" type="int32" pass="return" description="Internal Value of that signal." />
+		</method>	
+
+		<method name="GetRTCInternalValue" description="Returns an internal RTC value by RTC Signal ID. The signal register is instantly read and directly passed back to the caller.">
+			<param name="InternalSignalID" type="uint32" pass="in" description="Internal RTC Signal ID. See SCANLAB RTC Documentation for set_trigger for a proper explanation. Some values are mapped from the enum definition of RTCChannelType." />
+			<param name="Value" type="int32" pass="return" description="Internal Value of that signal." />
+		</method>	
+
 		<method name="StopExecution" description="Stops the execution of the current list immediately.">
 		</method>	
 
@@ -884,12 +1050,44 @@ Custom implementation
 			<param name="LaserOut2" type="bool" pass="in" description="Value for Laser Out Pin 2" />
 		</method>
 				
+		<method name="AddWriteDigitalIOList" description="Adds the change of all 16 digital IO Ports to the current open list.">
+			<param name="DigitalOutput" type="uint32" pass="in" description="Value for the digital IO. MUST be between 0 and 65535." />
+		</method>
+
+		<method name="AddWriteMaskedDigitalIOList" description="Adds the change a subset of 16 digital IO Ports to the current open list.">
+			<param name="DigitalOutput" type="uint32" pass="in" description="Value for the digital IO. MUST be between 0 and 65535." />
+			<param name="OutputMask" type="uint32" pass="in" description="Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535." />
+		</method>
+
 		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">
 		</method>
 
 		<method name="DisableOIE" description="Writes an OIE disabling command block to the open list.">
 		</method>
 				
+		<method name="CreateNLightAFXBeamProfileSelector" description="Creates an nLight AFX Beam Selector instance. If called multiple times, the same instance will be returned.">
+			<param name="Instance" type="class" class="NLightAFXProfileSelector" pass="return" description="nLight Profile selector instance." />		
+		</method>
+
+		<method name="AddGPIOSequence" description="Adds a GPIO Sequence. Fails if Sequence with the same identifier already exists.">
+			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
+			<param name="Instance" type="class" class="GPIOSequence" pass="return" description="GPIOSequence instance." />		
+		</method>
+		
+		<method name="WriteGPIOSequenceToList" description="Writes a GPIO Sequence to the current list. Fails if sequence does not exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
+		</method>
+				
+		<method name="FindGPIOSequence" description="Finds a GPIO Sequence. ">
+			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
+			<param name="MustExist" type="bool" pass="in" description="If true, the call fails if Sequence with the identifier does not exist." />			
+			<param name="Instance" type="optionalclass" class="GPIOSequence" pass="return" description="GPIOSequence instance. Returns null, if MustExist is fales and a sequence with the identifier does not exist." />		
+		</method>
+
+		<method name="DeleteGPIOSequence" description="Deletes a GPIO Sequence. Does nothing if Sequence with the identifier does not exists.">
+			<param name="Identifier" type="string" pass="in" description="Identifier for the sequence." />
+		</method>
+		
 		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.">
 		</method>
 
@@ -918,6 +1116,10 @@ Custom implementation
 
 		<method name="DisableOIEMeasurementTagging" description="Disables OIE Measurement tagging.">
 		</method>
+		
+		<method name="GetOIEMaxMeasurementTag" description="Returns the current maximum measurement tag that has been sent to the OIE.">
+			<param name="MeasurementTag" type="uint32" pass="return" description="Measurement Tag that has been sent to the OIE." />
+		</method>		
 
 		<method name="MapOIEMeasurementTag" description="Maps an OIE Measurement tag back to the original scan parameters.">
 			<param name="MeasurementTag" type="uint32" pass="in" description="Measurement Tag that has been sent to the OIE." />
@@ -980,8 +1182,14 @@ Custom implementation
 			<param name="M22" type="double" pass="in" description="Lower right field of the transformation matrix" />
 		</method>
 
+		<method name="CheckScanheadConnection" description="Checks if Scanhead is connected.">
+			<param name="ScanheadIsConnected" type="bool" pass="return" description="Returns, if the scanhead 1 is connected to the RTC card." />
+		</method>
+
 		<method name="PrepareRecording" description="Prepares recording of position data of the RTC Card. This needs to be called before any list is started.">
 			<param name="KeepInMemory" type="bool" pass="in" description="If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance." />
+			<param name="EnableScanheadFeedback" type="bool" pass="in" description="If true, the Scanhead feedback will be enabled. If false, scanner feedback signal channel types are not available." />
+			<param name="EnableBacktransformation" type="bool" pass="in" description="If true, the Scanhead backtransformation is read out from the RTC card. If false, scanhead position backtransformation is not enabled." />
 			<param name="RecordingInstance" type="class" class="RTCRecording" pass="return" description="Recording instance." />		
 		</method>
 

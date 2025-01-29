@@ -73,45 +73,59 @@ void CXMLDocumentNodeInstance::extractFromPugiNode(pugi::xml_document* pXMLDocum
 		std::string sNameSpacePrefix;		
 		splitNameSpaceName (attribute.name(), sAttributeName, sNameSpacePrefix);
 
-		PXMLDocumentNameSpace pNameSpace;
-		if (sNameSpacePrefix.empty()) {
-			pNameSpace = m_pNameSpace;
-		}
-		else {
-			pNameSpace = m_pDocument->FindNamespaceByPrefix(sNameSpacePrefix, true);
-		}
+		if (sNameSpacePrefix != "xmlns") {
 
-		std::string sAttributeValue = attribute.as_string();
+			PXMLDocumentNameSpace pNameSpace;
+			if (sNameSpacePrefix.empty()) {
+				pNameSpace = m_pNameSpace;
+			}
+			else {
+				pNameSpace = m_pDocument->FindNamespaceByPrefix(sNameSpacePrefix, true);
+			}
 
-		bool bIsValidAttribute = true;
-		if (bIsRoot) {
-			if (sAttributeName == "xmlns")
-				bIsValidAttribute = false;
+			std::string sAttributeValue = attribute.as_string();
+
+			bool bIsValidAttribute = true;
+			if (bIsRoot) {
+				if (sAttributeName == "xmlns")
+					bIsValidAttribute = false;
+			}
+
+			if (bIsValidAttribute)
+				AddAttribute(m_pNameSpace, sAttributeName, sAttributeValue);
 		}
-
-		if (bIsValidAttribute)
-			AddAttribute (m_pNameSpace, sAttributeName, sAttributeValue);
 	}
 
+	size_t nChildIndex = 0;
 	auto children = pXMLNode->children();
 	for (auto child : children) {
-		std::string sChildName;
-		std::string sNameSpacePrefix;
-		splitNameSpaceName(child.name(), sChildName, sNameSpacePrefix);
+		std::string sChildFullName(child.name ());
+		if (sChildFullName.empty ()) { // Content text
+			if (nChildIndex != 0)
+				throw ELibMCInterfaceException(LIBMC_ERROR_XMLNODECONTAINSAMBIGOUSCONTENTDATA);
 
-		PXMLDocumentNameSpace pNameSpace;
-		if (sNameSpacePrefix.empty()) {
-			pNameSpace = m_pNameSpace;
+			std::string sTextContent (child.value());
+			SetTextContent(sTextContent);
 		}
 		else {
-			pNameSpace = m_pDocument->FindNamespaceByPrefix(sNameSpacePrefix, true);
+			std::string sChildName;
+			std::string sNameSpacePrefix;
+			splitNameSpaceName(sChildFullName, sChildName, sNameSpacePrefix);
+
+			PXMLDocumentNameSpace pNameSpace;
+			if (sNameSpacePrefix.empty()) {
+				pNameSpace = m_pNameSpace;
+			}
+			else {
+				pNameSpace = m_pDocument->FindNamespaceByPrefix(sNameSpacePrefix, true);
+			}
+
+			auto pChildNode = std::make_shared<CXMLDocumentNodeInstance>(m_pDocument, this, pNameSpace, sChildName);
+
+			addChildEx(pChildNode);
+
+			pChildNode->extractFromPugiNode(pXMLDocument, &child, false);
 		}
-
-		auto pChildNode = std::make_shared<CXMLDocumentNodeInstance> (m_pDocument, this, pNameSpace, sChildName);
-
-		addChildEx(pChildNode);
-
-		pChildNode->extractFromPugiNode(pXMLDocument, &child, false);
 	}
 
 }
@@ -369,7 +383,7 @@ void CXMLDocumentNodeInstance::splitNameSpaceName(const std::string& sPrefixedNa
 		sUnprefixedName = sPrefixedName.substr(pos + 1);
 		
 		auto nextpos = sUnprefixedName.find(":");
-		if (pos != std::string::npos) {
+		if (nextpos != std::string::npos) {
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLNODEORATTRIBUTENAME, sPrefixedName);
 		}
 
@@ -429,3 +443,36 @@ bool CXMLDocumentNodeInstance::compareName(const std::string& sNameSpace, const 
 	auto pNameSpace = m_pDocument->FindNamespace(sNameSpace, true);
 	return ((pNameSpace.get() == m_pNameSpace.get()) && (m_sNodeName == sName));
 }
+
+void CXMLDocumentNodeInstance::CopyFrom(CXMLDocumentNodeInstance* pFromInstance)
+{
+	if (pFromInstance == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	uint64_t nAttributeCount = pFromInstance->GetAttributeCount();
+	for (uint64_t nIndex = 0; nIndex < nAttributeCount; nIndex++) {
+		auto pAttribute = pFromInstance->GetAttribute(nIndex);
+		std::string sAttributeNameSpace = pAttribute->getNameSpace()->getNameSpaceName ();
+
+		auto pNewNameSpace = m_pDocument->FindNamespace(sAttributeNameSpace, true);
+		AddAttribute(pNewNameSpace, pAttribute->getAttributeName(), pAttribute->getValue());
+	}
+
+	auto children = pFromInstance->getChildren();
+	for (auto child : children) {
+		std::string sChildName = child->GetName();
+		std::string sChildNameSpace = child->GetNameSpace()->getNameSpaceName();
+
+		auto pNewNameSpace = m_pDocument->FindNamespace(sChildNameSpace, true);
+		auto pNewNode = std::make_shared<CXMLDocumentNodeInstance>(m_pDocument, this, pNewNameSpace, sChildName);
+		addChildEx  (pNewNode);
+
+		pNewNode->CopyFrom(child.get());
+	}
+
+	std::string sTextContent = pFromInstance->GetTextContent();
+	if (!sTextContent.empty ())
+		SetTextContent (sTextContent);
+
+}
+

@@ -50,7 +50,7 @@ namespace AMCData {
 		sqlite3_close((sqlite3*) m_pDBHandle);
 	}
 
-	PSQLStatement CSQLHandler_SQLite::prepareStatement(const std::string& sSQLString)
+	PSQLStatement CSQLHandler_SQLite::prepareStatementLocked(const std::string& sSQLString, PSQLTransactionLock pLock) 
 	{
 		if (sSQLString.length() > SQLITE_MAXSTATEMENTLENGTH)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -58,7 +58,7 @@ namespace AMCData {
 		sqlite3_stmt* pStmt = nullptr;
 		checkSQLiteError(sqlite3_prepare_v2((sqlite3*)m_pDBHandle, sSQLString.c_str(), (int)sSQLString.length(), &pStmt, nullptr));
 			
-		return std::make_shared<CSQLStatement_SQLite>(this, (void *)pStmt);
+		return std::make_shared<CSQLStatement_SQLite>(this, (void *)pStmt, pLock);
 	}
 
     void CSQLHandler_SQLite::checkSQLiteError(int nError)
@@ -105,7 +105,7 @@ namespace AMCData {
 
 	PSQLTransaction CSQLHandler_SQLite::beginTransaction()
 	{
-		return std::make_shared <CSQLTransaction>(this);
+		return std::make_shared <CSQLTransaction>(this, createLock ());
 	}
 
 

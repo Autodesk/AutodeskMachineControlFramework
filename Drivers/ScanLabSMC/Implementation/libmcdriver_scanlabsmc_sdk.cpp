@@ -135,7 +135,7 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8, const std::strin
 	}
 #endif // _WIN32
 
-
+	this->slsc_cfg_get_scanmotioncontrol_version = (PScanLabSMCPtr_slsc_cfg_get_scanmotioncontrol_version)_loadScanLabSMCAddress(hLibrary, "slsc_cfg_get_scanmotioncontrol_version");
 	this->slsc_cfg_initialize_from_file = (PScanLabSMCPtr_slsc_cfg_initialize_from_file)_loadScanLabSMCAddress(hLibrary, "slsc_cfg_initialize_from_file");
 	this->slsc_cfg_delete = (PScanLabSMCPtr_slsc_cfg_delete)_loadScanLabSMCAddress(hLibrary, "slsc_cfg_delete");
 	this->slsc_job_begin = (PScanLabSMCPtr_slsc_job_begin)_loadScanLabSMCAddress(hLibrary, "slsc_job_begin");
@@ -155,6 +155,8 @@ CScanLabSMCSDK::CScanLabSMCSDK(const std::string& sDLLNameUTF8, const std::strin
 	this->slsc_job_set_corner_tolerance = (PScanLabSMCPtr_slsc_job_set_corner_tolerance)_loadScanLabSMCAddress(hLibrary, "slsc_job_set_corner_tolerance");
 	this->slsc_ctrl_get_error = (PScanLabSMCPtr_slsc_ctrl_get_error)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_error");
 	this->slsc_ctrl_get_error_count = (PScanLabSMCPtr_slsc_ctrl_get_error_count)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_error_count");
+	this->slsc_ctrl_get_simulation_filename = (PScanLabSMCPtr_slsc_ctrl_get_simulation_filename)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_simulation_filename");
+	this->slsc_ctrl_get_job_characteristic = (PScanLabSMCPtr_slsc_ctrl_get_job_characteristic)_loadScanLabSMCAddress(hLibrary, "slsc_ctrl_get_job_characteristic");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -241,6 +243,7 @@ void CScanLabSMCSDK::checkError(size_t hHandle, uint32_t nSMCError)
 
 void CScanLabSMCSDK::resetFunctionPtrs()
 {
+	slsc_cfg_get_scanmotioncontrol_version = nullptr;
 	slsc_cfg_initialize_from_file = nullptr;
 	slsc_cfg_delete = nullptr;
 	slsc_job_begin = nullptr;
@@ -260,6 +263,9 @@ void CScanLabSMCSDK::resetFunctionPtrs()
 	slsc_job_set_corner_tolerance = nullptr;
 	slsc_ctrl_get_error = nullptr;
 	slsc_ctrl_get_error_count = nullptr;
+	slsc_ctrl_get_simulation_filename = nullptr;
+	slsc_ctrl_get_job_characteristic = nullptr;
+
 
 }
 

@@ -71,10 +71,9 @@ public:
     virtual ~CStorageState();
 
     std::string getStreamPath(const std::string& sStreamUUID);
-    std::string getJournalPath(const std::string& sTimeFileName);
-    std::string getJournalDataPath(const std::string& sTimeFileName);
+    std::string getJournalBasePath(const std::string& sTimeFileName);
+    std::string getJournalChunkBaseName(const std::string& sTimeFileName);
     std::string getJournalFileName(const std::string& sTimeFileName);
-    std::string getJournalDataFileName(const std::string& sTimeFileName);
 
     std::string getSessionUUID();
 

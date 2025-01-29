@@ -62,6 +62,11 @@ namespace AMC {
 			PServerConfiguration m_pServerConfiguration;
 
 			void* m_pListeningServerInstance;
+
+			std::string m_sHostName;
+			uint32_t m_nPort;
+			bool m_bUseHTTPS;
+			bool m_bServiceHasBeenStarted;
 		
 		public:
 		
@@ -76,6 +81,10 @@ namespace AMC {
 			PServerIO getServerIO ();
 
 			void stopListening();
+
+			std::string getServerURL ();
+
+			bool getServiceHasBeenStarted();
 			
 	};
 	

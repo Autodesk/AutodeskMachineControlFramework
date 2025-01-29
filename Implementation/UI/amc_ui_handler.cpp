@@ -73,8 +73,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::vector<PUIClientAction>& clientActions)
-    : m_nErrorCode(nErrorCode), m_clientActions (clientActions), m_sErrorMessage (sErrorMessage)
+CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::vector<PUIClientAction>& clientActions, const std::map<std::string, std::string>& returnValues)
+    : m_nErrorCode(nErrorCode), m_clientActions (clientActions), m_sErrorMessage (sErrorMessage), m_returnValues (returnValues)
 {
 
 }
@@ -94,7 +94,18 @@ std::vector<PUIClientAction>& CUIHandleEventResponse::getClientActions()
     return m_clientActions;
 }
 
+std::map<std::string, std::string>& CUIHandleEventResponse::getReturnValues()
+{
+    return m_returnValues;
+}
 
+bool CUIHandleEventResponse::externalValueNameIsReserved(const std::string& sName)
+{
+    if (sName == AMC_API_KEY_UI_EVENTACTIONS)
+        return true;
+
+    return false;
+}
 
 
 
@@ -749,7 +760,7 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
 }
 
 
-CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sEventPayloadJSON, PAPIAuth pAPIAuth)
+CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sEventFormPayloadJSON, const std::string& sEventParameterJSON, PAPIAuth pAPIAuth)
 {
     auto pLogger = m_pUISystemState->getLogger();
 
@@ -757,6 +768,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
     std::string sErrorMessage;
 
     std::vector<PUIClientAction> clientActions;
+    std::map<std::string, std::string> returnValues;
 
     try {
 
@@ -789,11 +801,54 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
 
+        if (!sEventParameterJSON.empty ()) {
+            rapidjson::Document document;
+            document.Parse(sEventParameterJSON.c_str());
+            if (!document.IsObject())
+                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
+
+            for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin();
+                itr != document.MemberEnd(); ++itr)
+            {
+                if (!itr->name.IsString())
+                    throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+
+                std::string sPayloadName = itr->name.GetString();
+                if (!sPayloadName.empty()) {
+
+                    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sPayloadName))
+                        throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERNAME, sPayloadName);
+
+                    if (itr->value.IsString()) {
+                        std::string sPayloadValue = itr->value.GetString();
+                        pInternalUIEnvironment->addExternalEventParameter (sPayloadName, sPayloadValue);
+                    }
+
+                    if (itr->value.IsBool()) {
+                        std::string sPayloadValue = itr->value.GetBool() ? "1" : "0";
+                        pInternalUIEnvironment->addExternalEventParameter(sPayloadName, sPayloadValue);
+                    }
+
+                    if (itr->value.IsInt()) {
+                        std::string sPayloadValue = std::to_string (itr->value.GetInt64());
+                        pInternalUIEnvironment->addExternalEventParameter(sPayloadName, sPayloadValue);
+                    }
+
+                    if (itr->value.IsDouble()) {
+                        std::string sPayloadValue = std::to_string(itr->value.GetDouble());
+                        pInternalUIEnvironment->addExternalEventParameter(sPayloadName, sPayloadValue);
+                    }
+                }
+
+            }
+
+        }
+
         auto pClientVariableHandler = pAPIAuth->getClientVariableHandler();
-        if ((pClientVariableHandler.get() != nullptr) && (!sEventPayloadJSON.empty())) {
+        if ((pClientVariableHandler.get() != nullptr) && (!sEventFormPayloadJSON.empty())) {
 
             rapidjson::Document document;
-            document.Parse(sEventPayloadJSON.c_str());
+            document.Parse(sEventFormPayloadJSON.c_str());
             if (!document.IsObject())
                 throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
 
@@ -838,6 +893,8 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         clientActions = pInternalUIEnvironment->getClientActions();
 
+        returnValues = pInternalUIEnvironment->getExternalEventReturnValues();
+
     } 
     catch (LibMCUI::ELibMCUIException & UIException) {
         nErrorCode = UIException.getErrorCode();
@@ -858,7 +915,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
     }
 
-    return CUIHandleEventResponse (nErrorCode, sErrorMessage, clientActions);
+    return CUIHandleEventResponse (nErrorCode, sErrorMessage, clientActions, returnValues);
        
 
 }

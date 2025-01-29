@@ -102,6 +102,7 @@ namespace AMC {
 		PToolpathPart findPartByUUID(const std::string & sUUID);
 
 		uint32_t getLayerZInUnits(uint32_t nLayerIndex);
+		uint32_t getLayerMinZInUnits(uint32_t nLayerIndex);
 
 		uint32_t getMetaDataCount ();
 		void getMetaDataInfo (uint32_t nMetaDataIndex, std::string & sNameSpace, std::string& sName);

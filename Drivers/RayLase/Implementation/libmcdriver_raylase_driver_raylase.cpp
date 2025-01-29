@@ -41,6 +41,8 @@ Abstract: This is a stub class definition of CDriver_Raylase
 
 using namespace LibMCDriver_Raylase::Impl;
 
+#include <set>
+
 /*************************************************************************************************************************
  Class definition of CDriver_Raylase 
 **************************************************************************************************************************/
@@ -154,6 +156,9 @@ void CDriver_Raylase::LoadSDK()
 
 IRaylaseCard* CDriver_Raylase::ConnectByIP(const std::string& sCardName, const std::string& sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts)
 {
+    if (m_pRayLaseSDK.get () == nullptr)
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_RAYLASESDKNOTLOADED);
+
     if (sCardName.empty())
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCARDNAME);
     if (sCardIP.empty())
@@ -165,7 +170,7 @@ IRaylaseCard* CDriver_Raylase::ConnectByIP(const std::string& sCardName, const s
     if (iIter != m_CardInstances.end ())
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_CARDALREADYREGISTERED, "card already registered: " + sCardName);
 
-    auto pCard = CRaylaseCardImpl::connectByIP(m_pRayLaseSDK, sCardName, sCardIP, nPort, dMaxLaserPowerInWatts, m_bSimulationMode, m_pDriverEnvironment);
+    auto pCard = CRaylaseCardImpl::connectByIP(m_pRayLaseSDK, sCardName, sCardIP, nPort, dMaxLaserPowerInWatts, m_bSimulationMode, m_pDriverEnvironment, m_pSDKWorkingDirectory);
     m_CardInstances.insert(std::make_pair (sCardName, pCard));
 
     return new CRaylaseCard (pCard);
@@ -184,6 +189,30 @@ IRaylaseCard* CDriver_Raylase::GetConnectedCard(const std::string& sCardName)
 
 }
 
+bool CDriver_Raylase::CardExists(const std::string& sCardName)
+{
+    if (sCardName.empty())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCARDNAME);
+
+    auto iIter = m_CardInstances.find(sCardName);
+    return (iIter != m_CardInstances.end());
+}
+
+void CDriver_Raylase::DisconnectCard(const std::string& sCardName)
+{
+    if (sCardName.empty())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCARDNAME);
+
+    auto iIter = m_CardInstances.find(sCardName);
+    if (iIter != m_CardInstances.end())
+    {
+        auto pCard = iIter->second;
+        m_CardInstances.erase(iIter);
+        pCard->Disconnect();
+    }
+
+}
+
 
 void CDriver_Raylase::SetToSimulationMode()
 {
@@ -193,4 +222,81 @@ void CDriver_Raylase::SetToSimulationMode()
 bool CDriver_Raylase::IsSimulationMode()
 {
     return m_bSimulationMode;
+}
+
+
+
+void CDriver_Raylase::DrawLayerMultiLaser(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS)
+{
+    std::map <uint32_t, PRaylaseCardImpl> laserMap;
+    if (m_bSimulationMode)
+        return;
+
+    for (auto iCardIter : m_CardInstances) {
+        auto pCard = iCardIter.second;
+        uint32_t nLaserIndex = pCard->getAssignedLaserIndex();
+
+        if (nLaserIndex != 0) {
+            auto iExistingIter = laserMap.find(nLaserIndex);
+            if (iExistingIter != laserMap.end())
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_ASSIGNEDDUPLICATELASERINDEX, "a duplicate laser index was assigned: " + std::to_string (nLaserIndex) + " at cards " + pCard->getCardName () + " / " + iExistingIter->second->getCardName ());
+
+            laserMap.insert (std::make_pair (nLaserIndex, pCard));
+        }
+    }
+
+    if (laserMap.empty ())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED);
+
+    auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+    auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+
+    std::vector<PRaylaseCardList> executionLists;
+
+    uint64_t nStartTime = m_pDriverEnvironment->GetGlobalTimerInMilliseconds();
+
+    for (auto iCardIter : laserMap) {
+        auto pCard = iCardIter.second;
+        uint32_t nLaserIndex = pCard->getAssignedLaserIndex();
+
+        auto pList = pCard->createNewList();
+        pList->addLayerToList(pLayer, nLaserIndex, true);
+        pList->setListOnCard(0);
+        pList->executeList(0);
+
+        executionLists.push_back(pList);
+    }
+
+    
+    std::set<CRaylaseCardList*> listsThatAreDone;
+
+    while (listsThatAreDone.size() < executionLists.size ()) {
+
+        for (auto pList : executionLists) {
+
+            auto iFinishedIter = listsThatAreDone.find(pList.get());
+            if (iFinishedIter == listsThatAreDone.end()) {
+
+
+                uint64_t nCurrentTime = m_pDriverEnvironment->GetGlobalTimerInMilliseconds();
+                if (nCurrentTime < nStartTime)
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDSYSTEMTIMING);
+
+                uint64_t nMillisecondsPassed = nCurrentTime - nStartTime;
+                if (nMillisecondsPassed > nScanningTimeoutInMS)
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SCANNINGTIMEOUT);
+
+                bool listDone = pList->waitForExecution(100);
+                if (listDone) {
+                    listsThatAreDone.insert (pList.get ());
+                }
+
+            }
+        }        
+    }
+
+    for (auto pList : executionLists) {
+        pList->deleteListListOnCard();
+    }
+
 }

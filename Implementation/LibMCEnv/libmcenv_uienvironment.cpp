@@ -36,7 +36,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_usermanagementhandler.hpp"
-#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_journalhandler_current.hpp"
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_scenehandler.hpp"
@@ -48,6 +48,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_tempstreamwriter.hpp"
 #include "libmcenv_zipstreamwriter.hpp"
+#include "libmcenv_imageloader.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_accesscontrol.hpp"
@@ -59,7 +60,6 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_buildexecution.hpp"
-#include "libmcenv_journalvariable.hpp"
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
 
@@ -382,10 +382,11 @@ IImageData* CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, 
     return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+IImageLoader* CUIEnvironment::CreateImageLoader()
 {
-    return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+    return new CImageLoader();
 }
+
 
 LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
 {
@@ -463,6 +464,12 @@ std::vector<AMC::PUIClientAction>& CUIEnvironment::getClientActions()
     return m_ClientActions;
 }
 
+std::map<std::string, std::string>& CUIEnvironment::getExternalEventReturnValues()
+{
+    return m_ExternalEventReturnValues;
+}
+
+
 
 ITestEnvironment* CUIEnvironment::GetTestEnvironment()
 {
@@ -511,7 +518,7 @@ LibMCEnv::Impl::IXMLDocument* CUIEnvironment::ParseXMLData(const LibMCEnv_uint64
 
 IDataTable* CUIEnvironment::CreateDataTable()
 {
-    return new CDataTable();
+    return new CDataTable(m_pUISystemState->getToolpathHandler ());
 }
 
 
@@ -538,7 +545,7 @@ IBuild* CUIEnvironment::GetBuildJob(const std::string& sBuildUUID)
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler (), m_pUISystemState->getGlobalChronoInstance ());
+    return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler (), m_pUISystemState->getGlobalChronoInstance (), m_pUISystemState->getStateJournal ());
 }
 
 bool CUIEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
@@ -564,7 +571,7 @@ IBuildExecution* CUIEnvironment::GetBuildExecution(const std::string& sExecution
     auto pDataModel = m_pUISystemState->getDataModel();
     auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
     auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
-    return new CBuildExecution (pBuildExecution, pDataModel, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler(), m_pUISystemState->getGlobalChronoInstance());
+    return new CBuildExecution (pBuildExecution, pDataModel, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler(), m_pUISystemState->getGlobalChronoInstance(), m_pUISystemState->getStateJournal ());
 
 }
 
@@ -647,7 +654,7 @@ IUserManagementHandler* CUIEnvironment::CreateUserManagement()
 
 IJournalHandler* CUIEnvironment::GetCurrentJournal()
 {
-    return new CJournalHandler(m_pUISystemState->getStateJournal());
+    return new CJournalHandler_Current(m_pUISystemState->getStateJournal());
 }
 
 ISceneHandler* CUIEnvironment::CreateSceneHandler() 
@@ -929,4 +936,114 @@ void CUIEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 {
     AMCCommon::CChrono chrono;
     chrono.sleepMilliseconds(nDelay);
+}
+
+void CUIEnvironment::addExternalEventParameter(const std::string& sKey, const std::string& sValue)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sKey))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY, sKey);
+
+    if (AMC::CUIHandleEventResponse::externalValueNameIsReserved(sKey))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED, "external return value key is reserved: " + sKey);
+
+    m_ExternalEventParameters.insert(std::make_pair (sKey, sValue));
+}
+
+bool CUIEnvironment::HasExternalEventParameter(const std::string& sParameterName)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY, sParameterName);
+
+    auto iIter = m_ExternalEventParameters.find(sParameterName);
+    return (iIter != m_ExternalEventParameters.end());
+
+}
+
+std::string CUIEnvironment::GetExternalEventParameter(const std::string& sParameterName)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY, "invalid external event parameter key: " +  sParameterName);
+
+    auto iIter = m_ExternalEventParameters.find(sParameterName);
+    if (iIter == m_ExternalEventParameters.end())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER, "could not find external event parameter: " + sParameterName);
+
+    return iIter->second;
+
+}
+
+void CUIEnvironment::AddExternalEventResultValue(const std::string& sReturnValueName, const std::string& sReturnValue)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sReturnValueName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY, "invalid external return value key: " + sReturnValueName);
+
+    if (AMC::CUIHandleEventResponse::externalValueNameIsReserved (sReturnValueName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED, "external return value key is reserved: " + sReturnValueName);
+
+    m_ExternalEventReturnValues.insert(std::make_pair (sReturnValueName, sReturnValue));
+}
+
+IJSONObject* CUIEnvironment::GetExternalEventParameters()
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IJSONObject* CUIEnvironment::GetExternalEventResults()
+{
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+bool CUIEnvironment::HasResourceData(const std::string& sIdentifier)
+{
+
+    if (m_pUIHandler == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourceEntry = pResourcePackage->findEntryByName(sIdentifier, false);
+
+    return (pResourceEntry.get() != nullptr);
+}
+
+
+void CUIEnvironment::LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer)
+{
+    
+    if (m_pUIHandler == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+    auto nResourceSize = pResourceEntry->getSize();
+
+    if (pResourceDataNeededCount != nullptr)
+        *pResourceDataNeededCount = nResourceSize;
+
+    if (pResourceDataBuffer != nullptr) {
+        if (nResourceDataBufferSize < nResourceSize)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+        pResourcePackage->readEntryEx(sResourceName, pResourceDataBuffer, nResourceDataBufferSize);
+    }
+
+
+}
+
+std::string CUIEnvironment::LoadResourceString(const std::string& sResourceName)
+{
+    
+    if (m_pUIHandler == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    return pResourcePackage->readEntryUTF8String(sResourceName);
 }

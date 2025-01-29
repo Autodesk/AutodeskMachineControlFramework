@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMCData {
 
-	CSQLStatement_SQLite::CSQLStatement_SQLite(CSQLHandler_SQLite* pHandler, void* pStmtHandle)
-		: m_pHandler (pHandler), m_pStmtHandle (pStmtHandle), m_bAllowNext (true), m_bHasColumn (false), m_bHadRow (false)
+	CSQLStatement_SQLite::CSQLStatement_SQLite(CSQLHandler_SQLite* pHandler, void* pStmtHandle, PSQLTransactionLock pLock)
+		: m_pHandler (pHandler), m_pStmtHandle (pStmtHandle), m_bAllowNext (true), m_bHasColumn (false), m_bHadRow (false), m_pLock (pLock)
 	{
 		if (pHandler == nullptr)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -100,6 +100,10 @@ namespace AMCData {
 			return false;
 
 		int nResult = sqlite3_step((sqlite3_stmt*)m_pStmtHandle);
+
+		// Release lock after execution
+		m_pLock = nullptr;
+
 		switch (nResult) {
 		case SQLITE_DONE:
 			m_bAllowNext = false;
@@ -124,6 +128,10 @@ namespace AMCData {
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_SQLITE_TOOMANYRESULTROWS);
 
 		int nResult = sqlite3_step((sqlite3_stmt*)m_pStmtHandle);
+
+		// Release lock after execution
+		m_pLock = nullptr;
+
 		switch (nResult) {
 		case SQLITE_DONE:
 			m_bAllowNext = false;

@@ -80,6 +80,8 @@ public:
 
     IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID, const LibMCData_uint64 nAbsoluteTimeStamp) override;
 
+    bool JobExists(const std::string& sJobUUID) override;
+
 	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
 
 	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;

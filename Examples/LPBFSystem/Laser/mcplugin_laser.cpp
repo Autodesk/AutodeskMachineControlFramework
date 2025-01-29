@@ -43,7 +43,7 @@ LIBMC_IMPORTDRIVERCLASSES(ScanLabSMC, ScanLabSMC)
 __BEGINDRIVERIMPORT
 __IMPORTDRIVER(ScanLab_RTC6, "scanlab");
 __IMPORTDRIVER(Raylase, "raylase");
-__IMPORTDRIVER(ScanLabSMC, "scanlabsmc");
+__IMPORTDRIVER(ScanLabSMC, "scanlabsmc_0_9");
 __ENDDRIVERIMPORT
 
 
@@ -140,9 +140,25 @@ void InitialiseScanlabDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDri
 
 }
 
-void InitialiseScanlabSMCDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDriver_ScanLabSMC pDriver)
+void InitialiseScanlabSMCDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDriver_ScanLabSMC pDriver, const std::string & sJobUUID)
 {
 	pStateEnvironment->LogMessage("Initialising Scanlab SMC Driver");
+
+	pStateEnvironment->LogMessage("Loading build job " + sJobUUID);
+	auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
+	auto pToolpath = pBuildJob->CreateToolpathAccessor();
+	auto pMetaData = pToolpath->FindUniqueMetaData("http://schemas.scanlab.com/smc/2024/10", "smc_control");
+
+	auto pAttribute = pMetaData->FindAttribute("http://schemas.scanlab.com/smc/2024/10", "config", true);
+	std::string sConfigName = pAttribute->GetValue();
+
+	pStateEnvironment->LogMessage("Loading SMC Configuration Template from " + sConfigName);
+
+	std::vector<uint8_t> buffer;
+	pToolpath->GetBinaryMetaData(sConfigName, buffer);
+
+	std::string sSMCConfigurationTemplate(buffer.begin(), buffer.end());
+
 
 	auto sIPAddress = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
 	auto nSerial = pStateEnvironment->GetIntegerParameter("cardconfig", "serial");
@@ -153,8 +169,10 @@ void InitialiseScanlabSMCDriver(LibMCEnv::PStateEnvironment pStateEnvironment, P
 	pConfiguration->SetDynamicViolationReaction(LibMCDriver_ScanLabSMC::eDynamicViolationReaction::StopAndReport);
 
 	pConfiguration->SetSerialNumber((uint32_t) nSerial);
+	pConfiguration->SetConfigurationTemplate (sSMCConfigurationTemplate);
 	pConfiguration->SetIPAddress(sIPAddress);
 	pConfiguration->SetCorrectionFileResource(sCorrectionResourceName);
+	pConfiguration->SetSimulationSubDirectory("SMCSimulation");
 	pConfiguration->SetFirmwareResources("rtc6eth", "rtc6rbf", "rtc6dat");
 
 	auto pContext = pDriver->CreateContext("smccontext", pConfiguration);
@@ -176,7 +194,6 @@ __DECLARESTATE(init)
 	}
 	else if (sCardType == "scanlabsmc")
 	{
-		InitialiseScanlabSMCDriver(pStateEnvironment, __acquireDriver(ScanLabSMC));
 	}
 	else if (sCardType == "raylase") {
 		InitialiseRaylaseDriver(pStateEnvironment, __acquireDriver(Raylase));
@@ -206,6 +223,22 @@ __DECLARESTATE(idle)
 
 		
 	LibMCEnv::PSignalHandler pHandlerInstance;
+
+	if (pStateEnvironment->WaitForSignal("signal_initlaserforjob", 0, pHandlerInstance)) {
+		std::string sJobUUID = pHandlerInstance->GetUUID("jobuuid");
+
+		if (sCardType == "scanlabsmc") {
+
+			auto pDriver = __acquireDriver(ScanLabSMC);
+			InitialiseScanlabSMCDriver(pStateEnvironment, pDriver, sJobUUID);
+
+		}		
+
+		pHandlerInstance->SetBoolResult("success", true);
+		pHandlerInstance->SignalHandled();
+	}
+
+
 	if (pStateEnvironment->WaitForSignal("signal_exposure", 0, pHandlerInstance)) {
 		pStateEnvironment->StoreSignal("exposuresignal", pHandlerInstance);
 
@@ -228,6 +261,7 @@ __DECLARESTATE(exposure)
 
 	pStateEnvironment->LogMessage("Exposure...");
 	auto pBuildJob = pStateEnvironment->GetBuildJob(pSignalHandler->GetString("jobuuid"));
+	auto pExecution = pBuildJob->FindExecution(pSignalHandler->GetString("executionuuid"));
 	auto nLayerIndex = (uint32_t)pSignalHandler->GetInteger("layerindex");
 
 
@@ -241,15 +275,73 @@ __DECLARESTATE(exposure)
 			pStateEnvironment->Sleep(2000);
 		}
 
-		pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		auto pContext = pDriver->GetContext();
+		auto pRecording = pContext->PrepareRecording(true);
+
+		pRecording->AddChannel("x", LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetXBacktransformed);
+		pRecording->AddChannel("y", LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetYBacktransformed);
+		pRecording->AddChannel("power", LibMCDriver_ScanLab::eRTCChannelType::ChannelAnalogOut1);
+
+		pContext->SetStartList(1, 0);
+		pRecording->EnableRecording(LibMCDriver_ScanLab::eRTCRecordingFrequency::Record100kHz);
+
+		auto pAccessor = pBuildJob->CreateToolpathAccessor();
+		auto pLayer = pAccessor->LoadLayer(nLayerIndex);
+		pContext->AddLayerToList(pLayer, false);
+
+		pRecording->DisableRecording();
+
+		pStateEnvironment->LogMessage("Starting Execution...");
+
+		pRecording->ExecuteListWithRecording();
+
+		pStateEnvironment->LogMessage("Execution finished");
+
+		auto pDataTable = pStateEnvironment->CreateDataTable();
+		pRecording->AddRecordsToDataTable("x", pDataTable, "x", "X");
+		pRecording->AddRecordsToDataTable("y", pDataTable, "y", "Y");
+		pRecording->AddRecordsToDataTable("power", pDataTable, "power", "Power");
+
+		auto pTempStream = pStateEnvironment->CreateTemporaryStream("layer_" + std::to_string (nLayerIndex), "text/csv");
+		pDataTable->WriteCSVToStream(pTempStream, nullptr);
+		pTempStream->Finish();
+
+		//pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
 	}
 	else if (sCardType == "scanlabsmc")
 	{
 		auto pDriver = __acquireDriver(ScanLabSMC);
 
-		auto pContext = pDriver->FindContext("smccontext");
-		pContext->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
 
+
+		auto pContext = pDriver->FindContext("smccontext");
+		//pContext->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		auto pJob = pContext->BeginJob(0.0, 0.0, LibMCDriver_ScanLabSMC::eBlendMode::Deactivated);
+
+		auto pDataTable = pStateEnvironment->CreateDataTable();
+
+		auto pAccessor = pBuildJob->CreateToolpathAccessor();
+		pStateEnvironment->LogMessage("Loading layer...");
+
+		auto pLayer = pAccessor->LoadLayer(nLayerIndex);
+		pStateEnvironment->LogMessage("Writing layer to SCANmotionControl...");
+
+		pJob->AddLayerToList(pLayer);
+		pJob->Finalize();
+		pStateEnvironment->LogMessage("Executing layer...");
+		pJob->Execute (true);
+
+		pStateEnvironment->LogMessage("Parsing simulation data...");
+		pJob->LoadSimulationData(pDataTable);
+
+		pStateEnvironment->LogMessage("Parsing finished...");
+		//pExecution->StoreDataTable("smcdatalayer" + std::to_string(nLayerIndex), "SMC Data Layer " + std::to_string(nLayerIndex), pDataTable, nullptr, "");
+
+		auto pTempStream = pStateEnvironment->CreateTemporaryStream("smcdatalayer" + std::to_string(nLayerIndex), "text/csv");
+		pDataTable->WriteCSVToStream(pTempStream, nullptr);	
+		pTempStream->Finish();
+
+		pExecution->AttachTempStream("smcdatalayer" + std::to_string(nLayerIndex), "SMC Data Layer " + std::to_string(nLayerIndex), "", pTempStream.get());
 		
 	}
 	else if (sCardType == "raylase") {
@@ -263,7 +355,7 @@ __DECLARESTATE(exposure)
 		pStateEnvironment->LogMessage("Get Connected Card...");
 		auto pCard = pDriver->GetConnectedCard("card1");
 		pStateEnvironment->LogMessage("Drawing Layer...");
-		pCard->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		pCard->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex, 100000);
 		pStateEnvironment->LogMessage("Drawing Layer successful...");
 	}
 

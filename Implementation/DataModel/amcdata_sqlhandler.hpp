@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
+#include <thread>
+#include <mutex>
 
 #include "amcdata_sqlstatement.hpp"
 #include "amcdata_sqltransaction.hpp"
@@ -47,11 +49,35 @@ namespace AMCData {
 	class CSQLStatement;
 	typedef std::shared_ptr<CSQLStatement> PSQLStatement;
 
+	class CSQLTransactionLock;
+	typedef std::shared_ptr<CSQLTransactionLock> PSQLTransactionLock;
+
 	class CSQLTransaction;
 	typedef std::shared_ptr<CSQLTransaction> PSQLTransaction;
 
+	class CSQLTransactionLock {
+		private:
+			std::lock_guard<std::mutex> m_lockGuard;
+
+		public:
+			CSQLTransactionLock(std::mutex& mutexToLock)
+				: m_lockGuard (mutexToLock)
+			{
+
+
+			}
+
+			virtual ~CSQLTransactionLock()
+			{
+
+			}
+
+	};
+
 	class CSQLHandler {
 	private:
+
+		std::mutex m_Mutex;
 		
 	public:
 
@@ -61,9 +87,19 @@ namespace AMCData {
 		virtual ~CSQLHandler()
 		{}
 
-		virtual PSQLStatement prepareStatement (const std::string & sSQLString) = 0;
+		virtual PSQLStatement prepareStatement(const std::string& sSQLString)
+		{
+			return prepareStatementLocked(sSQLString, createLock());
+		}
+
+		virtual PSQLStatement prepareStatementLocked (const std::string& sSQLString, PSQLTransactionLock pLock) = 0;
 
 		virtual PSQLTransaction beginTransaction() = 0;
+
+		virtual PSQLTransactionLock createLock() {
+			return std::make_shared<CSQLTransactionLock>(m_Mutex);
+		}
+
 
 	};
 

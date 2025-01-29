@@ -57,14 +57,19 @@ namespace Impl {
 
 class CPNGImageStoreOptions : public virtual IPNGImageStoreOptions, public virtual CBase {
 private:
+    LibMCEnv::ePNGStorageFormat m_PNGStorageFormat;
 
 public:
 
-    CPNGImageStoreOptions();
+	CPNGImageStoreOptions();
 
-    virtual ~CPNGImageStoreOptions();
+	virtual ~CPNGImageStoreOptions();
 
 	void ResetToDefaults() override;
+
+	LibMCEnv::ePNGStorageFormat GetStorageFormat() override;
+
+	void SetStorageFormat(const LibMCEnv::ePNGStorageFormat ePNGStorageFormat) override;
 
 };
 

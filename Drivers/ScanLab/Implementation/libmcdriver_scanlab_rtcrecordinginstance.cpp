@@ -156,23 +156,33 @@ LibMCDriver_ScanLab::eRTCChannelType CRTCRecordingChannel::getChannelType()
 uint32_t CRTCRecordingChannel::getRTCTrigger8Parameter()
 {
 	switch (m_ChannelType) {
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelLaserOn:
+			return 0; /** Laser On Value (RTC Channel 0, LASERON) */
+
 		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentXRaw:
-			return 1; /** Raw X Value of the Scan Head (RTC Channel 1, StatusAX) */
+			return 1; /** Raw X Value of the Scan Head. Fails if Scanhead feedback is not enabled. (RTC Channel 1, StatusAX) */
 
 		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentYRaw:
-			return 2; /** Raw Y Value of the Scan Head (RTC Channel 2, StatusAY) */
+			return 2; /** Raw Y Value of the Scan Head Fails if Scanhead feedback is not enabled. (RTC Channel 2, StatusAY) */
 		
 		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentZRaw: 
-			return 4; /** Raw Z Value of the Scan Head (RTC Channel 4, StatusBX) */
+			return 4; /** Raw Z Value of the Scan Head Fails if Scanhead feedback is not enabled. (RTC Channel 4, StatusBX) */
 
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetXRaw:
-			return 7; /** Target X Value of the Scan Head (RTC Channel 7, SampleX) */
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetX:
+			return 7; /** Target X Value of the Scan Head. (RTC Channel 7, SampleX) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetY:
+			return 8; /** Target Y Value of the Scan Head. (RTC Channel 8, SampleY) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetZ:
+			return 9; /** Target Z Value of the Scan Head. (RTC Channel 9, SampleZ) */
+
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetXTransformed:
+			return 20; /** Target X Value of the Scan Head (RTC Channel 7, SampleX) */
 		
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetYRaw:
-			return 8; /** Target Y Value of the Scan Head (RTC Channel 8, SampleY) */
-
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetZRaw:
-			return  9; /** Target Z Value of the Scan Head (RTC Channel 9, SampleZ) */
+		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetYTransformed:
+			return 21; /** Target Y Value of the Scan Head (RTC Channel 8, SampleY) */
 
 		case LibMCDriver_ScanLab::eRTCChannelType::ChannelAutoLaserControlMode:
 			return 24; /** Control Parameter of AutoLaserControl (RTC Channel 24) */
@@ -257,29 +267,7 @@ uint32_t CRTCRecordingChannel::getRTCTrigger8Parameter()
 
 		case LibMCDriver_ScanLab::eRTCChannelType::ChannelRS232: 
 			return 58; /** RS232 Channel Value (RTC Channel 58) */
-
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelLaserOn:
-			return 0; /** Laser On Value (RTC Channel 0, LASERON) */
-
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentXBacktransformed:
-			return 1; /** Current X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 1, StatusAX) */
-
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentYBacktransformed:
-			return 2; /** Current Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 2, StatusAY) */
-
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentZBacktransformed:
-			return 4; /** Current Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 4, StatusBX) */
-
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetXBacktransformed:
-			return 7; /** Target X Value of the Scan Head, Backtransformed via the correction file (RTC Channel 7, SampleX) */
-
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetYBacktransformed:
-			return 8; /** Target Y Value of the Scan Head, Backtransformed via the correction file (RTC Channel 8, SampleY) */
-
-		case LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetZBacktransformed:
-			return 9; /** Target Z Value of the Scan Head, Backtransformed via the correction file (RTC Channel 9, SampleZ) */
-			
-			
+						
 		default:
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE, "invalid channel type: " + std::to_string ((uint32_t) m_ChannelType));
 	}
@@ -367,16 +355,19 @@ void CRTCRecordingChannel::getAllScaledRecordEntries(uint64_t nValuesBufferSize,
 }
 
 
+
 /*************************************************************************************************************************
  Class definition of CRTCRecording 
 **************************************************************************************************************************/
-CRTCRecordingInstance::CRTCRecordingInstance(const std::string& sUUID, PScanLabSDK pSDK, uint32_t cardNo, double dCorrectionFactor, size_t nChunkSize)
+CRTCRecordingInstance::CRTCRecordingInstance(const std::string& sUUID, PScanLabSDK pSDK, uint32_t cardNo, double dXYCorrectionFactor, double dZCorrectionFactor, size_t nChunkSize, bool bEnableScanheadFeedback, bool bEnableBacktransformation)
 	: m_pSDK (pSDK), 
 	m_sUUID (sUUID),
 	m_CardNo (cardNo),
-	m_dCorrectionFactor (dCorrectionFactor),
-	m_bScanHeadConnectionCheckEnabled (true),
-	m_nChunkSize (nChunkSize)
+	m_dXYCorrectionFactor (dXYCorrectionFactor),
+	m_dZCorrectionFactor(dZCorrectionFactor),
+	m_nChunkSize (nChunkSize),
+	m_bEnableScanheadFeedback (bEnableScanheadFeedback),
+	m_bEnableBacktransformation (bEnableBacktransformation)
 
 {
 	if (pSDK.get() == nullptr)
@@ -388,12 +379,47 @@ CRTCRecordingInstance::CRTCRecordingInstance(const std::string& sUUID, PScanLabS
 	m_AvailableChannelIDs.reserve(RTC_CHANNELCOUNT);
 	for (int32_t nChannelID = RTC_CHANNELCOUNT; nChannelID > 0; nChannelID--)
 		m_AvailableChannelIDs.push_back(nChannelID);
+
+	uint32_t nHeadNoXY = 1;
+	uint32_t nHeadNoZ = 2;
+	uint32_t nAxisX = 1;
+	uint32_t nAxisY = 2;
+	uint32_t nAxisZ = 1;
+
+	if (bEnableScanheadFeedback) {
+
+		uint32_t ControlCommand = 0x0501; // activates actual position recording
+		//activate porition recording for each axis induvidually, x-axis = 1, y-axis = 2
+		m_pSDK->n_control_command(m_CardNo, nHeadNoXY, nAxisX, ControlCommand);
+		m_pSDK->checkLastErrorOfCard(m_CardNo);
+
+		m_pSDK->n_control_command(m_CardNo, nHeadNoXY, nAxisY, ControlCommand);
+		m_pSDK->checkLastErrorOfCard(m_CardNo);
+
+		m_pSDK->n_control_command(m_CardNo, nHeadNoZ, nAxisZ, ControlCommand);
+		m_pSDK->checkLastErrorOfCard(m_CardNo);
+		
+		m_pSDK->n_control_command(m_CardNo, nHeadNoZ, 2, ControlCommand);
+		m_pSDK->checkLastErrorOfCard(m_CardNo);
+
+	}
+
+	if (m_bEnableBacktransformation) {
+		m_pSDK->checkGlobalErrorOfCard(m_CardNo);
+
+		m_HeadTransform.resize(528520 * 4);
+
+		m_pSDK->checkError(m_pSDK->n_upload_transform(m_CardNo, 1, m_HeadTransform.data()));
+
+	}
 }
 
 CRTCRecordingInstance::~CRTCRecordingInstance()
 {
 
 }
+
+
 
 std::string CRTCRecordingInstance::normalizeChannelName(const std::string& sChannelName)
 {
@@ -424,15 +450,6 @@ std::string CRTCRecordingInstance::getUUID()
 	return m_sUUID;
 }
 
-bool CRTCRecordingInstance::getScanheadConnectionCheckIsEnabled()
-{
-	return m_bScanHeadConnectionCheckEnabled;
-}
-
-void CRTCRecordingInstance::setScanheadConnectionCheckIsEnabled(bool bValue)
-{
-	m_bScanHeadConnectionCheckEnabled = bValue;
-}
 
 void CRTCRecordingInstance::clear()
 {
@@ -447,6 +464,14 @@ PRTCRecordingChannel CRTCRecordingInstance::addChannel(const std::string& sChann
 
 	std::string sNormalizedChannelName = normalizeChannelName(sChannelName);
 
+	if (!m_bEnableScanheadFeedback) {
+		if ((eChannelType == LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentXRaw) ||
+			(eChannelType == LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentYRaw) ||
+			(eChannelType == LibMCDriver_ScanLab::eRTCChannelType::ChannelCurrentZRaw)) {
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANHEADCHANNELNEEDSFEEDBACKENABLED, "scan head channel needs feedback enabled: " + sNormalizedChannelName);
+		}
+	}
+
 	auto iIter = m_ChannelMap.find(sNormalizedChannelName);
 	if (iIter != m_ChannelMap.end())
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DUPLICATECHANNELNAME, "duplicate channel name: " + sNormalizedChannelName);
@@ -456,6 +481,11 @@ PRTCRecordingChannel CRTCRecordingInstance::addChannel(const std::string& sChann
 
 	uint32_t nChannelID = *m_AvailableChannelIDs.rbegin ();
 	m_AvailableChannelIDs.pop_back();
+
+	for (auto iIter : m_ChannelMap) {
+		if (iIter.second->getChannelType () == eChannelType)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CHANNELTYPEISALREADYRECORDED, "channel type is already recorded: " + sNormalizedChannelName);
+	}
 
 	if ((nChannelID < 1) || (nChannelID > RTC_CHANNELCOUNT))
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELID, "invalid channel ID");
@@ -494,8 +524,9 @@ int32_t * CRTCRecordingChannel::reserveDataBuffer(uint32_t nCount, uint32_t& nEn
 
 	if (nCount == 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW, "data recording interval underflow");
-	if (nCount > m_nChunkSize)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW, "data recording interval overflow");
+	if (nCount > m_nChunkSize) {
+		nCount = m_nChunkSize;		
+	}
 
 	if (m_pCurrentChunk.get() != nullptr) {
 		if (m_pCurrentChunk->isFull())
@@ -583,7 +614,7 @@ void CRTCRecordingInstance::enableRecording(uint32_t nPeriod)
 	}
 
 	m_pSDK->checkGlobalErrorOfCard(m_CardNo);
-	m_pSDK->n_set_trigger8(m_CardNo, nPeriod, rtcChannels.at (0), rtcChannels.at (1), rtcChannels.at (2), rtcChannels.at(3), rtcChannels.at(4), rtcChannels.at(5), rtcChannels.at (6), rtcChannels.at(7));
+	m_pSDK->n_set_trigger8(m_CardNo, nPeriod | RTC6_BITFLAG_SETTRIGGER_ROUNDTRIP, rtcChannels.at (0), rtcChannels.at (1), rtcChannels.at (2), rtcChannels.at(3), rtcChannels.at(4), rtcChannels.at(5), rtcChannels.at (6), rtcChannels.at(7));
 	m_pSDK->checkLastErrorOfCard(m_CardNo);
 
 }
@@ -652,7 +683,7 @@ void CRTCRecordingInstance::executeListWithRecording()
 	uint32_t LastPosition = 0;
 	uint32_t Increment = 100000;
 
-	uint32_t nMaxMESPosition = (1UL << 23) - 1;
+	uint32_t nMaxMESPosition = (1UL << 22) - 1;
 
 	do // Wait for measurement to start
 	{
@@ -674,8 +705,22 @@ void CRTCRecordingInstance::executeListWithRecording()
 		}
 		else if (MesPosition < LastPosition)
 		{
-			readRecordedDataBlockFromRTC(LastPosition, nMaxMESPosition);
-			LastPosition = 0;
+			//std::cout << "Roundtrip reached: MesPosition: " << MesPosition << " / LastPosition: " << LastPosition << std::endl;
+
+			if (MesPosition > nMaxMESPosition)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW, "data recording interval overflow: MesPosition exceeds Max MES Position");
+
+			uint32_t nBytesToRead = nMaxMESPosition - LastPosition;
+			if (nBytesToRead > Increment) {
+				readRecordedDataBlockFromRTC(LastPosition, LastPosition + Increment);
+				LastPosition += Increment;
+			}
+			else {
+				readRecordedDataBlockFromRTC(LastPosition, nMaxMESPosition);
+				LastPosition = 0;
+
+			}
+
 		}
 		else {
 			if (!MesBusy) {
@@ -731,6 +776,214 @@ void CRTCRecordingInstance::addScaledRecordsToDataTable(const std::string& sChan
 		pChannel->getAllScaledRecordEntries(nRecordCount, &nNeededEntries, buffer.data(), dScaleFactor, dOffset);
 
 		pDataTable->SetDoubleColumnValues(sColumnIdentifier, buffer);
+	}
+
+}
+
+void CRTCRecordingInstance::addBacktransformedXYPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY)
+{
+	if (!m_bEnableBacktransformation)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED);
+	if (m_HeadTransform.size () == 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED);
+
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	PRTCRecordingChannel pChannelX = nullptr;
+	PRTCRecordingChannel pChannelY = nullptr;
+
+	for (auto iIter : m_ChannelMap) {
+		auto channelType = iIter.second->getChannelType();
+		if (channelType == eRTCChannelType::ChannelCurrentXRaw)
+			pChannelX = iIter.second;
+		if (channelType == eRTCChannelType::ChannelCurrentYRaw)
+			pChannelY = iIter.second;
+	}
+
+	if (pChannelX.get () == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXNOTRECORDED);
+	if (pChannelY.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELYNOTRECORDED);
+
+	pDataTable->AddColumn(sColumnIdentifierX, sColumnDescriptionX, LibMCEnv::eDataTableColumnType::DoubleColumn);
+	pDataTable->AddColumn(sColumnIdentifierY, sColumnDescriptionY, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	uint64_t nRecordCount = pChannelX->getRecordCount();
+	if (nRecordCount != pChannelY->getRecordCount())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXANDYRECORDCOUNTMISMATCH);
+
+	if (nRecordCount > 0) {
+		std::vector<int32_t> bufferX;
+		std::vector<int32_t> bufferY;
+		uint64_t nNeededEntries = 0;
+
+		bufferX.resize(nRecordCount);
+		pChannelX->getAllRecordEntries(nRecordCount, &nNeededEntries, bufferX.data());
+		
+		bufferY.resize(nRecordCount);
+		pChannelY->getAllRecordEntries(nRecordCount, &nNeededEntries, bufferY.data());
+
+		std::vector<double> backtransformedX;
+		std::vector<double> backtransformedY;
+
+		backtransformedX.resize(nRecordCount);
+		backtransformedY.resize(nRecordCount);
+
+		for (uint64_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+			int32_t nX = bufferX.at(nIndex);
+			int32_t nY = bufferY.at(nIndex);
+			m_pSDK->checkError(m_pSDK->transform(&nX, &nY, m_HeadTransform.data(), 0));
+
+			backtransformedX.at(nIndex) = (double)nX / m_dXYCorrectionFactor;
+			backtransformedY.at(nIndex) = (double)nY / m_dXYCorrectionFactor;
+		}
+
+		pDataTable->SetDoubleColumnValues(sColumnIdentifierX, backtransformedX);
+		pDataTable->SetDoubleColumnValues(sColumnIdentifierY, backtransformedY);
+	}
+
+
+}
+
+void CRTCRecordingInstance::backtransformRawXYCoordinates(const int32_t nRawCoordinateX, const int32_t nRawCoordinateY, double& dBacktransformedX, double& dBacktransformedY)
+{
+	if (!m_bEnableBacktransformation)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED);
+	if (m_HeadTransform.size() == 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED);
+
+	// Apply BackTransformation XY
+	int32_t nCoordinateX = nRawCoordinateX;
+	int32_t nCoordinateY = nRawCoordinateY;
+	m_pSDK->checkError(m_pSDK->transform(&nCoordinateX, &nCoordinateY, m_HeadTransform.data(), 0));
+
+	dBacktransformedX = (double)nCoordinateX / m_dXYCorrectionFactor;
+	dBacktransformedY = (double)nCoordinateY / m_dXYCorrectionFactor;
+
+}
+
+void CRTCRecordingInstance::addBacktransformedZPositionToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierZ, const std::string& sColumnDescriptionZ)
+{
+	if (!m_bEnableBacktransformation)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED);
+	if (m_HeadTransform.size() == 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED);
+
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	PRTCRecordingChannel pChannelZ = nullptr;
+
+	for (auto iIter : m_ChannelMap) {
+		auto channelType = iIter.second->getChannelType();
+		if (channelType == eRTCChannelType::ChannelCurrentZRaw)
+			pChannelZ = iIter.second;
+	}
+
+	if (pChannelZ.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELZNOTRECORDED);
+
+	pDataTable->AddColumn(sColumnIdentifierZ, sColumnDescriptionZ, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	uint64_t nRecordCount = pChannelZ->getRecordCount();
+
+	if (nRecordCount > 0) {
+		std::vector<int32_t> bufferZ;
+		uint64_t nNeededEntries = 0;
+
+		bufferZ.resize(nRecordCount);
+		pChannelZ->getAllRecordEntries(nRecordCount, &nNeededEntries, bufferZ.data());
+
+		std::vector<double> backtransformedZ;
+
+		backtransformedZ.resize(nRecordCount);
+
+		for (uint64_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+			int32_t nZ = bufferZ.at(nIndex);
+			int32_t nDummy = 0;
+			m_pSDK->checkError(m_pSDK->transform(&nZ, &nDummy, m_HeadTransform.data(), 1));
+
+			backtransformedZ.at(nIndex) = (double)nZ / m_dZCorrectionFactor;
+		}
+
+		pDataTable->SetDoubleColumnValues(sColumnIdentifierZ, backtransformedZ);
+	}
+
+
+}
+
+double CRTCRecordingInstance::backtransformRawZCoordinate(const int32_t nRawCoordinateZ)
+{
+	if (!m_bEnableBacktransformation)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED);
+	if (m_HeadTransform.size() == 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BACKTRANSFORMATIONISNOTENABLED);
+
+	// Apply BackTransformation Z
+	int32_t nCoordinateZ = nRawCoordinateZ;
+	int32_t nDummy = 0;
+	m_pSDK->checkError(m_pSDK->transform(&nCoordinateZ, &nDummy, m_HeadTransform.data(), 1));
+
+	return (double)nCoordinateZ / m_dZCorrectionFactor;
+
+}
+
+void CRTCRecordingInstance::addTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY)
+{
+	if (pDataTable.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	PRTCRecordingChannel pChannelX = nullptr;
+	PRTCRecordingChannel pChannelY = nullptr;
+
+	for (auto iIter : m_ChannelMap) {
+		auto channelType = iIter.second->getChannelType();
+		if (channelType == eRTCChannelType::ChannelTargetX)
+			pChannelX = iIter.second;
+		if (channelType == eRTCChannelType::ChannelTargetY)
+			pChannelY = iIter.second;
+	}
+
+	if (pChannelX.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXNOTRECORDED);
+	if (pChannelY.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELYNOTRECORDED);
+
+	pDataTable->AddColumn(sColumnIdentifierX, sColumnDescriptionX, LibMCEnv::eDataTableColumnType::DoubleColumn);
+	pDataTable->AddColumn(sColumnIdentifierY, sColumnDescriptionY, LibMCEnv::eDataTableColumnType::DoubleColumn);
+
+	uint64_t nRecordCount = pChannelX->getRecordCount();
+	if (nRecordCount != pChannelY->getRecordCount())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_RTCCHANNELXANDYRECORDCOUNTMISMATCH);
+
+	if (nRecordCount > 0) {
+		std::vector<int32_t> bufferX;
+		std::vector<int32_t> bufferY;
+		uint64_t nNeededEntries = 0;
+
+		bufferX.resize(nRecordCount);
+		pChannelX->getAllRecordEntries(nRecordCount, &nNeededEntries, bufferX.data());
+
+		bufferY.resize(nRecordCount);
+		pChannelY->getAllRecordEntries(nRecordCount, &nNeededEntries, bufferY.data());
+
+		std::vector<double> coordXinmm;
+		std::vector<double> coordYinmm;
+
+		coordXinmm.resize(nRecordCount);
+		coordYinmm.resize(nRecordCount);
+
+		for (uint64_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+			int32_t nX = bufferX.at(nIndex);
+			int32_t nY = bufferY.at(nIndex);
+
+			coordXinmm.at(nIndex) = (double)nX / m_dXYCorrectionFactor;
+			coordYinmm.at(nIndex) = (double)nY / m_dXYCorrectionFactor;
+		}
+
+		pDataTable->SetDoubleColumnValues(sColumnIdentifierX, coordXinmm);
+		pDataTable->SetDoubleColumnValues(sColumnIdentifierY, coordYinmm);
 	}
 
 }

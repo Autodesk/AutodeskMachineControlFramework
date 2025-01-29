@@ -86,3 +86,11 @@ std::vector<uint8_t>& CPNGImageData::getPNGStreamBuffer()
     return m_PNGStream;
 }
 
+void CPNGImageData::WriteToStream(ITempStreamWriter* pStream)
+{
+    if (pStream == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    if (m_PNGStream.size() > 0)
+        pStream->WriteData(m_PNGStream.size(), m_PNGStream.data());
+}

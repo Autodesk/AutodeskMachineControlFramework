@@ -162,6 +162,7 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sName
     pUpdateStatement->setString(4, sUUID);
     pUpdateStatement->setString(5, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
     pUpdateStatement->execute();
+    pUpdateStatement = nullptr;
 
 }
 
@@ -254,6 +255,7 @@ void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string
     pUpdateStatement->setString(4, sUUID);
     pUpdateStatement->setString(5, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
     pUpdateStatement->execute();
+    pUpdateStatement = nullptr;
 
 }
 
@@ -360,6 +362,7 @@ void CStorage::FinishRandomWriteStream(const std::string& sUUID)
     pUpdateStatement->setString(5, sUUID);
     pUpdateStatement->setString(6, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
     pUpdateStatement->execute();
+    pUpdateStatement = nullptr;
 
 }
 
@@ -389,6 +392,7 @@ bool CStorage::StreamIsImage(const std::string& sUUID)
 
     auto sMimeType = pStatement->getColumnString(1);
     auto sLowerMimeType = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(sMimeType));
+    pStatement = nullptr;
 
     return m_pStorageState->isImageContent(sLowerMimeType);
 

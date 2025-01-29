@@ -226,7 +226,30 @@
 		<error name="INVALIDSUPPORTINDEX" code="10186" description="Invalid support index" />		
 		<error name="INVALIDSOLIDINDEX" code="10187" description="Invalid solid index" />		
 		<error name="INVALIDCOMPONENTINDEX" code="10188" description="Invalid component index" />		
-
+		<error name="INVALIDEXTERNALEVENTPARAMETERKEY" code="10189" description="Invalid external event parameter key" />		
+		<error name="COULDNOTFINDEXTERNALEVENTPARAMETER" code="10190" description="Could not find external event parameter" />		
+		<error name="INVALIDEXTERNALEVENTRETURNVALUEKEY" code="10191" description="Invalid external event return value key" />				
+		<error name="EXTERNALEVENTVALUEKEYISRESERVED" code="10192" description="External event value key is reserved." />		
+		<error name="EXTERNALEVENTRETURNVALUEKEYISRESERVED" code="10193" description="External event return value key is reserved." />		
+		<error name="INVALIDYUY2BUFFERSIZE" code="10194" description="Invalid YUY2 buffer size" />		
+		<error name="YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2" code="10195" description="YUY2 pixel count must be a multiple of 2" />		
+		<error name="INVALIDJPEGDATA" code="10196" description="Invalid JPEG Data size" />		
+		<error name="INVALIDJPEGBUFFERSIZE" code="10197" description="Invalid JPEG Buffer size" />		
+		<error name="COULDNOTINITIALIZEJPEGLIBRARY" code="10198" description="Could not initialize JPEG library" />		
+		<error name="COULDNOTSETJPEGSTOPONWARNING" code="10199" description="Could not set JPEG StopOnWarning" />		
+		<error name="COULDNOTSETFASTUPSAMPLE" code="10200" description="Could not set FastUpSample" />		
+		<error name="COULDNOTSETFASTDCT" code="10201" description="Could not set FastDCT" />		
+		<error name="COULDNOTREADJPEGHEADER" code="10202" description="Could not read JPEG Header" />		
+		<error name="INVALIDJPEGIMAGESIZE" code="10203" description="Invalid JPEG image size" />		
+		<error name="JPEGCOLORPRECISIONTOOHIGH" code="10204" description="JPEG color precision too high" />		
+		<error name="COULDNOTDECOMPRESSJPEG" code="10205" description="Could not decompress JPEG" />		
+		<error name="COULDNOTSTOREJPEGIMAGE" code="10206" description="Could not store JPEG image" />		
+		<error name="INVALIDPNGEXPORTFORMAT" code="10207" description="Invalid PNG Export Format" />		
+		<error name="INVALIDMEMORYCACHEQUOTA" code="10208" description="Invalid memory cache quota" />		
+		<error name="NOXAXISCOLUMNGIVEN" code="10209" description="No X Axis Column given" />		
+		<error name="NOYAXISCOLUMNGIVEN" code="10210" description="No Y Axis Column given" />		
+		<error name="INVALIDSCATTERPLOTPOINTINDEX" code="10211" description="Invalid scatter plot index." />		
+		<error name="SCATTERPLOTNOTFOUND" code="10212" description="Scatter plot not found" />		
 		
 	</errors>
 
@@ -247,12 +270,35 @@
 		<option name="Debug" value="6"/>
 		<option name="Unknown" value="7"/>
 	</enum>	
+	
+	
+	<enum name="JSONObjectType">
+		<option name="Unknown" value="0"/>
+		<option name="String" value="1"/>
+		<option name="Integer" value="2"/>
+		<option name="Double" value="3"/>
+		<option name="Object" value="4"/>
+		<option name="Array" value="5"/>
+	</enum>	
+	
 		
 	<enum name="ImagePixelFormat">
 		<option name="Unknown" value="0" />
 		<option name="GreyScale8bit" value="1" />
 		<option name="RGB24bit" value="2" />
 		<option name="RGBA32bit" value="3" />
+		<option name="RGB16bit" value="4" />
+	</enum>
+	
+	<enum name="PNGStorageFormat">
+		<option name="Unknown" value="0" />
+		<option name="BlackWhite1bit" value="1" />
+		<option name="GreyScale1bit" value="2" />
+		<option name="GreyScale2bit" value="3" />
+		<option name="GreyScale4bit" value="4" />
+		<option name="GreyScale8bit" value="5" />
+		<option name="RGB24bit" value="6" />
+		<option name="RGBA32bit" value="7" />
 	</enum>
 	
 	<enum name="FieldSamplingMode">
@@ -293,6 +339,14 @@
 		<option name="MarkDelay" value="12" />
 		<option name="LaserFocus" value="13" />
 	</enum>
+	
+	<enum name="ToolpathProfileOverrideFactor">
+		<option name="Unknown" value="0" />
+		<option name="FactorF" value="1" />
+		<option name="FactorG" value="2" />
+		<option name="FactorH" value="3" />
+	</enum>
+
 	
 	<enum name="MessageDialogType">
 		<option name="Unknown" value="0" />
@@ -362,7 +416,11 @@
 		<member name="Y2" type="double" />
 	</struct>
 
-
+	<struct name="Hatch2DOverrides">
+		<member name="Point1Override" type="double" />
+		<member name="Point2Override" type="double" />
+	</struct>	
+	
 	<struct name="ModelDataTransform">
 		<member name="Matrix" type="double" rows="3" columns="3"/>
 		<member name="Translation" type="double" rows="3"/>
@@ -449,8 +507,17 @@
 	<class name="PNGImageStoreOptions" parent="Base" description="Option class to parametrize saving of PNG Images.">
 	
 		<method name="ResetToDefaults" description="Resets Options to default.">
-		</method>	
+		</method>
 	
+		<method name="GetStorageFormat" description="Returns the PNG storage format.">
+			<param name="PNGStorageFormat" type="enum" class="PNGStorageFormat" pass="return" description="PNG Format of image" />		
+		</method>
+
+		<method name="SetStorageFormat" description="Sets the PNG storage format.">
+			<param name="PNGStorageFormat" type="enum" class="PNGStorageFormat" pass="in" description="new PNG Format of image" />		
+		</method>
+
+
 	</class>
 	
 	
@@ -461,9 +528,41 @@
 			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
 		</method>		
 
-		<method name="GetPNGDataStream" description="Retrieves encoded data stream of image object.">
+		<method name="GetPNGDataStream" description="Retrieves encoded PNG data of image object.">
 			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
 		</method>
+		
+		<method name="WriteToStream" description="Writes encoded PNG data into a stream object.">
+			<param name="Stream" type="class" class="TempStreamWriter" pass="in" description="Stream to write to." />
+		</method>
+		
+
+	</class>
+	
+	
+	<class name="JPEGImageStoreOptions" parent="Base" description="Option class to parametrize saving of JPEG Images.">
+	
+		<method name="ResetToDefaults" description="Resets Options to default.">
+		</method>	
+	
+	</class>
+	
+	
+	<class name="JPEGImageData" parent="Base" description="Binary representation of JPEG Data.">
+
+		<method name="GetSizeInPixels" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="GetJPEGDataStream" description="Retrieves encoded JPEG data of image object.">
+			<param name="JPEGData" type="basicarray" class="uint8" pass="out" description="JPEG Data stream." />
+		</method>
+
+		<method name="WriteToStream" description="Writes encoded JPEG data into a stream object.">
+			<param name="Stream" type="class" class="TempStreamWriter" pass="in" description="Stream to write to." />
+		</method>
+
 
 	</class>
 	
@@ -501,20 +600,23 @@
 			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
 			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
 		</method>		
+				
+		<method name="CreatePNGOptions" description="Creates PNG Options for storing the PNG file.">		
+			<param name="PNGStorageOptions" type="class" class="PNGImageStoreOptions" pass="return" description="Encoding options for the image." />		
+		</method>
 
 		<method name="CreatePNGImage" description="Creates PNG Image out of the pixel data.">		
 			<param name="PNGStorageOptions" type="optionalclass" class="PNGImageStoreOptions" pass="in" description="Optional encoding options for the image." />		
 			<param name="PNGImage" type="class" class="PNGImageData" pass="return" description="Image data." />		
 		</method>
 
-		<method name="EncodePNG" description="Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.">
+		<method name="CreateJPEGOptions" description="Creates PNG Options for storing the PNG file.">		
+			<param name="JPEGStorageOptions" type="class" class="JPEGImageStoreOptions" pass="return" description="Encoding options for the image." />		
 		</method>
 
-		<method name="GetEncodedPNGData" description="Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
-		</method>
-		
-		<method name="ClearEncodedPNGData" description="Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.">
+		<method name="CreateJPEGImage" description="Creates JPEG Image out of the pixel data.">		
+			<param name="JPEGStorageOptions" type="optionalclass" class="JPEGImageStoreOptions" pass="in" description="Optional encoding options for the image." />		
+			<param name="JPEGImage" type="class" class="JPEGImageData" pass="return" description="Image data." />		
 		</method>
 		
 		<method name="Clear" description="Sets all pixels to a single value.">
@@ -548,8 +650,140 @@
 			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
 			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
 		</method>
+
+		<method name="GetPixels" description="Returns a subset of an image or the whole image data. Please use this function instead of GetPixelRange.">
+			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="CountX" type="uint32" pass="in" description="Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X." />
+			<param name="CountY" type="uint32" pass="in" description="Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y." />
+			<param name="TargetFormat" type="enum" class="ImagePixelFormat" pass="in" description="Target pixel format to convert the image data to." />
+			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on target format." />
+		</method>		
+
+		<method name="SetPixels" description="Exchanges a subset of an image or the whole image data. Please use this function instead of SetPixelRange.">
+			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="CountX" type="uint32" pass="in" description="Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X." />
+			<param name="CountY" type="uint32" pass="in" description="Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y." />
+			<param name="SourceFormat" type="enum" class="ImagePixelFormat" pass="in" description="Source pixel format to convert the image data from." />
+			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format." />
+		</method>
+
+		<method name="SetPixelsFromRawYUY2Data" description="Sets all pixels from a raw YUY2 color array.">
+			<param name="YUY2Data" type="basicarray" class="uint8" pass="in" description="Pixel array in YUY2 color format (2 bytes per pixels). The array MUST have a length of PixelSizeX * PixelSizeY * 2." />
+		</method>
+
+		<method name="WriteToRawMemory" description="Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.">
+			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="CountX" type="uint32" pass="in" description="Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X." />
+			<param name="CountY" type="uint32" pass="in" description="Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y." />
+			<param name="TargetFormat" type="enum" class="ImagePixelFormat" pass="in" description="Target pixel format to convert the image data to." />
+			<param name="Target" type="pointer" pass="in" description="Memory address to write to. The pixel value of StartX/StartY will be written to this address." />
+			<param name="YLineOffset" type="uint32" pass="in" description="Offset to add to the Target pointer to advance a line (in bytes)." />
+		</method>		
+
+		<method name="ReadFromRawMemory" description="Reads an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the source.">
+			<param name="StartX" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="StartY" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="CountX" type="uint32" pass="in" description="Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X." />
+			<param name="CountY" type="uint32" pass="in" description="Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y." />
+			<param name="SourceFormat" type="enum" class="ImagePixelFormat" pass="in" description="Source pixel format to convert the image data from." />
+			<param name="Source" type="pointer" pass="in" description="Memory address to read from. The pixel value of StartX/StartY will be written to this address." />
+			<param name="YLineOffset" type="uint32" pass="in" description="Offset to add to the source pointer to advance a line (in bytes)." />
+		</method>		
+
 	
 	</class>
+	
+	<class name="ImageLoader" parent="Base" description="Class for loading images from various data formats.">
+
+		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="PNG Data as byte array. Fails if image cannot be loaded." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
+
+		<method name="LoadJPEGImage" description="creates an image object from a JPEG data stream.">
+			<param name="JPEGData" type="basicarray" class="uint8" pass="in" description="JPEG Data as byte array. Fails if image cannot be loaded." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
+
+		<method name="CreateImageFromRawRGB24Data" description="creates an image object from raw RGB24 Data. (3 bytes per pixel)">
+			<param name="RGB24Data" type="basicarray" class="uint8" pass="in" description="RGB 24 data. MUST contain PixelSizeX * PixelSizeY * 3 bytes." />
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use in memory." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance with the data." />
+		</method>
+	
+		<method name="CreateImageFromRawRGBA32Data" description="creates an image object from raw RGBA32 Data. (4 bytes per pixel)">
+			<param name="RGBA32Data" type="basicarray" class="uint8" pass="in" description="RGBA 32 data. MUST contain PixelSizeX * PixelSizeY * 4 bytes." />
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use in memory." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance with the data." />
+		</method>
+
+		<method name="CreateImageFromRawYUY2Data" description="creates an image object from raw YUY2 Data. (2 bytes per pixel)">
+			<param name="YUY2Data" type="basicarray" class="uint8" pass="in" description="YUY2 data. MUST contain PixelSizeX * PixelSizeY * 2 bytes." />
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use in memory." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance with the data." />
+		</method>
+		
+
+	</class>
+
+	
+	
+	<class name="VideoStream" parent="Base" description="Video stream class.">
+	
+		
+	
+	</class>
+	
+
+	<class name="ScatterPlot" parent="Base" description="A scatter plot object contains a in memory scatter plot of X/Y data..">
+		
+		<method name="GetUUID" description="Global UUID of the plot.">
+			<param name="UUID" type="string" pass="return" description="Scatter plot UUID." />
+		</method>
+	
+		<method name="GetPointCount" description="Returns the point count of the plot.">
+			<param name="PointCount" type="uint32" pass="return" description="Point Count of the plot" />
+		</method>
+
+		<method name="GetPointPosition" description="Returns the position of a data point.">
+			<param name="PointIndex" type="uint32" pass="in" description="Index of the point in the plot. 0-based. MUST be smaller than PointCount" />
+			<param name="X" type="double" pass="out" description="X value of the point in mm" />
+			<param name="Y" type="double" pass="out" description="Y value of the point in mm" />
+		</method>
+
+		<method name="GetBoundaries" description="Returns the bounding box of the scatter plot data. Returns 0/0-0/0 in case no points are available.">
+			<param name="MinX" type="double" pass="out" description="Minimum X value of the point in mm" />
+			<param name="MinY" type="double" pass="out" description="Minimum Y value of the point in mm" />
+			<param name="MaxX" type="double" pass="out" description="Maximum X value of the point in mm" />
+			<param name="MaxY" type="double" pass="out" description="Maximum Y value of the point in mm" />
+		</method>
+
+		<method name="Release" description="Release the scatter plot and clear its memory. All accessing code will lose access to the data.">
+		</method>
+
+	</class>
+
 	
 	<class name="DiscreteFieldData2DStoreOptions" parent="Base" description="Option class to parametrize saving of Field Data.">
 	
@@ -705,6 +939,57 @@
 
 	</class>
 	
+
+	<class name="DataTableScatterPlotOptions" parent="Base" description="Configurates the creation of scatter plots from the data table.">
+
+		<method name="SetXAxisColumn" description="Sets the column to use for the X Axis value. Column MUST exist.">
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the column. Must be alphanumeric and not empty." />
+			<param name="ScaleFactor" type="double" pass="in" description="Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters." />
+			<param name="OffsetFactor" type="double" pass="in" description="Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters." />
+		</method>
+
+		<method name="GetXAxisColumn" description="Returns the column to use for the X Axis value..">
+			<param name="ColumnIdentifier" type="string" pass="return" description="Identifier of the column. Empty if not set yet." />
+		</method>
+
+		<method name="GetXAxisScaling" description="Returns the scaling for the X Axis value..">
+			<param name="ScaleFactor" type="double" pass="return" description="Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0." />
+		</method>
+		
+		<method name="GetXAxisOffset" description="Returns the scaling for the X Axis value..">
+			<param name="OffsetFactor" type="double" pass="return" description="Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0." />
+		</method>
+
+		<method name="SetYAxisColumn" description="Sets the column to use for the Y Axis value. Column MUST exist.">
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the column. Must be alphanumeric and not empty." />
+			<param name="ScaleFactor" type="double" pass="in" description="Scale factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters." />
+			<param name="OffsetFactor" type="double" pass="in" description="Offset factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters." />
+		</method>
+
+		<method name="GetYAxisColumn" description="Returns the column to use for the X Axis value..">
+			<param name="ColumnIdentifier" type="string" pass="return" description="Identifier of the column. Empty if not set yet." />
+		</method>
+
+		<method name="GetYAxisScaling" description="Returns the scaling for the X Axis value..">
+			<param name="ScaleFactor" type="double" pass="return" description="Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0." />
+		</method>
+		
+		<method name="GetYAxisOffset" description="Returns the scaling for the X Axis value..">
+			<param name="OffsetFactor" type="double" pass="return" description="Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0." />
+		</method>
+
+		<method name="AddDataChannel" description="Adds a data channel. Column MUST exist.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Identifier of the channel. Must be alphanumeric and not empty." />
+			<param name="ColumnIdentifier" type="string" pass="in" description="Identifier of the column to use. Must be alphanumeric and not empty." />
+			<param name="ScaleFactor" type="double" pass="in" description="Scale factor to use. The channel value will be computed as raw value times scale factor plus offset factor." />
+			<param name="OffsetFactor" type="double" pass="in" description="Offset factor to use. The channel value will be computed as raw value times scale factor plus offset factor." />
+			<param name="Color" type="uint32" pass="in" description="Base color to use." />
+		</method>
+
+	</class>
+	
+	
+	
 	<class name="DataTable" parent="Base" description="A in memory data table, streamable for example into a CSV file.">
 	
 		<method name="AddColumn" description="Adds a column to the data field.">
@@ -826,6 +1111,15 @@
 			<param name="Stream" type="class" class="StreamReader" pass="in" description="Stream read instance to read from." />
 		</method>
 		
+		<method name="CreateScatterPlotOptions" description="Creates an options object for scatter plot computation.">
+			<param name="ScatterPlotOptions" type="class" class="DataTableScatterPlotOptions" pass="return" description="DataTableScatterPlotOptions Instance" />
+		</method>
+		
+		<method name="CalculateScatterPlot" description="Creates a scatterplot from the data table according to its input parameters.">
+			<param name="ScatterPlotOptions" type="class" class="DataTableScatterPlotOptions" pass="in" description="ScatterPlot Options to use" />
+			<param name="ScatterPlot" type="class" class="ScatterPlot" pass="return" description="ScatterPlot Instance" />
+		</method>
+		
 	</class>
 
 	<class name="DataSeries" parent="Base" description="A data series of points.">
@@ -863,8 +1157,9 @@
 		
 		<method name="SampleJournalVariable" description="Samples a journal variable.">
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="in" description="Journal variable to sample." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to generate." />
-			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
+			<param name="StartTimeStamp" type="uint64" pass="in" description="Start time stamp to sample. MUST be smaller than end time stamp." />
+			<param name="EndTimeStamp" type="uint64" pass="in" description="End time stamp to sample. MUST be larger than start time stamp." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to generate. MUST be greater than 1." />
 		</method>
 		
 		<method name="GetVersion" description="Returns the incrementing change version of the data series.">
@@ -1473,36 +1768,36 @@
 		</method>
 
 		<method name="GetSegmentPointCount" description="Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="HatchCount" type="uint32" pass="return" description="Hatch count of segment." />
 		</method>
 		
 		<method name="GetSegmentHatchCount" description="Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="HatchCount" type="uint32" pass="return" description="Hatch count of segment." />
 		</method>
 		
 		<method name="GetSegmentProfileUUID" description="Retrieves the assigned segment profile uuid.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ProfileUUID" type="string" pass="return" description="Segment Profile UUID" />
 		</method>
 
 		<method name="SegmentProfileHasValue" description="Retrieves an assigned profile custom value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="HasValue" type="bool" pass="return" description="Returns true if value exist." />
 		</method>
 
 		<method name="GetSegmentProfileValue" description="Retrieves an assigned profile custom value. Fails if value does not exist.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="Value" type="string" pass="return" description="String Value." />
 		</method>
 
 		<method name="GetSegmentProfileValueDef" description="Retrieves an assigned profile custom value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="DefaultValue" type="string" pass="in" description="Default value if value does not exist." />
@@ -1511,14 +1806,14 @@
 
 
 		<method name="GetSegmentProfileDoubleValue" description="Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="Value" type="double" pass="return" description="Double Value." />
 		</method>
 
 		<method name="GetSegmentProfileDoubleValueDef" description="Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="DefaultValue" type="double" pass="in" description="Default value if value does not exist." />
@@ -1526,14 +1821,14 @@
 		</method>
 
 		<method name="GetSegmentProfileIntegerValue" description="Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="Value" type="int64" pass="return" description="Integer Value." />
 		</method>
 
 		<method name="GetSegmentProfileIntegerValueDef" description="Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="DefaultValue" type="int64" pass="in" description="Default value if value does not exist." />
@@ -1542,14 +1837,14 @@
 
 
 		<method name="GetSegmentProfileBoolValue" description="Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="Value" type="bool" pass="return" description="Boolean Value." />
 		</method>
 
 		<method name="GetSegmentProfileBoolValueDef" description="Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Namespace" type="string" pass="in" description="Namespace to query for." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="DefaultValue" type="bool" pass="in" description="Default value if value does not exist." />
@@ -1557,48 +1852,66 @@
 		</method>
 
 		<method name="GetSegmentProfileTypedValue" description="Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ValueType" type="enum" class="ToolpathProfileValueType" pass="in" description="Enum to query for. MUST NOT be custom." />
 			<param name="Value" type="double" pass="return" description="Double Value" />
 		</method>
 
 		<method name="GetSegmentProfileTypedValueDef" description="Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ValueType" type="enum" class="ToolpathProfileValueType" pass="in" description="Enum to query for. MUST NOT be custom." />
 			<param name="DefaultValue" type="double" pass="in" description="Default value if value does not exist." />
 			<param name="Value" type="double" pass="return" description="Double Value" />
 		</method>
 		
 		<method name="GetSegmentPartUUID" description="Retrieves the assigned segment part uuid.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PartUUID" type="string" pass="return" description="Segment Part UUID" />
 		</method>
 
 		<method name="GetSegmentLocalPartID" description="Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="LocalPartID" type="uint32" pass="return" description="Local Part ID of the segment" />
 		</method>
 	
 		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array. Positions are absolute in units." />
 		</method>
 		
 		<method name="GetSegmentHatchData" description="Retrieves the assigned segment hatch list. Fails if segment type is not hatch.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="HatchData" type="structarray" class="Hatch2D" pass="out" description="The hatch data array. Positions are absolute in units." />
 		</method>
 
 		<method name="GetSegmentPointDataInMM" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PointData" type="structarray" class="FloatPosition2D" pass="out" description="The point data array. Positions are absolute in mm." />
 		</method>
 		
 		<method name="GetSegmentHatchDataInMM" description="Retrieves the assigned segment hatch list. Fails if segment type is not hatch.">
-			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="SegmentIndex" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="HatchData" type="structarray" class="FloatHatch2D" pass="out" description="The hatch data array. Positions are absolute in mm." />
 		</method>
+
+		<method name="SegmentHasOverrideFactors" description="Returns if a segment has override factors attached to its points.">
+			<param name="SegmentIndex" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="in" description="Which override factor to return (F, G or H)." />
+			<param name="HasOverrideFactors" type="bool" pass="return" description="Returns true if the Segment given has an override factor of a certain type." />
+		</method>
 		
+		<method name="GetSegmentPointOverrides" description="Retrieves factor overrides for a specific segment. For type hatch, the points are taken pairwise.">
+			<param name="SegmentIndex" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="in" description="Which override factor to return (F, G or H)." />
+			<param name="OverrideData" type="basicarray" class="double" pass="out" description="The override factor array. Will return as many override factors as points in the segment." />
+		</method>
+		
+		<method name="GetSegmentHatchOverrides" description="Retrieves factor overrides for a specific segment. Fails if segment type is not hatch.">
+			<param name="SegmentIndex" type="uint32" pass="in" description="Segment Index. Must be between 0 and Count - 1." />
+			<param name="OverrideFactor" type="enum" class="ToolpathProfileOverrideFactor" pass="in" description="Which override factor to return (F, G or H)." />
+			<param name="OverrideData" type="structarray" class="Hatch2DOverrides" pass="out" description="The override factor array. Will return as many override factors as hatches in the segment. Each element contains one factor for the first point or the second point." />
+		</method>
+
 		<method name="GetZValue" description="Retrieves the layers Z Value in units.">
 			<param name="ZValue" type="int32" pass="return" description="Z Value of the layer in units." />
 		</method>
@@ -1953,6 +2266,7 @@
 		</method>
 		
 		<method name="LoadAttachedJournal" description="Loads the journal that is associated with the build execution and returns an accessor instance.">
+			<param name="CacheMemoryQuotaInMegabytes" type="uint32" pass="in" description="Memory quota to use for cached reading in bytes. MUST be larger than 16 and smaller than 4096." />
 			<param name="JournalHandler" type="class" class="JournalHandler" pass="return" description="Journal instance." />
 		</method>	
 		
@@ -2369,6 +2683,165 @@
 	</class>
 
 
+	<class name="JSONObject" parent="Base" description="A JSON Object.">
+
+		<method name="HasMember" description="Returns if a member with a specific name exist.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="MemberExists" type="bool" pass="return" description="returns if a member with a specific name exists." />
+		</method>
+
+		<method name="GetMemberCount" description="Returns the number of members.">
+			<param name="Count" type="uint64" pass="return" description="returns the number of members." />
+		</method>
+
+		<method name="GetMemberName" description="Returns the name of a member by index.">
+			<param name="Index" type="uint64" pass="in" description="Index of the member, 0-based. Fails if larger or equal than MemberCount" />
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+		</method>
+
+		<method name="GetMemberType" description="Returns the member type. Returns unknown, if the member does not exist.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="MemberType" type="enum" class="JSONObjectType" pass="return" description="The type of the member.." />
+		</method>
+
+		<method name="GetValue" description="Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="string" pass="return" description="Member value." />
+		</method>
+
+		<method name="GetIntegerValue" description="Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="int64" pass="return" description="Member value." />
+		</method>
+
+		<method name="GetDoubleValue" description="Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="double" pass="return" description="Member value." />
+		</method>
+	
+		<method name="GetBoolValue" description="Returns a member as boolean value. Fails if member is of type Array or Object or Double.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="bool" pass="return" description="Member value." />
+		</method>
+
+		<method name="GetObjectValue" description="Returns a member as object value. Fails if member is not of type Object.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="class" class="JSONObject" pass="return" description="Member value." />
+		</method>
+
+		<method name="GetArrayValue" description="Returns a member as object value. Fails if member is not of type Array.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="class" class="JSONArray" pass="return" description="Member value." />
+		</method>
+
+		<method name="RemoveMember" description="Removes a member with a specific name. Does nothing if Member does not exist.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+		</method>
+
+		<method name="AddValue" description="Adds a member as string value. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="string" pass="in" description="Member value." />
+		</method>
+
+		<method name="AddIntegerValue" description="Adds a member as integer value. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="int64" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddDoubleValue" description="Adds a member as double value. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="double" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddBoolValue" description="Adds a member as bool value. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="bool" pass="return" description="Member value." />
+		</method>
+	
+		<method name="AddObjectValue" description="Returns a member as object value. Returns empty object. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="class" class="JSONObject" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddArrayValue" description="Returns a member as object value. Returns empty array. Fails if member already exists.">
+			<param name="Name" type="string" pass="in" description="Name of the member." />
+			<param name="Value" type="class" class="JSONArray" pass="return" description="Member value." />
+		</method>
+
+	</class>
+
+
+	<class name="JSONArray" parent="Base" description="A JSON Array.">
+
+		<method name="GetElementCount" description="Returns the number of elements.">
+			<param name="Count" type="uint64" pass="return" description="returns the number of elements." />
+		</method>
+
+		<method name="GetElementType" description="Returns the element type. Returns unknown, if the element does not exist.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="ElementType" type="enum" class="JSONObjectType" pass="return" description="The type of the element.." />
+		</method>
+
+		<method name="GetValue" description="Returns a element as string value. Fails if element is of type Array or Object. Returns true or false in terms of Boolean value.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="string" pass="return" description="Element value." />
+		</method>
+
+		<method name="GetIntegerValue" description="Returns a element as integer value. Fails if element is of type Array or Object, or a non-double string.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="int64" pass="return" description="Element value." />
+		</method>
+
+		<method name="GetDoubleValue" description="Returns a element as double value. Fails if element is of type Array or Object, or a non-integer string.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="double" pass="return" description="Element value." />
+		</method>
+	
+		<method name="GetBoolValue" description="Returns a element as boolean value. Fails if element is of type Array or Object or Double.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="bool" pass="return" description="Element value." />
+		</method>
+
+		<method name="GetObjectValue" description="Returns a element as object value. Fails if element is not of type Object.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="class" class="JSONObject" pass="return" description="Element value." />
+		</method>
+
+		<method name="GetArrayValue" description="Returns a element as object value. Fails if element is not of type Array.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+			<param name="Value" type="class" class="JSONArray" pass="return" description="Element value." />
+		</method>
+
+		<method name="RemoveElement" description="Removes an element with a specific index. Does nothing if Element does not exist.">
+			<param name="Index" type="uint64" pass="in" description="Index of the element, 0-based. Fails if larger or equal than ElementCount" />
+		</method>
+
+		<method name="AddValue" description="Adds an element as string value.">
+			<param name="Value" type="string" pass="in" description="Member value." />
+		</method>
+
+		<method name="AddIntegerValue" description="Adds a member as integer value.">
+			<param name="Value" type="int64" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddDoubleValue" description="Adds a member as double value.">
+			<param name="Value" type="double" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddBoolValue" description="Adds a member as bool value.">
+			<param name="Value" type="bool" pass="return" description="Member value." />
+		</method>
+	
+		<method name="AddObjectValue" description="Returns a member as object value. Returns empty object.">
+			<param name="Value" type="class" class="JSONObject" pass="return" description="Member value." />
+		</method>
+
+		<method name="AddArrayValue" description="Returns a member as object value. Returns empty array.">
+			<param name="Value" type="class" class="JSONArray" pass="return" description="Member value." />
+		</method>
+
+	</class>
+
 	<class name="XMLDocumentNode" parent="Base" description="An XML document node.">
 
 		<method name="GetName" description="Retrieves name of the node.">
@@ -2575,6 +3048,9 @@
 		<method name="Remove" description="Removes the node from its parent. The root node of the document can not be removed.">
 		</method>
 
+		<method name="CopyFrom" description="Copies all content from another node in a recursive way.">
+			<param name="OtherNode" type="class" class="XMLDocumentNode" pass="in" description="other XML Document Node. Does not need to live in the same document." />
+		</method>
 		
 		
 	</class>
@@ -2846,7 +3322,7 @@
 	</class>	
 
 
-	<class name="DriverStatusUpdateSession" parent="Base" description="Thread-safe class for updating the status variables of the driver">
+	<class name="DriverStatusUpdateSession" parent="Base" description="Class for updating the status variables of the driver in a thread-safe way. One instance should be created per driver thread.">
 	
 		<method name="SetStringParameter" description="sets a string parameter">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
@@ -2887,6 +3363,32 @@
 
 		<method name="Sleep" description="Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
 			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
+
+		<method name="GetStringParameter" description="Gets a string parameter. Fails if parameter does not exist.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value of parameter" />
+		</method>
+
+		<method name="GetUUIDParameter" description="Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value of parameter" />
+		</method>
+
+		<method name="GetDoubleParameter" description="Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="return" description="Value of parameter" />
+		</method>
+
+		<method name="GetIntegerParameter" description="Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="return" description="Value of parameter" />
+		</method>
+
+		<method name="GetBoolParameter" description="Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="return" description="Value of parameter" />
 		</method>
 
 	</class>
@@ -2941,7 +3443,7 @@
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
 		</method>
 
-		<method name="MachineHasResourceData" description = "retrieves if attached driver has data with the given identifier.">
+		<method name="MachineHasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
 		</method>
@@ -3008,28 +3510,27 @@
 			<param name="DefaultValue" type="bool" pass="in" description="default value to set" />
 		</method>
 		
-		
-		<method name="SetStringParameter" description="sets a string parameter">
+		<method name="SetStringParameter" description="Sets a string parameter. For getting a string, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetUUIDParameter" description="sets a uuid parameter">
+		<method name="SetUUIDParameter" description="sets a uuid parameter. For getting a UUID, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetDoubleParameter" description="sets a double parameter">
+		<method name="SetDoubleParameter" description="sets a double parameter. For getting a Double, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="double" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetIntegerParameter" description="sets an int parameter">
+		<method name="SetIntegerParameter" description="sets an int parameter. For getting an Integer, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="int64" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetBoolParameter" description="sets a bool parameter">
+		<method name="SetBoolParameter" description="sets a bool parameter. For getting a bool, use a Status Update Session.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="bool" pass="in" description="Value to set" />
 		</method>
@@ -3066,15 +3567,11 @@
 			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
 		</method>		
-		
-		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
-			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
-			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
-		</method>
 
+		<method name="CreateImageLoader" description="creates an image loader object.">			
+			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
+		</method>		
+		
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
 			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
@@ -3441,51 +3938,17 @@
 		<method name="GetVariableName" description="returns the name of the recorded variable.">
 			<param name="Name" type="string" pass="return" description="Path or name." />
 		</method>
-		
-		<method name="GetStartTimeStamp" description="Returns the beginning time stamp of the available data point.">
-			<param name="RecordingStartInMicroSeconds" type="uint64" pass="return" description="Start Timestamp of Recording in microseconds." />
-		</method>
-	
-		<method name="GetEndTimeStamp" description="Returns the beginning time stamp of the available data point.">
-			<param name="RecordingEndInMicroSeconds" type="uint64" pass="return" description="End Timestamp of Recording in microseconds." />
-		</method>
-
-		<method name="ComputeFullAverage" description="Calculates the average value over the full available time interval.">
-			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
-		</method>
-		
-		<method name="ComputeAverage" description="Calculates the average value over a time interval. Fails if no data is available in this time interval.">
-			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in ms." />
-			<param name="EndTimeInMicroSeconds" type="uint64" pass="in" description="End Timestamp of the interval in ms. MUST be larger than Timestamp." />
-			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />
-			<param name="AverageValue" type="double" pass="return" description="Average value of the variable." />
-		</method>
-		
-		<method name="ComputeSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
+					
+		<method name="ComputeDoubleSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
 			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
 			<param name="SampleValue" type="double" pass="return" description="Value of the variable at the time step." />
 		</method>
-
-		<method name="ComputeUniformAverageSamples" description="Retrieves sample values for an interval. Interval MUST be inside the available recording time.">
-			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
-			<param name="IntervalIncrement" type="uint64" pass="in" description="Sampling interval distance in microseconds. MUST be larger than 0." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time." />
-			<param name="MovingAverageDelta" type="double" pass="in" description="Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta." />
-			<param name="ClampInterval" type="bool" pass="in" description="If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail." />			
-			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
-		</method>
-
-		<method name="ComputeEquidistantSamples" description="Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.">
-			<param name="StartTimeInMicroSeconds" type="uint64" pass="in" description="Start Timestamp of the interval in microseconds." />
-			<param name="IntervalIncrement" type="uint64" pass="in" description="Sampling interval distance in microseconds. MUST be larger than 0." />
-			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples." />
-			<param name="JournalSampling" type="class" class="UniformJournalSampling" pass="return" description="Returns an instance with the sampling results." />			
-		</method>
-
-		<method name="ReceiveRawTimeStream" description="Retrieves the raw timestream data of the variable.">
-			<param name="TimeStreamEntries" type="structarray" class="TimeStreamEntry" pass="out" description="All change events of the variable in the accessed interval." />
-		</method>
 		
+		<method name="ComputeIntegerSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
+			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
+			<param name="SampleValue" type="int64" pass="return" description="Value of the variable at the time step in integer." />
+		</method>
+
 	</class>
 
 	<class name="Alert" parent="Base">
@@ -3571,17 +4034,9 @@
 
 
 	<class name="JournalHandler" parent="Base" description="Class for accessing an AMCF journal.">
-
+				
 		<method name="RetrieveJournalVariable" description = "Retrieves the history of a given variable in the system journal.">
 			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
-			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
-		</method>
-				
-		<method name="RetrieveJournalVariableFromTimeInterval" description = "Retrieves the history of a given variable in the system journal for an arbitrary time interval.">
-			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
-			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval." />
-			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
 						
@@ -3589,6 +4044,14 @@
 			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
 		</method>
 	
+		<method name="GetEndTime" description="Retrieves the end time of the journal recording.">
+			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
+		</method>
+
+		<method name="GetJournalLifeTimeInMicroseconds" description="Retrieves the life time of the journal. Which is EndTime minus StartTime.">
+			<param name="LifeTimeInMicroseconds" type="uint64" pass="return" description="Life Time." />
+		</method>
+
 		<method name="RetrieveLogEntries" description="Retrieves the current log entries of the journal.">
 			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="How many microseconds the journal should be retrieved in the past." />
 			<param name="MinLogLevel" type="enum" class="LogLevel" pass="out" description="Only entries with a log level that is higher than the given one are returned."/>
@@ -3811,6 +4274,9 @@
 			<param name="SignalTypeName" type="string" pass="in" description="Name Of Signal to be returned" />
 			<param name="HandlerInstance" type="optionalclass" class="SignalHandler" pass="return" description="Signal object. If no signal has been found the signal handler object will be null." />
 		</method>		
+		
+		<method name="ClearAllUnhandledSignals" description="Clears all unhandled signals and marks them invalid.">
+		</method>		
 
 		<method name="GetUnhandledSignalByUUID" description="retrieves an unhandled signal from the current state machine by UUID.">
 			<param name="UUID" type="string" pass="in" description="Name" />
@@ -3954,6 +4420,10 @@
 			<param name="Value" type="bool" pass="return" description="Value to set" />
 		</method>
 		
+		<method name="HasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />
+			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
+		</method>
 
 		<method name="LoadResourceData" description="loads a plugin resource file into memory.">
 			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
@@ -3974,13 +4444,9 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
 		</method>		
 		
-		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
-			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
-			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />	
-		</method>
+		<method name="CreateImageLoader" description="creates an image loader object.">			
+			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
+		</method>		
 
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
@@ -4210,7 +4676,22 @@
 			<param name="TimeoutInMS" type="uint32" pass="in" description="How many milliseconds the snackbar should be shown." />
 		</method>
 
-		<method name="ShowHintColored" description="Shows a hint message in the user interface in a certain color.">
+		<method name="HasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />
+			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
+		</method>
+
+		<method name="LoadResourceData" description="loads a plugin resource file into memory.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
+		</method>
+
+		<method name="LoadResourceString" description="loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="string" pass="return" description="Resource Data String." />
+		</method>
+
+		<method name="ShowHintColored" description="Shows a hint message in the user interface in a certain color.">		
 			<param name="Hint" type="string" pass="in" description="Hint to show." />
 			<param name="TimeoutInMS" type="uint32" pass="in" description="How many milliseconds the snackbar should be shown." />
 			<param name="Color" type="struct" class="ColorRGB" pass="in" description="Background color of hint." />
@@ -4379,13 +4860,9 @@
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
 		</method>		
 		
-		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
-			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
-			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
-			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
-		</method>
+		<method name="CreateImageLoader" description="creates an image loader object.">			
+			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
+		</method>		
 
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
@@ -4593,6 +5070,29 @@
 
 		<method name="Sleep" description="Puts the current request to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
 			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
+		<method name="HasExternalEventParameter" description="Checks if an external event parameter exists. DEPRECIATED, use GetExternalEventParameters instead.">
+			<param name="ParameterName" type="string" pass="in" description="The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+			<param name="ParameterExists" type="bool" pass="return" description="Flag if the parameter exists." />
+		</method>
+		
+		<method name="GetExternalEventParameter" description="Returns an external event string parameter. Fails if it does not exists or is not of type string. DEPRECIATED, use GetExternalEventParameters instead.">
+			<param name="ParameterName" type="string" pass="in" description="The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+			<param name="ParameterValue" type="string" pass="return" description="Parameter value." />
+		</method>
+		
+		<method name="AddExternalEventResultValue" description="Adds a return string value to return to the external event caller. DEPRECIATED, use GetExternalEventParameters instead.">
+			<param name="ReturnValueName" type="string" pass="in" description="The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+			<param name="ReturnValue" type="string" pass="in" description="Return value." />
+		</method>
+		
+		<method name="GetExternalEventParameters" description="Returns the external event parameters. This JSON Object was passed on from the external API.">
+			<param name="ParameterValue" type="class" class="JSONObject" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetExternalEventResults" description="Returns the external event results. This JSON Object will be passed on to an ext">
+			<param name="ParameterValue" type="class" class="JSONObject" pass="return" description="Parameter value." />
 		</method>
 
 	</class>

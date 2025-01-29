@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="Generic Linux Framebuffer Driver" namespace="LibMCDriver_FrameBuffer" copyright="Autodesk Inc." year="2024" basename="libmcdriver_framebuffer"
+	version="2.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+
+		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
+		<error name="DEVICENOTSUPPORTEDONPLATFORM" code="1001" description="device not supported on platform" />
+		<error name="COULDNOTOPENFRAMEBUFFERDEVICE" code="1002" description="could not open framebuffer device" />
+		<error name="COULDNOTGETFIXEDSCREENINFO" code="1003" description="could not get fixed screen info" />
+		<error name="COULDNOTGETVARIABLESCREENINFO" code="1004" description="could not get fixed variable info" />
+		<error name="COULDNOTMAPFRAMEBUFFERMEMORY" code="1005" description="could not get map framebuffer memory" />
+		<error name="UNKNOWNFRAMEBUFFERBITDEPTH" code="1006" description="unknown framebuffer bit depth" />
+		<error name="FRAMEBUFFERDEVICENOTFOUND" code="1007" description="framebuffer device not found" />
+		<error name="EMPTYFRAMEBUFFERIDENTIFIER" code="1008" description="empty framebuffer identifier" />
+		<error name="FRAMEBUFFERIDENTIFIERISTOOLONG" code="1009" description="framebuffer identifier is too long" />
+		<error name="INVALIDFRAMEBUFFERIDENTIFIER" code="1010" description="invalid framebuffer identifier" />
+		<error name="INVALIDPIXELFORMAT" code="1011" description="invalid pixel format" />
+		<error name="INVALIDSCREENSIZE" code="1012" description="invalid screen size" />
+		<error name="INVALIDDRAWBUFFER" code="1013" description="invalid draw buffer" />
+		<error name="INVALIDLINELENGTH" code="1014" description="invalid line length" />
+		
+		
+		
+	</errors>
+
+	
+<!--
+
+This base Driver interface MUST be in Sync with LibMCDriver.xml
+
+-->
+	
+	<class name="Base">
+	</class>
+
+	
+	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
+	
+		<method name="GetName" description = "returns the name identifier of the driver">
+			<param name="Name" type="string" pass="return" description="Name of the driver." />
+		</method>
+
+		<method name="GetType" description = "returns the type identifier of the driver">
+			<param name="Type" type="string" pass="return" description="Type of the driver." />
+		</method>
+
+		<method name="GetVersion" description = "returns the version identifiers of the driver">
+			<param name="Major" type="uint32" pass="out" description="Major version." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version." />
+			<param name="Micro" type="uint32" pass="out" description="Micro version." />
+			<param name="Build" type="string" pass="out" description="Build identifier." />
+		</method>
+
+		<method name="QueryParameters" description = "Updates the driver parameters in the driver environment. Should only be called in the driver thread.">
+		</method>
+
+		<method name="QueryParametersEx" description = "Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.">
+			<param name="DriverUpdateInstance" type="class" class="LibMCEnv:DriverStatusUpdateSession" pass="in" description="Status update instance." />
+		</method>
+	
+	</class>
+
+<!--
+
+End Interface
+
+-->
+
+
+<!--
+
+Custom implementation
+
+-->
+
+	
+	<enum name="FrameBufferBitDepth" description="Bit Depth of a frame buffer">
+		<option name="Unknown" value="0"/>
+		<option name="RGB888" value="1"/>
+		<option name="RGBA8888" value="2"/>
+		<option name="RGB565" value="3"/>
+	</enum>	
+	
+	<struct name="Color">
+		<member name="Red" type="uint8" />
+		<member name="Green" type="uint8" />
+		<member name="Blue" type="uint8" />
+	</struct>
+
+	<class name="FrameBufferAccess" parent="Base" description="Giving access to a framebuffer device. Does support calling from arbitrary threads.">
+
+		<method name="GetScreenWidth" description = "Returns the width of the screen.">
+			<param name="ScreenWidth" type="uint32" pass="return" description="Screen width of Framebuffer. Minimum 128, Maximum 16348.." />
+		</method>
+
+		<method name="GetScreenHeight" description = "Returns the height of the screen.">
+			<param name="ScreenHeight" type="uint32" pass="return" description="Screen height of Framebuffer. Minimum 128, Maximum 16348.." />
+		</method>
+		
+		<method name="BitDepth" description = "Returns the bitdepth of the screen.">
+			<param name="BitDepth" type="enum" class="FrameBufferBitDepth" pass="return" description="Framebuffer bit depth." />
+		</method>
+
+		<method name="UsesDoubleBuffering" description = "Returns, if the frame buffer supports and uses double buffering.">
+			<param name="DoubleBufferingIsEnabled" type="bool" pass="return" description="Returns true if Double buffering is in enabled." />
+		</method>
+		
+		<method name="Flip" description = "Flips the buffers and shows the current draw buffer on screen. Does nothing if double buffering is disabled.">
+		</method>
+
+		<method name="ClearScreen" description = "Clears the current draw buffer with an arbitrary precision color.">
+			<param name="RGBColor" type="struct" class="Color" pass="in" description="Color to use." />
+		</method>
+
+		<method name="ClearScreenRGB" description = "Clears the current draw buffer with an arbitrary precision color.">
+			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
+			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
+			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />
+		</method>
+
+		<method name="SetPixel" description = "Sets a pixel in a certain color.">
+			<param name="X" type="int32" pass="in" description="X Coordinate of pixel to set." />
+			<param name="Y" type="int32" pass="in" description="Y Coordinate of pixel to set." />
+			<param name="RGBColor" type="struct" class="Color" pass="in" description="Color to use." />
+		</method>				
+
+		<method name="SetPixelRGB" description = "Sets a pixel in a certain color.">
+			<param name="X" type="int32" pass="in" description="X Coordinate of pixel to set." />
+			<param name="Y" type="int32" pass="in" description="Y Coordinate of pixel to set." />
+			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
+			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
+			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />
+		</method>				
+
+		<method name="FillRectangle" description = "Draws a rectangle in a certain color, including the corner points.">
+			<param name="X1" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y1" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="X2" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y2" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="RGBColor" type="struct" class="Color" pass="in" description="Color to use." />
+		</method>				
+
+		<method name="FillRectangleRGB" description = "Draws a rectangle in a certain color, including the corner points.">
+			<param name="X1" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y1" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="X2" type="int32" pass="in" description="X Coordinate of first point to use." />
+			<param name="Y2" type="int32" pass="in" description="Y Coordinate of first point to use." />
+			<param name="Red" type="uint8" pass="in" description="Red value to use (0-255)." />
+			<param name="Green" type="uint8" pass="in" description="Green value to use (0-255)." />
+			<param name="Blue" type="uint8" pass="in" description="Blue value to use (0-255)." />
+		</method>				
+
+		<method name="DrawImage" description = "Draws an image at a certain position.">
+			<param name="X" type="int32" pass="in" description="X Coordinate of image." />
+			<param name="Y" type="int32" pass="in" description="Y Coordinate of image." />
+			<param name="Image" type="class" class="LibMCEnv:ImageData" pass="in" description="Image object to draw." />
+		</method>				
+
+	</class>
+
+	<class name="Driver_FrameBuffer" parent="Driver" description="A generic Linux Framebuffer Driver.">
+
+		<method name="SupportsSimulation" description = "Returns if a the driver supports simulation framebuffers">
+			<param name="SupportFlag" type="bool" pass="return" description="Returns true if simulation Framebuffer are supported." />
+		</method>
+
+		<method name="SupportsDevice" description = "Returns if a the driver supports physical framebuffer devices.">
+			<param name="SupportFlag" type="bool" pass="return" description="Returns true if physical framebuffer devices are supported. Returns false on platforms that do not support Framebuffers." />
+		</method>
+
+		<method name="CreateFrameBufferSimulation" description = "Creates a fake framebuffer instance. Failes if Simulation is not supported.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists." />
+			<param name="ScreenWidth" type="uint32" pass="in" description="Screen width to use. Minimum 128, Maximum 16348.." />
+			<param name="ScreenHeight" type="uint32" pass="in" description="Screen height to use. Minimum 128, Maximum 16348.." />
+			<param name="BitDepth" type="enum" class="FrameBufferBitDepth" pass="in" description="Framebuffer bit depth." />
+			<param name="FrameBufferInstance" type="class" class="FrameBufferAccess" pass="return" description="Framebuffer access instance." />
+		</method>
+
+		<method name="OpenFrameBufferDevice" description = "Opens a new framebuffer device on Linux.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists." />
+			<param name="DeviceName" type="string" pass="in" description="Device name, for example /dev/fb0." />
+			<param name="AllowSimulationFallback" type="bool" pass="in" description="If true, the call will creates a simulation device on other platforms than Linux. The standard resolution in this case will be 1920x1080x24." />
+			<param name="FrameBufferInstance" type="class" class="FrameBufferAccess" pass="return" description="Framebuffer access instance." />
+		</method>
+
+		<method name="ReleaseFramebuffer" description = "Releases a Framebuffer instance. Does nothing if insance does not exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists." />
+		</method>
+
+		<method name="FindFrameBuffer" description = "Retrieves a previously created framebuffer instance. Fails if instance does not exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists." />
+			<param name="FrameBufferInstance" type="class" class="FrameBufferAccess" pass="return" description="Framebuffer access instance." />
+		</method>
+
+		<method name="FrameBufferExists" description = "Returns if a framebuffer instance exists.">
+			<param name="Identifier" type="string" pass="in" description="Identifier of the framebuffer instance. Alphanumeric string with optional _ and - character up to 256 characters. Fails if identifier is empty or already exists." />
+			<param name="Exists" type="bool" pass="return" description="Returns true if Framebuffer exists." />
+		</method>
+
+
+	</class>
+
+
+
+
+<!--
+
+End of Custom implementation
+
+-->
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateDriver" description="Creates a driver instance with a specific name.">
+			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
+			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
+			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
+			<param name="Instance" type="optionalclass" class="Driver" pass="return" description="New Driver instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
+

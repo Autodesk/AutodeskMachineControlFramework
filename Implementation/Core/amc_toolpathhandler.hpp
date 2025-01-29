@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 
 #include "amc_toolpathentity.hpp"
+#include "amc_scatterplot.hpp"
 #include "libmcdata_dynamic.hpp"
 
 namespace AMC {
@@ -59,6 +60,8 @@ namespace AMC {
 
 		std::set<std::string> m_AttachmentRelationsToRead;
 
+		std::map<std::string, PScatterplot> m_Scatterplots;
+
 	public:
 
 		CToolpathHandler(LibMCData::PDataModel pDataModel);
@@ -77,6 +80,9 @@ namespace AMC {
 		void registerAttachmentRelationsToRead(const std::string & sRelationShip);
 
 		void unregisterAttachmentRelationsToRead(const std::string& sRelationShip);
+
+		void storeScatterplot (PScatterplot pScatterplot);
+		PScatterplot restoreScatterplot(const std::string & sUUID, bool bMustExist);
 
 	};
 

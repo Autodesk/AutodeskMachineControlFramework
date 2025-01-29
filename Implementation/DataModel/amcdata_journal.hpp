@@ -36,14 +36,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <vector>
 #include <mutex>
+#include <fstream>
 #include <atomic>
 
 #include "amcdata_sqlhandler.hpp"
 #include "common_exportstream_native.hpp"
 #include "libmcdata_types.hpp"
+#include "amcdata_journalchunkdatafile.hpp"
 
 namespace AMCData {
-	
+
+	#define JOURNAL_MAXFILESPERSESSION 999999
+	#define JOURNAL_MAXFILEDIGITS 6
+
+
+	class CActiveJournalFile : public CJournalChunkDataFile {
+	private:
+		std::fstream m_Stream;
+		std::mutex m_FileMutex;
+
+		uint32_t m_nFileIndex;
+		uint64_t m_nTotalSize;
+	public:
+
+		CActiveJournalFile(const std::string & sFileName, uint32_t nFileIndex);
+
+		virtual ~CActiveJournalFile();
+
+		uint64_t retrieveWritePosition();
+
+		void flushBuffers();
+
+		void writeBuffer (const void * pBuffer, size_t nSize);
+
+		void readBuffer(uint64_t nDataOffset, uint8_t* pBuffer, uint64_t nDataLength) override;
+
+		uint32_t getFileIndex();
+
+		uint64_t getTotalSize();
+
+	};
+
+	typedef std::shared_ptr<CActiveJournalFile> PActiveJournalFile;
 
 	class CJournal {
 	private:
@@ -55,15 +89,22 @@ namespace AMCData {
 		std::atomic<uint32_t> m_AlertID;		
 		std::string m_sSessionUUID;
 
-		AMCCommon::PExportStream_Native m_pJournalStream;
+		std::string m_sJournalBasePath;
+		std::string m_sChunkBaseName;
 		
+		std::vector<PActiveJournalFile> m_JournalFiles;
+
+		PActiveJournalFile m_pCurrentJournalFile;
+
+		PActiveJournalFile createJournalFile();
+
 	public:
 
 		static std::string convertAlertLevelToString(const LibMCData::eAlertLevel eLevel);
 		
 		static LibMCData::eAlertLevel convertStringToAlertLevel(const std::string & sValue, bool bFailIfUnknown);
 
-		CJournal(const std::string& sJournalPath, const std::string& sJournalDataPath, const std::string & sSessionUUID);
+		CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string & sSessionUUID);
 
 		virtual ~CJournal();
 
@@ -75,7 +116,13 @@ namespace AMCData {
 
 		LibMCData_uint32 GetMaxLogEntryID();
 
-		void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer);
+		void CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType, double dUnits);
+
+		void CreateVariableAliasInJournalDB(const std::string& sAliasName, const std::string& sSourceName);
+
+		void WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32* pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64* pValueDataBuffer);
+
+		void ReadJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, uint64_t & nStartTimeStamp, uint64_t & nEndTimeStamp, std::vector<LibMCData::sJournalChunkVariableInfo> & variableInfo, std::vector<uint32_t> & timeStampData, std::vector<int64_t> & valueData);
 
 		AMCData::PSQLHandler getSQLHandler();
 
@@ -101,6 +148,17 @@ namespace AMCData {
 
 		void acknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimeStampUTC);
 		void deactivateAlert(const std::string& sAlertUUID);
+
+		uint64_t getChunkIntervalInMicroseconds ();
+
+		uint64_t getMaxMemoryQuotaInBytes ();
+
+		uint64_t getMaxChunkFileSizeQuotaInBytes ();
+
+		static std::string convertDataTypeToString(LibMCData::eParameterDataType dataType);
+
+		static LibMCData::eParameterDataType convertStringToDataType(const std::string & sValue);
+
 	};
 
 	typedef std::shared_ptr<CJournal> PJournal;

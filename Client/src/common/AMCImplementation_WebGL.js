@@ -98,7 +98,6 @@ class WebGLElement {
         }
     }
 	
-	
 	updateGLPosition () 
 	{
         if (this.glelement) {
@@ -110,22 +109,30 @@ class WebGLElement {
             this.glelement.scale.z = this.scale.z;
         }
 	}
-
-
+		
 }
 
 class WebGLLinesElement extends WebGLElement {
 
-    constructor(lineData, zValue, lineThickness, lineColor) {
+    constructor(lineData, zValue, lineThickness, lineColor, vertexcolors) {
         super();
 
         let geometry = new THREE.BufferGeometry();
-        const material = new THREE.MeshBasicMaterial({
-            vertexColors: false,
-            color: lineColor
-        });
+        let material;
+
+		if (vertexcolors) {
+			material = new THREE.MeshBasicMaterial({
+				vertexColors: true
+			});
+		} else {
+			material = new THREE.MeshBasicMaterial({
+				vertexColors: false,
+				color: lineColor
+			});
+		}
 
         const positions = [];
+		const colors = [];
 
         const lineCount = lineData.length / 4;
 
@@ -150,15 +157,296 @@ class WebGLLinesElement extends WebGLElement {
                 positions.push(x2 - ux, y2 - uy, zValue);
                 positions.push(x1 - ux, y1 - uy, zValue);
                 positions.push(x1 + ux, y1 + uy, zValue);
+				
+				if (vertexcolors) {
+					
+					// Add colors for each vertex
+					const color = new THREE.Color(vertexcolors[i]); 
+					for (let j = 0; j < 6; j++) { 
+						colors.push(color.r, color.g, color.b);
+					}
+				}
             }
         }
 
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+		if (vertexcolors) {
+			geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); 
+		}
         geometry.computeBoundingSphere();
 
         this.glelement = new THREE.Mesh(geometry, material);
-
     }
+	
+	intersectRay (mouseX, mouseY, raycaster) {
+		if (!raycaster)
+			return -1;
+		if (!this.glelement)
+			return -1;
+		
+		const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
+		const rayDirection = new THREE.Vector3(0, 0, 1);
+
+		raycaster.ray.origin.copy(rayOrigin);
+		raycaster.ray.direction.copy(rayDirection);                
+		
+		const collisionsPoints = raycaster.intersectObject(this.glelement);
+		
+		if (collisionsPoints.length > 0) {
+			let faceIndex = collisionsPoints[0].faceIndex;
+			if (faceIndex % 2 !== 0) {
+				return (faceIndex - 1) / 2;
+			} else {
+				return faceIndex / 2;
+			}
+			
+		} else {
+			return -1;
+		}		
+
+	}
+}
+
+class WebGLPointsElement extends WebGLElement {
+
+    constructor(pointsData, zValue, pointsRadius, pointsColor, vertexcolors) {
+        super();
+
+        let geometry = new THREE.BufferGeometry();
+        let material;
+
+		if (vertexcolors) {
+			material = new THREE.MeshBasicMaterial({
+				vertexColors: true
+			});
+		} else {
+			material = new THREE.MeshBasicMaterial({
+				vertexColors: false,
+				color: pointsColor
+			});
+		}
+
+        let numberOfPoints = pointsData.length / 2;
+
+        const vertices = [];
+		const colors = [];
+
+        for (let i = 0; i < numberOfPoints; i++) {
+            vertices.push(
+                pointsData[i * 2] - pointsRadius / 2, pointsData[i * 2 + 1] - pointsRadius / 2, zValue,
+                pointsData[i * 2] - pointsRadius / 2, pointsData[i * 2 + 1] + pointsRadius / 2, zValue,
+                pointsData[i * 2] + pointsRadius / 2, pointsData[i * 2 + 1] + pointsRadius / 2, zValue,
+                pointsData[i * 2] - pointsRadius / 2, pointsData[i * 2 + 1] - pointsRadius / 2, zValue,
+                pointsData[i * 2] + pointsRadius / 2, pointsData[i * 2 + 1] + pointsRadius / 2, zValue,
+                pointsData[i * 2] + pointsRadius / 2, pointsData[i * 2 + 1] - pointsRadius / 2, zValue,
+            );
+			
+			if (vertexcolors) {
+					
+					// Add colors for each vertex
+					const color = new THREE.Color(vertexcolors[i]); 
+					for (let j = 0; j < 6; j++) { 
+						colors.push(color.r, color.g, color.b);
+					}
+				}
+        }
+
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+		if (vertexcolors) {
+			geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); 
+		}
+        geometry.computeBoundingSphere();
+
+        this.glelement = new THREE.Mesh(geometry, material);
+    }
+}
+
+
+class WebGLLocalizedPointsElement extends WebGLElement {
+
+    constructor(pointsData, zValue, pointsRadius, pointsColor, vertexcolors, originx, originy, quadsizex, quadsizey, quadcountx, quadcounty) {
+        super();
+		
+		this.quadgeometries = [];
+		this.quadmaterials = [];
+		this.glelements = [];
+		this.xcoordinates = [];
+		this.ycoordinates = [];
+		this.pointids = [];
+		
+		this.originx = originx;
+		this.originy = originy;
+		this.quadsizex = quadsizex;
+		this.quadsizey = quadsizey;
+		this.quadcountx = quadcountx;
+		this.quadcounty = quadcounty;
+		this.quadcount = quadcountx * quadcounty;
+		
+		let group = new THREE.Group();
+		
+		for (let quadindex = 0; quadindex < this.quadcount; quadindex++) {
+			this.xcoordinates[quadindex] = [];
+			this.ycoordinates[quadindex] = [];
+			this.pointids[quadindex] = [];
+			this.quadgeometries[quadindex] = null;
+			this.quadmaterials[quadindex] = null;
+			this.glelements[quadindex] = null;			
+		}
+			
+
+
+        let numberOfPoints = pointsData.length / 2;
+
+        for (let i = 0; i < numberOfPoints; i++) {
+			let x = pointsData[i * 2];
+			let y = pointsData[i * 2 + 1];
+			
+			let quadx = Math.floor ( (x - originx) / quadsizex);
+			let quady = Math.floor ( (y - originy) / quadsizey);
+			
+			if (quadx < 0) quadx = 0;
+			if (quady < 0) quady = 0;
+			if (quadx >= quadcountx) quadx = quadcountx - 1;
+			if (quady >= quadcounty) quady = quadcounty - 1;
+			
+			let quadindex = quadx + quady * quadcountx;
+			this.xcoordinates[quadindex].push (x);
+			this.ycoordinates[quadindex].push (y);
+			this.pointids[quadindex].push (i);
+		}
+		
+		
+		for (let quadindex = 0; quadindex < this.quadcount; quadindex++) {
+			
+			let xcoordinates = this.xcoordinates[quadindex];
+			let ycoordinates = this.ycoordinates[quadindex];
+			if ((xcoordinates.length > 0) && (xcoordinates.length === ycoordinates.length)) {
+				
+				let pointcount = xcoordinates.length;
+				
+				this.quadgeometries[quadindex] = new THREE.BufferGeometry();
+				if (vertexcolors) {
+					this.quadmaterials [quadindex] = new THREE.MeshBasicMaterial({
+						vertexColors: true
+					});
+				} else {
+					this.quadmaterials [quadindex] = new THREE.MeshBasicMaterial({
+						vertexColors: false,
+						color: pointsColor
+					});
+				}
+				
+				let vertices = [];
+				let colors = [];
+				for (let i = 0; i < pointcount; i++) {
+					let x = xcoordinates[i];
+					let y = ycoordinates[i];
+					vertices.push(
+						x - pointsRadius / 2, y - pointsRadius / 2, zValue,
+						x - pointsRadius / 2, y + pointsRadius / 2, zValue,
+						x + pointsRadius / 2, y + pointsRadius / 2, zValue,
+						x - pointsRadius / 2, y - pointsRadius / 2, zValue,
+						x + pointsRadius / 2, y + pointsRadius / 2, zValue,
+						x + pointsRadius / 2, y - pointsRadius / 2, zValue,
+					);
+					
+					if (vertexcolors) {
+						let pointid = this.pointids[quadindex][i];
+						const color = new THREE.Color(vertexcolors[pointid]); 
+						for (let j = 0; j < 6; j++) { 
+							colors.push(color.r, color.g, color.b);
+						}
+					}
+
+				}
+				
+				
+				this.quadgeometries[quadindex].setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+				if (vertexcolors) {
+					this.quadgeometries[quadindex].setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); 
+				}
+				this.quadgeometries[quadindex].computeBoundingSphere();
+
+				this.glelements[quadindex] = new THREE.Mesh(this.quadgeometries[quadindex], this.quadmaterials [quadindex]);
+			
+				group.add(this.glelements[quadindex]);
+				
+			}
+								
+
+			this.glelement = group;
+	
+			
+			
+
+            /*
+			
+			if (vertexcolors) {
+					
+					// Add colors for each vertex
+					const color = new THREE.Color(vertexcolors[i]); 
+					for (let j = 0; j < 6; j++) { 
+						colors.push(color.r, color.g, color.b);
+					}
+				} */
+        }
+
+        
+    }
+	
+	
+	intersectRay (mouseX, mouseY, raycaster) {
+		if (!raycaster)
+			return -1;
+		if (!this.glelement)
+			return -1;
+		
+		let localmouseX = (mouseX - this.position.x) / this.scale.x;
+		let localmouseY = (mouseY - this.position.y) / this.scale.y;
+		
+		console.log (mouseX + " " + mouseY + ": " + localmouseX + " " + localmouseY);
+		
+		let quadx = Math.floor ( (localmouseX - this.originx) / this.quadsizex);
+		let quady = Math.floor ( (localmouseY - this.originy) / this.quadsizey);
+			
+		if (quadx < 0) quadx = 0;
+		if (quady < 0) quady = 0;
+		if (quadx >= this.quadcountx) quadx = this.quadcountx - 1;
+		if (quady >= this.quadcounty) quady = this.quadcounty - 1;
+		
+		let quadindex = quadx + quady * this.quadcountx;
+		let quadglelement = this.glelements[quadindex];
+		if (quadglelement) {
+		
+			const rayOrigin = new THREE.Vector3(mouseX, mouseY, -100);
+			const rayDirection = new THREE.Vector3(0, 0, 1);
+
+			raycaster.ray.origin.copy(rayOrigin);
+			raycaster.ray.direction.copy(rayDirection);                
+			
+			const collisionsPoints = raycaster.intersectObject(quadglelement);
+			
+			if (collisionsPoints.length > 0) {
+				let faceIndex = collisionsPoints[0].faceIndex;
+				let localPointIndex;
+				if (faceIndex % 2 !== 0) {
+					localPointIndex = (faceIndex - 1) / 2;
+				} else {
+					localPointIndex = faceIndex / 2;
+				}
+				
+				let pointID = this.pointids[quadindex][localPointIndex];
+				
+				return pointID;
+				
+			} else {
+				return -1;
+			}		
+		}
+		
+		return -1;
+
+	}
 
 }
 
@@ -284,7 +572,6 @@ class WebGLBoxElement extends WebGLElement {
 
 }
 
-
 class WebGLMeshElement extends WebGLElement {
 
     constructor(applicationInstance, meshUUID, meshcolor) {
@@ -362,7 +649,6 @@ class WebGLMeshElement extends WebGLElement {
     }
 
 }
-
 
 class WebGLGridElement extends WebGLElement {
 
@@ -520,7 +806,6 @@ class WebGLSVGElement extends WebGLElement {
 
 }
 
-
 class WebGLAmbientLight extends WebGLElement {
 
     constructor (paramColor, paramIntensity) {
@@ -535,7 +820,6 @@ class WebGLAmbientLight extends WebGLElement {
 
 }
 
-
 class WebGLImpl {
 
     constructor() {
@@ -546,9 +830,8 @@ class WebGLImpl {
 		
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0xffffff);
-		
-		//this.raycaster = new THREE.Raycaster();
-		//this.raycaster.params.Line.threshold = RAYCAST_LINE_THRESHOLD;
+
+		this.raycaster = new THREE.Raycaster();
 
         this.renderElements = new Map();
 		
@@ -568,8 +851,6 @@ class WebGLImpl {
         this.camera = new THREE.OrthographicCamera(0, dSizeX, 0, dSizeY, dNear, dFar);
         this.camera.position.z = dFar * 0.99;
     }
-
-
 
     setupOrthoView(paramSizeX, paramSizeY, paramNear, paramFar) 
 	{
@@ -607,12 +888,34 @@ class WebGLImpl {
 		this.camera.position.set( dX, dY, dZ );
 	}
 
-
     setupDOMElement(domelement) {
 		if (!domelement)
 			throw "No DOM Element to attach to";
 
         domelement.append(this.renderer.domElement);
+
+        // const rendererWindowPosition = this.renderer.domElement.getBoundingClientRect();
+        // console.log(rendererWindowPosition);
+
+        const infoboxDiv = document.createElement('div');
+        infoboxDiv.id = 'infobox_points';
+        infoboxDiv.style.display = 'none'
+        infoboxDiv.style.position = 'absolute';
+        infoboxDiv.style.top = 0;
+        infoboxDiv.style.left = 0;
+        infoboxDiv.style.zIndex = 100;
+        infoboxDiv.style.padding = '5px';
+        infoboxDiv.style.borderRadius = '5px';
+        infoboxDiv.style.fontFamily = 'Arial';
+        infoboxDiv.style.fontSize = '8pt';
+        infoboxDiv.style.fontWeight = 'bold';
+        infoboxDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+        infoboxDiv.style.color = 'white';
+        infoboxDiv.style.visibility = 'none';
+        infoboxDiv.innerText = '---';
+
+        this.renderer.domElement.parentElement.style.position = 'relative';
+        this.renderer.domElement.parentElement.appendChild(infoboxDiv);
     }
 
     resizeTo(sizex, sizey) {
@@ -638,6 +941,24 @@ class WebGLImpl {
 
     }
 
+	getRaycasterCollisions(elementidentifier, mouseX, mouseY) {
+		
+		let elementMesh = this.findElement (elementidentifier);
+		
+		if (!elementMesh) 
+			return -1;
+			
+		if (!elementMesh.glelement) 
+			return -1;
+						
+		if (elementMesh.intersectRay) {
+			return elementMesh.intersectRay (mouseX, mouseY, this.raycaster);
+		}
+		
+		return -1;
+							
+	}
+	
     hasElement(identifier) {
         if (!identifier)
             return false;
@@ -668,6 +989,36 @@ class WebGLImpl {
             return null;
 
         return this.renderElements.get(identifier);
+    }
+
+    getElementPosition(identifier) {
+        const element = this.findElement(identifier);
+
+        if (!element || !element.position) {
+            return null;
+        }
+
+        return element.position;
+    }
+
+    getElementEdgePositions(identifier) {
+        const element = this.findElement(identifier);
+
+        if (!element || !element.glelement.geometry.attributes.position.array) {
+            return null;
+        }
+
+        return element.glelement.geometry.attributes.position.array;
+    }
+
+    getElementScale(identifier) {
+        const element = this.findElement(identifier);
+
+        if (!element || !element.glelement.scale) {
+            return null;
+        }
+
+        return element.glelement.scale;
     }
 
     addElement(identifier, renderElement) {
@@ -701,18 +1052,45 @@ class WebGLImpl {
         return gridElement;
     }
 
-    add2DLineGeometry(identifier, lineData, zValue, lineThickness, lineColor) {
+    add2DLineGeometry(identifier, lineData, zValue, lineThickness, lineColor, vertexcolors) {
         if (!identifier)
             return;
 		
 		this.removeElement (identifier);
 
-        let linesElement = new WebGLLinesElement(lineData, zValue, lineThickness, lineColor);
+        let linesElement = new WebGLLinesElement(lineData, zValue, lineThickness, lineColor, vertexcolors);
 
         this.addElement(identifier, linesElement);
 
         return linesElement;
     }
+
+    add2DPointsGeometry(identifier, pointsData, zValue, pointsSize, pointsColor, vertexcolors) {
+        if (!identifier)
+            return;
+		
+		this.removeElement (identifier);
+
+        let pointsElement = new WebGLPointsElement(pointsData, zValue, pointsSize, pointsColor, vertexcolors);
+
+        this.addElement(identifier, pointsElement);
+
+        return pointsElement;
+    }
+
+    add2DLocalizedPointsGeometry(identifier, pointsData, zValue, pointsRadius, pointsColor, vertexcolors, originx, originy, quadsizex, quadsizey, quadcountx, quadcounty) {
+        if (!identifier)
+            return;
+		
+		this.removeElement (identifier);
+
+        let pointsElement = new WebGLLocalizedPointsElement(pointsData, zValue, pointsRadius, pointsColor, vertexcolors, originx, originy, quadsizex, quadsizey, quadcountx, quadcounty);
+
+        this.addElement(identifier, pointsElement);
+
+        return pointsElement;
+    }
+	
 
     addSVGImage(identifier, url, zValue, fillShapes, showStrokes) {
         if (!identifier)
@@ -778,7 +1156,6 @@ class WebGLImpl {
 		
 		return meshElement;
 	}
-
 	
 	pick2DElement (x, y)
 	{		
@@ -897,7 +1274,6 @@ class WebGLImpl {
 				
 		return;
     }
-
 }
 
 export default WebGLImpl;

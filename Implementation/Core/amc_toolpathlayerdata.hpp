@@ -43,6 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_types.hpp"
 #include "amc_xmldocument.hpp"
 
+#define TOOLPATHSEGMENTOVERRIDEFACTOR_F 1
+#define TOOLPATHSEGMENTOVERRIDEFACTOR_G 2
+#define TOOLPATHSEGMENTOVERRIDEFACTOR_H 4
+
 namespace AMC {
 
 
@@ -53,8 +57,14 @@ namespace AMC {
 		uint32_t m_ProfileUUID;
 		uint32_t m_PartUUID;
 		uint32_t m_LocalPartID;
+		uint32_t m_LaserIndex;
+		uint32_t m_HasOverrideFactors;
 		int64_t* m_AttributeData;
 	} sToolpathLayerSegment;
+
+	typedef struct _sToolpathLayerOverride {
+		double m_dFactors[3]; // F, G and H
+	} sToolpathLayerOverride;
 
 	class CToolpathCustomSegmentAttribute {
 	private:
@@ -83,20 +93,29 @@ namespace AMC {
 
 	class CToolpathLayerProfile {
 		private:
+			uint32_t m_nProfileIndex;
 			std::string m_sUUID;
+			std::string m_sName;
 			std::map<std::pair<std::string, std::string>, std::string> m_ProfileValues;
 
 		public:
 
-			CToolpathLayerProfile(const std::string & sUUID);
+			CToolpathLayerProfile(const uint32_t nProfileIndex,  const std::string& sUUID, const std::string& sName);
 			virtual ~CToolpathLayerProfile();
 
 			std::string getUUID();
+			std::string getName();
 			void addValue(const std::string & sNameSpace, const std::string & sValueName, const std::string & sValue);
 
 			bool hasValue(const std::string& sNameSpace, const std::string& sValueName);
 			std::string getValue(const std::string& sNameSpace, const std::string& sValueName);
 			std::string getValueDef(const std::string& sNameSpace, const std::string& sValueName, const std::string & sDefaultValue);
+			double getDoubleValue(const std::string& sNameSpace, const std::string& sValueName);
+			double getDoubleValueDef(const std::string& sNameSpace, const std::string& sValueName, double dDefaultValue);
+			int64_t getIntegerValue(const std::string& sNameSpace, const std::string& sValueName);
+			int64_t getIntegerValueDef(const std::string& sNameSpace, const std::string& sValueName, int64_t nDefaultValue);
+
+			uint32_t getProfileIndex();
 	};
 
 	typedef std::shared_ptr<CToolpathLayerProfile> PToolpathLayerProfile;
@@ -111,6 +130,7 @@ namespace AMC {
 		std::vector<sToolpathLayerSegment> m_Segments;
 		std::vector<int64_t> m_SegmentAttributeData;
 		std::vector<LibMCEnv::sPosition2D> m_Points;
+		std::vector<sToolpathLayerOverride> m_OverrideFactors;
 
 		std::vector<std::string> m_UUIDs;
 		std::map<std::string, uint32_t> m_UUIDMap;
@@ -148,6 +168,7 @@ namespace AMC {
 		std::string getSegmentProfileUUID(const uint32_t nSegmentIndex);
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);
 		uint32_t getSegmentLocalPartID(const uint32_t nSegmentIndex);
+		uint32_t getSegmentLaserIndex(const uint32_t nSegmentIndex);
 		PToolpathLayerProfile getSegmentProfile(const uint32_t nSegmentIndex);
 
 		bool findCustomSegmentAttribute(const std::string& sNameSpace, const std::string& sName, uint32_t& nAttributeID, LibMCEnv::eToolpathAttributeType & attributeType);
@@ -165,6 +186,15 @@ namespace AMC {
 		PXMLDocumentInstance findUniqueMetaData(const std::string& sNameSpace, const std::string& sName);
 
 		void calculateExtents(int32_t & nMinX, int32_t & nMinY, int32_t & nMaxX, int32_t & nMaxY);
+
+		bool segmentHasOverrideFactors(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor);
+
+		void storePointOverrides(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, double * pOverrideData);
+
+		void storeHatchOverrides(uint32_t nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, LibMCEnv::sHatch2DOverrides* pOverrideData);
+
+		static std::string getValueNameByType(const LibMCEnv::eToolpathProfileValueType eValueType);
+
 	};
 
 

@@ -135,6 +135,8 @@
 
 		<error name="COULDNOTWRITETOPAYLOAD" code="1080" description="Could not write to payload." />
 		<error name="INVALIDPAYLOADADDRESS" code="1081" description="Invalid payload address." />
+		<error name="COULDNOTCREATEOPCUACLIENT" code="1082" description="Could not create OPCUA Client." />
+		
 		
 		
 		
@@ -143,7 +145,30 @@
 		
 	</errors>
 
-	
+	<enum name="UAIntegerType">
+	   <option name="Unknown" value="0" />
+	   <option name="UAUInt8" value="1" />
+	   <option name="UAUInt16" value="2" />
+	   <option name="UAUInt32" value="3" />
+	   <option name="UAUInt64" value="4" />
+	   <option name="UAInt8" value="5" />
+	   <option name="UAInt16" value="6" />
+	   <option name="UAInt32" value="7" />
+	   <option name="UAInt64" value="8" />
+	</enum>
+
+	<enum name="UADoubleType">
+	   <option name="Unknown" value="0" />
+	   <option name="UAFloat32" value="1" />
+	   <option name="UADouble64" value="2" />
+	</enum>
+
+	<enum name="UASecurityMode">
+	   <option name="None" value="0" />
+	   <option name="Sign" value="1" />
+	   <option name="SignAndEncrypt" value="2" />
+	</enum>
+
 <!--
 
 This base Driver interface MUST be in Sync with LibMCDriver.xml
@@ -197,51 +222,6 @@ Custom implementation
 
 -->
 
-	<class name="PLCCommand" parent="Base">
-	
-		<method name="SetIntegerParameter" description="Sets an integer parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="int64" pass="in" description="Parameter Value" />
-		</method>		
-	
-		<method name="SetBoolParameter" description="Sets a bool parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="bool" pass="in" description="Parameter Value" />
-		</method>
-
-		<method name="SetDoubleParameter" description="Sets a double parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="double" pass="in" description="Parameter Value" />
-		</method>		
-
-	</class>
-
-	<class name="PLCCommandList" parent="Base">
-	
-		<method name="AddCommand" description="Adds a command to the list. List must not be executed before.">
-			<param name="CommandInstance" type="class" class="PLCCommand" pass="in" description="Add a command instance." />
-		</method>		
-				
-		<method name="FinishList" description="Finish command list.">
-		</method>		
-
-		<method name="ExecuteList" description="Execute command list.">
-		</method>		
-
-		<method name="WaitForList" description="Wait for command list to finish executing">
-			<param name="ReactionTimeInMS" type="uint32" pass="in" description="How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time." />
-			<param name="WaitForTimeInMS" type="uint32" pass="in" description="How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished." />
-			<param name="CommandSuccess" type="bool" pass="return" description="Returns true if the command was finished successfully." />
-		</method>
-
-		<method name="PauseList" description="Pause command list. Must be executed or resumed before.">
-		</method>		
-		
-		<method name="ResumeList" description="Resume command list. Must be paused before.">
-		</method>		
-
-	</class>
-
 
 	<class name="Driver_OPCUA" parent="Driver" description="A Driver for a BR Automation PLC.">
 
@@ -252,33 +232,68 @@ Custom implementation
 			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
 		</method>	
 
-		<method name="Connect" description= "Connects to a OPCUA PLC Controller.">
-			<param name="IPAddress" type="string" pass="in" description="IP Address of PLC Service." />
-			<param name="Port" type="uint32" pass="in" description="Port of PLC Service." />				
-			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
+		<method name="EnableEncryption" description="Enables encryption for subsequent connects.">
+			<param name="LocalCertificate" type="string" pass="in" description="Local Certificate String" />
+			<param name="PrivateKey" type="string" pass="in" description="Private Key" />
+			<param name="SecurityMode" type="enum" class="UASecurityMode" pass="in" description="Security mode to use." />
 		</method>
 
-
-		<method name="Disconnect" description= "Disconnects from the OPCUA PLC Controller.">
+		<method name="DisableEncryption" description="Enables encryption for subsequent connects.">
 		</method>
 
-		<method name="CreateCommandList" description="Create Command">
-			<param name="ListInstance" type="class" class="PLCCommandList" pass="return" description="Command list instance" />
-		</method>		
-		
-		<method name="CreateCommand" description="Creates a command instance.">
-			<param name="CommandName" type="string" pass="in" description="Command Name." />
-			<param name="CommandInstance" type="class" class="PLCCommand" pass="return" description="Returns a command instance." />
-		</method>		
-		
-		<method name="StartJournaling" description="Start Journaling.">
-		</method>		
-		
-		<method name="StopJournaling" description="Stop Journaling.">
-		</method>		
+		<method name="ConnectWithUserName" description= "Connects to a OPCUA PLC Controller.">
+			<param name="EndPointURL" type="string" pass="in" description="End point URL to connect to." />
+			<param name="Username" type="string" pass="in" description="User login." />
+			<param name="Password" type="string" pass="in" description="Password." />
+			<param name="ApplicationURL" type="string" pass="in" description="Application URL to use." />
+		</method>
 
-		<method name="RefreshJournal" description="Refresh Journal.">
-		</method>		
+		<method name="Disconnect" description="Disconnect from the end point. Does nothing if not connected">
+		</method>
+		
+		<method name="IsConnected" description="Returns if an end point is connected.">
+			<param name="Value" type="bool" pass="return" description="Returns true if connected." />
+		</method>
+
+		<method name="ReadInteger" description="Reads an integer node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="NodeType" type="enum" class="UAIntegerType" pass="in" description="Type of Node to read" />
+			<param name="Value" type="int64" pass="return" description="Retrieved Node Value" />
+		</method>
+
+		<method name="ReadDouble" description="Reads a double node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="NodeType" type="enum" class="UADoubleType" pass="in" description="Type of Node to read" />
+			<param name="Value" type="double" pass="return" description="Retrieved Node Value" />
+		</method>
+	
+		<method name="ReadString" description="Reads a string node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="Value" type="string" pass="return" description="Retrieved String Value" />
+		</method>
+
+		<method name="WriteInteger" description="Writes an integer node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="NodeType" type="enum" class="UAIntegerType" pass="in" description="Type of Node to write" />
+			<param name="Value" type="int64" pass="in" description="Node Value to write" />
+		</method>
+
+		<method name="WriteDouble" description="Writes a double node value. Fails if not connected or node does not exist.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="NodeType" type="enum" class="UADoubleType" pass="in" description="Type of Node to write" />
+			<param name="Value" type="double" pass="in" description="Node Value to write" />
+		</method>
+	
+		<method name="WriteString" description="Writes a string node value. Fails if not connected.">
+			<param name="NameSpace" type="uint32" pass="in" description="Namespace ID" />
+			<param name="NodeName" type="string" pass="in" description="NodeToRead" />
+			<param name="Value" type="string" pass="in" description="Node Value to write" />
+		</method>
 
 	</class>
 

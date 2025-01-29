@@ -55,21 +55,6 @@ CRTCRecording::~CRTCRecording()
 }
 
 
-bool CRTCRecording::ScanheadConnectionCheckIsEnabled()
-{
-	return m_pInstance->getScanheadConnectionCheckIsEnabled ();
-}
-
-void CRTCRecording::EnableScanheadConnectionCheck()
-{
-	m_pInstance->setScanheadConnectionCheckIsEnabled(true);
-}
-
-void CRTCRecording::DisableScanheadConnectionCheck()
-{
-	m_pInstance->setScanheadConnectionCheckIsEnabled(false);
-}
-
 void CRTCRecording::Clear()
 {
 	m_pInstance->clear();
@@ -158,5 +143,31 @@ void CRTCRecording::AddRecordsToDataTable(const std::string & sChannelName, LibM
 void CRTCRecording::AddScaledRecordsToDataTable(const std::string & sChannelName, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset)
 {
 	m_pInstance->addScaledRecordsToDataTable(sChannelName, pDataTable, sColumnIdentifier, sColumnDescription, dScaleFactor, dOffset);
+}
+
+void CRTCRecording::AddBacktransformedXYPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY)
+{
+	m_pInstance->addBacktransformedXYPositionsToDataTable(pDataTable, sColumnIdentifierX, sColumnDescriptionX, sColumnIdentifierY, sColumnDescriptionY);
+}
+
+void CRTCRecording::BacktransformRawXYCoordinates(const LibMCDriver_ScanLab_int32 nRawCoordinateX, const LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double& dBacktransformedX, LibMCDriver_ScanLab_double& dBacktransformedY)
+{
+	m_pInstance->backtransformRawXYCoordinates(nRawCoordinateX, nRawCoordinateY, dBacktransformedX, dBacktransformedY);
+}
+
+void CRTCRecording::AddBacktransformedZPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierZ, const std::string& sColumnDescriptionZ)
+{
+	m_pInstance->addBacktransformedZPositionToDataTable(pDataTable, sColumnIdentifierZ, sColumnDescriptionZ);
+}
+
+double CRTCRecording::BacktransformRawZCoordinate(const int32_t nRawCoordinateZ)
+{
+	return m_pInstance->backtransformRawZCoordinate(nRawCoordinateZ);
+
+}
+
+void CRTCRecording::AddTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY)
+{
+	m_pInstance->addTargetPositionsToDataTable(pDataTable, sColumnIdentifierX, sColumnDescriptionX, sColumnIdentifierY, sColumnDescriptionY);
 }
 

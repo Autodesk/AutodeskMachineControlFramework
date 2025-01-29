@@ -36,7 +36,7 @@ Abstract: This is the class declaration of CDriver_OPCUA
 #define __LIBMCDRIVER_OPCUA_DRIVER_OPCUA
 
 #include "libmcdriver_opcua_interfaces.hpp"
-#include "libmcdriver_open62541_client.hpp"
+#include "../LibOpen62541/Headers/CppDynamic/libopen62541_dynamic.hpp"
 
 // Parent classes
 #include "libmcdriver_opcua_driver.hpp"
@@ -44,9 +44,6 @@ Abstract: This is the class declaration of CDriver_OPCUA
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
-
-// Include custom headers here.
-
 
 namespace LibMCDriver_OPCUA {
 namespace Impl {
@@ -56,7 +53,8 @@ namespace Impl {
  Class declaration of CDriver_OPCUA 
 **************************************************************************************************************************/
 
-class CDriver_OPCUA : public virtual IDriver_OPCUA, public virtual CDriver, public virtual COpen62541ClientLogger {
+
+class CDriver_OPCUA : public virtual IDriver_OPCUA, public virtual CDriver {
 private:
 
 
@@ -72,8 +70,12 @@ protected:
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 	LibMCEnv::PWorkingFile m_pOpen62541DLL;
+	LibMCEnv::PWorkingFile m_pLibCryptoDLL;
+	LibMCEnv::PWorkingFile m_pLibSSLDLL;
+	LibMCEnv::PWorkingFile m_pLibOpen62541DLL;
 
-	POpen62541Client m_pClient;
+	LibOpen62541::PWrapper m_pLibraryWrapper;
+	LibOpen62541::POPCClient m_pClient;	
 
 public:
 
@@ -96,21 +98,27 @@ public:
 
 	bool IsSimulationMode() override;
 
-	void Connect(const std::string & sIPAddress, const LibMCDriver_OPCUA_uint32 nPort, const LibMCDriver_OPCUA_uint32 nTimeout) override;
+	void EnableEncryption(const std::string& sLocalCertificate, const std::string& sPrivateKey, const LibMCDriver_OPCUA::eUASecurityMode eSecurityMode) override;
+
+	void DisableEncryption() override;
+
+	void ConnectWithUserName(const std::string& sEndPointURL, const std::string& sUsername, const std::string& sPassword, const std::string& sApplicationURL) override;
 
 	void Disconnect() override;
+	
+	bool IsConnected() override;
 
-	IPLCCommandList * CreateCommandList() override;
+	LibMCDriver_OPCUA_int64 ReadInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const LibMCDriver_OPCUA::eUAIntegerType eNodeType)  override;
 
-	IPLCCommand * CreateCommand(const std::string & sCommandName) override;
+	LibMCDriver_OPCUA_double ReadDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const LibMCDriver_OPCUA::eUADoubleType eNodeType) override;
 
-	void StartJournaling() override;
+	std::string ReadString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName) override;
 
-	void StopJournaling() override;
+	void WriteInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const LibMCDriver_OPCUA::eUAIntegerType eNodeType, const LibMCDriver_OPCUA_int64 nValue) override;
 
-	void RefreshJournal() override;
+	void WriteDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const LibMCDriver_OPCUA::eUADoubleType eNodeType, const LibMCDriver_OPCUA_double dValue) override;
 
-	virtual void onLog(const std::string& sMessage, opcUA_LogLevel level, opcUA_LogCategory category) override;
+	void WriteString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const std::string& sValue) override;
 
 };
 

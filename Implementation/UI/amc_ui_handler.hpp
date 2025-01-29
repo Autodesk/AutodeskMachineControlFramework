@@ -92,22 +92,7 @@ namespace AMC {
 
 	
 
-	class CUIHandleEventResponse {
-	private:
-		uint32_t m_nErrorCode;
-		std::string m_sErrorMessage;
-
-		std::vector<PUIClientAction> m_clientActions;
-		
-	public:
-		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::vector<PUIClientAction> & clientActions);
-
-		uint32_t getErrorCode();
-
-		std::string getErrorMessage();
-
-		std::vector<PUIClientAction> & getClientActions ();
-	};
+	
 
 	class CUIHandler : public CUIModule_UIEventHandler {
 	protected:
@@ -174,7 +159,7 @@ namespace AMC {
 
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		CUIHandleEventResponse handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sEventPayloadJSON, PAPIAuth pAPIAuth);
+		CUIHandleEventResponse handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sEventFormPayloadJSON, const std::string & sEventParameterJSON, PAPIAuth pAPIAuth);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
 

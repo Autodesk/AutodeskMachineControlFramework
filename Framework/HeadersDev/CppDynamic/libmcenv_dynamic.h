@@ -198,6 +198,24 @@ typedef LibMCEnvResult (*PLibMCEnvCryptoContext_NormalizeUUIDStringPtr) (LibMCEn
 */
 typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr) (LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions);
 
+/**
+* Returns the PNG storage format.
+*
+* @param[in] pPNGImageStoreOptions - PNGImageStoreOptions instance.
+* @param[out] pPNGStorageFormat - PNG Format of image
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_GetStorageFormatPtr) (LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions, LibMCEnv::ePNGStorageFormat * pPNGStorageFormat);
+
+/**
+* Sets the PNG storage format.
+*
+* @param[in] pPNGImageStoreOptions - PNGImageStoreOptions instance.
+* @param[in] ePNGStorageFormat - new PNG Format of image
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr) (LibMCEnv_PNGImageStoreOptions pPNGImageStoreOptions, LibMCEnv::ePNGStorageFormat ePNGStorageFormat);
+
 /*************************************************************************************************************************
  Class definition for PNGImageData
 **************************************************************************************************************************/
@@ -213,7 +231,7 @@ typedef LibMCEnvResult (*PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvPNGImageData_GetSizeInPixelsPtr) (LibMCEnv_PNGImageData pPNGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
 
 /**
-* Retrieves encoded data stream of image object.
+* Retrieves encoded PNG data of image object.
 *
 * @param[in] pPNGImageData - PNGImageData instance.
 * @param[in] nPNGDataBufferSize - Number of elements in buffer
@@ -222,6 +240,61 @@ typedef LibMCEnvResult (*PLibMCEnvPNGImageData_GetSizeInPixelsPtr) (LibMCEnv_PNG
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvPNGImageData_GetPNGDataStreamPtr) (LibMCEnv_PNGImageData pPNGImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
+
+/**
+* Writes encoded PNG data into a stream object.
+*
+* @param[in] pPNGImageData - PNGImageData instance.
+* @param[in] pStream - Stream to write to.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvPNGImageData_WriteToStreamPtr) (LibMCEnv_PNGImageData pPNGImageData, LibMCEnv_TempStreamWriter pStream);
+
+/*************************************************************************************************************************
+ Class definition for JPEGImageStoreOptions
+**************************************************************************************************************************/
+
+/**
+* Resets Options to default.
+*
+* @param[in] pJPEGImageStoreOptions - JPEGImageStoreOptions instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr) (LibMCEnv_JPEGImageStoreOptions pJPEGImageStoreOptions);
+
+/*************************************************************************************************************************
+ Class definition for JPEGImageData
+**************************************************************************************************************************/
+
+/**
+* Returns image pixel sizes.
+*
+* @param[in] pJPEGImageData - JPEGImageData instance.
+* @param[out] pPixelSizeX - Number of pixels in X
+* @param[out] pPixelSizeY - Number of pixels in Y
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJPEGImageData_GetSizeInPixelsPtr) (LibMCEnv_JPEGImageData pJPEGImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
+
+/**
+* Retrieves encoded JPEG data of image object.
+*
+* @param[in] pJPEGImageData - JPEGImageData instance.
+* @param[in] nJPEGDataBufferSize - Number of elements in buffer
+* @param[out] pJPEGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pJPEGDataBuffer - uint8  buffer of JPEG Data stream.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJPEGImageData_GetJPEGDataStreamPtr) (LibMCEnv_JPEGImageData pJPEGImageData, const LibMCEnv_uint64 nJPEGDataBufferSize, LibMCEnv_uint64* pJPEGDataNeededCount, LibMCEnv_uint8 * pJPEGDataBuffer);
+
+/**
+* Writes encoded JPEG data into a stream object.
+*
+* @param[in] pJPEGImageData - JPEGImageData instance.
+* @param[in] pStream - Stream to write to.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJPEGImageData_WriteToStreamPtr) (LibMCEnv_JPEGImageData pJPEGImageData, LibMCEnv_TempStreamWriter pStream);
 
 /*************************************************************************************************************************
  Class definition for ImageData
@@ -296,6 +369,15 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_GetSizeInPixelsPtr) (LibMCEnv_ImageD
 typedef LibMCEnvResult (*PLibMCEnvImageData_ResizeImagePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY);
 
 /**
+* Creates PNG Options for storing the PNG file.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[out] pPNGStorageOptions - Encoding options for the image.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_CreatePNGOptionsPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions * pPNGStorageOptions);
+
+/**
 * Creates PNG Image out of the pixel data.
 *
 * @param[in] pImageData - ImageData instance.
@@ -306,31 +388,23 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_ResizeImagePtr) (LibMCEnv_ImageData 
 typedef LibMCEnvResult (*PLibMCEnvImageData_CreatePNGImagePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_PNGImageStoreOptions pPNGStorageOptions, LibMCEnv_PNGImageData * pPNGImage);
 
 /**
-* Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
+* Creates PNG Options for storing the PNG file.
 *
 * @param[in] pImageData - ImageData instance.
+* @param[out] pJPEGStorageOptions - Encoding options for the image.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvImageData_EncodePNGPtr) (LibMCEnv_ImageData pImageData);
+typedef LibMCEnvResult (*PLibMCEnvImageData_CreateJPEGOptionsPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_JPEGImageStoreOptions * pJPEGStorageOptions);
 
 /**
-* Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+* Creates JPEG Image out of the pixel data.
 *
 * @param[in] pImageData - ImageData instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[out] pPNGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pPNGDataBuffer - uint8  buffer of PNG Data stream.
+* @param[in] pJPEGStorageOptions - Optional encoding options for the image.
+* @param[out] pJPEGImage - Image data.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvImageData_GetEncodedPNGDataPtr) (LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer);
-
-/**
-* Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
-*
-* @param[in] pImageData - ImageData instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvImageData_ClearEncodedPNGDataPtr) (LibMCEnv_ImageData pImageData);
+typedef LibMCEnvResult (*PLibMCEnvImageData_CreateJPEGImagePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_JPEGImageStoreOptions pJPEGStorageOptions, LibMCEnv_JPEGImageData * pJPEGImage);
 
 /**
 * Sets all pixels to a single value.
@@ -391,6 +465,216 @@ typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelRangePtr) (LibMCEnv_ImageDat
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelRangePtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer);
+
+/**
+* Returns a subset of an image or the whole image data. Please use this function instead of GetPixelRange.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[out] pValueNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pValueBuffer - uint8  buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on target format.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_GetPixelsPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eTargetFormat, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer);
+
+/**
+* Exchanges a subset of an image or the whole image data. Please use this function instead of SetPixelRange.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+* @param[in] nValueBufferSize - Number of elements in buffer
+* @param[in] pValueBuffer - uint8 buffer of New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelsPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eSourceFormat, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer);
+
+/**
+* Sets all pixels from a raw YUY2 color array.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nYUY2DataBufferSize - Number of elements in buffer
+* @param[in] pYUY2DataBuffer - uint8 buffer of Pixel array in YUY2 color format (2 bytes per pixels). The array MUST have a length of PixelSizeX * PixelSizeY * 2.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_SetPixelsFromRawYUY2DataPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8 * pYUY2DataBuffer);
+
+/**
+* Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+* @param[in] pTarget - Memory address to write to. The pixel value of StartX/StartY will be written to this address.
+* @param[in] nYLineOffset - Offset to add to the Target pointer to advance a line (in bytes).
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_WriteToRawMemoryPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eTargetFormat, LibMCEnv_pvoid pTarget, LibMCEnv_uint32 nYLineOffset);
+
+/**
+* Reads an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the source.
+*
+* @param[in] pImageData - ImageData instance.
+* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+* @param[in] pSource - Memory address to read from. The pixel value of StartX/StartY will be written to this address.
+* @param[in] nYLineOffset - Offset to add to the source pointer to advance a line (in bytes).
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageData_ReadFromRawMemoryPtr) (LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nStartX, LibMCEnv_uint32 nStartY, LibMCEnv_uint32 nCountX, LibMCEnv_uint32 nCountY, LibMCEnv::eImagePixelFormat eSourceFormat, LibMCEnv_pvoid pSource, LibMCEnv_uint32 nYLineOffset);
+
+/*************************************************************************************************************************
+ Class definition for ImageLoader
+**************************************************************************************************************************/
+
+/**
+* creates an image object from a PNG data stream.
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nPNGDataBufferSize - Number of elements in buffer
+* @param[in] pPNGDataBuffer - uint8 buffer of PNG Data as byte array. Fails if image cannot be loaded.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageLoader_LoadPNGImagePtr) (LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from a JPEG data stream.
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nJPEGDataBufferSize - Number of elements in buffer
+* @param[in] pJPEGDataBuffer - uint8 buffer of JPEG Data as byte array. Fails if image cannot be loaded.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageLoader_LoadJPEGImagePtr) (LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nJPEGDataBufferSize, const LibMCEnv_uint8 * pJPEGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from raw RGB24 Data. (3 bytes per pixel)
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nRGB24DataBufferSize - Number of elements in buffer
+* @param[in] pRGB24DataBuffer - uint8 buffer of RGB 24 data. MUST contain PixelSizeX * PixelSizeY * 3 bytes.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use in memory.
+* @param[out] pImageDataInstance - Image instance with the data.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageLoader_CreateImageFromRawRGB24DataPtr) (LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nRGB24DataBufferSize, const LibMCEnv_uint8 * pRGB24DataBuffer, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from raw RGBA32 Data. (4 bytes per pixel)
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nRGBA32DataBufferSize - Number of elements in buffer
+* @param[in] pRGBA32DataBuffer - uint8 buffer of RGBA 32 data. MUST contain PixelSizeX * PixelSizeY * 4 bytes.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use in memory.
+* @param[out] pImageDataInstance - Image instance with the data.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageLoader_CreateImageFromRawRGBA32DataPtr) (LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nRGBA32DataBufferSize, const LibMCEnv_uint8 * pRGBA32DataBuffer, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from raw YUY2 Data. (2 bytes per pixel)
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] nYUY2DataBufferSize - Number of elements in buffer
+* @param[in] pYUY2DataBuffer - uint8 buffer of YUY2 data. MUST contain PixelSizeX * PixelSizeY * 2 bytes.
+* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use in memory.
+* @param[out] pImageDataInstance - Image instance with the data.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvImageLoader_CreateImageFromRawYUY2DataPtr) (LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8 * pYUY2DataBuffer, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/*************************************************************************************************************************
+ Class definition for VideoStream
+**************************************************************************************************************************/
+
+/*************************************************************************************************************************
+ Class definition for ScatterPlot
+**************************************************************************************************************************/
+
+/**
+* Global UUID of the plot.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Scatter plot UUID., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvScatterPlot_GetUUIDPtr) (LibMCEnv_ScatterPlot pScatterPlot, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the point count of the plot.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @param[out] pPointCount - Point Count of the plot
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvScatterPlot_GetPointCountPtr) (LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_uint32 * pPointCount);
+
+/**
+* Returns the position of a data point.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @param[in] nPointIndex - Index of the point in the plot. 0-based. MUST be smaller than PointCount
+* @param[out] pX - X value of the point in mm
+* @param[out] pY - Y value of the point in mm
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvScatterPlot_GetPointPositionPtr) (LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_uint32 nPointIndex, LibMCEnv_double * pX, LibMCEnv_double * pY);
+
+/**
+* Returns the bounding box of the scatter plot data. Returns 0/0-0/0 in case no points are available.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @param[out] pMinX - Minimum X value of the point in mm
+* @param[out] pMinY - Minimum Y value of the point in mm
+* @param[out] pMaxX - Maximum X value of the point in mm
+* @param[out] pMaxY - Maximum Y value of the point in mm
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvScatterPlot_GetBoundariesPtr) (LibMCEnv_ScatterPlot pScatterPlot, LibMCEnv_double * pMinX, LibMCEnv_double * pMinY, LibMCEnv_double * pMaxX, LibMCEnv_double * pMaxY);
+
+/**
+* Release the scatter plot and clear its memory. All accessing code will lose access to the data.
+*
+* @param[in] pScatterPlot - ScatterPlot instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvScatterPlot_ReleasePtr) (LibMCEnv_ScatterPlot pScatterPlot);
 
 /*************************************************************************************************************************
  Class definition for DiscreteFieldData2DStoreOptions
@@ -681,6 +965,103 @@ typedef LibMCEnvResult (*PLibMCEnvDataTableCSVWriteOptions_GetSeparatorPtr) (Lib
 typedef LibMCEnvResult (*PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr) (LibMCEnv_DataTableCSVWriteOptions pDataTableCSVWriteOptions, const char * pSeparator);
 
 /*************************************************************************************************************************
+ Class definition for DataTableScatterPlotOptions
+**************************************************************************************************************************/
+
+/**
+* Sets the column to use for the X Axis value. Column MUST exist.
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] pColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+* @param[in] dScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+* @param[in] dOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_SetXAxisColumnPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor);
+
+/**
+* Returns the column to use for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] nColumnIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pColumnIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pColumnIdentifierBuffer -  buffer of Identifier of the column. Empty if not set yet., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_GetXAxisColumnPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const LibMCEnv_uint32 nColumnIdentifierBufferSize, LibMCEnv_uint32* pColumnIdentifierNeededChars, char * pColumnIdentifierBuffer);
+
+/**
+* Returns the scaling for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[out] pScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_GetXAxisScalingPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pScaleFactor);
+
+/**
+* Returns the scaling for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[out] pOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_GetXAxisOffsetPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pOffsetFactor);
+
+/**
+* Sets the column to use for the Y Axis value. Column MUST exist.
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] pColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+* @param[in] dScaleFactor - Scale factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+* @param[in] dOffsetFactor - Offset factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_SetYAxisColumnPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor);
+
+/**
+* Returns the column to use for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] nColumnIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pColumnIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pColumnIdentifierBuffer -  buffer of Identifier of the column. Empty if not set yet., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_GetYAxisColumnPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const LibMCEnv_uint32 nColumnIdentifierBufferSize, LibMCEnv_uint32* pColumnIdentifierNeededChars, char * pColumnIdentifierBuffer);
+
+/**
+* Returns the scaling for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[out] pScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_GetYAxisScalingPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pScaleFactor);
+
+/**
+* Returns the scaling for the X Axis value..
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[out] pOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_GetYAxisOffsetPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, LibMCEnv_double * pOffsetFactor);
+
+/**
+* Adds a data channel. Column MUST exist.
+*
+* @param[in] pDataTableScatterPlotOptions - DataTableScatterPlotOptions instance.
+* @param[in] pChannelIdentifier - Identifier of the channel. Must be alphanumeric and not empty.
+* @param[in] pColumnIdentifier - Identifier of the column to use. Must be alphanumeric and not empty.
+* @param[in] dScaleFactor - Scale factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+* @param[in] dOffsetFactor - Offset factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+* @param[in] nColor - Base color to use.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTableScatterPlotOptions_AddDataChannelPtr) (LibMCEnv_DataTableScatterPlotOptions pDataTableScatterPlotOptions, const char * pChannelIdentifier, const char * pColumnIdentifier, LibMCEnv_double dScaleFactor, LibMCEnv_double dOffsetFactor, LibMCEnv_uint32 nColor);
+
+/*************************************************************************************************************************
  Class definition for DataTable
 **************************************************************************************************************************/
 
@@ -949,6 +1330,25 @@ typedef LibMCEnvResult (*PLibMCEnvDataTable_WriteDataToStreamPtr) (LibMCEnv_Data
 */
 typedef LibMCEnvResult (*PLibMCEnvDataTable_LoadFromStreamPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_StreamReader pStream);
 
+/**
+* Creates an options object for scatter plot computation.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[out] pScatterPlotOptions - DataTableScatterPlotOptions Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_CreateScatterPlotOptionsPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableScatterPlotOptions * pScatterPlotOptions);
+
+/**
+* Creates a scatterplot from the data table according to its input parameters.
+*
+* @param[in] pDataTable - DataTable instance.
+* @param[in] pScatterPlotOptions - ScatterPlot Options to use
+* @param[out] pScatterPlot - ScatterPlot Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDataTable_CalculateScatterPlotPtr) (LibMCEnv_DataTable pDataTable, LibMCEnv_DataTableScatterPlotOptions pScatterPlotOptions, LibMCEnv_ScatterPlot * pScatterPlot);
+
 /*************************************************************************************************************************
  Class definition for DataSeries
 **************************************************************************************************************************/
@@ -1036,11 +1436,12 @@ typedef LibMCEnvResult (*PLibMCEnvDataSeries_SetAllEntriesPtr) (LibMCEnv_DataSer
 *
 * @param[in] pDataSeries - DataSeries instance.
 * @param[in] pJournalVariable - Journal variable to sample.
-* @param[in] nNumberOfSamples - Number of samples to generate.
-* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+* @param[in] nStartTimeStamp - Start time stamp to sample. MUST be smaller than end time stamp.
+* @param[in] nEndTimeStamp - End time stamp to sample. MUST be larger than start time stamp.
+* @param[in] nNumberOfSamples - Number of samples to generate. MUST be greater than 1.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvDataSeries_SampleJournalVariablePtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta);
+typedef LibMCEnvResult (*PLibMCEnvDataSeries_SampleJournalVariablePtr) (LibMCEnv_DataSeries pDataSeries, LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeStamp, LibMCEnv_uint64 nEndTimeStamp, LibMCEnv_uint32 nNumberOfSamples);
 
 /**
 * Returns the incrementing change version of the data series.
@@ -2312,51 +2713,51 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_FindCustomSegmentAttributeInfoPt
 * Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[out] pHatchCount - Hatch count of segment.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint32 * pHatchCount);
 
 /**
 * Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[out] pHatchCount - Hatch count of segment.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint32 * pHatchCount);
 
 /**
 * Retrieves the assigned segment profile uuid.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nProfileUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pProfileUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pProfileUUIDBuffer -  buffer of Segment Profile UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nProfileUUIDBufferSize, LibMCEnv_uint32* pProfileUUIDNeededChars, char * pProfileUUIDBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint32 nProfileUUIDBufferSize, LibMCEnv_uint32* pProfileUUIDNeededChars, char * pProfileUUIDBuffer);
 
 /**
 * Retrieves an assigned profile custom value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[out] pHasValue - Returns true if value exist.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentProfileHasValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, bool * pHasValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentProfileHasValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, bool * pHasValue);
 
 /**
 * Retrieves an assigned profile custom value. Fails if value does not exist.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
@@ -2364,13 +2765,13 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentProfileHasValuePtr) (LibM
 * @param[out] pValueBuffer -  buffer of String Value., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Retrieves an assigned profile custom value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] pDefaultValue - Default value if value does not exist.
@@ -2379,117 +2780,127 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibM
 * @param[out] pValueBuffer -  buffer of String Value., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[out] pValue - Double Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, LibMCEnv_double * pValue);
 
 /**
 * Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] dDefaultValue - Default value if value does not exist.
 * @param[out] pValue - Double Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileDoubleValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
 
 /**
 * Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[out] pValue - Integer Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, LibMCEnv_int64 * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, LibMCEnv_int64 * pValue);
 
 /**
 * Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] nDefaultValue - Default value if value does not exist.
 * @param[out] pValue - Integer Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileIntegerValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue);
 
 /**
 * Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[out] pValue - Boolean Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileBoolValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, bool * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileBoolValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, bool * pValue);
 
 /**
 * Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pNamespace - Namespace to query for.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] bDefaultValue - Default value if value does not exist.
 * @param[out] pValue - Boolean Value.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileBoolValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pNamespace, const char * pValueName, bool bDefaultValue, bool * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileBoolValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const char * pNamespace, const char * pValueName, bool bDefaultValue, bool * pValue);
 
 /**
 * Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] eValueType - Enum to query for. MUST NOT be custom.
 * @param[out] pValue - Double Value
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
 
 /**
 * Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] eValueType - Enum to query for. MUST NOT be custom.
 * @param[in] dDefaultValue - Default value if value does not exist.
 * @param[out] pValue - Double Value
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValueDefPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
 
 /**
 * Retrieves the assigned segment part uuid.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nPartUUIDBufferSize - size of the buffer (including trailing 0)
 * @param[out] pPartUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pPartUUIDBuffer -  buffer of Segment Part UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPartUUIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nPartUUIDBufferSize, LibMCEnv_uint32* pPartUUIDNeededChars, char * pPartUUIDBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPartUUIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint32 nPartUUIDBufferSize, LibMCEnv_uint32* pPartUUIDNeededChars, char * pPartUUIDBuffer);
+
+/**
+* Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pLocalPartID - Local Part ID of the segment
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint32 * pLocalPartID);
 
 /**
 * Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
@@ -2505,49 +2916,86 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) (LibMC
 * Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nPointDataBufferSize - Number of elements in buffer
 * @param[out] pPointDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pPointDataBuffer - Position2D  buffer of The point data array. Positions are absolute in units.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer);
 
 /**
 * Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nHatchDataBufferSize - Number of elements in buffer
 * @param[out] pHatchDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pHatchDataBuffer - Hatch2D  buffer of The hatch data array. Positions are absolute in units.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer);
 
 /**
 * Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nPointDataBufferSize - Number of elements in buffer
 * @param[out] pPointDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pPointDataBuffer - FloatPosition2D  buffer of The point data array. Positions are absolute in mm.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer);
 
 /**
 * Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nHatchDataBufferSize - Number of elements in buffer
 * @param[out] pHatchDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pHatchDataBuffer - FloatHatch2D  buffer of The hatch data array. Positions are absolute in mm.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer);
+
+/**
+* Returns if a segment has override factors attached to its points.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+* @param[out] pHasOverrideFactors - Returns true if the Segment given has an override factor of a certain type.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_SegmentHasOverrideFactorsPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, bool * pHasOverrideFactors);
+
+/**
+* Retrieves factor overrides for a specific segment. For type hatch, the points are taken pairwise.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+* @param[in] nOverrideDataBufferSize - Number of elements in buffer
+* @param[out] pOverrideDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pOverrideDataBuffer - double  buffer of The override factor array. Will return as many override factors as points in the segment.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointOverridesPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, const LibMCEnv_uint64 nOverrideDataBufferSize, LibMCEnv_uint64* pOverrideDataNeededCount, LibMCEnv_double * pOverrideDataBuffer);
+
+/**
+* Retrieves factor overrides for a specific segment. Fails if segment type is not hatch.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+* @param[in] nOverrideDataBufferSize - Number of elements in buffer
+* @param[out] pOverrideDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pOverrideDataBuffer - Hatch2DOverrides  buffer of The override factor array. Will return as many override factors as hatches in the segment. Each element contains one factor for the first point or the second point.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchOverridesPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, const LibMCEnv_uint64 nOverrideDataBufferSize, LibMCEnv_uint64* pOverrideDataNeededCount, LibMCEnv::sHatch2DOverrides * pOverrideDataBuffer);
 
 /**
 * Retrieves the layers Z Value in units.
@@ -3280,10 +3728,11 @@ typedef LibMCEnvResult (*PLibMCEnvBuildExecution_GetMetaDataStringPtr) (LibMCEnv
 * Loads the journal that is associated with the build execution and returns an accessor instance.
 *
 * @param[in] pBuildExecution - BuildExecution instance.
+* @param[in] nCacheMemoryQuotaInMegabytes - Memory quota to use for cached reading in bytes. MUST be larger than 16 and smaller than 4096.
 * @param[out] pJournalHandler - Journal instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadAttachedJournalPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_JournalHandler * pJournalHandler);
+typedef LibMCEnvResult (*PLibMCEnvBuildExecution_LoadAttachedJournalPtr) (LibMCEnv_BuildExecution pBuildExecution, LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes, LibMCEnv_JournalHandler * pJournalHandler);
 
 /*************************************************************************************************************************
  Class definition for BuildExecutionIterator
@@ -4113,6 +4562,328 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_SetBoolValuePtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvXMLDocumentAttribute_RemovePtr) (LibMCEnv_XMLDocumentAttribute pXMLDocumentAttribute);
 
 /*************************************************************************************************************************
+ Class definition for JSONObject
+**************************************************************************************************************************/
+
+/**
+* Returns if a member with a specific name exist.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pMemberExists - returns if a member with a specific name exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_HasMemberPtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pMemberExists);
+
+/**
+* Returns the number of members.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[out] pCount - returns the number of members.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetMemberCountPtr) (LibMCEnv_JSONObject pJSONObject, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns the name of a member by index.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] nIndex - Index of the member, 0-based. Fails if larger or equal than MemberCount
+* @param[in] pName - Name of the member.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetMemberNamePtr) (LibMCEnv_JSONObject pJSONObject, LibMCEnv_uint64 nIndex, const char * pName);
+
+/**
+* Returns the member type. Returns unknown, if the member does not exist.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pMemberType - The type of the member..
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetMemberTypePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv::eJSONObjectType * pMemberType);
+
+/**
+* Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Member value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetIntegerValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_int64 * pValue);
+
+/**
+* Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetDoubleValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_double * pValue);
+
+/**
+* Returns a member as boolean value. Fails if member is of type Array or Object or Double.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetBoolValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pValue);
+
+/**
+* Returns a member as object value. Fails if member is not of type Object.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetObjectValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONObject * pValue);
+
+/**
+* Returns a member as object value. Fails if member is not of type Array.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_GetArrayValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONArray * pValue);
+
+/**
+* Removes a member with a specific name. Does nothing if Member does not exist.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_RemoveMemberPtr) (LibMCEnv_JSONObject pJSONObject, const char * pName);
+
+/**
+* Adds a member as string value. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[in] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, const char * pValue);
+
+/**
+* Adds a member as integer value. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddIntegerValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_int64 * pValue);
+
+/**
+* Adds a member as double value. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddDoubleValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_double * pValue);
+
+/**
+* Adds a member as bool value. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddBoolValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, bool * pValue);
+
+/**
+* Returns a member as object value. Returns empty object. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddObjectValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONObject * pValue);
+
+/**
+* Returns a member as object value. Returns empty array. Fails if member already exists.
+*
+* @param[in] pJSONObject - JSONObject instance.
+* @param[in] pName - Name of the member.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONObject_AddArrayValuePtr) (LibMCEnv_JSONObject pJSONObject, const char * pName, LibMCEnv_JSONArray * pValue);
+
+/*************************************************************************************************************************
+ Class definition for JSONArray
+**************************************************************************************************************************/
+
+/**
+* Returns the number of elements.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pCount - returns the number of elements.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetElementCountPtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns the element type. Returns unknown, if the element does not exist.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pElementType - The type of the element..
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetElementTypePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv::eJSONObjectType * pElementType);
+
+/**
+* Returns a element as string value. Fails if element is of type Array or Object. Returns true or false in terms of Boolean value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Element value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns a element as integer value. Fails if element is of type Array or Object, or a non-double string.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetIntegerValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv_int64 * pValue);
+
+/**
+* Returns a element as double value. Fails if element is of type Array or Object, or a non-integer string.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetDoubleValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv_double * pValue);
+
+/**
+* Returns a element as boolean value. Fails if element is of type Array or Object or Double.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetBoolValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, bool * pValue);
+
+/**
+* Returns a element as object value. Fails if element is not of type Object.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetObjectValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv_JSONObject * pValue);
+
+/**
+* Returns a element as object value. Fails if element is not of type Array.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @param[out] pValue - Element value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_GetArrayValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex, LibMCEnv_JSONArray * pValue);
+
+/**
+* Removes an element with a specific index. Does nothing if Element does not exist.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_RemoveElementPtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_uint64 nIndex);
+
+/**
+* Adds an element as string value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[in] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddValuePtr) (LibMCEnv_JSONArray pJSONArray, const char * pValue);
+
+/**
+* Adds a member as integer value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddIntegerValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_int64 * pValue);
+
+/**
+* Adds a member as double value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddDoubleValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_double * pValue);
+
+/**
+* Adds a member as bool value.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddBoolValuePtr) (LibMCEnv_JSONArray pJSONArray, bool * pValue);
+
+/**
+* Returns a member as object value. Returns empty object.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddObjectValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_JSONObject * pValue);
+
+/**
+* Returns a member as object value. Returns empty array.
+*
+* @param[in] pJSONArray - JSONArray instance.
+* @param[out] pValue - Member value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJSONArray_AddArrayValuePtr) (LibMCEnv_JSONArray pJSONArray, LibMCEnv_JSONArray * pValue);
+
+/*************************************************************************************************************************
  Class definition for XMLDocumentNode
 **************************************************************************************************************************/
 
@@ -4508,6 +5279,15 @@ typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_RemoveChildrenWithNamePtr) (Li
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_RemovePtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode);
+
+/**
+* Copies all content from another node in a recursive way.
+*
+* @param[in] pXMLDocumentNode - XMLDocumentNode instance.
+* @param[in] pOtherNode - other XML Document Node. Does not need to live in the same document.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvXMLDocumentNode_CopyFromPtr) (LibMCEnv_XMLDocumentNode pXMLDocumentNode, LibMCEnv_XMLDocumentNode pOtherNode);
 
 /*************************************************************************************************************************
  Class definition for XMLDocumentNodes
@@ -5134,6 +5914,60 @@ typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_LogInfoPtr) (LibMCEn
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_SleepPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, LibMCEnv_uint32 nDelay);
 
+/**
+* Gets a string parameter. Fails if parameter does not exist.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of parameter, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetStringParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of parameter, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetUUIDParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetDoubleParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_double * pValue);
+
+/**
+* Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetIntegerParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_int64 * pValue);
+
+/**
+* Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Value of parameter
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverStatusUpdateSession_GetBoolParameterPtr) (LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, bool * pValue);
+
 /*************************************************************************************************************************
  Class definition for DriverEnvironment
 **************************************************************************************************************************/
@@ -5232,7 +6066,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateDataTablePtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData);
 
 /**
-* retrieves if attached driver has data with the given identifier.
+* retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pIdentifier - identifier of the binary data in the driver package.
@@ -5365,7 +6199,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterIntegerParameterPtr)
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, bool bDefaultValue);
 
 /**
-* sets a string parameter
+* Sets a string parameter. For getting a string, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5375,7 +6209,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr) (L
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetStringParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
 
 /**
-* sets a uuid parameter
+* sets a uuid parameter. For getting a UUID, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5385,7 +6219,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetStringParameterPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetUUIDParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
 
 /**
-* sets a double parameter
+* sets a double parameter. For getting a Double, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5395,7 +6229,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetUUIDParameterPtr) (LibMCE
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetDoubleParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_double dValue);
 
 /**
-* sets an int parameter
+* sets an int parameter. For getting an Integer, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5405,7 +6239,7 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetDoubleParameterPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetIntegerParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_int64 nValue);
 
 /**
-* sets a bool parameter
+* sets a bool parameter. For getting a bool, use a Status Update Session.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pParameterName - Parameter Name
@@ -5483,18 +6317,13 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_LogInfoPtr) (LibMCEnv_Driver
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateEmptyImagePtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* creates an image object from a PNG data stream.
+* creates an image loader object.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[in] pPNGDataBuffer - uint8 buffer of DPI Value in X. MUST be positive.
-* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @param[out] pImageLoaderInstance - Image loader instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_LoadPNGImagePtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateImageLoaderPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
 
 /**
 * Creates an empty discrete field.
@@ -6248,45 +7077,6 @@ typedef LibMCEnvResult (*PLibMCEnvUniformJournalSampling_GetAllSamplesPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetVariableNamePtr) (LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
-* Returns the beginning time stamp of the available data point.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pRecordingStartInMicroSeconds - Start Timestamp of Recording in microseconds.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetStartTimeStampPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingStartInMicroSeconds);
-
-/**
-* Returns the beginning time stamp of the available data point.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pRecordingEndInMicroSeconds - End Timestamp of Recording in microseconds.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_GetEndTimeStampPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 * pRecordingEndInMicroSeconds);
-
-/**
-* Calculates the average value over the full available time interval.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[out] pAverageValue - Average value of the variable.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeFullAveragePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_double * pAverageValue);
-
-/**
-* Calculates the average value over a time interval. Fails if no data is available in this time interval.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
-* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
-* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-* @param[out] pAverageValue - Average value of the variable.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeAveragePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nEndTimeInMicroSeconds, bool bClampInterval, LibMCEnv_double * pAverageValue);
-
-/**
 * Computes a single sample at a time. Fails if no data is available at this time value.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
@@ -6294,44 +7084,17 @@ typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeAveragePtr) (LibMCEnv_J
 * @param[out] pSampleValue - Value of the variable at the time step.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeSamplePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_double * pSampleValue);
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeDoubleSamplePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_double * pSampleValue);
 
 /**
-* Retrieves sample values for an interval. Interval MUST be inside the available recording time.
+* Computes a single sample at a time. Fails if no data is available at this time value.
 *
 * @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
-* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
-* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-* @param[out] pJournalSampling - Returns an instance with the sampling results.
+* @param[in] nTimeInMicroSeconds - Timestamp to check.
+* @param[out] pSampleValue - Value of the variable at the time step in integer.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_double dMovingAverageDelta, bool bClampInterval, LibMCEnv_UniformJournalSampling * pJournalSampling);
-
-/**
-* Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
-* @param[out] pJournalSampling - Returns an instance with the sampling results.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeInMicroSeconds, LibMCEnv_uint64 nIntervalIncrement, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pJournalSampling);
-
-/**
-* Retrieves the raw timestream data of the variable.
-*
-* @param[in] pJournalVariable - JournalVariable instance.
-* @param[in] nTimeStreamEntriesBufferSize - Number of elements in buffer
-* @param[out] pTimeStreamEntriesNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pTimeStreamEntriesBuffer - TimeStreamEntry  buffer of All change events of the variable in the accessed interval.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) (LibMCEnv_JournalVariable pJournalVariable, const LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer);
+typedef LibMCEnvResult (*PLibMCEnvJournalVariable_ComputeIntegerSamplePtr) (LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_int64 * pSampleValue);
 
 /*************************************************************************************************************************
  Class definition for Alert
@@ -6521,23 +7284,10 @@ typedef LibMCEnvResult (*PLibMCEnvLogEntryList_GetEntryTimePtr) (LibMCEnv_LogEnt
 *
 * @param[in] pJournalHandler - JournalHandler instance.
 * @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
-* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
 * @param[out] pJournalVariable - Journal Instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable);
-
-/**
-* Retrieves the history of a given variable in the system journal for an arbitrary time interval.
-*
-* @param[in] pJournalHandler - JournalHandler instance.
-* @param[in] pVariableName - Variable name to analyse. Fails if Variable does not exist.
-* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
-* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
-* @param[out] pJournalVariable - Journal Instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_JournalVariable * pJournalVariable);
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariablePtr) (LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_JournalVariable * pJournalVariable);
 
 /**
 * Retrieves the reference start time of the journal.
@@ -6547,6 +7297,24 @@ typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveJournalVariableFromTime
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvJournalHandler_GetStartTimePtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Retrieves the end time of the journal recording.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pDateTimeInstance - DateTime Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_GetEndTimePtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Retrieves the life time of the journal. Which is EndTime minus StartTime.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pLifeTimeInMicroseconds - Life Time.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_GetJournalLifeTimeInMicrosecondsPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 * pLifeTimeInMicroseconds);
 
 /**
 * Retrieves the current log entries of the journal.
@@ -7019,6 +7787,14 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_WaitForSignalPtr) (LibMCEnv_S
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetUnhandledSignalPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, LibMCEnv_SignalHandler * pHandlerInstance);
 
 /**
+* Clears all unhandled signals and marks them invalid.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_ClearAllUnhandledSignalsPtr) (LibMCEnv_StateEnvironment pStateEnvironment);
+
+/**
 * retrieves an unhandled signal from the current state machine by UUID.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -7298,6 +8074,16 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetIntegerParameterPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetBoolParameterPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
 /**
+* retrieves if the machine resources has data with the given identifier.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the machine resource package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasResourceDataPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
 * loads a plugin resource file into memory.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -7336,18 +8122,13 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadResourceStringPtr) (LibMC
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateEmptyImagePtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* creates an image object from a PNG data stream.
+* creates an image loader object.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[in] pPNGDataBuffer - uint8 buffer of DPI Value in X. MUST be positive.
-* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @param[out] pImageLoaderInstance - Image loader instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadPNGImagePtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateImageLoaderPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
 
 /**
 * Creates an empty discrete field.
@@ -7803,6 +8584,40 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LogOutPtr) (LibMCEnv_UIEnvironme
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ShowHintPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pHint, LibMCEnv_uint32 nTimeoutInMS);
 
 /**
+* retrieves if the machine resources has data with the given identifier.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the machine resource package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasResourceDataPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
+* loads a plugin resource file into memory.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - Number of elements in buffer
+* @param[out] pResourceDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pResourceDataBuffer - uint8  buffer of Resource Data Buffer.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LoadResourceDataPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
+
+/**
+* loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - size of the buffer (including trailing 0)
+* @param[out] pResourceDataNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pResourceDataBuffer -  buffer of Resource Data String., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LoadResourceStringPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pResourceName, const LibMCEnv_uint32 nResourceDataBufferSize, LibMCEnv_uint32* pResourceDataNeededChars, char * pResourceDataBuffer);
+
+/**
 * Shows a hint message in the user interface in a certain color.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -8125,18 +8940,13 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SetUIPropertyAsBoolPtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateEmptyImagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
-* creates an image object from a PNG data stream.
+* creates an image loader object.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[in] pPNGDataBuffer - uint8 buffer of DPI Value in X. MUST be positive.
-* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @param[out] pImageLoaderInstance - Image loader instance.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LoadPNGImagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateImageLoaderPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
 
 /**
 * Returns the global timer in milliseconds.
@@ -8556,6 +9366,56 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetStartDateTimePtr) (LibMCEnv_U
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SleepPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nDelay);
 
+/**
+* Checks if an external event parameter exists. DEPRECIATED, use GetExternalEventParameters instead.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[out] pParameterExists - Flag if the parameter exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HasExternalEventParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pParameterName, bool * pParameterExists);
+
+/**
+* Returns an external event string parameter. Fails if it does not exists or is not of type string. DEPRECIATED, use GetExternalEventParameters instead.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[in] nParameterValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pParameterValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pParameterValueBuffer -  buffer of Parameter value., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetExternalEventParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pParameterName, const LibMCEnv_uint32 nParameterValueBufferSize, LibMCEnv_uint32* pParameterValueNeededChars, char * pParameterValueBuffer);
+
+/**
+* Adds a return string value to return to the external event caller. DEPRECIATED, use GetExternalEventParameters instead.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[in] pReturnValue - Return value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_AddExternalEventResultValuePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, const char * pReturnValue);
+
+/**
+* Returns the external event parameters. This JSON Object was passed on from the external API.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pParameterValue - Parameter value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetExternalEventParametersPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JSONObject * pParameterValue);
+
+/**
+* Returns the external event results. This JSON Object will be passed on to an ext
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pParameterValue - Parameter value.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetExternalEventResultsPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_JSONObject * pParameterValue);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -8625,8 +9485,15 @@ typedef struct {
 	PLibMCEnvCryptoContext_CreateUUIDPtr m_CryptoContext_CreateUUID;
 	PLibMCEnvCryptoContext_NormalizeUUIDStringPtr m_CryptoContext_NormalizeUUIDString;
 	PLibMCEnvPNGImageStoreOptions_ResetToDefaultsPtr m_PNGImageStoreOptions_ResetToDefaults;
+	PLibMCEnvPNGImageStoreOptions_GetStorageFormatPtr m_PNGImageStoreOptions_GetStorageFormat;
+	PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr m_PNGImageStoreOptions_SetStorageFormat;
 	PLibMCEnvPNGImageData_GetSizeInPixelsPtr m_PNGImageData_GetSizeInPixels;
 	PLibMCEnvPNGImageData_GetPNGDataStreamPtr m_PNGImageData_GetPNGDataStream;
+	PLibMCEnvPNGImageData_WriteToStreamPtr m_PNGImageData_WriteToStream;
+	PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr m_JPEGImageStoreOptions_ResetToDefaults;
+	PLibMCEnvJPEGImageData_GetSizeInPixelsPtr m_JPEGImageData_GetSizeInPixels;
+	PLibMCEnvJPEGImageData_GetJPEGDataStreamPtr m_JPEGImageData_GetJPEGDataStream;
+	PLibMCEnvJPEGImageData_WriteToStreamPtr m_JPEGImageData_WriteToStream;
 	PLibMCEnvImageData_GetPixelFormatPtr m_ImageData_GetPixelFormat;
 	PLibMCEnvImageData_ChangePixelFormatPtr m_ImageData_ChangePixelFormat;
 	PLibMCEnvImageData_GetDPIPtr m_ImageData_GetDPI;
@@ -8634,15 +9501,30 @@ typedef struct {
 	PLibMCEnvImageData_GetSizeInMMPtr m_ImageData_GetSizeInMM;
 	PLibMCEnvImageData_GetSizeInPixelsPtr m_ImageData_GetSizeInPixels;
 	PLibMCEnvImageData_ResizeImagePtr m_ImageData_ResizeImage;
+	PLibMCEnvImageData_CreatePNGOptionsPtr m_ImageData_CreatePNGOptions;
 	PLibMCEnvImageData_CreatePNGImagePtr m_ImageData_CreatePNGImage;
-	PLibMCEnvImageData_EncodePNGPtr m_ImageData_EncodePNG;
-	PLibMCEnvImageData_GetEncodedPNGDataPtr m_ImageData_GetEncodedPNGData;
-	PLibMCEnvImageData_ClearEncodedPNGDataPtr m_ImageData_ClearEncodedPNGData;
+	PLibMCEnvImageData_CreateJPEGOptionsPtr m_ImageData_CreateJPEGOptions;
+	PLibMCEnvImageData_CreateJPEGImagePtr m_ImageData_CreateJPEGImage;
 	PLibMCEnvImageData_ClearPtr m_ImageData_Clear;
 	PLibMCEnvImageData_GetPixelPtr m_ImageData_GetPixel;
 	PLibMCEnvImageData_SetPixelPtr m_ImageData_SetPixel;
 	PLibMCEnvImageData_GetPixelRangePtr m_ImageData_GetPixelRange;
 	PLibMCEnvImageData_SetPixelRangePtr m_ImageData_SetPixelRange;
+	PLibMCEnvImageData_GetPixelsPtr m_ImageData_GetPixels;
+	PLibMCEnvImageData_SetPixelsPtr m_ImageData_SetPixels;
+	PLibMCEnvImageData_SetPixelsFromRawYUY2DataPtr m_ImageData_SetPixelsFromRawYUY2Data;
+	PLibMCEnvImageData_WriteToRawMemoryPtr m_ImageData_WriteToRawMemory;
+	PLibMCEnvImageData_ReadFromRawMemoryPtr m_ImageData_ReadFromRawMemory;
+	PLibMCEnvImageLoader_LoadPNGImagePtr m_ImageLoader_LoadPNGImage;
+	PLibMCEnvImageLoader_LoadJPEGImagePtr m_ImageLoader_LoadJPEGImage;
+	PLibMCEnvImageLoader_CreateImageFromRawRGB24DataPtr m_ImageLoader_CreateImageFromRawRGB24Data;
+	PLibMCEnvImageLoader_CreateImageFromRawRGBA32DataPtr m_ImageLoader_CreateImageFromRawRGBA32Data;
+	PLibMCEnvImageLoader_CreateImageFromRawYUY2DataPtr m_ImageLoader_CreateImageFromRawYUY2Data;
+	PLibMCEnvScatterPlot_GetUUIDPtr m_ScatterPlot_GetUUID;
+	PLibMCEnvScatterPlot_GetPointCountPtr m_ScatterPlot_GetPointCount;
+	PLibMCEnvScatterPlot_GetPointPositionPtr m_ScatterPlot_GetPointPosition;
+	PLibMCEnvScatterPlot_GetBoundariesPtr m_ScatterPlot_GetBoundaries;
+	PLibMCEnvScatterPlot_ReleasePtr m_ScatterPlot_Release;
 	PLibMCEnvDiscreteFieldData2DStoreOptions_ResetToDefaultsPtr m_DiscreteFieldData2DStoreOptions_ResetToDefaults;
 	PLibMCEnvDiscreteFieldData2D_GetDPIPtr m_DiscreteFieldData2D_GetDPI;
 	PLibMCEnvDiscreteFieldData2D_SetDPIPtr m_DiscreteFieldData2D_SetDPI;
@@ -8668,6 +9550,15 @@ typedef struct {
 	PLibMCEnvDiscreteFieldData2D_DuplicatePtr m_DiscreteFieldData2D_Duplicate;
 	PLibMCEnvDataTableCSVWriteOptions_GetSeparatorPtr m_DataTableCSVWriteOptions_GetSeparator;
 	PLibMCEnvDataTableCSVWriteOptions_SetSeparatorPtr m_DataTableCSVWriteOptions_SetSeparator;
+	PLibMCEnvDataTableScatterPlotOptions_SetXAxisColumnPtr m_DataTableScatterPlotOptions_SetXAxisColumn;
+	PLibMCEnvDataTableScatterPlotOptions_GetXAxisColumnPtr m_DataTableScatterPlotOptions_GetXAxisColumn;
+	PLibMCEnvDataTableScatterPlotOptions_GetXAxisScalingPtr m_DataTableScatterPlotOptions_GetXAxisScaling;
+	PLibMCEnvDataTableScatterPlotOptions_GetXAxisOffsetPtr m_DataTableScatterPlotOptions_GetXAxisOffset;
+	PLibMCEnvDataTableScatterPlotOptions_SetYAxisColumnPtr m_DataTableScatterPlotOptions_SetYAxisColumn;
+	PLibMCEnvDataTableScatterPlotOptions_GetYAxisColumnPtr m_DataTableScatterPlotOptions_GetYAxisColumn;
+	PLibMCEnvDataTableScatterPlotOptions_GetYAxisScalingPtr m_DataTableScatterPlotOptions_GetYAxisScaling;
+	PLibMCEnvDataTableScatterPlotOptions_GetYAxisOffsetPtr m_DataTableScatterPlotOptions_GetYAxisOffset;
+	PLibMCEnvDataTableScatterPlotOptions_AddDataChannelPtr m_DataTableScatterPlotOptions_AddDataChannel;
 	PLibMCEnvDataTable_AddColumnPtr m_DataTable_AddColumn;
 	PLibMCEnvDataTable_RemoveColumnPtr m_DataTable_RemoveColumn;
 	PLibMCEnvDataTable_ClearPtr m_DataTable_Clear;
@@ -8693,6 +9584,8 @@ typedef struct {
 	PLibMCEnvDataTable_WriteCSVToStreamPtr m_DataTable_WriteCSVToStream;
 	PLibMCEnvDataTable_WriteDataToStreamPtr m_DataTable_WriteDataToStream;
 	PLibMCEnvDataTable_LoadFromStreamPtr m_DataTable_LoadFromStream;
+	PLibMCEnvDataTable_CreateScatterPlotOptionsPtr m_DataTable_CreateScatterPlotOptions;
+	PLibMCEnvDataTable_CalculateScatterPlotPtr m_DataTable_CalculateScatterPlot;
 	PLibMCEnvDataSeries_GetNamePtr m_DataSeries_GetName;
 	PLibMCEnvDataSeries_GetUUIDPtr m_DataSeries_GetUUID;
 	PLibMCEnvDataSeries_ClearPtr m_DataSeries_Clear;
@@ -8850,6 +9743,9 @@ typedef struct {
 	PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr m_ToolpathLayer_GetSegmentHatchData;
 	PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr m_ToolpathLayer_GetSegmentPointDataInMM;
 	PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr m_ToolpathLayer_GetSegmentHatchDataInMM;
+	PLibMCEnvToolpathLayer_SegmentHasOverrideFactorsPtr m_ToolpathLayer_SegmentHasOverrideFactors;
+	PLibMCEnvToolpathLayer_GetSegmentPointOverridesPtr m_ToolpathLayer_GetSegmentPointOverrides;
+	PLibMCEnvToolpathLayer_GetSegmentHatchOverridesPtr m_ToolpathLayer_GetSegmentHatchOverrides;
 	PLibMCEnvToolpathLayer_GetZValuePtr m_ToolpathLayer_GetZValue;
 	PLibMCEnvToolpathLayer_GetZValueInMMPtr m_ToolpathLayer_GetZValueInMM;
 	PLibMCEnvToolpathLayer_GetUnitsPtr m_ToolpathLayer_GetUnits;
@@ -8996,6 +9892,38 @@ typedef struct {
 	PLibMCEnvXMLDocumentAttribute_SetDoubleValuePtr m_XMLDocumentAttribute_SetDoubleValue;
 	PLibMCEnvXMLDocumentAttribute_SetBoolValuePtr m_XMLDocumentAttribute_SetBoolValue;
 	PLibMCEnvXMLDocumentAttribute_RemovePtr m_XMLDocumentAttribute_Remove;
+	PLibMCEnvJSONObject_HasMemberPtr m_JSONObject_HasMember;
+	PLibMCEnvJSONObject_GetMemberCountPtr m_JSONObject_GetMemberCount;
+	PLibMCEnvJSONObject_GetMemberNamePtr m_JSONObject_GetMemberName;
+	PLibMCEnvJSONObject_GetMemberTypePtr m_JSONObject_GetMemberType;
+	PLibMCEnvJSONObject_GetValuePtr m_JSONObject_GetValue;
+	PLibMCEnvJSONObject_GetIntegerValuePtr m_JSONObject_GetIntegerValue;
+	PLibMCEnvJSONObject_GetDoubleValuePtr m_JSONObject_GetDoubleValue;
+	PLibMCEnvJSONObject_GetBoolValuePtr m_JSONObject_GetBoolValue;
+	PLibMCEnvJSONObject_GetObjectValuePtr m_JSONObject_GetObjectValue;
+	PLibMCEnvJSONObject_GetArrayValuePtr m_JSONObject_GetArrayValue;
+	PLibMCEnvJSONObject_RemoveMemberPtr m_JSONObject_RemoveMember;
+	PLibMCEnvJSONObject_AddValuePtr m_JSONObject_AddValue;
+	PLibMCEnvJSONObject_AddIntegerValuePtr m_JSONObject_AddIntegerValue;
+	PLibMCEnvJSONObject_AddDoubleValuePtr m_JSONObject_AddDoubleValue;
+	PLibMCEnvJSONObject_AddBoolValuePtr m_JSONObject_AddBoolValue;
+	PLibMCEnvJSONObject_AddObjectValuePtr m_JSONObject_AddObjectValue;
+	PLibMCEnvJSONObject_AddArrayValuePtr m_JSONObject_AddArrayValue;
+	PLibMCEnvJSONArray_GetElementCountPtr m_JSONArray_GetElementCount;
+	PLibMCEnvJSONArray_GetElementTypePtr m_JSONArray_GetElementType;
+	PLibMCEnvJSONArray_GetValuePtr m_JSONArray_GetValue;
+	PLibMCEnvJSONArray_GetIntegerValuePtr m_JSONArray_GetIntegerValue;
+	PLibMCEnvJSONArray_GetDoubleValuePtr m_JSONArray_GetDoubleValue;
+	PLibMCEnvJSONArray_GetBoolValuePtr m_JSONArray_GetBoolValue;
+	PLibMCEnvJSONArray_GetObjectValuePtr m_JSONArray_GetObjectValue;
+	PLibMCEnvJSONArray_GetArrayValuePtr m_JSONArray_GetArrayValue;
+	PLibMCEnvJSONArray_RemoveElementPtr m_JSONArray_RemoveElement;
+	PLibMCEnvJSONArray_AddValuePtr m_JSONArray_AddValue;
+	PLibMCEnvJSONArray_AddIntegerValuePtr m_JSONArray_AddIntegerValue;
+	PLibMCEnvJSONArray_AddDoubleValuePtr m_JSONArray_AddDoubleValue;
+	PLibMCEnvJSONArray_AddBoolValuePtr m_JSONArray_AddBoolValue;
+	PLibMCEnvJSONArray_AddObjectValuePtr m_JSONArray_AddObjectValue;
+	PLibMCEnvJSONArray_AddArrayValuePtr m_JSONArray_AddArrayValue;
 	PLibMCEnvXMLDocumentNode_GetNamePtr m_XMLDocumentNode_GetName;
 	PLibMCEnvXMLDocumentNode_GetNameSpacePtr m_XMLDocumentNode_GetNameSpace;
 	PLibMCEnvXMLDocumentNode_GetTextContentPtr m_XMLDocumentNode_GetTextContent;
@@ -9031,6 +9959,7 @@ typedef struct {
 	PLibMCEnvXMLDocumentNode_RemoveChildPtr m_XMLDocumentNode_RemoveChild;
 	PLibMCEnvXMLDocumentNode_RemoveChildrenWithNamePtr m_XMLDocumentNode_RemoveChildrenWithName;
 	PLibMCEnvXMLDocumentNode_RemovePtr m_XMLDocumentNode_Remove;
+	PLibMCEnvXMLDocumentNode_CopyFromPtr m_XMLDocumentNode_CopyFrom;
 	PLibMCEnvXMLDocumentNodes_GetNodeCountPtr m_XMLDocumentNodes_GetNodeCount;
 	PLibMCEnvXMLDocumentNodes_GetNodePtr m_XMLDocumentNodes_GetNode;
 	PLibMCEnvXMLDocumentNodes_CountNodesByNamePtr m_XMLDocumentNodes_CountNodesByName;
@@ -9090,6 +10019,11 @@ typedef struct {
 	PLibMCEnvDriverStatusUpdateSession_LogWarningPtr m_DriverStatusUpdateSession_LogWarning;
 	PLibMCEnvDriverStatusUpdateSession_LogInfoPtr m_DriverStatusUpdateSession_LogInfo;
 	PLibMCEnvDriverStatusUpdateSession_SleepPtr m_DriverStatusUpdateSession_Sleep;
+	PLibMCEnvDriverStatusUpdateSession_GetStringParameterPtr m_DriverStatusUpdateSession_GetStringParameter;
+	PLibMCEnvDriverStatusUpdateSession_GetUUIDParameterPtr m_DriverStatusUpdateSession_GetUUIDParameter;
+	PLibMCEnvDriverStatusUpdateSession_GetDoubleParameterPtr m_DriverStatusUpdateSession_GetDoubleParameter;
+	PLibMCEnvDriverStatusUpdateSession_GetIntegerParameterPtr m_DriverStatusUpdateSession_GetIntegerParameter;
+	PLibMCEnvDriverStatusUpdateSession_GetBoolParameterPtr m_DriverStatusUpdateSession_GetBoolParameter;
 	PLibMCEnvDriverEnvironment_CreateStatusUpdateSessionPtr m_DriverEnvironment_CreateStatusUpdateSession;
 	PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr m_DriverEnvironment_CreateWorkingDirectory;
 	PLibMCEnvDriverEnvironment_CreateTCPIPConnectionPtr m_DriverEnvironment_CreateTCPIPConnection;
@@ -9123,7 +10057,7 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_LogWarningPtr m_DriverEnvironment_LogWarning;
 	PLibMCEnvDriverEnvironment_LogInfoPtr m_DriverEnvironment_LogInfo;
 	PLibMCEnvDriverEnvironment_CreateEmptyImagePtr m_DriverEnvironment_CreateEmptyImage;
-	PLibMCEnvDriverEnvironment_LoadPNGImagePtr m_DriverEnvironment_LoadPNGImage;
+	PLibMCEnvDriverEnvironment_CreateImageLoaderPtr m_DriverEnvironment_CreateImageLoader;
 	PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr m_DriverEnvironment_CreateDiscreteField2D;
 	PLibMCEnvDriverEnvironment_CreateDiscreteField2DFromImagePtr m_DriverEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvDriverEnvironment_HasBuildJobPtr m_DriverEnvironment_HasBuildJob;
@@ -9194,14 +10128,8 @@ typedef struct {
 	PLibMCEnvUniformJournalSampling_GetSamplePtr m_UniformJournalSampling_GetSample;
 	PLibMCEnvUniformJournalSampling_GetAllSamplesPtr m_UniformJournalSampling_GetAllSamples;
 	PLibMCEnvJournalVariable_GetVariableNamePtr m_JournalVariable_GetVariableName;
-	PLibMCEnvJournalVariable_GetStartTimeStampPtr m_JournalVariable_GetStartTimeStamp;
-	PLibMCEnvJournalVariable_GetEndTimeStampPtr m_JournalVariable_GetEndTimeStamp;
-	PLibMCEnvJournalVariable_ComputeFullAveragePtr m_JournalVariable_ComputeFullAverage;
-	PLibMCEnvJournalVariable_ComputeAveragePtr m_JournalVariable_ComputeAverage;
-	PLibMCEnvJournalVariable_ComputeSamplePtr m_JournalVariable_ComputeSample;
-	PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr m_JournalVariable_ComputeUniformAverageSamples;
-	PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr m_JournalVariable_ComputeEquidistantSamples;
-	PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr m_JournalVariable_ReceiveRawTimeStream;
+	PLibMCEnvJournalVariable_ComputeDoubleSamplePtr m_JournalVariable_ComputeDoubleSample;
+	PLibMCEnvJournalVariable_ComputeIntegerSamplePtr m_JournalVariable_ComputeIntegerSample;
 	PLibMCEnvAlert_GetUUIDPtr m_Alert_GetUUID;
 	PLibMCEnvAlert_IsActivePtr m_Alert_IsActive;
 	PLibMCEnvAlert_GetAlertLevelPtr m_Alert_GetAlertLevel;
@@ -9219,8 +10147,9 @@ typedef struct {
 	PLibMCEnvLogEntryList_GetEntryPtr m_LogEntryList_GetEntry;
 	PLibMCEnvLogEntryList_GetEntryTimePtr m_LogEntryList_GetEntryTime;
 	PLibMCEnvJournalHandler_RetrieveJournalVariablePtr m_JournalHandler_RetrieveJournalVariable;
-	PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr m_JournalHandler_RetrieveJournalVariableFromTimeInterval;
 	PLibMCEnvJournalHandler_GetStartTimePtr m_JournalHandler_GetStartTime;
+	PLibMCEnvJournalHandler_GetEndTimePtr m_JournalHandler_GetEndTime;
+	PLibMCEnvJournalHandler_GetJournalLifeTimeInMicrosecondsPtr m_JournalHandler_GetJournalLifeTimeInMicroseconds;
 	PLibMCEnvJournalHandler_RetrieveLogEntriesPtr m_JournalHandler_RetrieveLogEntries;
 	PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr m_JournalHandler_RetrieveLogEntriesFromTimeInterval;
 	PLibMCEnvJournalHandler_RetrieveAlertsPtr m_JournalHandler_RetrieveAlerts;
@@ -9259,6 +10188,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_PrepareSignalPtr m_StateEnvironment_PrepareSignal;
 	PLibMCEnvStateEnvironment_WaitForSignalPtr m_StateEnvironment_WaitForSignal;
 	PLibMCEnvStateEnvironment_GetUnhandledSignalPtr m_StateEnvironment_GetUnhandledSignal;
+	PLibMCEnvStateEnvironment_ClearAllUnhandledSignalsPtr m_StateEnvironment_ClearAllUnhandledSignals;
 	PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr m_StateEnvironment_GetUnhandledSignalByUUID;
 	PLibMCEnvStateEnvironment_GetDriverLibraryPtr m_StateEnvironment_GetDriverLibrary;
 	PLibMCEnvStateEnvironment_CreateDriverAccessPtr m_StateEnvironment_CreateDriverAccess;
@@ -9286,10 +10216,11 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetDoubleParameterPtr m_StateEnvironment_GetDoubleParameter;
 	PLibMCEnvStateEnvironment_GetIntegerParameterPtr m_StateEnvironment_GetIntegerParameter;
 	PLibMCEnvStateEnvironment_GetBoolParameterPtr m_StateEnvironment_GetBoolParameter;
+	PLibMCEnvStateEnvironment_HasResourceDataPtr m_StateEnvironment_HasResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceStringPtr m_StateEnvironment_LoadResourceString;
 	PLibMCEnvStateEnvironment_CreateEmptyImagePtr m_StateEnvironment_CreateEmptyImage;
-	PLibMCEnvStateEnvironment_LoadPNGImagePtr m_StateEnvironment_LoadPNGImage;
+	PLibMCEnvStateEnvironment_CreateImageLoaderPtr m_StateEnvironment_CreateImageLoader;
 	PLibMCEnvStateEnvironment_CreateDiscreteField2DPtr m_StateEnvironment_CreateDiscreteField2D;
 	PLibMCEnvStateEnvironment_CreateDiscreteField2DFromImagePtr m_StateEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr m_StateEnvironment_GetGlobalTimerInMilliseconds;
@@ -9334,6 +10265,9 @@ typedef struct {
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
 	PLibMCEnvUIEnvironment_LogOutPtr m_UIEnvironment_LogOut;
 	PLibMCEnvUIEnvironment_ShowHintPtr m_UIEnvironment_ShowHint;
+	PLibMCEnvUIEnvironment_HasResourceDataPtr m_UIEnvironment_HasResourceData;
+	PLibMCEnvUIEnvironment_LoadResourceDataPtr m_UIEnvironment_LoadResourceData;
+	PLibMCEnvUIEnvironment_LoadResourceStringPtr m_UIEnvironment_LoadResourceString;
 	PLibMCEnvUIEnvironment_ShowHintColoredPtr m_UIEnvironment_ShowHintColored;
 	PLibMCEnvUIEnvironment_HideHintPtr m_UIEnvironment_HideHint;
 	PLibMCEnvUIEnvironment_StartStreamDownloadPtr m_UIEnvironment_StartStreamDownload;
@@ -9362,7 +10296,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_SetUIPropertyAsIntegerPtr m_UIEnvironment_SetUIPropertyAsInteger;
 	PLibMCEnvUIEnvironment_SetUIPropertyAsBoolPtr m_UIEnvironment_SetUIPropertyAsBool;
 	PLibMCEnvUIEnvironment_CreateEmptyImagePtr m_UIEnvironment_CreateEmptyImage;
-	PLibMCEnvUIEnvironment_LoadPNGImagePtr m_UIEnvironment_LoadPNGImage;
+	PLibMCEnvUIEnvironment_CreateImageLoaderPtr m_UIEnvironment_CreateImageLoader;
 	PLibMCEnvUIEnvironment_GetGlobalTimerInMillisecondsPtr m_UIEnvironment_GetGlobalTimerInMilliseconds;
 	PLibMCEnvUIEnvironment_GetGlobalTimerInMicrosecondsPtr m_UIEnvironment_GetGlobalTimerInMicroseconds;
 	PLibMCEnvUIEnvironment_GetTestEnvironmentPtr m_UIEnvironment_GetTestEnvironment;
@@ -9403,6 +10337,11 @@ typedef struct {
 	PLibMCEnvUIEnvironment_GetCustomDateTimePtr m_UIEnvironment_GetCustomDateTime;
 	PLibMCEnvUIEnvironment_GetStartDateTimePtr m_UIEnvironment_GetStartDateTime;
 	PLibMCEnvUIEnvironment_SleepPtr m_UIEnvironment_Sleep;
+	PLibMCEnvUIEnvironment_HasExternalEventParameterPtr m_UIEnvironment_HasExternalEventParameter;
+	PLibMCEnvUIEnvironment_GetExternalEventParameterPtr m_UIEnvironment_GetExternalEventParameter;
+	PLibMCEnvUIEnvironment_AddExternalEventResultValuePtr m_UIEnvironment_AddExternalEventResultValue;
+	PLibMCEnvUIEnvironment_GetExternalEventParametersPtr m_UIEnvironment_GetExternalEventParameters;
+	PLibMCEnvUIEnvironment_GetExternalEventResultsPtr m_UIEnvironment_GetExternalEventResults;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

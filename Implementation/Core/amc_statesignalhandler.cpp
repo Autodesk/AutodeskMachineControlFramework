@@ -116,6 +116,19 @@ namespace AMC {
 		return iIter->second->checkSignalInternal(sNormalizedUUID);
 	}
 
+	void CStateSignalHandler::clearUnhandledSignals(const std::string& sInstanceName)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+
+		for (auto it = m_SignalMap.begin(); it != m_SignalMap.end(); it++) {
+			// Check if the first element of the key matches
+			if (it->first.first == sInstanceName) {
+				it->second->clearSignalInternal();
+			}
+		}
+	}
+
+
 
 	bool CStateSignalHandler::canTrigger(const std::string& sInstanceName, const std::string& sSignalName)
 	{

@@ -82,7 +82,21 @@
 		<error name="EMPTYRTCAUXILIARYRESOURCENAME" code="1028" description="Empty RTC auxiliary resource name" />		
 		<error name="RTCAUXILIARYRESOURCENOTFOUND" code="1029" description="RTC auxiliary resource not found." />				
 		<error name="INVALIDPOINTCOUNT" code="1030" description="Invalid point count." />		
-									
+		<error name="EMPTYCONFIGURATIONRESOURCENAME" code="1031" description="Empty configuration resource name." />		
+		<error name="CONFIGURATIONRESOURCENOTFOUND" code="1032" description="Configuration resource not found." />		
+		<error name="COULDNOTOOPENSIMULATIONFILE" code="1033" description="Could not open simulation file." />		
+		<error name="INVALIDSIMULATIONFILENAME" code="1034" description="Invalid simulation file name." />		
+		<error name="UNSUPPORTEDSMCVERSION" code="1035" description="Unsupported SMC Version." />		
+		<error name="SMCTEMPLATEVERSIONMISMATCH" code="1036" description="SMC Template version mismatch." />		
+		<error name="UNKNOWNSMCMAJORVERSION" code="1037" description="Unknown SMC Major Version." />		
+		<error name="UNKNOWNSMCMINORVERSION" code="1038" description="Unknown SMC Minor Version." />		
+		<error name="INVALIDJOBCHARACTERISTIC" code="1039" description="Invalid job characteristic." />		
+		<error name="COULDNOTGETJOBCHARACTERISTIC" code="1040" description="Could not get job characteristic." />		
+		<error name="JOBDURATIONHASNOTBEENPARSED" code="1041" description="Job duration has not been parsed." />		
+		<error name="COULDNOTSTOPJOBEXECUTION" code="1042" description="Could not stop job execution." />		
+		
+		
+											
 	</errors>
 
 	<struct name="Point2D">
@@ -116,6 +130,72 @@
 	   <option name="Warn" value="2" />
 	   <option name="Info" value="3" />
 	</enum>
+
+	
+	<enum name="SMCConfigVersion">
+	   <option name="Unknown" value="0" />
+	   <option name="Version_0_8" value="8" />
+	   <option name="Version_0_9" value="9" />
+	</enum>
+
+	<enum name="JobCharacteristic">
+	   <option name="Cart_XPos_ScanAxis" value="0" description="Max. absolute scan head position in X direction. In mm." />
+	   <option name="Cart_YPos_ScanAxis" value="1" description="Max. absolute scan head position in Y direction. In mm." />
+	   <option name="Cart_ZPos_ScanAxis" value="2" description="Max. absolute scan head position in Z direction. In mm." />
+	   <option name="Cart_XPos_StageAxis" value="10" description="Max. absolute stage position in X direction. In mm." />
+	   <option name="Cart_YPos_StageAxis" value="11" description="Max. absolute stage position in Y direction. In mm." />
+	   <option name="Cart_ZPos_StageAxis" value="12" description="Max. absolute stage position in Z direction. In mm." />
+	   <option name="Cart_XVel_ScanAxis" value="20" description="Max. absolute scan head velocity in X direction. In mm/s." />
+	   <option name="Cart_YVel_ScanAxis" value="21" description="Max. absolute scan head velocity in Y direction. In mm/s." />
+	   <option name="Cart_ZVel_ScanAxis" value="22" description="Max. absolute scan head velocity in Z direction. In mm/s." />
+	   <option name="Cart_XVel_StageAxis" value="30" description="Max. absolute stage velocity in X direction. In mm/s." />
+	   <option name="Cart_YVel_StageAxis" value="31" description="Max. absolute stage velocity in Y direction. In mm/s." />
+	   <option name="Cart_ZVel_StageAxis" value="32" description="Max. absolute stage velocity in X direction. In mm/s." />
+	   <option name="Cart_XAcc_ScanAxis" value="40" description="Max. absolute scan head acceleration in X direction. In mm/s^2." />
+	   <option name="Cart_YAcc_ScanAxis" value="41" description="Max. absolute scan head acceleration in Y direction.In mm/s^2." />
+	   <option name="Cart_ZAcc_ScanAxis" value="42" description="Max. absolute scan head acceleration in Zdirection.In mm/s^2." />
+	   <option name="Cart_XAcc_StageAxis" value="50" description="Max. absolute stage acceleration in X direction. In mm/s^2." />
+	   <option name="Cart_YAcc_StageAxis" value="51" description="Max. absolute stage acceleration in Y direction. In mm/s^2." />
+	   <option name="Cart_ZAcc_StageAxis" value="52" description="Max. absolute stage acceleration in Z direction. In mm/s^2." />
+	   <option name="Cart_XJerk_StageAxis" value="70" description="Max. absolute stage jerk in X direction. In mm/s^3." />
+	   <option name="Cart_YJerk_StageAxis" value="71" description="Max. absolute stage jerk in Y direction. In mm/s^3." />
+	   <option name="Cart_ZJerk_StageAxis" value="72" description="Max. absolute stage jerk in Z direction. In mm/s^3." />
+	   <option name="Cart_XPos_ScanAxis_LaserOn" value="80" description="Max. absolute scan head position in X direction with active laser. In mm." />
+	   <option name="Cart_YPos_ScanAxis_LaserOn" value="81" description="Max. absolute scan head position in Y direction with active laser. In mm." />
+	   <option name="Cart_ZPos_ScanAxis_LaserOn" value="82" description="Max. absolute scan head position in Z direction with active laser. In mm." />
+	   <option name="Cart_XPos_StageAxis_LaserOn" value="90" description="Max. abs. stage position in X direction with active laser. In mm." />
+	   <option name="Cart_YPos_StageAxis_LaserOn" value="91" description="Max. abs. stage position in Y direction with active laser. In mm." />
+	   <option name="Cart_ZPos_StageAxis_LaserOn" value="92" description="Max. abs. stage position in Z direction with active laser. In mm." />
+	   <option name="Cart_XPos_ScanAxis_Max" value="100" description="Max. scan head position in X direction. In mm." />
+	   <option name="Cart_YPos_ScanAxis_Max" value="101" description="Max. scan head position in Y direction. In mm." />
+	   <option name="Cart_ZPos_ScanAxis_Max" value="102" description="Max. scan head position in Z direction. In mm." />
+	   <option name="Cart_XPos_ScanAxis_Min" value="110" description="Min. scan head position in X direction. In mm." />
+	   <option name="Cart_YPos_ScanAxis_Min" value="111" description="Min. scan head position in Y direction. In mm." />
+	   <option name="Cart_ZPos_ScanAxis_Min" value="112" description="Min. scan head position in Z direction. In mm." />
+	   <option name="Cart_XPos_ScanAxis_LaserOn_Max" value="120" description="Max. scan head position in X direction with active laser. In mm." />
+	   <option name="Cart_YPos_ScanAxis_LaserOn_Max" value="121" description="Max. scan head position in Y direction with active laser. In mm." />
+	   <option name="Cart_ZPos_ScanAxis_LaserOn_Max" value="122" description="Max. scan head position in Z direction with active laser. In mm." />
+	   <option name="Cart_XPos_ScanAxis_LaserOn_Min" value="130" description="Min. scan head position in X direction with active laser. In mm." />
+	   <option name="Cart_YPos_ScanAxis_LaserOn_Min" value="131" description="Min. scan head position in Y direction with active laser. In mm." />
+	   <option name="Cart_ZPos_ScanAxis_LaserOn_Min" value="132" description="Min. scan head position in Z direction with active laser. In mm." />	   
+	   <option name="Cart_XPos_StageAxis_Max" value="140" description="Max. stage position in X direction. In mm." />
+	   <option name="Cart_YPos_StageAxis_Max" value="141" description="Max. stage position in Y direction. In mm." />
+	   <option name="Cart_ZPos_StageAxis_Max" value="142" description="Max. stage position in Z direction. In mm." />	   
+	   <option name="Cart_XPos_StageAxis_Min" value="150" description="Min. stage position in X direction. In mm." />
+	   <option name="Cart_YPos_StageAxis_Min" value="151" description="Min. stage position in Y direction. In mm." />
+	   <option name="Cart_ZPos_StageAxis_Min" value="152" description="Min. stage position in Z direction. In mm." />	   
+	   <option name="Cart_XPos_StageAxis_LaserOn_Max" value="160" description="Max. stage position in X direction with active laser. In mm." />
+	   <option name="Cart_YPos_StageAxis_LaserOn_Max" value="161" description="Max. stage position in Y direction with active laser. In mm." />
+	   <option name="Cart_ZPos_StageAxis_LaserOn_Max" value="162" description="Max. stage position in Z direction with active laser. In mm." />	   
+	   <option name="Cart_XPos_StageAxis_LaserOn_Min" value="170" description="Min. stage position in X direction with active laser. In mm." />
+	   <option name="Cart_YPos_StageAxis_LaserOn_Min" value="171" description="Min. stage position in Y direction with active laser. In mm." />
+	   <option name="Cart_ZPos_StageAxis_LaserOn_Min" value="172" description="Min. stage position in Z direction with active laser. In mm." />	   
+	   <option name="InsertedSkywritings" value="180" description="Number of transitions in the job where a skywriting had to be inserted." />
+	   <option name="MotionMicroSteps" value="181" description="Number of micro vectors that make up the job." />	   
+	   <option name="MinimalMarkSpeed" value="182" description="Minimum velocity reached by the laser spot during the job." />
+	   <option name="MaximalMarkSpeed" value="183" description="Maximum velocity reached by the laser spot during the job." />	   
+	</enum>
+	
 
 	
 <!--
@@ -235,6 +315,20 @@ Custom implementation
 		<method name="StopExecution" description="Stops the execution of the current list immediately.">
 		</method>	
 
+		<method name="LoadSimulationData" description="Reads the SMC Simulation data into a data table.">
+			<param name="SimulationDataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table object to read the simulation into." />
+		</method>	
+		
+		<method name="GetJobCharacteristic" description="Returns a characteristic value of a job.">
+			<param name="ValueType" type="enum" class="JobCharacteristic" pass="in" description="Type of job" />
+			<param name="Value" type="double" pass="return" description="Characteristic Value" />
+		</method>	
+		
+		<method name="GetJobDuration" description="Returns the duration of the job in seconds.">
+			<param name="JobDuration" type="double" pass="return" description="Duration in seconds." />
+		</method>	
+		
+
 	</class>
 
 
@@ -280,6 +374,26 @@ Custom implementation
 			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
 		</method>
 
+		<method name="SetConfigurationTemplate" description="Sets the SMC Configuration Template. Currently supported version is 0.9.">
+			<param name="TemplateXML" type="string" pass="in" description="Value to set." />
+		</method>	
+
+		<method name="SetConfigurationTemplateResource" description="Sets the SMC Configuration Template from resource data. Currently supported version is 0.9.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name to load." />
+		</method>	
+
+		<method name="GetConfigurationTemplate" description="Returns the current SMC Configuration Template. Currently supported version is 0.9.">
+			<param name="TemplateXML" type="string" pass="return" description="Value to set." />
+		</method>	
+
+		<method name="SetSimulationSubDirectory" description="Set the simulation subdirectory name. MUST be an alphanumeric string with _ and .">
+			<param name="SubDirectory" type="string" pass="in" description="New simulation subdirectory name. Default is Simulations" />
+		</method>
+
+		<method name="GetSimulationSubDirectory" description="Returns the simulation subdirectory name">
+			<param name="SubDirectory" type="string" pass="return" description="Returns the simulation subdirectory name." />
+		</method>
+
 		<method name="SetFirmware" description="Sets card firmware from binary data.">
 			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
 			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
@@ -319,6 +433,10 @@ Custom implementation
 			<param name="SerialNumber" type="uint32" pass="return" description="Returns serial number of board." />
 		</method>
 		
+		<method name="GetSimulationSubDirectory" description="Returns the simulation subdirectory name">
+			<param name="SubDirectory" type="string" pass="return" description="Returns the simulation subdirectory name." />
+		</method>
+				
 		<method name="GetLaserIndex" description="Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.">
 			<param name="LaserIndex" type="uint32" pass="return" description="Returns laser index of board." />
 		</method>
@@ -366,7 +484,7 @@ Custom implementation
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
 		</method>
-				
+						
 	</class>
 
 

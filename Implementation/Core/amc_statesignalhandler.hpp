@@ -72,6 +72,8 @@ namespace AMC {
 
 		bool checkSignalUUID(const std::string& sInstanceName, std::string sCurrentSignalUUID);
 
+		void clearUnhandledSignals(const std::string& sInstanceName);
+
 		bool canTrigger(const std::string& sInstanceName, const std::string& sSignalName);
 
 		bool hasSignalDefinition(const std::string& sInstanceName, const std::string& sSignalName);

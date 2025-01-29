@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CDataTable
 #define __LIBMCENV_DATATABLE
 
 #include "libmcenv_interfaces.hpp"
+#include "amc_toolpathhandler.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -46,6 +47,7 @@ Abstract: This is the class declaration of CDataTable
 
 // Include custom headers here.
 #include <map>
+#include "amc_scatterplot.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -90,6 +92,10 @@ public:
 	virtual void ReadDataFromStream(IStreamReader* pReader, uint64_t nEntryCount) = 0;
 
 	virtual size_t getEntrySizeInBytes() = 0;
+
+	virtual void fillScatterplotXCoordinates (AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) = 0;
+
+	virtual void fillScatterplotYCoordinates(AMC::CScatterplot* pScatterplot, double dScaleFactor, double dOffset) = 0;
 };
 
 typedef std::shared_ptr<CDataTableColumn> PDataTableColumn;
@@ -99,6 +105,9 @@ class CDataTable : public virtual IDataTable, public virtual CBase {
 private:
 
 	size_t m_nMaxRowCount;
+
+	// Toolpath handler to store scatter plots
+	AMC::PToolpathHandler m_pToolpathHandler;
 
 	std::map<std::string, PDataTableColumn> m_ColumnMap;
 	std::vector<PDataTableColumn> m_Columns;
@@ -111,9 +120,9 @@ private:
 
 public:
 
-	static CDataTable* makeFromStream (IStreamReader * pStreamReader);
+	static CDataTable* makeFromStream (IStreamReader * pStreamReader, AMC::PToolpathHandler pToolpathHandler);
 
-	CDataTable();
+	CDataTable(AMC::PToolpathHandler pToolpathHandler);
 
 	virtual ~CDataTable();
 
@@ -166,6 +175,11 @@ public:
 	void LoadFromStream(IStreamReader* pStream) override;
 
 	void Clear() override;
+
+	IDataTableScatterPlotOptions* CreateScatterPlotOptions() override;
+
+	IScatterPlot* CalculateScatterPlot(IDataTableScatterPlotOptions* pScatterPlotInput) override;
+
 };
 
 } // namespace Impl

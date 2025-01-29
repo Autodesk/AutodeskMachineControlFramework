@@ -127,3 +127,17 @@ void CSMCJob::StopExecution()
     m_pJobInstance->StopExecution();
 }
 
+void CSMCJob::LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable)
+{
+    m_pJobInstance->ReadSimulationFile(pSimulationDataTable);
+}
+
+LibMCDriver_ScanLabSMC_double CSMCJob::GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType)
+{
+    return m_pJobInstance->GetJobCharacteristic (eValueType);
+}
+
+LibMCDriver_ScanLabSMC_double CSMCJob::GetJobDuration()
+{
+    return m_pJobInstance->GetJobDuration ();
+}

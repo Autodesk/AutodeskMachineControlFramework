@@ -40,3 +40,6 @@
 [submodule "submodules/libgrpc"]
 	path = submodules/libgrpc
 	url = https://github.com/alexanderoster/libgrpc.git
+[submodule "submodules/libjpeg-turbo"]
+	path = submodules/libjpeg-turbo
+	url = https://github.com/libjpeg-turbo/libjpeg-turbo.git

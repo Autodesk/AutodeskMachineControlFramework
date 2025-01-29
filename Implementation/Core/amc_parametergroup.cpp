@@ -221,6 +221,26 @@ namespace AMC {
 		return iIter->second->getBoolValue();
 	}
 
+	std::string CParameterGroup::getUUIDParameterValueByIndex(const uint32_t nIndex)
+	{
+		std::string sValue = getParameterValueByIndex(nIndex);
+		if (AMCCommon::CUtils::stringIsUUIDString(sValue))
+			return AMCCommon::CUtils::normalizeUUIDString(sValue);
+
+		return AMCCommon::CUtils::createEmptyUUID();
+	}
+
+	std::string CParameterGroup::getUUIDParameterValueByName(const std::string& sName)
+	{
+		std::string sValue = getParameterValueByName(sName);
+		if (AMCCommon::CUtils::stringIsUUIDString(sValue))
+			return AMCCommon::CUtils::normalizeUUIDString(sValue);
+
+		return AMCCommon::CUtils::createEmptyUUID();
+	}
+
+
+
 
 	eParameterDataType CParameterGroup::getParameterDataTypeByIndex(const uint32_t nIndex)
 	{
@@ -243,6 +263,7 @@ namespace AMC {
 
 		return iIter->second->getDataType();
 	}
+
 
 
 	void CParameterGroup::setParameterValueByIndex(const uint32_t nIndex, const std::string& sValue)
@@ -439,6 +460,17 @@ namespace AMC {
 		return iIter->second->getOriginalPath();
 	}
 
+	uint64_t CParameterGroup::getChangeCounterOf(const std::string& sName)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		auto iIter = m_Parameters.find(sName);
+
+		if (iIter == m_Parameters.end())
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
+
+		return iIter->second->getChangeCounter();
+	}
+
 
 	void CParameterGroup::addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue)
 	{
@@ -522,7 +554,7 @@ namespace AMC {
 
 			int64_t nValue = 0;			
 			if (sDefaultValue.length() > 0)
-				nValue = AMCCommon::CUtils::stringToInteger(sDefaultValue);
+				nValue = AMCCommon::CUtils::stringToIntegerWithAccuracy(sDefaultValue, PARAMETER_INTEGERACCURACY);
 
 			addNewIntParameter(sName, sDescription, nValue);
 
@@ -531,7 +563,7 @@ namespace AMC {
 
 			bool bValue = false;
 			if (sDefaultValue.length() > 0)
-				bValue = AMCCommon::CUtils::stringToInteger(sDefaultValue) != 0;
+				bValue = AMCCommon::CUtils::stringToBool(sDefaultValue) != 0;
 			addNewBoolParameter(sName, sDescription, bValue);
 
 		}

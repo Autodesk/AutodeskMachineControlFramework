@@ -97,6 +97,12 @@ LibMCDriver_ScanLabSMC_uint32 CSMCContext::GetLaserIndex()
 	return m_pContextInstance->GetLaserIndex();
 }
 
+std::string CSMCContext::GetSimulationSubDirectory()
+{
+	return m_pContextInstance->GetSimulationSubDirectory();
+}
+
+
 void CSMCContext::SetLaserOrigin(const LibMCDriver_ScanLabSMC_double dOriginX, const LibMCDriver_ScanLabSMC_double dOriginY)
 {
 }
@@ -141,7 +147,7 @@ void CSMCContext::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Sc
 {
 	auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
 
-	auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+	auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);	
 
 	auto pJob = m_pContextInstance->BeginJob(0.0, 0.0, eBlendMode::MaxAccuracy);
 	pJob->AddLayerToList(pLayer);

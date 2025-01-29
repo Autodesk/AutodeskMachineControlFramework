@@ -344,4 +344,26 @@ void CXMLDocumentNode::Remove()
     throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
+void CXMLDocumentNode::CopyFrom(IXMLDocumentNode* pOtherNode)
+{
+    if (pOtherNode == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    auto pOtherNodeInstance = dynamic_cast<CXMLDocumentNode*> (pOtherNode);
+    if (pOtherNodeInstance == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+
+    m_pXMLDocumentNode->CopyFrom(pOtherNodeInstance->getXMLDocumentNode().get ());
+}
+
+AMC::PXMLDocumentNodeInstance CXMLDocumentNode::getXMLDocumentNode()
+{
+    return m_pXMLDocumentNode;
+}
+
+AMC::PXMLDocumentInstance CXMLDocumentNode::getXMLDocument()
+{
+    return m_pXMLDocument;
+}
+
 

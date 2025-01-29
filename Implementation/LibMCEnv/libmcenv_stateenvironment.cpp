@@ -40,11 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_imagedata.hpp"
-#include "libmcenv_journalvariable.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
-#include "libmcenv_journalhandler.hpp"
+#include "libmcenv_journalhandler_current.hpp"
 #include "libmcenv_usermanagementhandler.hpp"
 #include "libmcenv_meshobject.hpp"
 #include "libmcenv_persistentmeshobject.hpp"
@@ -56,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
 #include "libmcenv_modeldatacomponentinstance.hpp"
+#include "libmcenv_imageloader.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -155,6 +155,12 @@ ISignalHandler* CStateEnvironment::GetUnhandledSignal(const std::string& sSignal
 	return nullptr;
 }
 
+void CStateEnvironment::ClearAllUnhandledSignals()
+{
+	m_pSystemState->stateSignalHandler()->clearUnhandledSignals(m_sInstanceName);
+}
+
+
 ISignalHandler* CStateEnvironment::GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist)
 {
 	std::string sNormalizedSignalUUID = AMCCommon::CUtils::normalizeUUIDString (sUUID);
@@ -194,7 +200,7 @@ IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getMeshHandlerInstance(), m_pSystemState->getGlobalChronoInstance ());
+	return new CBuild(pDataModel, pBuildJob->GetUUID (), m_pSystemState->getToolpathHandlerInstance (), m_pSystemState->getMeshHandlerInstance(), m_pSystemState->getGlobalChronoInstance (), m_pSystemState->getStateJournalInstance ());
 }
 
 bool CStateEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
@@ -220,7 +226,7 @@ IBuildExecution* CStateEnvironment::GetBuildExecution(const std::string& sExecut
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
 	auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
-	return new CBuildExecution(pBuildExecution, pDataModel, m_pSystemState->getToolpathHandlerInstance(), m_pSystemState->getMeshHandlerInstance (), m_pSystemState->getGlobalChronoInstance());
+	return new CBuildExecution(pBuildExecution, pDataModel, m_pSystemState->getToolpathHandlerInstance(), m_pSystemState->getMeshHandlerInstance (), m_pSystemState->getGlobalChronoInstance(), m_pSystemState->getStateJournalInstance ());
 
 }
 
@@ -438,6 +444,21 @@ bool CStateEnvironment::GetBoolParameter(const std::string& sParameterGroup, con
 	return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
+bool CStateEnvironment::HasResourceData(const std::string& sIdentifier)
+{
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourceEntry = pResourcePackage->findEntryByName(sIdentifier, false);
+
+	return (pResourceEntry.get() != nullptr);
+}
+
 
 void CStateEnvironment::LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer)
 {
@@ -485,9 +506,9 @@ IImageData* CStateEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSize
 	return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData* CStateEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+IImageLoader* CStateEnvironment::CreateImageLoader()
 {
-	return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+	return new CImageLoader();
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
@@ -585,7 +606,7 @@ LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLString(const std::strin
 
 IDataTable* CStateEnvironment::CreateDataTable()
 {
-	return new CDataTable();
+	return new CDataTable(m_pSystemState->getToolpathHandlerInstance ());
 }
 
 LibMCEnv::Impl::IXMLDocument* CStateEnvironment::ParseXMLData(const LibMCEnv_uint64 nXMLDataBufferSize, const LibMCEnv_uint8* pXMLDataBuffer)
@@ -668,7 +689,7 @@ IUserManagementHandler* CStateEnvironment::CreateUserManagement()
 
 IJournalHandler* CStateEnvironment::GetCurrentJournal()
 {
-	return new CJournalHandler(m_pSystemState->getStateJournalInstance());
+	return new CJournalHandler_Current(m_pSystemState->getStateJournalInstance());
 }
 
 /*IMeshObject* CStateEnvironment::RegisterMeshFrom3MFResource(const std::string& sResourceName)
