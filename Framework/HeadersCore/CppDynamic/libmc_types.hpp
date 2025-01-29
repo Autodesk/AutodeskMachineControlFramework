@@ -624,6 +624,31 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INTERNALMETADATAERROR 607 /** Internal metadata error */
 #define LIBMC_ERROR_INVALIDBINARYMETADATAPATH 608 /** Invalid Binary metadata path */
 #define LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND 609 /** Binary metadata path not found */
+#define LIBMC_ERROR_JOURNALCHUNKHASTOOMANYENTRIES 610 /** Journal chunk has too many entries */
+#define LIBMC_ERROR_COULDNOTSERIALIZEJOURNALENTRIES 611 /** Could not serialize journal entries */
+#define LIBMC_ERROR_JOURNALSAMPLINGOUTSIDEOFRECORDINGINTERVAL 612 /** Journal sampling outside of recording interval */
+#define LIBMC_ERROR_JOURNALWRITINGOUTSIDEOFRECORDINGINTERVAL 613 /** Journal writing outside of recording interval */
+#define LIBMC_ERROR_JOURNALWRITINGISNOTINCREMENTAL 614 /** Journal writing is not incremental */
+#define LIBMC_ERROR_JOURNALCHUNKMEMORYEXCEEDSQUOTA 615 /** Journal chunk memory exceeds quota */
+#define LIBMC_ERROR_JOURNALCHUNKINTERNALMEMORYBOOKKEEPINGERROR 616 /** Journal chunk internal memory bookkeeping error. */
+#define LIBMC_ERROR_JOURNALCHUNKMEMORYISZERO 617 /** Journal chunk memory is zero */
+#define LIBMC_ERROR_JOURNALRECORDINGCHUNKISEMPTY 618 /** Journal recording chunk is empty. */
+#define LIBMC_ERROR_INVALIDHATCHOVERRIDECOUNT 619 /** Invalid hatch override count. */
+#define LIBMC_ERROR_INVALIDPOINTOVERRIDECOUNT 620 /** Invalid point override count. */
+#define LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX 621 /** Invalid override factor index. */
+#define LIBMC_ERROR_XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX 622 /** XML Namespace Definition contains empty prefix. */
+#define LIBMC_ERROR_XMLNODECONTAINSAMBIGOUSCONTENTDATA 623 /** XML node contains ambiguous content data. */
+#define LIBMC_ERROR_INVALIDPROFILEVALUETYPE 624 /** Invalid profile value type */
+#define LIBMC_ERROR_INVALIDJOURNALCHUNKTIMESTAMP 625 /** Invalid journal chunk time stamp */
+#define LIBMC_ERROR_OVERLAPPINGJOURNALCHUNKTIMESTAMP 626 /** Overlapping journal chunk time stamp */
+#define LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS 627 /** Invalid toolpath layer thickness */
+#define LIBMC_ERROR_SCATTERPLOTNOTFOUND 628 /** Scatter plot not found */
+#define LIBMC_ERROR_CUSTOMREQUESTNOTSUPPORTED 629 /** Custom request not supported */
+#define LIBMC_ERROR_MISSINGCUSTOMREQUESTTYPE 630 /** Missing custom request type */
+#define LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER 631 /** Missing custom request layer */
+#define LIBMC_ERROR_INVALIDCONTENTSTATEID 632 /** Invalid content state ID */
+#define LIBMC_ERROR_INVALIDWIDGETREQUEST 633 /** Invalid widget request */
+#define LIBMC_ERROR_SOURCEVARIABLENOTFOUND 634 /** Source variable not found */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1160,6 +1185,31 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INTERNALMETADATAERROR: return "Internal metadata error";
     case LIBMC_ERROR_INVALIDBINARYMETADATAPATH: return "Invalid Binary metadata path";
     case LIBMC_ERROR_BINARYMETADATAPATHNOTFOUND: return "Binary metadata path not found";
+    case LIBMC_ERROR_JOURNALCHUNKHASTOOMANYENTRIES: return "Journal chunk has too many entries";
+    case LIBMC_ERROR_COULDNOTSERIALIZEJOURNALENTRIES: return "Could not serialize journal entries";
+    case LIBMC_ERROR_JOURNALSAMPLINGOUTSIDEOFRECORDINGINTERVAL: return "Journal sampling outside of recording interval";
+    case LIBMC_ERROR_JOURNALWRITINGOUTSIDEOFRECORDINGINTERVAL: return "Journal writing outside of recording interval";
+    case LIBMC_ERROR_JOURNALWRITINGISNOTINCREMENTAL: return "Journal writing is not incremental";
+    case LIBMC_ERROR_JOURNALCHUNKMEMORYEXCEEDSQUOTA: return "Journal chunk memory exceeds quota";
+    case LIBMC_ERROR_JOURNALCHUNKINTERNALMEMORYBOOKKEEPINGERROR: return "Journal chunk internal memory bookkeeping error.";
+    case LIBMC_ERROR_JOURNALCHUNKMEMORYISZERO: return "Journal chunk memory is zero";
+    case LIBMC_ERROR_JOURNALRECORDINGCHUNKISEMPTY: return "Journal recording chunk is empty.";
+    case LIBMC_ERROR_INVALIDHATCHOVERRIDECOUNT: return "Invalid hatch override count.";
+    case LIBMC_ERROR_INVALIDPOINTOVERRIDECOUNT: return "Invalid point override count.";
+    case LIBMC_ERROR_INVALIDOVERRIDEFACTORINDEX: return "Invalid override factor index.";
+    case LIBMC_ERROR_XMLNAMESPACEDEFINITIONCONTAINSEMPTYPREFIX: return "XML Namespace Definition contains empty prefix.";
+    case LIBMC_ERROR_XMLNODECONTAINSAMBIGOUSCONTENTDATA: return "XML node contains ambiguous content data.";
+    case LIBMC_ERROR_INVALIDPROFILEVALUETYPE: return "Invalid profile value type";
+    case LIBMC_ERROR_INVALIDJOURNALCHUNKTIMESTAMP: return "Invalid journal chunk time stamp";
+    case LIBMC_ERROR_OVERLAPPINGJOURNALCHUNKTIMESTAMP: return "Overlapping journal chunk time stamp";
+    case LIBMC_ERROR_INVALIDTOOLPATHLAYERTHICKNESS: return "Invalid toolpath layer thickness";
+    case LIBMC_ERROR_SCATTERPLOTNOTFOUND: return "Scatter plot not found";
+    case LIBMC_ERROR_CUSTOMREQUESTNOTSUPPORTED: return "Custom request not supported";
+    case LIBMC_ERROR_MISSINGCUSTOMREQUESTTYPE: return "Missing custom request type";
+    case LIBMC_ERROR_MISSINGCUSTOMREQUESTLAYER: return "Missing custom request layer";
+    case LIBMC_ERROR_INVALIDCONTENTSTATEID: return "Invalid content state ID";
+    case LIBMC_ERROR_INVALIDWIDGETREQUEST: return "Invalid widget request";
+    case LIBMC_ERROR_SOURCEVARIABLENOTFOUND: return "Source variable not found";
     default: return "unknown error";
   }
 }

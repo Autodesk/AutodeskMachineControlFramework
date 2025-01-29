@@ -76,6 +76,7 @@ namespace AMC {
 		bool triggerSignalInternal(const std::string& sParameterData, std::string& sNewSignalUUID);
 		bool checkSignalInternal(std::string& sCurrentSignalUUID);
 		bool canTriggerInternal();
+		void clearSignalInternal();
 
 		void markSignalAsHandledInternal(const std::string& sResultData);
 		bool signalHasBeenHandledInternal(const std::string& sSignalUUID, bool clearAllResults, std::string& sResultData);

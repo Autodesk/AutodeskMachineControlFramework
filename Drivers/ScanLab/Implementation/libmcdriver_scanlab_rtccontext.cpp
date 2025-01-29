@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 #include "libmcdriver_scanlab_uartconnection.hpp"
 #include "libmcdriver_scanlab_rtcrecording.hpp"
+#include "libmcdriver_scanlab_gpiosequence.hpp"
+#include "libmcdriver_scanlab_gpiosequenceinstance.hpp"
 
 // Include custom headers here.
 #include <math.h>
@@ -607,7 +609,12 @@ void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MULTIPLELASERPORTSNOTCOMPATIBLEWITHPID);
 		}
 
-		// See documentation what 1 means.
+		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+		m_pScanLabSDK->n_set_fly_2d(m_CardNo, 1.0, 1.0);
+		m_pScanLabSDK->n_long_delay(m_CardNo, 10);
+		m_pScanLabSDK->n_fly_return(m_CardNo, 0, 0);
+
 		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 
@@ -1416,6 +1423,32 @@ void CRTCContext::AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserO
 }
 
 
+void CRTCContext::AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput)
+{
+	if (nDigitalOutput > 65535)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE);
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_write_io_port_list(m_CardNo, nDigitalOutput);
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+void CRTCContext::AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask)
+{
+	if (nDigitalOutput > 65535)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTVALUE);
+	if (nOutputMask > 65535)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDIGITALOUTPUTMASK);
+
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	m_pScanLabSDK->n_write_io_port_mask_list(m_CardNo, nDigitalOutput, nOutputMask);
+	
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+}
+
+
 void CRTCContext::callSetTriggerOIE(uint32_t nPeriod)
 {
 
@@ -1474,6 +1507,58 @@ void CRTCContext::DisableOIE()
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 }
+
+INLightAFXProfileSelector* CRTCContext::CreateNLightAFXBeamProfileSelector()
+{
+	if (m_pNLightAFXSelectorInstance.get () == nullptr)
+		m_pNLightAFXSelectorInstance = std::make_shared <CNLightAFXProfileSelectorInstance> (m_pScanLabSDK, m_CardNo);
+
+	return new CNLightAFXProfileSelector(m_pNLightAFXSelectorInstance);
+}
+
+IGPIOSequence* CRTCContext::AddGPIOSequence(const std::string& sIdentifier)
+{
+	auto iIter = m_GPIOSequences.find(sIdentifier);
+	if (iIter != m_GPIOSequences.end())
+		throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_DUPLICATEGPIOSEQUENCEIDENTIFIER, sIdentifier);
+
+	auto pInstance = std::make_shared<CGPIOSequenceInstance>(sIdentifier);
+
+	m_GPIOSequences.insert(std::make_pair (sIdentifier, pInstance));
+
+	return new CGPIOSequence (pInstance);
+}
+
+IGPIOSequence* CRTCContext::FindGPIOSequence(const std::string& sIdentifier, const bool bMustExist)
+{
+	auto iIter = m_GPIOSequences.find(sIdentifier);
+	if (iIter != m_GPIOSequences.end())
+		return new CGPIOSequence(iIter->second);
+	
+	if (bMustExist)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDGPIOSEQUENCE, sIdentifier);
+
+	return nullptr;
+}
+
+void CRTCContext::DeleteGPIOSequence(const std::string& sIdentifier)
+{
+	auto iIter = m_GPIOSequences.find(sIdentifier);
+	if (iIter != m_GPIOSequences.end())
+		m_GPIOSequences.erase(iIter);
+
+}
+
+void CRTCContext::WriteGPIOSequenceToList(const std::string& sIdentifier)
+{
+	auto iIter = m_GPIOSequences.find(sIdentifier);
+	if (iIter == m_GPIOSequences.end())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDGPIOSEQUENCE, sIdentifier);
+
+	iIter->second->writeToSDKList (m_pScanLabSDK.get (), m_CardNo);
+
+}
+
 
 void CRTCContext::StartOIEMeasurement()
 {
@@ -1549,6 +1634,12 @@ void CRTCContext::ClearOIEMeasurementTags()
 {
 	m_MeasurementTags.clear();
 }
+
+LibMCDriver_ScanLab_uint32 CRTCContext::GetOIEMaxMeasurementTag()
+{
+	return (uint32_t)m_MeasurementTags.size();
+}
+
 
 void CRTCContext::EnableOIEMeasurementTagging()
 {
@@ -1675,11 +1766,31 @@ void CRTCContext::SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11,
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 }
 
-IRTCRecording* CRTCContext::PrepareRecording(const bool bKeepInMemory)
+bool CRTCContext::CheckScanheadConnection()
+{
+	uint32_t nHeadNoXY = 1;
+	uint32_t nHeadNoZ = 2;
+	
+	uint32_t HeadStatus1 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoXY);
+	if ((HeadStatus1 & RTC6_BITFLAG_SCANHEADSTATUS_POWERFLAG) == 0)
+	{
+		return false;
+	}
+
+	uint32_t HeadStatus2 = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNoZ);
+	if ((HeadStatus2 & RTC6_BITFLAG_SCANHEADSTATUS_POWERFLAG) == 0)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+IRTCRecording* CRTCContext::PrepareRecording(const bool bKeepInMemory, const bool bEnableScanheadFeedback, const bool bEnableBacktransformation)
 {
 	auto pCryptoContext = m_pDriverEnvironment->CreateCryptoContext();
 	std::string sUUID = pCryptoContext->CreateUUID();
-	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, RTC_CHUNKSIZE_DEFAULT);
+	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, m_dZCorrectionFactor, RTC_CHUNKSIZE_DEFAULT, bEnableScanheadFeedback, bEnableBacktransformation);
 
 	if (bKeepInMemory)
 		m_Recordings.insert(std::make_pair (pInstance->getUUID(), pInstance));
@@ -2123,6 +2234,19 @@ void CRTCContext::AddLayerToList(LibMCEnv::PToolpathLayer pLayer, bool bFailIfNo
 	addLayerToListEx(pLayer, oieRecordingMode, nAttributeFilterID, nAttributeFilterValue, (float)dMaxLaserPowerInWatts, bFailIfNonAssignedDataExists);
 }
 
+void CRTCContext::addGPIOSequenceToList(const std::string& sSequenceName)
+{
+	auto iIter = m_GPIOSequences.find(sSequenceName);
+	if (iIter == m_GPIOSequences.end ())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDGPIOSEQUENCE, "Could not find GPIO sequence: " + sSequenceName);
+
+	auto pSequence = iIter->second;
+	if (pSequence->getAutomaticSelection () == false)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SELECTEDGPIOSEQUENCEISDISABLED, "Selected GPIO sequence is disabled: " + sSequenceName);
+
+	pSequence->writeToSDKList(m_pScanLabSDK.get(), m_CardNo);
+
+}
 
 void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordingMode oieRecordingMode, uint32_t nAttributeFilterID, int64_t nAttributeFilterValue, float fMaxLaserPowerInWatts, bool bFailIfNonAssignedDataExists)
 {
@@ -2172,6 +2296,27 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 		if (bDrawSegment && (nPointCount >= 2)) {
 
+			// Run GPIO Pre-Sequence
+			auto sPreSequence = pLayer->GetSegmentProfileValueDef(nSegmentIndex, "http://schemas.scanlab.com/gpiosequence/2025/01", "presequence", "");
+			if (!sPreSequence.empty()) {
+				addGPIOSequenceToList (sPreSequence);
+			}
+
+			// Update nLight AFX Mode if necessary
+			if (m_pNLightAFXSelectorInstance.get() != nullptr) {
+				if (m_pNLightAFXSelectorInstance->isEnabled()) {
+					int64_t nLightAFXMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.nlight.com/afx/2024/09", "afxmode", 0);
+					if (nLightAFXMode < 0) 
+						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE, "Invalid nLightAFXMode: " + std::to_string(nLightAFXMode));
+					if (nLightAFXMode > (int64_t) m_pNLightAFXSelectorInstance->getMaxAFXMode ())
+						throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDNLIGHTAFXMODE, "Invalid nLightAFXMode: " + std::to_string(nLightAFXMode));
+
+					m_pNLightAFXSelectorInstance->selectAFXModeIfNecessary((uint32_t)nLightAFXMode);
+
+				}
+			}
+
+
 			float fJumpSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
 			float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
 			float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
@@ -2183,15 +2328,21 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 				nOIEPIDControlIndex = (uint32_t) pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/oie/2023/08", "pidindex", 0);
 			}
 
-			int64_t nLaserIndexToDraw = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "", "laserindex", 0);
+			// Legacy fix: There might be 3MFs with double values as laser index (like 1.0000)
+			// Ensure that they are at least approximately installers
+			double dLaserIndexOfSegment = pLayer->GetSegmentProfileDoubleValueDef(nSegmentIndex, "", "laserindex", 0);
+			int64_t nLaserIndexOfSegment = (int64_t)round(dLaserIndexOfSegment);
+			if (abs(dLaserIndexOfSegment - double(nLaserIndexOfSegment)) > 0.001)
+				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SEGMENTHASINVALIDLASERINDEX, "Segment has invalid laser index: " + std::to_string(dLaserIndexOfSegment));
+
 			int64_t nCurrentLaserIndex = GetLaserIndex();
 
-			if (nLaserIndexToDraw == 0) {
+			if (nLaserIndexOfSegment == 0) {
 				if (bFailIfNonAssignedDataExists)
-					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER, "Laser index has no assigned scanner: " + std::to_string(nLaserIndexToDraw));
+					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_LASERINDEXHASNOASSIGNEDSCANNER, "Laser index has no assigned scanner: " + std::to_string(nLaserIndexOfSegment));
 			}
 
-			if (nLaserIndexToDraw == nCurrentLaserIndex) {
+			if (nLaserIndexOfSegment == nCurrentLaserIndex) {
 
 				int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
 
@@ -2278,7 +2429,14 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 		}
 
+		// Run GPIO Post-Sequence
+		auto sPostSequence = pLayer->GetSegmentProfileValueDef(nSegmentIndex, "http://schemas.scanlab.com/gpiosequence/2025/01", "postsequence", "");
+		if (!sPostSequence.empty()) {
+			addGPIOSequenceToList(sPostSequence);
+		}
 	}
+
+
 
 	if (m_bEnableOIEPIDControl) {
 		SetOIEPIDMode(0);
@@ -2286,6 +2444,12 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 
 	if ((oieRecordingMode != eOIERecordingMode::OIERecordingDisabled))
 		StopOIEMeasurement();
+
+	// Disable AFX Mode
+	if (m_pNLightAFXSelectorInstance.get() != nullptr) {
+		if (m_pNLightAFXSelectorInstance->isEnabled())
+			m_pNLightAFXSelectorInstance->selectAFXModeIfNecessary (0);
+	}
 
 	switch (oieRecordingMode) {
 	case eOIERecordingMode::OIEEnableAndContinuousMeasurement:
@@ -2528,5 +2692,20 @@ void CRTCContext::SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nC
 	m_pScanLabSDK->n_set_scanahead_line_params(m_CardNo, nCappedCornerScale, nCappedEndScale, nCappedAccScale);
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
+}
+
+LibMCDriver_ScanLab_int32 CRTCContext::GetRTCChannel(const LibMCDriver_ScanLab::eRTCChannelType eChannelType)
+{
+	uint32_t nInternalSignalID = (uint32_t)eChannelType;
+	if ((nInternalSignalID == 0) || (nInternalSignalID >= (uint32_t)LibMCDriver_ScanLab::eRTCChannelType::ChannelLaserOn))
+		throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDCHANNELTYPE);
+
+	return m_pScanLabSDK->n_get_value(m_CardNo, nInternalSignalID);
+
+}
+
+LibMCDriver_ScanLab_int32 CRTCContext::GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID)
+{
+	return m_pScanLabSDK->n_get_value(m_CardNo, nInternalSignalID);
 }
 

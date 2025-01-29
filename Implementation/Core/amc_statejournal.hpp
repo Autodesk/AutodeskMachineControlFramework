@@ -36,18 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include "amc_statejournalstream.hpp"
+#include "libmcdata_types.hpp"
 #include "common_chrono.hpp"
 
 namespace AMC {
-
-	enum class eStateJournalVariableType {
-		vtUnknown = 0,
-		vtIntegerParameter = 1,
-		vtStringParameter = 2,
-		vtDoubleParameter = 3,
-		vtBoolParameter = 4,
-	};
-
 
 	enum class eStateJournalMode {
 		sjmInitialising = 1,
@@ -97,9 +89,9 @@ namespace AMC {
 		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
-		void readDoubleTimeStream (const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
+		//void readDoubleTimeStream (const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
-		sStateJournalStatistics computeStatistics (const std::string& sName, const sStateJournalInterval& interval);
+		//sStateJournalStatistics computeStatistics (const std::string& sName, const sStateJournalInterval& interval);
 
 		double computeSample(const std::string& sName, const uint64_t nTimeStamp);
 		
@@ -108,6 +100,8 @@ namespace AMC {
 		void registerAlias (const std::string& sName, const std::string& sSourceName);
 
 		std::string getStartTimeAsUTC();
+
+		uint64_t getLifeTimeInMicroseconds();
 
 	};
 

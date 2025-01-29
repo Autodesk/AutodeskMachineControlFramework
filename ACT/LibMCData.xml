@@ -391,22 +391,59 @@
 		<error name="ZIPSTREAMENTRYIDNOTFOUND" code="391" description="ZIP Stream entry ID not found." />	
 		<error name="ZIPWRITINGALREADYFINISHED" code="392" description="ZIP Writing already finished." />	
 		<error name="INVALIDBUILDJOBLAYERCOUNT" code="393" description="Invalid build job layer count." />	
-		<error name="COULDNOTDETERMINEEXECUTIONCOUNT" code="394" description="Could not determine execution count." />	
-		
-		
+		<error name="COULDNOTDETERMINEEXECUTIONCOUNT" code="394" description="Could not determine execution count." />			
+		<error name="COULDNOTCREATEJOURNALFILE" code="395" description="Could not create journal file." />	
+		<error name="INVALIDJOURNALTIMESTAMP" code="396" description="Invalid journal time stamp." />	
+		<error name="INVALIDJOURNALDATAOFFSET" code="397" description="Invalid journal data offset." />	
+		<error name="INVALIDJOURNALDATALENGTH" code="398" description="Invalid journal data length." />	
+		<error name="INVALIDJOURNALDATASIGNATURE" code="399" description="Invalid journal data signature." />	
+		<error name="JOURNALMEMORYSIZEMISMATCH" code="400" description="Invalid journal memory size mismatch." />	
+		<error name="JOURNALMEMORYVARIABLECOUNTISZERO" code="401" description="Invalid journal memory variable count." />	
+		<error name="JOURNALMEMORYVALUECOUNTISZERO" code="402" description="Invalid journal memory value count." />			
+		<error name="COULDNOTSEEKJOURNALSTREAM" code="403" description="Could not create seek journal stream." />	
+		<error name="COULDNOTPREPAREJOURNALWRITING" code="404" description="Could not prepare journal writing." />	
+		<error name="COULDNOTFINISHJOURNALWRITING" code="405" description="Could not finish journal writing." />	
+		<error name="COULDNOTWRITETOJOURNALSTREAM" code="406" description="Could not write to journal stream." />	
+		<error name="COULDNOTREADFROMJOURNALSTREAM" code="407" description="Could not read from journal stream." />	
+		<error name="COULDNOTFULLYREADFROMJOURNALSTREAM" code="408" description="Could not fully read from journal stream." />	
+		<error name="COULDGETJOURNALSTREAMPOSITION" code="409" description="Could not get journal stream position." />	
+		<error name="INVALIDJOURNALFILEINDEX" code="410" description="Invalid journal file index." />	
+		<error name="JOURNALEXCEEDSMAXIMUMFILES" code="411" description="Journal exceeds maxium files." />	
+		<error name="COULDNOTFINDJOURNALUUID" code="412" description="Could not find journal UUID." />	
+		<error name="UNKNOWNDATATYPE" code="413" description="Unknown data type." />	
+		<error name="DUPLICATEJOURNALVARIABLEID" code="414" description="Duplicate journal variable ID." />	
+		<error name="DUPLICATEJOURNALVARIABLEINDEX" code="415" description="Duplicate journal variable index." />	
+		<error name="DUPLICATEJOURNALVARIABLENAME" code="416" description="Duplicate journal variable name." />	
+		<error name="DUPLICATEJOURNALFILEINDEX" code="417" description="Duplicate journal file index." />	
+		<error name="DUPLICATEJOURNALCHUNKINDEX" code="418" description="Duplicate journal chunk index." />	
+		<error name="JOURNALFILEINDEXNOTFOUND" code="419" description="Journal file index not found." />	
+		<error name="JOURNALCHUNKNOTFOUND" code="420" description="Journal chunk not found." />		
+		<error name="JOURNALREADERFILENOTOPEN" code="421" description="Journal chunk not found." />		
+		<error name="NEGATIVEJOURNALCHUNKINDEX" code="422" description="Negative journal chunk index" />		
+		<error name="NEGATIVEJOURNALFILEINDEX" code="423" description="Negative journal file index" />		
+		<error name="NEGATIVEJOURNALSTARTTIMESTAMP" code="424" description="Negative journal start time stamp" />
+		<error name="INVALIDJOURNALENDTIMESTAMP" code="425" description="Invalid journal end time stamp" />
+		<error name="NEGATIVEJOURNALDATAOFFSET" code="426" description="Negative journal data offset" />
+		<error name="NEGATIVEJOURNALDATALENGTH" code="427" description="Negative journal data length" />
+		<error name="JOURNALTIMESTAMPSNOTINCREASING" code="428" description="Journal time stamp is not increasing" />
+		<error name="NEGATIVEJOURNALVARIABLEINDEX" code="429" description="Negative journal variable index" />
+		<error name="NONPOSITIVEJOURNALVARIABLEID" code="430" description="Non-positive journal variable ID" />
+		<error name="EMPTYJOURNALVARIABLENAME" code="431" description="Empty journal variable name" />
+		<error name="INVALIDVARIABLEINDEX" code="432" description="Invalid variable index" />
+		<error name="INVALIDCHUNKINDEX" code="433" description="Invalid chunk index" />
+		<error name="UNKNOWNSOURCEJOURNALVARIABLENAME" code="434" description="Unknown source journal variable name" />
+		<error name="JOURNALVARIABLEALIASALREADYEXISTS" code="435" description="Journal variable alias already exists." />
+		<error name="INVALIDALIASINDEX" code="436" description="Invalid alias index" />
+		<error name="SOURCEOFJOURNALALIASNOTFOUND" code="437" description="Source of Journal Alias not found" />
+
 	</errors>
 	
 		
 	<struct name="JournalChunkVariableInfo">
 		<member name="VariableIndex" type="uint32" />
-		<member name="VariableType" type="uint32" />
+		<member name="StorageType" type="uint32" />
 		<member name="EntryStartIndex" type="uint32" />
 		<member name="EntryCount" type="uint32" />
-	</struct>
-
-	<struct name="JournalChunkIntegerEntry">
-		<member name="RelativeTimeStampInMicroseconds" type="uint32" />
-		<member name="IntegerValue" type="int64" />
 	</struct>
 
 	<enum name="AlertLevel">
@@ -685,29 +722,136 @@
 	</class>
 
 
+    <!-- The JournalChunkIntegerData class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="JournalChunkIntegerData" parent="Base" description="Class containing the read out value of a journal chunk">
+
+		<method name="GetChunkIndex" description="Returns index of chunk.">
+			<param name="ChunkIndex" type="uint32" pass="return" description="Index of the Chunk" />	
+		</method>		
+
+		<method name="GetStartTimeStamp" description="Returns start time stamp of chunk.">
+			<param name="StartTimeStamp" type="uint64" pass="return" description="Start Timestamp of the chunk (in microseconds)" />	
+		</method>		
+
+		<method name="GetEndTimeStamp" description="Returns start end stamp of chunk.">
+			<param name="EndTimeStamp" type="uint64" pass="return" description="End Timestamp of the chunk (in microseconds)" />	
+		</method>		
+
+		<method name="GetVariableInfo" description="Returns the variable information array.">
+			<param name="VariableInfo" type="structarray" class="JournalChunkVariableInfo" pass="out" description="Variable information array. References TimeStamps and Values." />	
+		</method>		
+
+		<method name="GetTimeStampData" description="Returns the timestamp data.">
+			<param name="TimeStampData" type="basicarray" class="uint32" pass="out" description="Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData." />	
+		</method>		
+
+		<method name="GetValueData" description="Returns the timestamp data.">
+			<param name="ValueData" type="basicarray" class="int64" pass="out" description="Integer values. Must have same cardinality as TimeStampData." />	
+		</method>		
+
+	</class>
+
+
     <!-- The JournalSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="JournalSession" parent="Base" description="Journaling Instance">
 
 		<method name="GetSessionUUID" description="retrieves the session UUID.">
 			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
-		</method>	
+		</method>
+		
+		<method name="CreateVariableInJournalDB" description="creates variable in journal DB.">
+			<param name="Name" type="string" pass="in" description="Variable Name" />	
+			<param name="ID" type="uint32" pass="in" description="Variable ID" />	
+			<param name="Index" type="uint32" pass="in" description="Variable Index" />	
+			<param name="DataType" type="enum" class="ParameterDataType" pass="in" description="Variable Data Type" />	
+			<param name="Units" type="double" pass="in" description="Unit factor, if DataType is Double. Will be ignored otherwise." />	
+		</method>
+		
+		<method name="CreateVariableAliasInJournalDB" description="creates variable alias in journal DB.">
+			<param name="AliasName" type="string" pass="in" description="Alias Name" />	
+			<param name="SourceName" type="string" pass="in" description="Source Variable Name" />	
+		</method>
+
+		
+		
 
 		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
 			<param name="StartTimeStamp" type="uint64" pass="in" description="Start Timestamp of the chunk (in microseconds)" />	
 			<param name="EndTimeStamp" type="uint64" pass="in" description="End Timestamp of the chunk (in microseconds)" />	
-			<param name="VariableInfo" type="structarray" class="JournalChunkVariableInfo" pass="in" description="Variable information." />	
-			<param name="EntryData" type="structarray" class="JournalChunkIntegerEntry" pass="in" description="Entry bulk data." />	
-		</method>
-		
-		<method name="GetChunkCapacity" description="Returns the chunk capacity of the session journal.">
-			<param name="ChunkCapacity" type="uint32" pass="return" description="Maximum Chunk Capacity in Journal in Bytes" />	
-		</method>
-		
-		<method name="GetFlushInterval" description="Returns the flush interval of the session journal.">
-			<param name="FlushInterval" type="uint32" pass="return" description="The interval determines how often a session journal chunk is written to disk. In Seconds." />	
+			<param name="VariableInfo" type="structarray" class="JournalChunkVariableInfo" pass="in" description="Variable information array. References TimeStamps and Values." />	
+			<param name="TimeStampData" type="basicarray" class="uint32" pass="in" description="Relative Timestamps with reference of StartTimeStamp. Must have same cardinality as ValueData." />	
+			<param name="ValueData" type="basicarray" class="int64" pass="in" description="Integer values. Must have same cardinality as TimeStampData." />	
 		</method>
 				
+		<method name="ReadChunkIntegerData" description="reads journal state data from disk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to read. Fails if chunk index is not found." />	
+			<param name="IntegerData" type="class" class="JournalChunkIntegerData" pass="return" description="Journal Chunk Data Instance" />	
+		</method>		
+		
+		<method name="GetChunkCacheQuota" description="Returns the chunk cache quota size in bytes.">
+			<param name="CacheQuota" type="uint64" pass="return" description="Maximum Chunk Capacity in Journal in Bytes" />	
+		</method>
+		
+		<method name="GetChunkIntervalInMicroseconds" description="Returns the chunk interval of the session journal in Microseconds.">
+			<param name="ChunkInterval" type="uint64" pass="return" description="The interval determines how often a session journal chunk is written to disk." />	
+		</method>
+				
+	</class>
+	
+	
+	    <!-- The JournalReader class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="JournalReader" parent="Base" description="Journaling Instance">
+
+		<method name="GetJournalUUID" description="retrieves the UUID of the journal.">
+			<param name="JournalUUID" type="string" pass="return" description="Journal UUID" />	
+		</method>
+		
+		<method name="GetStartTime" description="returns the start timestamp of the journal.">
+			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
+		</method>
+
+		<method name="GetLifeTimeInMicroseconds" description="Get journal life time in microseconds.">
+			<param name="LifeTime" type="uint64" pass="return" description="Journal life time in microseconds." />	
+		</method>				
+		
+		<method name="ReadChunkIntegerData" description="reads journal state data from disk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to read. Fails if chunk index is not found." />	
+			<param name="IntegerData" type="class" class="JournalChunkIntegerData" pass="return" description="Journal Chunk Data Instance" />	
+		</method>		
+
+		<method name="GetVariableCount" description="Returns number of variables.">
+			<param name="Count" type="uint32" pass="return" description="Number of variables in journal." />	
+		</method>				
+
+		<method name="GetVariableInformation" description="Returns the information for a variable.">
+			<param name="VariableIndex" type="uint32" pass="in" description="Index of the variable." />	
+			<param name="VariableName" type="string" pass="out" description="Name of the variable." />	
+			<param name="VariableID" type="uint32" pass="out" description="ID of the variable." />
+			<param name="DataType" type="enum" class="ParameterDataType" pass="out" description="Data type of the variable." />
+			<param name="Units" type="double" pass="out" description="Unit factor, if DataType is Double. Will be 0.0 otherwise." />	
+		</method>				
+						
+		<method name="GetAliasCount" description="Returns number of aliases.">
+			<param name="Count" type="uint32" pass="return" description="Number of aliases in journal." />	
+		</method>				
+
+		<method name="GetAliasInformation" description="Returns the information for a variable alias.">
+			<param name="AliasIndex" type="uint32" pass="in" description="Index of the alias." />	
+			<param name="AliasName" type="string" pass="out" description="Name of the alias." />	
+			<param name="SourceVariableName" type="string" pass="out" description="Name of the variable." />	
+		</method>				
+
+		<method name="GetChunkCount" description="Returns number of chunks.">
+			<param name="Count" type="uint32" pass="return" description="Number of chunks in journal." />	
+		</method>				
+
+		<method name="GetChunkInformation" description="Returns the information for a chunk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the chunk." />	
+			<param name="StartTimeStamp" type="uint64" pass="out" description="Start timestamp of the chunk in microseconds." />	
+			<param name="EndTimeStamp" type="uint64" pass="out" description="End timestamp of the chunk in microseconds." />	
+		</method>				
+
 	</class>
 
     <!-- The StorageStream class is not thread safe and MUST ONLY be used in a single thread context... -->
@@ -1308,6 +1452,11 @@
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
 		</method>
 
+		<method name="JobExists" description="Checks if a job with a specific UUID exists.">
+			<param name="JobUUID" type="string" pass="in" description="UUID String for the build job." />	
+			<param name="Exists" type="bool" pass="return" description="Build Job exists." />
+		</method>
+
 		<method name="RetrieveJob" description="Retrieves a job with a specific UUID.">
 			<param name="JobUUID" type="string" pass="in" description="UUID String for the build job. Must be an existing Job." />	
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
@@ -1640,12 +1789,17 @@
 			<param name="BuildJobHandler" type="class" class="BuildJobHandler" pass="return" description="BuildJobHandler class instance." />	
 		</method>
 		
-		<method name="CreateNewLogSession" description="creates a global log session access class.">
+		<method name="CreateNewLogSession" description="creates a global log session class.">
 			<param name="LogSession" type="class" class="LogSession" pass="return" description="LogSession class instance." />	
 		</method>
 		
-		<method name="CreateJournalSession" description="creates a global journal session access class.">
+		<method name="CreateJournalSession" description="creates a global journal session class.">
 			<param name="JournalSession" type="class" class="JournalSession" pass="return" description="JournalSession class instance." />	
+		</method>
+
+		<method name="CreateJournalReader" description="creates an access instance to a past journal session. Fails if journal cannot be accessed.">
+			<param name="JournalUUID" type="string" pass="in" description="UUID of journal to load. UUID MUST NOT reference the current journaling session.." />	
+			<param name="JournalReader" type="class" class="JournalReader" pass="return" description="JournalReader class instance." />	
 		</method>
 
 		<method name="CreateAlertSession" description="creates a global alert session access class.">

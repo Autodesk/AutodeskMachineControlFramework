@@ -34,15 +34,49 @@ Abstract: This is a stub class definition of CDriver_OPCUA
 // Include custom headers here.
 #include "libmcdriver_opcua_driver_opcua.hpp"
 #include "libmcdriver_opcua_interfaceexception.hpp"
-
-#include "pugixml.hpp"
-#include <iostream>
-
+    
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 
 using namespace LibMCDriver_OPCUA::Impl;
+
+class COPCUA_DLLDirectoryCache {
+private:
+#ifdef _WIN32
+    std::wstring m_sCachedDLLDirectoryW;
+#endif // _WIN32
+
+public:
+    COPCUA_DLLDirectoryCache();
+    virtual ~COPCUA_DLLDirectoryCache();
+
+};
+
+typedef std::shared_ptr<COPCUA_DLLDirectoryCache> POPCUA_DLLDirectoryCache;
+
+
+COPCUA_DLLDirectoryCache::COPCUA_DLLDirectoryCache()
+{
+#ifdef _WIN32
+    std::vector<wchar_t> buffer;
+    buffer.resize(MAX_PATH + 1);
+    GetDllDirectoryW(MAX_PATH, buffer.data());
+
+    buffer.at(MAX_PATH) = 0;
+    m_sCachedDLLDirectoryW = std::wstring(buffer.data());
+#endif // _WIN32
+}
+
+COPCUA_DLLDirectoryCache::~COPCUA_DLLDirectoryCache()
+{
+#ifdef _WIN32
+    if (!m_sCachedDLLDirectoryW.empty()) {
+        SetDllDirectoryW(m_sCachedDLLDirectoryW.c_str());
+    }
+#endif // _WIN32
+}
+
 
 /*************************************************************************************************************************
  Class definition of CDriver_OPCUA 
@@ -59,120 +93,40 @@ CDriver_OPCUA::CDriver_OPCUA(const std::string& sName, LibMCEnv::PDriverEnvironm
 CDriver_OPCUA::~CDriver_OPCUA()
 {
     m_pClient = nullptr;
+    m_pLibOpen62541DLL = nullptr;
     m_pOpen62541DLL = nullptr;
+    m_pLibSSLDLL = nullptr;
+    m_pLibCryptoDLL = nullptr;
     m_pWorkingDirectory = nullptr;
 }
 
 void CDriver_OPCUA::Configure(const std::string& sConfigurationString)
 {
-    if (sConfigurationString.length() == 0)
-        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_INVALIDDRIVERPROTOCOL);
-
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_string(sConfigurationString.c_str());
-    if (!result)
-        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_COULDNOTPARSEDRIVERPROTOCOL);
-
-    pugi::xml_node burprotocolNode = doc.child("opcuaprotocol");
-    if (burprotocolNode.empty())
-        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_INVALIDDRIVERPROTOCOL);
-
-    pugi::xml_node versionNode = burprotocolNode.child("version");
-    if (versionNode.empty())
-        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_NOVERSIONDEFINITION);
-
-    pugi::xml_attribute majorversionAttrib = versionNode.attribute("major");
-    if (majorversionAttrib.empty())
-        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_NOMAJORVERSION);
-    m_nMajorVersion = majorversionAttrib.as_uint(0);
-
-    pugi::xml_attribute minorversionAttrib = versionNode.attribute("minor");
-    if (minorversionAttrib.empty())
-        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_NOMINORVERSION);
-    m_nMinorVersion = minorversionAttrib.as_uint(0);
-
-    pugi::xml_attribute patchversionAttrib = versionNode.attribute("patch");
-    if (patchversionAttrib.empty())
-        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_NOPATCHVERSION);
-    m_nPatchVersion = patchversionAttrib.as_uint(0);
-
-    pugi::xml_node machineStatusNode = burprotocolNode.child("machinestatus");
-    if (machineStatusNode.empty())
-        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_NOMACHINESTATUSDEFINITION);
-
-    /*auto statusNodes = machineStatusNode.children();
-    for (pugi::xml_node childNode : statusNodes)
-    {
-        auto pValue = readParameterFromXMLNode(childNode);
-
-        if (dynamic_cast<CDriver_BuRBoolValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterBoolParameter(pValue->getName(), pValue->getDescription(), false);
-
-        if (dynamic_cast<CDriver_BuRStringValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterStringParameter(pValue->getName(), pValue->getDescription(), "");
-
-        if (dynamic_cast<CDriver_BuRLRealValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
-
-        if (dynamic_cast<CDriver_BuRRealValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
-
-        if (dynamic_cast<CDriver_BuRIntValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
-
-        if (dynamic_cast<CDriver_BuRDIntValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
-
-        m_DriverParameters.push_back(pValue);
-        m_DriverParameterMap.insert(std::make_pair(pValue->getName(), pValue));
-
-    } */
-
-
-    /*pugi::xml_node commandsNode = burprotocolNode.child("commands");
-    if (commandsNode.empty())
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOCOMMANDSLIST);
-
-    auto commandNodes = commandsNode.children("command");
-    for (pugi::xml_node commandNode : commandNodes)
-    {
-
-        auto nameAttrib = commandNode.attribute("name");
-        auto cmdIdAttrib = commandNode.attribute("id");
-
-        std::string sName = nameAttrib.as_string();
-        if (sName.empty())
-            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COMMANDNAMEMISSING);
-
-        if (cmdIdAttrib.empty())
-            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COMMANDIDMISSING);
-
-        uint32_t nCommandID = cmdIdAttrib.as_int(0);
-        if ((nCommandID < BUR_MINCUSTOMCOMMANDID) || (nCommandID > BUR_MAXCUSTOMCOMMANDID))
-            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCOMMANDID);
-
-        auto pDefinition = std::make_shared<CDriver_BuRCommandDefinition>(sName, nCommandID);
-        m_CommandDefinitions.insert(std::make_pair(sName, pDefinition));
-
-        auto parametersNodes = commandNode.children();
-        for (pugi::xml_node parameterNode : parametersNodes)
-        {
-            auto pValue = readParameterFromXMLNode(parameterNode);
-            pDefinition->addParameter(pValue);
-        }
-
-
-    } */
-
 
     m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
-    m_pOpen62541DLL = m_pWorkingDirectory->StoreDriverData("open62541.dll", "open62541_win64");
-    
-    auto pSDK = std::make_shared<COpen62541SDK>(m_pOpen62541DLL->GetAbsoluteFileName());
-    m_pClient = std::make_shared <COpen62541Client>(pSDK, this);
+    m_pOpen62541DLL = m_pWorkingDirectory->StoreDriverData("open62541.dll", "open62541-x64");
+    m_pLibCryptoDLL = m_pWorkingDirectory->StoreDriverData("libcrypto-3-x64.dll", "libcrypto-3-x64");
+    m_pLibSSLDLL = m_pWorkingDirectory->StoreDriverData("libssl-3-x64.dll", "libssl-3-x64");
+    m_pLibOpen62541DLL = m_pWorkingDirectory->StoreDriverData("libopen62541.dll", "libopen62541-x64");
 
-    m_pClient->connect("opc.tcp://localhost:4840/freeopcua/server/");
+    auto pDLLDirectoryCache = std::make_shared<COPCUA_DLLDirectoryCache>();
 
+#ifdef _WIN32
+    std::string sDLLDirectoryUTF8 = m_pWorkingDirectory->GetAbsoluteFilePath();
+
+    int nPathLength = (int)sDLLDirectoryUTF8.length();
+    int nPathBufferSize = nPathLength * 2 + 2;
+    std::vector<wchar_t> wsDLLPath(nPathBufferSize);
+    int nPathResult = MultiByteToWideChar(CP_UTF8, 0, sDLLDirectoryUTF8.c_str(), nPathLength, &wsDLLPath[0], nPathBufferSize);
+    if (nPathResult == 0)
+        throw ELibMCDriver_OPCUAInterfaceException(LIBMCDRIVER_OPCUA_ERROR_COULDNOTLOADLIBRARY);
+    SetDllDirectoryW(wsDLLPath.data ());
+#endif
+
+
+
+    m_pLibraryWrapper = LibOpen62541::CWrapper::loadLibrary(m_pLibOpen62541DLL->GetAbsoluteFileName ());
+    m_pClient = m_pLibraryWrapper->CreateClient();
 }
 
 std::string CDriver_OPCUA::GetName()
@@ -182,7 +136,7 @@ std::string CDriver_OPCUA::GetName()
 
 std::string CDriver_OPCUA::GetType()
 {
-	return "opcua";
+	return "opcua-1.0";
 }
 
 void CDriver_OPCUA::GetVersion(LibMCDriver_OPCUA_uint32& nMajor, LibMCDriver_OPCUA_uint32& nMinor, LibMCDriver_OPCUA_uint32& nMicro, std::string& sBuild)
@@ -215,65 +169,158 @@ bool CDriver_OPCUA::IsSimulationMode()
 	return m_bSimulationMode;
 }
 
-void CDriver_OPCUA::Connect(const std::string & sIPAddress, const LibMCDriver_OPCUA_uint32 nPort, const LibMCDriver_OPCUA_uint32 nTimeout)
+void CDriver_OPCUA::DisableEncryption() 
 {
-	
+    m_pClient->DisableEncryption ();
+}
 
+void CDriver_OPCUA::EnableEncryption(const std::string& sLocalCertificate, const std::string& sPrivateKey, const LibMCDriver_OPCUA::eUASecurityMode eSecurityMode)
+{
+    LibOpen62541::eUASecurityMode eLibSecurityMode;
 
+    switch (eSecurityMode) {
+        case LibMCDriver_OPCUA::eUASecurityMode::Sign:
+            eLibSecurityMode = LibOpen62541::eUASecurityMode::Sign;
+            break;
+        case LibMCDriver_OPCUA::eUASecurityMode::SignAndEncrypt:
+            eLibSecurityMode = LibOpen62541::eUASecurityMode::SignAndEncrypt;
+            break;
+        default:
+            eLibSecurityMode = LibOpen62541::eUASecurityMode::None;
+    }
+
+    m_pClient->EnableEncryption(sLocalCertificate, sPrivateKey, eLibSecurityMode);
+}
+
+bool CDriver_OPCUA::IsConnected()
+{
+    return m_pClient->IsConnected();
+}
+
+void CDriver_OPCUA::ConnectWithUserName(const std::string& sEndPointURL, const std::string& sUsername, const std::string& sPassword, const std::string& sApplicationURL)
+{
+    m_pClient->ConnectUserName (sEndPointURL, sUsername, sPassword, sApplicationURL);
 }
 
 void CDriver_OPCUA::Disconnect()
 {
+    m_pClient->Disconnect();
 }
 
-IPLCCommandList * CDriver_OPCUA::CreateCommandList()
+LibMCDriver_OPCUA_int64 CDriver_OPCUA::ReadInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const LibMCDriver_OPCUA::eUAIntegerType eNodeType)
 {
-	return nullptr;
-}
-
-IPLCCommand * CDriver_OPCUA::CreateCommand(const std::string & sCommandName)
-{
-	return nullptr;
-}
-
-void CDriver_OPCUA::StartJournaling()
-{
-}
-
-void CDriver_OPCUA::StopJournaling()
-{
-}
-
-void CDriver_OPCUA::RefreshJournal()
-{
-}
-
-void CDriver_OPCUA::onLog(const std::string& sMessage, opcUA_LogLevel level, opcUA_LogCategory category)
-{
-    std::string sCategory;
-    switch (category) {
-    case UA_LOGCATEGORY_NETWORK: sCategory = "network"; break;
-    case UA_LOGCATEGORY_SECURECHANNEL: sCategory = "securechannel"; break;
-    case UA_LOGCATEGORY_SESSION: sCategory = "session"; break;
-    case UA_LOGCATEGORY_SERVER: sCategory = "server"; break;
-    case UA_LOGCATEGORY_CLIENT: sCategory = "client"; break;
-    case UA_LOGCATEGORY_USERLAND: sCategory = "userland"; break;
-    case UA_LOGCATEGORY_SECURITYPOLICY: sCategory = "securitypolicy"; break;
-    case UA_LOGCATEGORY_EVENTLOOP: sCategory = "eventloop"; break;
-    default: sCategory = "unknown";
+    LibOpen62541::eUAIntegerType eLibNodeType;
+    switch (eNodeType) {
+        case LibMCDriver_OPCUA::eUAIntegerType::UAUInt8:
+            eLibNodeType = LibOpen62541::eUAIntegerType::UAUInt8;
+            break;
+        case LibMCDriver_OPCUA::eUAIntegerType::UAUInt16:
+            eLibNodeType = LibOpen62541::eUAIntegerType::UAUInt16;
+            break;
+        case LibMCDriver_OPCUA::eUAIntegerType::UAUInt32:
+            eLibNodeType = LibOpen62541::eUAIntegerType::UAUInt32;
+            break;
+        case LibMCDriver_OPCUA::eUAIntegerType::UAUInt64:
+            eLibNodeType = LibOpen62541::eUAIntegerType::UAUInt64;
+            break;
+        case LibMCDriver_OPCUA::eUAIntegerType::UAInt8:
+            eLibNodeType = LibOpen62541::eUAIntegerType::UAInt8;
+            break;
+        case LibMCDriver_OPCUA::eUAIntegerType::UAInt16:
+            eLibNodeType = LibOpen62541::eUAIntegerType::UAInt16;
+            break;
+        case LibMCDriver_OPCUA::eUAIntegerType::UAInt32:
+            eLibNodeType = LibOpen62541::eUAIntegerType::UAInt32;
+            break;
+        case LibMCDriver_OPCUA::eUAIntegerType::UAInt64:
+            eLibNodeType = LibOpen62541::eUAIntegerType::UAInt64;
+            break;
+        default:
+            eLibNodeType = LibOpen62541::eUAIntegerType::Unknown;
     }
 
-    switch (level) {
-    case UA_LOGLEVEL_DEBUG:
-    case UA_LOGLEVEL_INFO:
-        m_pDriverEnvironment->LogInfo(sCategory + " | " + sMessage);
-        break;
-    case UA_LOGLEVEL_WARNING:
-        m_pDriverEnvironment->LogWarning(sCategory + " | " + sMessage);
-        break;
-    case UA_LOGLEVEL_ERROR: 
-    case UA_LOGLEVEL_FATAL:
-        m_pDriverEnvironment->LogMessage(sCategory + " | " + sMessage);
-        break;
-    }
+    return m_pClient->ReadInteger (nNameSpace, sNodeName, eLibNodeType);
 }
+
+LibMCDriver_OPCUA_double CDriver_OPCUA::ReadDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const LibMCDriver_OPCUA::eUADoubleType eNodeType)
+{
+    LibOpen62541::eUADoubleType eLibNodeType;
+    switch (eNodeType) {
+    case LibMCDriver_OPCUA::eUADoubleType::UAFloat32:
+        eLibNodeType = LibOpen62541::eUADoubleType::UAFloat32;
+        break;
+    case LibMCDriver_OPCUA::eUADoubleType::UADouble64:
+        eLibNodeType = LibOpen62541::eUADoubleType::UADouble64;
+        break;
+    default:
+        eLibNodeType = LibOpen62541::eUADoubleType::Unknown;
+    }
+
+    return m_pClient->ReadDouble (nNameSpace, sNodeName, eLibNodeType);
+}
+
+std::string CDriver_OPCUA::ReadString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName)
+{
+    return m_pClient->ReadString(nNameSpace, sNodeName);
+}
+
+void CDriver_OPCUA::WriteInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const LibMCDriver_OPCUA::eUAIntegerType eNodeType, const LibMCDriver_OPCUA_int64 nValue)
+{
+    LibOpen62541::eUAIntegerType eLibNodeType;
+    switch (eNodeType) {
+    case LibMCDriver_OPCUA::eUAIntegerType::UAUInt8:
+        eLibNodeType = LibOpen62541::eUAIntegerType::UAUInt8;
+        break;
+    case LibMCDriver_OPCUA::eUAIntegerType::UAUInt16:
+        eLibNodeType = LibOpen62541::eUAIntegerType::UAUInt16;
+        break;
+    case LibMCDriver_OPCUA::eUAIntegerType::UAUInt32:
+        eLibNodeType = LibOpen62541::eUAIntegerType::UAUInt32;
+        break;
+    case LibMCDriver_OPCUA::eUAIntegerType::UAUInt64:
+        eLibNodeType = LibOpen62541::eUAIntegerType::UAUInt64;
+        break;
+    case LibMCDriver_OPCUA::eUAIntegerType::UAInt8:
+        eLibNodeType = LibOpen62541::eUAIntegerType::UAInt8;
+        break;
+    case LibMCDriver_OPCUA::eUAIntegerType::UAInt16:
+        eLibNodeType = LibOpen62541::eUAIntegerType::UAInt16;
+        break;
+    case LibMCDriver_OPCUA::eUAIntegerType::UAInt32:
+        eLibNodeType = LibOpen62541::eUAIntegerType::UAInt32;
+        break;
+    case LibMCDriver_OPCUA::eUAIntegerType::UAInt64:
+        eLibNodeType = LibOpen62541::eUAIntegerType::UAInt64;
+        break;
+    default:
+        eLibNodeType = LibOpen62541::eUAIntegerType::Unknown;
+    }
+
+    m_pClient->WriteInteger(nNameSpace, sNodeName, eLibNodeType, nValue);
+
+}
+
+void CDriver_OPCUA::WriteDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const LibMCDriver_OPCUA::eUADoubleType eNodeType, const LibMCDriver_OPCUA_double dValue)
+{
+    LibOpen62541::eUADoubleType eLibNodeType;
+    switch (eNodeType) {
+    case LibMCDriver_OPCUA::eUADoubleType::UAFloat32:
+        eLibNodeType = LibOpen62541::eUADoubleType::UAFloat32;
+        break;
+    case LibMCDriver_OPCUA::eUADoubleType::UADouble64:
+        eLibNodeType = LibOpen62541::eUADoubleType::UADouble64;
+        break;
+    default:
+        eLibNodeType = LibOpen62541::eUADoubleType::Unknown;
+    }
+
+    m_pClient->WriteDouble(nNameSpace, sNodeName, eLibNodeType, dValue);
+}
+
+
+void CDriver_OPCUA::WriteString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string& sNodeName, const std::string& sValue)
+{
+    m_pClient->WriteString(nNameSpace, sNodeName, sValue);
+}
+
+

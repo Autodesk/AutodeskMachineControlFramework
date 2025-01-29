@@ -84,6 +84,10 @@ private:
 
 	std::vector<AMC::PUIClientAction> m_ClientActions;
 
+	std::map<std::string, std::string> m_ExternalEventParameters;
+
+	std::map<std::string, std::string> m_ExternalEventReturnValues;
+
 protected:
 
 public:
@@ -149,7 +153,7 @@ public:
 
 	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
-	IImageData* LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+	IImageLoader* CreateImageLoader() override;
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
@@ -166,6 +170,8 @@ public:
 	std::string ShowMessageDlg(const std::string& sCaption, const std::string& sTitle, const LibMCEnv::eMessageDialogType eDialogType, const std::string& sYesEvent, const std::string& sNoEvent, const std::string& sCancelEvent) override;
 
 	std::vector<AMC::PUIClientAction>& getClientActions();
+
+	std::map<std::string, std::string>& getExternalEventReturnValues();
 
 	ITestEnvironment* GetTestEnvironment() override;
 
@@ -241,7 +247,26 @@ public:
 
 	IDateTime* GetStartDateTime() override;
 
+	bool HasResourceData(const std::string& sIdentifier) override;
+
+	void LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer) override;
+
+	std::string LoadResourceString(const std::string& sResourceName) override;
+
 	void Sleep(const LibMCEnv_uint32 nDelay) override;
+
+	void addExternalEventParameter (const std::string & sKey, const std::string & sValue);
+
+	bool HasExternalEventParameter(const std::string& sParameterName) override;
+
+	std::string GetExternalEventParameter(const std::string& sParameterName) override;
+
+	void AddExternalEventResultValue(const std::string& sReturnValueName, const std::string& sReturnValue) override;
+
+	IJSONObject* GetExternalEventParameters() override;
+
+	IJSONObject* GetExternalEventResults() override;
+
 
 };
 

@@ -94,6 +94,9 @@ namespace AMC {
 		// Returns the original source parameter path of the parameter (resolving all derives)
 		std::string getOriginalParameterPath(const std::string& sName);
 
+		// Returns the change counter of the parameter (resolving all derives)
+		uint64_t getChangeCounterOf(const std::string& sName);
+
 		// Returns the local parameter path, like "statemachine.groupname.parametername"
 		std::string getLocalParameterPath(const std::string& sName);
 
@@ -118,6 +121,8 @@ namespace AMC {
 		int64_t getIntParameterValueByName(const std::string& sName);
 		bool getBoolParameterValueByIndex(const uint32_t nIndex);
 		bool getBoolParameterValueByName(const std::string& sName);
+		std::string getUUIDParameterValueByIndex(const uint32_t nIndex);
+		std::string getUUIDParameterValueByName(const std::string& sName);
 
 		eParameterDataType getParameterDataTypeByIndex(const uint32_t nIndex);
 		eParameterDataType getParameterDataTypeByName(const std::string& sName);

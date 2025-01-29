@@ -104,6 +104,13 @@ target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Imp
 target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Interfaces)
 target_compile_options(${DRIVERNAME} PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
 
+if(MSVC)
+    # For Release builds: /MT
+    target_compile_options(${DRIVERNAME} PRIVATE "$<$<CONFIG:Release>:/MT>")
+    # For Debug builds: /MTd
+    target_compile_options(${DRIVERNAME} PRIVATE "$<$<CONFIG:Debug>:/MTd>")
+ endif()
+
 if(WIN32)
 if (MSVC)
 else()

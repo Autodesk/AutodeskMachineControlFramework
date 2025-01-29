@@ -271,7 +271,7 @@ int64_t CUIExpression::evaluateIntegerValue(CStateMachineData* pStateMachineData
 		if (!bIsNumber)
 			throw ELibMCCustomException (LIBMC_ERROR_INVALIDINTEGEREXPRESSION, sExpression);
 
-		return AMCCommon::CUtils::stringToInteger(sExpression);
+		return AMCCommon::CUtils::stringToIntegerWithAccuracy(sExpression, PARAMETER_INTEGERACCURACY);
 	}
 
 }
@@ -339,7 +339,7 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 		if (!bIsNumber)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDBOOLEANEXPRESSION, sExpression);
 
-		int64_t nValue = AMCCommon::CUtils::stringToInteger(sExpression);
+		int64_t nValue = AMCCommon::CUtils::stringToIntegerWithAccuracy(sExpression, PARAMETER_INTEGERACCURACY);
 		if (bInvert)
 			return (nValue == 0);
 
@@ -354,6 +354,22 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 bool CUIExpression::evaluateBoolValue(PStateMachineData pStateMachineData)
 {
 	return evaluateBoolValue(pStateMachineData.get ());
+}
+
+std::string CUIExpression::evaluateUUIDValue(CStateMachineData* pStateMachineData)
+{
+	std::string sValue = evaluateStringValue(pStateMachineData);
+
+	if (AMCCommon::CUtils::stringIsUUIDString(sValue))
+		return AMCCommon::CUtils::normalizeUUIDString(sValue);
+
+	return AMCCommon::CUtils::createEmptyUUID();
+	
+}
+
+std::string CUIExpression::evaluateUUIDValue(PStateMachineData pStateMachineData)
+{
+	return evaluateUUIDValue(pStateMachineData.get());
 }
 
 

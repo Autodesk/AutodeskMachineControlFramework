@@ -94,6 +94,12 @@ public:
 
 	void StopExecution() override;
 
+	void LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable) override;
+
+	LibMCDriver_ScanLabSMC_double GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType) override;
+
+	LibMCDriver_ScanLabSMC_double GetJobDuration() override;
+
 };
 
 } // namespace Impl

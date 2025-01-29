@@ -107,3 +107,28 @@ void CDriverStatusUpdateSession::Sleep(const LibMCEnv_uint32 nDelay)
 	m_Chrono.sleepMilliseconds(nDelay);
 }
 
+std::string CDriverStatusUpdateSession::GetStringParameter(const std::string& sParameterName)
+{
+	return m_pParameterGroup->getParameterValueByName(sParameterName);
+}
+
+std::string CDriverStatusUpdateSession::GetUUIDParameter(const std::string& sParameterName)
+{
+	return AMCCommon::CUtils::normalizeUUIDString (m_pParameterGroup->getParameterValueByName(sParameterName));
+
+}
+
+LibMCEnv_double CDriverStatusUpdateSession::GetDoubleParameter(const std::string& sParameterName)
+{
+	return m_pParameterGroup->getDoubleParameterValueByName(sParameterName);
+}
+
+LibMCEnv_int64 CDriverStatusUpdateSession::GetIntegerParameter(const std::string& sParameterName)
+{
+	return m_pParameterGroup->getIntParameterValueByName(sParameterName);
+}
+
+bool CDriverStatusUpdateSession::GetBoolParameter(const std::string& sParameterName)
+{
+	return m_pParameterGroup->getBoolParameterValueByName(sParameterName);
+}

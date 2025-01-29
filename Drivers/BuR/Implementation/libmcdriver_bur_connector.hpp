@@ -37,6 +37,7 @@ Abstract: This is the class declaration of CDriver_BuR
 
 #include "libmcdriver_bur_connector.hpp"
 #include "libmcdriver_bur_definitions.hpp"
+#include "libmcdriver_bur_journal.hpp"
 
 // Include custom headers here.
 #include <mutex>
@@ -56,7 +57,7 @@ Abstract: This is the class declaration of CDriver_BuR
 #define BUR_COMMAND_DIRECT_LISTSTATUS 105
 #define BUR_COMMAND_DIRECT_ABORTLIST 106
 #define BUR_COMMAND_DIRECT_RESUMELIST 107
-#define BUR_COMMAND_DIRECT_MACHINESTATUS 108
+#define BUR_COMMAND_DIRECT_MACHINESTATUSLEGACY 108
 #define BUR_COMMAND_DIRECT_DELETELIST 112
 
 #define BUR_COMMAND_DIRECT_CURRENTJOURNALSTATUS 120
@@ -109,12 +110,12 @@ public:
 
 typedef std::shared_ptr<CDriver_BuRPacket> PDriver_BuRPacket;
 
-class CDriver_BuRSocketConnection;
-
 class CDriver_BuRConnector {
 private:
 
 protected:
+
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
     uint32_t m_nWorkerThreadCount;
     uint32_t m_nMaxReceiveBufferSize;
@@ -130,18 +131,22 @@ protected:
     uint32_t m_nSequenceID;
     uint32_t m_nPacketSignature;
 
+    uint32_t m_nReceiveTimeoutInMS;
+
     bool m_StartJournaling;
 
-    std::shared_ptr<CDriver_BuRSocketConnection> m_pCurrentConnection;
+    LibMCEnv::PTCPIPConnection m_pCurrentConnection;
 
-    std::mutex m_ConnectionMutex;
+    std::mutex m_ConnectionOrJournalMutex;
     std::mutex m_SequenceMapMutex;
 
     std::list<PDriver_BuRValue> m_DriverParameters;
     std::map<std::string, PDriver_BuRValue> m_DriverParameterMap;
 
     std::map<std::string, PDriver_BuRCommandDefinition> m_CommandDefinitions;
-    std::map<std::string, PDriver_BuRValue> m_ControlParameterMap;
+    //std::map<std::string, PDriver_BuRValue> m_ControlParameterMap;
+
+    PDriver_BuRJournal m_pJournal;
 
     //PDriver_BuRPacket receiveCommandFromPLCEx (CDriver_BuRSocketConnection* pConnection);
 
@@ -151,9 +156,13 @@ protected:
 
 public:
 
-	CDriver_BuRConnector (uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize, eDriver_BurProtocolVersion ProtocolVersion, uint32_t nPacketSignature);
+	CDriver_BuRConnector (LibMCEnv::PDriverEnvironment pDriverEnvironment, uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize, eDriver_BurProtocolVersion ProtocolVersion, uint32_t nPacketSignature);
 
-    void queryParameters (BurPacketCallback callback);
+    virtual ~CDriver_BuRConnector();
+
+    void queryParametersLegacy (BurPacketCallback callback);
+
+    void queryParametersVersion3 (LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
 
     void refreshJournal();
 
@@ -179,7 +188,11 @@ public:
     sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, uint32_t nParameter4, BurPacketCallback callback);
     sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, BurPacketCallback callback);
 
-    void retrieveJournalSchema();
+    PDriver_BuRJournal retrieveJournalSchema();
+
+    bool isLegacy();
+
+    bool isVersion3();
 
 };
 

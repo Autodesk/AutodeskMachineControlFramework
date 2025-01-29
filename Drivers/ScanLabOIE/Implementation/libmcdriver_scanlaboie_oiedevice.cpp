@@ -112,7 +112,8 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 	  m_bHasCorrectionData (false),
 	  m_nRTCSignalCount (0),
 	  m_nSensorSignalCount (0),
-	  m_nAdditionalSignalCount (0)
+	  m_nAdditionalSignalCount (0),
+	n_LastReceivedMeasurementTag (0)
 
 {
 	if ((pOIESDK.get() == nullptr) || (pInstance == nullptr) || (pWorkingDirectory.get () == nullptr) || (pDeviceConfiguration == nullptr))
@@ -334,6 +335,8 @@ void COIEDeviceInstance::Connect(const std::string& sUserName, const std::string
 
 	pDLLCache = nullptr;
 
+	n_LastReceivedMeasurementTag = 0;
+
 }
 
 void COIEDeviceInstance::Disconnect()
@@ -457,6 +460,7 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 	if (sName.empty())
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPNAME);
 
+	n_LastReceivedMeasurementTag = 0;
 
 	try {
 		//std::cout << "Starting app call..." << std::endl;
@@ -665,6 +669,7 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 				uint32_t* pMeasurementTag = (pPacketNumber + 1); 
 
 				m_pCurrentDataRecording->startRecord(*pPacketNumber, *pMeasurementTag, dX, dY);
+				n_LastReceivedMeasurementTag = *pMeasurementTag;
 
 				// Record sensor values first.
 				uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);
@@ -764,6 +769,8 @@ void COIEDeviceInstance::ClearCurrentRecording()
 		m_pCurrentDataRecording = nullptr;
 		m_pCurrentDataRecording = pOldRecording->createEmptyDuplicate();
 
+		n_LastReceivedMeasurementTag = 0;
+
 	}
 }
 
@@ -805,6 +812,12 @@ bool COIEDeviceInstance::rtcIsBusy()
 
 	return ((((uint32_t)state) & OIE_DEVICESTATE_RTCBUSY) != 0);
 }
+
+uint32_t COIEDeviceInstance::getReceivedMeasurementTag()
+{
+	return n_LastReceivedMeasurementTag;
+}
+
 
 COIEDevice::COIEDevice(POIEDeviceInstance pDeviceInstance)
 {
@@ -990,8 +1003,13 @@ bool COIEDevice::IsLoggedIn()
 bool COIEDevice::IsStreaming()
 {
 	return lockInstance()->isStreaming();
-
 }
+
+LibMCDriver_ScanLabOIE_uint32 COIEDevice::GetReceivedMeasurementTag()
+{
+	return lockInstance()->getReceivedMeasurementTag ();
+}
+
 
 bool COIEDevice::RTCIsBusy()
 {

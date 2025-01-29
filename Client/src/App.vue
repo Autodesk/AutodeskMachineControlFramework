@@ -88,7 +88,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<div v-bind:style="appContentDivStyle" v-if="appIsReady">
 			<v-card v-bind:style="appContentCardStyle" elevation="2" class="pa-3" width="90%" > 
 				<template v-for="uiPage in Application.AppContent.Pages">
-					<v-container :key="uiPage.name" v-if="appIsReady && (Application.AppState.activePage == uiPage.name)" style="width:100%; height:100%; display:block;">
+					<v-container :key="uiPage.name" v-if="appIsReady && Application.pageIsActive (uiPage)" style="width:100%; height:100%; display:block;">
 										
 						<template v-for="uiModule in uiPage.modules">
 							<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					

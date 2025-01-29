@@ -256,6 +256,34 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_stopexecution(LibMCDriver_ScanLabSMC_SMCJob pSMCJob);
 
+/**
+* Reads the SMC Simulation data into a data table.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] pSimulationDataTable - Data table object to read the simulation into.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadsimulationdata(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_DataTable pSimulationDataTable);
+
+/**
+* Returns a characteristic value of a job.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] eValueType - Type of job
+* @param[out] pValue - Characteristic Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_getjobcharacteristic(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType, LibMCDriver_ScanLabSMC_double * pValue);
+
+/**
+* Returns the duration of the job in seconds.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[out] pJobDuration - Duration in seconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_getjobduration(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCDriver_ScanLabSMC_double * pJobDuration);
+
 /*************************************************************************************************************************
  Class definition for SMCConfiguration
 **************************************************************************************************************************/
@@ -354,6 +382,55 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setcorrectionfileresource(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
 
 /**
+* Sets the SMC Configuration Template. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pTemplateXML - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplate(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pTemplateXML);
+
+/**
+* Sets the SMC Configuration Template from resource data. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pResourceName - Resource name to load.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setconfigurationtemplateresource(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pResourceName);
+
+/**
+* Returns the current SMC Configuration Template. Currently supported version is 0.9.
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nTemplateXMLBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTemplateXMLNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTemplateXMLBuffer -  buffer of Value to set., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getconfigurationtemplate(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nTemplateXMLBufferSize, LibMCDriver_ScanLabSMC_uint32* pTemplateXMLNeededChars, char * pTemplateXMLBuffer);
+
+/**
+* Set the simulation subdirectory name. MUST be an alphanumeric string with _ and .
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] pSubDirectory - New simulation subdirectory name. Default is Simulations
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_setsimulationsubdirectory(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const char * pSubDirectory);
+
+/**
+* Returns the simulation subdirectory name
+*
+* @param[in] pSMCConfiguration - SMCConfiguration instance.
+* @param[in] nSubDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubDirectoryBuffer -  buffer of Returns the simulation subdirectory name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcconfiguration_getsimulationsubdirectory(LibMCDriver_ScanLabSMC_SMCConfiguration pSMCConfiguration, const LibMCDriver_ScanLabSMC_uint32 nSubDirectoryBufferSize, LibMCDriver_ScanLabSMC_uint32* pSubDirectoryNeededChars, char * pSubDirectoryBuffer);
+
+/**
 * Sets card firmware from binary data.
 *
 * @param[in] pSMCConfiguration - SMCConfiguration instance.
@@ -437,6 +514,17 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_getserialnumber(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, LibMCDriver_ScanLabSMC_uint32 * pSerialNumber);
+
+/**
+* Returns the simulation subdirectory name
+*
+* @param[in] pSMCContext - SMCContext instance.
+* @param[in] nSubDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubDirectoryBuffer -  buffer of Returns the simulation subdirectory name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smccontext_getsimulationsubdirectory(LibMCDriver_ScanLabSMC_SMCContext pSMCContext, const LibMCDriver_ScanLabSMC_uint32 nSubDirectoryBufferSize, LibMCDriver_ScanLabSMC_uint32* pSubDirectoryNeededChars, char * pSubDirectoryBuffer);
 
 /**
 * Returns the laser index assigned to the card. This is the laser index that will be used to map the toolpath laser data to the according device.

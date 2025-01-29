@@ -128,96 +128,6 @@ LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_quer
 LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_queryparametersex(LibMCDriver_OPCUA_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
- Class definition for PLCCommand
-**************************************************************************************************************************/
-
-/**
-* Sets an integer parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] nValue - Parameter Value
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommand_setintegerparameter(LibMCDriver_OPCUA_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_OPCUA_int64 nValue);
-
-/**
-* Sets a bool parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] bValue - Parameter Value
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommand_setboolparameter(LibMCDriver_OPCUA_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
-
-/**
-* Sets a double parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] dValue - Parameter Value
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommand_setdoubleparameter(LibMCDriver_OPCUA_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_OPCUA_double dValue);
-
-/*************************************************************************************************************************
- Class definition for PLCCommandList
-**************************************************************************************************************************/
-
-/**
-* Adds a command to the list. List must not be executed before.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @param[in] pCommandInstance - Add a command instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommandlist_addcommand(LibMCDriver_OPCUA_PLCCommandList pPLCCommandList, LibMCDriver_OPCUA_PLCCommand pCommandInstance);
-
-/**
-* Finish command list.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommandlist_finishlist(LibMCDriver_OPCUA_PLCCommandList pPLCCommandList);
-
-/**
-* Execute command list.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommandlist_executelist(LibMCDriver_OPCUA_PLCCommandList pPLCCommandList);
-
-/**
-* Wait for command list to finish executing
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
-* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
-* @param[out] pCommandSuccess - Returns true if the command was finished successfully.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommandlist_waitforlist(LibMCDriver_OPCUA_PLCCommandList pPLCCommandList, LibMCDriver_OPCUA_uint32 nReactionTimeInMS, LibMCDriver_OPCUA_uint32 nWaitForTimeInMS, bool * pCommandSuccess);
-
-/**
-* Pause command list. Must be executed or resumed before.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommandlist_pauselist(LibMCDriver_OPCUA_PLCCommandList pPLCCommandList);
-
-/**
-* Resume command list. Must be paused before.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_plccommandlist_resumelist(LibMCDriver_OPCUA_PLCCommandList pPLCCommandList);
-
-/*************************************************************************************************************************
  Class definition for Driver_OPCUA
 **************************************************************************************************************************/
 
@@ -239,18 +149,38 @@ LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcu
 LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_issimulationmode(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, bool * pSimulationModeEnabled);
 
 /**
+* Enables encryption for subsequent connects.
+*
+* @param[in] pDriver_OPCUA - Driver_OPCUA instance.
+* @param[in] pLocalCertificate - Local Certificate String
+* @param[in] pPrivateKey - Private Key
+* @param[in] eSecurityMode - Security mode to use.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_enableencryption(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, const char * pLocalCertificate, const char * pPrivateKey, LibMCDriver_OPCUA::eUASecurityMode eSecurityMode);
+
+/**
+* Enables encryption for subsequent connects.
+*
+* @param[in] pDriver_OPCUA - Driver_OPCUA instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_disableencryption(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA);
+
+/**
 * Connects to a OPCUA PLC Controller.
 *
 * @param[in] pDriver_OPCUA - Driver_OPCUA instance.
-* @param[in] pIPAddress - IP Address of PLC Service.
-* @param[in] nPort - Port of PLC Service.
-* @param[in] nTimeout - Timeout in milliseconds.
+* @param[in] pEndPointURL - End point URL to connect to.
+* @param[in] pUsername - User login.
+* @param[in] pPassword - Password.
+* @param[in] pApplicationURL - Application URL to use.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_connect(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, const char * pIPAddress, LibMCDriver_OPCUA_uint32 nPort, LibMCDriver_OPCUA_uint32 nTimeout);
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_connectwithusername(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, const char * pEndPointURL, const char * pUsername, const char * pPassword, const char * pApplicationURL);
 
 /**
-* Disconnects from the OPCUA PLC Controller.
+* Disconnect from the end point. Does nothing if not connected
 *
 * @param[in] pDriver_OPCUA - Driver_OPCUA instance.
 * @return error code or 0 (success)
@@ -258,47 +188,85 @@ LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcu
 LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_disconnect(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA);
 
 /**
-* Create Command
+* Returns if an end point is connected.
 *
 * @param[in] pDriver_OPCUA - Driver_OPCUA instance.
-* @param[out] pListInstance - Command list instance
+* @param[out] pValue - Returns true if connected.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_createcommandlist(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, LibMCDriver_OPCUA_PLCCommandList * pListInstance);
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_isconnected(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, bool * pValue);
 
 /**
-* Creates a command instance.
+* Reads an integer node value. Fails if not connected or node does not exist.
 *
 * @param[in] pDriver_OPCUA - Driver_OPCUA instance.
-* @param[in] pCommandName - Command Name.
-* @param[out] pCommandInstance - Returns a command instance.
+* @param[in] nNameSpace - Namespace ID
+* @param[in] pNodeName - NodeToRead
+* @param[in] eNodeType - Type of Node to read
+* @param[out] pValue - Retrieved Node Value
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_createcommand(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, const char * pCommandName, LibMCDriver_OPCUA_PLCCommand * pCommandInstance);
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_readinteger(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, LibMCDriver_OPCUA_uint32 nNameSpace, const char * pNodeName, LibMCDriver_OPCUA::eUAIntegerType eNodeType, LibMCDriver_OPCUA_int64 * pValue);
 
 /**
-* Start Journaling.
+* Reads a double node value. Fails if not connected or node does not exist.
 *
 * @param[in] pDriver_OPCUA - Driver_OPCUA instance.
+* @param[in] nNameSpace - Namespace ID
+* @param[in] pNodeName - NodeToRead
+* @param[in] eNodeType - Type of Node to read
+* @param[out] pValue - Retrieved Node Value
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_startjournaling(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA);
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_readdouble(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, LibMCDriver_OPCUA_uint32 nNameSpace, const char * pNodeName, LibMCDriver_OPCUA::eUADoubleType eNodeType, LibMCDriver_OPCUA_double * pValue);
 
 /**
-* Stop Journaling.
+* Reads a string node value. Fails if not connected or node does not exist.
 *
 * @param[in] pDriver_OPCUA - Driver_OPCUA instance.
+* @param[in] nNameSpace - Namespace ID
+* @param[in] pNodeName - NodeToRead
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Retrieved String Value, may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_stopjournaling(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA);
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_readstring(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, LibMCDriver_OPCUA_uint32 nNameSpace, const char * pNodeName, const LibMCDriver_OPCUA_uint32 nValueBufferSize, LibMCDriver_OPCUA_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
-* Refresh Journal.
+* Writes an integer node value. Fails if not connected or node does not exist.
 *
 * @param[in] pDriver_OPCUA - Driver_OPCUA instance.
+* @param[in] nNameSpace - Namespace ID
+* @param[in] pNodeName - NodeToRead
+* @param[in] eNodeType - Type of Node to write
+* @param[in] nValue - Node Value to write
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_refreshjournal(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA);
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_writeinteger(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, LibMCDriver_OPCUA_uint32 nNameSpace, const char * pNodeName, LibMCDriver_OPCUA::eUAIntegerType eNodeType, LibMCDriver_OPCUA_int64 nValue);
+
+/**
+* Writes a double node value. Fails if not connected or node does not exist.
+*
+* @param[in] pDriver_OPCUA - Driver_OPCUA instance.
+* @param[in] nNameSpace - Namespace ID
+* @param[in] pNodeName - NodeToRead
+* @param[in] eNodeType - Type of Node to write
+* @param[in] dValue - Node Value to write
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_writedouble(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, LibMCDriver_OPCUA_uint32 nNameSpace, const char * pNodeName, LibMCDriver_OPCUA::eUADoubleType eNodeType, LibMCDriver_OPCUA_double dValue);
+
+/**
+* Writes a string node value. Fails if not connected.
+*
+* @param[in] pDriver_OPCUA - Driver_OPCUA instance.
+* @param[in] nNameSpace - Namespace ID
+* @param[in] pNodeName - NodeToRead
+* @param[in] pValue - Node Value to write
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_OPCUA_DECLSPEC LibMCDriver_OPCUAResult libmcdriver_opcua_driver_opcua_writestring(LibMCDriver_OPCUA_Driver_OPCUA pDriver_OPCUA, LibMCDriver_OPCUA_uint32 nNameSpace, const char * pNodeName, const char * pValue);
 
 /*************************************************************************************************************************
  Global functions

@@ -48,6 +48,7 @@ Abstract: This is the class declaration of COIEDevice
 #include "libmcdriver_scanlaboie_sdk.hpp"
 #include "libmcdriver_scanlaboie_datarecordinginstance.hpp"
 #include <mutex>
+#include <atomic>
 
 namespace LibMCDriver_ScanLabOIE {
 namespace Impl {
@@ -90,6 +91,8 @@ protected:
 
 	oie_instance m_pInstance;
 	oie_device m_pDevice;
+
+	std::atomic<uint32_t> n_LastReceivedMeasurementTag;
 
 	std::string m_sDeviceName;
 	std::string m_sHostName;
@@ -195,6 +198,8 @@ public:
 
 	bool rtcIsBusy();
 
+	uint32_t getReceivedMeasurementTag ();
+
 };
 
 typedef std::shared_ptr<COIEDeviceInstance> POIEDeviceInstance;
@@ -276,7 +281,7 @@ public:
 
 	bool RTCIsBusy() override;
 
-
+	LibMCDriver_ScanLabOIE_uint32 GetReceivedMeasurementTag() override;
 
 };
 

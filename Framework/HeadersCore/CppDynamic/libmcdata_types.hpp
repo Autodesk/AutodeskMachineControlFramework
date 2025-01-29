@@ -419,6 +419,49 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED 392 /** ZIP Writing already finished. */
 #define LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT 393 /** Invalid build job layer count. */
 #define LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT 394 /** Could not determine execution count. */
+#define LIBMCDATA_ERROR_COULDNOTCREATEJOURNALFILE 395 /** Could not create journal file. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP 396 /** Invalid journal time stamp. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALDATAOFFSET 397 /** Invalid journal data offset. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALDATALENGTH 398 /** Invalid journal data length. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALDATASIGNATURE 399 /** Invalid journal data signature. */
+#define LIBMCDATA_ERROR_JOURNALMEMORYSIZEMISMATCH 400 /** Invalid journal memory size mismatch. */
+#define LIBMCDATA_ERROR_JOURNALMEMORYVARIABLECOUNTISZERO 401 /** Invalid journal memory variable count. */
+#define LIBMCDATA_ERROR_JOURNALMEMORYVALUECOUNTISZERO 402 /** Invalid journal memory value count. */
+#define LIBMCDATA_ERROR_COULDNOTSEEKJOURNALSTREAM 403 /** Could not create seek journal stream. */
+#define LIBMCDATA_ERROR_COULDNOTPREPAREJOURNALWRITING 404 /** Could not prepare journal writing. */
+#define LIBMCDATA_ERROR_COULDNOTFINISHJOURNALWRITING 405 /** Could not finish journal writing. */
+#define LIBMCDATA_ERROR_COULDNOTWRITETOJOURNALSTREAM 406 /** Could not write to journal stream. */
+#define LIBMCDATA_ERROR_COULDNOTREADFROMJOURNALSTREAM 407 /** Could not read from journal stream. */
+#define LIBMCDATA_ERROR_COULDNOTFULLYREADFROMJOURNALSTREAM 408 /** Could not fully read from journal stream. */
+#define LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION 409 /** Could not get journal stream position. */
+#define LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX 410 /** Invalid journal file index. */
+#define LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES 411 /** Journal exceeds maxium files. */
+#define LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID 412 /** Could not find journal UUID. */
+#define LIBMCDATA_ERROR_UNKNOWNDATATYPE 413 /** Unknown data type. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEID 414 /** Duplicate journal variable ID. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEINDEX 415 /** Duplicate journal variable index. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLENAME 416 /** Duplicate journal variable name. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX 417 /** Duplicate journal file index. */
+#define LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX 418 /** Duplicate journal chunk index. */
+#define LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND 419 /** Journal file index not found. */
+#define LIBMCDATA_ERROR_JOURNALCHUNKNOTFOUND 420 /** Journal chunk not found. */
+#define LIBMCDATA_ERROR_JOURNALREADERFILENOTOPEN 421 /** Journal chunk not found. */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALCHUNKINDEX 422 /** Negative journal chunk index */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALFILEINDEX 423 /** Negative journal file index */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALSTARTTIMESTAMP 424 /** Negative journal start time stamp */
+#define LIBMCDATA_ERROR_INVALIDJOURNALENDTIMESTAMP 425 /** Invalid journal end time stamp */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALDATAOFFSET 426 /** Negative journal data offset */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALDATALENGTH 427 /** Negative journal data length */
+#define LIBMCDATA_ERROR_JOURNALTIMESTAMPSNOTINCREASING 428 /** Journal time stamp is not increasing */
+#define LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX 429 /** Negative journal variable index */
+#define LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID 430 /** Non-positive journal variable ID */
+#define LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME 431 /** Empty journal variable name */
+#define LIBMCDATA_ERROR_INVALIDVARIABLEINDEX 432 /** Invalid variable index */
+#define LIBMCDATA_ERROR_INVALIDCHUNKINDEX 433 /** Invalid chunk index */
+#define LIBMCDATA_ERROR_UNKNOWNSOURCEJOURNALVARIABLENAME 434 /** Unknown source journal variable name */
+#define LIBMCDATA_ERROR_JOURNALVARIABLEALIASALREADYEXISTS 435 /** Journal variable alias already exists. */
+#define LIBMCDATA_ERROR_INVALIDALIASINDEX 436 /** Invalid alias index */
+#define LIBMCDATA_ERROR_SOURCEOFJOURNALALIASNOTFOUND 437 /** Source of Journal Alias not found */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -750,6 +793,49 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_ZIPWRITINGALREADYFINISHED: return "ZIP Writing already finished.";
     case LIBMCDATA_ERROR_INVALIDBUILDJOBLAYERCOUNT: return "Invalid build job layer count.";
     case LIBMCDATA_ERROR_COULDNOTDETERMINEEXECUTIONCOUNT: return "Could not determine execution count.";
+    case LIBMCDATA_ERROR_COULDNOTCREATEJOURNALFILE: return "Could not create journal file.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALTIMESTAMP: return "Invalid journal time stamp.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALDATAOFFSET: return "Invalid journal data offset.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALDATALENGTH: return "Invalid journal data length.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALDATASIGNATURE: return "Invalid journal data signature.";
+    case LIBMCDATA_ERROR_JOURNALMEMORYSIZEMISMATCH: return "Invalid journal memory size mismatch.";
+    case LIBMCDATA_ERROR_JOURNALMEMORYVARIABLECOUNTISZERO: return "Invalid journal memory variable count.";
+    case LIBMCDATA_ERROR_JOURNALMEMORYVALUECOUNTISZERO: return "Invalid journal memory value count.";
+    case LIBMCDATA_ERROR_COULDNOTSEEKJOURNALSTREAM: return "Could not create seek journal stream.";
+    case LIBMCDATA_ERROR_COULDNOTPREPAREJOURNALWRITING: return "Could not prepare journal writing.";
+    case LIBMCDATA_ERROR_COULDNOTFINISHJOURNALWRITING: return "Could not finish journal writing.";
+    case LIBMCDATA_ERROR_COULDNOTWRITETOJOURNALSTREAM: return "Could not write to journal stream.";
+    case LIBMCDATA_ERROR_COULDNOTREADFROMJOURNALSTREAM: return "Could not read from journal stream.";
+    case LIBMCDATA_ERROR_COULDNOTFULLYREADFROMJOURNALSTREAM: return "Could not fully read from journal stream.";
+    case LIBMCDATA_ERROR_COULDGETJOURNALSTREAMPOSITION: return "Could not get journal stream position.";
+    case LIBMCDATA_ERROR_INVALIDJOURNALFILEINDEX: return "Invalid journal file index.";
+    case LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES: return "Journal exceeds maxium files.";
+    case LIBMCDATA_ERROR_COULDNOTFINDJOURNALUUID: return "Could not find journal UUID.";
+    case LIBMCDATA_ERROR_UNKNOWNDATATYPE: return "Unknown data type.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEID: return "Duplicate journal variable ID.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLEINDEX: return "Duplicate journal variable index.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALVARIABLENAME: return "Duplicate journal variable name.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALFILEINDEX: return "Duplicate journal file index.";
+    case LIBMCDATA_ERROR_DUPLICATEJOURNALCHUNKINDEX: return "Duplicate journal chunk index.";
+    case LIBMCDATA_ERROR_JOURNALFILEINDEXNOTFOUND: return "Journal file index not found.";
+    case LIBMCDATA_ERROR_JOURNALCHUNKNOTFOUND: return "Journal chunk not found.";
+    case LIBMCDATA_ERROR_JOURNALREADERFILENOTOPEN: return "Journal chunk not found.";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALCHUNKINDEX: return "Negative journal chunk index";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALFILEINDEX: return "Negative journal file index";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALSTARTTIMESTAMP: return "Negative journal start time stamp";
+    case LIBMCDATA_ERROR_INVALIDJOURNALENDTIMESTAMP: return "Invalid journal end time stamp";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALDATAOFFSET: return "Negative journal data offset";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALDATALENGTH: return "Negative journal data length";
+    case LIBMCDATA_ERROR_JOURNALTIMESTAMPSNOTINCREASING: return "Journal time stamp is not increasing";
+    case LIBMCDATA_ERROR_NEGATIVEJOURNALVARIABLEINDEX: return "Negative journal variable index";
+    case LIBMCDATA_ERROR_NONPOSITIVEJOURNALVARIABLEID: return "Non-positive journal variable ID";
+    case LIBMCDATA_ERROR_EMPTYJOURNALVARIABLENAME: return "Empty journal variable name";
+    case LIBMCDATA_ERROR_INVALIDVARIABLEINDEX: return "Invalid variable index";
+    case LIBMCDATA_ERROR_INVALIDCHUNKINDEX: return "Invalid chunk index";
+    case LIBMCDATA_ERROR_UNKNOWNSOURCEJOURNALVARIABLENAME: return "Unknown source journal variable name";
+    case LIBMCDATA_ERROR_JOURNALVARIABLEALIASALREADYEXISTS: return "Journal variable alias already exists.";
+    case LIBMCDATA_ERROR_INVALIDALIASINDEX: return "Invalid alias index";
+    case LIBMCDATA_ERROR_SOURCEOFJOURNALALIASNOTFOUND: return "Source of Journal Alias not found";
     default: return "unknown error";
   }
 }
@@ -765,7 +851,9 @@ typedef LibMCDataHandle LibMCData_LogSession;
 typedef LibMCDataHandle LibMCData_Alert;
 typedef LibMCDataHandle LibMCData_AlertIterator;
 typedef LibMCDataHandle LibMCData_AlertSession;
+typedef LibMCDataHandle LibMCData_JournalChunkIntegerData;
 typedef LibMCDataHandle LibMCData_JournalSession;
+typedef LibMCDataHandle LibMCData_JournalReader;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_StorageZIPWriter;
 typedef LibMCDataHandle LibMCData_Storage;
@@ -857,15 +945,10 @@ namespace LibMCData {
   
   typedef struct sJournalChunkVariableInfo {
       LibMCData_uint32 m_VariableIndex;
-      LibMCData_uint32 m_VariableType;
+      LibMCData_uint32 m_StorageType;
       LibMCData_uint32 m_EntryStartIndex;
       LibMCData_uint32 m_EntryCount;
   } sJournalChunkVariableInfo;
-  
-  typedef struct sJournalChunkIntegerEntry {
-      LibMCData_uint32 m_RelativeTimeStampInMicroseconds;
-      LibMCData_int64 m_IntegerValue;
-  } sJournalChunkIntegerEntry;
   
   #pragma pack ()
   
@@ -914,7 +997,6 @@ typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
 typedef LibMCData::eCustomDataType eLibMCDataCustomDataType;
 typedef LibMCData::eBuildJobExecutionStatus eLibMCDataBuildJobExecutionStatus;
 typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
-typedef LibMCData::sJournalChunkIntegerEntry sLibMCDataJournalChunkIntegerEntry;
 typedef LibMCData::LogCallback LibMCDataLogCallback;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;

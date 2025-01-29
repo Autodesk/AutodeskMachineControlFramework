@@ -87,6 +87,8 @@ public:
 
 	ISignalHandler* GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist) override;
 
+	void ClearAllUnhandledSignals() override;
+
 	bool HasBuildJob(const std::string& sBuildUUID) override;
 
 	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
@@ -141,13 +143,15 @@ public:
 
 	bool GetBoolParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
+	bool HasResourceData(const std::string& sIdentifier) override;
+
 	void LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer) override;
 
 	std::string LoadResourceString(const std::string& sResourceName) override;
 
 	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
-	IImageData* LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+	IImageLoader* CreateImageLoader() override;
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 

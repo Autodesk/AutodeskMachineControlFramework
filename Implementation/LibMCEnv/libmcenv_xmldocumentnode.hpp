@@ -137,6 +137,11 @@ public:
 
 	void Remove() override;
 
+	void CopyFrom(IXMLDocumentNode* pOtherNode) override;
+
+	AMC::PXMLDocumentNodeInstance getXMLDocumentNode ();
+	AMC::PXMLDocumentInstance getXMLDocument ();
+
 };
 
 } // namespace Impl

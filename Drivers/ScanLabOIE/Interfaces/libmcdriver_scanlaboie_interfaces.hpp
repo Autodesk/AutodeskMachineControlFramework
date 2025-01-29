@@ -816,6 +816,12 @@ public:
 	virtual bool IsStreaming() = 0;
 
 	/**
+	* IOIEDevice::GetReceivedMeasurementTag - Returns the last measurement tag that has been retrieved.
+	* @return Measurement Tag that has been retrieved last.
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetReceivedMeasurementTag() = 0;
+
+	/**
 	* IOIEDevice::RTCIsBusy - Returns if the connected RTC is busy.
 	* @return Flag if the connected RTC is busy.
 	*/

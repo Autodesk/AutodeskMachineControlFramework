@@ -59,15 +59,22 @@ namespace AMCCommon {
 		static std::string normalizeSHA256String(const std::string & sRawString);		
 		static std::string createEmptyUUID();
 		static bool stringIsUUIDString(const std::string& sRawString);
+		static bool stringIsNonEmptyUUIDString(const std::string& sRawString);
 
-		static std::string UTF16toUTF8(std::wstring sString);
-		static std::wstring UTF8toUTF16(std::string sString);
+		static std::string UTF16toUTF8(const std::wstring & sString);
+		static std::wstring UTF8toUTF16(const std::string & sString);
 		static bool UTF8StringIsValid (const std::string & sString);
 		static std::string trimString (const std::string& sString);
 		static std::string toLowerString(const std::string& sString);
 		static void splitString (const std::string& sString, const std::string & sDelimiter, std::vector<std::string> & stringVector);
 		static int64_t stringToInteger(const std::string& sString);
+
+		// Makes a string to an integer, but also accepts doubles that are only +/- dAccuracy "away" from an integer
+		// Fails if the value is more than "accuracy" away from an integer value.
+		static int64_t stringToIntegerWithAccuracy (const std::string& sString, double dAccuracy);
+
 		static double stringToDouble(const std::string& sString);
+		static bool stringToBool(const std::string& sString);
 
 		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
 		static std::string calculateSHA256FromString(const std::string& sString);
@@ -78,6 +85,7 @@ namespace AMCCommon {
 		static std::string encodeBase64 (const std::string& sString, eBase64Type eType);
 		static void decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t> & byteBuffer);
 		static std::string decodeBase64ToASCIIString(const std::string& sString, eBase64Type eType);
+		static std::string encodeRFC5987(const std::string& sInput);
 
 		static bool fileOrPathExistsOnDisk(const std::string& sPathName);
 		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
@@ -97,6 +105,9 @@ namespace AMCCommon {
 
 		static bool stringIsValidAlphanumericNameString(const std::string& sString); // Only alphanumeric characters and underscore, underscore not as first character!
 		static bool stringIsValidAlphanumericPathString(const std::string& sString); // Only alphanumeric name strings separated by dots
+
+		static std::string getCurrentUserHomeDirectory();
+		static std::string getTempFolder();
 
 	};
 

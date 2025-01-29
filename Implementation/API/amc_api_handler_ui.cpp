@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_meshentity.hpp"
 #include "amc_meshhandler.hpp"
 #include "amc_dataserieshandler.hpp"
+#include "amc_scatterplot.hpp"
+#include "amc_toolpathhandler.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -127,6 +129,40 @@ public:
 };
 
 
+class CAPIRenderPointCloudResponse : public CAPIFixedFloatBufferResponse {
+private:
+
+public:
+
+	CAPIRenderPointCloudResponse(AMC::CScatterplot * pScatterplot)
+		: CAPIFixedFloatBufferResponse("application/binary")
+	{
+
+		
+		if (pScatterplot != nullptr) {
+			size_t nPointCount = pScatterplot->getEntryCount ();
+			resizeTo(nPointCount * 2); 
+
+			auto& entries = pScatterplot->getEntries();
+
+			for (size_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+
+				auto& entry = entries.at(nPointIndex);
+				
+				addFloat((float)entry.m_dX);
+				addFloat((float)entry.m_dY);
+
+			}
+
+		}
+
+
+	}
+
+};
+
+
+
 CAPIHandler_UI::CAPIHandler_UI(PSystemState pSystemState)
 	: CAPIHandler(pSystemState->getClientHash()), m_pSystemState(pSystemState)
 {
@@ -138,20 +174,20 @@ CAPIHandler_UI::CAPIHandler_UI(PSystemState pSystemState)
 
 CAPIHandler_UI::~CAPIHandler_UI()
 {
-	
+
 }
-				
-std::string CAPIHandler_UI::getBaseURI ()
+
+std::string CAPIHandler_UI::getBaseURI()
 {
 	return "api/ui";
 }
 
-APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& sParameterUUID, uint32_t & sParameterStateID)
+APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& sParameterUUID, std::string& sAdditionalParameter)
 {
 	// Leave away base URI
-	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(getBaseURI ().length ()));
+	auto sParameterString = AMCCommon::CUtils::toLowerString(sURI.substr(getBaseURI().length()));
 	sParameterUUID = "";
-	sParameterStateID = 0;
+	sAdditionalParameter = "";
 
 	if (requestType == eAPIRequestType::rtGet) {
 
@@ -165,7 +201,7 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 
 		if (sParameterString.length() == 43) {
 			if (sParameterString.substr(0, 7) == "/image/") {
-				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr (7, 36));
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(7, 36));
 				return APIHandler_UIType::utImage;
 			}
 		}
@@ -190,7 +226,7 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(13, 36));
 				if (sParameterString.length() > 49) {
 					if (sParameterString.at(49) == '/') {
-						sParameterStateID = std::stoi(sParameterString.substr (50));
+						sAdditionalParameter = sParameterString.substr(50);
 					}
 				}
 
@@ -212,6 +248,13 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			}
 		}
 
+		if (sParameterString.length() == 48) {
+			if (sParameterString.substr(0, 12) == "/pointcloud/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(12));
+				return APIHandler_UIType::utPointCloud;
+			}
+		}
+
 	}
 
 
@@ -219,6 +262,26 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 
 		if ((sParameterString == "/event/") || (sParameterString == "/event")) {
 			return APIHandler_UIType::utEvent;
+		}
+
+		if (sParameterString.length() >= 44) {
+			if (sParameterString.substr(0, 8) == "/widget/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(8, 36));
+				size_t nParameterLength = sParameterString.length();
+				if (nParameterLength > 44) {
+					if (sParameterString.substr(44, 1) != "/")
+						throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDWIDGETREQUEST, "Invalid widget request: " + sParameterString.substr(44));
+					
+					if (nParameterLength > 45) {
+						sAdditionalParameter = sParameterString.substr(45);
+						if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sAdditionalParameter))
+							throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDWIDGETREQUEST, "Invalid widget request: " + sParameterString.substr(44));
+
+					}
+
+				}
+				return APIHandler_UIType::utWidgetRequest;
+			}
 		}
 
 	}
@@ -230,8 +293,8 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) 
 {
 	std::string sParameterUUID;
-	uint32_t nParameterStateID = 0;
-	auto uiType = parseRequest(sURI, requestType, sParameterUUID, nParameterStateID);
+	std::string sAdditionalParameter;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID, sAdditionalParameter);
 
 	// The Configuration needs to be available pre-login
 	// Downloads do not need to be authorized, as they generate download ticket ids that are unique to the session user...
@@ -251,10 +314,10 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 bool CAPIHandler_UI::expectsRawBody(const std::string& sURI, const eAPIRequestType requestType)
 {
 	std::string sParameterUUID;
-	uint32_t nParameterStateID = 0;
-	auto uiType = parseRequest(sURI, requestType, sParameterUUID, nParameterStateID);
+	std::string sAdditionalParameter;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID, sAdditionalParameter);
 
-	return (uiType == APIHandler_UIType::utEvent);
+	return (uiType == APIHandler_UIType::utEvent) || (uiType == APIHandler_UIType::utWidgetRequest);
 
 }
 
@@ -380,16 +443,15 @@ void CAPIHandler_UI::handleContentItemRequest(CJSONWriter& writer, const std::st
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto pModuleItem = m_pSystemState->uiHandler()->findModuleItem (sParameterUUID);
-	if (pModuleItem.get () == nullptr)
+	auto pWidget = m_pSystemState->uiHandler()->findModuleItem (sParameterUUID);
+	if (pWidget.get () == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_MODULEITEMNOTFOUND);
 
 	CJSONWriterObject object(writer);
-	pModuleItem->addContentToJSON(writer, object, pAuth->getClientVariableHandler ().get(), nStateID);
+	pWidget->addContentToJSON(writer, object, pAuth->getClientVariableHandler ().get(), nStateID);
 	writer.addString(AMC_API_KEY_UI_ITEMUUID, sParameterUUID);
 	writer.addObject(AMC_API_KEY_UI_CONTENT, object);
 }
-
 
 void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
@@ -399,8 +461,10 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
-	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
-	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
+	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);	
+	std::string sSenderUUID;
+	if (apiRequest.hasValue (AMC_API_KEY_UI_EVENTSENDER))
+		sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
 
 	std::string sFormValueJSON;
 	if (apiRequest.hasValue(AMC_API_KEY_UI_FORMVALUEJSON)) {
@@ -409,7 +473,7 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	
 	auto pUIHandler = m_pSystemState->uiHandler();
 
-	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth);
+	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, "", pAuth);
 
 	CJSONWriterArray contentUpdateNode(writer);
 
@@ -440,11 +504,29 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 }
 
 
+void CAPIHandler_UI::handleWidgetRequest(CJSONWriter& writer, const std::string& sWidgetUUID, const std::string& sRequestType, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pBodyData == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
+	auto pUIHandler = m_pSystemState->uiHandler();
+
+	auto pWidget = pUIHandler->findModuleItem(AMCCommon::CUtils::normalizeUUIDString(sWidgetUUID));
+	if (pWidget.get () == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_MODULEITEMNOTFOUND, "Widget not found: " + sWidgetUUID);
+
+	pWidget->handleCustomRequest (pAuth, sRequestType, apiRequest, writer, pUIHandler);
+
+}
+
 PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	std::string sParameterUUID;
-	uint32_t nParameterStateID = 0;
-	auto uiType = parseRequest(sURI, requestType, sParameterUUID, nParameterStateID);
+	std::string sAdditionalParameter;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID, sAdditionalParameter);
 
 	CJSONWriter writer;
 	writeJSONHeader(writer, AMC_API_PROTOCOL_UI);
@@ -458,9 +540,17 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 		handleStateRequest(writer, pAuth);
 		break;
 
-	case APIHandler_UIType::utContentItem:
-		handleContentItemRequest(writer, sParameterUUID, pAuth, nParameterStateID);
+	case APIHandler_UIType::utContentItem: {
+		int64_t nStateID = 0;
+		if (!sAdditionalParameter.empty()) {
+			nStateID = std::stoi(sAdditionalParameter);
+
+			if ((nStateID < 0) || (nStateID > INT32_MAX))
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCONTENTSTATEID, "Invalid content state id: " + sAdditionalParameter);
+		}
+		handleContentItemRequest(writer, sParameterUUID, pAuth, (uint32_t) nStateID);
 		break;
+	}
 
 	case APIHandler_UIType::utImage:
 		return handleImageRequest(sParameterUUID, pAuth);
@@ -480,12 +570,21 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 		return std::make_shared<CAPIRenderEdgesResponse>(pMeshEntity.get());
 	}
 
+	case APIHandler_UIType::utPointCloud: {
+		auto pToolpathHandler = m_pSystemState->getToolpathHandlerInstance();
+		auto pScatterplot = pToolpathHandler->restoreScatterplot(sParameterUUID, false);
+		return std::make_shared<CAPIRenderPointCloudResponse>(pScatterplot.get ());
+	}
 
 	case APIHandler_UIType::utChart:
 		return handleChartRequest(sParameterUUID, pAuth);
 
 	case APIHandler_UIType::utEvent:
 		handleEventRequest (writer, pBodyData, nBodyDataSize, pAuth);
+		break;
+
+	case APIHandler_UIType::utWidgetRequest:
+		handleWidgetRequest (writer, sParameterUUID, sAdditionalParameter, pBodyData, nBodyDataSize, pAuth);
 		break;
 
 	default:

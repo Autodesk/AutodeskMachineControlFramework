@@ -49,6 +49,8 @@ namespace AMCData {
 
 	class CSQLStatement_SQLite : public CSQLStatement {
 	private:
+		PSQLTransactionLock m_pLock;
+
 		CSQLHandler_SQLite* m_pHandler; 
 		void* m_pStmtHandle;
 
@@ -61,7 +63,7 @@ namespace AMCData {
 	public:
 
 		CSQLStatement_SQLite() = delete;
-		CSQLStatement_SQLite(CSQLHandler_SQLite* pHandler, void* pStmtHandle);
+		CSQLStatement_SQLite(CSQLHandler_SQLite* pHandler, void* pStmtHandle, PSQLTransactionLock pLock);
 
 		virtual ~CSQLStatement_SQLite();
 			

@@ -33,7 +33,8 @@ Abstract: This is a stub class definition of CDataSeries
 
 #include "libmcenv_dataseries.hpp"
 #include "libmcenv_interfaceexception.hpp"
-#include "libmcenv_journalvariable.hpp"
+#include "libmcenv_journalvariable_current.hpp"
+#include "libmcenv_journalvariable_historic.hpp"
 
 // Include custom headers here.
 #include <cmath>
@@ -151,7 +152,7 @@ void CDataSeries::SetAllEntries(const LibMCEnv_uint64 nEntryArrayBufferSize, con
 	}
 }
 
-void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta)
+void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples) 
 {
 	m_pDataSeries->increaseVersion();
 	auto& entries = m_pDataSeries->getEntries();
@@ -163,12 +164,13 @@ void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, cons
 	if (nNumberOfSamples < 2)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES);
 
-	auto pJournalVariableImpl = dynamic_cast<CJournalVariable*> (pJournalVariable);
+	auto pJournalVariableImpl = dynamic_cast<CJournalVariable_Current*> (pJournalVariable);
 	if (pJournalVariableImpl == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 
-	uint64_t nStartTimeStamp = pJournalVariableImpl->GetStartTimeStamp();
-	uint64_t nEndTimeStamp = pJournalVariableImpl->GetEndTimeStamp();
+	if (nEndTimeStamp < nStartTimeStamp)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL);
+
 	uint64_t nDeltaTime = nEndTimeStamp - nStartTimeStamp;
 
 	if (nDeltaTime > 0) {
@@ -179,20 +181,9 @@ void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, cons
 
 			double dValue = 0.0;
 
-			uint64_t nMovingAverageDeltaInMicroSeconds = 0;
-			if (dMovingAverageDelta > 0.0)
-				nMovingAverageDeltaInMicroSeconds = (uint64_t) std::round(dMovingAverageDelta * 1000000);			
-			if (nMovingAverageDeltaInMicroSeconds < 1)
-				nMovingAverageDeltaInMicroSeconds = 1;
-
 			uint64_t nTimeStampInMicroSeconds = nStartTimeStamp + (nIndex * nDeltaTime + (nDeltaTime / 2)) / nNumberOfSamples;
-			uint64_t nIntervalStartTimeStampInMicroSeconds = 0;
-			if (nMovingAverageDeltaInMicroSeconds < nTimeStampInMicroSeconds)
-				nIntervalStartTimeStampInMicroSeconds = nTimeStampInMicroSeconds - nMovingAverageDeltaInMicroSeconds;
 
-			int64_t nIntervalEndTimeStampInMicroSeconds = nTimeStampInMicroSeconds + nMovingAverageDeltaInMicroSeconds;
-
-			dValue = pJournalVariableImpl->ComputeAverage(nIntervalStartTimeStampInMicroSeconds, nIntervalEndTimeStampInMicroSeconds, true);
+			dValue = pJournalVariable->ComputeDoubleSample (nTimeStampInMicroSeconds);
 
 			auto& entry = entries.at(nIndex);
 

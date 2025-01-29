@@ -77,6 +77,8 @@ namespace AMC {
 		int64_t evaluateIntegerValue(PStateMachineData pStateMachineData);
 		bool evaluateBoolValue(CStateMachineData* pStateMachineData);
 		bool evaluateBoolValue(PStateMachineData pStateMachineData);
+		std::string evaluateUUIDValue(CStateMachineData* pStateMachineData);
+		std::string evaluateUUIDValue(PStateMachineData pStateMachineData);
 
 		void checkExpressionSyntax(CStateMachineData* pStateMachineData);
 		void checkExpressionSyntax(PStateMachineData pStateMachineData);

@@ -102,6 +102,7 @@ void CStorageZIPWriter::Finish()
 	pUpdateStatement->setString(5, m_pStorageWriter->getUUID ());
 	pUpdateStatement->setString(6, AMCData::CStorageState::storageStreamStatusToString(AMCData::eStorageStreamStatus::sssNew));
 	pUpdateStatement->execute();
+	pUpdateStatement = nullptr;
 
 }
 

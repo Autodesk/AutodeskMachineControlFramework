@@ -37,6 +37,7 @@ Abstract: This is the class declaration of CDriver_Raylase
 
 #include "libmcdriver_raylase_interfaces.hpp"
 #include "libmcdriver_raylase_sdk.hpp"
+#include "libmcdriver_raylase_raylasecardimpl.hpp"
 #include "libmcdriver_raylase_raylasecard.hpp"
 
 // Parent classes
@@ -78,7 +79,8 @@ protected:
 
 public:
     CDriver_Raylase(const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
-    virtual ~CDriver_Raylase();
+    
+	virtual ~CDriver_Raylase();
 
     void Configure(const std::string& sConfigurationString) override;
 
@@ -100,9 +102,15 @@ public:
 
     IRaylaseCard* GetConnectedCard(const std::string& sCardName) override;
 
+    bool CardExists(const std::string& sCardName) override;
+
+    void DisconnectCard(const std::string& sCardName) override;
+
     void SetToSimulationMode() override;
 
     bool IsSimulationMode() override;
+
+    void DrawLayerMultiLaser(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS);
 
 
 };

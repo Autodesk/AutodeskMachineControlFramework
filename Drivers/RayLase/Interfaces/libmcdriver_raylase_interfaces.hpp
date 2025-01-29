@@ -57,6 +57,8 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
+class IRaylaseCommandLog;
+class INLightDriverBoard;
 class IRaylaseCard;
 class IDriver_Raylase;
 
@@ -310,6 +312,61 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
+ Class interface for RaylaseCommandLog 
+**************************************************************************************************************************/
+
+class IRaylaseCommandLog : public virtual IDriver {
+public:
+	/**
+	* IRaylaseCommandLog::RetrieveAsString - Returns the log as  string.
+	* @return Retrieved log string.
+	*/
+	virtual std::string RetrieveAsString() = 0;
+
+};
+
+typedef IBaseSharedPtr<IRaylaseCommandLog> PIRaylaseCommandLog;
+
+
+/*************************************************************************************************************************
+ Class interface for NLightDriverBoard 
+**************************************************************************************************************************/
+
+class INLightDriverBoard : public virtual IBase {
+public:
+	/**
+	* INLightDriverBoard::InitializeLaser - Initializes the NLight laser via the driver board.
+	*/
+	virtual void InitializeLaser() = 0;
+
+	/**
+	* INLightDriverBoard::DisableLaser - Disables the NLight laser via the driver board.
+	*/
+	virtual void DisableLaser() = 0;
+
+	/**
+	* INLightDriverBoard::ClearError - Clears any error state in the NLight laser via the driver board.
+	*/
+	virtual void ClearError() = 0;
+
+	/**
+	* INLightDriverBoard::SetLaserMode - Sets the nLight Laser Mode. Board must have been initialized first.
+	* @param[in] nLaserMode - Sets the laser mode.
+	*/
+	virtual void SetLaserMode(const LibMCDriver_Raylase_uint32 nLaserMode) = 0;
+
+	/**
+	* INLightDriverBoard::HasError - Checks, if the laser is in an error state.
+	* @return Returns true if the laser is in an error state.
+	*/
+	virtual bool HasError() = 0;
+
+};
+
+typedef IBaseSharedPtr<INLightDriverBoard> PINLightDriverBoard;
+
+
+/*************************************************************************************************************************
  Class interface for RaylaseCard 
 **************************************************************************************************************************/
 
@@ -322,19 +379,36 @@ public:
 	virtual bool IsConnected() = 0;
 
 	/**
-	* IRaylaseCard::Disconnect - Disconnects and unregisters the card.
-	*/
-	virtual void Disconnect() = 0;
-
-	/**
 	* IRaylaseCard::ResetToSystemDefaults - Resets the card settings to system defaults.
 	*/
 	virtual void ResetToSystemDefaults() = 0;
 
 	/**
+	* IRaylaseCard::EnableCommandLogging - Enables Command logging for the Raylase SDK interface.
+	*/
+	virtual void EnableCommandLogging() = 0;
+
+	/**
+	* IRaylaseCard::DisableCommandLogging - Disables Command logging for the Raylase SDK interface.
+	*/
+	virtual void DisableCommandLogging() = 0;
+
+	/**
+	* IRaylaseCard::RetrieveLatestLog - Retrieves the last Raylase SDK command log. Fails if Command logging was never enabled.
+	* @return Instance of connected card.
+	*/
+	virtual IRaylaseCommandLog * RetrieveLatestLog() = 0;
+
+	/**
 	* IRaylaseCard::LaserOn - Turns the laser on.
 	*/
 	virtual void LaserOn() = 0;
+
+	/**
+	* IRaylaseCard::GetNLightDriverBoard - Returns the NLight Driver Board Handler class.
+	* @return NLight Driver Board Instance
+	*/
+	virtual INLightDriverBoard * GetNLightDriverBoard() = 0;
 
 	/**
 	* IRaylaseCard::LaserOff - Turns the laser off.
@@ -374,11 +448,56 @@ public:
 	virtual void GetLaserStatus(bool & bPilotIsEnabled, bool & bLaserIsArmed, bool & bLaserAlarm) = 0;
 
 	/**
+	* IRaylaseCard::AssignLaserIndex - Assigns a laser index to the card.
+	* @param[in] nLaserIndex - Laser index to assign. This will map to the laser indices given in the build file. 0 means no assignment.
+	*/
+	virtual void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex) = 0;
+
+	/**
+	* IRaylaseCard::GetAssignedLaserIndex - Returns the assigned laser index to the card. Default value is 0 (unassigned).
+	* @return Assigned laser index. This will map to the laser indices given in the build file. 0 means no assignment.
+	*/
+	virtual LibMCDriver_Raylase_uint32 GetAssignedLaserIndex() = 0;
+
+	/**
 	* IRaylaseCard::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
 	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
 	* @param[in] nLayerIndex - Layer index of the build file.
+	* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
 	*/
-	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex) = 0;
+	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) = 0;
+
+	/**
+	* IRaylaseCard::SetRotationalCoordinateTransform - Sets the rotational coordinate transform to use.
+	* @param[in] dM11 - Upper left field of the transformation matrix.
+	* @param[in] dM12 - Upper right field of the transformation matrix.
+	* @param[in] dM21 - Lower left field of the transformation matrix.
+	* @param[in] dM22 - Lower right field of the transformation matrix.
+	*/
+	virtual void SetRotationalCoordinateTransform(const LibMCDriver_Raylase_double dM11, const LibMCDriver_Raylase_double dM12, const LibMCDriver_Raylase_double dM21, const LibMCDriver_Raylase_double dM22) = 0;
+
+	/**
+	* IRaylaseCard::GetRotationalCoordinateTransform - Returns the rotational coordinate transform in use. The default is the identity matrix.
+	* @param[out] dM11 - Upper left field of the transformation matrix.
+	* @param[out] dM12 - Upper right field of the transformation matrix.
+	* @param[out] dM21 - Lower left field of the transformation matrix.
+	* @param[out] dM22 - Lower right field of the transformation matrix.
+	*/
+	virtual void GetRotationalCoordinateTransform(LibMCDriver_Raylase_double & dM11, LibMCDriver_Raylase_double & dM12, LibMCDriver_Raylase_double & dM21, LibMCDriver_Raylase_double & dM22) = 0;
+
+	/**
+	* IRaylaseCard::SetTranslationalCoordinateTransform - Sets the translational coordinate transform to use.
+	* @param[in] dOffsetX - Translation in X in mm.
+	* @param[in] dOffsetY - Translation in Y in mm.
+	*/
+	virtual void SetTranslationalCoordinateTransform(const LibMCDriver_Raylase_double dOffsetX, const LibMCDriver_Raylase_double dOffsetY) = 0;
+
+	/**
+	* IRaylaseCard::GetTranslationalCoordinateTransform - Returns the translational coordinate transform in use. Default is 0/0
+	* @param[out] dOffsetX - Translation in X in mm.
+	* @param[out] dOffsetY - Translation in Y in mm.
+	*/
+	virtual void GetTranslationalCoordinateTransform(LibMCDriver_Raylase_double & dOffsetX, LibMCDriver_Raylase_double & dOffsetY) = 0;
 
 };
 
@@ -429,6 +548,28 @@ public:
 	* @return Instance of connected card.
 	*/
 	virtual IRaylaseCard * GetConnectedCard(const std::string & sCardName) = 0;
+
+	/**
+	* IDriver_Raylase::CardExists - Retrieves.
+	* @param[in] sCardName - Name of scanner card to retrieve.
+	* @return Returns true if card exists, false otherwise.
+	*/
+	virtual bool CardExists(const std::string & sCardName) = 0;
+
+	/**
+	* IDriver_Raylase::DisconnectCard - Disconnects and unregisters a card. Does nothing if card does not exist.
+	* @param[in] sCardName - Name of scanner card to disconnect. Card will be removed from driver.
+	*/
+	virtual void DisconnectCard(const std::string & sCardName) = 0;
+
+	/**
+	* IDriver_Raylase::DrawLayerMultiLaser - Draws a layer of a build stream. Blocks until the layer is drawn. The call will fail if the laser assignment of the cards is not unique.
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
+	* @param[in] bFailIfNonAssignedDataExists - If true, the call will fail in case a layer contains data that is not assigned to any defined scanner card.
+	* @param[in] nScanningTimeoutInMS - Maximum duration of the scanning process in milliseconds.
+	*/
+	virtual void DrawLayerMultiLaser(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const bool bFailIfNonAssignedDataExists, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) = 0;
 
 };
 

@@ -37,6 +37,8 @@ Abstract: This is the class declaration of CRaylaseCard
 
 #include "libmcdriver_raylase_interfaces.hpp"
 #include "libmcdriver_raylase_sdk.hpp"
+#include "libmcdriver_raylase_raylasecardlist.hpp"
+#include "libmcdriver_raylase_raylasecardimpl.hpp"
 
 // Parent classes
 #include "libmcdriver_raylase_base.hpp"
@@ -50,61 +52,6 @@ Abstract: This is the class declaration of CRaylaseCard
 
 namespace LibMCDriver_Raylase {
 namespace Impl {
-
-class CRaylaseCardImpl;
-typedef std::shared_ptr<CRaylaseCardImpl> PRaylaseCardImpl;
-
-class CRaylaseCardImpl {
-private:
-
-	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
-
-	PRaylaseSDK m_pSDK;
-	std::string m_sCardName;
-	std::string m_sCardIP;
-	uint32_t m_nPort;
-
-	double m_dMaxLaserPowerInWatts;
-
-	rlHandle m_Handle;
-	bool m_bSimulationMode;
-
-	bool m_bSimulatedPilotIsEnabled;
-	bool m_bSimulatedPilotIsArmed;
-	bool m_bSimulatedPilotIsAlarm;
-
-public:
-	
-	static PRaylaseCardImpl connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment);
-
-	CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment);
-	virtual ~CRaylaseCardImpl();
-
-	void ResetToSystemDefaults();
-
-	void LaserOn();
-
-	void LaserOff();
-
-	void ArmLaser(const bool bShallBeArmed);
-
-	bool IsLaserArmed();
-
-	void EnablePilot(const bool bShallBeEnabled);
-
-	bool PilotIsEnabled();
-
-	void GetLaserStatus(bool& bPilotIsEnabled, bool& bLaserIsArmed, bool& bLaserAlarm);
-
-	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex);
-
-	bool IsConnected();
-
-	void Disconnect();
-
-
-};
-
 
 
 /*************************************************************************************************************************
@@ -123,9 +70,15 @@ public:
 
 	bool IsConnected() override;
 
-	void Disconnect() override;
-
 	void ResetToSystemDefaults() override;
+
+	void EnableCommandLogging() override;
+
+	void DisableCommandLogging() override;
+
+	INLightDriverBoard* GetNLightDriverBoard() override;
+
+	IRaylaseCommandLog* RetrieveLatestLog() override;
 
 	void LaserOn() override;
 
@@ -141,7 +94,19 @@ public:
 
 	void GetLaserStatus(bool & bPilotIsEnabled, bool & bLaserIsArmed, bool & bLaserAlarm) override;
 
-	void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex) override;
+	void AssignLaserIndex(const LibMCDriver_Raylase_uint32 nLaserIndex) override;
+
+	LibMCDriver_Raylase_uint32 GetAssignedLaserIndex() override;
+
+	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex, const LibMCDriver_Raylase_uint32 nScanningTimeoutInMS) override;
+
+	void SetRotationalCoordinateTransform(const LibMCDriver_Raylase_double dM11, const LibMCDriver_Raylase_double dM12, const LibMCDriver_Raylase_double dM21, const LibMCDriver_Raylase_double dM22) override;
+
+	void GetRotationalCoordinateTransform(LibMCDriver_Raylase_double& dM11, LibMCDriver_Raylase_double& dM12, LibMCDriver_Raylase_double& dM21, LibMCDriver_Raylase_double& dM22) override;
+
+	void SetTranslationalCoordinateTransform(const LibMCDriver_Raylase_double dOffsetX, const LibMCDriver_Raylase_double dOffsetY) override;
+	
+	void GetTranslationalCoordinateTransform(LibMCDriver_Raylase_double& dOffsetX, LibMCDriver_Raylase_double& dOffsetY) override;
 
 };
 

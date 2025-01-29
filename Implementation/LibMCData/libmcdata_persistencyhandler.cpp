@@ -37,6 +37,8 @@ Abstract: This is a stub class definition of CPersistencyHandler
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
 
+#define PERSISTENCY_INTEGERACCURACY 0.001
+
 using namespace LibMCData::Impl;
 
 /*************************************************************************************************************************
@@ -124,10 +126,10 @@ void CPersistencyHandler::StorePersistentParameter(const std::string& sUUID, con
 		sNormalizedValue = sValue;
 		break;
 	case LibMCData::eParameterDataType::Integer:
-		sNormalizedValue = std::to_string(AMCCommon::CUtils::stringToInteger(sValue));
+		sNormalizedValue = std::to_string(AMCCommon::CUtils::stringToIntegerWithAccuracy(sValue, PERSISTENCY_INTEGERACCURACY));
 		break;
 	case LibMCData::eParameterDataType::Bool:
-		if (AMCCommon::CUtils::stringToInteger(sValue) != 0)
+		if (AMCCommon::CUtils::stringToIntegerWithAccuracy(sValue, PERSISTENCY_INTEGERACCURACY) != 0)
 			sNormalizedValue = "1";
 		else
 			sNormalizedValue = "0";
@@ -242,13 +244,13 @@ LibMCData_double CPersistencyHandler::RetrievePersistentDoubleParameter(const st
 LibMCData_int64 CPersistencyHandler::RetrievePersistentIntegerParameter(const std::string & sUUID)
 {
 	auto sStringValue = retrievePersistentParameter(sUUID, LibMCData::eParameterDataType::Integer);
-	return AMCCommon::CUtils::stringToInteger(sStringValue);
+	return AMCCommon::CUtils::stringToIntegerWithAccuracy(sStringValue, PERSISTENCY_INTEGERACCURACY);
 }
 
 bool CPersistencyHandler::RetrievePersistentBoolParameter(const std::string & sUUID)
 {
 	auto sStringValue = retrievePersistentParameter(sUUID, LibMCData::eParameterDataType::Bool);
-	return (AMCCommon::CUtils::stringToInteger(sStringValue) != 0);
+	return (AMCCommon::CUtils::stringToIntegerWithAccuracy(sStringValue, PERSISTENCY_INTEGERACCURACY) != 0);
 }
 
 std::string CPersistencyHandler::retrievePersistentParameter(const std::string& sUUID, const LibMCData::eParameterDataType eDataType)

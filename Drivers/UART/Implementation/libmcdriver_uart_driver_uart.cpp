@@ -168,7 +168,7 @@ void CDriver_UART::Disconnect()
 bool CDriver_UART::IsConnected()
 {
 	if (m_pConnection.get() != nullptr) {
-		return m_pConnection->available();
+		return m_pConnection->isOpen();
 	}
 
 	return false;

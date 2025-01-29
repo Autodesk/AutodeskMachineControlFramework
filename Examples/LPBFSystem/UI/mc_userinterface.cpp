@@ -660,6 +660,48 @@ public:
 
 };
 
+
+class CEvent_OnLoadHistoricJournal : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onloadhistoricjournal";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on Load Historic Journal");
+
+		std::string sSender = pUIEnvironment->RetrieveEventSender();
+		
+		auto sExecutionUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
+		pUIEnvironment->LogMessage("Build execution UUID " + sExecutionUUID);
+
+		auto pBuildExecution = pUIEnvironment->GetBuildExecution(sExecutionUUID);
+
+		auto pJournal = pBuildExecution->LoadAttachedJournal(256);
+
+		auto pStartTime = pJournal->GetStartTime();
+		pUIEnvironment->LogMessage ("Start Time: " + pStartTime->ToUTCDateTime ());
+
+		uint64_t nLifetimeInMicroseconds = pJournal->GetJournalLifeTimeInMicroseconds();
+
+		auto pVariable = pJournal->RetrieveJournalVariableFromTimeInterval("main.jobinfo.countertest", 0, nLifetimeInMicroseconds);
+		double dValue = pVariable->ComputeDoubleSample(10000000);
+
+		pUIEnvironment->LogMessage("Double sample: " + std::to_string (dValue));
+
+
+
+	}
+
+};
+
+
+
 class CEvent_CancelBuildFromPause : public virtual CEvent {
 
 public:
@@ -743,6 +785,9 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnViewIn3D>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnLoadHistoricJournal>(sEventName, pEventInstance))
+		return pEventInstance;
+	
 	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);
