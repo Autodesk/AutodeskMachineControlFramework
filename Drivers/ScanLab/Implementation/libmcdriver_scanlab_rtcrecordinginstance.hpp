@@ -45,8 +45,8 @@ Abstract: This is the class declaration of CRTCRecording
 
 #define RTC_CHANNELCOUNT 8
 #define RTC_CHUNKSIZE_MIN 1024
-#define RTC_CHUNKSIZE_MAX (1024 * 1024)
-#define RTC_CHUNKSIZE_DEFAULT 100000
+#define RTC_CHUNKSIZE_MAX (1024 * 1024 * 16)
+#define RTC_CHUNKSIZE_DEFAULT (1024 * 1024)
 
 
 namespace LibMCDriver_ScanLab {

@@ -524,8 +524,9 @@ int32_t * CRTCRecordingChannel::reserveDataBuffer(uint32_t nCount, uint32_t& nEn
 
 	if (nCount == 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGUNDERFLOW, "data recording interval underflow");
-	if (nCount > m_nChunkSize)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW, "data recording interval overflow");
+	if (nCount > m_nChunkSize) {
+		nCount = m_nChunkSize;		
+	}
 
 	if (m_pCurrentChunk.get() != nullptr) {
 		if (m_pCurrentChunk->isFull())
@@ -682,7 +683,7 @@ void CRTCRecordingInstance::executeListWithRecording()
 	uint32_t LastPosition = 0;
 	uint32_t Increment = 100000;
 
-	uint32_t nMaxMESPosition = (1UL << 23) - 1;
+	uint32_t nMaxMESPosition = (1UL << 22) - 1;
 
 	do // Wait for measurement to start
 	{
@@ -704,6 +705,8 @@ void CRTCRecordingInstance::executeListWithRecording()
 		}
 		else if (MesPosition < LastPosition)
 		{
+			//std::cout << "Roundtrip reached: MesPosition: " << MesPosition << " / LastPosition: " << LastPosition << std::endl;
+
 			if (MesPosition > nMaxMESPosition)
 				throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DATARECORDINGOVERFLOW, "data recording interval overflow: MesPosition exceeds Max MES Position");
 
