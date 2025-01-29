@@ -49,14 +49,19 @@ namespace AMCData {
 	class CSQLStatement;
 	typedef std::shared_ptr<CSQLStatement> PSQLStatement;
 
+	class CSQLTransactionLock;
+	typedef std::shared_ptr<CSQLTransactionLock> PSQLTransactionLock;
+
 	class CSQLTransaction {
 	protected:
 		bool m_bIsClosed;	
+		PSQLTransactionLock m_pLock;
 		CSQLHandler * m_pSQLHandler;
 	
 	public:
 
-		CSQLTransaction(CSQLHandler * pSQLHandler);
+		CSQLTransaction(CSQLHandler * pSQLHandler, PSQLTransactionLock pLock);
+
 		virtual ~CSQLTransaction();
 		
 		virtual void commit ();

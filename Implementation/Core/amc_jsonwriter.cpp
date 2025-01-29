@@ -193,6 +193,18 @@ void CJSONWriter::addDouble(const std::string& sName, double dValue)
 	m_document.AddMember(strName, strValue, m_allocator);
 }
 
+void CJSONWriter::addBoolean(const std::string& sName, bool bValue)
+{
+	rapidjson::Value strName;
+	strName.SetString(sName.c_str(), m_allocator);
+	rapidjson::Value strValue;
+	strValue.SetBool(bValue);
+
+	m_document.AddMember(strName, strValue, m_allocator);
+
+}
+
+
 void CJSONWriter::addObject(const std::string& sName, CJSONWriterObject& object)
 {
 	rapidjson::Value strName;

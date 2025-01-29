@@ -76,6 +76,13 @@ set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "" IMPORT_PREFIX "" )
 set_target_properties(${PLUGINNAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 set_target_properties(${PLUGINNAME} PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
 
+if(MSVC)
+    # For Release builds: /MT
+    target_compile_options(${PLUGINNAME} PRIVATE "$<$<CONFIG:Release>:/MT>")
+    # For Debug builds: /MTd
+    target_compile_options(${PLUGINNAME} PRIVATE "$<$<CONFIG:Debug>:/MTd>")
+ endif()
+
 # This makes sure symbols are exported
 target_compile_options(${PLUGINNAME} PRIVATE "-D${EXPORTFLAG}")
 if(WIN32)

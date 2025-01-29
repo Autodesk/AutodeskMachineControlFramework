@@ -86,11 +86,12 @@ protected:
 
     bool m_bIsQueryingParameters;
 
-    std::list<PDriver_BuRValue> m_DriverParameters;
-    std::map<std::string, PDriver_BuRValue> m_DriverParameterMap;
+    std::list<PDriver_BuRValue> m_LegacyDriverParameters;
+    std::map<std::string, PDriver_BuRValue> m_LegacyDriverParameterMap;
+
+    std::vector<PDriver_BuRJournalParameterValue> m_JournalParameterValues;
 
     std::map<std::string, PDriver_BuRCommandDefinition> m_CommandDefinitions;
-    std::map<std::string, PDriver_BuRValue> m_ControlParameterMap;
 
     PDriver_BuRConnector m_pConnector; 
 

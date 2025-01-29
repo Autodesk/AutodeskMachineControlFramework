@@ -113,6 +113,16 @@ __DECLARESTATE(initbuild)
 	pStateEnvironment->LogMessage("Initializing build...");
 	auto sJobUUID = pStateEnvironment->GetUUIDParameter("jobinfo", "jobuuid");
 
+	auto pLaserInitSignal = pStateEnvironment->PrepareSignal("laser", "signal_initlaserforjob");
+	pLaserInitSignal->SetUUID("jobuuid", sJobUUID);
+	pLaserInitSignal->Trigger();
+
+	if (!pLaserInitSignal->WaitForHandling(10000))
+		throw std::runtime_error("timeout while initialising laser");
+
+	if (!pLaserInitSignal->GetBoolResult ("success"))
+		throw std::runtime_error("laser initialization failed");
+
 	pStateEnvironment->LogMessage("Loading Toolpath...");
 	auto pBuildJob = pStateEnvironment->GetBuildJob (sJobUUID);
 	pBuildJob->LoadToolpath();
@@ -124,9 +134,13 @@ __DECLARESTATE(initbuild)
 		dTotalHeight = pBuildJob->GetBuildHeightInMM();
 	}
 
+	auto pJobExecution = pBuildJob->StartExecution("", "");
+
+
 	pStateEnvironment->LogMessage("Job Name: " + sJobName);
 	pStateEnvironment->LogMessage("Layer Count: " + std::to_string (nLayerCount));
 
+	pStateEnvironment->SetStringParameter("jobinfo", "executionuuid", pJobExecution->GetUUID ());
 	pStateEnvironment->SetStringParameter("jobinfo", "jobname", sJobName);
 	pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 1);
 	pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
@@ -221,6 +235,7 @@ __DECLARESTATE(exposelayer)
 	pStateEnvironment->LogMessage("Exposing layer...");
 
 	auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
+	auto sExecutionUUID = pStateEnvironment->GetStringParameter("jobinfo", "executionuuid");
 	auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 	auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
 	auto nExposureTimeOut = pStateEnvironment->GetIntegerParameter("jobinfo", "exposuretimeout");
@@ -242,6 +257,7 @@ __DECLARESTATE(exposelayer)
 
 		auto pExposureSignal = pStateEnvironment->PrepareSignal("laser", "signal_exposure");
 		pExposureSignal->SetString("jobuuid", sJobUUID);
+		pExposureSignal->SetString("executionuuid", sExecutionUUID);		
 		pExposureSignal->SetInteger("layerindex", nCurrentLayer);
 		pExposureSignal->SetInteger("timeout", nExposureTimeOut);
 		pExposureSignal->Trigger();

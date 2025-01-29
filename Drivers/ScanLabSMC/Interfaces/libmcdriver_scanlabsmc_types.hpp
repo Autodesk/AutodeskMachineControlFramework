@@ -136,6 +136,18 @@ typedef void * LibMCDriver_ScanLabSMC_pvoid;
 #define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME 1028 /** Empty RTC auxiliary resource name */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND 1029 /** RTC auxiliary resource not found. */
 #define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT 1030 /** Invalid point count. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONRESOURCENAME 1031 /** Empty configuration resource name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_CONFIGURATIONRESOURCENOTFOUND 1032 /** Configuration resource not found. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTOOPENSIMULATIONFILE 1033 /** Could not open simulation file. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDSIMULATIONFILENAME 1034 /** Invalid simulation file name. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_UNSUPPORTEDSMCVERSION 1035 /** Unsupported SMC Version. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_SMCTEMPLATEVERSIONMISMATCH 1036 /** SMC Template version mismatch. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMAJORVERSION 1037 /** Unknown SMC Major Version. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION 1038 /** Unknown SMC Minor Version. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC 1039 /** Invalid job characteristic. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTGETJOBCHARACTERISTIC 1040 /** Could not get job characteristic. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_JOBDURATIONHASNOTBEENPARSED 1041 /** Job duration has not been parsed. */
+#define LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOPJOBEXECUTION 1042 /** Could not stop job execution. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabSMC
@@ -184,6 +196,18 @@ inline const char * LIBMCDRIVER_SCANLABSMC_GETERRORSTRING (LibMCDriver_ScanLabSM
     case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME: return "Empty RTC auxiliary resource name";
     case LIBMCDRIVER_SCANLABSMC_ERROR_RTCAUXILIARYRESOURCENOTFOUND: return "RTC auxiliary resource not found.";
     case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPOINTCOUNT: return "Invalid point count.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYCONFIGURATIONRESOURCENAME: return "Empty configuration resource name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_CONFIGURATIONRESOURCENOTFOUND: return "Configuration resource not found.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTOOPENSIMULATIONFILE: return "Could not open simulation file.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDSIMULATIONFILENAME: return "Invalid simulation file name.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_UNSUPPORTEDSMCVERSION: return "Unsupported SMC Version.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_SMCTEMPLATEVERSIONMISMATCH: return "SMC Template version mismatch.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMAJORVERSION: return "Unknown SMC Major Version.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMINORVERSION: return "Unknown SMC Minor Version.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDJOBCHARACTERISTIC: return "Invalid job characteristic.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTGETJOBCHARACTERISTIC: return "Could not get job characteristic.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_JOBDURATIONHASNOTBEENPARSED: return "Job duration has not been parsed.";
+    case LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTSTOPJOBEXECUTION: return "Could not stop job execution.";
     default: return "unknown error";
   }
 }
@@ -225,6 +249,70 @@ namespace LibMCDriver_ScanLabSMC {
     Info = 3
   };
   
+  enum class eSMCConfigVersion : LibMCDriver_ScanLabSMC_int32 {
+    Unknown = 0,
+    Version_0_8 = 8,
+    Version_0_9 = 9
+  };
+  
+  enum class eJobCharacteristic : LibMCDriver_ScanLabSMC_int32 {
+    Cart_XPos_ScanAxis = 0, /** Max. absolute scan head position in X direction. In mm. */
+    Cart_YPos_ScanAxis = 1, /** Max. absolute scan head position in Y direction. In mm. */
+    Cart_ZPos_ScanAxis = 2, /** Max. absolute scan head position in Z direction. In mm. */
+    Cart_XPos_StageAxis = 10, /** Max. absolute stage position in X direction. In mm. */
+    Cart_YPos_StageAxis = 11, /** Max. absolute stage position in Y direction. In mm. */
+    Cart_ZPos_StageAxis = 12, /** Max. absolute stage position in Z direction. In mm. */
+    Cart_XVel_ScanAxis = 20, /** Max. absolute scan head velocity in X direction. In mm/s. */
+    Cart_YVel_ScanAxis = 21, /** Max. absolute scan head velocity in Y direction. In mm/s. */
+    Cart_ZVel_ScanAxis = 22, /** Max. absolute scan head velocity in Z direction. In mm/s. */
+    Cart_XVel_StageAxis = 30, /** Max. absolute stage velocity in X direction. In mm/s. */
+    Cart_YVel_StageAxis = 31, /** Max. absolute stage velocity in Y direction. In mm/s. */
+    Cart_ZVel_StageAxis = 32, /** Max. absolute stage velocity in X direction. In mm/s. */
+    Cart_XAcc_ScanAxis = 40, /** Max. absolute scan head acceleration in X direction. In mm/s^2. */
+    Cart_YAcc_ScanAxis = 41, /** Max. absolute scan head acceleration in Y direction.In mm/s^2. */
+    Cart_ZAcc_ScanAxis = 42, /** Max. absolute scan head acceleration in Zdirection.In mm/s^2. */
+    Cart_XAcc_StageAxis = 50, /** Max. absolute stage acceleration in X direction. In mm/s^2. */
+    Cart_YAcc_StageAxis = 51, /** Max. absolute stage acceleration in Y direction. In mm/s^2. */
+    Cart_ZAcc_StageAxis = 52, /** Max. absolute stage acceleration in Z direction. In mm/s^2. */
+    Cart_XJerk_StageAxis = 70, /** Max. absolute stage jerk in X direction. In mm/s^3. */
+    Cart_YJerk_StageAxis = 71, /** Max. absolute stage jerk in Y direction. In mm/s^3. */
+    Cart_ZJerk_StageAxis = 72, /** Max. absolute stage jerk in Z direction. In mm/s^3. */
+    Cart_XPos_ScanAxis_LaserOn = 80, /** Max. absolute scan head position in X direction with active laser. In mm. */
+    Cart_YPos_ScanAxis_LaserOn = 81, /** Max. absolute scan head position in Y direction with active laser. In mm. */
+    Cart_ZPos_ScanAxis_LaserOn = 82, /** Max. absolute scan head position in Z direction with active laser. In mm. */
+    Cart_XPos_StageAxis_LaserOn = 90, /** Max. abs. stage position in X direction with active laser. In mm. */
+    Cart_YPos_StageAxis_LaserOn = 91, /** Max. abs. stage position in Y direction with active laser. In mm. */
+    Cart_ZPos_StageAxis_LaserOn = 92, /** Max. abs. stage position in Z direction with active laser. In mm. */
+    Cart_XPos_ScanAxis_Max = 100, /** Max. scan head position in X direction. In mm. */
+    Cart_YPos_ScanAxis_Max = 101, /** Max. scan head position in Y direction. In mm. */
+    Cart_ZPos_ScanAxis_Max = 102, /** Max. scan head position in Z direction. In mm. */
+    Cart_XPos_ScanAxis_Min = 110, /** Min. scan head position in X direction. In mm. */
+    Cart_YPos_ScanAxis_Min = 111, /** Min. scan head position in Y direction. In mm. */
+    Cart_ZPos_ScanAxis_Min = 112, /** Min. scan head position in Z direction. In mm. */
+    Cart_XPos_ScanAxis_LaserOn_Max = 120, /** Max. scan head position in X direction with active laser. In mm. */
+    Cart_YPos_ScanAxis_LaserOn_Max = 121, /** Max. scan head position in Y direction with active laser. In mm. */
+    Cart_ZPos_ScanAxis_LaserOn_Max = 122, /** Max. scan head position in Z direction with active laser. In mm. */
+    Cart_XPos_ScanAxis_LaserOn_Min = 130, /** Min. scan head position in X direction with active laser. In mm. */
+    Cart_YPos_ScanAxis_LaserOn_Min = 131, /** Min. scan head position in Y direction with active laser. In mm. */
+    Cart_ZPos_ScanAxis_LaserOn_Min = 132, /** Min. scan head position in Z direction with active laser. In mm. */
+    Cart_XPos_StageAxis_Max = 140, /** Max. stage position in X direction. In mm. */
+    Cart_YPos_StageAxis_Max = 141, /** Max. stage position in Y direction. In mm. */
+    Cart_ZPos_StageAxis_Max = 142, /** Max. stage position in Z direction. In mm. */
+    Cart_XPos_StageAxis_Min = 150, /** Min. stage position in X direction. In mm. */
+    Cart_YPos_StageAxis_Min = 151, /** Min. stage position in Y direction. In mm. */
+    Cart_ZPos_StageAxis_Min = 152, /** Min. stage position in Z direction. In mm. */
+    Cart_XPos_StageAxis_LaserOn_Max = 160, /** Max. stage position in X direction with active laser. In mm. */
+    Cart_YPos_StageAxis_LaserOn_Max = 161, /** Max. stage position in Y direction with active laser. In mm. */
+    Cart_ZPos_StageAxis_LaserOn_Max = 162, /** Max. stage position in Z direction with active laser. In mm. */
+    Cart_XPos_StageAxis_LaserOn_Min = 170, /** Min. stage position in X direction with active laser. In mm. */
+    Cart_YPos_StageAxis_LaserOn_Min = 171, /** Min. stage position in Y direction with active laser. In mm. */
+    Cart_ZPos_StageAxis_LaserOn_Min = 172, /** Min. stage position in Z direction with active laser. In mm. */
+    InsertedSkywritings = 180, /** Number of transitions in the job where a skywriting had to be inserted. */
+    MotionMicroSteps = 181, /** Number of micro vectors that make up the job. */
+    MinimalMarkSpeed = 182, /** Minimum velocity reached by the laser spot during the job. */
+    MaximalMarkSpeed = 183 /** Maximum velocity reached by the laser spot during the job. */
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -251,6 +339,8 @@ namespace LibMCDriver_ScanLabSMC {
 typedef LibMCDriver_ScanLabSMC::eBlendMode eLibMCDriver_ScanLabSMCBlendMode;
 typedef LibMCDriver_ScanLabSMC::eDynamicViolationReaction eLibMCDriver_ScanLabSMCDynamicViolationReaction;
 typedef LibMCDriver_ScanLabSMC::eWarnLevel eLibMCDriver_ScanLabSMCWarnLevel;
+typedef LibMCDriver_ScanLabSMC::eSMCConfigVersion eLibMCDriver_ScanLabSMCSMCConfigVersion;
+typedef LibMCDriver_ScanLabSMC::eJobCharacteristic eLibMCDriver_ScanLabSMCJobCharacteristic;
 typedef LibMCDriver_ScanLabSMC::sPoint2D sLibMCDriver_ScanLabSMCPoint2D;
 typedef LibMCDriver_ScanLabSMC::sHatch2D sLibMCDriver_ScanLabSMCHatch2D;
 

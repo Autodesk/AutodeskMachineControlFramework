@@ -43,6 +43,7 @@ Abstract: This is the class declaration of CDriverEnvironment
 #include "amc_meshhandler.hpp"
 #include "common_chrono.hpp"
 #include "amc_logger.hpp"
+#include "amc_statejournal.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -80,12 +81,13 @@ protected:
 	AMC::PMeshHandler m_pMeshHandler;
 	LibMCData::PDataModel m_pDataModel;
 	AMC::PLogger m_pLogger;
+	AMC::PStateJournal m_pStateJournal;
 
 	AMCCommon::PChrono m_pGlobalChrono;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName, AMC::PStateJournal pStateJournal);
 
 	virtual ~CDriverEnvironment();
 
@@ -151,7 +153,7 @@ public:
 
 	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
-	IImageData* LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+	IImageLoader* CreateImageLoader() override;
 
 	IXMLDocument* CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace) override;
 

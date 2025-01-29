@@ -107,6 +107,8 @@ void CDriver_ScanLab_RTC6xN::Configure(const std::string& sConfigurationString)
 		m_pDriverEnvironment->RegisterBoolParameter(sPrefix + "temperature_ok", "Scan Head Temperature is ok", false);
 		m_pDriverEnvironment->RegisterBoolParameter(sPrefix + "power_ok", "Scan Head Power is ok", false);
 		m_pDriverEnvironment->RegisterBoolParameter(sPrefix + "laser_on", "Laser is On", false);
+		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "analogout1", "Analog Out 1", 0);
+		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "analogout2", "Analog Out 2", 0);
 		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "position_x", "Laser Position X", 0);
 		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "position_y", "Laser Position Y", 0);
 		m_pDriverEnvironment->RegisterIntegerParameter(sPrefix + "position_z", "Laser Position Z", 0);
@@ -574,12 +576,16 @@ void CDriver_ScanLab_RTC6xN::updateCardStatus(LibMCEnv::PDriverStatusUpdateSessi
 
 				pRTCContext->GetStatus(Busy, ListPosition);
 				pRTCContext->GetHeadStatus(1, bPositionXisOK, bPositionYisOK, bTemperatureisOK, bPowerisOK);
+				int32_t nAnalogOut1 = pRTCContext->GetRTCChannel(eRTCChannelType::ChannelAnalogOut1);
+				int32_t nAnalogOut2 = pRTCContext->GetRTCChannel(eRTCChannelType::ChannelAnalogOut2);
 
 				pDriverUpdateInstance->SetBoolParameter(sPrefix + "position_x_ok", bPositionXisOK);
 				pDriverUpdateInstance->SetBoolParameter(sPrefix + "position_y_ok", bPositionYisOK);
 				pDriverUpdateInstance->SetBoolParameter(sPrefix + "temperature_ok", bTemperatureisOK);
 				pDriverUpdateInstance->SetBoolParameter(sPrefix + "power_ok", bPowerisOK);
 
+				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "analogout1", nAnalogOut1);
+				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "analogout2", nAnalogOut2);
 				pDriverUpdateInstance->SetIntegerParameter(sPrefix + "list_position", ListPosition);
 				pDriverUpdateInstance->SetBoolParameter(sPrefix + "card_busy", Busy);
 

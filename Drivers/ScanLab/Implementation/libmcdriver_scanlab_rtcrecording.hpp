@@ -67,12 +67,6 @@ public:
 
 	virtual ~CRTCRecording();
 
-	bool ScanheadConnectionCheckIsEnabled() override;
-
-	void EnableScanheadConnectionCheck() override;
-
-	void DisableScanheadConnectionCheck() override;
-
 	void Clear() override;
 
 	void AddChannel(const std::string & sChannelName, const LibMCDriver_ScanLab::eRTCChannelType eChannelType) override;
@@ -98,6 +92,16 @@ public:
 	void AddRecordsToDataTable(const std::string & sChannelName, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription) override;
 
 	void AddScaledRecordsToDataTable(const std::string & sChannelName, LibMCEnv::PDataTable pDataTable, const std::string & sColumnIdentifier, const std::string & sColumnDescription, const LibMCDriver_ScanLab_double dScaleFactor, const LibMCDriver_ScanLab_double dOffset) override;
+
+	void AddBacktransformedXYPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY) override;
+
+	void BacktransformRawXYCoordinates(const LibMCDriver_ScanLab_int32 nRawCoordinateX, const LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double& dBacktransformedX, LibMCDriver_ScanLab_double& dBacktransformedY) override;
+
+	void AddBacktransformedZPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierZ, const std::string& sColumnDescriptionZ) override;
+
+	double BacktransformRawZCoordinate(const int32_t nRawCoordinateZ) override;
+
+	void AddTargetPositionsToDataTable(LibMCEnv::PDataTable pDataTable, const std::string& sColumnIdentifierX, const std::string& sColumnDescriptionX, const std::string& sColumnIdentifierY, const std::string& sColumnDescriptionY) override;
 
 };
 

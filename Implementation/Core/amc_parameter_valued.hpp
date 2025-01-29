@@ -61,6 +61,8 @@ namespace AMC {
 
 		// The global original path of the parameter..
 		std::string m_sOriginalPath;
+
+		uint64_t m_nChangeCounter;
 		
 		// update value including persistency storage
 		void setValueEx(const std::string& sValue, uint64_t nAbsoluteTimeStamp);
@@ -111,6 +113,8 @@ namespace AMC {
 		void enablePersistency (const std::string& sPersistentName, const std::string& sPersistentUUID);
 		void disablePersistency();
 		void setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler, uint64_t nAbsoluteTimeStamp);
+
+		virtual uint64_t getChangeCounter() override;
 
 	};
 	

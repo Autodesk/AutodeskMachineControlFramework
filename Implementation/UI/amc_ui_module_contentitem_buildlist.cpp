@@ -278,7 +278,6 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUSER, pBuildJob->GetCreatorName());
 		entryObject.addInteger(AMC_API_KEY_UI_ITEMBUILDEXECUTIONCOUNT, pBuildJob->GetExecutionCount());
 
-		pBuildJob->GetTimeStamp();
 
 		entryArray.addObject(entryObject);
 

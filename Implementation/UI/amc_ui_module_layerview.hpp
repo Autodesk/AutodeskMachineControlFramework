@@ -61,6 +61,15 @@ namespace AMC {
 		CUIExpression m_OriginY;
 		CUIExpression m_BaseImage;
 		CUIExpression m_LayerIndex;
+		CUIExpression m_LabelVisible;
+		CUIExpression m_LabelCaption;
+		CUIExpression m_LabelIcon;
+		CUIExpression m_SliderFixed;
+		CUIExpression m_SliderChangeEvent;
+		CUIExpression m_BuildUUID;
+		CUIExpression m_ExecutionUUID;
+		CUIExpression m_ScatterplotUUID;
+
 		PUIModuleEnvironment m_pUIModuleEnvironment;
 		std::string m_sUUID;
 
@@ -74,10 +83,16 @@ namespace AMC {
 
 		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
 
-		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler);
 
+		void handleCustomRequest(PAPIAuth pAuth, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response, CUIModule_UIEventHandler* pEventHandler) override;
+
+		void setBuildReference(CUIExpression buildUUID, CUIExpression executionUUID, CUIExpression scatterplotUUID);
+
+		void setLabelExpressions (CUIExpression labelVisible, CUIExpression labelCaption, CUIExpression labelIcon);
+
+		void setSliderExpressions(CUIExpression sliderChangeEvent, CUIExpression sliderFixed);
 	};
 
 

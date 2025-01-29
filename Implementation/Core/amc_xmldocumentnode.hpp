@@ -128,7 +128,9 @@ namespace AMC {
 
 		void RemoveChildrenWithName(CXMLDocumentNameSpace* pNameSpace, const std::string& sName);
 
+		void CopyFrom(CXMLDocumentNodeInstance* pFromInstance);
 
+		static void splitNameSpaceName(const std::string& sPrefixedName, std::string& sUnprefixedName, std::string& sNameSpacePrefix);
 	};
 
 	

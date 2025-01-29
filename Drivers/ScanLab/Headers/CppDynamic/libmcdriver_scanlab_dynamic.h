@@ -348,31 +348,6 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCJob_AddFreeVariablePt
 **************************************************************************************************************************/
 
 /**
-* Returns if the scan head connection is checked when recording
-*
-* @param[in] pRTCRecording - RTCRecording instance.
-* @param[out] pValue - If true, the Scanhead connection will be checked for an error when recording.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_ScanheadConnectionCheckIsEnabledPtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, bool * pValue);
-
-/**
-* Enables the Scanhead connection check. The check is enabled by default.
-*
-* @param[in] pRTCRecording - RTCRecording instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_EnableScanheadConnectionCheckPtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording);
-
-/**
-* Disables the Scanhead connection check.
-*
-* @param[in] pRTCRecording - RTCRecording instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_DisableScanheadConnectionCheckPtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording);
-
-/**
 * Clears all recording data and channels.
 *
 * @param[in] pRTCRecording - RTCRecording instance.
@@ -385,7 +360,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_ClearPtr) (
 *
 * @param[in] pRTCRecording - RTCRecording instance.
 * @param[in] pChannelName - Identifier string. MUST be a non-empty alphanumeric string, with optional scores and underscores. MUST be unique.
-* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined.
+* @param[in] eChannelType - Channel type enum. MUST NOT be Undefined. Fails if channel type is already recorded. Fails if scan head feedback is not enabled and channel type is ChannelCurrentXRaw, ChannelCurrentYRaw or ChannelCurrentZ.
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddChannelPtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCDriver_ScanLab::eRTCChannelType eChannelType);
@@ -502,6 +477,289 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddRecordsT
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddScaledRecordsToDataTablePtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, const char * pChannelName, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifier, const char * pColumnDescription, LibMCDriver_ScanLab_double dScaleFactor, LibMCDriver_ScanLab_double dOffset);
+
+/**
+* Writes backtransformed positions to a data table as double columns. Fails if Channels of types Raw X and Raw Y do not both exist or positional backtransformation is not enabled.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+* @param[in] pColumnIdentifierX - Identifier of the X Column.
+* @param[in] pColumnDescriptionX - Description of the X Column.
+* @param[in] pColumnIdentifierY - Identifier of the X Column.
+* @param[in] pColumnDescriptionY - Description of the X Column.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddBacktransformedXYPositionsToDataTablePtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifierX, const char * pColumnDescriptionX, const char * pColumnIdentifierY, const char * pColumnDescriptionY);
+
+/**
+* Backtransforms raw coordinates in X and Y. Fails if positional backtransformation is not enabled.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] nRawCoordinateX - Raw X coordinate.
+* @param[in] nRawCoordinateY - Raw Y coordinate.
+* @param[out] pBacktransformedX - Backtransformed X coordinate in mm.
+* @param[out] pBacktransformedY - Backtransformed Y coordinate in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_BacktransformRawXYCoordinatesPtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCDriver_ScanLab_int32 nRawCoordinateX, LibMCDriver_ScanLab_int32 nRawCoordinateY, LibMCDriver_ScanLab_double * pBacktransformedX, LibMCDriver_ScanLab_double * pBacktransformedY);
+
+/**
+* Writes backtransformed Z positions to a data table as double column. Fails if Channels of types Raw Z does exist or positional backtransformation is not enabled.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+* @param[in] pColumnIdentifierZ - Identifier of the Z Column.
+* @param[in] pColumnDescriptionZ - Description of the Z Column.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddBacktransformedZPositionsToDataTablePtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifierZ, const char * pColumnDescriptionZ);
+
+/**
+* Backtransforms raw Z coordinate. Fails if positional backtransformation is not enabled.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] nRawCoordinateZ - Raw coordinates in Z.
+* @param[out] pBacktransformedZ - Backtransformed Z coordinate in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_BacktransformRawZCoordinatePtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCDriver_ScanLab_int32 nRawCoordinateZ, LibMCDriver_ScanLab_double * pBacktransformedZ);
+
+/**
+* Writes target positions to a data table as double columns. Fails if Channels of types Target X and Target Y do not both exist.
+*
+* @param[in] pRTCRecording - RTCRecording instance.
+* @param[in] pDataTable - Data table instance to write to. Coordinates will be stored in mm.
+* @param[in] pColumnIdentifierX - Identifier of the X Column.
+* @param[in] pColumnDescriptionX - Description of the X Column.
+* @param[in] pColumnIdentifierY - Identifier of the X Column.
+* @param[in] pColumnDescriptionY - Description of the X Column.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCRecording_AddTargetPositionsToDataTablePtr) (LibMCDriver_ScanLab_RTCRecording pRTCRecording, LibMCEnv_DataTable pDataTable, const char * pColumnIdentifierX, const char * pColumnDescriptionX, const char * pColumnIdentifierY, const char * pColumnDescriptionY);
+
+/*************************************************************************************************************************
+ Class definition for GPIOSequence
+**************************************************************************************************************************/
+
+/**
+* Returns the identifier of the GPIO Sequence.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Returns identifier string, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_GetIdentifierPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, const LibMCDriver_ScanLab_uint32 nIdentifierBufferSize, LibMCDriver_ScanLab_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Clears all sequence steps.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_ClearPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence);
+
+/**
+* Adds the writing of an output pin.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nOutputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+* @param[in] bOutputValue - If true, bit will be set, if false bit will be cleared.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_AddOutputPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nOutputBit, bool bOutputValue);
+
+/**
+* Adds a delay to the GPIO Sequence.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nDelayInMilliseconds - Delay in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_AddDelayPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nDelayInMilliseconds);
+
+/**
+* Waits for an input pin to reach a certain value.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nInputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+* @param[in] bInputValue - If true, the wait is for the bit becoming 1, if false, the wait is for the bit becoming 0.
+* @param[in] nMaxDelayInMilliseconds - Sets the maximum time it is allowed to take. Fails, if MaxDelay is 0.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_WaitforInputPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nInputBit, bool bInputValue, LibMCDriver_ScanLab_uint32 nMaxDelayInMilliseconds);
+
+/**
+* Adds a label to the current sequence position.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] pLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+* @param[in] nMaxPasses - Maximum number of times this label can be passed. Triggers an error if the label is passed more often.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_AddLabelPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, const char * pLabelName, LibMCDriver_ScanLab_uint32 nMaxPasses);
+
+/**
+* Jumps to a label. Fails if label does not exist.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] pLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_GoToLabelPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, const char * pLabelName);
+
+/**
+* Jumps to a label, if a certain input pin is set or cleared. Fails if label does not exist. Does nothing, if the input condition is not fulfilled.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @param[in] nInputBit - RTC Digital Output Bit index. MUST be between 0 and 15.
+* @param[in] bInputValue - If true, the jump is for the bit becoming 1, if false, the jump is for the bit becoming 0.
+* @param[in] pLabelName - Name of the label. Must be unique in the sequence. Only alphanumeric characters and _ and - are allowed. 
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_ConditionalGoToLabelPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence, LibMCDriver_ScanLab_uint32 nInputBit, bool bInputValue, const char * pLabelName);
+
+/**
+* Enables the GPIOSequence inside the DrawLayer Routine. The Sequence ID will be taken out of the build profile in this case.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_EnableAutomaticSelectionPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence);
+
+/**
+* Disables the GPIOSequence selection.
+*
+* @param[in] pGPIOSequence - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabGPIOSequence_DisableAutomaticSelectionPtr) (LibMCDriver_ScanLab_GPIOSequence pGPIOSequence);
+
+/*************************************************************************************************************************
+ Class definition for NLightAFXProfileSelector
+**************************************************************************************************************************/
+
+/**
+* Sets the control output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+* @param[in] nStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetControlOutputPinsPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 nStartDigitalOutputBit);
+
+/**
+* Returns the control output pin mapping for the nLight AFX Laser.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pEnableDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection enable flag (Pro_B7). MUST be between 0 and 15. Default is 0.
+* @param[out] pStartDigitalOutputBit - RTC Digital Output Bit index that is connected to the AFX beam selection start flag (Pro_Start). MUST be between 0 and 15. Default is 1
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetControlOutputPinsPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pEnableDigitalOutputBit, LibMCDriver_ScanLab_uint32 * pStartDigitalOutputBit);
+
+/**
+* Sets the selection output pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+* @param[in] nStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+* @param[in] nStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionOutputPinsPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 nStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 nStartIndexSelection2OutputBit);
+
+/**
+* Returns the selection output pin mapping for the nLight AFX Laser.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pStartIndexSelection0OutputBit - RTC Digital Output Bit index that is connected to lowest bit of the selection index (Pro_B1). MUST be between 0 and 15. Default is 2.
+* @param[out] pStartIndexSelection1OutputBit - RTC Digital Output Bit index that is connected to second lowest bit of the selection index (Pro_B2). MUST be between 0 and 15. Default is 3.
+* @param[out] pStartIndexSelection2OutputBit - RTC Digital Output Bit index that is connected to third lowest bit of the selection index (Pro_B3). MUST be between 0 and 15. Default is 4.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionOutputPinsPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pStartIndexSelection0OutputBit, LibMCDriver_ScanLab_uint32 * pStartIndexSelection1OutputBit, LibMCDriver_ScanLab_uint32 * pStartIndexSelection2OutputBit);
+
+/**
+* Sets the acknowledge pin mapping for the nLight AFX Laser. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nSelectionAcknowledgeInputBit - RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY). MUST be between 0 and 15. Default is 0.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeInputPinPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nSelectionAcknowledgeInputBit);
+
+/**
+* Returns the acknowledge pin mapping for the nLight AFX Laser.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pSelectionAcknowledgeInputBit - RTC Digital Input Bit index that is connected to the AFX beam selection ready flag (BPP_RDY).
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeInputPinPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pSelectionAcknowledgeInputBit);
+
+/**
+* Sets the delay that is added for the AFX Mode selection to be transfered. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nSelectionDelayInMilliseconds - Selection Delay in milliseconds. Default is 30.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionDelayPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nSelectionDelayInMilliseconds);
+
+/**
+* Returns the delay that is added for the AFX Mode selection to transfered.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pSelectionDelayInMilliseconds - Selection Delay in milliseconds. Default is 30.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionDelayPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pSelectionDelayInMilliseconds);
+
+/**
+* Sets the timeout that the AFX Mode selection will wait to be applied. Call will fail if profile selection is enabled.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nAcknowledgeInMilliseconds - Acknowledge Timeout in Milliseconds. Default is 500.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeTimeoutPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nAcknowledgeInMilliseconds);
+
+/**
+* Returns the timeout that the AFX Mode selection will wait to be applied.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[out] pAcknowledgeTimeoutInMilliseconds - Acknowledge Timeout in Milliseconds. Default is 500.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeTimeoutPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 * pAcknowledgeTimeoutInMilliseconds);
+
+/**
+* Enables the AFX Mode selection inside the DrawLayer Routine. The Laser Mode will be taken out of the build profile in this case.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_EnableAutomaticSelectionPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector);
+
+/**
+* Disables the AFX Mode selection.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_DisableAutomaticSelectionPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector);
+
+/**
+* Adds a custom selection cycle to the currenly open list.
+*
+* @param[in] pNLightAFXProfileSelector - NLightAFXProfileSelector instance.
+* @param[in] nAFXModeIndex - AFX Mode index to set. MUST be between 0 and 7.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabNLightAFXProfileSelector_AddCustomSelectionPtr) (LibMCDriver_ScanLab_NLightAFXProfileSelector pNLightAFXProfileSelector, LibMCDriver_ScanLab_uint32 nAFXModeIndex);
 
 /*************************************************************************************************************************
  Class definition for RTCContext
@@ -963,6 +1221,26 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCurrentFre
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pTimeStamp);
 
 /**
+* Returns an RTC Channel in real time. The signal register is instantly read and directly passed back to the caller.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] eChannelType - Internal RTC Channel type. See SCANLAB RTC Documentation for set_trigger for a proper explanation.
+* @param[out] pValue - Internal Value of that signal.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetRTCChannelPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eRTCChannelType eChannelType, LibMCDriver_ScanLab_int32 * pValue);
+
+/**
+* Returns an internal RTC value by RTC Signal ID. The signal register is instantly read and directly passed back to the caller.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nInternalSignalID - Internal RTC Signal ID. See SCANLAB RTC Documentation for set_trigger for a proper explanation. Some values are mapped from the enum definition of RTCChannelType.
+* @param[out] pValue - Internal Value of that signal.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetRTCInternalValuePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nInternalSignalID, LibMCDriver_ScanLab_int32 * pValue);
+
+/**
 * Stops the execution of the current list immediately.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1179,6 +1457,25 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetLaserPinIn
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bLaserOut1, bool bLaserOut2);
 
 /**
+* Adds the change of all 16 digital IO Ports to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddWriteDigitalIOListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput);
+
+/**
+* Adds the change a subset of 16 digital IO Ports to the current open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nDigitalOutput - Value for the digital IO. MUST be between 0 and 65535.
+* @param[in] nOutputMask - Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput, LibMCDriver_ScanLab_uint32 nOutputMask);
+
+/**
 * Writes an OIE enabling command block to the open list.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1193,6 +1490,54 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPtr)
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Creates an nLight AFX Beam Selector instance. If called multiple times, the same instance will be returned.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pInstance - nLight Profile selector instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_NLightAFXProfileSelector * pInstance);
+
+/**
+* Adds a GPIO Sequence. Fails if Sequence with the same identifier already exists.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @param[out] pInstance - GPIOSequence instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddGPIOSequencePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier, LibMCDriver_ScanLab_GPIOSequence * pInstance);
+
+/**
+* Writes a GPIO Sequence to the current list. Fails if sequence does not exist.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_WriteGPIOSequenceToListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier);
+
+/**
+* Finds a GPIO Sequence. 
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @param[in] bMustExist - If true, the call fails if Sequence with the identifier does not exist.
+* @param[out] pInstance - GPIOSequence instance. Returns null, if MustExist is fales and a sequence with the identifier does not exist.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_FindGPIOSequencePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier, bool bMustExist, LibMCDriver_ScanLab_GPIOSequence * pInstance);
+
+/**
+* Deletes a GPIO Sequence. Does nothing if Sequence with the identifier does not exists.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] pIdentifier - Identifier for the sequence.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DeleteGPIOSequencePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pIdentifier);
 
 /**
 * Writes an OIE measurement start command block to the open list. Same as StartOIEMeasurement with false as parameter.
@@ -1267,6 +1612,15 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEMeas
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns the current maximum measurement tag that has been sent to the OIE.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pMeasurementTag - Measurement Tag that has been sent to the OIE.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetOIEMaxMeasurementTagPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pMeasurementTag);
 
 /**
 * Maps an OIE Measurement tag back to the original scan parameters.
@@ -1380,14 +1734,25 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransforma
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dM11, LibMCDriver_ScanLab_double dM12, LibMCDriver_ScanLab_double dM21, LibMCDriver_ScanLab_double dM22);
 
 /**
+* Checks if Scanhead is connected.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pScanheadIsConnected - Returns, if the scanhead 1 is connected to the RTC card.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_CheckScanheadConnectionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pScanheadIsConnected);
+
+/**
 * Prepares recording of position data of the RTC Card. This needs to be called before any list is started.
 *
 * @param[in] pRTCContext - RTCContext instance.
 * @param[in] bKeepInMemory - If true, the recording will be persisted in the driver and can be recovered by its UUID. If false, the lifetime of the recording data ends with the release of the recording instance. Persistent Recordings will eat up a lot of memory and should be taken under careful consideration. Recordings can be made non-persistent with the RemoveFromMemory function of the instance.
+* @param[in] bEnableScanheadFeedback - If true, the Scanhead feedback will be enabled. If false, scanner feedback signal channel types are not available.
+* @param[in] bEnableBacktransformation - If true, the Scanhead backtransformation is read out from the RTC card. If false, scanhead position backtransformation is not enabled.
 * @param[out] pRecordingInstance - Recording instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bKeepInMemory, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bKeepInMemory, bool bEnableScanheadFeedback, bool bEnableBacktransformation, LibMCDriver_ScanLab_RTCRecording * pRecordingInstance);
 
 /**
 * Checks if a recording exists in the driver memory. Recording MUST have been created with KeepInMemory set to true.
@@ -2505,9 +2870,6 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCJob_AddMarkMovementPtr m_RTCJob_AddMarkMovement;
 	PLibMCDriver_ScanLabRTCJob_AddTimedMarkMovementPtr m_RTCJob_AddTimedMarkMovement;
 	PLibMCDriver_ScanLabRTCJob_AddFreeVariablePtr m_RTCJob_AddFreeVariable;
-	PLibMCDriver_ScanLabRTCRecording_ScanheadConnectionCheckIsEnabledPtr m_RTCRecording_ScanheadConnectionCheckIsEnabled;
-	PLibMCDriver_ScanLabRTCRecording_EnableScanheadConnectionCheckPtr m_RTCRecording_EnableScanheadConnectionCheck;
-	PLibMCDriver_ScanLabRTCRecording_DisableScanheadConnectionCheckPtr m_RTCRecording_DisableScanheadConnectionCheck;
 	PLibMCDriver_ScanLabRTCRecording_ClearPtr m_RTCRecording_Clear;
 	PLibMCDriver_ScanLabRTCRecording_AddChannelPtr m_RTCRecording_AddChannel;
 	PLibMCDriver_ScanLabRTCRecording_RemoveChannelPtr m_RTCRecording_RemoveChannel;
@@ -2521,6 +2883,34 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCRecording_ExecuteListWithRecordingPtr m_RTCRecording_ExecuteListWithRecording;
 	PLibMCDriver_ScanLabRTCRecording_AddRecordsToDataTablePtr m_RTCRecording_AddRecordsToDataTable;
 	PLibMCDriver_ScanLabRTCRecording_AddScaledRecordsToDataTablePtr m_RTCRecording_AddScaledRecordsToDataTable;
+	PLibMCDriver_ScanLabRTCRecording_AddBacktransformedXYPositionsToDataTablePtr m_RTCRecording_AddBacktransformedXYPositionsToDataTable;
+	PLibMCDriver_ScanLabRTCRecording_BacktransformRawXYCoordinatesPtr m_RTCRecording_BacktransformRawXYCoordinates;
+	PLibMCDriver_ScanLabRTCRecording_AddBacktransformedZPositionsToDataTablePtr m_RTCRecording_AddBacktransformedZPositionsToDataTable;
+	PLibMCDriver_ScanLabRTCRecording_BacktransformRawZCoordinatePtr m_RTCRecording_BacktransformRawZCoordinate;
+	PLibMCDriver_ScanLabRTCRecording_AddTargetPositionsToDataTablePtr m_RTCRecording_AddTargetPositionsToDataTable;
+	PLibMCDriver_ScanLabGPIOSequence_GetIdentifierPtr m_GPIOSequence_GetIdentifier;
+	PLibMCDriver_ScanLabGPIOSequence_ClearPtr m_GPIOSequence_Clear;
+	PLibMCDriver_ScanLabGPIOSequence_AddOutputPtr m_GPIOSequence_AddOutput;
+	PLibMCDriver_ScanLabGPIOSequence_AddDelayPtr m_GPIOSequence_AddDelay;
+	PLibMCDriver_ScanLabGPIOSequence_WaitforInputPtr m_GPIOSequence_WaitforInput;
+	PLibMCDriver_ScanLabGPIOSequence_AddLabelPtr m_GPIOSequence_AddLabel;
+	PLibMCDriver_ScanLabGPIOSequence_GoToLabelPtr m_GPIOSequence_GoToLabel;
+	PLibMCDriver_ScanLabGPIOSequence_ConditionalGoToLabelPtr m_GPIOSequence_ConditionalGoToLabel;
+	PLibMCDriver_ScanLabGPIOSequence_EnableAutomaticSelectionPtr m_GPIOSequence_EnableAutomaticSelection;
+	PLibMCDriver_ScanLabGPIOSequence_DisableAutomaticSelectionPtr m_GPIOSequence_DisableAutomaticSelection;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetControlOutputPinsPtr m_NLightAFXProfileSelector_SetControlOutputPins;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetControlOutputPinsPtr m_NLightAFXProfileSelector_GetControlOutputPins;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionOutputPinsPtr m_NLightAFXProfileSelector_SetSelectionOutputPins;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionOutputPinsPtr m_NLightAFXProfileSelector_GetSelectionOutputPins;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeInputPinPtr m_NLightAFXProfileSelector_SetAcknowledgeInputPin;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeInputPinPtr m_NLightAFXProfileSelector_GetAcknowledgeInputPin;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetSelectionDelayPtr m_NLightAFXProfileSelector_SetSelectionDelay;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetSelectionDelayPtr m_NLightAFXProfileSelector_GetSelectionDelay;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_SetAcknowledgeTimeoutPtr m_NLightAFXProfileSelector_SetAcknowledgeTimeout;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_GetAcknowledgeTimeoutPtr m_NLightAFXProfileSelector_GetAcknowledgeTimeout;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_EnableAutomaticSelectionPtr m_NLightAFXProfileSelector_EnableAutomaticSelection;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_DisableAutomaticSelectionPtr m_NLightAFXProfileSelector_DisableAutomaticSelection;
+	PLibMCDriver_ScanLabNLightAFXProfileSelector_AddCustomSelectionPtr m_NLightAFXProfileSelector_AddCustomSelection;
 	PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr m_RTCContext_LoadFirmware;
 	PLibMCDriver_ScanLabRTCContext_LoadCorrectionFilePtr m_RTCContext_LoadCorrectionFile;
 	PLibMCDriver_ScanLabRTCContext_SelectCorrectionTablePtr m_RTCContext_SelectCorrectionTable;
@@ -2565,6 +2955,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddFreeVariablePtr m_RTCContext_AddFreeVariable;
 	PLibMCDriver_ScanLabRTCContext_GetCurrentFreeVariablePtr m_RTCContext_GetCurrentFreeVariable;
 	PLibMCDriver_ScanLabRTCContext_GetTimeStampPtr m_RTCContext_GetTimeStamp;
+	PLibMCDriver_ScanLabRTCContext_GetRTCChannelPtr m_RTCContext_GetRTCChannel;
+	PLibMCDriver_ScanLabRTCContext_GetRTCInternalValuePtr m_RTCContext_GetRTCInternalValue;
 	PLibMCDriver_ScanLabRTCContext_StopExecutionPtr m_RTCContext_StopExecution;
 	PLibMCDriver_ScanLabRTCContext_DrawHatchesOIEPtr m_RTCContext_DrawHatchesOIE;
 	PLibMCDriver_ScanLabRTCContext_AddLayerToListPtr m_RTCContext_AddLayerToList;
@@ -2585,8 +2977,15 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetLaserPinOutPtr m_RTCContext_SetLaserPinOut;
 	PLibMCDriver_ScanLabRTCContext_GetLaserPinInPtr m_RTCContext_GetLaserPinIn;
 	PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr m_RTCContext_AddLaserPinOutToList;
+	PLibMCDriver_ScanLabRTCContext_AddWriteDigitalIOListPtr m_RTCContext_AddWriteDigitalIOList;
+	PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr m_RTCContext_AddWriteMaskedDigitalIOList;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPtr m_RTCContext_EnableOIE;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
+	PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr m_RTCContext_CreateNLightAFXBeamProfileSelector;
+	PLibMCDriver_ScanLabRTCContext_AddGPIOSequencePtr m_RTCContext_AddGPIOSequence;
+	PLibMCDriver_ScanLabRTCContext_WriteGPIOSequenceToListPtr m_RTCContext_WriteGPIOSequenceToList;
+	PLibMCDriver_ScanLabRTCContext_FindGPIOSequencePtr m_RTCContext_FindGPIOSequence;
+	PLibMCDriver_ScanLabRTCContext_DeleteGPIOSequencePtr m_RTCContext_DeleteGPIOSequence;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr m_RTCContext_StartOIEMeasurement;
 	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementExPtr m_RTCContext_StartOIEMeasurementEx;
 	PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr m_RTCContext_StopOIEMeasurement;
@@ -2596,6 +2995,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_ClearOIEMeasurementTagsPtr m_RTCContext_ClearOIEMeasurementTags;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEMeasurementTaggingPtr m_RTCContext_EnableOIEMeasurementTagging;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEMeasurementTaggingPtr m_RTCContext_DisableOIEMeasurementTagging;
+	PLibMCDriver_ScanLabRTCContext_GetOIEMaxMeasurementTagPtr m_RTCContext_GetOIEMaxMeasurementTag;
 	PLibMCDriver_ScanLabRTCContext_MapOIEMeasurementTagPtr m_RTCContext_MapOIEMeasurementTag;
 	PLibMCDriver_ScanLabRTCContext_DisableSkyWritingPtr m_RTCContext_DisableSkyWriting;
 	PLibMCDriver_ScanLabRTCContext_EnableSkyWritingMode1Ptr m_RTCContext_EnableSkyWritingMode1;
@@ -2606,6 +3006,7 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetTransformationScalePtr m_RTCContext_SetTransformationScale;
 	PLibMCDriver_ScanLabRTCContext_SetTransformationOffsetPtr m_RTCContext_SetTransformationOffset;
 	PLibMCDriver_ScanLabRTCContext_SetTransformationMatrixPtr m_RTCContext_SetTransformationMatrix;
+	PLibMCDriver_ScanLabRTCContext_CheckScanheadConnectionPtr m_RTCContext_CheckScanheadConnection;
 	PLibMCDriver_ScanLabRTCContext_PrepareRecordingPtr m_RTCContext_PrepareRecording;
 	PLibMCDriver_ScanLabRTCContext_HasRecordingPtr m_RTCContext_HasRecording;
 	PLibMCDriver_ScanLabRTCContext_FindRecordingPtr m_RTCContext_FindRecording;

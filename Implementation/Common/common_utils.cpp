@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <thread>
 #include <cctype>
+#include <cmath>
 
 #include "crossguid/guid.hpp"
 #include "PicoSHA2/picosha2.h"
@@ -126,7 +127,7 @@ namespace AMCCommon {
 	}
 
 
-	std::string CUtils::UTF16toUTF8(const std::wstring sString)
+	std::string CUtils::UTF16toUTF8(const std::wstring & sString)
 	{
 
 		// Check Input Sanity
@@ -341,30 +342,26 @@ namespace AMCCommon {
 
 	void CUtils::splitString(const std::string& sString, const std::string& sDelimiter, std::vector<std::string>& stringVector)
 	{
-		auto nDelimiterLength = sDelimiter.length();
-		if (nDelimiterLength == 0)
-			throw std::runtime_error("split string delimiter is empty");
-
-		if (!sString.empty()) {
-			
-			size_t nOffset = 0;
-			bool bFinished = false;
-			while (!bFinished) {
-				auto nPos = sString.find(sDelimiter, nOffset);
-				if (nPos == std::string::npos) {
-					stringVector.push_back(sString);
-					bFinished = true;
-				}
-				else {
-					stringVector.push_back(sString.substr (nOffset, nPos - nOffset));
-					nOffset = nPos + nDelimiterLength;
-				}
-
-			}
-
-
+		if (sDelimiter.empty()) {
+			throw std::runtime_error("Delimiter is empty");
 		}
 
+		size_t prev = 0;
+		size_t pos = 0;
+		const size_t delimiterLength = sDelimiter.length();
+
+		while ((pos = sString.find(sDelimiter, prev)) != std::string::npos) {
+			if (pos != prev) {
+				// Add non-empty substring to the vector
+				stringVector.emplace_back(sString.substr(prev, pos - prev));
+			}
+			prev = pos + delimiterLength;
+		}
+
+		// Add the last substring if it's not empty
+		if (prev < sString.size()) {
+			stringVector.emplace_back(sString.substr(prev));
+		}
 	}
 
 
@@ -372,13 +369,84 @@ namespace AMCCommon {
 	{
 		std::string trimmedString = trimString(sString);
 
-		size_t nConversionErrorIndex = 0;
-		int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
-		
-		if (nConversionErrorIndex != trimmedString.length())
-			throw std::runtime_error("invalid integer string: " + sString);
+		try {
 
-		return nResult;
+			size_t nConversionErrorIndex = 0;
+			int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
+
+			if (nConversionErrorIndex != trimmedString.length())
+				throw std::runtime_error("invalid integer string: " + sString);
+
+			return nResult;
+		}
+		catch (...)
+		{
+			throw std::runtime_error("invalid integer string: " + sString);
+		}
+
+	}
+
+	int64_t CUtils::stringToIntegerWithAccuracy(const std::string& sString, double dAccuracy)
+	{
+		if (dAccuracy <= 0.0)
+			throw std::runtime_error("invalid integer accuracy: " + std::to_string (dAccuracy));
+
+		std::string trimmedString = trimString(sString);
+
+		try {
+
+			// try integer first...
+			size_t nConversionErrorIndex = 0;
+			int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
+
+			if (nConversionErrorIndex != trimmedString.length()) {
+				//If it is not a pure integer, try double parsing
+				double dResult = stringToDouble(sString);
+
+				// And round it to a certain value
+				nResult = (int64_t) round(dResult);
+
+				// Check if the value deviates from an integer...
+				if (abs (dResult - (double) nResult) > dAccuracy)
+					throw std::runtime_error("string deviates from integer value: " + sString);
+			}
+				
+
+			return nResult;
+		}
+		catch (...)
+		{
+			throw std::runtime_error("invalid integer string: " + sString);
+		}
+	}
+
+
+
+	bool CUtils::stringToBool(const std::string& sString)
+	{
+		std::string trimmedString = toLowerString (trimString(sString));
+
+		try {
+
+			if (trimmedString == "false")
+				return false;
+
+			if (trimmedString == "true")
+				return true;
+
+			size_t nConversionErrorIndex = 0;
+			int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
+
+			if (nConversionErrorIndex != trimmedString.length())
+				throw std::runtime_error("invalid integer string: " + sString);
+
+			return nResult != 0;
+		}
+		catch (...)
+		{
+			throw std::runtime_error("invalid integer string: " + sString);
+		}
+
 	}
 
 	double CUtils::stringToDouble(const std::string& sString)
@@ -395,7 +463,7 @@ namespace AMCCommon {
 	}
 
 
-    std::wstring CUtils::UTF8toUTF16(const std::string sString)
+    std::wstring CUtils::UTF8toUTF16(const std::string & sString)
 	{
 
 		// Check Input Sanity
@@ -572,6 +640,40 @@ namespace AMCCommon {
 		return true;
 	}
 
+	bool CUtils::stringIsNonEmptyUUIDString(const std::string& sRawString)
+	{
+		std::string sTrimmedString = trimString(sRawString);
+		if (sTrimmedString.length() != 36)
+			return false;
+
+		bool bCharsAreAllZero = true;
+
+		size_t nIndex = 0;
+		for (char ch : sTrimmedString) {
+			char lowerChar = ::tolower(ch);
+
+			if ((nIndex == 8) || (nIndex == 13) || (nIndex == 18) || (nIndex == 23)) {
+				if (lowerChar != '-')
+					return false;
+			}
+			else {
+				bool bCharIsValid = (((lowerChar >= '0') && (lowerChar <= '9')) ||
+					((lowerChar >= 'a') && (lowerChar <= 'f')));
+				if (!bCharIsValid)
+					return false;
+
+				if (lowerChar != '0')
+					bCharsAreAllZero = false;
+			}
+
+			nIndex++;
+
+		}
+
+		return !bCharsAreAllZero;
+	}
+
+
 	std::string CUtils::normalizeUUIDString(const std::string & sRawString)
 	{
 		uint32_t nIndex = 0;
@@ -602,18 +704,6 @@ namespace AMCCommon {
 		normalizedArray[36] = 0;
 
 		return std::string(normalizedArray.data());
-
-		/*
-		Depreciated code!
-		 
-		std::transform(sRawString.begin(), sRawString.end(), sRawString.begin(), ::tolower);
-		sRawString.erase(std::remove_if(sRawString.begin(), sRawString.end(), &UUIDInValid), sRawString.end());
-		if (sRawString.length() != 32) {
-			throw std::runtime_error("invalid uuid string " + sRawString);
-		}
-		return sRawString.substr(0, 8) + '-' + sRawString.substr(8, 4) + '-' + sRawString.substr(12, 4) + '-' + sRawString.substr(16, 4) + '-' + sRawString.substr(20, 12);
-		
-		*/
 	}
 
 
@@ -960,6 +1050,25 @@ namespace AMCCommon {
 
 	}
 
+	std::string CUtils::encodeRFC5987(const std::string& sInput) 
+	{
+		std::ostringstream encoded;
+		encoded << "UTF-8''";  // RFC 5987 syntax starts with "charset'lang'"
+
+		for (unsigned char c : sInput) {
+			if (isalnum(c) || c == '*' || c == '-' || c == '.' || c == '_') {
+				// Characters that are safe to use directly
+				encoded << c;
+			}
+			else {
+				// Percent-encode all other characters
+				encoded << '%' << std::uppercase << std::hex << static_cast<int>(c);
+			}
+		}
+
+		return encoded.str();
+	}
+
 	void CUtils::decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t>& byteBuffer)
 	{
 		switch (eType) {
@@ -986,8 +1095,7 @@ namespace AMCCommon {
 				throw std::runtime_error("invalid ASCII character in base64 decoding");
 		}
 
-		byteBuffer.push_back (0);
-		return std::string((char*)byteBuffer.data());
+		return std::string(byteBuffer.begin(), byteBuffer.end());
 	}
 
 
@@ -1049,5 +1157,39 @@ namespace AMCCommon {
 		return foundItems;
 	}
 
+
+	std::string CUtils::getTempFolder()
+	{
+#if defined _WIN32
+		std::vector<wchar_t> TempPathBuffer;
+		TempPathBuffer.resize(MAX_PATH + 1);
+		auto nSize = GetTempPathW(MAX_PATH, TempPathBuffer.data());
+		if (nSize == 0)
+			throw std::runtime_error("could not get temp file path");
+
+		TempPathBuffer[MAX_PATH] = 0;
+		std::string tmpfolder = CUtils::UTF16toUTF8(TempPathBuffer.data());
+#else
+		std::string tmpfolder = GetEnv("TMPDIR");
+#endif
+		if (tmpfolder.empty())
+			return "";
+		else {
+			auto finaltmpfolder = tmpfolder + "/Autodesk/";
+			if (!CUtils::fileOrPathExistsOnDisk(finaltmpfolder)) {
+#ifdef _WIN32
+				auto finaltmpfolderw = CUtils::UTF8toUTF16(finaltmpfolder);
+				CreateDirectoryW(finaltmpfolderw.data(), NULL);
+#else
+				mkdir(finaltmpfolder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#endif
+
+			}
+			if (!CUtils::fileOrPathExistsOnDisk(finaltmpfolder)) {
+				throw std::runtime_error("tmp filepath does not exist");
+			}
+			return finaltmpfolder;
+		}
+	}
 
 }

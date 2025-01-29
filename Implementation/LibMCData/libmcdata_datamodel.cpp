@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_storage.hpp"
 #include "libmcdata_logsession.hpp"
 #include "libmcdata_journalsession.hpp"
+#include "libmcdata_journalreader.hpp"
 #include "libmcdata_alertsession.hpp"
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
@@ -57,6 +58,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 
 using namespace LibMCData::Impl;
+
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 /*************************************************************************************************************************
  Class definition of CDataModel 
@@ -133,21 +137,21 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     // Store Database type after successful initialisation
     m_eDataBaseType = dataBaseType;
 
-    auto sJournalPath = m_pStorageState->getJournalPath(m_sTimeFileName);
-    auto sJournalDataPath = m_pStorageState->getJournalDataPath(m_sTimeFileName);
+    auto sJournalBasePath = m_pStorageState->getJournalBasePath(m_sTimeFileName);
     auto sJournalName = m_pStorageState->getJournalFileName(m_sTimeFileName);
-    auto sJournalDataName = m_pStorageState->getJournalDataFileName(m_sTimeFileName);
+    auto sJournalChunkBaseName = m_pStorageState->getJournalChunkBaseName(m_sTimeFileName);
 
-    m_pJournal = std::make_shared<AMCData::CJournal>(sJournalPath, sJournalDataPath, m_sSessionUUID);
+    m_pJournal = std::make_shared<AMCData::CJournal> (sJournalBasePath, sJournalName, sJournalChunkBaseName, m_sSessionUUID);
 
-    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion, githash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     pStatement->setString(1, m_sSessionUUID);
     pStatement->setString(2, m_sStartTime);
     pStatement->setString(3, sJournalName);
-    pStatement->setString(4, sJournalDataName);
-    pStatement->setString(5, sJournalPath);
-    pStatement->setString(6, sJournalDataPath);
+    pStatement->setString(4, sJournalChunkBaseName);
+    pStatement->setString(5, "");
+    pStatement->setString(6, "");
     pStatement->setInt(7, m_pJournal->getSchemaVersion ());
+    pStatement->setString(8, __STRINGIZE_VALUE_OF(__GITHASH));
     pStatement->execute();
 
 }
@@ -200,6 +204,14 @@ IJournalSession* CDataModel::CreateJournalSession()
     return new CJournalSession(m_pJournal);
 
 }
+
+IJournalReader* CDataModel::CreateJournalReader(const std::string& sJournalUUID)
+{
+    auto sJournalBasePath = m_pStorageState->getJournalBasePath(m_sTimeFileName);
+
+    return new CJournalReader(m_pSQLHandler, sJournalUUID, sJournalBasePath);
+}
+
 
 IAlertSession* CDataModel::CreateAlertSession()
 {

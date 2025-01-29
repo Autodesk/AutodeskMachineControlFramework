@@ -71,7 +71,7 @@ __DECLARESTATE(init)
 	pStateEnvironment->LogMessage("Successfully Initialized machine..");
 
 
-	auto pPLCCommandList = pDriver->CreateCommandList();
+	/*auto pPLCCommandList = pDriver->CreateCommandList();
 
 	//auto pPLCCommand_TurnOn = pDriver->CreateCommand("turnon");
 	//pPLCCommandList->AddCommand(pPLCCommand_TurnOn);
@@ -98,7 +98,7 @@ __DECLARESTATE(init)
 	}
 	else {
 		pStateEnvironment->LogMessage("Timeout while turning on printer!");
-	}
+	} */
 
 	pStateEnvironment->SetNextState("idle");
 }
@@ -133,24 +133,24 @@ __DECLARESTATE(idle)
 
 		auto pPLCCommandList = pDriver->CreateCommandList();
 
-		auto pPLCCommand_LaserPointerOn = pDriver->CreateCommand("setlaserpointer");
+		/*auto pPLCCommand_LaserPointerOn = pDriver->CreateCommand("setlaserpointer");
 		pPLCCommand_LaserPointerOn->SetIntegerParameter("laseron", (int)bLaserOn);
 		pPLCCommandList->AddCommand(pPLCCommand_LaserPointerOn);
 		pPLCCommandList->FinishList();
 		pPLCCommandList->ExecuteList();
 
 		if (pPLCCommandList->WaitForList(300, 10000)) {
-			pStateEnvironment->LogMessage("Laser pointer state changed");
+			pStateEnvironment->LogMessage("Laser pointer state changed"); */
 			pHandlerInstance->SetBoolResult("success", true);
 			pStateEnvironment->SetNextState("idle");
-
+/*
 		}
 		else {
 			pStateEnvironment->LogMessage("Timeout while laser pointer state change!");
 			pHandlerInstance->SetBoolResult("success", false);
 			pStateEnvironment->SetNextState("fatalerror");
 
-		}
+		}*/
 
 		pHandlerInstance->SignalHandled();
 
@@ -174,7 +174,7 @@ __DECLARESTATE(recoating)
 	}
 
 
-	auto pPLCCommandList = pDriver->CreateCommandList();
+	/*auto pPLCCommandList = pDriver->CreateCommandList();
 
 	auto pPLCCommand_MoveRecoater = pDriver->CreateCommand("moverecoater");
 	pPLCCommand_MoveRecoater->SetIntegerParameter("targetposition", 50000);
@@ -199,9 +199,9 @@ __DECLARESTATE(recoating)
 			bReady = true;
 			break;
 		}
-	}
+	} */
 
-
+	bool bReady = true;
 
 	if (bReady) {
 		pStateEnvironment->LogMessage("Recoating finished");

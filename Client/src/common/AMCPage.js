@@ -79,5 +79,12 @@ export default class AMCApplicationPage extends Common.AMCObject {
 		this.application.addItem (item);
 	}
 	
-
+	isActive ()
+	{
+		if (this.application) {
+			return this.application.pageIsActive (this)
+		}
+		
+		return false;
+	}
 }

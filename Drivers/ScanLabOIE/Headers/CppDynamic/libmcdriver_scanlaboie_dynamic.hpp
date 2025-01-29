@@ -640,6 +640,7 @@ public:
 	inline void ClearCurrentRecording();
 	inline bool IsLoggedIn();
 	inline bool IsStreaming();
+	inline LibMCDriver_ScanLabOIE_uint32 GetReceivedMeasurementTag();
 	inline bool RTCIsBusy();
 };
 	
@@ -863,6 +864,7 @@ public:
 		pWrapperTable->m_OIEDevice_ClearCurrentRecording = nullptr;
 		pWrapperTable->m_OIEDevice_IsLoggedIn = nullptr;
 		pWrapperTable->m_OIEDevice_IsStreaming = nullptr;
+		pWrapperTable->m_OIEDevice_GetReceivedMeasurementTag = nullptr;
 		pWrapperTable->m_OIEDevice_RTCIsBusy = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_GetDriverType = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = nullptr;
@@ -1572,6 +1574,15 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_OIEDevice_GetReceivedMeasurementTag = (PLibMCDriver_ScanLabOIEOIEDevice_GetReceivedMeasurementTagPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_getreceivedmeasurementtag");
+		#else // _WIN32
+		pWrapperTable->m_OIEDevice_GetReceivedMeasurementTag = (PLibMCDriver_ScanLabOIEOIEDevice_GetReceivedMeasurementTagPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_getreceivedmeasurementtag");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OIEDevice_GetReceivedMeasurementTag == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_OIEDevice_RTCIsBusy = (PLibMCDriver_ScanLabOIEOIEDevice_RTCIsBusyPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_rtcisbusy");
 		#else // _WIN32
 		pWrapperTable->m_OIEDevice_RTCIsBusy = (PLibMCDriver_ScanLabOIEOIEDevice_RTCIsBusyPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_rtcisbusy");
@@ -2040,6 +2051,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_isstreaming", (void**)&(pWrapperTable->m_OIEDevice_IsStreaming));
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_IsStreaming == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_getreceivedmeasurementtag", (void**)&(pWrapperTable->m_OIEDevice_GetReceivedMeasurementTag));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_GetReceivedMeasurementTag == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_rtcisbusy", (void**)&(pWrapperTable->m_OIEDevice_RTCIsBusy));
@@ -3013,6 +3028,18 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_IsStreaming(m_pHandle, &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* COIEDevice::GetReceivedMeasurementTag - Returns the last measurement tag that has been retrieved.
+	* @return Measurement Tag that has been retrieved last.
+	*/
+	LibMCDriver_ScanLabOIE_uint32 COIEDevice::GetReceivedMeasurementTag()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultMeasurementTag = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_GetReceivedMeasurementTag(m_pHandle, &resultMeasurementTag));
+		
+		return resultMeasurementTag;
 	}
 	
 	/**

@@ -60,11 +60,17 @@ class ITestEnvironment;
 class ICryptoContext;
 class IPNGImageStoreOptions;
 class IPNGImageData;
+class IJPEGImageStoreOptions;
+class IJPEGImageData;
 class IImageData;
+class IImageLoader;
+class IVideoStream;
+class IScatterPlot;
 class IDiscreteFieldData2DStoreOptions;
 class IDiscreteFieldData2D;
 class IDataTableWriteOptions;
 class IDataTableCSVWriteOptions;
+class IDataTableScatterPlotOptions;
 class IDataTable;
 class IDataSeries;
 class IDateTimeDifference;
@@ -87,6 +93,8 @@ class IWorkingFile;
 class IWorkingFileIterator;
 class IWorkingDirectory;
 class IXMLDocumentAttribute;
+class IJSONObject;
+class IJSONArray;
 class IXMLDocumentNode;
 class IXMLDocumentNodes;
 class IXMLDocument;
@@ -461,6 +469,18 @@ public:
 	*/
 	virtual void ResetToDefaults() = 0;
 
+	/**
+	* IPNGImageStoreOptions::GetStorageFormat - Returns the PNG storage format.
+	* @return PNG Format of image
+	*/
+	virtual LibMCEnv::ePNGStorageFormat GetStorageFormat() = 0;
+
+	/**
+	* IPNGImageStoreOptions::SetStorageFormat - Sets the PNG storage format.
+	* @param[in] ePNGStorageFormat - new PNG Format of image
+	*/
+	virtual void SetStorageFormat(const LibMCEnv::ePNGStorageFormat ePNGStorageFormat) = 0;
+
 };
 
 typedef IBaseSharedPtr<IPNGImageStoreOptions> PIPNGImageStoreOptions;
@@ -480,16 +500,70 @@ public:
 	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
 
 	/**
-	* IPNGImageData::GetPNGDataStream - Retrieves encoded data stream of image object.
+	* IPNGImageData::GetPNGDataStream - Retrieves encoded PNG data of image object.
 	* @param[in] nPNGDataBufferSize - Number of elements in buffer
 	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
 	*/
 	virtual void GetPNGDataStream(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
 
+	/**
+	* IPNGImageData::WriteToStream - Writes encoded PNG data into a stream object.
+	* @param[in] pStream - Stream to write to.
+	*/
+	virtual void WriteToStream(ITempStreamWriter* pStream) = 0;
+
 };
 
 typedef IBaseSharedPtr<IPNGImageData> PIPNGImageData;
+
+
+/*************************************************************************************************************************
+ Class interface for JPEGImageStoreOptions 
+**************************************************************************************************************************/
+
+class IJPEGImageStoreOptions : public virtual IBase {
+public:
+	/**
+	* IJPEGImageStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	virtual void ResetToDefaults() = 0;
+
+};
+
+typedef IBaseSharedPtr<IJPEGImageStoreOptions> PIJPEGImageStoreOptions;
+
+
+/*************************************************************************************************************************
+ Class interface for JPEGImageData 
+**************************************************************************************************************************/
+
+class IJPEGImageData : public virtual IBase {
+public:
+	/**
+	* IJPEGImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IJPEGImageData::GetJPEGDataStream - Retrieves encoded JPEG data of image object.
+	* @param[in] nJPEGDataBufferSize - Number of elements in buffer
+	* @param[out] pJPEGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pJPEGDataBuffer - uint8 buffer of JPEG Data stream.
+	*/
+	virtual void GetJPEGDataStream(LibMCEnv_uint64 nJPEGDataBufferSize, LibMCEnv_uint64* pJPEGDataNeededCount, LibMCEnv_uint8 * pJPEGDataBuffer) = 0;
+
+	/**
+	* IJPEGImageData::WriteToStream - Writes encoded JPEG data into a stream object.
+	* @param[in] pStream - Stream to write to.
+	*/
+	virtual void WriteToStream(ITempStreamWriter* pStream) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJPEGImageData> PIJPEGImageData;
 
 
 /*************************************************************************************************************************
@@ -546,6 +620,12 @@ public:
 	virtual void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
 
 	/**
+	* IImageData::CreatePNGOptions - Creates PNG Options for storing the PNG file.
+	* @return Encoding options for the image.
+	*/
+	virtual IPNGImageStoreOptions * CreatePNGOptions() = 0;
+
+	/**
 	* IImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
 	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
 	* @return Image data.
@@ -553,22 +633,17 @@ public:
 	virtual IPNGImageData * CreatePNGImage(IPNGImageStoreOptions* pPNGStorageOptions) = 0;
 
 	/**
-	* IImageData::EncodePNG - Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
+	* IImageData::CreateJPEGOptions - Creates PNG Options for storing the PNG file.
+	* @return Encoding options for the image.
 	*/
-	virtual void EncodePNG() = 0;
+	virtual IJPEGImageStoreOptions * CreateJPEGOptions() = 0;
 
 	/**
-	* IImageData::GetEncodedPNGData - Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
+	* IImageData::CreateJPEGImage - Creates JPEG Image out of the pixel data.
+	* @param[in] pJPEGStorageOptions - Optional encoding options for the image.
+	* @return Image data.
 	*/
-	virtual void GetEncodedPNGData(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
-
-	/**
-	* IImageData::ClearEncodedPNGData - Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
-	*/
-	virtual void ClearEncodedPNGData() = 0;
+	virtual IJPEGImageData * CreateJPEGImage(IJPEGImageStoreOptions* pJPEGStorageOptions) = 0;
 
 	/**
 	* IImageData::Clear - Sets all pixels to a single value.
@@ -615,9 +690,193 @@ public:
 	*/
 	virtual void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer) = 0;
 
+	/**
+	* IImageData::GetPixels - Returns a subset of an image or the whole image data. Please use this function instead of GetPixelRange.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[out] pValueNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on target format.
+	*/
+	virtual void GetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eTargetFormat, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer) = 0;
+
+	/**
+	* IImageData::SetPixels - Exchanges a subset of an image or the whole image data. Please use this function instead of SetPixelRange.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[in] pValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format.
+	*/
+	virtual void SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eSourceFormat, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer) = 0;
+
+	/**
+	* IImageData::SetPixelsFromRawYUY2Data - Sets all pixels from a raw YUY2 color array.
+	* @param[in] nYUY2DataBufferSize - Number of elements in buffer
+	* @param[in] pYUY2DataBuffer - Pixel array in YUY2 color format (2 bytes per pixels). The array MUST have a length of PixelSizeX * PixelSizeY * 2.
+	*/
+	virtual void SetPixelsFromRawYUY2Data(const LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8 * pYUY2DataBuffer) = 0;
+
+	/**
+	* IImageData::WriteToRawMemory - Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+	* @param[in] nTarget - Memory address to write to. The pixel value of StartX/StartY will be written to this address.
+	* @param[in] nYLineOffset - Offset to add to the Target pointer to advance a line (in bytes).
+	*/
+	virtual void WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset) = 0;
+
+	/**
+	* IImageData::ReadFromRawMemory - Reads an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the source.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+	* @param[in] nSource - Memory address to read from. The pixel value of StartX/StartY will be written to this address.
+	* @param[in] nYLineOffset - Offset to add to the source pointer to advance a line (in bytes).
+	*/
+	virtual void ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const LibMCEnv::eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset) = 0;
+
 };
 
 typedef IBaseSharedPtr<IImageData> PIImageData;
+
+
+/*************************************************************************************************************************
+ Class interface for ImageLoader 
+**************************************************************************************************************************/
+
+class IImageLoader : public virtual IBase {
+public:
+	/**
+	* IImageLoader::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[in] pPNGDataBuffer - PNG Data as byte array. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::LoadJPEGImage - creates an image object from a JPEG data stream.
+	* @param[in] nJPEGDataBufferSize - Number of elements in buffer
+	* @param[in] pJPEGDataBuffer - JPEG Data as byte array. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	virtual IImageData * LoadJPEGImage(const LibMCEnv_uint64 nJPEGDataBufferSize, const LibMCEnv_uint8 * pJPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::CreateImageFromRawRGB24Data - creates an image object from raw RGB24 Data. (3 bytes per pixel)
+	* @param[in] nRGB24DataBufferSize - Number of elements in buffer
+	* @param[in] pRGB24DataBuffer - RGB 24 data. MUST contain PixelSizeX * PixelSizeY * 3 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	virtual IImageData * CreateImageFromRawRGB24Data(const LibMCEnv_uint64 nRGB24DataBufferSize, const LibMCEnv_uint8 * pRGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::CreateImageFromRawRGBA32Data - creates an image object from raw RGBA32 Data. (4 bytes per pixel)
+	* @param[in] nRGBA32DataBufferSize - Number of elements in buffer
+	* @param[in] pRGBA32DataBuffer - RGBA 32 data. MUST contain PixelSizeX * PixelSizeY * 4 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	virtual IImageData * CreateImageFromRawRGBA32Data(const LibMCEnv_uint64 nRGBA32DataBufferSize, const LibMCEnv_uint8 * pRGBA32DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::CreateImageFromRawYUY2Data - creates an image object from raw YUY2 Data. (2 bytes per pixel)
+	* @param[in] nYUY2DataBufferSize - Number of elements in buffer
+	* @param[in] pYUY2DataBuffer - YUY2 data. MUST contain PixelSizeX * PixelSizeY * 2 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	virtual IImageData * CreateImageFromRawYUY2Data(const LibMCEnv_uint64 nYUY2DataBufferSize, const LibMCEnv_uint8 * pYUY2DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+};
+
+typedef IBaseSharedPtr<IImageLoader> PIImageLoader;
+
+
+/*************************************************************************************************************************
+ Class interface for VideoStream 
+**************************************************************************************************************************/
+
+class IVideoStream : public virtual IBase {
+public:
+};
+
+typedef IBaseSharedPtr<IVideoStream> PIVideoStream;
+
+
+/*************************************************************************************************************************
+ Class interface for ScatterPlot 
+**************************************************************************************************************************/
+
+class IScatterPlot : public virtual IBase {
+public:
+	/**
+	* IScatterPlot::GetUUID - Global UUID of the plot.
+	* @return Scatter plot UUID.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IScatterPlot::GetPointCount - Returns the point count of the plot.
+	* @return Point Count of the plot
+	*/
+	virtual LibMCEnv_uint32 GetPointCount() = 0;
+
+	/**
+	* IScatterPlot::GetPointPosition - Returns the position of a data point.
+	* @param[in] nPointIndex - Index of the point in the plot. 0-based. MUST be smaller than PointCount
+	* @param[out] dX - X value of the point in mm
+	* @param[out] dY - Y value of the point in mm
+	*/
+	virtual void GetPointPosition(const LibMCEnv_uint32 nPointIndex, LibMCEnv_double & dX, LibMCEnv_double & dY) = 0;
+
+	/**
+	* IScatterPlot::GetBoundaries - Returns the bounding box of the scatter plot data. Returns 0/0-0/0 in case no points are available.
+	* @param[out] dMinX - Minimum X value of the point in mm
+	* @param[out] dMinY - Minimum Y value of the point in mm
+	* @param[out] dMaxX - Maximum X value of the point in mm
+	* @param[out] dMaxY - Maximum Y value of the point in mm
+	*/
+	virtual void GetBoundaries(LibMCEnv_double & dMinX, LibMCEnv_double & dMinY, LibMCEnv_double & dMaxX, LibMCEnv_double & dMaxY) = 0;
+
+	/**
+	* IScatterPlot::Release - Release the scatter plot and clear its memory. All accessing code will lose access to the data.
+	*/
+	virtual void Release() = 0;
+
+};
+
+typedef IBaseSharedPtr<IScatterPlot> PIScatterPlot;
 
 
 /*************************************************************************************************************************
@@ -860,6 +1119,79 @@ typedef IBaseSharedPtr<IDataTableCSVWriteOptions> PIDataTableCSVWriteOptions;
 
 
 /*************************************************************************************************************************
+ Class interface for DataTableScatterPlotOptions 
+**************************************************************************************************************************/
+
+class IDataTableScatterPlotOptions : public virtual IBase {
+public:
+	/**
+	* IDataTableScatterPlotOptions::SetXAxisColumn - Sets the column to use for the X Axis value. Column MUST exist.
+	* @param[in] sColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+	* @param[in] dOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+	*/
+	virtual void SetXAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor) = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetXAxisColumn - Returns the column to use for the X Axis value..
+	* @return Identifier of the column. Empty if not set yet.
+	*/
+	virtual std::string GetXAxisColumn() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetXAxisScaling - Returns the scaling for the X Axis value..
+	* @return Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+	*/
+	virtual LibMCEnv_double GetXAxisScaling() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetXAxisOffset - Returns the scaling for the X Axis value..
+	* @return Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+	*/
+	virtual LibMCEnv_double GetXAxisOffset() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::SetYAxisColumn - Sets the column to use for the Y Axis value. Column MUST exist.
+	* @param[in] sColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+	* @param[in] dOffsetFactor - Offset factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+	*/
+	virtual void SetYAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor) = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetYAxisColumn - Returns the column to use for the X Axis value..
+	* @return Identifier of the column. Empty if not set yet.
+	*/
+	virtual std::string GetYAxisColumn() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetYAxisScaling - Returns the scaling for the X Axis value..
+	* @return Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+	*/
+	virtual LibMCEnv_double GetYAxisScaling() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::GetYAxisOffset - Returns the scaling for the X Axis value..
+	* @return Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+	*/
+	virtual LibMCEnv_double GetYAxisOffset() = 0;
+
+	/**
+	* IDataTableScatterPlotOptions::AddDataChannel - Adds a data channel. Column MUST exist.
+	* @param[in] sChannelIdentifier - Identifier of the channel. Must be alphanumeric and not empty.
+	* @param[in] sColumnIdentifier - Identifier of the column to use. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+	* @param[in] dOffsetFactor - Offset factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+	* @param[in] nColor - Base color to use.
+	*/
+	virtual void AddDataChannel(const std::string & sChannelIdentifier, const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor, const LibMCEnv_uint32 nColor) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataTableScatterPlotOptions> PIDataTableScatterPlotOptions;
+
+
+/*************************************************************************************************************************
  Class interface for DataTable 
 **************************************************************************************************************************/
 
@@ -1049,6 +1381,19 @@ public:
 	*/
 	virtual void LoadFromStream(IStreamReader* pStream) = 0;
 
+	/**
+	* IDataTable::CreateScatterPlotOptions - Creates an options object for scatter plot computation.
+	* @return DataTableScatterPlotOptions Instance
+	*/
+	virtual IDataTableScatterPlotOptions * CreateScatterPlotOptions() = 0;
+
+	/**
+	* IDataTable::CalculateScatterPlot - Creates a scatterplot from the data table according to its input parameters.
+	* @param[in] pScatterPlotOptions - ScatterPlot Options to use
+	* @return ScatterPlot Instance
+	*/
+	virtual IScatterPlot * CalculateScatterPlot(IDataTableScatterPlotOptions* pScatterPlotOptions) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDataTable> PIDataTable;
@@ -1113,10 +1458,11 @@ public:
 	/**
 	* IDataSeries::SampleJournalVariable - Samples a journal variable.
 	* @param[in] pJournalVariable - Journal variable to sample.
-	* @param[in] nNumberOfSamples - Number of samples to generate.
-	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	* @param[in] nStartTimeStamp - Start time stamp to sample. MUST be smaller than end time stamp.
+	* @param[in] nEndTimeStamp - End time stamp to sample. MUST be larger than start time stamp.
+	* @param[in] nNumberOfSamples - Number of samples to generate. MUST be greater than 1.
 	*/
-	virtual void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta) = 0;
+	virtual void SampleJournalVariable(IJournalVariable* pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples) = 0;
 
 	/**
 	* IDataSeries::GetVersion - Returns the incrementing change version of the data series.
@@ -2049,133 +2395,140 @@ public:
 
 	/**
 	* IToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.
 	*/
-	virtual LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex) = 0;
+	virtual LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nSegmentIndex) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentHatchCount - Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.
 	*/
-	virtual LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex) = 0;
+	virtual LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nSegmentIndex) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileUUID - Retrieves the assigned segment profile uuid.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Segment Profile UUID
 	*/
-	virtual std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex) = 0;
+	virtual std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nSegmentIndex) = 0;
 
 	/**
 	* IToolpathLayer::SegmentProfileHasValue - Retrieves an assigned profile custom value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Returns true if value exist.
 	*/
-	virtual bool SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+	virtual bool SegmentProfileHasValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value. Fails if value does not exist.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileValueDef - Retrieves an assigned profile custom value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] sDefaultValue - Default value if value does not exist.
 	* @return String Value.
 	*/
-	virtual std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue) = 0;
+	virtual std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileDoubleValue - Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Double Value.
 	*/
-	virtual LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+	virtual LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileDoubleValueDef - Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] dDefaultValue - Default value if value does not exist.
 	* @return Double Value.
 	*/
-	virtual LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue) = 0;
+	virtual LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileIntegerValue - Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Integer Value.
 	*/
-	virtual LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+	virtual LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileIntegerValueDef - Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] nDefaultValue - Default value if value does not exist.
 	* @return Integer Value.
 	*/
-	virtual LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue) = 0;
+	virtual LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileBoolValue - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Boolean Value.
 	*/
-	virtual bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
+	virtual bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileBoolValueDef - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] bDefaultValue - Default value if value does not exist.
 	* @return Boolean Value.
 	*/
-	virtual bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue) = 0;
+	virtual bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
-	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
+	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nSegmentIndex, const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileTypedValueDef - Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @param[in] dDefaultValue - Default value if value does not exist.
 	* @return Double Value
 	*/
-	virtual LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue) = 0;
+	virtual LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nSegmentIndex, const LibMCEnv::eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Segment Part UUID
 	*/
-	virtual std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex) = 0;
+	virtual std::string GetSegmentPartUUID(const LibMCEnv_uint32 nSegmentIndex) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentLocalPartID - Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
+	* @return Local Part ID of the segment
+	*/
+	virtual LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nSegmentIndex) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentLocalPartID - Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
@@ -2186,39 +2539,67 @@ public:
 
 	/**
 	* IToolpathLayer::GetSegmentPointData - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[out] pPointDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pPointDataBuffer - Position2D buffer of The point data array. Positions are absolute in units.
 	*/
-	virtual void GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) = 0;
+	virtual void GetSegmentPointData(const LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentHatchData - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] nHatchDataBufferSize - Number of elements in buffer
 	* @param[out] pHatchDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pHatchDataBuffer - Hatch2D buffer of The hatch data array. Positions are absolute in units.
 	*/
-	virtual void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer) = 0;
+	virtual void GetSegmentHatchData(const LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentPointDataInMM - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[out] pPointDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pPointDataBuffer - FloatPosition2D buffer of The point data array. Positions are absolute in mm.
 	*/
-	virtual void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer) = 0;
+	virtual void GetSegmentPointDataInMM(const LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentHatchDataInMM - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] nHatchDataBufferSize - Number of elements in buffer
 	* @param[out] pHatchDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pHatchDataBuffer - FloatHatch2D buffer of The hatch data array. Positions are absolute in mm.
 	*/
-	virtual void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer) = 0;
+	virtual void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::SegmentHasOverrideFactors - Returns if a segment has override factors attached to its points.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @return Returns true if the Segment given has an override factor of a certain type.
+	*/
+	virtual bool SegmentHasOverrideFactors(const LibMCEnv_uint32 nSegmentIndex, const LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentPointOverrides - Retrieves factor overrides for a specific segment. For type hatch, the points are taken pairwise.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @param[in] nOverrideDataBufferSize - Number of elements in buffer
+	* @param[out] pOverrideDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pOverrideDataBuffer - double buffer of The override factor array. Will return as many override factors as points in the segment.
+	*/
+	virtual void GetSegmentPointOverrides(const LibMCEnv_uint32 nSegmentIndex, const LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, LibMCEnv_uint64 nOverrideDataBufferSize, LibMCEnv_uint64* pOverrideDataNeededCount, LibMCEnv_double * pOverrideDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentHatchOverrides - Retrieves factor overrides for a specific segment. Fails if segment type is not hatch.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @param[in] nOverrideDataBufferSize - Number of elements in buffer
+	* @param[out] pOverrideDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pOverrideDataBuffer - Hatch2DOverrides buffer of The override factor array. Will return as many override factors as hatches in the segment. Each element contains one factor for the first point or the second point.
+	*/
+	virtual void GetSegmentHatchOverrides(const LibMCEnv_uint32 nSegmentIndex, const LibMCEnv::eToolpathProfileOverrideFactor eOverrideFactor, LibMCEnv_uint64 nOverrideDataBufferSize, LibMCEnv_uint64* pOverrideDataNeededCount, LibMCEnv::sHatch2DOverrides * pOverrideDataBuffer) = 0;
 
 	/**
 	* IToolpathLayer::GetZValue - Retrieves the layers Z Value in units.
@@ -2725,9 +3106,10 @@ public:
 
 	/**
 	* IBuildExecution::LoadAttachedJournal - Loads the journal that is associated with the build execution and returns an accessor instance.
+	* @param[in] nCacheMemoryQuotaInMegabytes - Memory quota to use for cached reading in bytes. MUST be larger than 16 and smaller than 4096.
 	* @return Journal instance.
 	*/
-	virtual IJournalHandler * LoadAttachedJournal() = 0;
+	virtual IJournalHandler * LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes) = 0;
 
 };
 
@@ -3344,6 +3726,242 @@ typedef IBaseSharedPtr<IXMLDocumentAttribute> PIXMLDocumentAttribute;
 
 
 /*************************************************************************************************************************
+ Class interface for JSONObject 
+**************************************************************************************************************************/
+
+class IJSONObject : public virtual IBase {
+public:
+	/**
+	* IJSONObject::HasMember - Returns if a member with a specific name exist.
+	* @param[in] sName - Name of the member.
+	* @return returns if a member with a specific name exists.
+	*/
+	virtual bool HasMember(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetMemberCount - Returns the number of members.
+	* @return returns the number of members.
+	*/
+	virtual LibMCEnv_uint64 GetMemberCount() = 0;
+
+	/**
+	* IJSONObject::GetMemberName - Returns the name of a member by index.
+	* @param[in] nIndex - Index of the member, 0-based. Fails if larger or equal than MemberCount
+	* @param[in] sName - Name of the member.
+	*/
+	virtual void GetMemberName(const LibMCEnv_uint64 nIndex, const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetMemberType - Returns the member type. Returns unknown, if the member does not exist.
+	* @param[in] sName - Name of the member.
+	* @return The type of the member..
+	*/
+	virtual LibMCEnv::eJSONObjectType GetMemberType(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetValue - Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual std::string GetValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetIntegerValue - Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetDoubleValue - Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_double GetDoubleValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetBoolValue - Returns a member as boolean value. Fails if member is of type Array or Object or Double.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual bool GetBoolValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetObjectValue - Returns a member as object value. Fails if member is not of type Object.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual IJSONObject * GetObjectValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::GetArrayValue - Returns a member as object value. Fails if member is not of type Array.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual IJSONArray * GetArrayValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::RemoveMember - Removes a member with a specific name. Does nothing if Member does not exist.
+	* @param[in] sName - Name of the member.
+	*/
+	virtual void RemoveMember(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddValue - Adds a member as string value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @param[in] sValue - Member value.
+	*/
+	virtual void AddValue(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
+	* IJSONObject::AddIntegerValue - Adds a member as integer value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_int64 AddIntegerValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddDoubleValue - Adds a member as double value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_double AddDoubleValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddBoolValue - Adds a member as bool value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual bool AddBoolValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddObjectValue - Returns a member as object value. Returns empty object. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual IJSONObject * AddObjectValue(const std::string & sName) = 0;
+
+	/**
+	* IJSONObject::AddArrayValue - Returns a member as object value. Returns empty array. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	virtual IJSONArray * AddArrayValue(const std::string & sName) = 0;
+
+};
+
+typedef IBaseSharedPtr<IJSONObject> PIJSONObject;
+
+
+/*************************************************************************************************************************
+ Class interface for JSONArray 
+**************************************************************************************************************************/
+
+class IJSONArray : public virtual IBase {
+public:
+	/**
+	* IJSONArray::GetElementCount - Returns the number of elements.
+	* @return returns the number of elements.
+	*/
+	virtual LibMCEnv_uint64 GetElementCount() = 0;
+
+	/**
+	* IJSONArray::GetElementType - Returns the element type. Returns unknown, if the element does not exist.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return The type of the element..
+	*/
+	virtual LibMCEnv::eJSONObjectType GetElementType(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetValue - Returns a element as string value. Fails if element is of type Array or Object. Returns true or false in terms of Boolean value.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual std::string GetValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetIntegerValue - Returns a element as integer value. Fails if element is of type Array or Object, or a non-double string.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetDoubleValue - Returns a element as double value. Fails if element is of type Array or Object, or a non-integer string.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual LibMCEnv_double GetDoubleValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetBoolValue - Returns a element as boolean value. Fails if element is of type Array or Object or Double.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual bool GetBoolValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetObjectValue - Returns a element as object value. Fails if element is not of type Object.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual IJSONObject * GetObjectValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::GetArrayValue - Returns a element as object value. Fails if element is not of type Array.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	virtual IJSONArray * GetArrayValue(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::RemoveElement - Removes an element with a specific index. Does nothing if Element does not exist.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	*/
+	virtual void RemoveElement(const LibMCEnv_uint64 nIndex) = 0;
+
+	/**
+	* IJSONArray::AddValue - Adds an element as string value.
+	* @param[in] sValue - Member value.
+	*/
+	virtual void AddValue(const std::string & sValue) = 0;
+
+	/**
+	* IJSONArray::AddIntegerValue - Adds a member as integer value.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_int64 AddIntegerValue() = 0;
+
+	/**
+	* IJSONArray::AddDoubleValue - Adds a member as double value.
+	* @return Member value.
+	*/
+	virtual LibMCEnv_double AddDoubleValue() = 0;
+
+	/**
+	* IJSONArray::AddBoolValue - Adds a member as bool value.
+	* @return Member value.
+	*/
+	virtual bool AddBoolValue() = 0;
+
+	/**
+	* IJSONArray::AddObjectValue - Returns a member as object value. Returns empty object.
+	* @return Member value.
+	*/
+	virtual IJSONObject * AddObjectValue() = 0;
+
+	/**
+	* IJSONArray::AddArrayValue - Returns a member as object value. Returns empty array.
+	* @return Member value.
+	*/
+	virtual IJSONArray * AddArrayValue() = 0;
+
+};
+
+typedef IBaseSharedPtr<IJSONArray> PIJSONArray;
+
+
+/*************************************************************************************************************************
  Class interface for XMLDocumentNode 
 **************************************************************************************************************************/
 
@@ -3622,6 +4240,12 @@ public:
 	* IXMLDocumentNode::Remove - Removes the node from its parent. The root node of the document can not be removed.
 	*/
 	virtual void Remove() = 0;
+
+	/**
+	* IXMLDocumentNode::CopyFrom - Copies all content from another node in a recursive way.
+	* @param[in] pOtherNode - other XML Document Node. Does not need to live in the same document.
+	*/
+	virtual void CopyFrom(IXMLDocumentNode* pOtherNode) = 0;
 
 };
 
@@ -4113,6 +4737,41 @@ public:
 	*/
 	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
 
+	/**
+	* IDriverStatusUpdateSession::GetStringParameter - Gets a string parameter. Fails if parameter does not exist.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual std::string GetStringParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::GetUUIDParameter - Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual std::string GetUUIDParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::GetDoubleParameter - Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual LibMCEnv_double GetDoubleParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::GetIntegerParameter - Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::GetBoolParameter - Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	virtual bool GetBoolParameter(const std::string & sParameterName) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverStatusUpdateSession> PIDriverStatusUpdateSession;
@@ -4191,7 +4850,7 @@ public:
 	virtual bool DriverHasResourceData(const std::string & sIdentifier) = 0;
 
 	/**
-	* IDriverEnvironment::MachineHasResourceData - retrieves if attached driver has data with the given identifier.
+	* IDriverEnvironment::MachineHasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
 	*/
@@ -4288,35 +4947,35 @@ public:
 	virtual void RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetStringParameter - sets a string parameter
+	* IDriverEnvironment::SetStringParameter - Sets a string parameter. For getting a string, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sValue - Value to set
 	*/
 	virtual void SetStringParameter(const std::string & sParameterName, const std::string & sValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetUUIDParameter - sets a uuid parameter
+	* IDriverEnvironment::SetUUIDParameter - sets a uuid parameter. For getting a UUID, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sValue - Value to set
 	*/
 	virtual void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetDoubleParameter - sets a double parameter
+	* IDriverEnvironment::SetDoubleParameter - sets a double parameter. For getting a Double, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] dValue - Value to set
 	*/
 	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetIntegerParameter - sets an int parameter
+	* IDriverEnvironment::SetIntegerParameter - sets an int parameter. For getting an Integer, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] nValue - Value to set
 	*/
 	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue) = 0;
 
 	/**
-	* IDriverEnvironment::SetBoolParameter - sets a bool parameter
+	* IDriverEnvironment::SetBoolParameter - sets a bool parameter. For getting a bool, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] bValue - Value to set
 	*/
@@ -4370,15 +5029,10 @@ public:
 	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
-	* IDriverEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* IDriverEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
 	* IDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
@@ -4942,66 +5596,18 @@ public:
 	virtual std::string GetVariableName() = 0;
 
 	/**
-	* IJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return Start Timestamp of Recording in microseconds.
-	*/
-	virtual LibMCEnv_uint64 GetStartTimeStamp() = 0;
-
-	/**
-	* IJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return End Timestamp of Recording in microseconds.
-	*/
-	virtual LibMCEnv_uint64 GetEndTimeStamp() = 0;
-
-	/**
-	* IJournalVariable::ComputeFullAverage - Calculates the average value over the full available time interval.
-	* @return Average value of the variable.
-	*/
-	virtual LibMCEnv_double ComputeFullAverage() = 0;
-
-	/**
-	* IJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
-	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
-	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-	* @return Average value of the variable.
-	*/
-	virtual LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval) = 0;
-
-	/**
-	* IJournalVariable::ComputeSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* IJournalVariable::ComputeDoubleSample - Computes a single sample at a time. Fails if no data is available at this time value.
 	* @param[in] nTimeInMicroSeconds - Timestamp to check.
 	* @return Value of the variable at the time step.
 	*/
-	virtual LibMCEnv_double ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
+	virtual LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
 
 	/**
-	* IJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-	* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
-	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
-	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-	* @return Returns an instance with the sampling results.
+	* IJournalVariable::ComputeIntegerSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* @param[in] nTimeInMicroSeconds - Timestamp to check.
+	* @return Value of the variable at the time step in integer.
 	*/
-	virtual IUniformJournalSampling * ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval) = 0;
-
-	/**
-	* IJournalVariable::ComputeEquidistantSamples - Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-	* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
-	* @return Returns an instance with the sampling results.
-	*/
-	virtual IUniformJournalSampling * ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples) = 0;
-
-	/**
-	* IJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
-	* @param[in] nTimeStreamEntriesBufferSize - Number of elements in buffer
-	* @param[out] pTimeStreamEntriesNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pTimeStreamEntriesBuffer - TimeStreamEntry buffer of All change events of the variable in the accessed interval.
-	*/
-	virtual void ReceiveRawTimeStream(LibMCEnv_uint64 nTimeStreamEntriesBufferSize, LibMCEnv_uint64* pTimeStreamEntriesNeededCount, LibMCEnv::sTimeStreamEntry * pTimeStreamEntriesBuffer) = 0;
+	virtual LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
 
 };
 
@@ -5153,25 +5759,27 @@ public:
 	/**
 	* IJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
 	* @return Journal Instance.
 	*/
-	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds) = 0;
-
-	/**
-	* IJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
-	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
-	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
-	* @return Journal Instance.
-	*/
-	virtual IJournalVariable * RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
+	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName) = 0;
 
 	/**
 	* IJournalHandler::GetStartTime - Retrieves the reference start time of the journal.
 	* @return DateTime Instance
 	*/
 	virtual IDateTime * GetStartTime() = 0;
+
+	/**
+	* IJournalHandler::GetEndTime - Retrieves the end time of the journal recording.
+	* @return DateTime Instance
+	*/
+	virtual IDateTime * GetEndTime() = 0;
+
+	/**
+	* IJournalHandler::GetJournalLifeTimeInMicroseconds - Retrieves the life time of the journal. Which is EndTime minus StartTime.
+	* @return Life Time.
+	*/
+	virtual LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds() = 0;
 
 	/**
 	* IJournalHandler::RetrieveLogEntries - Retrieves the current log entries of the journal.
@@ -5493,6 +6101,11 @@ public:
 	virtual ISignalHandler * GetUnhandledSignal(const std::string & sSignalTypeName) = 0;
 
 	/**
+	* IStateEnvironment::ClearAllUnhandledSignals - Clears all unhandled signals and marks them invalid.
+	*/
+	virtual void ClearAllUnhandledSignals() = 0;
+
+	/**
 	* IStateEnvironment::GetUnhandledSignalByUUID - retrieves an unhandled signal from the current state machine by UUID.
 	* @param[in] sUUID - Name
 	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.
@@ -5685,6 +6298,13 @@ public:
 	virtual bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
+	* IStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	virtual bool HasResourceData(const std::string & sIdentifier) = 0;
+
+	/**
 	* IStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
 	* @param[in] sResourceName - Name of the resource.
 	* @param[in] nResourceDataBufferSize - Number of elements in buffer
@@ -5712,15 +6332,10 @@ public:
 	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
-	* IStateEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* IStateEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
 	* IStateEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
@@ -6052,6 +6667,29 @@ public:
 	virtual void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS) = 0;
 
 	/**
+	* IUIEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	virtual bool HasResourceData(const std::string & sIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[in] nResourceDataBufferSize - Number of elements in buffer
+	* @param[out] pResourceDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+	*/
+	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
+
+	/**
+	* IUIEnvironment::LoadResourceString - loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+	* @param[in] sResourceName - Name of the resource.
+	* @return Resource Data String.
+	*/
+	virtual std::string LoadResourceString(const std::string & sResourceName) = 0;
+
+	/**
 	* IUIEnvironment::ShowHintColored - Shows a hint message in the user interface in a certain color.
 	* @param[in] sHint - Hint to show.
 	* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
@@ -6272,15 +6910,10 @@ public:
 	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
-	* IUIEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* IUIEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
 	* IUIEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
@@ -6569,6 +7202,39 @@ public:
 	* @param[in] nDelay - Milliseconds to sleeps
 	*/
 	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
+
+	/**
+	* IUIEnvironment::HasExternalEventParameter - Checks if an external event parameter exists. DEPRECIATED, use GetExternalEventParameters instead.
+	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @return Flag if the parameter exists.
+	*/
+	virtual bool HasExternalEventParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetExternalEventParameter - Returns an external event string parameter. Fails if it does not exists or is not of type string. DEPRECIATED, use GetExternalEventParameters instead.
+	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @return Parameter value.
+	*/
+	virtual std::string GetExternalEventParameter(const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::AddExternalEventResultValue - Adds a return string value to return to the external event caller. DEPRECIATED, use GetExternalEventParameters instead.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] sReturnValue - Return value.
+	*/
+	virtual void AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue) = 0;
+
+	/**
+	* IUIEnvironment::GetExternalEventParameters - Returns the external event parameters. This JSON Object was passed on from the external API.
+	* @return Parameter value.
+	*/
+	virtual IJSONObject * GetExternalEventParameters() = 0;
+
+	/**
+	* IUIEnvironment::GetExternalEventResults - Returns the external event results. This JSON Object will be passed on to an ext
+	* @return Parameter value.
+	*/
+	virtual IJSONObject * GetExternalEventResults() = 0;
 
 };
 

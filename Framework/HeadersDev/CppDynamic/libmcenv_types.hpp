@@ -283,6 +283,30 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDSUPPORTINDEX 10186 /** Invalid support index */
 #define LIBMCENV_ERROR_INVALIDSOLIDINDEX 10187 /** Invalid solid index */
 #define LIBMCENV_ERROR_INVALIDCOMPONENTINDEX 10188 /** Invalid component index */
+#define LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY 10189 /** Invalid external event parameter key */
+#define LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER 10190 /** Could not find external event parameter */
+#define LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY 10191 /** Invalid external event return value key */
+#define LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED 10192 /** External event value key is reserved. */
+#define LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED 10193 /** External event return value key is reserved. */
+#define LIBMCENV_ERROR_INVALIDYUY2BUFFERSIZE 10194 /** Invalid YUY2 buffer size */
+#define LIBMCENV_ERROR_YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2 10195 /** YUY2 pixel count must be a multiple of 2 */
+#define LIBMCENV_ERROR_INVALIDJPEGDATA 10196 /** Invalid JPEG Data size */
+#define LIBMCENV_ERROR_INVALIDJPEGBUFFERSIZE 10197 /** Invalid JPEG Buffer size */
+#define LIBMCENV_ERROR_COULDNOTINITIALIZEJPEGLIBRARY 10198 /** Could not initialize JPEG library */
+#define LIBMCENV_ERROR_COULDNOTSETJPEGSTOPONWARNING 10199 /** Could not set JPEG StopOnWarning */
+#define LIBMCENV_ERROR_COULDNOTSETFASTUPSAMPLE 10200 /** Could not set FastUpSample */
+#define LIBMCENV_ERROR_COULDNOTSETFASTDCT 10201 /** Could not set FastDCT */
+#define LIBMCENV_ERROR_COULDNOTREADJPEGHEADER 10202 /** Could not read JPEG Header */
+#define LIBMCENV_ERROR_INVALIDJPEGIMAGESIZE 10203 /** Invalid JPEG image size */
+#define LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH 10204 /** JPEG color precision too high */
+#define LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG 10205 /** Could not decompress JPEG */
+#define LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE 10206 /** Could not store JPEG image */
+#define LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT 10207 /** Invalid PNG Export Format */
+#define LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA 10208 /** Invalid memory cache quota */
+#define LIBMCENV_ERROR_NOXAXISCOLUMNGIVEN 10209 /** No X Axis Column given */
+#define LIBMCENV_ERROR_NOYAXISCOLUMNGIVEN 10210 /** No Y Axis Column given */
+#define LIBMCENV_ERROR_INVALIDSCATTERPLOTPOINTINDEX 10211 /** Invalid scatter plot index. */
+#define LIBMCENV_ERROR_SCATTERPLOTNOTFOUND 10212 /** Scatter plot not found */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -478,6 +502,30 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "Invalid support index";
     case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "Invalid solid index";
     case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "Invalid component index";
+    case LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY: return "Invalid external event parameter key";
+    case LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER: return "Could not find external event parameter";
+    case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "Invalid external event return value key";
+    case LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED: return "External event value key is reserved.";
+    case LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED: return "External event return value key is reserved.";
+    case LIBMCENV_ERROR_INVALIDYUY2BUFFERSIZE: return "Invalid YUY2 buffer size";
+    case LIBMCENV_ERROR_YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2: return "YUY2 pixel count must be a multiple of 2";
+    case LIBMCENV_ERROR_INVALIDJPEGDATA: return "Invalid JPEG Data size";
+    case LIBMCENV_ERROR_INVALIDJPEGBUFFERSIZE: return "Invalid JPEG Buffer size";
+    case LIBMCENV_ERROR_COULDNOTINITIALIZEJPEGLIBRARY: return "Could not initialize JPEG library";
+    case LIBMCENV_ERROR_COULDNOTSETJPEGSTOPONWARNING: return "Could not set JPEG StopOnWarning";
+    case LIBMCENV_ERROR_COULDNOTSETFASTUPSAMPLE: return "Could not set FastUpSample";
+    case LIBMCENV_ERROR_COULDNOTSETFASTDCT: return "Could not set FastDCT";
+    case LIBMCENV_ERROR_COULDNOTREADJPEGHEADER: return "Could not read JPEG Header";
+    case LIBMCENV_ERROR_INVALIDJPEGIMAGESIZE: return "Invalid JPEG image size";
+    case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEG color precision too high";
+    case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "Could not decompress JPEG";
+    case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
+    case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "Invalid PNG Export Format";
+    case LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA: return "Invalid memory cache quota";
+    case LIBMCENV_ERROR_NOXAXISCOLUMNGIVEN: return "No X Axis Column given";
+    case LIBMCENV_ERROR_NOYAXISCOLUMNGIVEN: return "No Y Axis Column given";
+    case LIBMCENV_ERROR_INVALIDSCATTERPLOTPOINTINDEX: return "Invalid scatter plot index.";
+    case LIBMCENV_ERROR_SCATTERPLOTNOTFOUND: return "Scatter plot not found";
     default: return "unknown error";
   }
 }
@@ -492,11 +540,17 @@ typedef LibMCEnvHandle LibMCEnv_TestEnvironment;
 typedef LibMCEnvHandle LibMCEnv_CryptoContext;
 typedef LibMCEnvHandle LibMCEnv_PNGImageStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_PNGImageData;
+typedef LibMCEnvHandle LibMCEnv_JPEGImageStoreOptions;
+typedef LibMCEnvHandle LibMCEnv_JPEGImageData;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
+typedef LibMCEnvHandle LibMCEnv_ImageLoader;
+typedef LibMCEnvHandle LibMCEnv_VideoStream;
+typedef LibMCEnvHandle LibMCEnv_ScatterPlot;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2DStoreOptions;
 typedef LibMCEnvHandle LibMCEnv_DiscreteFieldData2D;
 typedef LibMCEnvHandle LibMCEnv_DataTableWriteOptions;
 typedef LibMCEnvHandle LibMCEnv_DataTableCSVWriteOptions;
+typedef LibMCEnvHandle LibMCEnv_DataTableScatterPlotOptions;
 typedef LibMCEnvHandle LibMCEnv_DataTable;
 typedef LibMCEnvHandle LibMCEnv_DataSeries;
 typedef LibMCEnvHandle LibMCEnv_DateTimeDifference;
@@ -519,6 +573,8 @@ typedef LibMCEnvHandle LibMCEnv_WorkingFile;
 typedef LibMCEnvHandle LibMCEnv_WorkingFileIterator;
 typedef LibMCEnvHandle LibMCEnv_WorkingDirectory;
 typedef LibMCEnvHandle LibMCEnv_XMLDocumentAttribute;
+typedef LibMCEnvHandle LibMCEnv_JSONObject;
+typedef LibMCEnvHandle LibMCEnv_JSONArray;
 typedef LibMCEnvHandle LibMCEnv_XMLDocumentNode;
 typedef LibMCEnvHandle LibMCEnv_XMLDocumentNodes;
 typedef LibMCEnvHandle LibMCEnv_XMLDocument;
@@ -571,11 +627,32 @@ namespace LibMCEnv {
     Unknown = 7
   };
   
+  enum class eJSONObjectType : LibMCEnv_int32 {
+    Unknown = 0,
+    String = 1,
+    Integer = 2,
+    Double = 3,
+    Object = 4,
+    Array = 5
+  };
+  
   enum class eImagePixelFormat : LibMCEnv_int32 {
     Unknown = 0,
     GreyScale8bit = 1,
     RGB24bit = 2,
-    RGBA32bit = 3
+    RGBA32bit = 3,
+    RGB16bit = 4
+  };
+  
+  enum class ePNGStorageFormat : LibMCEnv_int32 {
+    Unknown = 0,
+    BlackWhite1bit = 1,
+    GreyScale1bit = 2,
+    GreyScale2bit = 3,
+    GreyScale4bit = 4,
+    GreyScale8bit = 5,
+    RGB24bit = 6,
+    RGBA32bit = 7
   };
   
   enum class eFieldSamplingMode : LibMCEnv_int32 {
@@ -614,6 +691,13 @@ namespace LibMCEnv {
     JumpDelay = 11,
     MarkDelay = 12,
     LaserFocus = 13
+  };
+  
+  enum class eToolpathProfileOverrideFactor : LibMCEnv_int32 {
+    Unknown = 0,
+    FactorF = 1,
+    FactorG = 2,
+    FactorH = 3
   };
   
   enum class eMessageDialogType : LibMCEnv_int32 {
@@ -688,6 +772,11 @@ namespace LibMCEnv {
       LibMCEnv_double m_Y2;
   } sFloatHatch2D;
   
+  typedef struct sHatch2DOverrides {
+      LibMCEnv_double m_Point1Override;
+      LibMCEnv_double m_Point2Override;
+  } sHatch2DOverrides;
+  
   typedef struct sModelDataTransform {
       LibMCEnv_double m_Matrix[3][3];
       LibMCEnv_double m_Translation[3];
@@ -711,11 +800,14 @@ namespace LibMCEnv {
 // define legacy C-names for enums, structs and function types
 typedef LibMCEnv::eAlertLevel eLibMCEnvAlertLevel;
 typedef LibMCEnv::eLogLevel eLibMCEnvLogLevel;
+typedef LibMCEnv::eJSONObjectType eLibMCEnvJSONObjectType;
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
+typedef LibMCEnv::ePNGStorageFormat eLibMCEnvPNGStorageFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathAttributeType eLibMCEnvToolpathAttributeType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
+typedef LibMCEnv::eToolpathProfileOverrideFactor eLibMCEnvToolpathProfileOverrideFactor;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
 typedef LibMCEnv::eDataTableColumnType eLibMCEnvDataTableColumnType;
@@ -727,6 +819,7 @@ typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;
 typedef LibMCEnv::sFieldData2DPoint sLibMCEnvFieldData2DPoint;
 typedef LibMCEnv::sFieldData3DPoint sLibMCEnvFieldData3DPoint;
 typedef LibMCEnv::sFloatHatch2D sLibMCEnvFloatHatch2D;
+typedef LibMCEnv::sHatch2DOverrides sLibMCEnvHatch2DOverrides;
 typedef LibMCEnv::sModelDataTransform sLibMCEnvModelDataTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
 typedef LibMCEnv::sTimeStreamEntry sLibMCEnvTimeStreamEntry;

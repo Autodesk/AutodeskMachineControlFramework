@@ -122,6 +122,8 @@ namespace AMC {
 
 		void addDouble(const std::string& sName, double dValue);
 
+		void addBoolean(const std::string& sName, bool bValue);
+
 		void addObject(const std::string& sName, CJSONWriterObject& object);
 
 		void addArray(const std::string& sName, CJSONWriterArray& array);

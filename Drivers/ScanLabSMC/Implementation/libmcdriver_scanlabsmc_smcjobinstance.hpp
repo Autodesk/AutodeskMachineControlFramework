@@ -53,14 +53,20 @@ private:
 	PSMCContextHandle m_pContextHandle;
 	PScanLabSMCSDK m_pSDK;
 
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	std::string m_sSimulationSubDirectory;
+
 	slscJobID m_JobID;
 	bool m_bIsFinalized;
+
+	bool m_bHasJobDuration;
+	double m_dJobDuration;
 
 	void drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBufferSize, const LibMCDriver_ScanLabSMC::sPoint2D* pPointsBuffer, bool bIsClosed);
 
 public:
 
-	CSMCJobInstance(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode);
+	CSMCJobInstance(PSMCContextHandle pContextHandle, double dStartPositionX, double dStartPositionY, LibMCDriver_ScanLabSMC::eBlendMode eBlendMode, LibMCEnv::PWorkingDirectory pWorkingDirectory, std::string sSimulationSubDirectory);
 
 	virtual ~CSMCJobInstance();
 
@@ -88,6 +94,13 @@ public:
 	void StopExecution();
 
 	void AddLayerToList(LibMCEnv::PToolpathLayer pLayer);
+
+	void ReadSimulationFile (LibMCEnv::PDataTable pDataTable);
+
+	double GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType);
+
+	double GetJobDuration();
+
 
 };
 

@@ -78,6 +78,15 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == "scanlab-smc-0.6")
 		return new CDriver_ScanLabSMC(sName, sType, pDriverEnvironment);
 
+	if (sType == "scanlab-smc-0.8")
+		return new CDriver_ScanLabSMC(sName, sType, pDriverEnvironment);
+
+	if (sType == "scanlab-smc-0.9")
+		return new CDriver_ScanLabSMC(sName, sType, pDriverEnvironment);
+
+	if (sType == "scanlab-smc-latest")
+		return new CDriver_ScanLabSMC(sName, sType, pDriverEnvironment);
+
 	return nullptr;
 }
 

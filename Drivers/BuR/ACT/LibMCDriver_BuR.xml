@@ -160,6 +160,17 @@
 		<error name="JOURNALSCHEMAHASINVALIDVALUENAME" code="1104" description="Journal schema misses value name." />						
 		<error name="JOURNALSCHEMAHASINVALIDVALUEID" code="1105" description="Journal schema misses value id." />						
 		<error name="JOURNALSCHEMAHASINVALIDVALUESIZE" code="1106" description="Journal schema misses value size." />						
+		<error name="DUPLICATEJOURNALVALUEID" code="1107" description="Duplicate Journal value ID." />						
+		<error name="JOURNALVALUEIDNOTFOUND" code="1108" description="Journal value ID not found" />						
+		<error name="INVALIDJOURNALVALUEINDEX" code="1109" description="Invalid Journal value index" />						
+		<error name="DUPLICATEJOURNALGROUPID" code="1110" description="Duplicate Journal group ID." />						
+		<error name="JOURNALGROUPIDNOTFOUND" code="1111" description="Journal group ID not found" />						
+		<error name="INVALIDJOURNALGROUPINDEX" code="1112" description="Invalid Journal group index" />						
+		<error name="JOURNALVALUENAMENOTFOUND" code="1113" description="Journal value name not found" />						
+		<error name="JOURNALGROUPNAMENOTFOUND" code="1114" description="Journal group name not found" />						
+		<error name="NOGROUPATTRIBUTE" code="1115" description="No group attribute" />						
+		<error name="NOVALUEATTRIBUTE" code="1116" description="No value attribute" />						
+		
 			
 
 	</errors>

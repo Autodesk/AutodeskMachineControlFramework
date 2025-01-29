@@ -65,11 +65,17 @@ class CTestEnvironment;
 class CCryptoContext;
 class CPNGImageStoreOptions;
 class CPNGImageData;
+class CJPEGImageStoreOptions;
+class CJPEGImageData;
 class CImageData;
+class CImageLoader;
+class CVideoStream;
+class CScatterPlot;
 class CDiscreteFieldData2DStoreOptions;
 class CDiscreteFieldData2D;
 class CDataTableWriteOptions;
 class CDataTableCSVWriteOptions;
+class CDataTableScatterPlotOptions;
 class CDataTable;
 class CDataSeries;
 class CDateTimeDifference;
@@ -92,6 +98,8 @@ class CWorkingFile;
 class CWorkingFileIterator;
 class CWorkingDirectory;
 class CXMLDocumentAttribute;
+class CJSONObject;
+class CJSONArray;
 class CXMLDocumentNode;
 class CXMLDocumentNodes;
 class CXMLDocument;
@@ -130,11 +138,17 @@ typedef CTestEnvironment CLibMCEnvTestEnvironment;
 typedef CCryptoContext CLibMCEnvCryptoContext;
 typedef CPNGImageStoreOptions CLibMCEnvPNGImageStoreOptions;
 typedef CPNGImageData CLibMCEnvPNGImageData;
+typedef CJPEGImageStoreOptions CLibMCEnvJPEGImageStoreOptions;
+typedef CJPEGImageData CLibMCEnvJPEGImageData;
 typedef CImageData CLibMCEnvImageData;
+typedef CImageLoader CLibMCEnvImageLoader;
+typedef CVideoStream CLibMCEnvVideoStream;
+typedef CScatterPlot CLibMCEnvScatterPlot;
 typedef CDiscreteFieldData2DStoreOptions CLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef CDiscreteFieldData2D CLibMCEnvDiscreteFieldData2D;
 typedef CDataTableWriteOptions CLibMCEnvDataTableWriteOptions;
 typedef CDataTableCSVWriteOptions CLibMCEnvDataTableCSVWriteOptions;
+typedef CDataTableScatterPlotOptions CLibMCEnvDataTableScatterPlotOptions;
 typedef CDataTable CLibMCEnvDataTable;
 typedef CDataSeries CLibMCEnvDataSeries;
 typedef CDateTimeDifference CLibMCEnvDateTimeDifference;
@@ -157,6 +171,8 @@ typedef CWorkingFile CLibMCEnvWorkingFile;
 typedef CWorkingFileIterator CLibMCEnvWorkingFileIterator;
 typedef CWorkingDirectory CLibMCEnvWorkingDirectory;
 typedef CXMLDocumentAttribute CLibMCEnvXMLDocumentAttribute;
+typedef CJSONObject CLibMCEnvJSONObject;
+typedef CJSONArray CLibMCEnvJSONArray;
 typedef CXMLDocumentNode CLibMCEnvXMLDocumentNode;
 typedef CXMLDocumentNodes CLibMCEnvXMLDocumentNodes;
 typedef CXMLDocument CLibMCEnvXMLDocument;
@@ -195,11 +211,17 @@ typedef std::shared_ptr<CTestEnvironment> PTestEnvironment;
 typedef std::shared_ptr<CCryptoContext> PCryptoContext;
 typedef std::shared_ptr<CPNGImageStoreOptions> PPNGImageStoreOptions;
 typedef std::shared_ptr<CPNGImageData> PPNGImageData;
+typedef std::shared_ptr<CJPEGImageStoreOptions> PJPEGImageStoreOptions;
+typedef std::shared_ptr<CJPEGImageData> PJPEGImageData;
 typedef std::shared_ptr<CImageData> PImageData;
+typedef std::shared_ptr<CImageLoader> PImageLoader;
+typedef std::shared_ptr<CVideoStream> PVideoStream;
+typedef std::shared_ptr<CScatterPlot> PScatterPlot;
 typedef std::shared_ptr<CDiscreteFieldData2DStoreOptions> PDiscreteFieldData2DStoreOptions;
 typedef std::shared_ptr<CDiscreteFieldData2D> PDiscreteFieldData2D;
 typedef std::shared_ptr<CDataTableWriteOptions> PDataTableWriteOptions;
 typedef std::shared_ptr<CDataTableCSVWriteOptions> PDataTableCSVWriteOptions;
+typedef std::shared_ptr<CDataTableScatterPlotOptions> PDataTableScatterPlotOptions;
 typedef std::shared_ptr<CDataTable> PDataTable;
 typedef std::shared_ptr<CDataSeries> PDataSeries;
 typedef std::shared_ptr<CDateTimeDifference> PDateTimeDifference;
@@ -222,6 +244,8 @@ typedef std::shared_ptr<CWorkingFile> PWorkingFile;
 typedef std::shared_ptr<CWorkingFileIterator> PWorkingFileIterator;
 typedef std::shared_ptr<CWorkingDirectory> PWorkingDirectory;
 typedef std::shared_ptr<CXMLDocumentAttribute> PXMLDocumentAttribute;
+typedef std::shared_ptr<CJSONObject> PJSONObject;
+typedef std::shared_ptr<CJSONArray> PJSONArray;
 typedef std::shared_ptr<CXMLDocumentNode> PXMLDocumentNode;
 typedef std::shared_ptr<CXMLDocumentNodes> PXMLDocumentNodes;
 typedef std::shared_ptr<CXMLDocument> PXMLDocument;
@@ -260,11 +284,17 @@ typedef PTestEnvironment PLibMCEnvTestEnvironment;
 typedef PCryptoContext PLibMCEnvCryptoContext;
 typedef PPNGImageStoreOptions PLibMCEnvPNGImageStoreOptions;
 typedef PPNGImageData PLibMCEnvPNGImageData;
+typedef PJPEGImageStoreOptions PLibMCEnvJPEGImageStoreOptions;
+typedef PJPEGImageData PLibMCEnvJPEGImageData;
 typedef PImageData PLibMCEnvImageData;
+typedef PImageLoader PLibMCEnvImageLoader;
+typedef PVideoStream PLibMCEnvVideoStream;
+typedef PScatterPlot PLibMCEnvScatterPlot;
 typedef PDiscreteFieldData2DStoreOptions PLibMCEnvDiscreteFieldData2DStoreOptions;
 typedef PDiscreteFieldData2D PLibMCEnvDiscreteFieldData2D;
 typedef PDataTableWriteOptions PLibMCEnvDataTableWriteOptions;
 typedef PDataTableCSVWriteOptions PLibMCEnvDataTableCSVWriteOptions;
+typedef PDataTableScatterPlotOptions PLibMCEnvDataTableScatterPlotOptions;
 typedef PDataTable PLibMCEnvDataTable;
 typedef PDataSeries PLibMCEnvDataSeries;
 typedef PDateTimeDifference PLibMCEnvDateTimeDifference;
@@ -287,6 +317,8 @@ typedef PWorkingFile PLibMCEnvWorkingFile;
 typedef PWorkingFileIterator PLibMCEnvWorkingFileIterator;
 typedef PWorkingDirectory PLibMCEnvWorkingDirectory;
 typedef PXMLDocumentAttribute PLibMCEnvXMLDocumentAttribute;
+typedef PJSONObject PLibMCEnvJSONObject;
+typedef PJSONArray PLibMCEnvJSONArray;
 typedef PXMLDocumentNode PLibMCEnvXMLDocumentNode;
 typedef PXMLDocumentNodes PLibMCEnvXMLDocumentNodes;
 typedef PXMLDocument PLibMCEnvXMLDocument;
@@ -580,6 +612,30 @@ public:
 			case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "INVALIDSUPPORTINDEX";
 			case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "INVALIDSOLIDINDEX";
 			case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "INVALIDCOMPONENTINDEX";
+			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY: return "INVALIDEXTERNALEVENTPARAMETERKEY";
+			case LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER: return "COULDNOTFINDEXTERNALEVENTPARAMETER";
+			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "INVALIDEXTERNALEVENTRETURNVALUEKEY";
+			case LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED: return "EXTERNALEVENTVALUEKEYISRESERVED";
+			case LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED: return "EXTERNALEVENTRETURNVALUEKEYISRESERVED";
+			case LIBMCENV_ERROR_INVALIDYUY2BUFFERSIZE: return "INVALIDYUY2BUFFERSIZE";
+			case LIBMCENV_ERROR_YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2: return "YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2";
+			case LIBMCENV_ERROR_INVALIDJPEGDATA: return "INVALIDJPEGDATA";
+			case LIBMCENV_ERROR_INVALIDJPEGBUFFERSIZE: return "INVALIDJPEGBUFFERSIZE";
+			case LIBMCENV_ERROR_COULDNOTINITIALIZEJPEGLIBRARY: return "COULDNOTINITIALIZEJPEGLIBRARY";
+			case LIBMCENV_ERROR_COULDNOTSETJPEGSTOPONWARNING: return "COULDNOTSETJPEGSTOPONWARNING";
+			case LIBMCENV_ERROR_COULDNOTSETFASTUPSAMPLE: return "COULDNOTSETFASTUPSAMPLE";
+			case LIBMCENV_ERROR_COULDNOTSETFASTDCT: return "COULDNOTSETFASTDCT";
+			case LIBMCENV_ERROR_COULDNOTREADJPEGHEADER: return "COULDNOTREADJPEGHEADER";
+			case LIBMCENV_ERROR_INVALIDJPEGIMAGESIZE: return "INVALIDJPEGIMAGESIZE";
+			case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEGCOLORPRECISIONTOOHIGH";
+			case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "COULDNOTDECOMPRESSJPEG";
+			case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "COULDNOTSTOREJPEGIMAGE";
+			case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "INVALIDPNGEXPORTFORMAT";
+			case LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA: return "INVALIDMEMORYCACHEQUOTA";
+			case LIBMCENV_ERROR_NOXAXISCOLUMNGIVEN: return "NOXAXISCOLUMNGIVEN";
+			case LIBMCENV_ERROR_NOYAXISCOLUMNGIVEN: return "NOYAXISCOLUMNGIVEN";
+			case LIBMCENV_ERROR_INVALIDSCATTERPLOTPOINTINDEX: return "INVALIDSCATTERPLOTPOINTINDEX";
+			case LIBMCENV_ERROR_SCATTERPLOTNOTFOUND: return "SCATTERPLOTNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -775,6 +831,30 @@ public:
 			case LIBMCENV_ERROR_INVALIDSUPPORTINDEX: return "Invalid support index";
 			case LIBMCENV_ERROR_INVALIDSOLIDINDEX: return "Invalid solid index";
 			case LIBMCENV_ERROR_INVALIDCOMPONENTINDEX: return "Invalid component index";
+			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTPARAMETERKEY: return "Invalid external event parameter key";
+			case LIBMCENV_ERROR_COULDNOTFINDEXTERNALEVENTPARAMETER: return "Could not find external event parameter";
+			case LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY: return "Invalid external event return value key";
+			case LIBMCENV_ERROR_EXTERNALEVENTVALUEKEYISRESERVED: return "External event value key is reserved.";
+			case LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED: return "External event return value key is reserved.";
+			case LIBMCENV_ERROR_INVALIDYUY2BUFFERSIZE: return "Invalid YUY2 buffer size";
+			case LIBMCENV_ERROR_YUY2PIXELCOUNTMUSTBEAMULTIPLEOF2: return "YUY2 pixel count must be a multiple of 2";
+			case LIBMCENV_ERROR_INVALIDJPEGDATA: return "Invalid JPEG Data size";
+			case LIBMCENV_ERROR_INVALIDJPEGBUFFERSIZE: return "Invalid JPEG Buffer size";
+			case LIBMCENV_ERROR_COULDNOTINITIALIZEJPEGLIBRARY: return "Could not initialize JPEG library";
+			case LIBMCENV_ERROR_COULDNOTSETJPEGSTOPONWARNING: return "Could not set JPEG StopOnWarning";
+			case LIBMCENV_ERROR_COULDNOTSETFASTUPSAMPLE: return "Could not set FastUpSample";
+			case LIBMCENV_ERROR_COULDNOTSETFASTDCT: return "Could not set FastDCT";
+			case LIBMCENV_ERROR_COULDNOTREADJPEGHEADER: return "Could not read JPEG Header";
+			case LIBMCENV_ERROR_INVALIDJPEGIMAGESIZE: return "Invalid JPEG image size";
+			case LIBMCENV_ERROR_JPEGCOLORPRECISIONTOOHIGH: return "JPEG color precision too high";
+			case LIBMCENV_ERROR_COULDNOTDECOMPRESSJPEG: return "Could not decompress JPEG";
+			case LIBMCENV_ERROR_COULDNOTSTOREJPEGIMAGE: return "Could not store JPEG image";
+			case LIBMCENV_ERROR_INVALIDPNGEXPORTFORMAT: return "Invalid PNG Export Format";
+			case LIBMCENV_ERROR_INVALIDMEMORYCACHEQUOTA: return "Invalid memory cache quota";
+			case LIBMCENV_ERROR_NOXAXISCOLUMNGIVEN: return "No X Axis Column given";
+			case LIBMCENV_ERROR_NOYAXISCOLUMNGIVEN: return "No Y Axis Column given";
+			case LIBMCENV_ERROR_INVALIDSCATTERPLOTPOINTINDEX: return "Invalid scatter plot index.";
+			case LIBMCENV_ERROR_SCATTERPLOTNOTFOUND: return "Scatter plot not found";
 		}
 		return "unknown error";
 	}
@@ -897,11 +977,17 @@ private:
 	friend class CCryptoContext;
 	friend class CPNGImageStoreOptions;
 	friend class CPNGImageData;
+	friend class CJPEGImageStoreOptions;
+	friend class CJPEGImageData;
 	friend class CImageData;
+	friend class CImageLoader;
+	friend class CVideoStream;
+	friend class CScatterPlot;
 	friend class CDiscreteFieldData2DStoreOptions;
 	friend class CDiscreteFieldData2D;
 	friend class CDataTableWriteOptions;
 	friend class CDataTableCSVWriteOptions;
+	friend class CDataTableScatterPlotOptions;
 	friend class CDataTable;
 	friend class CDataSeries;
 	friend class CDateTimeDifference;
@@ -924,6 +1010,8 @@ private:
 	friend class CWorkingFileIterator;
 	friend class CWorkingDirectory;
 	friend class CXMLDocumentAttribute;
+	friend class CJSONObject;
+	friend class CJSONArray;
 	friend class CXMLDocumentNode;
 	friend class CXMLDocumentNodes;
 	friend class CXMLDocument;
@@ -1086,6 +1174,8 @@ public:
 	}
 	
 	inline void ResetToDefaults();
+	inline ePNGStorageFormat GetStorageFormat();
+	inline void SetStorageFormat(const ePNGStorageFormat ePNGStorageFormat);
 };
 	
 /*************************************************************************************************************************
@@ -1104,6 +1194,43 @@ public:
 	
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void GetPNGDataStream(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline void WriteToStream(classParam<CTempStreamWriter> pStream);
+};
+	
+/*************************************************************************************************************************
+ Class CJPEGImageStoreOptions 
+**************************************************************************************************************************/
+class CJPEGImageStoreOptions : public CBase {
+public:
+	
+	/**
+	* CJPEGImageStoreOptions::CJPEGImageStoreOptions - Constructor for JPEGImageStoreOptions class.
+	*/
+	CJPEGImageStoreOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void ResetToDefaults();
+};
+	
+/*************************************************************************************************************************
+ Class CJPEGImageData 
+**************************************************************************************************************************/
+class CJPEGImageData : public CBase {
+public:
+	
+	/**
+	* CJPEGImageData::CJPEGImageData - Constructor for JPEGImageData class.
+	*/
+	CJPEGImageData(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void GetJPEGDataStream(std::vector<LibMCEnv_uint8> & JPEGDataBuffer);
+	inline void WriteToStream(classParam<CTempStreamWriter> pStream);
 };
 	
 /*************************************************************************************************************************
@@ -1127,15 +1254,78 @@ public:
 	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
 	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
 	inline void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline PPNGImageStoreOptions CreatePNGOptions();
 	inline PPNGImageData CreatePNGImage(classParam<CPNGImageStoreOptions> pPNGStorageOptions);
-	inline void EncodePNG();
-	inline void GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
-	inline void ClearEncodedPNGData();
+	inline PJPEGImageStoreOptions CreateJPEGOptions();
+	inline PJPEGImageData CreateJPEGImage(classParam<CJPEGImageStoreOptions> pJPEGStorageOptions);
 	inline void Clear(const LibMCEnv_uint32 nValue);
 	inline LibMCEnv_uint32 GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
 	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue);
 	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer);
 	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+	inline void GetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, std::vector<LibMCEnv_uint8> & ValueBuffer);
+	inline void SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
+	inline void SetPixelsFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer);
+	inline void WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset);
+	inline void ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset);
+};
+	
+/*************************************************************************************************************************
+ Class CImageLoader 
+**************************************************************************************************************************/
+class CImageLoader : public CBase {
+public:
+	
+	/**
+	* CImageLoader::CImageLoader - Constructor for ImageLoader class.
+	*/
+	CImageLoader(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadJPEGImage(const CInputVector<LibMCEnv_uint8> & JPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData CreateImageFromRawRGB24Data(const CInputVector<LibMCEnv_uint8> & RGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData CreateImageFromRawRGBA32Data(const CInputVector<LibMCEnv_uint8> & RGBA32DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData CreateImageFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+};
+	
+/*************************************************************************************************************************
+ Class CVideoStream 
+**************************************************************************************************************************/
+class CVideoStream : public CBase {
+public:
+	
+	/**
+	* CVideoStream::CVideoStream - Constructor for VideoStream class.
+	*/
+	CVideoStream(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+};
+	
+/*************************************************************************************************************************
+ Class CScatterPlot 
+**************************************************************************************************************************/
+class CScatterPlot : public CBase {
+public:
+	
+	/**
+	* CScatterPlot::CScatterPlot - Constructor for ScatterPlot class.
+	*/
+	CScatterPlot(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetUUID();
+	inline LibMCEnv_uint32 GetPointCount();
+	inline void GetPointPosition(const LibMCEnv_uint32 nPointIndex, LibMCEnv_double & dX, LibMCEnv_double & dY);
+	inline void GetBoundaries(LibMCEnv_double & dMinX, LibMCEnv_double & dMinY, LibMCEnv_double & dMaxX, LibMCEnv_double & dMaxY);
+	inline void Release();
 };
 	
 /*************************************************************************************************************************
@@ -1228,6 +1418,31 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDataTableScatterPlotOptions 
+**************************************************************************************************************************/
+class CDataTableScatterPlotOptions : public CBase {
+public:
+	
+	/**
+	* CDataTableScatterPlotOptions::CDataTableScatterPlotOptions - Constructor for DataTableScatterPlotOptions class.
+	*/
+	CDataTableScatterPlotOptions(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void SetXAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor);
+	inline std::string GetXAxisColumn();
+	inline LibMCEnv_double GetXAxisScaling();
+	inline LibMCEnv_double GetXAxisOffset();
+	inline void SetYAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor);
+	inline std::string GetYAxisColumn();
+	inline LibMCEnv_double GetYAxisScaling();
+	inline LibMCEnv_double GetYAxisOffset();
+	inline void AddDataChannel(const std::string & sChannelIdentifier, const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor, const LibMCEnv_uint32 nColor);
+};
+	
+/*************************************************************************************************************************
  Class CDataTable 
 **************************************************************************************************************************/
 class CDataTable : public CBase {
@@ -1266,6 +1481,8 @@ public:
 	inline void WriteCSVToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableCSVWriteOptions> pOptions);
 	inline void WriteDataToStream(classParam<CTempStreamWriter> pWriter, classParam<CDataTableWriteOptions> pOptions);
 	inline void LoadFromStream(classParam<CStreamReader> pStream);
+	inline PDataTableScatterPlotOptions CreateScatterPlotOptions();
+	inline PScatterPlot CalculateScatterPlot(classParam<CDataTableScatterPlotOptions> pScatterPlotOptions);
 };
 	
 /*************************************************************************************************************************
@@ -1290,7 +1507,7 @@ public:
 	inline LibMCEnv_uint64 GetMaximum();
 	inline void GetAllEntries(std::vector<sTimeStreamEntry> & EntryArrayBuffer);
 	inline void SetAllEntries(const CInputVector<sTimeStreamEntry> & EntryArrayBuffer);
-	inline void SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta);
+	inline void SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples);
 	inline LibMCEnv_uint32 GetVersion();
 	inline void IncreaseVersion();
 };
@@ -1595,26 +1812,29 @@ public:
 	inline LibMCEnv_uint32 FindCustomSegmentAttributeID(const std::string & sNamespace, const std::string & sAttributeName);
 	inline eToolpathAttributeType FindCustomSegmentAttributeType(const std::string & sNamespace, const std::string & sAttributeName);
 	inline void FindCustomSegmentAttributeInfo(const std::string & sNamespace, const std::string & sAttributeName, LibMCEnv_uint32 & nAttributeID, eToolpathAttributeType & eAttributeType);
-	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex);
-	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex);
-	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
-	inline bool SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue);
-	inline LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue);
-	inline LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue);
-	inline bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName);
-	inline bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue);
-	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
-	inline LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue);
-	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
-	inline LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex);
-	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
-	inline void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer);
-	inline void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer);
-	inline void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatHatch2D> & HatchDataBuffer);
+	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nSegmentIndex);
+	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nSegmentIndex);
+	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nSegmentIndex);
+	inline bool SegmentProfileHasValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline std::string GetSegmentProfileValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue);
+	inline LibMCEnv_double GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline LibMCEnv_double GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue);
+	inline LibMCEnv_int64 GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline LibMCEnv_int64 GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue);
+	inline bool GetSegmentProfileBoolValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName);
+	inline bool GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue);
+	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileValueType eValueType);
+	inline LibMCEnv_double GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue);
+	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nSegmentIndex);
+	inline LibMCEnv_uint32 GetSegmentLocalPartID(const LibMCEnv_uint32 nSegmentIndex);
+	inline void GetSegmentPointData(const LibMCEnv_uint32 nSegmentIndex, std::vector<sPosition2D> & PointDataBuffer);
+	inline void GetSegmentHatchData(const LibMCEnv_uint32 nSegmentIndex, std::vector<sHatch2D> & HatchDataBuffer);
+	inline void GetSegmentPointDataInMM(const LibMCEnv_uint32 nSegmentIndex, std::vector<sFloatPosition2D> & PointDataBuffer);
+	inline void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nSegmentIndex, std::vector<sFloatHatch2D> & HatchDataBuffer);
+	inline bool SegmentHasOverrideFactors(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor);
+	inline void GetSegmentPointOverrides(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<LibMCEnv_double> & OverrideDataBuffer);
+	inline void GetSegmentHatchOverrides(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<sHatch2DOverrides> & OverrideDataBuffer);
 	inline LibMCEnv_int32 GetZValue();
 	inline LibMCEnv_double GetZValueInMM();
 	inline LibMCEnv_double GetUnits();
@@ -1715,7 +1935,7 @@ public:
 	inline void StoreMetaDataString(const std::string & sKey, const std::string & sValue);
 	inline bool HasMetaDataString(const std::string & sKey);
 	inline std::string GetMetaDataString(const std::string & sKey);
-	inline PJournalHandler LoadAttachedJournal();
+	inline PJournalHandler LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes);
 };
 	
 /*************************************************************************************************************************
@@ -1908,6 +2128,70 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CJSONObject 
+**************************************************************************************************************************/
+class CJSONObject : public CBase {
+public:
+	
+	/**
+	* CJSONObject::CJSONObject - Constructor for JSONObject class.
+	*/
+	CJSONObject(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool HasMember(const std::string & sName);
+	inline LibMCEnv_uint64 GetMemberCount();
+	inline void GetMemberName(const LibMCEnv_uint64 nIndex, const std::string & sName);
+	inline eJSONObjectType GetMemberType(const std::string & sName);
+	inline std::string GetValue(const std::string & sName);
+	inline LibMCEnv_int64 GetIntegerValue(const std::string & sName);
+	inline LibMCEnv_double GetDoubleValue(const std::string & sName);
+	inline bool GetBoolValue(const std::string & sName);
+	inline PJSONObject GetObjectValue(const std::string & sName);
+	inline PJSONArray GetArrayValue(const std::string & sName);
+	inline void RemoveMember(const std::string & sName);
+	inline void AddValue(const std::string & sName, const std::string & sValue);
+	inline LibMCEnv_int64 AddIntegerValue(const std::string & sName);
+	inline LibMCEnv_double AddDoubleValue(const std::string & sName);
+	inline bool AddBoolValue(const std::string & sName);
+	inline PJSONObject AddObjectValue(const std::string & sName);
+	inline PJSONArray AddArrayValue(const std::string & sName);
+};
+	
+/*************************************************************************************************************************
+ Class CJSONArray 
+**************************************************************************************************************************/
+class CJSONArray : public CBase {
+public:
+	
+	/**
+	* CJSONArray::CJSONArray - Constructor for JSONArray class.
+	*/
+	CJSONArray(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 GetElementCount();
+	inline eJSONObjectType GetElementType(const LibMCEnv_uint64 nIndex);
+	inline std::string GetValue(const LibMCEnv_uint64 nIndex);
+	inline LibMCEnv_int64 GetIntegerValue(const LibMCEnv_uint64 nIndex);
+	inline LibMCEnv_double GetDoubleValue(const LibMCEnv_uint64 nIndex);
+	inline bool GetBoolValue(const LibMCEnv_uint64 nIndex);
+	inline PJSONObject GetObjectValue(const LibMCEnv_uint64 nIndex);
+	inline PJSONArray GetArrayValue(const LibMCEnv_uint64 nIndex);
+	inline void RemoveElement(const LibMCEnv_uint64 nIndex);
+	inline void AddValue(const std::string & sValue);
+	inline LibMCEnv_int64 AddIntegerValue();
+	inline LibMCEnv_double AddDoubleValue();
+	inline bool AddBoolValue();
+	inline PJSONObject AddObjectValue();
+	inline PJSONArray AddArrayValue();
+};
+	
+/*************************************************************************************************************************
  Class CXMLDocumentNode 
 **************************************************************************************************************************/
 class CXMLDocumentNode : public CBase {
@@ -1956,6 +2240,7 @@ public:
 	inline void RemoveChild(classParam<CXMLDocumentNode> pChildInstance);
 	inline void RemoveChildrenWithName(const std::string & sNameSpace, const std::string & sName);
 	inline void Remove();
+	inline void CopyFrom(classParam<CXMLDocumentNode> pOtherNode);
 };
 	
 /*************************************************************************************************************************
@@ -2143,6 +2428,11 @@ public:
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
+	inline std::string GetStringParameter(const std::string & sParameterName);
+	inline std::string GetUUIDParameter(const std::string & sParameterName);
+	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterName);
+	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterName);
+	inline bool GetBoolParameter(const std::string & sParameterName);
 };
 	
 /*************************************************************************************************************************
@@ -2192,7 +2482,7 @@ public:
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageLoader CreateImageLoader();
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
@@ -2391,14 +2681,8 @@ public:
 	}
 	
 	inline std::string GetVariableName();
-	inline LibMCEnv_uint64 GetStartTimeStamp();
-	inline LibMCEnv_uint64 GetEndTimeStamp();
-	inline LibMCEnv_double ComputeFullAverage();
-	inline LibMCEnv_double ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval);
-	inline LibMCEnv_double ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
-	inline PUniformJournalSampling ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval);
-	inline PUniformJournalSampling ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples);
-	inline void ReceiveRawTimeStream(std::vector<sTimeStreamEntry> & TimeStreamEntriesBuffer);
+	inline LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
+	inline LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
 };
 	
 /*************************************************************************************************************************
@@ -2479,9 +2763,10 @@ public:
 	{
 	}
 	
-	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
-	inline PJournalVariable RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
+	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName);
 	inline PDateTime GetStartTime();
+	inline PDateTime GetEndTime();
+	inline LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds();
 	inline PLogEntryList RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, eLogLevel & eMinLogLevel);
 	inline PLogEntryList RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, eLogLevel & eMinLogLevel);
 	inline PAlertIterator RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
@@ -2568,6 +2853,7 @@ public:
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
 	inline PSignalHandler GetUnhandledSignal(const std::string & sSignalTypeName);
+	inline void ClearAllUnhandledSignals();
 	inline PSignalHandler GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
@@ -2595,10 +2881,11 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline bool HasResourceData(const std::string & sIdentifier);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageLoader CreateImageLoader();
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
@@ -2675,6 +2962,9 @@ public:
 	inline void ActivatePage(const std::string & sPageName);
 	inline void LogOut();
 	inline void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS);
+	inline bool HasResourceData(const std::string & sIdentifier);
+	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
+	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline void ShowHintColored(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS, const sColorRGB & Color, const sColorRGB & FontColor);
 	inline void HideHint();
 	inline void StartStreamDownload(const std::string & sUUID, const std::string & sFilename);
@@ -2703,7 +2993,7 @@ public:
 	inline void SetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_int64 nValue);
 	inline void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
-	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageLoader CreateImageLoader();
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline LibMCEnv_uint64 GetGlobalTimerInMicroseconds();
 	inline PTestEnvironment GetTestEnvironment();
@@ -2744,6 +3034,11 @@ public:
 	inline PDateTime GetCustomDateTime(const LibMCEnv_uint32 nYear, const LibMCEnv_uint32 nMonth, const LibMCEnv_uint32 nDay, const LibMCEnv_uint32 nHour, const LibMCEnv_uint32 nMinute, const LibMCEnv_uint32 nSecond, const LibMCEnv_uint32 nMicrosecond);
 	inline PDateTime GetStartDateTime();
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
+	inline bool HasExternalEventParameter(const std::string & sParameterName);
+	inline std::string GetExternalEventParameter(const std::string & sParameterName);
+	inline void AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue);
+	inline PJSONObject GetExternalEventParameters();
+	inline PJSONObject GetExternalEventResults();
 };
 	
 	/**
@@ -2840,8 +3135,15 @@ public:
 		pWrapperTable->m_CryptoContext_CreateUUID = nullptr;
 		pWrapperTable->m_CryptoContext_NormalizeUUIDString = nullptr;
 		pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults = nullptr;
+		pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat = nullptr;
+		pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat = nullptr;
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_PNGImageData_GetPNGDataStream = nullptr;
+		pWrapperTable->m_PNGImageData_WriteToStream = nullptr;
+		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = nullptr;
+		pWrapperTable->m_JPEGImageData_GetSizeInPixels = nullptr;
+		pWrapperTable->m_JPEGImageData_GetJPEGDataStream = nullptr;
+		pWrapperTable->m_JPEGImageData_WriteToStream = nullptr;
 		pWrapperTable->m_ImageData_GetPixelFormat = nullptr;
 		pWrapperTable->m_ImageData_ChangePixelFormat = nullptr;
 		pWrapperTable->m_ImageData_GetDPI = nullptr;
@@ -2849,15 +3151,30 @@ public:
 		pWrapperTable->m_ImageData_GetSizeInMM = nullptr;
 		pWrapperTable->m_ImageData_GetSizeInPixels = nullptr;
 		pWrapperTable->m_ImageData_ResizeImage = nullptr;
+		pWrapperTable->m_ImageData_CreatePNGOptions = nullptr;
 		pWrapperTable->m_ImageData_CreatePNGImage = nullptr;
-		pWrapperTable->m_ImageData_EncodePNG = nullptr;
-		pWrapperTable->m_ImageData_GetEncodedPNGData = nullptr;
-		pWrapperTable->m_ImageData_ClearEncodedPNGData = nullptr;
+		pWrapperTable->m_ImageData_CreateJPEGOptions = nullptr;
+		pWrapperTable->m_ImageData_CreateJPEGImage = nullptr;
 		pWrapperTable->m_ImageData_Clear = nullptr;
 		pWrapperTable->m_ImageData_GetPixel = nullptr;
 		pWrapperTable->m_ImageData_SetPixel = nullptr;
 		pWrapperTable->m_ImageData_GetPixelRange = nullptr;
 		pWrapperTable->m_ImageData_SetPixelRange = nullptr;
+		pWrapperTable->m_ImageData_GetPixels = nullptr;
+		pWrapperTable->m_ImageData_SetPixels = nullptr;
+		pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data = nullptr;
+		pWrapperTable->m_ImageData_WriteToRawMemory = nullptr;
+		pWrapperTable->m_ImageData_ReadFromRawMemory = nullptr;
+		pWrapperTable->m_ImageLoader_LoadPNGImage = nullptr;
+		pWrapperTable->m_ImageLoader_LoadJPEGImage = nullptr;
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data = nullptr;
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data = nullptr;
+		pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data = nullptr;
+		pWrapperTable->m_ScatterPlot_GetUUID = nullptr;
+		pWrapperTable->m_ScatterPlot_GetPointCount = nullptr;
+		pWrapperTable->m_ScatterPlot_GetPointPosition = nullptr;
+		pWrapperTable->m_ScatterPlot_GetBoundaries = nullptr;
+		pWrapperTable->m_ScatterPlot_Release = nullptr;
 		pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_GetDPI = nullptr;
 		pWrapperTable->m_DiscreteFieldData2D_SetDPI = nullptr;
@@ -2883,6 +3200,15 @@ public:
 		pWrapperTable->m_DiscreteFieldData2D_Duplicate = nullptr;
 		pWrapperTable->m_DataTableCSVWriteOptions_GetSeparator = nullptr;
 		pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_SetXAxisColumn = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisColumn = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisScaling = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisOffset = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_SetYAxisColumn = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisColumn = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisScaling = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisOffset = nullptr;
+		pWrapperTable->m_DataTableScatterPlotOptions_AddDataChannel = nullptr;
 		pWrapperTable->m_DataTable_AddColumn = nullptr;
 		pWrapperTable->m_DataTable_RemoveColumn = nullptr;
 		pWrapperTable->m_DataTable_Clear = nullptr;
@@ -2908,6 +3234,8 @@ public:
 		pWrapperTable->m_DataTable_WriteCSVToStream = nullptr;
 		pWrapperTable->m_DataTable_WriteDataToStream = nullptr;
 		pWrapperTable->m_DataTable_LoadFromStream = nullptr;
+		pWrapperTable->m_DataTable_CreateScatterPlotOptions = nullptr;
+		pWrapperTable->m_DataTable_CalculateScatterPlot = nullptr;
 		pWrapperTable->m_DataSeries_GetName = nullptr;
 		pWrapperTable->m_DataSeries_GetUUID = nullptr;
 		pWrapperTable->m_DataSeries_Clear = nullptr;
@@ -3065,6 +3393,9 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM = nullptr;
+		pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValueInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetUnits = nullptr;
@@ -3211,6 +3542,38 @@ public:
 		pWrapperTable->m_XMLDocumentAttribute_SetDoubleValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_SetBoolValue = nullptr;
 		pWrapperTable->m_XMLDocumentAttribute_Remove = nullptr;
+		pWrapperTable->m_JSONObject_HasMember = nullptr;
+		pWrapperTable->m_JSONObject_GetMemberCount = nullptr;
+		pWrapperTable->m_JSONObject_GetMemberName = nullptr;
+		pWrapperTable->m_JSONObject_GetMemberType = nullptr;
+		pWrapperTable->m_JSONObject_GetValue = nullptr;
+		pWrapperTable->m_JSONObject_GetIntegerValue = nullptr;
+		pWrapperTable->m_JSONObject_GetDoubleValue = nullptr;
+		pWrapperTable->m_JSONObject_GetBoolValue = nullptr;
+		pWrapperTable->m_JSONObject_GetObjectValue = nullptr;
+		pWrapperTable->m_JSONObject_GetArrayValue = nullptr;
+		pWrapperTable->m_JSONObject_RemoveMember = nullptr;
+		pWrapperTable->m_JSONObject_AddValue = nullptr;
+		pWrapperTable->m_JSONObject_AddIntegerValue = nullptr;
+		pWrapperTable->m_JSONObject_AddDoubleValue = nullptr;
+		pWrapperTable->m_JSONObject_AddBoolValue = nullptr;
+		pWrapperTable->m_JSONObject_AddObjectValue = nullptr;
+		pWrapperTable->m_JSONObject_AddArrayValue = nullptr;
+		pWrapperTable->m_JSONArray_GetElementCount = nullptr;
+		pWrapperTable->m_JSONArray_GetElementType = nullptr;
+		pWrapperTable->m_JSONArray_GetValue = nullptr;
+		pWrapperTable->m_JSONArray_GetIntegerValue = nullptr;
+		pWrapperTable->m_JSONArray_GetDoubleValue = nullptr;
+		pWrapperTable->m_JSONArray_GetBoolValue = nullptr;
+		pWrapperTable->m_JSONArray_GetObjectValue = nullptr;
+		pWrapperTable->m_JSONArray_GetArrayValue = nullptr;
+		pWrapperTable->m_JSONArray_RemoveElement = nullptr;
+		pWrapperTable->m_JSONArray_AddValue = nullptr;
+		pWrapperTable->m_JSONArray_AddIntegerValue = nullptr;
+		pWrapperTable->m_JSONArray_AddDoubleValue = nullptr;
+		pWrapperTable->m_JSONArray_AddBoolValue = nullptr;
+		pWrapperTable->m_JSONArray_AddObjectValue = nullptr;
+		pWrapperTable->m_JSONArray_AddArrayValue = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetName = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetNameSpace = nullptr;
 		pWrapperTable->m_XMLDocumentNode_GetTextContent = nullptr;
@@ -3246,6 +3609,7 @@ public:
 		pWrapperTable->m_XMLDocumentNode_RemoveChild = nullptr;
 		pWrapperTable->m_XMLDocumentNode_RemoveChildrenWithName = nullptr;
 		pWrapperTable->m_XMLDocumentNode_Remove = nullptr;
+		pWrapperTable->m_XMLDocumentNode_CopyFrom = nullptr;
 		pWrapperTable->m_XMLDocumentNodes_GetNodeCount = nullptr;
 		pWrapperTable->m_XMLDocumentNodes_GetNode = nullptr;
 		pWrapperTable->m_XMLDocumentNodes_CountNodesByName = nullptr;
@@ -3305,6 +3669,11 @@ public:
 		pWrapperTable->m_DriverStatusUpdateSession_LogWarning = nullptr;
 		pWrapperTable->m_DriverStatusUpdateSession_LogInfo = nullptr;
 		pWrapperTable->m_DriverStatusUpdateSession_Sleep = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection = nullptr;
@@ -3338,7 +3707,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_LogWarning = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
-		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateImageLoader = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
@@ -3409,14 +3778,8 @@ public:
 		pWrapperTable->m_UniformJournalSampling_GetSample = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetAllSamples = nullptr;
 		pWrapperTable->m_JournalVariable_GetVariableName = nullptr;
-		pWrapperTable->m_JournalVariable_GetStartTimeStamp = nullptr;
-		pWrapperTable->m_JournalVariable_GetEndTimeStamp = nullptr;
-		pWrapperTable->m_JournalVariable_ComputeFullAverage = nullptr;
-		pWrapperTable->m_JournalVariable_ComputeAverage = nullptr;
-		pWrapperTable->m_JournalVariable_ComputeSample = nullptr;
-		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = nullptr;
-		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = nullptr;
-		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeDoubleSample = nullptr;
+		pWrapperTable->m_JournalVariable_ComputeIntegerSample = nullptr;
 		pWrapperTable->m_Alert_GetUUID = nullptr;
 		pWrapperTable->m_Alert_IsActive = nullptr;
 		pWrapperTable->m_Alert_GetAlertLevel = nullptr;
@@ -3434,8 +3797,9 @@ public:
 		pWrapperTable->m_LogEntryList_GetEntry = nullptr;
 		pWrapperTable->m_LogEntryList_GetEntryTime = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
-		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = nullptr;
 		pWrapperTable->m_JournalHandler_GetStartTime = nullptr;
+		pWrapperTable->m_JournalHandler_GetEndTime = nullptr;
+		pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveLogEntries = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveAlerts = nullptr;
@@ -3474,6 +3838,7 @@ public:
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals = nullptr;
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
@@ -3501,10 +3866,11 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_HasResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
-		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateImageLoader = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
@@ -3549,6 +3915,9 @@ public:
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
 		pWrapperTable->m_UIEnvironment_LogOut = nullptr;
 		pWrapperTable->m_UIEnvironment_ShowHint = nullptr;
+		pWrapperTable->m_UIEnvironment_HasResourceData = nullptr;
+		pWrapperTable->m_UIEnvironment_LoadResourceData = nullptr;
+		pWrapperTable->m_UIEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_UIEnvironment_ShowHintColored = nullptr;
 		pWrapperTable->m_UIEnvironment_HideHint = nullptr;
 		pWrapperTable->m_UIEnvironment_StartStreamDownload = nullptr;
@@ -3577,7 +3946,7 @@ public:
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger = nullptr;
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
-		pWrapperTable->m_UIEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateImageLoader = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetTestEnvironment = nullptr;
@@ -3618,6 +3987,11 @@ public:
 		pWrapperTable->m_UIEnvironment_GetCustomDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_GetStartDateTime = nullptr;
 		pWrapperTable->m_UIEnvironment_Sleep = nullptr;
+		pWrapperTable->m_UIEnvironment_HasExternalEventParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_AddExternalEventResultValue = nullptr;
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameters = nullptr;
+		pWrapperTable->m_UIEnvironment_GetExternalEventResults = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -3791,6 +4165,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat = (PLibMCEnvPNGImageStoreOptions_GetStorageFormatPtr) GetProcAddress(hLibrary, "libmcenv_pngimagestoreoptions_getstorageformat");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat = (PLibMCEnvPNGImageStoreOptions_GetStorageFormatPtr) dlsym(hLibrary, "libmcenv_pngimagestoreoptions_getstorageformat");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat = (PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr) GetProcAddress(hLibrary, "libmcenv_pngimagestoreoptions_setstorageformat");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat = (PLibMCEnvPNGImageStoreOptions_SetStorageFormatPtr) dlsym(hLibrary, "libmcenv_pngimagestoreoptions_setstorageformat");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = (PLibMCEnvPNGImageData_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_pngimagedata_getsizeinpixels");
 		#else // _WIN32
 		pWrapperTable->m_PNGImageData_GetSizeInPixels = (PLibMCEnvPNGImageData_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_pngimagedata_getsizeinpixels");
@@ -3806,6 +4198,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PNGImageData_WriteToStream = (PLibMCEnvPNGImageData_WriteToStreamPtr) GetProcAddress(hLibrary, "libmcenv_pngimagedata_writetostream");
+		#else // _WIN32
+		pWrapperTable->m_PNGImageData_WriteToStream = (PLibMCEnvPNGImageData_WriteToStreamPtr) dlsym(hLibrary, "libmcenv_pngimagedata_writetostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PNGImageData_WriteToStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = (PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagestoreoptions_resettodefaults");
+		#else // _WIN32
+		pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults = (PLibMCEnvJPEGImageStoreOptions_ResetToDefaultsPtr) dlsym(hLibrary, "libmcenv_jpegimagestoreoptions_resettodefaults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JPEGImageData_GetSizeInPixels = (PLibMCEnvJPEGImageData_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagedata_getsizeinpixels");
+		#else // _WIN32
+		pWrapperTable->m_JPEGImageData_GetSizeInPixels = (PLibMCEnvJPEGImageData_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_jpegimagedata_getsizeinpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JPEGImageData_GetSizeInPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JPEGImageData_GetJPEGDataStream = (PLibMCEnvJPEGImageData_GetJPEGDataStreamPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagedata_getjpegdatastream");
+		#else // _WIN32
+		pWrapperTable->m_JPEGImageData_GetJPEGDataStream = (PLibMCEnvJPEGImageData_GetJPEGDataStreamPtr) dlsym(hLibrary, "libmcenv_jpegimagedata_getjpegdatastream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JPEGImageData_GetJPEGDataStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JPEGImageData_WriteToStream = (PLibMCEnvJPEGImageData_WriteToStreamPtr) GetProcAddress(hLibrary, "libmcenv_jpegimagedata_writetostream");
+		#else // _WIN32
+		pWrapperTable->m_JPEGImageData_WriteToStream = (PLibMCEnvJPEGImageData_WriteToStreamPtr) dlsym(hLibrary, "libmcenv_jpegimagedata_writetostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JPEGImageData_WriteToStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3872,6 +4309,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ImageData_CreatePNGOptions = (PLibMCEnvImageData_CreatePNGOptionsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createpngoptions");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_CreatePNGOptions = (PLibMCEnvImageData_CreatePNGOptionsPtr) dlsym(hLibrary, "libmcenv_imagedata_createpngoptions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_CreatePNGOptions == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ImageData_CreatePNGImage = (PLibMCEnvImageData_CreatePNGImagePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createpngimage");
 		#else // _WIN32
 		pWrapperTable->m_ImageData_CreatePNGImage = (PLibMCEnvImageData_CreatePNGImagePtr) dlsym(hLibrary, "libmcenv_imagedata_createpngimage");
@@ -3881,30 +4327,21 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ImageData_EncodePNG = (PLibMCEnvImageData_EncodePNGPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_encodepng");
+		pWrapperTable->m_ImageData_CreateJPEGOptions = (PLibMCEnvImageData_CreateJPEGOptionsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createjpegoptions");
 		#else // _WIN32
-		pWrapperTable->m_ImageData_EncodePNG = (PLibMCEnvImageData_EncodePNGPtr) dlsym(hLibrary, "libmcenv_imagedata_encodepng");
+		pWrapperTable->m_ImageData_CreateJPEGOptions = (PLibMCEnvImageData_CreateJPEGOptionsPtr) dlsym(hLibrary, "libmcenv_imagedata_createjpegoptions");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ImageData_EncodePNG == nullptr)
+		if (pWrapperTable->m_ImageData_CreateJPEGOptions == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ImageData_GetEncodedPNGData = (PLibMCEnvImageData_GetEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getencodedpngdata");
+		pWrapperTable->m_ImageData_CreateJPEGImage = (PLibMCEnvImageData_CreateJPEGImagePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_createjpegimage");
 		#else // _WIN32
-		pWrapperTable->m_ImageData_GetEncodedPNGData = (PLibMCEnvImageData_GetEncodedPNGDataPtr) dlsym(hLibrary, "libmcenv_imagedata_getencodedpngdata");
+		pWrapperTable->m_ImageData_CreateJPEGImage = (PLibMCEnvImageData_CreateJPEGImagePtr) dlsym(hLibrary, "libmcenv_imagedata_createjpegimage");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ImageData_GetEncodedPNGData == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageData_ClearEncodedPNGData = (PLibMCEnvImageData_ClearEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_clearencodedpngdata");
-		#else // _WIN32
-		pWrapperTable->m_ImageData_ClearEncodedPNGData = (PLibMCEnvImageData_ClearEncodedPNGDataPtr) dlsym(hLibrary, "libmcenv_imagedata_clearencodedpngdata");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageData_ClearEncodedPNGData == nullptr)
+		if (pWrapperTable->m_ImageData_CreateJPEGImage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3950,6 +4387,141 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageData_SetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetPixels = (PLibMCEnvImageData_GetPixelsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixels");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetPixels = (PLibMCEnvImageData_GetPixelsPtr) dlsym(hLibrary, "libmcenv_imagedata_getpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetPixels = (PLibMCEnvImageData_SetPixelsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setpixels");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetPixels = (PLibMCEnvImageData_SetPixelsPtr) dlsym(hLibrary, "libmcenv_imagedata_setpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data = (PLibMCEnvImageData_SetPixelsFromRawYUY2DataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setpixelsfromrawyuy2data");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data = (PLibMCEnvImageData_SetPixelsFromRawYUY2DataPtr) dlsym(hLibrary, "libmcenv_imagedata_setpixelsfromrawyuy2data");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_WriteToRawMemory = (PLibMCEnvImageData_WriteToRawMemoryPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_writetorawmemory");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_WriteToRawMemory = (PLibMCEnvImageData_WriteToRawMemoryPtr) dlsym(hLibrary, "libmcenv_imagedata_writetorawmemory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_WriteToRawMemory == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_ReadFromRawMemory = (PLibMCEnvImageData_ReadFromRawMemoryPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_readfromrawmemory");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_ReadFromRawMemory = (PLibMCEnvImageData_ReadFromRawMemoryPtr) dlsym(hLibrary, "libmcenv_imagedata_readfromrawmemory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_ReadFromRawMemory == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_LoadPNGImage = (PLibMCEnvImageLoader_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_imageloader_loadpngimage");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_LoadPNGImage = (PLibMCEnvImageLoader_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_imageloader_loadpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_LoadPNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_LoadJPEGImage = (PLibMCEnvImageLoader_LoadJPEGImagePtr) GetProcAddress(hLibrary, "libmcenv_imageloader_loadjpegimage");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_LoadJPEGImage = (PLibMCEnvImageLoader_LoadJPEGImagePtr) dlsym(hLibrary, "libmcenv_imageloader_loadjpegimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_LoadJPEGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data = (PLibMCEnvImageLoader_CreateImageFromRawRGB24DataPtr) GetProcAddress(hLibrary, "libmcenv_imageloader_createimagefromrawrgb24data");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data = (PLibMCEnvImageLoader_CreateImageFromRawRGB24DataPtr) dlsym(hLibrary, "libmcenv_imageloader_createimagefromrawrgb24data");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data = (PLibMCEnvImageLoader_CreateImageFromRawRGBA32DataPtr) GetProcAddress(hLibrary, "libmcenv_imageloader_createimagefromrawrgba32data");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data = (PLibMCEnvImageLoader_CreateImageFromRawRGBA32DataPtr) dlsym(hLibrary, "libmcenv_imageloader_createimagefromrawrgba32data");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data = (PLibMCEnvImageLoader_CreateImageFromRawYUY2DataPtr) GetProcAddress(hLibrary, "libmcenv_imageloader_createimagefromrawyuy2data");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data = (PLibMCEnvImageLoader_CreateImageFromRawYUY2DataPtr) dlsym(hLibrary, "libmcenv_imageloader_createimagefromrawyuy2data");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ScatterPlot_GetUUID = (PLibMCEnvScatterPlot_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_scatterplot_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_ScatterPlot_GetUUID = (PLibMCEnvScatterPlot_GetUUIDPtr) dlsym(hLibrary, "libmcenv_scatterplot_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ScatterPlot_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ScatterPlot_GetPointCount = (PLibMCEnvScatterPlot_GetPointCountPtr) GetProcAddress(hLibrary, "libmcenv_scatterplot_getpointcount");
+		#else // _WIN32
+		pWrapperTable->m_ScatterPlot_GetPointCount = (PLibMCEnvScatterPlot_GetPointCountPtr) dlsym(hLibrary, "libmcenv_scatterplot_getpointcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ScatterPlot_GetPointCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ScatterPlot_GetPointPosition = (PLibMCEnvScatterPlot_GetPointPositionPtr) GetProcAddress(hLibrary, "libmcenv_scatterplot_getpointposition");
+		#else // _WIN32
+		pWrapperTable->m_ScatterPlot_GetPointPosition = (PLibMCEnvScatterPlot_GetPointPositionPtr) dlsym(hLibrary, "libmcenv_scatterplot_getpointposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ScatterPlot_GetPointPosition == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ScatterPlot_GetBoundaries = (PLibMCEnvScatterPlot_GetBoundariesPtr) GetProcAddress(hLibrary, "libmcenv_scatterplot_getboundaries");
+		#else // _WIN32
+		pWrapperTable->m_ScatterPlot_GetBoundaries = (PLibMCEnvScatterPlot_GetBoundariesPtr) dlsym(hLibrary, "libmcenv_scatterplot_getboundaries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ScatterPlot_GetBoundaries == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ScatterPlot_Release = (PLibMCEnvScatterPlot_ReleasePtr) GetProcAddress(hLibrary, "libmcenv_scatterplot_release");
+		#else // _WIN32
+		pWrapperTable->m_ScatterPlot_Release = (PLibMCEnvScatterPlot_ReleasePtr) dlsym(hLibrary, "libmcenv_scatterplot_release");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ScatterPlot_Release == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4178,6 +4750,87 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_SetXAxisColumn = (PLibMCEnvDataTableScatterPlotOptions_SetXAxisColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_setxaxiscolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_SetXAxisColumn = (PLibMCEnvDataTableScatterPlotOptions_SetXAxisColumnPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_setxaxiscolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_SetXAxisColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisColumn = (PLibMCEnvDataTableScatterPlotOptions_GetXAxisColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_getxaxiscolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisColumn = (PLibMCEnvDataTableScatterPlotOptions_GetXAxisColumnPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_getxaxiscolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisScaling = (PLibMCEnvDataTableScatterPlotOptions_GetXAxisScalingPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_getxaxisscaling");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisScaling = (PLibMCEnvDataTableScatterPlotOptions_GetXAxisScalingPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_getxaxisscaling");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisScaling == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisOffset = (PLibMCEnvDataTableScatterPlotOptions_GetXAxisOffsetPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_getxaxisoffset");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisOffset = (PLibMCEnvDataTableScatterPlotOptions_GetXAxisOffsetPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_getxaxisoffset");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisOffset == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_SetYAxisColumn = (PLibMCEnvDataTableScatterPlotOptions_SetYAxisColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_setyaxiscolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_SetYAxisColumn = (PLibMCEnvDataTableScatterPlotOptions_SetYAxisColumnPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_setyaxiscolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_SetYAxisColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisColumn = (PLibMCEnvDataTableScatterPlotOptions_GetYAxisColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_getyaxiscolumn");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisColumn = (PLibMCEnvDataTableScatterPlotOptions_GetYAxisColumnPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_getyaxiscolumn");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisColumn == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisScaling = (PLibMCEnvDataTableScatterPlotOptions_GetYAxisScalingPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_getyaxisscaling");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisScaling = (PLibMCEnvDataTableScatterPlotOptions_GetYAxisScalingPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_getyaxisscaling");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisScaling == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisOffset = (PLibMCEnvDataTableScatterPlotOptions_GetYAxisOffsetPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_getyaxisoffset");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisOffset = (PLibMCEnvDataTableScatterPlotOptions_GetYAxisOffsetPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_getyaxisoffset");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisOffset == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_AddDataChannel = (PLibMCEnvDataTableScatterPlotOptions_AddDataChannelPtr) GetProcAddress(hLibrary, "libmcenv_datatablescatterplotoptions_adddatachannel");
+		#else // _WIN32
+		pWrapperTable->m_DataTableScatterPlotOptions_AddDataChannel = (PLibMCEnvDataTableScatterPlotOptions_AddDataChannelPtr) dlsym(hLibrary, "libmcenv_datatablescatterplotoptions_adddatachannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTableScatterPlotOptions_AddDataChannel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataTable_AddColumn = (PLibMCEnvDataTable_AddColumnPtr) GetProcAddress(hLibrary, "libmcenv_datatable_addcolumn");
 		#else // _WIN32
 		pWrapperTable->m_DataTable_AddColumn = (PLibMCEnvDataTable_AddColumnPtr) dlsym(hLibrary, "libmcenv_datatable_addcolumn");
@@ -4400,6 +5053,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataTable_LoadFromStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_CreateScatterPlotOptions = (PLibMCEnvDataTable_CreateScatterPlotOptionsPtr) GetProcAddress(hLibrary, "libmcenv_datatable_createscatterplotoptions");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_CreateScatterPlotOptions = (PLibMCEnvDataTable_CreateScatterPlotOptionsPtr) dlsym(hLibrary, "libmcenv_datatable_createscatterplotoptions");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_CreateScatterPlotOptions == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataTable_CalculateScatterPlot = (PLibMCEnvDataTable_CalculateScatterPlotPtr) GetProcAddress(hLibrary, "libmcenv_datatable_calculatescatterplot");
+		#else // _WIN32
+		pWrapperTable->m_DataTable_CalculateScatterPlot = (PLibMCEnvDataTable_CalculateScatterPlotPtr) dlsym(hLibrary, "libmcenv_datatable_calculatescatterplot");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataTable_CalculateScatterPlot == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5816,6 +6487,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors = (PLibMCEnvToolpathLayer_SegmentHasOverrideFactorsPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_segmenthasoverridefactors");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors = (PLibMCEnvToolpathLayer_SegmentHasOverrideFactorsPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_segmenthasoverridefactors");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides = (PLibMCEnvToolpathLayer_GetSegmentPointOverridesPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentpointoverrides");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides = (PLibMCEnvToolpathLayer_GetSegmentPointOverridesPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentpointoverrides");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides = (PLibMCEnvToolpathLayer_GetSegmentHatchOverridesPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchoverrides");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides = (PLibMCEnvToolpathLayer_GetSegmentHatchOverridesPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchoverrides");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetZValue = (PLibMCEnvToolpathLayer_GetZValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getzvalue");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetZValue = (PLibMCEnvToolpathLayer_GetZValuePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getzvalue");
@@ -7130,6 +7828,294 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_HasMember = (PLibMCEnvJSONObject_HasMemberPtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_hasmember");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_HasMember = (PLibMCEnvJSONObject_HasMemberPtr) dlsym(hLibrary, "libmcenv_jsonobject_hasmember");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_HasMember == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetMemberCount = (PLibMCEnvJSONObject_GetMemberCountPtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getmembercount");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetMemberCount = (PLibMCEnvJSONObject_GetMemberCountPtr) dlsym(hLibrary, "libmcenv_jsonobject_getmembercount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetMemberCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetMemberName = (PLibMCEnvJSONObject_GetMemberNamePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getmembername");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetMemberName = (PLibMCEnvJSONObject_GetMemberNamePtr) dlsym(hLibrary, "libmcenv_jsonobject_getmembername");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetMemberName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetMemberType = (PLibMCEnvJSONObject_GetMemberTypePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getmembertype");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetMemberType = (PLibMCEnvJSONObject_GetMemberTypePtr) dlsym(hLibrary, "libmcenv_jsonobject_getmembertype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetMemberType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetValue = (PLibMCEnvJSONObject_GetValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetValue = (PLibMCEnvJSONObject_GetValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetIntegerValue = (PLibMCEnvJSONObject_GetIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetIntegerValue = (PLibMCEnvJSONObject_GetIntegerValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetDoubleValue = (PLibMCEnvJSONObject_GetDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getdoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetDoubleValue = (PLibMCEnvJSONObject_GetDoubleValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getdoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetBoolValue = (PLibMCEnvJSONObject_GetBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetBoolValue = (PLibMCEnvJSONObject_GetBoolValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetObjectValue = (PLibMCEnvJSONObject_GetObjectValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getobjectvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetObjectValue = (PLibMCEnvJSONObject_GetObjectValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getobjectvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetObjectValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_GetArrayValue = (PLibMCEnvJSONObject_GetArrayValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_getarrayvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_GetArrayValue = (PLibMCEnvJSONObject_GetArrayValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_getarrayvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_GetArrayValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_RemoveMember = (PLibMCEnvJSONObject_RemoveMemberPtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_removemember");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_RemoveMember = (PLibMCEnvJSONObject_RemoveMemberPtr) dlsym(hLibrary, "libmcenv_jsonobject_removemember");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_RemoveMember == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_AddValue = (PLibMCEnvJSONObject_AddValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_addvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_AddValue = (PLibMCEnvJSONObject_AddValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_addvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_AddValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_AddIntegerValue = (PLibMCEnvJSONObject_AddIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_addintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_AddIntegerValue = (PLibMCEnvJSONObject_AddIntegerValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_addintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_AddIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_AddDoubleValue = (PLibMCEnvJSONObject_AddDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_adddoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_AddDoubleValue = (PLibMCEnvJSONObject_AddDoubleValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_adddoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_AddDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_AddBoolValue = (PLibMCEnvJSONObject_AddBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_addboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_AddBoolValue = (PLibMCEnvJSONObject_AddBoolValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_addboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_AddBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_AddObjectValue = (PLibMCEnvJSONObject_AddObjectValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_addobjectvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_AddObjectValue = (PLibMCEnvJSONObject_AddObjectValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_addobjectvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_AddObjectValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONObject_AddArrayValue = (PLibMCEnvJSONObject_AddArrayValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonobject_addarrayvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONObject_AddArrayValue = (PLibMCEnvJSONObject_AddArrayValuePtr) dlsym(hLibrary, "libmcenv_jsonobject_addarrayvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONObject_AddArrayValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_GetElementCount = (PLibMCEnvJSONArray_GetElementCountPtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_getelementcount");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_GetElementCount = (PLibMCEnvJSONArray_GetElementCountPtr) dlsym(hLibrary, "libmcenv_jsonarray_getelementcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_GetElementCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_GetElementType = (PLibMCEnvJSONArray_GetElementTypePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_getelementtype");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_GetElementType = (PLibMCEnvJSONArray_GetElementTypePtr) dlsym(hLibrary, "libmcenv_jsonarray_getelementtype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_GetElementType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_GetValue = (PLibMCEnvJSONArray_GetValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_getvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_GetValue = (PLibMCEnvJSONArray_GetValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_getvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_GetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_GetIntegerValue = (PLibMCEnvJSONArray_GetIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_getintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_GetIntegerValue = (PLibMCEnvJSONArray_GetIntegerValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_getintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_GetIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_GetDoubleValue = (PLibMCEnvJSONArray_GetDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_getdoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_GetDoubleValue = (PLibMCEnvJSONArray_GetDoubleValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_getdoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_GetDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_GetBoolValue = (PLibMCEnvJSONArray_GetBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_getboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_GetBoolValue = (PLibMCEnvJSONArray_GetBoolValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_getboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_GetBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_GetObjectValue = (PLibMCEnvJSONArray_GetObjectValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_getobjectvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_GetObjectValue = (PLibMCEnvJSONArray_GetObjectValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_getobjectvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_GetObjectValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_GetArrayValue = (PLibMCEnvJSONArray_GetArrayValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_getarrayvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_GetArrayValue = (PLibMCEnvJSONArray_GetArrayValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_getarrayvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_GetArrayValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_RemoveElement = (PLibMCEnvJSONArray_RemoveElementPtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_removeelement");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_RemoveElement = (PLibMCEnvJSONArray_RemoveElementPtr) dlsym(hLibrary, "libmcenv_jsonarray_removeelement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_RemoveElement == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_AddValue = (PLibMCEnvJSONArray_AddValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_addvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_AddValue = (PLibMCEnvJSONArray_AddValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_addvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_AddValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_AddIntegerValue = (PLibMCEnvJSONArray_AddIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_addintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_AddIntegerValue = (PLibMCEnvJSONArray_AddIntegerValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_addintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_AddIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_AddDoubleValue = (PLibMCEnvJSONArray_AddDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_adddoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_AddDoubleValue = (PLibMCEnvJSONArray_AddDoubleValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_adddoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_AddDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_AddBoolValue = (PLibMCEnvJSONArray_AddBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_addboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_AddBoolValue = (PLibMCEnvJSONArray_AddBoolValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_addboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_AddBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_AddObjectValue = (PLibMCEnvJSONArray_AddObjectValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_addobjectvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_AddObjectValue = (PLibMCEnvJSONArray_AddObjectValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_addobjectvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_AddObjectValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JSONArray_AddArrayValue = (PLibMCEnvJSONArray_AddArrayValuePtr) GetProcAddress(hLibrary, "libmcenv_jsonarray_addarrayvalue");
+		#else // _WIN32
+		pWrapperTable->m_JSONArray_AddArrayValue = (PLibMCEnvJSONArray_AddArrayValuePtr) dlsym(hLibrary, "libmcenv_jsonarray_addarrayvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JSONArray_AddArrayValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_XMLDocumentNode_GetName = (PLibMCEnvXMLDocumentNode_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_getname");
 		#else // _WIN32
 		pWrapperTable->m_XMLDocumentNode_GetName = (PLibMCEnvXMLDocumentNode_GetNamePtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_getname");
@@ -7442,6 +8428,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_XMLDocumentNode_Remove == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_XMLDocumentNode_CopyFrom = (PLibMCEnvXMLDocumentNode_CopyFromPtr) GetProcAddress(hLibrary, "libmcenv_xmldocumentnode_copyfrom");
+		#else // _WIN32
+		pWrapperTable->m_XMLDocumentNode_CopyFrom = (PLibMCEnvXMLDocumentNode_CopyFromPtr) dlsym(hLibrary, "libmcenv_xmldocumentnode_copyfrom");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_XMLDocumentNode_CopyFrom == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -7976,6 +8971,51 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter = (PLibMCEnvDriverStatusUpdateSession_GetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter = (PLibMCEnvDriverStatusUpdateSession_GetStringParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter = (PLibMCEnvDriverStatusUpdateSession_GetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getuuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter = (PLibMCEnvDriverStatusUpdateSession_GetUUIDParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getuuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter = (PLibMCEnvDriverStatusUpdateSession_GetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter = (PLibMCEnvDriverStatusUpdateSession_GetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter = (PLibMCEnvDriverStatusUpdateSession_GetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter = (PLibMCEnvDriverStatusUpdateSession_GetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter = (PLibMCEnvDriverStatusUpdateSession_GetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_getboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter = (PLibMCEnvDriverStatusUpdateSession_GetBoolParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_getboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = (PLibMCEnvDriverEnvironment_CreateStatusUpdateSessionPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createstatusupdatesession");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = (PLibMCEnvDriverEnvironment_CreateStatusUpdateSessionPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createstatusupdatesession");
@@ -8273,12 +9313,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DriverEnvironment_LoadPNGImage = (PLibMCEnvDriverEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_loadpngimage");
+		pWrapperTable->m_DriverEnvironment_CreateImageLoader = (PLibMCEnvDriverEnvironment_CreateImageLoaderPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createimageloader");
 		#else // _WIN32
-		pWrapperTable->m_DriverEnvironment_LoadPNGImage = (PLibMCEnvDriverEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_loadpngimage");
+		pWrapperTable->m_DriverEnvironment_CreateImageLoader = (PLibMCEnvDriverEnvironment_CreateImageLoaderPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createimageloader");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr)
+		if (pWrapperTable->m_DriverEnvironment_CreateImageLoader == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8912,75 +9952,21 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_GetStartTimeStamp = (PLibMCEnvJournalVariable_GetStartTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getstarttimestamp");
+		pWrapperTable->m_JournalVariable_ComputeDoubleSample = (PLibMCEnvJournalVariable_ComputeDoubleSamplePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computedoublesample");
 		#else // _WIN32
-		pWrapperTable->m_JournalVariable_GetStartTimeStamp = (PLibMCEnvJournalVariable_GetStartTimeStampPtr) dlsym(hLibrary, "libmcenv_journalvariable_getstarttimestamp");
+		pWrapperTable->m_JournalVariable_ComputeDoubleSample = (PLibMCEnvJournalVariable_ComputeDoubleSamplePtr) dlsym(hLibrary, "libmcenv_journalvariable_computedoublesample");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_GetStartTimeStamp == nullptr)
+		if (pWrapperTable->m_JournalVariable_ComputeDoubleSample == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_GetEndTimeStamp = (PLibMCEnvJournalVariable_GetEndTimeStampPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getendtimestamp");
+		pWrapperTable->m_JournalVariable_ComputeIntegerSample = (PLibMCEnvJournalVariable_ComputeIntegerSamplePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeintegersample");
 		#else // _WIN32
-		pWrapperTable->m_JournalVariable_GetEndTimeStamp = (PLibMCEnvJournalVariable_GetEndTimeStampPtr) dlsym(hLibrary, "libmcenv_journalvariable_getendtimestamp");
+		pWrapperTable->m_JournalVariable_ComputeIntegerSample = (PLibMCEnvJournalVariable_ComputeIntegerSamplePtr) dlsym(hLibrary, "libmcenv_journalvariable_computeintegersample");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_ComputeFullAverage = (PLibMCEnvJournalVariable_ComputeFullAveragePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computefullaverage");
-		#else // _WIN32
-		pWrapperTable->m_JournalVariable_ComputeFullAverage = (PLibMCEnvJournalVariable_ComputeFullAveragePtr) dlsym(hLibrary, "libmcenv_journalvariable_computefullaverage");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_ComputeFullAverage == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_ComputeAverage = (PLibMCEnvJournalVariable_ComputeAveragePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeaverage");
-		#else // _WIN32
-		pWrapperTable->m_JournalVariable_ComputeAverage = (PLibMCEnvJournalVariable_ComputeAveragePtr) dlsym(hLibrary, "libmcenv_journalvariable_computeaverage");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_ComputeSample = (PLibMCEnvJournalVariable_ComputeSamplePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computesample");
-		#else // _WIN32
-		pWrapperTable->m_JournalVariable_ComputeSample = (PLibMCEnvJournalVariable_ComputeSamplePtr) dlsym(hLibrary, "libmcenv_journalvariable_computesample");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_ComputeSample == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
-		#else // _WIN32
-		pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples = (PLibMCEnvJournalVariable_ComputeUniformAverageSamplesPtr) dlsym(hLibrary, "libmcenv_journalvariable_computeuniformaveragesamples");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = (PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_computeequidistantsamples");
-		#else // _WIN32
-		pWrapperTable->m_JournalVariable_ComputeEquidistantSamples = (PLibMCEnvJournalVariable_ComputeEquidistantSamplesPtr) dlsym(hLibrary, "libmcenv_journalvariable_computeequidistantsamples");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_ComputeEquidistantSamples == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = (PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_receiverawtimestream");
-		#else // _WIN32
-		pWrapperTable->m_JournalVariable_ReceiveRawTimeStream = (PLibMCEnvJournalVariable_ReceiveRawTimeStreamPtr) dlsym(hLibrary, "libmcenv_journalvariable_receiverawtimestream");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalVariable_ReceiveRawTimeStream == nullptr)
+		if (pWrapperTable->m_JournalVariable_ComputeIntegerSample == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9137,21 +10123,30 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval");
-		#else // _WIN32
-		pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval = (PLibMCEnvJournalHandler_RetrieveJournalVariableFromTimeIntervalPtr) dlsym(hLibrary, "libmcenv_journalhandler_retrievejournalvariablefromtimeinterval");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_JournalHandler_GetStartTime = (PLibMCEnvJournalHandler_GetStartTimePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getstarttime");
 		#else // _WIN32
 		pWrapperTable->m_JournalHandler_GetStartTime = (PLibMCEnvJournalHandler_GetStartTimePtr) dlsym(hLibrary, "libmcenv_journalhandler_getstarttime");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalHandler_GetStartTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_GetEndTime = (PLibMCEnvJournalHandler_GetEndTimePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getendtime");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_GetEndTime = (PLibMCEnvJournalHandler_GetEndTimePtr) dlsym(hLibrary, "libmcenv_journalhandler_getendtime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_GetEndTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds = (PLibMCEnvJournalHandler_GetJournalLifeTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getjournallifetimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds = (PLibMCEnvJournalHandler_GetJournalLifeTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_journalhandler_getjournallifetimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -9497,6 +10492,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals = (PLibMCEnvStateEnvironment_ClearAllUnhandledSignalsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_clearallunhandledsignals");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals = (PLibMCEnvStateEnvironment_ClearAllUnhandledSignalsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_clearallunhandledsignals");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = (PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getunhandledsignalbyuuid");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = (PLibMCEnvStateEnvironment_GetUnhandledSignalByUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getunhandledsignalbyuuid");
@@ -9740,6 +10744,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
@@ -9767,12 +10780,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_LoadPNGImage = (PLibMCEnvStateEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadpngimage");
+		pWrapperTable->m_StateEnvironment_CreateImageLoader = (PLibMCEnvStateEnvironment_CreateImageLoaderPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createimageloader");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_LoadPNGImage = (PLibMCEnvStateEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadpngimage");
+		pWrapperTable->m_StateEnvironment_CreateImageLoader = (PLibMCEnvStateEnvironment_CreateImageLoaderPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createimageloader");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr)
+		if (pWrapperTable->m_StateEnvironment_CreateImageLoader == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10172,6 +11185,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasResourceData = (PLibMCEnvUIEnvironment_HasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasResourceData = (PLibMCEnvUIEnvironment_HasResourceDataPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LoadResourceData = (PLibMCEnvUIEnvironment_LoadResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LoadResourceData = (PLibMCEnvUIEnvironment_LoadResourceDataPtr) dlsym(hLibrary, "libmcenv_uienvironment_loadresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LoadResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LoadResourceString = (PLibMCEnvUIEnvironment_LoadResourceStringPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadresourcestring");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LoadResourceString = (PLibMCEnvUIEnvironment_LoadResourceStringPtr) dlsym(hLibrary, "libmcenv_uienvironment_loadresourcestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LoadResourceString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_ShowHintColored = (PLibMCEnvUIEnvironment_ShowHintColoredPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_showhintcolored");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_ShowHintColored = (PLibMCEnvUIEnvironment_ShowHintColoredPtr) dlsym(hLibrary, "libmcenv_uienvironment_showhintcolored");
@@ -10424,12 +11464,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_LoadPNGImage = (PLibMCEnvUIEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadpngimage");
+		pWrapperTable->m_UIEnvironment_CreateImageLoader = (PLibMCEnvUIEnvironment_CreateImageLoaderPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createimageloader");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_LoadPNGImage = (PLibMCEnvUIEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_uienvironment_loadpngimage");
+		pWrapperTable->m_UIEnvironment_CreateImageLoader = (PLibMCEnvUIEnvironment_CreateImageLoaderPtr) dlsym(hLibrary, "libmcenv_uienvironment_createimageloader");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr)
+		if (pWrapperTable->m_UIEnvironment_CreateImageLoader == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10793,6 +11833,51 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasExternalEventParameter = (PLibMCEnvUIEnvironment_HasExternalEventParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasexternaleventparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasExternalEventParameter = (PLibMCEnvUIEnvironment_HasExternalEventParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_hasexternaleventparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasExternalEventParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameter = (PLibMCEnvUIEnvironment_GetExternalEventParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getexternaleventparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameter = (PLibMCEnvUIEnvironment_GetExternalEventParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getexternaleventparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetExternalEventParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_AddExternalEventResultValue = (PLibMCEnvUIEnvironment_AddExternalEventResultValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_addexternaleventresultvalue");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_AddExternalEventResultValue = (PLibMCEnvUIEnvironment_AddExternalEventResultValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_addexternaleventresultvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_AddExternalEventResultValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameters = (PLibMCEnvUIEnvironment_GetExternalEventParametersPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getexternaleventparameters");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetExternalEventParameters = (PLibMCEnvUIEnvironment_GetExternalEventParametersPtr) dlsym(hLibrary, "libmcenv_uienvironment_getexternaleventparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetExternalEventParameters == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetExternalEventResults = (PLibMCEnvUIEnvironment_GetExternalEventResultsPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getexternaleventresults");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetExternalEventResults = (PLibMCEnvUIEnvironment_GetExternalEventResultsPtr) dlsym(hLibrary, "libmcenv_uienvironment_getexternaleventresults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetExternalEventResults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -10905,12 +11990,40 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageStoreOptions_ResetToDefaults == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_pngimagestoreoptions_getstorageformat", (void**)&(pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageStoreOptions_GetStorageFormat == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_pngimagestoreoptions_setstorageformat", (void**)&(pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageStoreOptions_SetStorageFormat == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_pngimagedata_getsizeinpixels", (void**)&(pWrapperTable->m_PNGImageData_GetSizeInPixels));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetSizeInPixels == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_pngimagedata_getpngdatastream", (void**)&(pWrapperTable->m_PNGImageData_GetPNGDataStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_GetPNGDataStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_pngimagedata_writetostream", (void**)&(pWrapperTable->m_PNGImageData_WriteToStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PNGImageData_WriteToStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jpegimagestoreoptions_resettodefaults", (void**)&(pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageStoreOptions_ResetToDefaults == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jpegimagedata_getsizeinpixels", (void**)&(pWrapperTable->m_JPEGImageData_GetSizeInPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageData_GetSizeInPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jpegimagedata_getjpegdatastream", (void**)&(pWrapperTable->m_JPEGImageData_GetJPEGDataStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageData_GetJPEGDataStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jpegimagedata_writetostream", (void**)&(pWrapperTable->m_JPEGImageData_WriteToStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JPEGImageData_WriteToStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelformat", (void**)&(pWrapperTable->m_ImageData_GetPixelFormat));
@@ -10941,20 +12054,20 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ResizeImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_imagedata_createpngoptions", (void**)&(pWrapperTable->m_ImageData_CreatePNGOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreatePNGOptions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_imagedata_createpngimage", (void**)&(pWrapperTable->m_ImageData_CreatePNGImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreatePNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_imagedata_encodepng", (void**)&(pWrapperTable->m_ImageData_EncodePNG));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_EncodePNG == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_imagedata_createjpegoptions", (void**)&(pWrapperTable->m_ImageData_CreateJPEGOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreateJPEGOptions == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_imagedata_getencodedpngdata", (void**)&(pWrapperTable->m_ImageData_GetEncodedPNGData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetEncodedPNGData == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_imagedata_clearencodedpngdata", (void**)&(pWrapperTable->m_ImageData_ClearEncodedPNGData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ClearEncodedPNGData == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_imagedata_createjpegimage", (void**)&(pWrapperTable->m_ImageData_CreateJPEGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_CreateJPEGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_clear", (void**)&(pWrapperTable->m_ImageData_Clear));
@@ -10975,6 +12088,66 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_setpixelrange", (void**)&(pWrapperTable->m_ImageData_SetPixelRange));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getpixels", (void**)&(pWrapperTable->m_ImageData_GetPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setpixels", (void**)&(pWrapperTable->m_ImageData_SetPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setpixelsfromrawyuy2data", (void**)&(pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelsFromRawYUY2Data == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_writetorawmemory", (void**)&(pWrapperTable->m_ImageData_WriteToRawMemory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_WriteToRawMemory == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_readfromrawmemory", (void**)&(pWrapperTable->m_ImageData_ReadFromRawMemory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ReadFromRawMemory == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_loadpngimage", (void**)&(pWrapperTable->m_ImageLoader_LoadPNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_LoadPNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_loadjpegimage", (void**)&(pWrapperTable->m_ImageLoader_LoadJPEGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_LoadJPEGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_createimagefromrawrgb24data", (void**)&(pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_createimagefromrawrgba32data", (void**)&(pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_createimagefromrawyuy2data", (void**)&(pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scatterplot_getuuid", (void**)&(pWrapperTable->m_ScatterPlot_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ScatterPlot_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scatterplot_getpointcount", (void**)&(pWrapperTable->m_ScatterPlot_GetPointCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ScatterPlot_GetPointCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scatterplot_getpointposition", (void**)&(pWrapperTable->m_ScatterPlot_GetPointPosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ScatterPlot_GetPointPosition == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scatterplot_getboundaries", (void**)&(pWrapperTable->m_ScatterPlot_GetBoundaries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ScatterPlot_GetBoundaries == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_scatterplot_release", (void**)&(pWrapperTable->m_ScatterPlot_Release));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ScatterPlot_Release == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_discretefielddata2dstoreoptions_resettodefaults", (void**)&(pWrapperTable->m_DiscreteFieldData2DStoreOptions_ResetToDefaults));
@@ -11077,6 +12250,42 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableCSVWriteOptions_SetSeparator == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_setxaxiscolumn", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_SetXAxisColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_SetXAxisColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_getxaxiscolumn", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_getxaxisscaling", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisScaling));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisScaling == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_getxaxisoffset", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisOffset));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_GetXAxisOffset == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_setyaxiscolumn", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_SetYAxisColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_SetYAxisColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_getyaxiscolumn", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisColumn));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisColumn == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_getyaxisscaling", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisScaling));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisScaling == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_getyaxisoffset", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisOffset));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_GetYAxisOffset == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatablescatterplotoptions_adddatachannel", (void**)&(pWrapperTable->m_DataTableScatterPlotOptions_AddDataChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTableScatterPlotOptions_AddDataChannel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_datatable_addcolumn", (void**)&(pWrapperTable->m_DataTable_AddColumn));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_AddColumn == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -11175,6 +12384,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_datatable_loadfromstream", (void**)&(pWrapperTable->m_DataTable_LoadFromStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_LoadFromStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_createscatterplotoptions", (void**)&(pWrapperTable->m_DataTable_CreateScatterPlotOptions));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_CreateScatterPlotOptions == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_datatable_calculatescatterplot", (void**)&(pWrapperTable->m_DataTable_CalculateScatterPlot));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataTable_CalculateScatterPlot == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_dataseries_getname", (void**)&(pWrapperTable->m_DataSeries_GetName));
@@ -11805,6 +13022,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_segmenthasoverridefactors", (void**)&(pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_SegmentHasOverrideFactors == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointoverrides", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointOverrides == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenthatchoverrides", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchOverrides == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getzvalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetZValue));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetZValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12389,6 +13618,134 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentAttribute_Remove == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_hasmember", (void**)&(pWrapperTable->m_JSONObject_HasMember));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_HasMember == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getmembercount", (void**)&(pWrapperTable->m_JSONObject_GetMemberCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetMemberCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getmembername", (void**)&(pWrapperTable->m_JSONObject_GetMemberName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetMemberName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getmembertype", (void**)&(pWrapperTable->m_JSONObject_GetMemberType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetMemberType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getvalue", (void**)&(pWrapperTable->m_JSONObject_GetValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getintegervalue", (void**)&(pWrapperTable->m_JSONObject_GetIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getdoublevalue", (void**)&(pWrapperTable->m_JSONObject_GetDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getboolvalue", (void**)&(pWrapperTable->m_JSONObject_GetBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getobjectvalue", (void**)&(pWrapperTable->m_JSONObject_GetObjectValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetObjectValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_getarrayvalue", (void**)&(pWrapperTable->m_JSONObject_GetArrayValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_GetArrayValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_removemember", (void**)&(pWrapperTable->m_JSONObject_RemoveMember));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_RemoveMember == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_addvalue", (void**)&(pWrapperTable->m_JSONObject_AddValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_AddValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_addintegervalue", (void**)&(pWrapperTable->m_JSONObject_AddIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_AddIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_adddoublevalue", (void**)&(pWrapperTable->m_JSONObject_AddDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_AddDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_addboolvalue", (void**)&(pWrapperTable->m_JSONObject_AddBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_AddBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_addobjectvalue", (void**)&(pWrapperTable->m_JSONObject_AddObjectValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_AddObjectValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonobject_addarrayvalue", (void**)&(pWrapperTable->m_JSONObject_AddArrayValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONObject_AddArrayValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_getelementcount", (void**)&(pWrapperTable->m_JSONArray_GetElementCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_GetElementCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_getelementtype", (void**)&(pWrapperTable->m_JSONArray_GetElementType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_GetElementType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_getvalue", (void**)&(pWrapperTable->m_JSONArray_GetValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_GetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_getintegervalue", (void**)&(pWrapperTable->m_JSONArray_GetIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_GetIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_getdoublevalue", (void**)&(pWrapperTable->m_JSONArray_GetDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_GetDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_getboolvalue", (void**)&(pWrapperTable->m_JSONArray_GetBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_GetBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_getobjectvalue", (void**)&(pWrapperTable->m_JSONArray_GetObjectValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_GetObjectValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_getarrayvalue", (void**)&(pWrapperTable->m_JSONArray_GetArrayValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_GetArrayValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_removeelement", (void**)&(pWrapperTable->m_JSONArray_RemoveElement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_RemoveElement == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_addvalue", (void**)&(pWrapperTable->m_JSONArray_AddValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_AddValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_addintegervalue", (void**)&(pWrapperTable->m_JSONArray_AddIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_AddIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_adddoublevalue", (void**)&(pWrapperTable->m_JSONArray_AddDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_AddDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_addboolvalue", (void**)&(pWrapperTable->m_JSONArray_AddBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_AddBoolValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_addobjectvalue", (void**)&(pWrapperTable->m_JSONArray_AddObjectValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_AddObjectValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_jsonarray_addarrayvalue", (void**)&(pWrapperTable->m_JSONArray_AddArrayValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JSONArray_AddArrayValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_getname", (void**)&(pWrapperTable->m_XMLDocumentNode_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12527,6 +13884,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_remove", (void**)&(pWrapperTable->m_XMLDocumentNode_Remove));
 		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_Remove == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_xmldocumentnode_copyfrom", (void**)&(pWrapperTable->m_XMLDocumentNode_CopyFrom));
+		if ( (eLookupError != 0) || (pWrapperTable->m_XMLDocumentNode_CopyFrom == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_xmldocumentnodes_getnodecount", (void**)&(pWrapperTable->m_XMLDocumentNodes_GetNodeCount));
@@ -12765,6 +14126,26 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_Sleep == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getstringparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getuuidparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetUUIDParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getdoubleparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getintegerparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_getboolparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createstatusupdatesession", (void**)&(pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -12897,8 +14278,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateEmptyImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_driverenvironment_loadpngimage", (void**)&(pWrapperTable->m_DriverEnvironment_LoadPNGImage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createimageloader", (void**)&(pWrapperTable->m_DriverEnvironment_CreateImageLoader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateImageLoader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D));
@@ -13181,36 +14562,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetVariableName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_getstarttimestamp", (void**)&(pWrapperTable->m_JournalVariable_GetStartTimeStamp));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetStartTimeStamp == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computedoublesample", (void**)&(pWrapperTable->m_JournalVariable_ComputeDoubleSample));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeDoubleSample == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_getendtimestamp", (void**)&(pWrapperTable->m_JournalVariable_GetEndTimeStamp));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetEndTimeStamp == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_computefullaverage", (void**)&(pWrapperTable->m_JournalVariable_ComputeFullAverage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeFullAverage == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_computeaverage", (void**)&(pWrapperTable->m_JournalVariable_ComputeAverage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeAverage == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_computesample", (void**)&(pWrapperTable->m_JournalVariable_ComputeSample));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeSample == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_computeuniformaveragesamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeUniformAverageSamples == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_computeequidistantsamples", (void**)&(pWrapperTable->m_JournalVariable_ComputeEquidistantSamples));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeEquidistantSamples == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_journalvariable_receiverawtimestream", (void**)&(pWrapperTable->m_JournalVariable_ReceiveRawTimeStream));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ReceiveRawTimeStream == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_journalvariable_computeintegersample", (void**)&(pWrapperTable->m_JournalVariable_ComputeIntegerSample));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeIntegerSample == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_alert_getuuid", (void**)&(pWrapperTable->m_Alert_GetUUID));
@@ -13281,12 +14638,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariablefromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval));
-		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariableFromTimeInterval == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_getstarttime", (void**)&(pWrapperTable->m_JournalHandler_GetStartTime));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetStartTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_getendtime", (void**)&(pWrapperTable->m_JournalHandler_GetEndTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetEndTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_getjournallifetimeinmicroseconds", (void**)&(pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievelogentries", (void**)&(pWrapperTable->m_JournalHandler_RetrieveLogEntries));
@@ -13441,6 +14802,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUnhandledSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_clearallunhandledsignals", (void**)&(pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getunhandledsignalbyuuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -13549,6 +14914,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_HasResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -13561,8 +14930,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateEmptyImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadpngimage", (void**)&(pWrapperTable->m_StateEnvironment_LoadPNGImage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createimageloader", (void**)&(pWrapperTable->m_StateEnvironment_CreateImageLoader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateImageLoader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_StateEnvironment_CreateDiscreteField2D));
@@ -13741,6 +15110,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ShowHint == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasresourcedata", (void**)&(pWrapperTable->m_UIEnvironment_HasResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loadresourcedata", (void**)&(pWrapperTable->m_UIEnvironment_LoadResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loadresourcestring", (void**)&(pWrapperTable->m_UIEnvironment_LoadResourceString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadResourceString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_showhintcolored", (void**)&(pWrapperTable->m_UIEnvironment_ShowHintColored));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ShowHintColored == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -13853,8 +15234,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateEmptyImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_loadpngimage", (void**)&(pWrapperTable->m_UIEnvironment_LoadPNGImage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createimageloader", (void**)&(pWrapperTable->m_UIEnvironment_CreateImageLoader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateImageLoader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds));
@@ -14015,6 +15396,26 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_sleep", (void**)&(pWrapperTable->m_UIEnvironment_Sleep));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_Sleep == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasexternaleventparameter", (void**)&(pWrapperTable->m_UIEnvironment_HasExternalEventParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasExternalEventParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getexternaleventparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetExternalEventParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetExternalEventParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_addexternaleventresultvalue", (void**)&(pWrapperTable->m_UIEnvironment_AddExternalEventResultValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_AddExternalEventResultValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getexternaleventparameters", (void**)&(pWrapperTable->m_UIEnvironment_GetExternalEventParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetExternalEventParameters == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getexternaleventresults", (void**)&(pWrapperTable->m_UIEnvironment_GetExternalEventResults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetExternalEventResults == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -14241,6 +15642,27 @@ public:
 	}
 	
 	/**
+	* CPNGImageStoreOptions::GetStorageFormat - Returns the PNG storage format.
+	* @return PNG Format of image
+	*/
+	ePNGStorageFormat CPNGImageStoreOptions::GetStorageFormat()
+	{
+		ePNGStorageFormat resultPNGStorageFormat = (ePNGStorageFormat) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageStoreOptions_GetStorageFormat(m_pHandle, &resultPNGStorageFormat));
+		
+		return resultPNGStorageFormat;
+	}
+	
+	/**
+	* CPNGImageStoreOptions::SetStorageFormat - Sets the PNG storage format.
+	* @param[in] ePNGStorageFormat - new PNG Format of image
+	*/
+	void CPNGImageStoreOptions::SetStorageFormat(const ePNGStorageFormat ePNGStorageFormat)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageStoreOptions_SetStorageFormat(m_pHandle, ePNGStorageFormat));
+	}
+	
+	/**
 	 * Method definitions for class CPNGImageData
 	 */
 	
@@ -14255,7 +15677,7 @@ public:
 	}
 	
 	/**
-	* CPNGImageData::GetPNGDataStream - Retrieves encoded data stream of image object.
+	* CPNGImageData::GetPNGDataStream - Retrieves encoded PNG data of image object.
 	* @param[out] PNGDataBuffer - PNG Data stream.
 	*/
 	void CPNGImageData::GetPNGDataStream(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
@@ -14265,6 +15687,65 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetPNGDataStream(m_pHandle, 0, &elementsNeededPNGData, nullptr));
 		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
 		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_GetPNGDataStream(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+	}
+	
+	/**
+	* CPNGImageData::WriteToStream - Writes encoded PNG data into a stream object.
+	* @param[in] pStream - Stream to write to.
+	*/
+	void CPNGImageData::WriteToStream(classParam<CTempStreamWriter> pStream)
+	{
+		LibMCEnvHandle hStream = pStream.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_PNGImageData_WriteToStream(m_pHandle, hStream));
+	}
+	
+	/**
+	 * Method definitions for class CJPEGImageStoreOptions
+	 */
+	
+	/**
+	* CJPEGImageStoreOptions::ResetToDefaults - Resets Options to default.
+	*/
+	void CJPEGImageStoreOptions::ResetToDefaults()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageStoreOptions_ResetToDefaults(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CJPEGImageData
+	 */
+	
+	/**
+	* CJPEGImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CJPEGImageData::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_GetSizeInPixels(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CJPEGImageData::GetJPEGDataStream - Retrieves encoded JPEG data of image object.
+	* @param[out] JPEGDataBuffer - JPEG Data stream.
+	*/
+	void CJPEGImageData::GetJPEGDataStream(std::vector<LibMCEnv_uint8> & JPEGDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededJPEGData = 0;
+		LibMCEnv_uint64 elementsWrittenJPEGData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_GetJPEGDataStream(m_pHandle, 0, &elementsNeededJPEGData, nullptr));
+		JPEGDataBuffer.resize((size_t) elementsNeededJPEGData);
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_GetJPEGDataStream(m_pHandle, elementsNeededJPEGData, &elementsWrittenJPEGData, JPEGDataBuffer.data()));
+	}
+	
+	/**
+	* CJPEGImageData::WriteToStream - Writes encoded JPEG data into a stream object.
+	* @param[in] pStream - Stream to write to.
+	*/
+	void CJPEGImageData::WriteToStream(classParam<CTempStreamWriter> pStream)
+	{
+		LibMCEnvHandle hStream = pStream.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_JPEGImageData_WriteToStream(m_pHandle, hStream));
 	}
 	
 	/**
@@ -14343,6 +15824,21 @@ public:
 	}
 	
 	/**
+	* CImageData::CreatePNGOptions - Creates PNG Options for storing the PNG file.
+	* @return Encoding options for the image.
+	*/
+	PPNGImageStoreOptions CImageData::CreatePNGOptions()
+	{
+		LibMCEnvHandle hPNGStorageOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_CreatePNGOptions(m_pHandle, &hPNGStorageOptions));
+		
+		if (!hPNGStorageOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPNGImageStoreOptions>(m_pWrapper, hPNGStorageOptions);
+	}
+	
+	/**
 	* CImageData::CreatePNGImage - Creates PNG Image out of the pixel data.
 	* @param[in] pPNGStorageOptions - Optional encoding options for the image.
 	* @return Image data.
@@ -14360,32 +15856,35 @@ public:
 	}
 	
 	/**
-	* CImageData::EncodePNG - Depreciated. DO NOT USE. Encodes PNG and stores data stream in image object.
+	* CImageData::CreateJPEGOptions - Creates PNG Options for storing the PNG file.
+	* @return Encoding options for the image.
 	*/
-	void CImageData::EncodePNG()
+	PJPEGImageStoreOptions CImageData::CreateJPEGOptions()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_EncodePNG(m_pHandle));
+		LibMCEnvHandle hJPEGStorageOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_CreateJPEGOptions(m_pHandle, &hJPEGStorageOptions));
+		
+		if (!hJPEGStorageOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJPEGImageStoreOptions>(m_pWrapper, hJPEGStorageOptions);
 	}
 	
 	/**
-	* CImageData::GetEncodedPNGData - Depreciated. DO NOT USE. Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
-	* @param[out] PNGDataBuffer - PNG Data stream.
+	* CImageData::CreateJPEGImage - Creates JPEG Image out of the pixel data.
+	* @param[in] pJPEGStorageOptions - Optional encoding options for the image.
+	* @return Image data.
 	*/
-	void CImageData::GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	PJPEGImageData CImageData::CreateJPEGImage(classParam<CJPEGImageStoreOptions> pJPEGStorageOptions)
 	{
-		LibMCEnv_uint64 elementsNeededPNGData = 0;
-		LibMCEnv_uint64 elementsWrittenPNGData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetEncodedPNGData(m_pHandle, 0, &elementsNeededPNGData, nullptr));
-		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetEncodedPNGData(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
-	}
-	
-	/**
-	* CImageData::ClearEncodedPNGData - Depreciated. DO NOT USE. Releases encoded data stream of image object. Depreciated.
-	*/
-	void CImageData::ClearEncodedPNGData()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ClearEncodedPNGData(m_pHandle));
+		LibMCEnvHandle hJPEGStorageOptions = pJPEGStorageOptions.GetHandle();
+		LibMCEnvHandle hJPEGImage = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_CreateJPEGImage(m_pHandle, hJPEGStorageOptions, &hJPEGImage));
+		
+		if (!hJPEGImage) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJPEGImageData>(m_pWrapper, hJPEGImage);
 	}
 	
 	/**
@@ -14450,6 +15949,248 @@ public:
 	void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	* CImageData::GetPixels - Returns a subset of an image or the whole image data. Please use this function instead of GetPixelRange.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. Will return the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on target format.
+	*/
+	void CImageData::GetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, std::vector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValue = 0;
+		LibMCEnv_uint64 elementsWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixels(m_pHandle, nStartX, nStartY, nCountX, nCountY, eTargetFormat, 0, &elementsNeededValue, nullptr));
+		ValueBuffer.resize((size_t) elementsNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixels(m_pHandle, nStartX, nStartY, nCountX, nCountY, eTargetFormat, elementsNeededValue, &elementsWrittenValue, ValueBuffer.data()));
+	}
+	
+	/**
+	* CImageData::SetPixels - Exchanges a subset of an image or the whole image data. Please use this function instead of SetPixelRange.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+	* @param[in] ValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 2, 3 or 4 bytes per pixel, depending on source format.
+	*/
+	void CImageData::SetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixels(m_pHandle, nStartX, nStartY, nCountX, nCountY, eSourceFormat, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
+	}
+	
+	/**
+	* CImageData::SetPixelsFromRawYUY2Data - Sets all pixels from a raw YUY2 color array.
+	* @param[in] YUY2DataBuffer - Pixel array in YUY2 color format (2 bytes per pixels). The array MUST have a length of PixelSizeX * PixelSizeY * 2.
+	*/
+	void CImageData::SetPixelsFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelsFromRawYUY2Data(m_pHandle, (LibMCEnv_uint64)YUY2DataBuffer.size(), YUY2DataBuffer.data()));
+	}
+	
+	/**
+	* CImageData::WriteToRawMemory - Writes an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the target.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eTargetFormat - Target pixel format to convert the image data to.
+	* @param[in] pTarget - Memory address to write to. The pixel value of StartX/StartY will be written to this address.
+	* @param[in] nYLineOffset - Offset to add to the Target pointer to advance a line (in bytes).
+	*/
+	void CImageData::WriteToRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eTargetFormat, const LibMCEnv_pvoid pTarget, const LibMCEnv_uint32 nYLineOffset)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_WriteToRawMemory(m_pHandle, nStartX, nStartY, nCountX, nCountY, eTargetFormat, pTarget, nYLineOffset));
+	}
+	
+	/**
+	* CImageData::ReadFromRawMemory - Reads an image to a raw memory buffer, according to a target pixel format. SHOULD ONLY BE USED WITH CAUTION. No memory checks are performed on the source.
+	* @param[in] nStartX - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nStartY - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nCountX - Number of Pixels to write in X. StartX + SizeX MUST be smaller or equal the number of pixels in X.
+	* @param[in] nCountY - Number of Pixels to write in Y. StartY + SizeY MUST be smaller or equal the number of pixels in Y.
+	* @param[in] eSourceFormat - Source pixel format to convert the image data from.
+	* @param[in] pSource - Memory address to read from. The pixel value of StartX/StartY will be written to this address.
+	* @param[in] nYLineOffset - Offset to add to the source pointer to advance a line (in bytes).
+	*/
+	void CImageData::ReadFromRawMemory(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 nStartY, const LibMCEnv_uint32 nCountX, const LibMCEnv_uint32 nCountY, const eImagePixelFormat eSourceFormat, const LibMCEnv_pvoid pSource, const LibMCEnv_uint32 nYLineOffset)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ReadFromRawMemory(m_pHandle, nStartX, nStartY, nCountX, nCountY, eSourceFormat, pSource, nYLineOffset));
+	}
+	
+	/**
+	 * Method definitions for class CImageLoader
+	 */
+	
+	/**
+	* CImageLoader::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] PNGDataBuffer - PNG Data as byte array. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CImageLoader::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::LoadJPEGImage - creates an image object from a JPEG data stream.
+	* @param[in] JPEGDataBuffer - JPEG Data as byte array. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CImageLoader::LoadJPEGImage(const CInputVector<LibMCEnv_uint8> & JPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_LoadJPEGImage(m_pHandle, (LibMCEnv_uint64)JPEGDataBuffer.size(), JPEGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::CreateImageFromRawRGB24Data - creates an image object from raw RGB24 Data. (3 bytes per pixel)
+	* @param[in] RGB24DataBuffer - RGB 24 data. MUST contain PixelSizeX * PixelSizeY * 3 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	PImageData CImageLoader::CreateImageFromRawRGB24Data(const CInputVector<LibMCEnv_uint8> & RGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_CreateImageFromRawRGB24Data(m_pHandle, (LibMCEnv_uint64)RGB24DataBuffer.size(), RGB24DataBuffer.data(), nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::CreateImageFromRawRGBA32Data - creates an image object from raw RGBA32 Data. (4 bytes per pixel)
+	* @param[in] RGBA32DataBuffer - RGBA 32 data. MUST contain PixelSizeX * PixelSizeY * 4 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	PImageData CImageLoader::CreateImageFromRawRGBA32Data(const CInputVector<LibMCEnv_uint8> & RGBA32DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_CreateImageFromRawRGBA32Data(m_pHandle, (LibMCEnv_uint64)RGBA32DataBuffer.size(), RGBA32DataBuffer.data(), nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::CreateImageFromRawYUY2Data - creates an image object from raw YUY2 Data. (2 bytes per pixel)
+	* @param[in] YUY2DataBuffer - YUY2 data. MUST contain PixelSizeX * PixelSizeY * 2 bytes.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use in memory.
+	* @return Image instance with the data.
+	*/
+	PImageData CImageLoader::CreateImageFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_CreateImageFromRawYUY2Data(m_pHandle, (LibMCEnv_uint64)YUY2DataBuffer.size(), YUY2DataBuffer.data(), nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	 * Method definitions for class CVideoStream
+	 */
+	
+	/**
+	 * Method definitions for class CScatterPlot
+	 */
+	
+	/**
+	* CScatterPlot::GetUUID - Global UUID of the plot.
+	* @return Scatter plot UUID.
+	*/
+	std::string CScatterPlot::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ScatterPlot_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ScatterPlot_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CScatterPlot::GetPointCount - Returns the point count of the plot.
+	* @return Point Count of the plot
+	*/
+	LibMCEnv_uint32 CScatterPlot::GetPointCount()
+	{
+		LibMCEnv_uint32 resultPointCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ScatterPlot_GetPointCount(m_pHandle, &resultPointCount));
+		
+		return resultPointCount;
+	}
+	
+	/**
+	* CScatterPlot::GetPointPosition - Returns the position of a data point.
+	* @param[in] nPointIndex - Index of the point in the plot. 0-based. MUST be smaller than PointCount
+	* @param[out] dX - X value of the point in mm
+	* @param[out] dY - Y value of the point in mm
+	*/
+	void CScatterPlot::GetPointPosition(const LibMCEnv_uint32 nPointIndex, LibMCEnv_double & dX, LibMCEnv_double & dY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ScatterPlot_GetPointPosition(m_pHandle, nPointIndex, &dX, &dY));
+	}
+	
+	/**
+	* CScatterPlot::GetBoundaries - Returns the bounding box of the scatter plot data. Returns 0/0-0/0 in case no points are available.
+	* @param[out] dMinX - Minimum X value of the point in mm
+	* @param[out] dMinY - Minimum Y value of the point in mm
+	* @param[out] dMaxX - Maximum X value of the point in mm
+	* @param[out] dMaxY - Maximum Y value of the point in mm
+	*/
+	void CScatterPlot::GetBoundaries(LibMCEnv_double & dMinX, LibMCEnv_double & dMinY, LibMCEnv_double & dMaxX, LibMCEnv_double & dMaxY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ScatterPlot_GetBoundaries(m_pHandle, &dMinX, &dMinY, &dMaxX, &dMaxY));
+	}
+	
+	/**
+	* CScatterPlot::Release - Release the scatter plot and clear its memory. All accessing code will lose access to the data.
+	*/
+	void CScatterPlot::Release()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ScatterPlot_Release(m_pHandle));
 	}
 	
 	/**
@@ -14770,6 +16511,123 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CDataTableScatterPlotOptions
+	 */
+	
+	/**
+	* CDataTableScatterPlotOptions::SetXAxisColumn - Sets the column to use for the X Axis value. Column MUST exist.
+	* @param[in] sColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+	* @param[in] dOffsetFactor - Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters.
+	*/
+	void CDataTableScatterPlotOptions::SetXAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_SetXAxisColumn(m_pHandle, sColumnIdentifier.c_str(), dScaleFactor, dOffsetFactor));
+	}
+	
+	/**
+	* CDataTableScatterPlotOptions::GetXAxisColumn - Returns the column to use for the X Axis value..
+	* @return Identifier of the column. Empty if not set yet.
+	*/
+	std::string CDataTableScatterPlotOptions::GetXAxisColumn()
+	{
+		LibMCEnv_uint32 bytesNeededColumnIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenColumnIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_GetXAxisColumn(m_pHandle, 0, &bytesNeededColumnIdentifier, nullptr));
+		std::vector<char> bufferColumnIdentifier(bytesNeededColumnIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_GetXAxisColumn(m_pHandle, bytesNeededColumnIdentifier, &bytesWrittenColumnIdentifier, &bufferColumnIdentifier[0]));
+		
+		return std::string(&bufferColumnIdentifier[0]);
+	}
+	
+	/**
+	* CDataTableScatterPlotOptions::GetXAxisScaling - Returns the scaling for the X Axis value..
+	* @return Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+	*/
+	LibMCEnv_double CDataTableScatterPlotOptions::GetXAxisScaling()
+	{
+		LibMCEnv_double resultScaleFactor = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_GetXAxisScaling(m_pHandle, &resultScaleFactor));
+		
+		return resultScaleFactor;
+	}
+	
+	/**
+	* CDataTableScatterPlotOptions::GetXAxisOffset - Returns the scaling for the X Axis value..
+	* @return Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+	*/
+	LibMCEnv_double CDataTableScatterPlotOptions::GetXAxisOffset()
+	{
+		LibMCEnv_double resultOffsetFactor = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_GetXAxisOffset(m_pHandle, &resultOffsetFactor));
+		
+		return resultOffsetFactor;
+	}
+	
+	/**
+	* CDataTableScatterPlotOptions::SetYAxisColumn - Sets the column to use for the Y Axis value. Column MUST exist.
+	* @param[in] sColumnIdentifier - Identifier of the column. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+	* @param[in] dOffsetFactor - Offset factor to use. The Y value will be computed as raw value times scale factor plus offset factor in millimeters.
+	*/
+	void CDataTableScatterPlotOptions::SetYAxisColumn(const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_SetYAxisColumn(m_pHandle, sColumnIdentifier.c_str(), dScaleFactor, dOffsetFactor));
+	}
+	
+	/**
+	* CDataTableScatterPlotOptions::GetYAxisColumn - Returns the column to use for the X Axis value..
+	* @return Identifier of the column. Empty if not set yet.
+	*/
+	std::string CDataTableScatterPlotOptions::GetYAxisColumn()
+	{
+		LibMCEnv_uint32 bytesNeededColumnIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenColumnIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_GetYAxisColumn(m_pHandle, 0, &bytesNeededColumnIdentifier, nullptr));
+		std::vector<char> bufferColumnIdentifier(bytesNeededColumnIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_GetYAxisColumn(m_pHandle, bytesNeededColumnIdentifier, &bytesWrittenColumnIdentifier, &bufferColumnIdentifier[0]));
+		
+		return std::string(&bufferColumnIdentifier[0]);
+	}
+	
+	/**
+	* CDataTableScatterPlotOptions::GetYAxisScaling - Returns the scaling for the X Axis value..
+	* @return Scale factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 1.0.
+	*/
+	LibMCEnv_double CDataTableScatterPlotOptions::GetYAxisScaling()
+	{
+		LibMCEnv_double resultScaleFactor = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_GetYAxisScaling(m_pHandle, &resultScaleFactor));
+		
+		return resultScaleFactor;
+	}
+	
+	/**
+	* CDataTableScatterPlotOptions::GetYAxisOffset - Returns the scaling for the X Axis value..
+	* @return Offset factor to use. The X value will be computed as raw value times scale factor plus offset factor in millimeters. Default is 0.0.
+	*/
+	LibMCEnv_double CDataTableScatterPlotOptions::GetYAxisOffset()
+	{
+		LibMCEnv_double resultOffsetFactor = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_GetYAxisOffset(m_pHandle, &resultOffsetFactor));
+		
+		return resultOffsetFactor;
+	}
+	
+	/**
+	* CDataTableScatterPlotOptions::AddDataChannel - Adds a data channel. Column MUST exist.
+	* @param[in] sChannelIdentifier - Identifier of the channel. Must be alphanumeric and not empty.
+	* @param[in] sColumnIdentifier - Identifier of the column to use. Must be alphanumeric and not empty.
+	* @param[in] dScaleFactor - Scale factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+	* @param[in] dOffsetFactor - Offset factor to use. The channel value will be computed as raw value times scale factor plus offset factor.
+	* @param[in] nColor - Base color to use.
+	*/
+	void CDataTableScatterPlotOptions::AddDataChannel(const std::string & sChannelIdentifier, const std::string & sColumnIdentifier, const LibMCEnv_double dScaleFactor, const LibMCEnv_double dOffsetFactor, const LibMCEnv_uint32 nColor)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTableScatterPlotOptions_AddDataChannel(m_pHandle, sChannelIdentifier.c_str(), sColumnIdentifier.c_str(), dScaleFactor, dOffsetFactor, nColor));
+	}
+	
+	/**
 	 * Method definitions for class CDataTable
 	 */
 	
@@ -15084,6 +16942,38 @@ public:
 	}
 	
 	/**
+	* CDataTable::CreateScatterPlotOptions - Creates an options object for scatter plot computation.
+	* @return DataTableScatterPlotOptions Instance
+	*/
+	PDataTableScatterPlotOptions CDataTable::CreateScatterPlotOptions()
+	{
+		LibMCEnvHandle hScatterPlotOptions = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_CreateScatterPlotOptions(m_pHandle, &hScatterPlotOptions));
+		
+		if (!hScatterPlotOptions) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataTableScatterPlotOptions>(m_pWrapper, hScatterPlotOptions);
+	}
+	
+	/**
+	* CDataTable::CalculateScatterPlot - Creates a scatterplot from the data table according to its input parameters.
+	* @param[in] pScatterPlotOptions - ScatterPlot Options to use
+	* @return ScatterPlot Instance
+	*/
+	PScatterPlot CDataTable::CalculateScatterPlot(classParam<CDataTableScatterPlotOptions> pScatterPlotOptions)
+	{
+		LibMCEnvHandle hScatterPlotOptions = pScatterPlotOptions.GetHandle();
+		LibMCEnvHandle hScatterPlot = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataTable_CalculateScatterPlot(m_pHandle, hScatterPlotOptions, &hScatterPlot));
+		
+		if (!hScatterPlot) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CScatterPlot>(m_pWrapper, hScatterPlot);
+	}
+	
+	/**
 	 * Method definitions for class CDataSeries
 	 */
 	
@@ -15186,13 +17076,14 @@ public:
 	/**
 	* CDataSeries::SampleJournalVariable - Samples a journal variable.
 	* @param[in] pJournalVariable - Journal variable to sample.
-	* @param[in] nNumberOfSamples - Number of samples to generate.
-	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
+	* @param[in] nStartTimeStamp - Start time stamp to sample. MUST be smaller than end time stamp.
+	* @param[in] nEndTimeStamp - End time stamp to sample. MUST be larger than start time stamp.
+	* @param[in] nNumberOfSamples - Number of samples to generate. MUST be greater than 1.
 	*/
-	void CDataSeries::SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta)
+	void CDataSeries::SampleJournalVariable(classParam<CJournalVariable> pJournalVariable, const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples)
 	{
 		LibMCEnvHandle hJournalVariable = pJournalVariable.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_SampleJournalVariable(m_pHandle, hJournalVariable, nNumberOfSamples, dMovingAverageDelta));
+		CheckError(m_pWrapper->m_WrapperTable.m_DataSeries_SampleJournalVariable(m_pHandle, hJournalVariable, nStartTimeStamp, nEndTimeStamp, nNumberOfSamples));
 	}
 	
 	/**
@@ -16802,303 +18693,347 @@ public:
 	
 	/**
 	* CToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.
 	*/
-	LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nIndex)
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 resultHatchCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointCount(m_pHandle, nIndex, &resultHatchCount));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointCount(m_pHandle, nSegmentIndex, &resultHatchCount));
 		
 		return resultHatchCount;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentHatchCount - Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Hatch count of segment.
 	*/
-	LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nIndex)
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 resultHatchCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchCount(m_pHandle, nIndex, &resultHatchCount));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchCount(m_pHandle, nSegmentIndex, &resultHatchCount));
 		
 		return resultHatchCount;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileUUID - Retrieves the assigned segment profile uuid.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Segment Profile UUID
 	*/
-	std::string CToolpathLayer::GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex)
+	std::string CToolpathLayer::GetSegmentProfileUUID(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 bytesNeededProfileUUID = 0;
 		LibMCEnv_uint32 bytesWrittenProfileUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileUUID(m_pHandle, nIndex, 0, &bytesNeededProfileUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileUUID(m_pHandle, nSegmentIndex, 0, &bytesNeededProfileUUID, nullptr));
 		std::vector<char> bufferProfileUUID(bytesNeededProfileUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileUUID(m_pHandle, nIndex, bytesNeededProfileUUID, &bytesWrittenProfileUUID, &bufferProfileUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileUUID(m_pHandle, nSegmentIndex, bytesNeededProfileUUID, &bytesWrittenProfileUUID, &bufferProfileUUID[0]));
 		
 		return std::string(&bufferProfileUUID[0]);
 	}
 	
 	/**
 	* CToolpathLayer::SegmentProfileHasValue - Retrieves an assigned profile custom value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Returns true if value exist.
 	*/
-	bool CToolpathLayer::SegmentProfileHasValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	bool CToolpathLayer::SegmentProfileHasValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		bool resultHasValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentProfileHasValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultHasValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentProfileHasValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), &resultHasValue));
 		
 		return resultHasValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value. Fails if value does not exist.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileValueDef - Retrieves an assigned profile custom value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] sDefaultValue - Default value if value does not exist.
 	* @return String Value.
 	*/
-	std::string CToolpathLayer::GetSegmentProfileValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue)
+	std::string CToolpathLayer::GetSegmentProfileValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const std::string & sDefaultValue)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileDoubleValue - Retrieves an assigned profile custom double value. Fails if value does not exist or is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Double Value.
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileDoubleValueDef - Retrieves an assigned profile custom double value. Fails if value exists but is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] dDefaultValue - Default value if value does not exist.
 	* @return Double Value.
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileDoubleValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_double dDefaultValue)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), dDefaultValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileDoubleValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), dDefaultValue, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileIntegerValue - Retrieves an assigned profile custom integer value. Fails if value does not exist or is not a integer value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Integer Value.
 	*/
-	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		LibMCEnv_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileIntegerValueDef - Retrieves an assigned profile custom integer value. Fails if value exists but is not a integer value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] nDefaultValue - Default value if value does not exist.
 	* @return Integer Value.
 	*/
-	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue)
+	LibMCEnv_int64 CToolpathLayer::GetSegmentProfileIntegerValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const LibMCEnv_int64 nDefaultValue)
 	{
 		LibMCEnv_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), nDefaultValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileIntegerValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), nDefaultValue, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileBoolValue - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value does not exist or is not a bool value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @return Boolean Value.
 	*/
-	bool CToolpathLayer::GetSegmentProfileBoolValue(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName)
+	bool CToolpathLayer::GetSegmentProfileBoolValue(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName)
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValue(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValue(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileBoolValueDef - Retrieves an assigned profile custom boolean value. A Boolean value is either an integer value, or strings of the form true or false (case insensitive). Fails if value exists but is not a bool value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sNamespace - Namespace to query for.
 	* @param[in] sValueName - Value Name to query for.
 	* @param[in] bDefaultValue - Default value if value does not exist.
 	* @return Boolean Value.
 	*/
-	bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue)
+	bool CToolpathLayer::GetSegmentProfileBoolValueDef(const LibMCEnv_uint32 nSegmentIndex, const std::string & sNamespace, const std::string & sValueName, const bool bDefaultValue)
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValueDef(m_pHandle, nIndex, sNamespace.c_str(), sValueName.c_str(), bDefaultValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileBoolValueDef(m_pHandle, nSegmentIndex, sNamespace.c_str(), sValueName.c_str(), bDefaultValue, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type. Fails if value does not exist or is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileValueType eValueType)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, nIndex, eValueType, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, nSegmentIndex, eValueType, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileTypedValueDef - Retrieves an assigned profile value of a standard type. Fails if value exists but is not a double value.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @param[in] dDefaultValue - Default value if value does not exist.
 	* @return Double Value
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValueDef(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileValueType eValueType, const LibMCEnv_double dDefaultValue)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValueDef(m_pHandle, nIndex, eValueType, dDefaultValue, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValueDef(m_pHandle, nSegmentIndex, eValueType, dDefaultValue, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Segment Part UUID
 	*/
-	std::string CToolpathLayer::GetSegmentPartUUID(const LibMCEnv_uint32 nIndex)
+	std::string CToolpathLayer::GetSegmentPartUUID(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 bytesNeededPartUUID = 0;
 		LibMCEnv_uint32 bytesWrittenPartUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nIndex, 0, &bytesNeededPartUUID, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nSegmentIndex, 0, &bytesNeededPartUUID, nullptr));
 		std::vector<char> bufferPartUUID(bytesNeededPartUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nIndex, bytesNeededPartUUID, &bytesWrittenPartUUID, &bufferPartUUID[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPartUUID(m_pHandle, nSegmentIndex, bytesNeededPartUUID, &bytesWrittenPartUUID, &bufferPartUUID[0]));
 		
 		return std::string(&bufferPartUUID[0]);
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentLocalPartID - Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @return Local Part ID of the segment
 	*/
-	LibMCEnv_uint32 CToolpathLayer::GetSegmentLocalPartID(const LibMCEnv_uint32 nIndex)
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentLocalPartID(const LibMCEnv_uint32 nSegmentIndex)
 	{
 		LibMCEnv_uint32 resultLocalPartID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentLocalPartID(m_pHandle, nIndex, &resultLocalPartID));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentLocalPartID(m_pHandle, nSegmentIndex, &resultLocalPartID));
 		
 		return resultLocalPartID;
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentPointData - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] PointDataBuffer - The point data array. Positions are absolute in units.
 	*/
-	void CToolpathLayer::GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer)
+	void CToolpathLayer::GetSegmentPointData(const LibMCEnv_uint32 nSegmentIndex, std::vector<sPosition2D> & PointDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededPointData = 0;
 		LibMCEnv_uint64 elementsWrittenPointData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nIndex, 0, &elementsNeededPointData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nSegmentIndex, 0, &elementsNeededPointData, nullptr));
 		PointDataBuffer.resize((size_t) elementsNeededPointData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nSegmentIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentHatchData - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] HatchDataBuffer - The hatch data array. Positions are absolute in units.
 	*/
-	void CToolpathLayer::GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer)
+	void CToolpathLayer::GetSegmentHatchData(const LibMCEnv_uint32 nSegmentIndex, std::vector<sHatch2D> & HatchDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededHatchData = 0;
 		LibMCEnv_uint64 elementsWrittenHatchData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nIndex, 0, &elementsNeededHatchData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nSegmentIndex, 0, &elementsNeededHatchData, nullptr));
 		HatchDataBuffer.resize((size_t) elementsNeededHatchData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nSegmentIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentPointDataInMM - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] PointDataBuffer - The point data array. Positions are absolute in mm.
 	*/
-	void CToolpathLayer::GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer)
+	void CToolpathLayer::GetSegmentPointDataInMM(const LibMCEnv_uint32 nSegmentIndex, std::vector<sFloatPosition2D> & PointDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededPointData = 0;
 		LibMCEnv_uint64 elementsWrittenPointData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nIndex, 0, &elementsNeededPointData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nSegmentIndex, 0, &elementsNeededPointData, nullptr));
 		PointDataBuffer.resize((size_t) elementsNeededPointData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nSegmentIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentHatchDataInMM - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
-	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nSegmentIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] HatchDataBuffer - The hatch data array. Positions are absolute in mm.
 	*/
-	void CToolpathLayer::GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatHatch2D> & HatchDataBuffer)
+	void CToolpathLayer::GetSegmentHatchDataInMM(const LibMCEnv_uint32 nSegmentIndex, std::vector<sFloatHatch2D> & HatchDataBuffer)
 	{
 		LibMCEnv_uint64 elementsNeededHatchData = 0;
 		LibMCEnv_uint64 elementsWrittenHatchData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nIndex, 0, &elementsNeededHatchData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nSegmentIndex, 0, &elementsNeededHatchData, nullptr));
 		HatchDataBuffer.resize((size_t) elementsNeededHatchData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nSegmentIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::SegmentHasOverrideFactors - Returns if a segment has override factors attached to its points.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @return Returns true if the Segment given has an override factor of a certain type.
+	*/
+	bool CToolpathLayer::SegmentHasOverrideFactors(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor)
+	{
+		bool resultHasOverrideFactors = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_SegmentHasOverrideFactors(m_pHandle, nSegmentIndex, eOverrideFactor, &resultHasOverrideFactors));
+		
+		return resultHasOverrideFactors;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentPointOverrides - Retrieves factor overrides for a specific segment. For type hatch, the points are taken pairwise.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @param[out] OverrideDataBuffer - The override factor array. Will return as many override factors as points in the segment.
+	*/
+	void CToolpathLayer::GetSegmentPointOverrides(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<LibMCEnv_double> & OverrideDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededOverrideData = 0;
+		LibMCEnv_uint64 elementsWrittenOverrideData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointOverrides(m_pHandle, nSegmentIndex, eOverrideFactor, 0, &elementsNeededOverrideData, nullptr));
+		OverrideDataBuffer.resize((size_t) elementsNeededOverrideData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointOverrides(m_pHandle, nSegmentIndex, eOverrideFactor, elementsNeededOverrideData, &elementsWrittenOverrideData, OverrideDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentHatchOverrides - Retrieves factor overrides for a specific segment. Fails if segment type is not hatch.
+	* @param[in] nSegmentIndex - Segment Index. Must be between 0 and Count - 1.
+	* @param[in] eOverrideFactor - Which override factor to return (F, G or H).
+	* @param[out] OverrideDataBuffer - The override factor array. Will return as many override factors as hatches in the segment. Each element contains one factor for the first point or the second point.
+	*/
+	void CToolpathLayer::GetSegmentHatchOverrides(const LibMCEnv_uint32 nSegmentIndex, const eToolpathProfileOverrideFactor eOverrideFactor, std::vector<sHatch2DOverrides> & OverrideDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededOverrideData = 0;
+		LibMCEnv_uint64 elementsWrittenOverrideData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchOverrides(m_pHandle, nSegmentIndex, eOverrideFactor, 0, &elementsNeededOverrideData, nullptr));
+		OverrideDataBuffer.resize((size_t) elementsNeededOverrideData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchOverrides(m_pHandle, nSegmentIndex, eOverrideFactor, elementsNeededOverrideData, &elementsWrittenOverrideData, OverrideDataBuffer.data()));
 	}
 	
 	/**
@@ -18084,12 +20019,13 @@ public:
 	
 	/**
 	* CBuildExecution::LoadAttachedJournal - Loads the journal that is associated with the build execution and returns an accessor instance.
+	* @param[in] nCacheMemoryQuotaInMegabytes - Memory quota to use for cached reading in bytes. MUST be larger than 16 and smaller than 4096.
 	* @return Journal instance.
 	*/
-	PJournalHandler CBuildExecution::LoadAttachedJournal()
+	PJournalHandler CBuildExecution::LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes)
 	{
 		LibMCEnvHandle hJournalHandler = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadAttachedJournal(m_pHandle, &hJournalHandler));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildExecution_LoadAttachedJournal(m_pHandle, nCacheMemoryQuotaInMegabytes, &hJournalHandler));
 		
 		if (!hJournalHandler) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -19223,6 +21159,435 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CJSONObject
+	 */
+	
+	/**
+	* CJSONObject::HasMember - Returns if a member with a specific name exist.
+	* @param[in] sName - Name of the member.
+	* @return returns if a member with a specific name exists.
+	*/
+	bool CJSONObject::HasMember(const std::string & sName)
+	{
+		bool resultMemberExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_HasMember(m_pHandle, sName.c_str(), &resultMemberExists));
+		
+		return resultMemberExists;
+	}
+	
+	/**
+	* CJSONObject::GetMemberCount - Returns the number of members.
+	* @return returns the number of members.
+	*/
+	LibMCEnv_uint64 CJSONObject::GetMemberCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetMemberCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CJSONObject::GetMemberName - Returns the name of a member by index.
+	* @param[in] nIndex - Index of the member, 0-based. Fails if larger or equal than MemberCount
+	* @param[in] sName - Name of the member.
+	*/
+	void CJSONObject::GetMemberName(const LibMCEnv_uint64 nIndex, const std::string & sName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetMemberName(m_pHandle, nIndex, sName.c_str()));
+	}
+	
+	/**
+	* CJSONObject::GetMemberType - Returns the member type. Returns unknown, if the member does not exist.
+	* @param[in] sName - Name of the member.
+	* @return The type of the member..
+	*/
+	eJSONObjectType CJSONObject::GetMemberType(const std::string & sName)
+	{
+		eJSONObjectType resultMemberType = (eJSONObjectType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetMemberType(m_pHandle, sName.c_str(), &resultMemberType));
+		
+		return resultMemberType;
+	}
+	
+	/**
+	* CJSONObject::GetValue - Returns a member as string value. Fails if member is of type Array or Object. Returns true or false in terms of Boolean value.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	std::string CJSONObject::GetValue(const std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetValue(m_pHandle, sName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetValue(m_pHandle, sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CJSONObject::GetIntegerValue - Returns a member as integer value. Fails if member is of type Array or Object, or a non-double string.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	LibMCEnv_int64 CJSONObject::GetIntegerValue(const std::string & sName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetIntegerValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::GetDoubleValue - Returns a member as double value. Fails if member is of type Array or Object, or a non-integer string.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	LibMCEnv_double CJSONObject::GetDoubleValue(const std::string & sName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetDoubleValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::GetBoolValue - Returns a member as boolean value. Fails if member is of type Array or Object or Double.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	bool CJSONObject::GetBoolValue(const std::string & sName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetBoolValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::GetObjectValue - Returns a member as object value. Fails if member is not of type Object.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	PJSONObject CJSONObject::GetObjectValue(const std::string & sName)
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetObjectValue(m_pHandle, sName.c_str(), &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONObject>(m_pWrapper, hValue);
+	}
+	
+	/**
+	* CJSONObject::GetArrayValue - Returns a member as object value. Fails if member is not of type Array.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	PJSONArray CJSONObject::GetArrayValue(const std::string & sName)
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_GetArrayValue(m_pHandle, sName.c_str(), &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONArray>(m_pWrapper, hValue);
+	}
+	
+	/**
+	* CJSONObject::RemoveMember - Removes a member with a specific name. Does nothing if Member does not exist.
+	* @param[in] sName - Name of the member.
+	*/
+	void CJSONObject::RemoveMember(const std::string & sName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_RemoveMember(m_pHandle, sName.c_str()));
+	}
+	
+	/**
+	* CJSONObject::AddValue - Adds a member as string value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @param[in] sValue - Member value.
+	*/
+	void CJSONObject::AddValue(const std::string & sName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_AddValue(m_pHandle, sName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CJSONObject::AddIntegerValue - Adds a member as integer value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	LibMCEnv_int64 CJSONObject::AddIntegerValue(const std::string & sName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_AddIntegerValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::AddDoubleValue - Adds a member as double value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	LibMCEnv_double CJSONObject::AddDoubleValue(const std::string & sName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_AddDoubleValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::AddBoolValue - Adds a member as bool value. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	bool CJSONObject::AddBoolValue(const std::string & sName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_AddBoolValue(m_pHandle, sName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONObject::AddObjectValue - Returns a member as object value. Returns empty object. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	PJSONObject CJSONObject::AddObjectValue(const std::string & sName)
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_AddObjectValue(m_pHandle, sName.c_str(), &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONObject>(m_pWrapper, hValue);
+	}
+	
+	/**
+	* CJSONObject::AddArrayValue - Returns a member as object value. Returns empty array. Fails if member already exists.
+	* @param[in] sName - Name of the member.
+	* @return Member value.
+	*/
+	PJSONArray CJSONObject::AddArrayValue(const std::string & sName)
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONObject_AddArrayValue(m_pHandle, sName.c_str(), &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONArray>(m_pWrapper, hValue);
+	}
+	
+	/**
+	 * Method definitions for class CJSONArray
+	 */
+	
+	/**
+	* CJSONArray::GetElementCount - Returns the number of elements.
+	* @return returns the number of elements.
+	*/
+	LibMCEnv_uint64 CJSONArray::GetElementCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetElementCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CJSONArray::GetElementType - Returns the element type. Returns unknown, if the element does not exist.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return The type of the element..
+	*/
+	eJSONObjectType CJSONArray::GetElementType(const LibMCEnv_uint64 nIndex)
+	{
+		eJSONObjectType resultElementType = (eJSONObjectType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetElementType(m_pHandle, nIndex, &resultElementType));
+		
+		return resultElementType;
+	}
+	
+	/**
+	* CJSONArray::GetValue - Returns a element as string value. Fails if element is of type Array or Object. Returns true or false in terms of Boolean value.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	std::string CJSONArray::GetValue(const LibMCEnv_uint64 nIndex)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetValue(m_pHandle, nIndex, 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetValue(m_pHandle, nIndex, bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CJSONArray::GetIntegerValue - Returns a element as integer value. Fails if element is of type Array or Object, or a non-double string.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	LibMCEnv_int64 CJSONArray::GetIntegerValue(const LibMCEnv_uint64 nIndex)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetIntegerValue(m_pHandle, nIndex, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONArray::GetDoubleValue - Returns a element as double value. Fails if element is of type Array or Object, or a non-integer string.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	LibMCEnv_double CJSONArray::GetDoubleValue(const LibMCEnv_uint64 nIndex)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetDoubleValue(m_pHandle, nIndex, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONArray::GetBoolValue - Returns a element as boolean value. Fails if element is of type Array or Object or Double.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	bool CJSONArray::GetBoolValue(const LibMCEnv_uint64 nIndex)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetBoolValue(m_pHandle, nIndex, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONArray::GetObjectValue - Returns a element as object value. Fails if element is not of type Object.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	PJSONObject CJSONArray::GetObjectValue(const LibMCEnv_uint64 nIndex)
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetObjectValue(m_pHandle, nIndex, &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONObject>(m_pWrapper, hValue);
+	}
+	
+	/**
+	* CJSONArray::GetArrayValue - Returns a element as object value. Fails if element is not of type Array.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	* @return Element value.
+	*/
+	PJSONArray CJSONArray::GetArrayValue(const LibMCEnv_uint64 nIndex)
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_GetArrayValue(m_pHandle, nIndex, &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONArray>(m_pWrapper, hValue);
+	}
+	
+	/**
+	* CJSONArray::RemoveElement - Removes an element with a specific index. Does nothing if Element does not exist.
+	* @param[in] nIndex - Index of the element, 0-based. Fails if larger or equal than ElementCount
+	*/
+	void CJSONArray::RemoveElement(const LibMCEnv_uint64 nIndex)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_RemoveElement(m_pHandle, nIndex));
+	}
+	
+	/**
+	* CJSONArray::AddValue - Adds an element as string value.
+	* @param[in] sValue - Member value.
+	*/
+	void CJSONArray::AddValue(const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_AddValue(m_pHandle, sValue.c_str()));
+	}
+	
+	/**
+	* CJSONArray::AddIntegerValue - Adds a member as integer value.
+	* @return Member value.
+	*/
+	LibMCEnv_int64 CJSONArray::AddIntegerValue()
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_AddIntegerValue(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONArray::AddDoubleValue - Adds a member as double value.
+	* @return Member value.
+	*/
+	LibMCEnv_double CJSONArray::AddDoubleValue()
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_AddDoubleValue(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONArray::AddBoolValue - Adds a member as bool value.
+	* @return Member value.
+	*/
+	bool CJSONArray::AddBoolValue()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_AddBoolValue(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CJSONArray::AddObjectValue - Returns a member as object value. Returns empty object.
+	* @return Member value.
+	*/
+	PJSONObject CJSONArray::AddObjectValue()
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_AddObjectValue(m_pHandle, &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONObject>(m_pWrapper, hValue);
+	}
+	
+	/**
+	* CJSONArray::AddArrayValue - Returns a member as object value. Returns empty array.
+	* @return Member value.
+	*/
+	PJSONArray CJSONArray::AddArrayValue()
+	{
+		LibMCEnvHandle hValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JSONArray_AddArrayValue(m_pHandle, &hValue));
+		
+		if (!hValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONArray>(m_pWrapper, hValue);
+	}
+	
+	/**
 	 * Method definitions for class CXMLDocumentNode
 	 */
 	
@@ -19723,6 +22088,16 @@ public:
 	void CXMLDocumentNode::Remove()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_Remove(m_pHandle));
+	}
+	
+	/**
+	* CXMLDocumentNode::CopyFrom - Copies all content from another node in a recursive way.
+	* @param[in] pOtherNode - other XML Document Node. Does not need to live in the same document.
+	*/
+	void CXMLDocumentNode::CopyFrom(classParam<CXMLDocumentNode> pOtherNode)
+	{
+		LibMCEnvHandle hOtherNode = pOtherNode.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_XMLDocumentNode_CopyFrom(m_pHandle, hOtherNode));
 	}
 	
 	/**
@@ -20506,6 +22881,77 @@ public:
 	}
 	
 	/**
+	* CDriverStatusUpdateSession::GetStringParameter - Gets a string parameter. Fails if parameter does not exist.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	std::string CDriverStatusUpdateSession::GetStringParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetStringParameter(m_pHandle, sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetStringParameter(m_pHandle, sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::GetUUIDParameter - Gets a uuid parameter. Fails if parameter does not exist or is not a UUID.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	std::string CDriverStatusUpdateSession::GetUUIDParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetUUIDParameter(m_pHandle, sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetUUIDParameter(m_pHandle, sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::GetDoubleParameter - Gets a double parameter. Fails if parameter does not exist or is not a Double parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	LibMCEnv_double CDriverStatusUpdateSession::GetDoubleParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetDoubleParameter(m_pHandle, sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::GetIntegerParameter - Gets an int parameter. Fails if parameter does not exist or is not a Integer parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	LibMCEnv_int64 CDriverStatusUpdateSession::GetIntegerParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetIntegerParameter(m_pHandle, sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::GetBoolParameter - Gets a bool parameter. Fails if parameter does not exist or is not a Bool parameter.
+	* @param[in] sParameterName - Parameter Name
+	* @return Value of parameter
+	*/
+	bool CDriverStatusUpdateSession::GetBoolParameter(const std::string & sParameterName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_GetBoolParameter(m_pHandle, sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
 	 * Method definitions for class CDriverEnvironment
 	 */
 	
@@ -20653,7 +23099,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::MachineHasResourceData - retrieves if attached driver has data with the given identifier.
+	* CDriverEnvironment::MachineHasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @return returns true if the resource exists in the machine resource package.
 	*/
@@ -20804,7 +23250,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetStringParameter - sets a string parameter
+	* CDriverEnvironment::SetStringParameter - Sets a string parameter. For getting a string, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sValue - Value to set
 	*/
@@ -20814,7 +23260,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetUUIDParameter - sets a uuid parameter
+	* CDriverEnvironment::SetUUIDParameter - sets a uuid parameter. For getting a UUID, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sValue - Value to set
 	*/
@@ -20824,7 +23270,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetDoubleParameter - sets a double parameter
+	* CDriverEnvironment::SetDoubleParameter - sets a double parameter. For getting a Double, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] dValue - Value to set
 	*/
@@ -20834,7 +23280,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetIntegerParameter - sets an int parameter
+	* CDriverEnvironment::SetIntegerParameter - sets an int parameter. For getting an Integer, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] nValue - Value to set
 	*/
@@ -20844,7 +23290,7 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::SetBoolParameter - sets a bool parameter
+	* CDriverEnvironment::SetBoolParameter - sets a bool parameter. For getting a bool, use a Status Update Session.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] bValue - Value to set
 	*/
@@ -20934,22 +23380,18 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* CDriverEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	PImageData CDriverEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	PImageLoader CDriverEnvironment::CreateImageLoader()
 	{
-		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		LibMCEnvHandle hImageLoaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateImageLoader(m_pHandle, &hImageLoaderInstance));
 		
-		if (!hImageDataInstance) {
+		if (!hImageLoaderInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
 	}
 	
 	/**
@@ -21898,118 +24340,29 @@ public:
 	}
 	
 	/**
-	* CJournalVariable::GetStartTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return Start Timestamp of Recording in microseconds.
-	*/
-	LibMCEnv_uint64 CJournalVariable::GetStartTimeStamp()
-	{
-		LibMCEnv_uint64 resultRecordingStartInMicroSeconds = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetStartTimeStamp(m_pHandle, &resultRecordingStartInMicroSeconds));
-		
-		return resultRecordingStartInMicroSeconds;
-	}
-	
-	/**
-	* CJournalVariable::GetEndTimeStamp - Returns the beginning time stamp of the available data point.
-	* @return End Timestamp of Recording in microseconds.
-	*/
-	LibMCEnv_uint64 CJournalVariable::GetEndTimeStamp()
-	{
-		LibMCEnv_uint64 resultRecordingEndInMicroSeconds = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_GetEndTimeStamp(m_pHandle, &resultRecordingEndInMicroSeconds));
-		
-		return resultRecordingEndInMicroSeconds;
-	}
-	
-	/**
-	* CJournalVariable::ComputeFullAverage - Calculates the average value over the full available time interval.
-	* @return Average value of the variable.
-	*/
-	LibMCEnv_double CJournalVariable::ComputeFullAverage()
-	{
-		LibMCEnv_double resultAverageValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeFullAverage(m_pHandle, &resultAverageValue));
-		
-		return resultAverageValue;
-	}
-	
-	/**
-	* CJournalVariable::ComputeAverage - Calculates the average value over a time interval. Fails if no data is available in this time interval.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in ms.
-	* @param[in] nEndTimeInMicroSeconds - End Timestamp of the interval in ms. MUST be larger than Timestamp.
-	* @param[in] bClampInterval - If ClampInterval is false, the Interval MUST be completely contained in the available recording time. If ClampInterval is false, the Interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-	* @return Average value of the variable.
-	*/
-	LibMCEnv_double CJournalVariable::ComputeAverage(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nEndTimeInMicroSeconds, const bool bClampInterval)
-	{
-		LibMCEnv_double resultAverageValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeAverage(m_pHandle, nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, bClampInterval, &resultAverageValue));
-		
-		return resultAverageValue;
-	}
-	
-	/**
-	* CJournalVariable::ComputeSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* CJournalVariable::ComputeDoubleSample - Computes a single sample at a time. Fails if no data is available at this time value.
 	* @param[in] nTimeInMicroSeconds - Timestamp to check.
 	* @return Value of the variable at the time step.
 	*/
-	LibMCEnv_double CJournalVariable::ComputeSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
+	LibMCEnv_double CJournalVariable::ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
 	{
 		LibMCEnv_double resultSampleValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeSample(m_pHandle, nTimeInMicroSeconds, &resultSampleValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeDoubleSample(m_pHandle, nTimeInMicroSeconds, &resultSampleValue));
 		
 		return resultSampleValue;
 	}
 	
 	/**
-	* CJournalVariable::ComputeUniformAverageSamples - Retrieves sample values for an interval. Interval MUST be inside the available recording time.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-	* @param[in] nNumberOfSamples - Number of samples to record. NumberOfSamples times IntervalIncrement MUST be within the available recording time.
-	* @param[in] dMovingAverageDelta - Each sample will be averaged from minus MovingAverageDelta to plus MovingAverageDelta.
-	* @param[in] bClampInterval - If ClampInterval is false, each moving average interval MUST be completely contained in the available recording time. If ClampInterval is false, the moving average interval will be reduced to the available recording time. If there is no overlap of the Interval with the Recording time at all, the call will fail.
-	* @return Returns an instance with the sampling results.
+	* CJournalVariable::ComputeIntegerSample - Computes a single sample at a time. Fails if no data is available at this time value.
+	* @param[in] nTimeInMicroSeconds - Timestamp to check.
+	* @return Value of the variable at the time step in integer.
 	*/
-	PUniformJournalSampling CJournalVariable::ComputeUniformAverageSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples, const LibMCEnv_double dMovingAverageDelta, const bool bClampInterval)
+	LibMCEnv_int64 CJournalVariable::ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
 	{
-		LibMCEnvHandle hJournalSampling = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeUniformAverageSamples(m_pHandle, nStartTimeInMicroSeconds, nIntervalIncrement, nNumberOfSamples, dMovingAverageDelta, bClampInterval, &hJournalSampling));
+		LibMCEnv_int64 resultSampleValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeIntegerSample(m_pHandle, nTimeInMicroSeconds, &resultSampleValue));
 		
-		if (!hJournalSampling) {
-			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hJournalSampling);
-	}
-	
-	/**
-	* CJournalVariable::ComputeEquidistantSamples - Retrieves a number of equidistant sample values for an interval. Interval MUST be inside the available recording time.
-	* @param[in] nStartTimeInMicroSeconds - Start Timestamp of the interval in microseconds.
-	* @param[in] nIntervalIncrement - Sampling interval distance in microseconds. MUST be larger than 0.
-	* @param[in] nNumberOfSamples - Number of samples to record. The Length of the Interval (StartTimeInMicroSeconds - EndTimeInMicroSeconds) MUST be a multiple of the Number of samples.
-	* @return Returns an instance with the sampling results.
-	*/
-	PUniformJournalSampling CJournalVariable::ComputeEquidistantSamples(const LibMCEnv_uint64 nStartTimeInMicroSeconds, const LibMCEnv_uint64 nIntervalIncrement, const LibMCEnv_uint32 nNumberOfSamples)
-	{
-		LibMCEnvHandle hJournalSampling = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeEquidistantSamples(m_pHandle, nStartTimeInMicroSeconds, nIntervalIncrement, nNumberOfSamples, &hJournalSampling));
-		
-		if (!hJournalSampling) {
-			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hJournalSampling);
-	}
-	
-	/**
-	* CJournalVariable::ReceiveRawTimeStream - Retrieves the raw timestream data of the variable.
-	* @param[out] TimeStreamEntriesBuffer - All change events of the variable in the accessed interval.
-	*/
-	void CJournalVariable::ReceiveRawTimeStream(std::vector<sTimeStreamEntry> & TimeStreamEntriesBuffer)
-	{
-		LibMCEnv_uint64 elementsNeededTimeStreamEntries = 0;
-		LibMCEnv_uint64 elementsWrittenTimeStreamEntries = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ReceiveRawTimeStream(m_pHandle, 0, &elementsNeededTimeStreamEntries, nullptr));
-		TimeStreamEntriesBuffer.resize((size_t) elementsNeededTimeStreamEntries);
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ReceiveRawTimeStream(m_pHandle, elementsNeededTimeStreamEntries, &elementsWrittenTimeStreamEntries, TimeStreamEntriesBuffer.data()));
+		return resultSampleValue;
 	}
 	
 	/**
@@ -22255,31 +24608,12 @@ public:
 	/**
 	* CJournalHandler::RetrieveJournalVariable - Retrieves the history of a given variable in the system journal.
 	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nTimeDeltaInMicroseconds - How many microseconds the journal should be retrieved in the past.
 	* @return Journal Instance.
 	*/
-	PJournalVariable CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName, const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
+	PJournalVariable CJournalHandler::RetrieveJournalVariable(const std::string & sVariableName)
 	{
 		LibMCEnvHandle hJournalVariable = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), nTimeDeltaInMicroseconds, &hJournalVariable));
-		
-		if (!hJournalVariable) {
-			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
-	}
-	
-	/**
-	* CJournalHandler::RetrieveJournalVariableFromTimeInterval - Retrieves the history of a given variable in the system journal for an arbitrary time interval.
-	* @param[in] sVariableName - Variable name to analyse. Fails if Variable does not exist.
-	* @param[in] nStartTimeInMicroseconds - Start time stamp in microseconds. MUST be smaller than EndTimeInMicroseconds. Fails if larger than recorded time interval.
-	* @param[in] nEndTimeInMicroseconds - End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval.
-	* @return Journal Instance.
-	*/
-	PJournalVariable CJournalHandler::RetrieveJournalVariableFromTimeInterval(const std::string & sVariableName, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
-	{
-		LibMCEnvHandle hJournalVariable = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariableFromTimeInterval(m_pHandle, sVariableName.c_str(), nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hJournalVariable));
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_RetrieveJournalVariable(m_pHandle, sVariableName.c_str(), &hJournalVariable));
 		
 		if (!hJournalVariable) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -22300,6 +24634,33 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
+	}
+	
+	/**
+	* CJournalHandler::GetEndTime - Retrieves the end time of the journal recording.
+	* @return DateTime Instance
+	*/
+	PDateTime CJournalHandler::GetEndTime()
+	{
+		LibMCEnvHandle hDateTimeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetEndTime(m_pHandle, &hDateTimeInstance));
+		
+		if (!hDateTimeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
+	}
+	
+	/**
+	* CJournalHandler::GetJournalLifeTimeInMicroseconds - Retrieves the life time of the journal. Which is EndTime minus StartTime.
+	* @return Life Time.
+	*/
+	LibMCEnv_uint64 CJournalHandler::GetJournalLifeTimeInMicroseconds()
+	{
+		LibMCEnv_uint64 resultLifeTimeInMicroseconds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetJournalLifeTimeInMicroseconds(m_pHandle, &resultLifeTimeInMicroseconds));
+		
+		return resultLifeTimeInMicroseconds;
 	}
 	
 	/**
@@ -22927,6 +25288,14 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::ClearAllUnhandledSignals - Clears all unhandled signals and marks them invalid.
+	*/
+	void CStateEnvironment::ClearAllUnhandledSignals()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ClearAllUnhandledSignals(m_pHandle));
+	}
+	
+	/**
 	* CStateEnvironment::GetUnhandledSignalByUUID - retrieves an unhandled signal from the current state machine by UUID.
 	* @param[in] sUUID - Name
 	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.
@@ -23261,6 +25630,19 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	bool CStateEnvironment::HasResourceData(const std::string & sIdentifier)
+	{
+		bool resultHasResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasResourceData(m_pHandle, sIdentifier.c_str(), &resultHasResourceData));
+		
+		return resultHasResourceData;
+	}
+	
+	/**
 	* CStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
 	* @param[in] sResourceName - Name of the resource.
 	* @param[out] ResourceDataBuffer - Resource Data Buffer.
@@ -23311,22 +25693,18 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* CStateEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	PImageData CStateEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	PImageLoader CStateEnvironment::CreateImageLoader()
 	{
-		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		LibMCEnvHandle hImageLoaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateImageLoader(m_pHandle, &hImageLoaderInstance));
 		
-		if (!hImageDataInstance) {
+		if (!hImageLoaderInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
 	}
 	
 	/**
@@ -23970,6 +26348,49 @@ public:
 	}
 	
 	/**
+	* CUIEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	bool CUIEnvironment::HasResourceData(const std::string & sIdentifier)
+	{
+		bool resultHasResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasResourceData(m_pHandle, sIdentifier.c_str(), &resultHasResourceData));
+		
+		return resultHasResourceData;
+	}
+	
+	/**
+	* CUIEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[out] ResourceDataBuffer - Resource Data Buffer.
+	*/
+	void CUIEnvironment::LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededResourceData = 0;
+		LibMCEnv_uint64 elementsWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), 0, &elementsNeededResourceData, nullptr));
+		ResourceDataBuffer.resize((size_t) elementsNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), elementsNeededResourceData, &elementsWrittenResourceData, ResourceDataBuffer.data()));
+	}
+	
+	/**
+	* CUIEnvironment::LoadResourceString - loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+	* @param[in] sResourceName - Name of the resource.
+	* @return Resource Data String.
+	*/
+	std::string CUIEnvironment::LoadResourceString(const std::string & sResourceName)
+	{
+		LibMCEnv_uint32 bytesNeededResourceData = 0;
+		LibMCEnv_uint32 bytesWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadResourceString(m_pHandle, sResourceName.c_str(), 0, &bytesNeededResourceData, nullptr));
+		std::vector<char> bufferResourceData(bytesNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadResourceString(m_pHandle, sResourceName.c_str(), bytesNeededResourceData, &bytesWrittenResourceData, &bufferResourceData[0]));
+		
+		return std::string(&bufferResourceData[0]);
+	}
+	
+	/**
 	* CUIEnvironment::ShowHintColored - Shows a hint message in the user interface in a certain color.
 	* @param[in] sHint - Hint to show.
 	* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
@@ -24358,22 +26779,18 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
-	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
-	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
-	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* CUIEnvironment::CreateImageLoader - creates an image loader object.
+	* @return Image loader instance.
 	*/
-	PImageData CUIEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	PImageLoader CUIEnvironment::CreateImageLoader()
 	{
-		LibMCEnvHandle hImageDataInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		LibMCEnvHandle hImageLoaderInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateImageLoader(m_pHandle, &hImageLoaderInstance));
 		
-		if (!hImageDataInstance) {
+		if (!hImageLoaderInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
 	}
 	
 	/**
@@ -24987,6 +27404,75 @@ public:
 	void CUIEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_Sleep(m_pHandle, nDelay));
+	}
+	
+	/**
+	* CUIEnvironment::HasExternalEventParameter - Checks if an external event parameter exists. DEPRECIATED, use GetExternalEventParameters instead.
+	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @return Flag if the parameter exists.
+	*/
+	bool CUIEnvironment::HasExternalEventParameter(const std::string & sParameterName)
+	{
+		bool resultParameterExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasExternalEventParameter(m_pHandle, sParameterName.c_str(), &resultParameterExists));
+		
+		return resultParameterExists;
+	}
+	
+	/**
+	* CUIEnvironment::GetExternalEventParameter - Returns an external event string parameter. Fails if it does not exists or is not of type string. DEPRECIATED, use GetExternalEventParameters instead.
+	* @param[in] sParameterName - The name of the parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @return Parameter value.
+	*/
+	std::string CUIEnvironment::GetExternalEventParameter(const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededParameterValue = 0;
+		LibMCEnv_uint32 bytesWrittenParameterValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetExternalEventParameter(m_pHandle, sParameterName.c_str(), 0, &bytesNeededParameterValue, nullptr));
+		std::vector<char> bufferParameterValue(bytesNeededParameterValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetExternalEventParameter(m_pHandle, sParameterName.c_str(), bytesNeededParameterValue, &bytesWrittenParameterValue, &bufferParameterValue[0]));
+		
+		return std::string(&bufferParameterValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::AddExternalEventResultValue - Adds a return string value to return to the external event caller. DEPRECIATED, use GetExternalEventParameters instead.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] sReturnValue - Return value.
+	*/
+	void CUIEnvironment::AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_AddExternalEventResultValue(m_pHandle, sReturnValueName.c_str(), sReturnValue.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::GetExternalEventParameters - Returns the external event parameters. This JSON Object was passed on from the external API.
+	* @return Parameter value.
+	*/
+	PJSONObject CUIEnvironment::GetExternalEventParameters()
+	{
+		LibMCEnvHandle hParameterValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetExternalEventParameters(m_pHandle, &hParameterValue));
+		
+		if (!hParameterValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONObject>(m_pWrapper, hParameterValue);
+	}
+	
+	/**
+	* CUIEnvironment::GetExternalEventResults - Returns the external event results. This JSON Object will be passed on to an ext
+	* @return Parameter value.
+	*/
+	PJSONObject CUIEnvironment::GetExternalEventResults()
+	{
+		LibMCEnvHandle hParameterValue = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetExternalEventResults(m_pHandle, &hParameterValue));
+		
+		if (!hParameterValue) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CJSONObject>(m_pWrapper, hParameterValue);
 	}
 
 } // namespace LibMCEnv

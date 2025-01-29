@@ -38,6 +38,7 @@ Abstract: This is the class declaration of CBuildExecution
 #include "libmcenv_interfaces.hpp"
 #include "amc_toolpathhandler.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_statejournal.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -68,6 +69,7 @@ private:
 	AMC::PToolpathHandler m_pToolpathHandler;
 	AMC::PMeshHandler m_pMeshHandler;
 	AMCCommon::PChrono m_pGlobalChrono;
+	AMC::PStateJournal m_pStateJournal;
 	std::mutex m_Mutex;
 
 public:
@@ -76,7 +78,7 @@ public:
 
 	static std::shared_ptr<CBuildExecution> makeSharedFrom(CBuildExecution* pBuildExecution);
 
-	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono);
+	CBuildExecution(LibMCData::PBuildJobExecution pExecution, LibMCData::PDataModel pDataModel, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, AMCCommon::PChrono pGlobalChrono, AMC::PStateJournal pStateJournal);
 
 	virtual ~CBuildExecution();
 
@@ -156,7 +158,7 @@ public:
 
 	std::string GetMetaDataString(const std::string & sKey) override;
 
-	IJournalHandler* LoadAttachedJournal() override;
+	IJournalHandler* LoadAttachedJournal(const LibMCEnv_uint32 nCacheMemoryQuotaInMegabytes) override;
 
 };
 

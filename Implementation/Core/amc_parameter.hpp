@@ -73,6 +73,8 @@ namespace AMC {
 		virtual PParameter duplicate() = 0;
 
 		virtual std::string getOriginalPath() = 0;
+
+		virtual uint64_t getChangeCounter() = 0;
 	};
 
 	

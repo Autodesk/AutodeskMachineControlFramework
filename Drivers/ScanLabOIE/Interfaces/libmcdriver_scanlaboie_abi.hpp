@@ -825,6 +825,15 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_isstreaming(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, bool * pValue);
 
 /**
+* Returns the last measurement tag that has been retrieved.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[out] pMeasurementTag - Measurement Tag that has been retrieved last.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_getreceivedmeasurementtag(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 * pMeasurementTag);
+
+/**
 * Returns if the connected RTC is busy.
 *
 * @param[in] pOIEDevice - OIEDevice instance.

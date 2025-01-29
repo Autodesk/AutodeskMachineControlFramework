@@ -101,6 +101,15 @@ export class AMCApplicationItem extends AMCObject {
 		return this.moduleInstance.page.application;
 	}
 	
+	isActive ()
+	{
+		if (this.moduleInstance) {
+			return this.moduleInstance.isActive ();
+		}
+		
+		return false;
+	}
+	
 }
 
 
@@ -128,6 +137,15 @@ export class AMCApplicationModule extends AMCObject {
 		if (this.onDataHasChanged) {
 			this.onDataHasChanged (this);
 		}
+	}
+	
+	isActive ()
+	{
+		if (this.page) {
+			return this.page.isActive ();
+		} 
+		
+		return false;
 	}
 
 }

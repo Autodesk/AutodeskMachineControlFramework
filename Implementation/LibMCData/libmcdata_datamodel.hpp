@@ -97,6 +97,8 @@ public:
 
 	IJournalSession* CreateJournalSession() override;
 
+	IJournalReader* CreateJournalReader(const std::string& sJournalUUID) override;
+
 	IAlertSession* CreateAlertSession() override;
 
 	IBuildJobHandler* CreateBuildJobHandler() override;

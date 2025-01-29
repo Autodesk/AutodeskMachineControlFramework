@@ -34,9 +34,6 @@ Abstract: This is a stub class definition of CPNGImageStoreOptions
 #include "libmcenv_pngimagestoreoptions.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
-// Include custom headers here.
-
-
 using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
@@ -44,8 +41,10 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 CPNGImageStoreOptions::CPNGImageStoreOptions()
+    : m_PNGStorageFormat (LibMCEnv::ePNGStorageFormat::Unknown)
 {
-
+    ResetToDefaults();
+    
 }
 
 CPNGImageStoreOptions::~CPNGImageStoreOptions()
@@ -53,8 +52,18 @@ CPNGImageStoreOptions::~CPNGImageStoreOptions()
 
 }
 
-
 void CPNGImageStoreOptions::ResetToDefaults()
 {
+    m_PNGStorageFormat = LibMCEnv::ePNGStorageFormat::RGB24bit;
+}
+
+LibMCEnv::ePNGStorageFormat CPNGImageStoreOptions::GetStorageFormat()
+{
+    return m_PNGStorageFormat;
+}
+
+void CPNGImageStoreOptions::SetStorageFormat(const LibMCEnv::ePNGStorageFormat ePNGStorageFormat)
+{
+    m_PNGStorageFormat = ePNGStorageFormat;
 }
 

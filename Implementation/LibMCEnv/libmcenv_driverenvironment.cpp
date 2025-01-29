@@ -46,6 +46,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_cryptocontext.hpp"
 #include "libmcenv_datatable.hpp"
+#include "libmcenv_imageloader.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -63,7 +64,7 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName, AMC::PStateJournal pStateJournal)
     : m_bIsInitializing(false), 
     m_pParameterGroup(pParameterGroup), 
     m_pDriverResourcePackage (pDriverResourcePackage), 
@@ -74,7 +75,8 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
     m_pLogger (pLogger), 
     m_sDriverName (sDriverName), 
     m_pDataModel (pDataModel), 
-    m_pGlobalChrono (pGlobalChrono)
+    m_pGlobalChrono (pGlobalChrono),
+    m_pStateJournal (pStateJournal)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -97,6 +99,8 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
     if (pDriverResourcePackage.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pMachineResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pStateJournal.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
@@ -329,9 +333,9 @@ IImageData* CDriverEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSiz
     return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
 }
 
-IImageData* CDriverEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+IImageLoader* CDriverEnvironment::CreateImageLoader()
 {
-    return CImageData::createFromPNG (pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+    return new CImageLoader();
 }
 
 
@@ -377,7 +381,7 @@ LibMCEnv::Impl::IXMLDocument* CDriverEnvironment::ParseXMLData(const LibMCEnv_ui
 
 IDataTable* CDriverEnvironment::CreateDataTable()
 {
-    return new CDataTable ();
+    return new CDataTable (m_pToolpathHandler);
 }
 
 IDiscreteFieldData2D* CDriverEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
@@ -432,7 +436,7 @@ IBuild* CDriverEnvironment::GetBuildJob(const std::string& sBuildUUID)
 
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildJob = pBuildJobHandler->RetrieveJob(sNormalizedBuildUUID);
-    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
+    return new CBuild(m_pDataModel, pBuildJob->GetUUID (), m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono, m_pStateJournal);
 }
 
 bool CDriverEnvironment::HasBuildExecution(const std::string& sExecutionUUID)
@@ -456,7 +460,7 @@ IBuildExecution* CDriverEnvironment::GetBuildExecution(const std::string& sExecu
     std::string sNormalizedExecutionUUID = AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID);
     auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
     auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
-    return new CBuildExecution(pBuildExecution, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono);
+    return new CBuildExecution(pBuildExecution, m_pDataModel, m_pToolpathHandler, m_pMeshHandler, m_pGlobalChrono, m_pStateJournal);
 
 }
 

@@ -62,8 +62,6 @@ namespace LibMCDriver_OPCUA {
 class CWrapper;
 class CBase;
 class CDriver;
-class CPLCCommand;
-class CPLCCommandList;
 class CDriver_OPCUA;
 
 /*************************************************************************************************************************
@@ -72,8 +70,6 @@ class CDriver_OPCUA;
 typedef CWrapper CLibMCDriver_OPCUAWrapper;
 typedef CBase CLibMCDriver_OPCUABase;
 typedef CDriver CLibMCDriver_OPCUADriver;
-typedef CPLCCommand CLibMCDriver_OPCUAPLCCommand;
-typedef CPLCCommandList CLibMCDriver_OPCUAPLCCommandList;
 typedef CDriver_OPCUA CLibMCDriver_OPCUADriver_OPCUA;
 
 /*************************************************************************************************************************
@@ -82,8 +78,6 @@ typedef CDriver_OPCUA CLibMCDriver_OPCUADriver_OPCUA;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
-typedef std::shared_ptr<CPLCCommand> PPLCCommand;
-typedef std::shared_ptr<CPLCCommandList> PPLCCommandList;
 typedef std::shared_ptr<CDriver_OPCUA> PDriver_OPCUA;
 
 /*************************************************************************************************************************
@@ -92,8 +86,6 @@ typedef std::shared_ptr<CDriver_OPCUA> PDriver_OPCUA;
 typedef PWrapper PLibMCDriver_OPCUAWrapper;
 typedef PBase PLibMCDriver_OPCUABase;
 typedef PDriver PLibMCDriver_OPCUADriver;
-typedef PPLCCommand PLibMCDriver_OPCUAPLCCommand;
-typedef PPLCCommandList PLibMCDriver_OPCUAPLCCommandList;
 typedef PDriver_OPCUA PLibMCDriver_OPCUADriver_OPCUA;
 
 
@@ -255,6 +247,7 @@ public:
 			case LIBMCDRIVER_OPCUA_ERROR_RECEIVEDINVALIDPACKETLENGTH: return "RECEIVEDINVALIDPACKETLENGTH";
 			case LIBMCDRIVER_OPCUA_ERROR_COULDNOTWRITETOPAYLOAD: return "COULDNOTWRITETOPAYLOAD";
 			case LIBMCDRIVER_OPCUA_ERROR_INVALIDPAYLOADADDRESS: return "INVALIDPAYLOADADDRESS";
+			case LIBMCDRIVER_OPCUA_ERROR_COULDNOTCREATEOPCUACLIENT: return "COULDNOTCREATEOPCUACLIENT";
 		}
 		return "UNKNOWN";
 	}
@@ -344,6 +337,7 @@ public:
 			case LIBMCDRIVER_OPCUA_ERROR_RECEIVEDINVALIDPACKETLENGTH: return "Received invalid packet length.";
 			case LIBMCDRIVER_OPCUA_ERROR_COULDNOTWRITETOPAYLOAD: return "Could not write to payload.";
 			case LIBMCDRIVER_OPCUA_ERROR_INVALIDPAYLOADADDRESS: return "Invalid payload address.";
+			case LIBMCDRIVER_OPCUA_ERROR_COULDNOTCREATEOPCUACLIENT: return "Could not create OPCUA Client.";
 		}
 		return "unknown error";
 	}
@@ -467,8 +461,6 @@ private:
 
 	friend class CBase;
 	friend class CDriver;
-	friend class CPLCCommand;
-	friend class CPLCCommandList;
 	friend class CDriver_OPCUA;
 
 };
@@ -553,47 +545,6 @@ public:
 };
 	
 /*************************************************************************************************************************
- Class CPLCCommand 
-**************************************************************************************************************************/
-class CPLCCommand : public CBase {
-public:
-	
-	/**
-	* CPLCCommand::CPLCCommand - Constructor for PLCCommand class.
-	*/
-	CPLCCommand(CWrapper* pWrapper, LibMCDriver_OPCUAHandle pHandle)
-		: CBase(pWrapper, pHandle)
-	{
-	}
-	
-	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_OPCUA_int64 nValue);
-	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
-	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_OPCUA_double dValue);
-};
-	
-/*************************************************************************************************************************
- Class CPLCCommandList 
-**************************************************************************************************************************/
-class CPLCCommandList : public CBase {
-public:
-	
-	/**
-	* CPLCCommandList::CPLCCommandList - Constructor for PLCCommandList class.
-	*/
-	CPLCCommandList(CWrapper* pWrapper, LibMCDriver_OPCUAHandle pHandle)
-		: CBase(pWrapper, pHandle)
-	{
-	}
-	
-	inline void AddCommand(classParam<CPLCCommand> pCommandInstance);
-	inline void FinishList();
-	inline void ExecuteList();
-	inline bool WaitForList(const LibMCDriver_OPCUA_uint32 nReactionTimeInMS, const LibMCDriver_OPCUA_uint32 nWaitForTimeInMS);
-	inline void PauseList();
-	inline void ResumeList();
-};
-	
-/*************************************************************************************************************************
  Class CDriver_OPCUA 
 **************************************************************************************************************************/
 class CDriver_OPCUA : public CDriver {
@@ -609,13 +560,17 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
-	inline void Connect(const std::string & sIPAddress, const LibMCDriver_OPCUA_uint32 nPort, const LibMCDriver_OPCUA_uint32 nTimeout);
+	inline void EnableEncryption(const std::string & sLocalCertificate, const std::string & sPrivateKey, const eUASecurityMode eSecurityMode);
+	inline void DisableEncryption();
+	inline void ConnectWithUserName(const std::string & sEndPointURL, const std::string & sUsername, const std::string & sPassword, const std::string & sApplicationURL);
 	inline void Disconnect();
-	inline PPLCCommandList CreateCommandList();
-	inline PPLCCommand CreateCommand(const std::string & sCommandName);
-	inline void StartJournaling();
-	inline void StopJournaling();
-	inline void RefreshJournal();
+	inline bool IsConnected();
+	inline LibMCDriver_OPCUA_int64 ReadInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const eUAIntegerType eNodeType);
+	inline LibMCDriver_OPCUA_double ReadDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const eUADoubleType eNodeType);
+	inline std::string ReadString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName);
+	inline void WriteInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const eUAIntegerType eNodeType, const LibMCDriver_OPCUA_int64 nValue);
+	inline void WriteDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const eUADoubleType eNodeType, const LibMCDriver_OPCUA_double dValue);
+	inline void WriteString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const std::string & sValue);
 };
 	
 	/**
@@ -746,24 +701,19 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
-		pWrapperTable->m_PLCCommand_SetIntegerParameter = nullptr;
-		pWrapperTable->m_PLCCommand_SetBoolParameter = nullptr;
-		pWrapperTable->m_PLCCommand_SetDoubleParameter = nullptr;
-		pWrapperTable->m_PLCCommandList_AddCommand = nullptr;
-		pWrapperTable->m_PLCCommandList_FinishList = nullptr;
-		pWrapperTable->m_PLCCommandList_ExecuteList = nullptr;
-		pWrapperTable->m_PLCCommandList_WaitForList = nullptr;
-		pWrapperTable->m_PLCCommandList_PauseList = nullptr;
-		pWrapperTable->m_PLCCommandList_ResumeList = nullptr;
 		pWrapperTable->m_Driver_OPCUA_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_OPCUA_IsSimulationMode = nullptr;
-		pWrapperTable->m_Driver_OPCUA_Connect = nullptr;
+		pWrapperTable->m_Driver_OPCUA_EnableEncryption = nullptr;
+		pWrapperTable->m_Driver_OPCUA_DisableEncryption = nullptr;
+		pWrapperTable->m_Driver_OPCUA_ConnectWithUserName = nullptr;
 		pWrapperTable->m_Driver_OPCUA_Disconnect = nullptr;
-		pWrapperTable->m_Driver_OPCUA_CreateCommandList = nullptr;
-		pWrapperTable->m_Driver_OPCUA_CreateCommand = nullptr;
-		pWrapperTable->m_Driver_OPCUA_StartJournaling = nullptr;
-		pWrapperTable->m_Driver_OPCUA_StopJournaling = nullptr;
-		pWrapperTable->m_Driver_OPCUA_RefreshJournal = nullptr;
+		pWrapperTable->m_Driver_OPCUA_IsConnected = nullptr;
+		pWrapperTable->m_Driver_OPCUA_ReadInteger = nullptr;
+		pWrapperTable->m_Driver_OPCUA_ReadDouble = nullptr;
+		pWrapperTable->m_Driver_OPCUA_ReadString = nullptr;
+		pWrapperTable->m_Driver_OPCUA_WriteInteger = nullptr;
+		pWrapperTable->m_Driver_OPCUA_WriteDouble = nullptr;
+		pWrapperTable->m_Driver_OPCUA_WriteString = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -876,87 +826,6 @@ public:
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_OPCUAPLCCommand_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommand_setintegerparameter");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_OPCUAPLCCommand_SetIntegerParameterPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommand_setintegerparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_OPCUAPLCCommand_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommand_setboolparameter");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_OPCUAPLCCommand_SetBoolParameterPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommand_setboolparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_OPCUAPLCCommand_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommand_setdoubleparameter");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_OPCUAPLCCommand_SetDoubleParameterPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommand_setdoubleparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommandList_AddCommand = (PLibMCDriver_OPCUAPLCCommandList_AddCommandPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommandlist_addcommand");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommandList_AddCommand = (PLibMCDriver_OPCUAPLCCommandList_AddCommandPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommandlist_addcommand");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommandList_AddCommand == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommandList_FinishList = (PLibMCDriver_OPCUAPLCCommandList_FinishListPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommandlist_finishlist");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommandList_FinishList = (PLibMCDriver_OPCUAPLCCommandList_FinishListPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommandlist_finishlist");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommandList_FinishList == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommandList_ExecuteList = (PLibMCDriver_OPCUAPLCCommandList_ExecuteListPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommandlist_executelist");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommandList_ExecuteList = (PLibMCDriver_OPCUAPLCCommandList_ExecuteListPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommandlist_executelist");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommandList_ExecuteList == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommandList_WaitForList = (PLibMCDriver_OPCUAPLCCommandList_WaitForListPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommandlist_waitforlist");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommandList_WaitForList = (PLibMCDriver_OPCUAPLCCommandList_WaitForListPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommandlist_waitforlist");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommandList_WaitForList == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommandList_PauseList = (PLibMCDriver_OPCUAPLCCommandList_PauseListPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommandlist_pauselist");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommandList_PauseList = (PLibMCDriver_OPCUAPLCCommandList_PauseListPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommandlist_pauselist");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommandList_PauseList == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommandList_ResumeList = (PLibMCDriver_OPCUAPLCCommandList_ResumeListPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_plccommandlist_resumelist");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommandList_ResumeList = (PLibMCDriver_OPCUAPLCCommandList_ResumeListPtr) dlsym(hLibrary, "libmcdriver_opcua_plccommandlist_resumelist");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommandList_ResumeList == nullptr)
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_Driver_OPCUA_SetToSimulationMode = (PLibMCDriver_OPCUADriver_OPCUA_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_settosimulationmode");
 		#else // _WIN32
 		pWrapperTable->m_Driver_OPCUA_SetToSimulationMode = (PLibMCDriver_OPCUADriver_OPCUA_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_settosimulationmode");
@@ -975,12 +844,30 @@ public:
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_OPCUA_Connect = (PLibMCDriver_OPCUADriver_OPCUA_ConnectPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_connect");
+		pWrapperTable->m_Driver_OPCUA_EnableEncryption = (PLibMCDriver_OPCUADriver_OPCUA_EnableEncryptionPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_enableencryption");
 		#else // _WIN32
-		pWrapperTable->m_Driver_OPCUA_Connect = (PLibMCDriver_OPCUADriver_OPCUA_ConnectPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_connect");
+		pWrapperTable->m_Driver_OPCUA_EnableEncryption = (PLibMCDriver_OPCUADriver_OPCUA_EnableEncryptionPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_enableencryption");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_OPCUA_Connect == nullptr)
+		if (pWrapperTable->m_Driver_OPCUA_EnableEncryption == nullptr)
+			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_OPCUA_DisableEncryption = (PLibMCDriver_OPCUADriver_OPCUA_DisableEncryptionPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_disableencryption");
+		#else // _WIN32
+		pWrapperTable->m_Driver_OPCUA_DisableEncryption = (PLibMCDriver_OPCUADriver_OPCUA_DisableEncryptionPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_disableencryption");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_OPCUA_DisableEncryption == nullptr)
+			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_OPCUA_ConnectWithUserName = (PLibMCDriver_OPCUADriver_OPCUA_ConnectWithUserNamePtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_connectwithusername");
+		#else // _WIN32
+		pWrapperTable->m_Driver_OPCUA_ConnectWithUserName = (PLibMCDriver_OPCUADriver_OPCUA_ConnectWithUserNamePtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_connectwithusername");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_OPCUA_ConnectWithUserName == nullptr)
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -993,48 +880,66 @@ public:
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_OPCUA_CreateCommandList = (PLibMCDriver_OPCUADriver_OPCUA_CreateCommandListPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_createcommandlist");
+		pWrapperTable->m_Driver_OPCUA_IsConnected = (PLibMCDriver_OPCUADriver_OPCUA_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_isconnected");
 		#else // _WIN32
-		pWrapperTable->m_Driver_OPCUA_CreateCommandList = (PLibMCDriver_OPCUADriver_OPCUA_CreateCommandListPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_createcommandlist");
+		pWrapperTable->m_Driver_OPCUA_IsConnected = (PLibMCDriver_OPCUADriver_OPCUA_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_isconnected");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_OPCUA_CreateCommandList == nullptr)
+		if (pWrapperTable->m_Driver_OPCUA_IsConnected == nullptr)
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_OPCUA_CreateCommand = (PLibMCDriver_OPCUADriver_OPCUA_CreateCommandPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_createcommand");
+		pWrapperTable->m_Driver_OPCUA_ReadInteger = (PLibMCDriver_OPCUADriver_OPCUA_ReadIntegerPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_readinteger");
 		#else // _WIN32
-		pWrapperTable->m_Driver_OPCUA_CreateCommand = (PLibMCDriver_OPCUADriver_OPCUA_CreateCommandPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_createcommand");
+		pWrapperTable->m_Driver_OPCUA_ReadInteger = (PLibMCDriver_OPCUADriver_OPCUA_ReadIntegerPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_readinteger");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_OPCUA_CreateCommand == nullptr)
+		if (pWrapperTable->m_Driver_OPCUA_ReadInteger == nullptr)
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_OPCUA_StartJournaling = (PLibMCDriver_OPCUADriver_OPCUA_StartJournalingPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_startjournaling");
+		pWrapperTable->m_Driver_OPCUA_ReadDouble = (PLibMCDriver_OPCUADriver_OPCUA_ReadDoublePtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_readdouble");
 		#else // _WIN32
-		pWrapperTable->m_Driver_OPCUA_StartJournaling = (PLibMCDriver_OPCUADriver_OPCUA_StartJournalingPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_startjournaling");
+		pWrapperTable->m_Driver_OPCUA_ReadDouble = (PLibMCDriver_OPCUADriver_OPCUA_ReadDoublePtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_readdouble");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_OPCUA_StartJournaling == nullptr)
+		if (pWrapperTable->m_Driver_OPCUA_ReadDouble == nullptr)
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_OPCUA_StopJournaling = (PLibMCDriver_OPCUADriver_OPCUA_StopJournalingPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_stopjournaling");
+		pWrapperTable->m_Driver_OPCUA_ReadString = (PLibMCDriver_OPCUADriver_OPCUA_ReadStringPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_readstring");
 		#else // _WIN32
-		pWrapperTable->m_Driver_OPCUA_StopJournaling = (PLibMCDriver_OPCUADriver_OPCUA_StopJournalingPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_stopjournaling");
+		pWrapperTable->m_Driver_OPCUA_ReadString = (PLibMCDriver_OPCUADriver_OPCUA_ReadStringPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_readstring");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_OPCUA_StopJournaling == nullptr)
+		if (pWrapperTable->m_Driver_OPCUA_ReadString == nullptr)
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_OPCUA_RefreshJournal = (PLibMCDriver_OPCUADriver_OPCUA_RefreshJournalPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_refreshjournal");
+		pWrapperTable->m_Driver_OPCUA_WriteInteger = (PLibMCDriver_OPCUADriver_OPCUA_WriteIntegerPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_writeinteger");
 		#else // _WIN32
-		pWrapperTable->m_Driver_OPCUA_RefreshJournal = (PLibMCDriver_OPCUADriver_OPCUA_RefreshJournalPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_refreshjournal");
+		pWrapperTable->m_Driver_OPCUA_WriteInteger = (PLibMCDriver_OPCUADriver_OPCUA_WriteIntegerPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_writeinteger");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_OPCUA_RefreshJournal == nullptr)
+		if (pWrapperTable->m_Driver_OPCUA_WriteInteger == nullptr)
+			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_OPCUA_WriteDouble = (PLibMCDriver_OPCUADriver_OPCUA_WriteDoublePtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_writedouble");
+		#else // _WIN32
+		pWrapperTable->m_Driver_OPCUA_WriteDouble = (PLibMCDriver_OPCUADriver_OPCUA_WriteDoublePtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_writedouble");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_OPCUA_WriteDouble == nullptr)
+			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_OPCUA_WriteString = (PLibMCDriver_OPCUADriver_OPCUA_WriteStringPtr) GetProcAddress(hLibrary, "libmcdriver_opcua_driver_opcua_writestring");
+		#else // _WIN32
+		pWrapperTable->m_Driver_OPCUA_WriteString = (PLibMCDriver_OPCUADriver_OPCUA_WriteStringPtr) dlsym(hLibrary, "libmcdriver_opcua_driver_opcua_writestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_OPCUA_WriteString == nullptr)
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1140,42 +1045,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParametersEx == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommand_setintegerparameter", (void**)&(pWrapperTable->m_PLCCommand_SetIntegerParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommand_setboolparameter", (void**)&(pWrapperTable->m_PLCCommand_SetBoolParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommand_setdoubleparameter", (void**)&(pWrapperTable->m_PLCCommand_SetDoubleParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommandlist_addcommand", (void**)&(pWrapperTable->m_PLCCommandList_AddCommand));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_AddCommand == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommandlist_finishlist", (void**)&(pWrapperTable->m_PLCCommandList_FinishList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_FinishList == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommandlist_executelist", (void**)&(pWrapperTable->m_PLCCommandList_ExecuteList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_ExecuteList == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommandlist_waitforlist", (void**)&(pWrapperTable->m_PLCCommandList_WaitForList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_WaitForList == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommandlist_pauselist", (void**)&(pWrapperTable->m_PLCCommandList_PauseList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_PauseList == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_opcua_plccommandlist_resumelist", (void**)&(pWrapperTable->m_PLCCommandList_ResumeList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_ResumeList == nullptr) )
-			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_settosimulationmode", (void**)&(pWrapperTable->m_Driver_OPCUA_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1184,32 +1053,48 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_IsSimulationMode == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_connect", (void**)&(pWrapperTable->m_Driver_OPCUA_Connect));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_Connect == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_enableencryption", (void**)&(pWrapperTable->m_Driver_OPCUA_EnableEncryption));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_EnableEncryption == nullptr) )
+			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_disableencryption", (void**)&(pWrapperTable->m_Driver_OPCUA_DisableEncryption));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_DisableEncryption == nullptr) )
+			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_connectwithusername", (void**)&(pWrapperTable->m_Driver_OPCUA_ConnectWithUserName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_ConnectWithUserName == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_disconnect", (void**)&(pWrapperTable->m_Driver_OPCUA_Disconnect));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_Disconnect == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_createcommandlist", (void**)&(pWrapperTable->m_Driver_OPCUA_CreateCommandList));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_CreateCommandList == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_isconnected", (void**)&(pWrapperTable->m_Driver_OPCUA_IsConnected));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_IsConnected == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_createcommand", (void**)&(pWrapperTable->m_Driver_OPCUA_CreateCommand));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_CreateCommand == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_readinteger", (void**)&(pWrapperTable->m_Driver_OPCUA_ReadInteger));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_ReadInteger == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_startjournaling", (void**)&(pWrapperTable->m_Driver_OPCUA_StartJournaling));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_StartJournaling == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_readdouble", (void**)&(pWrapperTable->m_Driver_OPCUA_ReadDouble));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_ReadDouble == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_stopjournaling", (void**)&(pWrapperTable->m_Driver_OPCUA_StopJournaling));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_StopJournaling == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_readstring", (void**)&(pWrapperTable->m_Driver_OPCUA_ReadString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_ReadString == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_refreshjournal", (void**)&(pWrapperTable->m_Driver_OPCUA_RefreshJournal));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_RefreshJournal == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_writeinteger", (void**)&(pWrapperTable->m_Driver_OPCUA_WriteInteger));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_WriteInteger == nullptr) )
+			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_writedouble", (void**)&(pWrapperTable->m_Driver_OPCUA_WriteDouble));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_WriteDouble == nullptr) )
+			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_opcua_driver_opcua_writestring", (void**)&(pWrapperTable->m_Driver_OPCUA_WriteString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_OPCUA_WriteString == nullptr) )
 			return LIBMCDRIVER_OPCUA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_opcua_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1328,100 +1213,6 @@ public:
 	}
 	
 	/**
-	 * Method definitions for class CPLCCommand
-	 */
-	
-	/**
-	* CPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] nValue - Parameter Value
-	*/
-	void CPLCCommand::SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_OPCUA_int64 nValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetIntegerParameter(m_pHandle, sParameterName.c_str(), nValue));
-	}
-	
-	/**
-	* CPLCCommand::SetBoolParameter - Sets a bool parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] bValue - Parameter Value
-	*/
-	void CPLCCommand::SetBoolParameter(const std::string & sParameterName, const bool bValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
-	}
-	
-	/**
-	* CPLCCommand::SetDoubleParameter - Sets a double parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] dValue - Parameter Value
-	*/
-	void CPLCCommand::SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_OPCUA_double dValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetDoubleParameter(m_pHandle, sParameterName.c_str(), dValue));
-	}
-	
-	/**
-	 * Method definitions for class CPLCCommandList
-	 */
-	
-	/**
-	* CPLCCommandList::AddCommand - Adds a command to the list. List must not be executed before.
-	* @param[in] pCommandInstance - Add a command instance.
-	*/
-	void CPLCCommandList::AddCommand(classParam<CPLCCommand> pCommandInstance)
-	{
-		LibMCDriver_OPCUAHandle hCommandInstance = pCommandInstance.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_AddCommand(m_pHandle, hCommandInstance));
-	}
-	
-	/**
-	* CPLCCommandList::FinishList - Finish command list.
-	*/
-	void CPLCCommandList::FinishList()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_FinishList(m_pHandle));
-	}
-	
-	/**
-	* CPLCCommandList::ExecuteList - Execute command list.
-	*/
-	void CPLCCommandList::ExecuteList()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_ExecuteList(m_pHandle));
-	}
-	
-	/**
-	* CPLCCommandList::WaitForList - Wait for command list to finish executing
-	* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
-	* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
-	* @return Returns true if the command was finished successfully.
-	*/
-	bool CPLCCommandList::WaitForList(const LibMCDriver_OPCUA_uint32 nReactionTimeInMS, const LibMCDriver_OPCUA_uint32 nWaitForTimeInMS)
-	{
-		bool resultCommandSuccess = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_WaitForList(m_pHandle, nReactionTimeInMS, nWaitForTimeInMS, &resultCommandSuccess));
-		
-		return resultCommandSuccess;
-	}
-	
-	/**
-	* CPLCCommandList::PauseList - Pause command list. Must be executed or resumed before.
-	*/
-	void CPLCCommandList::PauseList()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_PauseList(m_pHandle));
-	}
-	
-	/**
-	* CPLCCommandList::ResumeList - Resume command list. Must be paused before.
-	*/
-	void CPLCCommandList::ResumeList()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_ResumeList(m_pHandle));
-	}
-	
-	/**
 	 * Method definitions for class CDriver_OPCUA
 	 */
 	
@@ -1446,18 +1237,38 @@ public:
 	}
 	
 	/**
-	* CDriver_OPCUA::Connect - Connects to a OPCUA PLC Controller.
-	* @param[in] sIPAddress - IP Address of PLC Service.
-	* @param[in] nPort - Port of PLC Service.
-	* @param[in] nTimeout - Timeout in milliseconds.
+	* CDriver_OPCUA::EnableEncryption - Enables encryption for subsequent connects.
+	* @param[in] sLocalCertificate - Local Certificate String
+	* @param[in] sPrivateKey - Private Key
+	* @param[in] eSecurityMode - Security mode to use.
 	*/
-	void CDriver_OPCUA::Connect(const std::string & sIPAddress, const LibMCDriver_OPCUA_uint32 nPort, const LibMCDriver_OPCUA_uint32 nTimeout)
+	void CDriver_OPCUA::EnableEncryption(const std::string & sLocalCertificate, const std::string & sPrivateKey, const eUASecurityMode eSecurityMode)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_Connect(m_pHandle, sIPAddress.c_str(), nPort, nTimeout));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_EnableEncryption(m_pHandle, sLocalCertificate.c_str(), sPrivateKey.c_str(), eSecurityMode));
 	}
 	
 	/**
-	* CDriver_OPCUA::Disconnect - Disconnects from the OPCUA PLC Controller.
+	* CDriver_OPCUA::DisableEncryption - Enables encryption for subsequent connects.
+	*/
+	void CDriver_OPCUA::DisableEncryption()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_DisableEncryption(m_pHandle));
+	}
+	
+	/**
+	* CDriver_OPCUA::ConnectWithUserName - Connects to a OPCUA PLC Controller.
+	* @param[in] sEndPointURL - End point URL to connect to.
+	* @param[in] sUsername - User login.
+	* @param[in] sPassword - Password.
+	* @param[in] sApplicationURL - Application URL to use.
+	*/
+	void CDriver_OPCUA::ConnectWithUserName(const std::string & sEndPointURL, const std::string & sUsername, const std::string & sPassword, const std::string & sApplicationURL)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_ConnectWithUserName(m_pHandle, sEndPointURL.c_str(), sUsername.c_str(), sPassword.c_str(), sApplicationURL.c_str()));
+	}
+	
+	/**
+	* CDriver_OPCUA::Disconnect - Disconnect from the end point. Does nothing if not connected
 	*/
 	void CDriver_OPCUA::Disconnect()
 	{
@@ -1465,58 +1276,97 @@ public:
 	}
 	
 	/**
-	* CDriver_OPCUA::CreateCommandList - Create Command
-	* @return Command list instance
+	* CDriver_OPCUA::IsConnected - Returns if an end point is connected.
+	* @return Returns true if connected.
 	*/
-	PPLCCommandList CDriver_OPCUA::CreateCommandList()
+	bool CDriver_OPCUA::IsConnected()
 	{
-		LibMCDriver_OPCUAHandle hListInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_CreateCommandList(m_pHandle, &hListInstance));
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_IsConnected(m_pHandle, &resultValue));
 		
-		if (!hListInstance) {
-			CheckError(LIBMCDRIVER_OPCUA_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CPLCCommandList>(m_pWrapper, hListInstance);
+		return resultValue;
 	}
 	
 	/**
-	* CDriver_OPCUA::CreateCommand - Creates a command instance.
-	* @param[in] sCommandName - Command Name.
-	* @return Returns a command instance.
+	* CDriver_OPCUA::ReadInteger - Reads an integer node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] eNodeType - Type of Node to read
+	* @return Retrieved Node Value
 	*/
-	PPLCCommand CDriver_OPCUA::CreateCommand(const std::string & sCommandName)
+	LibMCDriver_OPCUA_int64 CDriver_OPCUA::ReadInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const eUAIntegerType eNodeType)
 	{
-		LibMCDriver_OPCUAHandle hCommandInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_CreateCommand(m_pHandle, sCommandName.c_str(), &hCommandInstance));
+		LibMCDriver_OPCUA_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_ReadInteger(m_pHandle, nNameSpace, sNodeName.c_str(), eNodeType, &resultValue));
 		
-		if (!hCommandInstance) {
-			CheckError(LIBMCDRIVER_OPCUA_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CPLCCommand>(m_pWrapper, hCommandInstance);
+		return resultValue;
 	}
 	
 	/**
-	* CDriver_OPCUA::StartJournaling - Start Journaling.
+	* CDriver_OPCUA::ReadDouble - Reads a double node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] eNodeType - Type of Node to read
+	* @return Retrieved Node Value
 	*/
-	void CDriver_OPCUA::StartJournaling()
+	LibMCDriver_OPCUA_double CDriver_OPCUA::ReadDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const eUADoubleType eNodeType)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_StartJournaling(m_pHandle));
+		LibMCDriver_OPCUA_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_ReadDouble(m_pHandle, nNameSpace, sNodeName.c_str(), eNodeType, &resultValue));
+		
+		return resultValue;
 	}
 	
 	/**
-	* CDriver_OPCUA::StopJournaling - Stop Journaling.
+	* CDriver_OPCUA::ReadString - Reads a string node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @return Retrieved String Value
 	*/
-	void CDriver_OPCUA::StopJournaling()
+	std::string CDriver_OPCUA::ReadString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_StopJournaling(m_pHandle));
+		LibMCDriver_OPCUA_uint32 bytesNeededValue = 0;
+		LibMCDriver_OPCUA_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_ReadString(m_pHandle, nNameSpace, sNodeName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_ReadString(m_pHandle, nNameSpace, sNodeName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
 	}
 	
 	/**
-	* CDriver_OPCUA::RefreshJournal - Refresh Journal.
+	* CDriver_OPCUA::WriteInteger - Writes an integer node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] eNodeType - Type of Node to write
+	* @param[in] nValue - Node Value to write
 	*/
-	void CDriver_OPCUA::RefreshJournal()
+	void CDriver_OPCUA::WriteInteger(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const eUAIntegerType eNodeType, const LibMCDriver_OPCUA_int64 nValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_RefreshJournal(m_pHandle));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_WriteInteger(m_pHandle, nNameSpace, sNodeName.c_str(), eNodeType, nValue));
+	}
+	
+	/**
+	* CDriver_OPCUA::WriteDouble - Writes a double node value. Fails if not connected or node does not exist.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] eNodeType - Type of Node to write
+	* @param[in] dValue - Node Value to write
+	*/
+	void CDriver_OPCUA::WriteDouble(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const eUADoubleType eNodeType, const LibMCDriver_OPCUA_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_WriteDouble(m_pHandle, nNameSpace, sNodeName.c_str(), eNodeType, dValue));
+	}
+	
+	/**
+	* CDriver_OPCUA::WriteString - Writes a string node value. Fails if not connected.
+	* @param[in] nNameSpace - Namespace ID
+	* @param[in] sNodeName - NodeToRead
+	* @param[in] sValue - Node Value to write
+	*/
+	void CDriver_OPCUA::WriteString(const LibMCDriver_OPCUA_uint32 nNameSpace, const std::string & sNodeName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_OPCUA_WriteString(m_pHandle, nNameSpace, sNodeName.c_str(), sValue.c_str()));
 	}
 
 } // namespace LibMCDriver_OPCUA

@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CJournalSession
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "libmcdata_journalchunkintegerdata.hpp"
 
 
 using namespace LibMCData::Impl;
@@ -57,19 +58,45 @@ CJournalSession::~CJournalSession()
 }
 
 
-void CJournalSession::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nEntryDataBufferSize, const LibMCData::sJournalChunkIntegerEntry* pEntryDataBuffer)
+void CJournalSession::WriteJournalChunkIntegerData(const LibMCData_uint32 nChunkIndex, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nVariableInfoBufferSize, const LibMCData::sJournalChunkVariableInfo* pVariableInfoBuffer, const LibMCData_uint64 nTimeStampDataBufferSize, const LibMCData_uint32* pTimeStampDataBuffer, const LibMCData_uint64 nValueDataBufferSize, const LibMCData_int64* pValueDataBuffer) 
 {
-    m_pJournal->WriteJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nVariableInfoBufferSize, pVariableInfoBuffer, nEntryDataBufferSize, pEntryDataBuffer);
+    m_pJournal->WriteJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, nVariableInfoBufferSize, pVariableInfoBuffer, nTimeStampDataBufferSize, pTimeStampDataBuffer, nValueDataBufferSize, pValueDataBuffer);
 }
 
-LibMCData_uint32 CJournalSession::GetChunkCapacity()
+void CJournalSession::CreateVariableInJournalDB(const std::string& sName, const LibMCData_uint32 nID, const LibMCData_uint32 nIndex, const LibMCData::eParameterDataType eDataType, const LibMCData_double dUnits)
 {
-    return 1024 * 1024;
+    m_pJournal->CreateVariableInJournalDB(sName, nID, nIndex, eDataType, dUnits);
 }
 
-LibMCData_uint32 CJournalSession::GetFlushInterval()
+void CJournalSession::CreateVariableAliasInJournalDB(const std::string& sAliasName, const std::string& sSourceName)
 {
-    return 10;
+    m_pJournal->CreateVariableAliasInJournalDB(sAliasName, sSourceName);
+
+}
+
+
+IJournalChunkIntegerData* CJournalSession::ReadChunkIntegerData(const LibMCData_uint32 nChunkIndex)
+{
+    auto pResult = std::make_unique<CJournalChunkIntegerData>(nChunkIndex);
+
+    uint64_t nStartTimeStamp = 0;
+    uint64_t nEndTimeStamp = 0;
+
+    m_pJournal->ReadJournalChunkIntegerData(nChunkIndex, nStartTimeStamp, nEndTimeStamp, pResult->getVariableInfoInternal(), pResult->getTimeStampsInternal(), pResult->getValueDataInternal());
+    pResult->setTimeInterval(nStartTimeStamp, nEndTimeStamp);
+
+    return pResult.release();
+}
+
+
+LibMCData_uint64 CJournalSession::GetChunkCacheQuota()
+{
+    return m_pJournal->getMaxMemoryQuotaInBytes();
+}
+
+LibMCData_uint64 CJournalSession::GetChunkIntervalInMicroseconds()
+{
+    return m_pJournal->getChunkIntervalInMicroseconds();
 }
 
 std::string CJournalSession::GetSessionUUID()

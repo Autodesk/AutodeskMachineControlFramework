@@ -72,7 +72,9 @@ public:
 	void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) override;
 
 	void GetPNGDataStream(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) override;
-    
+
+    void WriteToStream(ITempStreamWriter* pStream) override;
+
     std::vector<uint8_t> & getPNGStreamBuffer ();
 
 };

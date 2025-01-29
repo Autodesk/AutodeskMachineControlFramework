@@ -202,6 +202,16 @@ typedef void * LibMCDriver_BuR_pvoid;
 #define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUENAME 1104 /** Journal schema misses value name. */
 #define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUEID 1105 /** Journal schema misses value id. */
 #define LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUESIZE 1106 /** Journal schema misses value size. */
+#define LIBMCDRIVER_BUR_ERROR_DUPLICATEJOURNALVALUEID 1107 /** Duplicate Journal value ID. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALVALUEIDNOTFOUND 1108 /** Journal value ID not found */
+#define LIBMCDRIVER_BUR_ERROR_INVALIDJOURNALVALUEINDEX 1109 /** Invalid Journal value index */
+#define LIBMCDRIVER_BUR_ERROR_DUPLICATEJOURNALGROUPID 1110 /** Duplicate Journal group ID. */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALGROUPIDNOTFOUND 1111 /** Journal group ID not found */
+#define LIBMCDRIVER_BUR_ERROR_INVALIDJOURNALGROUPINDEX 1112 /** Invalid Journal group index */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALVALUENAMENOTFOUND 1113 /** Journal value name not found */
+#define LIBMCDRIVER_BUR_ERROR_JOURNALGROUPNAMENOTFOUND 1114 /** Journal group name not found */
+#define LIBMCDRIVER_BUR_ERROR_NOGROUPATTRIBUTE 1115 /** No group attribute */
+#define LIBMCDRIVER_BUR_ERROR_NOVALUEATTRIBUTE 1116 /** No value attribute */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_BuR
@@ -316,6 +326,16 @@ inline const char * LIBMCDRIVER_BUR_GETERRORSTRING (LibMCDriver_BuRResult nError
     case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUENAME: return "Journal schema misses value name.";
     case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUEID: return "Journal schema misses value id.";
     case LIBMCDRIVER_BUR_ERROR_JOURNALSCHEMAHASINVALIDVALUESIZE: return "Journal schema misses value size.";
+    case LIBMCDRIVER_BUR_ERROR_DUPLICATEJOURNALVALUEID: return "Duplicate Journal value ID.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALVALUEIDNOTFOUND: return "Journal value ID not found";
+    case LIBMCDRIVER_BUR_ERROR_INVALIDJOURNALVALUEINDEX: return "Invalid Journal value index";
+    case LIBMCDRIVER_BUR_ERROR_DUPLICATEJOURNALGROUPID: return "Duplicate Journal group ID.";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALGROUPIDNOTFOUND: return "Journal group ID not found";
+    case LIBMCDRIVER_BUR_ERROR_INVALIDJOURNALGROUPINDEX: return "Invalid Journal group index";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALVALUENAMENOTFOUND: return "Journal value name not found";
+    case LIBMCDRIVER_BUR_ERROR_JOURNALGROUPNAMENOTFOUND: return "Journal group name not found";
+    case LIBMCDRIVER_BUR_ERROR_NOGROUPATTRIBUTE: return "No group attribute";
+    case LIBMCDRIVER_BUR_ERROR_NOVALUEATTRIBUTE: return "No value attribute";
     default: return "unknown error";
   }
 }

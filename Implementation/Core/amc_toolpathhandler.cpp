@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_toolpathhandler.hpp"
 #include "libmc_exceptiontypes.hpp"
-
+#include "common_utils.hpp"
 
 #define LIBRARYNAME_LIB3MF "lib3mf"
 
@@ -131,6 +131,28 @@ namespace AMC {
 		m_AttachmentRelationsToRead.erase(sRelationShip);
 
 	}
+
+	void CToolpathHandler::storeScatterplot(PScatterplot pScatterplot)
+	{
+		if (pScatterplot.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		m_Scatterplots.insert(std::make_pair (pScatterplot->getUUID(), pScatterplot));
+	}
+
+	PScatterplot CToolpathHandler::restoreScatterplot(const std::string& sUUID, bool bMustExist)
+	{
+		auto iIter = m_Scatterplots.find(AMCCommon::CUtils::normalizeUUIDString(sUUID));
+		if (iIter == m_Scatterplots.end()) {
+			if (bMustExist)
+				throw ELibMCCustomException(LIBMC_ERROR_SCATTERPLOTNOTFOUND, sUUID);
+
+			return nullptr;
+		}
+
+		return iIter->second;
+	}
+
 
 }
 

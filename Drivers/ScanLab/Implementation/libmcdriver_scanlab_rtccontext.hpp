@@ -15,6 +15,8 @@ Abstract: This is the class declaration of CRTCContext
 #include "libmcdriver_scanlab_interfaces.hpp"
 #include "libmcdriver_scanlab_sdk.hpp"
 #include "libmcdriver_scanlab_rtcrecordinginstance.hpp"
+#include "libmcdriver_scanlab_nlightafxprofileselector.hpp"
+#include "libmcdriver_scanlab_gpiosequence.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlab_base.hpp"
@@ -66,6 +68,8 @@ public:
 
 typedef std::shared_ptr<CRTCContextOwnerData> PRTCContextOwnerData;
 
+
+
 class CRTCContext : public virtual IRTCContext, public virtual CBase {
 
 protected:
@@ -111,8 +115,6 @@ protected:
 	bool m_bEnableLineSubdivision;
 	double m_dLineSubdivisionThreshold;
 
-	std::vector<uint8_t> m_HeadTransform;
-
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
@@ -121,6 +123,10 @@ protected:
 	std::vector<sLaserCalibrationPoint> m_LaserPowerCalibrationList;
 
 	std::map<std::string, PRTCRecordingInstance> m_Recordings;
+
+	std::map<std::string, PGPIOSequenceInstance> m_GPIOSequences;
+
+	PNLightAFXProfileSelectorInstance m_pNLightAFXSelectorInstance;
 	
 	void writeJumpSpeed (float jumpSpeed);
 
@@ -136,7 +142,7 @@ protected:
 
 	void sendOIEMeasurementTag (uint32_t nCurrentVectorID);
 
-	uint32_t saveRecordedDataBlock(std::ofstream& MyFile, uint32_t DataStart, uint32_t DataEnd, double CalibrationFactorXY);
+	void addGPIOSequenceToList (const std::string & sSequenceName);
 
 	void addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordingMode oieRecordingMode, uint32_t nAttributeFilterID, int64_t nAttributeFilterValue, float fMaxLaserPowerInWatts, bool bFailIfNonAssignedDataExists);
 
@@ -258,9 +264,23 @@ public:
 
 	void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2) override;
 
+	void AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput) override;
+
+	void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) override;
+
 	void EnableOIE() override;
 
 	void DisableOIE() override;
+
+	INLightAFXProfileSelector* CreateNLightAFXBeamProfileSelector() override;
+
+	IGPIOSequence* AddGPIOSequence(const std::string& sIdentifier) override;
+
+	IGPIOSequence* FindGPIOSequence(const std::string& sIdentifier, const bool bMustExist) override;
+
+	void DeleteGPIOSequence(const std::string& sIdentifier) override;
+
+	void WriteGPIOSequenceToList(const std::string& sIdentifier) override;
 
 	void StartOIEMeasurement() override;
 
@@ -271,6 +291,8 @@ public:
 	void SetOIEPIDMode(const LibMCDriver_ScanLab_uint32 nOIEPIDIndex) override;
 
 	void ClearOIEMeasurementTags() override;
+
+	LibMCDriver_ScanLab_uint32 GetOIEMaxMeasurementTag() override;
 
 	void EnableOIEMeasurementTagging() override;
 
@@ -300,7 +322,9 @@ public:
 	
 	void SetTransformationMatrix(const LibMCDriver_ScanLab_double dM11, const LibMCDriver_ScanLab_double dM12, const LibMCDriver_ScanLab_double dM21, const LibMCDriver_ScanLab_double dM22) override;
 
-	IRTCRecording* PrepareRecording(const bool bKeepInMemory) override;
+	bool CheckScanheadConnection() override;
+
+	IRTCRecording* PrepareRecording(const bool bKeepInMemory, const bool bEnableScanheadFeedback, const bool bEnableBacktransformation) override;
 
 	bool HasRecording(const std::string& sUUID) override;
 
@@ -400,6 +424,10 @@ public:
 	void SetScanAheadLaserShiftsInUnits(const LibMCDriver_ScanLab_int32 nLaserOnShift, const LibMCDriver_ScanLab_int32 nLaserOffShift) override;
 
 	void SetScanAheadLineParameters(const LibMCDriver_ScanLab_uint32 nCornerScale, const LibMCDriver_ScanLab_uint32 nEndScale, const LibMCDriver_ScanLab_uint32 nAccelerationScale) override;
+
+	LibMCDriver_ScanLab_int32 GetRTCChannel(const LibMCDriver_ScanLab::eRTCChannelType eChannelType) override;
+
+	LibMCDriver_ScanLab_int32 GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID) override;
 
 };
 

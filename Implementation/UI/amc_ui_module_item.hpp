@@ -40,6 +40,9 @@ namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_Item, PUIModule_Item);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
+	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
+	amcDeclareDependingClass(CUIModule_UIEventHandler, PUIModule_UIEventHandler);
 
 	class CUIModuleItem {
 	protected:		
@@ -63,6 +66,8 @@ namespace AMC {
 		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler * pClientVariableHandler, uint32_t nStateID) = 0;
 
 		virtual void setEventPayloadValue (const std::string & sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler);
+
+		virtual void handleCustomRequest (PAPIAuth pAuth, const std::string & requestType,  const CAPIJSONRequest & requestData, CJSONWriter & response, CUIModule_UIEventHandler* pEventHandler);
 
 	};
 

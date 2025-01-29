@@ -61,12 +61,15 @@ private:
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
     LibMCDriver_ScanLabSMC::eDynamicViolationReaction m_DynamicViolationReaction;
     LibMCDriver_ScanLabSMC::eWarnLevel m_WarnLevel;
+    
     uint32_t m_nSerialNumber;
     std::vector<uint8_t> m_CorrectionFileData;
     std::vector<uint8_t> m_FirmwareData;
     std::vector<uint8_t> m_FPGAData;
     std::vector<uint8_t> m_AuxiliaryData;
     std::string m_sIPAddress;
+    std::string m_sConfigurationTemplateXML;
+    std::string m_sSimulationSubDirectory;
 
 public:
 
@@ -93,12 +96,23 @@ public:
 	void SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nCorrectionFileDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pCorrectionFileDataBuffer) override;
 
 	void SetCorrectionFileResource(const std::string& sResourceName) override;
+
+    void SetConfigurationTemplateResource(const std::string& sResourceName) override;
     
+    void SetConfigurationTemplate(const std::string& sTemplateXML) override;
+
+    std::string GetConfigurationTemplate() override;
+
+    void SetSimulationSubDirectory(const std::string& sSubDirectory) override;
+
+    std::string GetSimulationSubDirectory() override;
+
+
     void SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLabSMC_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pFPGADataBuffer, const LibMCDriver_ScanLabSMC_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLabSMC_uint8* pAuxiliaryDataBuffer) override;
 
     void SetFirmwareResources(const std::string& sFirmwareDataResource, const std::string& sFPGADataResource, const std::string& sAuxiliaryDataResource) override;
 
-    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::PWorkingFile & newCorrectionFile);
+    std::string buildConfigurationXML(LibMCEnv::CWorkingDirectory * pWorkingDirectory, LibMCEnv::PWorkingFile & newCorrectionFile, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion, const std::string & sRTCIPAddress);
 
 };
 

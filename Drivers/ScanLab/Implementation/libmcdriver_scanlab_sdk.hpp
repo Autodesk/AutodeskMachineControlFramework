@@ -52,6 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SCANLAB_LASERFIELD_MINIMUMUNITS -524288
 #define SCANLAB_LASERFIELD_MAXIMUMUNITS 524287
 
+#define RTC6_BITFLAG_SCANHEADSTATUS_POWERFLAG (1UL << 7)
+#define RTC6_BITFLAG_SETTRIGGER_ROUNDTRIP (1UL << 31)
+
 
 namespace LibMCDriver_ScanLab {
 	namespace Impl {
@@ -99,6 +102,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_io_port_list) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_io_port_mask_list) (uint32_t nCardNo, uint32_t nValue, uint32_t nMask);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_8bit_port_list) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1_list) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2_list) (uint32_t nCardNo, uint32_t nValue);
@@ -214,6 +218,10 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_config_waveform_streaming_ctrl) (uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
 			
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_set_high_performance_mode) (uint32_t nCardNo, uint32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_repeat) (uint32_t nCardNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_until) (uint32_t nCardNo, uint32_t nNumberOfRepetitions);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_jump_rel_cond) (uint32_t nCardNo, uint32_t nMask1, uint32_t nMask0, int32_t nRelativeJumpPosition);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_jump_rel) (uint32_t nCardNo, int32_t nRelativeJumpPosition);
 
 		class CScanLabSDKJournal {
 		private:
@@ -289,7 +297,8 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_write_8bit_port ptr_n_write_8bit_port = nullptr;
 			PScanLabPtr_n_write_da_1 ptr_n_write_da_1 = nullptr;
 			PScanLabPtr_n_write_da_2 ptr_n_write_da_2 = nullptr;
-			PScanLabPtr_n_write_io_port ptr_n_write_io_port_list = nullptr;
+			PScanLabPtr_n_write_io_port_list ptr_n_write_io_port_list = nullptr;
+			PScanLabPtr_n_write_io_port_mask_list ptr_n_write_io_port_mask_list = nullptr;
 			PScanLabPtr_n_write_8bit_port ptr_n_write_8bit_port_list = nullptr;
 			PScanLabPtr_n_write_da_1 ptr_n_write_da_1_list = nullptr;
 			PScanLabPtr_n_write_da_2 ptr_n_write_da_2_list = nullptr;
@@ -393,6 +402,10 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_mcbsp_out_oie_ctrl ptr_n_set_mcbsp_out_oie_ctrl = nullptr;
 			PScanLabPtr_n_eth_config_waveform_streaming_ctrl ptr_n_eth_config_waveform_streaming_ctrl = nullptr;
 			PScanLabPtr_n_eth_set_high_performance_mode ptr_n_eth_set_high_performance_mode = nullptr;
+			PScanLabPtr_n_list_repeat ptr_n_list_repeat = nullptr;
+			PScanLabPtr_n_list_until ptr_n_list_until = nullptr;
+			PScanLabPtr_n_list_jump_rel_cond ptr_n_list_jump_rel_cond = nullptr;
+			PScanLabPtr_n_list_jump_rel ptr_n_list_jump_rel = nullptr;
 
 			void resetFunctionPtrs ();
 		public:
@@ -451,6 +464,7 @@ namespace LibMCDriver_ScanLab {
 			void n_write_da_1 (uint32_t nCardNo, uint32_t nValue);
 			void n_write_da_2 (uint32_t nCardNo, uint32_t nValue);
 			void n_write_io_port_list (uint32_t nCardNo, uint32_t nValue);
+			void n_write_io_port_mask_list(uint32_t nCardNo, uint32_t nValue, uint32_t nMask);			
 			void n_write_8bit_port_list (uint32_t nCardNo, uint32_t nValue);
 			void n_write_da_1_list (uint32_t nCardNo, uint32_t nValue);
 			void n_write_da_2_list (uint32_t nCardNo, uint32_t nValue);
@@ -565,6 +579,10 @@ namespace LibMCDriver_ScanLab {
 			void n_set_mcbsp_out_oie_ctrl (uint32_t nCardNo, uint32_t nSignalID1, uint32_t nSignalID2);
 			void n_eth_config_waveform_streaming_ctrl(uint32_t nCardNo, uint32_t nSize, uint32_t nFlags);
 			void n_eth_set_high_performance_mode(uint32_t nCardNo, uint32_t nMode);
+			void n_list_repeat (uint32_t nCardNo);
+			void n_list_until (uint32_t nCardNo, uint32_t nNumberOfRepetitions);
+			void n_list_jump_rel_cond (uint32_t nCardNo, uint32_t nMask1, uint32_t nMask0, int32_t nRelativeJumpPosition);
+			void n_list_jump_rel(uint32_t nCardNo, int32_t nRelativeJumpPosition);
 
 		};
 
