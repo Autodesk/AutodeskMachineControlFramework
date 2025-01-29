@@ -417,6 +417,15 @@ class LayerViewImpl {
 		this.RenderScene(true);		
 	}
 	
+	pointDataIsAvailable ()
+	{
+		if (this.layerPointsArray) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	updateLayerPoints () {
 		if (!this.glInstance) 
 			return;

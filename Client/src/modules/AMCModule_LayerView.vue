@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     Toolpath
                 </button>
 				
-				<button class="rounded-button" @click="onToggleColorModeClick">
+				<button class="rounded-button"  @click="onToggleColorModeClick" v-if="LayerViewerInstance.pointDataIsAvailable ()">
                     <v-icon left size="20px" color="white">mdi-palette</v-icon>
                     {{ getColorModeCaption () }}
                 </button>
