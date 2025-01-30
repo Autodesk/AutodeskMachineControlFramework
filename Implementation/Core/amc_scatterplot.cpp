@@ -29,25 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-<<<<<<<< HEAD:Implementation/Core/amc_meshsceneitem.cpp
-#include "amc_meshsceneitem.hpp"
-#include "libmc_exceptiontypes.hpp"
-#include "common_utils.hpp"
-#include "amc_meshutils.hpp"
-
-namespace AMC {
-
-
-	CMeshSceneItem::CMeshSceneItem(const std::string& sUUID, const std::string& sMeshEntityUUID)
-		: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), 
-		m_sMeshEntityUUID (AMCCommon::CUtils::normalizeUUIDString (sMeshEntityUUID))
-	{
-		m_Transform = CMeshUtils::createIdentityTransform();
-
-	}
-
-	CMeshSceneItem::~CMeshSceneItem()
-========
 #include "amc_scatterplot.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
@@ -61,37 +42,15 @@ namespace AMC {
 	}
 
 	CScatterplot::~CScatterplot()
->>>>>>>> develop:Implementation/Core/amc_scatterplot.cpp
 	{
 
 	}
 
-<<<<<<<< HEAD:Implementation/Core/amc_meshsceneitem.cpp
-	std::string CMeshSceneItem::getUUID()
-========
 	std::string CScatterplot::getUUID()
->>>>>>>> develop:Implementation/Core/amc_scatterplot.cpp
 	{
 		return m_sUUID;
 	}
 
-<<<<<<<< HEAD:Implementation/Core/amc_meshsceneitem.cpp
-	std::string CMeshSceneItem::getMeshEntityUUID()
-	{
-		return m_sMeshEntityUUID;
-	}
-
-	LibMCEnv::sModelDataTransform CMeshSceneItem::getTransform()
-	{
-		return m_Transform;
-	}
-
-	void CMeshSceneItem::updateTransform(const LibMCEnv::sModelDataTransform newTransform)
-	{
-		m_Transform = newTransform;
-	}
-
-========
 	void CScatterplot::clearData()
 	{
 		m_PointEntries.clear();
@@ -154,7 +113,6 @@ namespace AMC {
 		}
 	}
 
->>>>>>>> develop:Implementation/Core/amc_scatterplot.cpp
 }
 
 

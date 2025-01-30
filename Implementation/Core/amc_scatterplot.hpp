@@ -29,23 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-<<<<<<<< HEAD:Implementation/Core/amc_meshutils.hpp
-#ifndef __AMC_MESHUTILS
-#define __AMC_MESHUTILS
-
-#include "libmcenv_types.hpp"
-#include "lib3mf/lib3mf_types.hpp"
-
-namespace AMC {
-
-	class CMeshUtils {
-
-	public:
-
-		static LibMCEnv::sModelDataTransform map3MFTransform(const Lib3MF::sTransform transform3MF);
-
-		static LibMCEnv::sModelDataTransform createIdentityTransform();
-========
 #ifndef __AMC_SCATTERPLOT
 #define __AMC_SCATTERPLOT
 
@@ -98,21 +81,12 @@ namespace AMC {
 
 		void computeBoundaries();
 
->>>>>>>> develop:Implementation/Core/amc_scatterplot.hpp
 
-		static LibMCEnv::sModelDataTransform multiplyTransforms(const LibMCEnv::sModelDataTransform& transform1, const LibMCEnv::sModelDataTransform& transform2);
 	};
 
-<<<<<<<< HEAD:Implementation/Core/amc_meshutils.hpp
-
-}
-
-#endif //__AMC_MESHUTILS
-========
 	
 }
 
 
 #endif //__AMC_SCATTERPLOT
->>>>>>>> develop:Implementation/Core/amc_scatterplot.hpp
 
