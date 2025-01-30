@@ -276,10 +276,10 @@ __DECLARESTATE(exposure)
 		}
 
 		auto pContext = pDriver->GetContext();
-		auto pRecording = pContext->PrepareRecording(true);
+		auto pRecording = pContext->PrepareRecording(true, true, true);
 
-		pRecording->AddChannel("x", LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetXBacktransformed);
-		pRecording->AddChannel("y", LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetYBacktransformed);
+		pRecording->AddChannel("x", LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetX);
+		pRecording->AddChannel("y", LibMCDriver_ScanLab::eRTCChannelType::ChannelTargetY);
 		pRecording->AddChannel("power", LibMCDriver_ScanLab::eRTCChannelType::ChannelAnalogOut1);
 
 		pContext->SetStartList(1, 0);

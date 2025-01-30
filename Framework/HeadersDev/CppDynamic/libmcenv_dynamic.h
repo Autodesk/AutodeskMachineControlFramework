@@ -2903,16 +2903,6 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPartUUIDPtr) (LibMCEnv
 typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nSegmentIndex, LibMCEnv_uint32 * pLocalPartID);
 
 /**
-* Retrieves the local segment part id on the layer. ATTENTION: This ID is only unique within the layer and there is no guarantee to be globally unique or consistent across layers.
-*
-* @param[in] pToolpathLayer - ToolpathLayer instance.
-* @param[in] nIndex - Index. Must be between 0 and Count - 1.
-* @param[out] pLocalPartID - Local Part ID of the segment
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentLocalPartIDPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pLocalPartID);
-
-/**
 * Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
