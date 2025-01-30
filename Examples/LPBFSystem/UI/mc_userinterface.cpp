@@ -689,7 +689,7 @@ public:
 
 		uint64_t nLifetimeInMicroseconds = pJournal->GetJournalLifeTimeInMicroseconds();
 
-		auto pVariable = pJournal->RetrieveJournalVariableFromTimeInterval("main.jobinfo.countertest", 0, nLifetimeInMicroseconds);
+		auto pVariable = pJournal->RetrieveJournalVariable ("main.jobinfo.countertest");
 		double dValue = pVariable->ComputeDoubleSample(10000000);
 
 		pUIEnvironment->LogMessage("Double sample: " + std::to_string (dValue));
