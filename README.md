@@ -38,7 +38,7 @@ TODO
 	- cmake
 	- git
 	- uuid-dev
-* build_clean_linux64.sh should build the binaries and dev packages on Windows. The results are located in "build/Output".
+* build_clean_linux64.sh should build the binaries and dev packages on linux. The results are located in "build/Output".
 
 ## Dependencies / Prerequisites (on ARM Linux)
 TODO
