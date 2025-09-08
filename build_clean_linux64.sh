@@ -128,6 +128,7 @@ fi
 fi
 
 cp "$basepath/Artifacts/clientdist/clientpackage.zip" "$builddir/Output/${GITHASH}_core.client"
+cp "$basepath/Artifacts/apidocsdist/apidocspackage.zip" "$builddir/Output/${GITHASH}_core.apidocs"
 
 cd "$builddir"
 
