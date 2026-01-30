@@ -1114,6 +1114,15 @@ void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, con
 	m_nCurrentScanPositionY = intY;
 }
 
+int32_t CRTCContext::ConvertDelaySecondsToTicks(double delay)
+{
+	// 1 tick = 1/64 us = 1e-6 / 64 s
+	// ticks = delay / (1e-6/64) = delay * 64e6
+	const int64_t ticks = static_cast<int64_t>(std::llround(delay * 64.0e6));
+
+	// Clamp to [0 .. 32767]
+	return static_cast<int32_t>( (ticks < 0) ? 0 :	(ticks > 32767) ? 32767 : ticks );
+}
 
 void CRTCContext::AddMicrovectorMovement(const LibMCDriver_ScanLab_uint64 nMicrovectorArrayBufferSize, const LibMCDriver_ScanLab::sMicroVector* pMicrovectorArrayBuffer)
 {
@@ -1131,9 +1140,8 @@ void CRTCContext::AddMicrovectorMovement(const LibMCDriver_ScanLab_uint64 nMicro
 
 			int32_t intX = (int32_t)dX;
 			int32_t intY = (int32_t)dY;
-
-			int32_t intDelayLaserOn = (pMicroVector->m_LaserOnDelay < 0.0) ? -1 : round(pMicroVector->m_LaserOnDelay * 100000);
-			int32_t intDelayLaserOff = (pMicroVector->m_LaserOffDelay < 0.0) ? -1 : round(pMicroVector->m_LaserOffDelay * 100000);
+			int32_t intDelayLaserOn = (pMicroVector->m_LaserOnDelay < 0.0) ? -1 : ConvertDelaySecondsToTicks(pMicroVector->m_LaserOnDelay);
+			int32_t intDelayLaserOff = (pMicroVector->m_LaserOffDelay < 0.0) ? -1 : ConvertDelaySecondsToTicks(pMicroVector->m_LaserOffDelay);
 
 			m_pScanLabSDK->n_micro_vector_abs(m_CardNo, intX, intY, intDelayLaserOn, intDelayLaserOff);
 

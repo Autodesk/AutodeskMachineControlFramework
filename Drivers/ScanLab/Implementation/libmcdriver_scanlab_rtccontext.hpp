@@ -213,6 +213,9 @@ protected:
 	// Calls the SetTriggerX Call that is necessary for the specific OIE board
 	void callSetTriggerOIE(uint32_t nPeriod);
 
+	// Converts a delay in seconds to RTC ticks
+	int32_t ConvertDelaySecondsToTicks(double delay);
+
 public:
 
 	CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);

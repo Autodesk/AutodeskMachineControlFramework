@@ -841,9 +841,34 @@ public:
 
 	void fillScatterplotChannel(AMC::CScatterplot* pScatterplot, const std::string& sChannel, const std::string& sColumn, double dScaleFactor, double dOffset) override
 	{
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
-	}
+		if (pScatterplot == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+		auto& channelEntries = pScatterplot->getChannelEntries();
+		auto channelIter = channelEntries.find(sChannel);
+
+		if (channelIter == channelEntries.end()) {
+			channelEntries[sChannel][sColumn] = std::vector<double>();
+		}
+		else {
+			auto& columnEntries = channelIter->second;
+
+			if (columnEntries.find(sColumn) == columnEntries.end())
+				columnEntries[sColumn] = std::vector<double>();
+			else {
+				std::string sException = "The channel = " + sChannel + " with the column = " + sColumn + " already exists";
+				throw std::runtime_error(sException.c_str());
+			}
+		}
+
+		auto& vecColumn = channelEntries[sChannel][sColumn];
+
+		vecColumn.resize(m_Rows.size());
+
+		for (size_t nIndex = 0; nIndex < m_Rows.size(); nIndex++) {
+			vecColumn[nIndex] = (double)m_Rows.at(nIndex) * dScaleFactor + dOffset;
+		}
+	}
 };
 
 
