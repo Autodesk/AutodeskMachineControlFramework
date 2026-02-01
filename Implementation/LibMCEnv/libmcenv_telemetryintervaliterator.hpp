@@ -27,62 +27,52 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CJournalHandler_Current
+Abstract: This is the class declaration of CTelemetryIntervalIterator
 
 */
 
 
-#ifndef __LIBMCENV_JOURNALHANDLER_CURRENT
-#define __LIBMCENV_JOURNALHANDLER_CURRENT
+#ifndef __LIBMCENV_TELEMETRYINTERVALITERATOR
+#define __LIBMCENV_TELEMETRYINTERVALITERATOR
 
 #include "libmcenv_interfaces.hpp"
 
 // Parent classes
-#include "libmcenv_base.hpp"
+#include "libmcenv_iterator.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "amc_statejournal.hpp"
+#include "libmcenv_telemetryinterval.hpp"
+
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CJournalHandler_Current 
+ Class declaration of CTelemetryIntervalIterator 
 **************************************************************************************************************************/
 
-class CJournalHandler_Current : public virtual IJournalHandler, public virtual CBase {
-protected:
-
-    AMC::PStateJournal m_pStateJournal;
+class CTelemetryIntervalIterator : public virtual ITelemetryIntervalIterator, public virtual CIterator {
+private:
 
 public:
 
-    CJournalHandler_Current(AMC::PStateJournal pStateJournal);
+	CTelemetryIntervalIterator();
 
-    virtual ~CJournalHandler_Current();
+	virtual ~CTelemetryIntervalIterator();
 
-    IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName) override;
+	IIterator* Clone() override;
 
-    IDateTime* GetStartTime() override;
+	IBase* GetCurrent() override;
 
-    IDateTime* GetEndTime() override;
+	ITelemetryInterval* GetCurrentInterval() override;
 
-    LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds() override;
+	void AddInterval(std::shared_ptr<CTelemetryInterval> pInterval);
 
-	ILogEntryList* RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
-
-	ILogEntryList* RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
-
-	IAlertIterator* RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
-
-	IAlertIterator* RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
-
-	ITelemetryHandler* LoadTelemetryHandler() override;
 };
 
 } // namespace Impl
@@ -91,4 +81,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_JOURNALHANDLER_CURRENT
+#endif // __LIBMCENV_TELEMETRYINTERVALITERATOR

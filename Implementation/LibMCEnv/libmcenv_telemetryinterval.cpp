@@ -27,68 +27,56 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CJournalHandler_Current
+Abstract: This is a stub class definition of CTelemetryInterval
 
 */
 
-
-#ifndef __LIBMCENV_JOURNALHANDLER_CURRENT
-#define __LIBMCENV_JOURNALHANDLER_CURRENT
-
-#include "libmcenv_interfaces.hpp"
-
-// Parent classes
-#include "libmcenv_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcenv_telemetryinterval.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
-#include "amc_statejournal.hpp"
 
-namespace LibMCEnv {
-namespace Impl {
-
+using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CJournalHandler_Current 
+ Class definition of CTelemetryInterval 
 **************************************************************************************************************************/
 
-class CJournalHandler_Current : public virtual IJournalHandler, public virtual CBase {
-protected:
+CTelemetryInterval::CTelemetryInterval(uint64_t nMarkerID, const std::string& sChannelIdentifier, uint64_t nStartTimestamp, uint64_t nEndTimestamp, uint64_t nContextData)
+	: m_nMarkerID(nMarkerID), m_sChannelIdentifier(sChannelIdentifier), m_nStartTimestamp(nStartTimestamp), m_nEndTimestamp(nEndTimestamp), m_nContextData(nContextData)
+{
+}
 
-    AMC::PStateJournal m_pStateJournal;
+CTelemetryInterval::~CTelemetryInterval()
+{
+}
 
-public:
+LibMCEnv_uint64 CTelemetryInterval::GetMarkerID()
+{
+	return m_nMarkerID;
+}
 
-    CJournalHandler_Current(AMC::PStateJournal pStateJournal);
+std::string CTelemetryInterval::GetChannelIdentifier()
+{
+	return m_sChannelIdentifier;
+}
 
-    virtual ~CJournalHandler_Current();
+LibMCEnv_uint64 CTelemetryInterval::GetStartTimestamp()
+{
+	return m_nStartTimestamp;
+}
 
-    IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName) override;
+LibMCEnv_uint64 CTelemetryInterval::GetEndTimestamp()
+{
+	return m_nEndTimestamp;
+}
 
-    IDateTime* GetStartTime() override;
+LibMCEnv_uint64 CTelemetryInterval::GetDuration()
+{
+	return m_nEndTimestamp - m_nStartTimestamp;
+}
 
-    IDateTime* GetEndTime() override;
-
-    LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds() override;
-
-	ILogEntryList* RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
-
-	ILogEntryList* RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
-
-	IAlertIterator* RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
-
-	IAlertIterator* RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
-
-	ITelemetryHandler* LoadTelemetryHandler() override;
-};
-
-} // namespace Impl
-} // namespace LibMCEnv
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCENV_JOURNALHANDLER_CURRENT
+LibMCEnv_uint64 CTelemetryInterval::GetContextData()
+{
+	return m_nContextData;
+}

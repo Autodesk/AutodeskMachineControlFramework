@@ -124,6 +124,10 @@ class IAlert;
 class IAlertIterator;
 class ILogEntryList;
 class IJournalHandler;
+class ITelemetryInterval;
+class ITelemetryIntervalIterator;
+class ITelemetryChannelStatistics;
+class ITelemetryHandler;
 class IUserDetailList;
 class IUserManagementHandler;
 class IMachineConfigurationXSD;
@@ -6595,9 +6599,220 @@ public:
 	*/
 	virtual IAlertIterator * RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
 
+	/**
+	* IJournalHandler::LoadTelemetryHandler - Loads the telemetry handler for this journal.
+	* @return Telemetry handler instance.
+	*/
+	virtual ITelemetryHandler * LoadTelemetryHandler() = 0;
+
 };
 
 typedef IBaseSharedPtr<IJournalHandler> PIJournalHandler;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryInterval 
+**************************************************************************************************************************/
+
+class ITelemetryInterval : public virtual IBase {
+public:
+	/**
+	* ITelemetryInterval::GetMarkerID - Returns the marker ID.
+	* @return Marker ID
+	*/
+	virtual LibMCEnv_uint64 GetMarkerID() = 0;
+
+	/**
+	* ITelemetryInterval::GetChannelIdentifier - Returns the channel identifier.
+	* @return Channel identifier
+	*/
+	virtual std::string GetChannelIdentifier() = 0;
+
+	/**
+	* ITelemetryInterval::GetStartTimestamp - Returns the start timestamp in microseconds.
+	* @return Start timestamp
+	*/
+	virtual LibMCEnv_uint64 GetStartTimestamp() = 0;
+
+	/**
+	* ITelemetryInterval::GetEndTimestamp - Returns the end timestamp in microseconds.
+	* @return End timestamp
+	*/
+	virtual LibMCEnv_uint64 GetEndTimestamp() = 0;
+
+	/**
+	* ITelemetryInterval::GetDuration - Returns the duration in microseconds.
+	* @return Duration
+	*/
+	virtual LibMCEnv_uint64 GetDuration() = 0;
+
+	/**
+	* ITelemetryInterval::GetContextData - Returns the context data.
+	* @return Context data
+	*/
+	virtual LibMCEnv_uint64 GetContextData() = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryInterval> PITelemetryInterval;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryIntervalIterator 
+**************************************************************************************************************************/
+
+class ITelemetryIntervalIterator : public virtual IIterator {
+public:
+	/**
+	* ITelemetryIntervalIterator::GetCurrentInterval - Returns the current interval.
+	* @return Current interval
+	*/
+	virtual ITelemetryInterval * GetCurrentInterval() = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryIntervalIterator> PITelemetryIntervalIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryChannelStatistics 
+**************************************************************************************************************************/
+
+class ITelemetryChannelStatistics : public virtual IBase {
+public:
+	/**
+	* ITelemetryChannelStatistics::GetChannelIdentifier - Returns the channel identifier.
+	* @return Channel identifier
+	*/
+	virtual std::string GetChannelIdentifier() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetIntervalCount - Returns the number of completed intervals.
+	* @return Number of intervals
+	*/
+	virtual LibMCEnv_uint64 GetIntervalCount() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetInstantMarkerCount - Returns the number of instant markers.
+	* @return Number of instant markers
+	*/
+	virtual LibMCEnv_uint64 GetInstantMarkerCount() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetTotalDuration - Returns the total duration of all intervals.
+	* @return Total duration in microseconds
+	*/
+	virtual LibMCEnv_uint64 GetTotalDuration() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetMinDuration - Returns the minimum interval duration.
+	* @return Min duration in microseconds
+	*/
+	virtual LibMCEnv_uint64 GetMinDuration() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetMaxDuration - Returns the maximum interval duration.
+	* @return Max duration in microseconds
+	*/
+	virtual LibMCEnv_uint64 GetMaxDuration() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetAverageDuration - Returns the average interval duration.
+	* @return Average duration in microseconds
+	*/
+	virtual LibMCEnv_uint64 GetAverageDuration() = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryChannelStatistics> PITelemetryChannelStatistics;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryHandler 
+**************************************************************************************************************************/
+
+class ITelemetryHandler : public virtual IBase {
+public:
+	/**
+	* ITelemetryHandler::GetSessionUUID - Returns the session UUID.
+	* @return Session UUID
+	*/
+	virtual std::string GetSessionUUID() = 0;
+
+	/**
+	* ITelemetryHandler::GetStartTime - Returns the session start time.
+	* @return DateTime Instance
+	*/
+	virtual IDateTime * GetStartTime() = 0;
+
+	/**
+	* ITelemetryHandler::GetEndTime - Returns the session end time.
+	* @return DateTime Instance
+	*/
+	virtual IDateTime * GetEndTime() = 0;
+
+	/**
+	* ITelemetryHandler::GetLifeTimeInMicroseconds - Returns the session lifetime in microseconds.
+	* @return Lifetime
+	*/
+	virtual LibMCEnv_uint64 GetLifeTimeInMicroseconds() = 0;
+
+	/**
+	* ITelemetryHandler::GetChannelCount - Returns the number of telemetry channels.
+	* @return Number of channels
+	*/
+	virtual LibMCEnv_uint32 GetChannelCount() = 0;
+
+	/**
+	* ITelemetryHandler::GetChannelIdentifier - Returns the identifier for a channel by index.
+	* @param[in] nChannelIndex - Channel index (0-based)
+	* @return Channel identifier
+	*/
+	virtual std::string GetChannelIdentifier(const LibMCEnv_uint32 nChannelIndex) = 0;
+
+	/**
+	* ITelemetryHandler::HasChannel - Checks if a channel exists.
+	* @param[in] sIdentifier - Channel identifier
+	* @return True if channel exists
+	*/
+	virtual bool HasChannel(const std::string & sIdentifier) = 0;
+
+	/**
+	* ITelemetryHandler::GetChannelDescription - Returns the description of a channel.
+	* @param[in] sIdentifier - Channel identifier
+	* @return Channel description
+	*/
+	virtual std::string GetChannelDescription(const std::string & sIdentifier) = 0;
+
+	/**
+	* ITelemetryHandler::QueryIntervalsFromTimeDelta - Queries intervals from the last N microseconds.
+	* @param[in] sChannelIdentifier - Channel identifier. Empty string for all channels.
+	* @param[in] nTimeDeltaInMicroseconds - Time delta from the end of the session.
+	* @return Iterator over intervals
+	*/
+	virtual ITelemetryIntervalIterator * QueryIntervalsFromTimeDelta(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nTimeDeltaInMicroseconds) = 0;
+
+	/**
+	* ITelemetryHandler::QueryIntervalsFromTimeRange - Queries intervals within a time range.
+	* @param[in] sChannelIdentifier - Channel identifier. Empty string for all channels.
+	* @param[in] nStartTimeInMicroseconds - Start time.
+	* @param[in] nEndTimeInMicroseconds - End time.
+	* @return Iterator over intervals
+	*/
+	virtual ITelemetryIntervalIterator * QueryIntervalsFromTimeRange(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
+
+	/**
+	* ITelemetryHandler::GetChannelStatistics - Gets aggregated statistics for a channel.
+	* @param[in] sChannelIdentifier - Channel identifier.
+	* @param[in] nStartTimeInMicroseconds - Start time (0 for beginning of session).
+	* @param[in] nEndTimeInMicroseconds - End time (0 for end of session).
+	* @return Statistics instance
+	*/
+	virtual ITelemetryChannelStatistics * GetChannelStatistics(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryHandler> PITelemetryHandler;
 
 
 /*************************************************************************************************************************

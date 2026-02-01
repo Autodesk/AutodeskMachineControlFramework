@@ -103,6 +103,8 @@ public:
 
 	ITelemetrySession* CreateTelemetrySession() override;
 
+	ITelemetryReader* CreateTelemetryReader(const std::string& sJournalUUID) override;
+
 	IBuildJobHandler* CreateBuildJobHandler() override;
 
 	ILoginHandler* CreateLoginHandler() override;

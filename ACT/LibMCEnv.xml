@@ -292,6 +292,7 @@
 		<error name="MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED" code="10252" description="Schema type already registered, but with a different name." />	
 		<error name="NOCONFIGURATIONVERSIONFOUND" code="10253" description="No configuration version found." />	
 		<error name="NOCONFIGURATIONVERSIONACTIVE" code="10254" description="No configuration version active." />	
+		<error name="TELEMETRYCHANNELNOTFOUND" code="10255" description="Telemetry channel not found." />	
 		
 		
 	</errors>
@@ -4660,8 +4661,144 @@
 			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="Alert Iterator Instance." />
 		</method>
+
+		<method name="LoadTelemetryHandler" description="Loads the telemetry handler for this journal.">
+			<param name="TelemetryHandlerInstance" type="class" class="TelemetryHandler" pass="return" description="Telemetry handler instance." />
+		</method>
 		
 	</class>
+
+
+	<class name="TelemetryInterval" parent="Base" description="Represents a completed telemetry interval.">
+
+		<method name="GetMarkerID" description="Returns the marker ID.">
+			<param name="MarkerID" type="uint64" pass="return" description="Marker ID" />	
+		</method>
+
+		<method name="GetChannelIdentifier" description="Returns the channel identifier.">
+			<param name="Identifier" type="string" pass="return" description="Channel identifier" />	
+		</method>
+
+		<method name="GetStartTimestamp" description="Returns the start timestamp in microseconds.">
+			<param name="Timestamp" type="uint64" pass="return" description="Start timestamp" />	
+		</method>
+
+		<method name="GetEndTimestamp" description="Returns the end timestamp in microseconds.">
+			<param name="Timestamp" type="uint64" pass="return" description="End timestamp" />	
+		</method>
+
+		<method name="GetDuration" description="Returns the duration in microseconds.">
+			<param name="Duration" type="uint64" pass="return" description="Duration" />	
+		</method>
+
+		<method name="GetContextData" description="Returns the context data.">
+			<param name="ContextData" type="uint64" pass="return" description="Context data" />	
+		</method>
+
+	</class>
+
+
+	<class name="TelemetryIntervalIterator" parent="Iterator" description="Iterator for telemetry intervals.">
+		
+		<method name="GetCurrentInterval" description="Returns the current interval.">
+			<param name="Interval" type="class" class="TelemetryInterval" pass="return" description="Current interval" />	
+		</method>
+
+	</class>
+
+
+	<class name="TelemetryChannelStatistics" parent="Base" description="Aggregated telemetry statistics for a channel.">
+
+		<method name="GetChannelIdentifier" description="Returns the channel identifier.">
+			<param name="Identifier" type="string" pass="return" description="Channel identifier" />	
+		</method>
+
+		<method name="GetIntervalCount" description="Returns the number of completed intervals.">
+			<param name="Count" type="uint64" pass="return" description="Number of intervals" />	
+		</method>
+
+		<method name="GetInstantMarkerCount" description="Returns the number of instant markers.">
+			<param name="Count" type="uint64" pass="return" description="Number of instant markers" />	
+		</method>
+
+		<method name="GetTotalDuration" description="Returns the total duration of all intervals.">
+			<param name="Duration" type="uint64" pass="return" description="Total duration in microseconds" />	
+		</method>
+
+		<method name="GetMinDuration" description="Returns the minimum interval duration.">
+			<param name="Duration" type="uint64" pass="return" description="Min duration in microseconds" />	
+		</method>
+
+		<method name="GetMaxDuration" description="Returns the maximum interval duration.">
+			<param name="Duration" type="uint64" pass="return" description="Max duration in microseconds" />	
+		</method>
+
+		<method name="GetAverageDuration" description="Returns the average interval duration.">
+			<param name="Duration" type="uint64" pass="return" description="Average duration in microseconds" />	
+		</method>
+
+	</class>
+
+
+	<class name="TelemetryHandler" parent="Base" description="Handler for accessing past telemetry data.">
+
+		<method name="GetSessionUUID" description="Returns the session UUID.">
+			<param name="UUID" type="string" pass="return" description="Session UUID" />	
+		</method>
+
+		<method name="GetStartTime" description="Returns the session start time.">
+			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
+		</method>
+
+		<method name="GetEndTime" description="Returns the session end time.">
+			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
+		</method>
+
+		<method name="GetLifeTimeInMicroseconds" description="Returns the session lifetime in microseconds.">
+			<param name="LifeTime" type="uint64" pass="return" description="Lifetime" />	
+		</method>
+
+		<method name="GetChannelCount" description="Returns the number of telemetry channels.">
+			<param name="Count" type="uint32" pass="return" description="Number of channels" />	
+		</method>
+
+		<method name="GetChannelIdentifier" description="Returns the identifier for a channel by index.">
+			<param name="ChannelIndex" type="uint32" pass="in" description="Channel index (0-based)" />	
+			<param name="Identifier" type="string" pass="return" description="Channel identifier" />	
+		</method>
+
+		<method name="HasChannel" description="Checks if a channel exists.">
+			<param name="Identifier" type="string" pass="in" description="Channel identifier" />	
+			<param name="Exists" type="bool" pass="return" description="True if channel exists" />	
+		</method>
+
+		<method name="GetChannelDescription" description="Returns the description of a channel.">
+			<param name="Identifier" type="string" pass="in" description="Channel identifier" />	
+			<param name="Description" type="string" pass="return" description="Channel description" />	
+		</method>
+
+		<method name="QueryIntervalsFromTimeDelta" description="Queries intervals from the last N microseconds.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel identifier. Empty string for all channels." />	
+			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="Time delta from the end of the session." />	
+			<param name="Iterator" type="class" class="TelemetryIntervalIterator" pass="return" description="Iterator over intervals" />	
+		</method>
+
+		<method name="QueryIntervalsFromTimeRange" description="Queries intervals within a time range.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel identifier. Empty string for all channels." />	
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time." />	
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time." />	
+			<param name="Iterator" type="class" class="TelemetryIntervalIterator" pass="return" description="Iterator over intervals" />	
+		</method>
+
+		<method name="GetChannelStatistics" description="Gets aggregated statistics for a channel.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel identifier." />	
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time (0 for beginning of session)." />	
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time (0 for end of session)." />	
+			<param name="Statistics" type="class" class="TelemetryChannelStatistics" pass="return" description="Statistics instance" />	
+		</method>
+
+	</class>
+
 
 	<class name="UserDetailList" parent="Base" description="List of user details at a certain snapshot time.">
 

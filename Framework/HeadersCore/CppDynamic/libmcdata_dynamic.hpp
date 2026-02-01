@@ -67,6 +67,8 @@ class CAlert;
 class CAlertIterator;
 class CAlertSession;
 class CTelemetrySession;
+class CTelemetryChunkData;
+class CTelemetryReader;
 class CJournalChunkIntegerData;
 class CJournalSession;
 class CJournalReader;
@@ -107,6 +109,8 @@ typedef CAlert CLibMCDataAlert;
 typedef CAlertIterator CLibMCDataAlertIterator;
 typedef CAlertSession CLibMCDataAlertSession;
 typedef CTelemetrySession CLibMCDataTelemetrySession;
+typedef CTelemetryChunkData CLibMCDataTelemetryChunkData;
+typedef CTelemetryReader CLibMCDataTelemetryReader;
 typedef CJournalChunkIntegerData CLibMCDataJournalChunkIntegerData;
 typedef CJournalSession CLibMCDataJournalSession;
 typedef CJournalReader CLibMCDataJournalReader;
@@ -147,6 +151,8 @@ typedef std::shared_ptr<CAlert> PAlert;
 typedef std::shared_ptr<CAlertIterator> PAlertIterator;
 typedef std::shared_ptr<CAlertSession> PAlertSession;
 typedef std::shared_ptr<CTelemetrySession> PTelemetrySession;
+typedef std::shared_ptr<CTelemetryChunkData> PTelemetryChunkData;
+typedef std::shared_ptr<CTelemetryReader> PTelemetryReader;
 typedef std::shared_ptr<CJournalChunkIntegerData> PJournalChunkIntegerData;
 typedef std::shared_ptr<CJournalSession> PJournalSession;
 typedef std::shared_ptr<CJournalReader> PJournalReader;
@@ -187,6 +193,8 @@ typedef PAlert PLibMCDataAlert;
 typedef PAlertIterator PLibMCDataAlertIterator;
 typedef PAlertSession PLibMCDataAlertSession;
 typedef PTelemetrySession PLibMCDataTelemetrySession;
+typedef PTelemetryChunkData PLibMCDataTelemetryChunkData;
+typedef PTelemetryReader PLibMCDataTelemetryReader;
 typedef PJournalChunkIntegerData PLibMCDataJournalChunkIntegerData;
 typedef PJournalSession PLibMCDataJournalSession;
 typedef PJournalReader PLibMCDataJournalReader;
@@ -1184,6 +1192,8 @@ private:
 	friend class CAlertIterator;
 	friend class CAlertSession;
 	friend class CTelemetrySession;
+	friend class CTelemetryChunkData;
+	friend class CTelemetryReader;
 	friend class CJournalChunkIntegerData;
 	friend class CJournalSession;
 	friend class CJournalReader;
@@ -1417,6 +1427,56 @@ public:
 	inline std::string GetSessionUUID();
 	inline void CreateChannelInDB(const std::string & sUUID, const eTelemetryChannelType eChannelType, const LibMCData_uint32 nChannelIndex, const std::string & sChannelIdentifier, const std::string & sChannelDescription);
 	inline void WriteTelemetryChunk(const LibMCData_uint64 nChunkID, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sTelemetryChunkEntry> & TelemetryEntriesBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryChunkData 
+**************************************************************************************************************************/
+class CTelemetryChunkData : public CBase {
+public:
+	
+	/**
+	* CTelemetryChunkData::CTelemetryChunkData - Constructor for TelemetryChunkData class.
+	*/
+	CTelemetryChunkData(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCData_uint64 GetChunkIndex();
+	inline LibMCData_uint64 GetStartTimeStamp();
+	inline LibMCData_uint64 GetEndTimeStamp();
+	inline LibMCData_uint64 GetEntryCount();
+	inline void GetEntries(std::vector<sTelemetryChunkEntry> & TelemetryEntriesBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryReader 
+**************************************************************************************************************************/
+class CTelemetryReader : public CBase {
+public:
+	
+	/**
+	* CTelemetryReader::CTelemetryReader - Constructor for TelemetryReader class.
+	*/
+	CTelemetryReader(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetSessionUUID();
+	inline std::string GetStartTime();
+	inline LibMCData_uint64 GetLifeTimeInMicroseconds();
+	inline LibMCData_uint32 GetChannelCount();
+	inline void GetChannelInformation(const LibMCData_uint32 nChannelIndex, std::string & sChannelUUID, eTelemetryChannelType & eChannelType, std::string & sIdentifier, std::string & sDescription);
+	inline bool FindChannelByIdentifier(const std::string & sIdentifier, LibMCData_uint32 & nChannelIndex);
+	inline LibMCData_uint32 GetChunkCount();
+	inline void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp, LibMCData_uint64 & nEntryCount);
+	inline PTelemetryChunkData ReadChunkData(const LibMCData_uint32 nChunkIndex);
+	inline void FindChunksInTimeRange(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, std::vector<LibMCData_uint32> & ChunkIndicesBuffer);
+	inline void QueryIntervals(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, const LibMCData_uint32 nChannelIndex, std::vector<sTelemetryIntervalData> & IntervalsBuffer);
+	inline void QueryInstantMarkers(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, const LibMCData_uint32 nChannelIndex, std::vector<sTelemetryChunkEntry> & EntriesBuffer);
+	inline void GetChannelStatistics(const LibMCData_uint32 nChannelIndex, const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint64 & nIntervalCount, LibMCData_uint64 & nInstantMarkerCount, LibMCData_uint64 & nTotalDurationInMicroseconds, LibMCData_uint64 & nMinDurationInMicroseconds, LibMCData_uint64 & nMaxDurationInMicroseconds, LibMCData_uint64 & nAvgDurationInMicroseconds);
 };
 	
 /*************************************************************************************************************************
@@ -2085,6 +2145,7 @@ public:
 	inline PAlertSession CreateAlertSession();
 	inline PLoginHandler CreateLoginHandler();
 	inline PTelemetrySession CreateTelemetrySession();
+	inline PTelemetryReader CreateTelemetryReader(const std::string & sJournalUUID);
 	inline PPersistencyHandler CreatePersistencyHandler();
 	inline void SetBaseTempDirectory(const std::string & sTempDirectory);
 	inline std::string GetBaseTempDirectory();
@@ -2230,6 +2291,24 @@ public:
 		pWrapperTable->m_TelemetrySession_GetSessionUUID = nullptr;
 		pWrapperTable->m_TelemetrySession_CreateChannelInDB = nullptr;
 		pWrapperTable->m_TelemetrySession_WriteTelemetryChunk = nullptr;
+		pWrapperTable->m_TelemetryChunkData_GetChunkIndex = nullptr;
+		pWrapperTable->m_TelemetryChunkData_GetStartTimeStamp = nullptr;
+		pWrapperTable->m_TelemetryChunkData_GetEndTimeStamp = nullptr;
+		pWrapperTable->m_TelemetryChunkData_GetEntryCount = nullptr;
+		pWrapperTable->m_TelemetryChunkData_GetEntries = nullptr;
+		pWrapperTable->m_TelemetryReader_GetSessionUUID = nullptr;
+		pWrapperTable->m_TelemetryReader_GetStartTime = nullptr;
+		pWrapperTable->m_TelemetryReader_GetLifeTimeInMicroseconds = nullptr;
+		pWrapperTable->m_TelemetryReader_GetChannelCount = nullptr;
+		pWrapperTable->m_TelemetryReader_GetChannelInformation = nullptr;
+		pWrapperTable->m_TelemetryReader_FindChannelByIdentifier = nullptr;
+		pWrapperTable->m_TelemetryReader_GetChunkCount = nullptr;
+		pWrapperTable->m_TelemetryReader_GetChunkInformation = nullptr;
+		pWrapperTable->m_TelemetryReader_ReadChunkData = nullptr;
+		pWrapperTable->m_TelemetryReader_FindChunksInTimeRange = nullptr;
+		pWrapperTable->m_TelemetryReader_QueryIntervals = nullptr;
+		pWrapperTable->m_TelemetryReader_QueryInstantMarkers = nullptr;
+		pWrapperTable->m_TelemetryReader_GetChannelStatistics = nullptr;
 		pWrapperTable->m_JournalChunkIntegerData_GetChunkIndex = nullptr;
 		pWrapperTable->m_JournalChunkIntegerData_GetStartTimeStamp = nullptr;
 		pWrapperTable->m_JournalChunkIntegerData_GetEndTimeStamp = nullptr;
@@ -2466,6 +2545,7 @@ public:
 		pWrapperTable->m_DataModel_CreateAlertSession = nullptr;
 		pWrapperTable->m_DataModel_CreateLoginHandler = nullptr;
 		pWrapperTable->m_DataModel_CreateTelemetrySession = nullptr;
+		pWrapperTable->m_DataModel_CreateTelemetryReader = nullptr;
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = nullptr;
 		pWrapperTable->m_DataModel_SetBaseTempDirectory = nullptr;
 		pWrapperTable->m_DataModel_GetBaseTempDirectory = nullptr;
@@ -2855,6 +2935,168 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_TelemetrySession_WriteTelemetryChunk == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetChunkIndex = (PLibMCDataTelemetryChunkData_GetChunkIndexPtr) GetProcAddress(hLibrary, "libmcdata_telemetrychunkdata_getchunkindex");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetChunkIndex = (PLibMCDataTelemetryChunkData_GetChunkIndexPtr) dlsym(hLibrary, "libmcdata_telemetrychunkdata_getchunkindex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChunkData_GetChunkIndex == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetStartTimeStamp = (PLibMCDataTelemetryChunkData_GetStartTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_telemetrychunkdata_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetStartTimeStamp = (PLibMCDataTelemetryChunkData_GetStartTimeStampPtr) dlsym(hLibrary, "libmcdata_telemetrychunkdata_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChunkData_GetStartTimeStamp == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetEndTimeStamp = (PLibMCDataTelemetryChunkData_GetEndTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_telemetrychunkdata_getendtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetEndTimeStamp = (PLibMCDataTelemetryChunkData_GetEndTimeStampPtr) dlsym(hLibrary, "libmcdata_telemetrychunkdata_getendtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChunkData_GetEndTimeStamp == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetEntryCount = (PLibMCDataTelemetryChunkData_GetEntryCountPtr) GetProcAddress(hLibrary, "libmcdata_telemetrychunkdata_getentrycount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetEntryCount = (PLibMCDataTelemetryChunkData_GetEntryCountPtr) dlsym(hLibrary, "libmcdata_telemetrychunkdata_getentrycount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChunkData_GetEntryCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetEntries = (PLibMCDataTelemetryChunkData_GetEntriesPtr) GetProcAddress(hLibrary, "libmcdata_telemetrychunkdata_getentries");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChunkData_GetEntries = (PLibMCDataTelemetryChunkData_GetEntriesPtr) dlsym(hLibrary, "libmcdata_telemetrychunkdata_getentries");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChunkData_GetEntries == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_GetSessionUUID = (PLibMCDataTelemetryReader_GetSessionUUIDPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_getsessionuuid");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_GetSessionUUID = (PLibMCDataTelemetryReader_GetSessionUUIDPtr) dlsym(hLibrary, "libmcdata_telemetryreader_getsessionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_GetSessionUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_GetStartTime = (PLibMCDataTelemetryReader_GetStartTimePtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_getstarttime");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_GetStartTime = (PLibMCDataTelemetryReader_GetStartTimePtr) dlsym(hLibrary, "libmcdata_telemetryreader_getstarttime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_GetStartTime == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_GetLifeTimeInMicroseconds = (PLibMCDataTelemetryReader_GetLifeTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_getlifetimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_GetLifeTimeInMicroseconds = (PLibMCDataTelemetryReader_GetLifeTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcdata_telemetryreader_getlifetimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_GetLifeTimeInMicroseconds == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_GetChannelCount = (PLibMCDataTelemetryReader_GetChannelCountPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_getchannelcount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_GetChannelCount = (PLibMCDataTelemetryReader_GetChannelCountPtr) dlsym(hLibrary, "libmcdata_telemetryreader_getchannelcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_GetChannelCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_GetChannelInformation = (PLibMCDataTelemetryReader_GetChannelInformationPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_getchannelinformation");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_GetChannelInformation = (PLibMCDataTelemetryReader_GetChannelInformationPtr) dlsym(hLibrary, "libmcdata_telemetryreader_getchannelinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_GetChannelInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_FindChannelByIdentifier = (PLibMCDataTelemetryReader_FindChannelByIdentifierPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_findchannelbyidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_FindChannelByIdentifier = (PLibMCDataTelemetryReader_FindChannelByIdentifierPtr) dlsym(hLibrary, "libmcdata_telemetryreader_findchannelbyidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_FindChannelByIdentifier == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_GetChunkCount = (PLibMCDataTelemetryReader_GetChunkCountPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_getchunkcount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_GetChunkCount = (PLibMCDataTelemetryReader_GetChunkCountPtr) dlsym(hLibrary, "libmcdata_telemetryreader_getchunkcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_GetChunkCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_GetChunkInformation = (PLibMCDataTelemetryReader_GetChunkInformationPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_getchunkinformation");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_GetChunkInformation = (PLibMCDataTelemetryReader_GetChunkInformationPtr) dlsym(hLibrary, "libmcdata_telemetryreader_getchunkinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_GetChunkInformation == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_ReadChunkData = (PLibMCDataTelemetryReader_ReadChunkDataPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_readchunkdata");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_ReadChunkData = (PLibMCDataTelemetryReader_ReadChunkDataPtr) dlsym(hLibrary, "libmcdata_telemetryreader_readchunkdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_ReadChunkData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_FindChunksInTimeRange = (PLibMCDataTelemetryReader_FindChunksInTimeRangePtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_findchunksintimerange");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_FindChunksInTimeRange = (PLibMCDataTelemetryReader_FindChunksInTimeRangePtr) dlsym(hLibrary, "libmcdata_telemetryreader_findchunksintimerange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_FindChunksInTimeRange == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_QueryIntervals = (PLibMCDataTelemetryReader_QueryIntervalsPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_queryintervals");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_QueryIntervals = (PLibMCDataTelemetryReader_QueryIntervalsPtr) dlsym(hLibrary, "libmcdata_telemetryreader_queryintervals");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_QueryIntervals == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_QueryInstantMarkers = (PLibMCDataTelemetryReader_QueryInstantMarkersPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_queryinstantmarkers");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_QueryInstantMarkers = (PLibMCDataTelemetryReader_QueryInstantMarkersPtr) dlsym(hLibrary, "libmcdata_telemetryreader_queryinstantmarkers");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_QueryInstantMarkers == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryReader_GetChannelStatistics = (PLibMCDataTelemetryReader_GetChannelStatisticsPtr) GetProcAddress(hLibrary, "libmcdata_telemetryreader_getchannelstatistics");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryReader_GetChannelStatistics = (PLibMCDataTelemetryReader_GetChannelStatisticsPtr) dlsym(hLibrary, "libmcdata_telemetryreader_getchannelstatistics");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryReader_GetChannelStatistics == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4982,6 +5224,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataModel_CreateTelemetryReader = (PLibMCDataDataModel_CreateTelemetryReaderPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createtelemetryreader");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_CreateTelemetryReader = (PLibMCDataDataModel_CreateTelemetryReaderPtr) dlsym(hLibrary, "libmcdata_datamodel_createtelemetryreader");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_CreateTelemetryReader == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = (PLibMCDataDataModel_CreatePersistencyHandlerPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createpersistencyhandler");
 		#else // _WIN32
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = (PLibMCDataDataModel_CreatePersistencyHandlerPtr) dlsym(hLibrary, "libmcdata_datamodel_createpersistencyhandler");
@@ -5292,6 +5543,78 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_telemetrysession_writetelemetrychunk", (void**)&(pWrapperTable->m_TelemetrySession_WriteTelemetryChunk));
 		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetrySession_WriteTelemetryChunk == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetrychunkdata_getchunkindex", (void**)&(pWrapperTable->m_TelemetryChunkData_GetChunkIndex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChunkData_GetChunkIndex == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetrychunkdata_getstarttimestamp", (void**)&(pWrapperTable->m_TelemetryChunkData_GetStartTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChunkData_GetStartTimeStamp == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetrychunkdata_getendtimestamp", (void**)&(pWrapperTable->m_TelemetryChunkData_GetEndTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChunkData_GetEndTimeStamp == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetrychunkdata_getentrycount", (void**)&(pWrapperTable->m_TelemetryChunkData_GetEntryCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChunkData_GetEntryCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetrychunkdata_getentries", (void**)&(pWrapperTable->m_TelemetryChunkData_GetEntries));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChunkData_GetEntries == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_getsessionuuid", (void**)&(pWrapperTable->m_TelemetryReader_GetSessionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_GetSessionUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_getstarttime", (void**)&(pWrapperTable->m_TelemetryReader_GetStartTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_GetStartTime == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_getlifetimeinmicroseconds", (void**)&(pWrapperTable->m_TelemetryReader_GetLifeTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_GetLifeTimeInMicroseconds == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_getchannelcount", (void**)&(pWrapperTable->m_TelemetryReader_GetChannelCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_GetChannelCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_getchannelinformation", (void**)&(pWrapperTable->m_TelemetryReader_GetChannelInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_GetChannelInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_findchannelbyidentifier", (void**)&(pWrapperTable->m_TelemetryReader_FindChannelByIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_FindChannelByIdentifier == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_getchunkcount", (void**)&(pWrapperTable->m_TelemetryReader_GetChunkCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_GetChunkCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_getchunkinformation", (void**)&(pWrapperTable->m_TelemetryReader_GetChunkInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_GetChunkInformation == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_readchunkdata", (void**)&(pWrapperTable->m_TelemetryReader_ReadChunkData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_ReadChunkData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_findchunksintimerange", (void**)&(pWrapperTable->m_TelemetryReader_FindChunksInTimeRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_FindChunksInTimeRange == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_queryintervals", (void**)&(pWrapperTable->m_TelemetryReader_QueryIntervals));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_QueryIntervals == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_queryinstantmarkers", (void**)&(pWrapperTable->m_TelemetryReader_QueryInstantMarkers));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_QueryInstantMarkers == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_telemetryreader_getchannelstatistics", (void**)&(pWrapperTable->m_TelemetryReader_GetChannelStatistics));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryReader_GetChannelStatistics == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_journalchunkintegerdata_getchunkindex", (void**)&(pWrapperTable->m_JournalChunkIntegerData_GetChunkIndex));
@@ -6238,6 +6561,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateTelemetrySession == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_datamodel_createtelemetryreader", (void**)&(pWrapperTable->m_DataModel_CreateTelemetryReader));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateTelemetryReader == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createpersistencyhandler", (void**)&(pWrapperTable->m_DataModel_CreatePersistencyHandler));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreatePersistencyHandler == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -6878,6 +7205,273 @@ public:
 	void CTelemetrySession::WriteTelemetryChunk(const LibMCData_uint64 nChunkID, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const CInputVector<sTelemetryChunkEntry> & TelemetryEntriesBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_TelemetrySession_WriteTelemetryChunk(m_pHandle, nChunkID, nStartTimeStamp, nEndTimeStamp, (LibMCData_uint64)TelemetryEntriesBuffer.size(), TelemetryEntriesBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryChunkData
+	 */
+	
+	/**
+	* CTelemetryChunkData::GetChunkIndex - Returns index of chunk.
+	* @return Index of the chunk
+	*/
+	LibMCData_uint64 CTelemetryChunkData::GetChunkIndex()
+	{
+		LibMCData_uint64 resultChunkIndex = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChunkData_GetChunkIndex(m_pHandle, &resultChunkIndex));
+		
+		return resultChunkIndex;
+	}
+	
+	/**
+	* CTelemetryChunkData::GetStartTimeStamp - Returns start time stamp of chunk.
+	* @return Start Timestamp of the chunk (in microseconds)
+	*/
+	LibMCData_uint64 CTelemetryChunkData::GetStartTimeStamp()
+	{
+		LibMCData_uint64 resultStartTimeStamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChunkData_GetStartTimeStamp(m_pHandle, &resultStartTimeStamp));
+		
+		return resultStartTimeStamp;
+	}
+	
+	/**
+	* CTelemetryChunkData::GetEndTimeStamp - Returns end time stamp of chunk.
+	* @return End Timestamp of the chunk (in microseconds)
+	*/
+	LibMCData_uint64 CTelemetryChunkData::GetEndTimeStamp()
+	{
+		LibMCData_uint64 resultEndTimeStamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChunkData_GetEndTimeStamp(m_pHandle, &resultEndTimeStamp));
+		
+		return resultEndTimeStamp;
+	}
+	
+	/**
+	* CTelemetryChunkData::GetEntryCount - Returns the number of entries in this chunk.
+	* @return Number of entries.
+	*/
+	LibMCData_uint64 CTelemetryChunkData::GetEntryCount()
+	{
+		LibMCData_uint64 resultEntryCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChunkData_GetEntryCount(m_pHandle, &resultEntryCount));
+		
+		return resultEntryCount;
+	}
+	
+	/**
+	* CTelemetryChunkData::GetEntries - Returns the raw telemetry entries.
+	* @param[out] TelemetryEntriesBuffer - Telemetry entries array.
+	*/
+	void CTelemetryChunkData::GetEntries(std::vector<sTelemetryChunkEntry> & TelemetryEntriesBuffer)
+	{
+		LibMCData_uint64 elementsNeededTelemetryEntries = 0;
+		LibMCData_uint64 elementsWrittenTelemetryEntries = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChunkData_GetEntries(m_pHandle, 0, &elementsNeededTelemetryEntries, nullptr));
+		TelemetryEntriesBuffer.resize((size_t) elementsNeededTelemetryEntries);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChunkData_GetEntries(m_pHandle, elementsNeededTelemetryEntries, &elementsWrittenTelemetryEntries, TelemetryEntriesBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryReader
+	 */
+	
+	/**
+	* CTelemetryReader::GetSessionUUID - Retrieves the session UUID.
+	* @return Session UUID
+	*/
+	std::string CTelemetryReader::GetSessionUUID()
+	{
+		LibMCData_uint32 bytesNeededSessionUUID = 0;
+		LibMCData_uint32 bytesWrittenSessionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetSessionUUID(m_pHandle, 0, &bytesNeededSessionUUID, nullptr));
+		std::vector<char> bufferSessionUUID(bytesNeededSessionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetSessionUUID(m_pHandle, bytesNeededSessionUUID, &bytesWrittenSessionUUID, &bufferSessionUUID[0]));
+		
+		return std::string(&bufferSessionUUID[0]);
+	}
+	
+	/**
+	* CTelemetryReader::GetStartTime - Returns the start timestamp of the telemetry session.
+	* @return Timestamp in ISO8601 UTC format
+	*/
+	std::string CTelemetryReader::GetStartTime()
+	{
+		LibMCData_uint32 bytesNeededTimestamp = 0;
+		LibMCData_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetStartTime(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetStartTime(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		
+		return std::string(&bufferTimestamp[0]);
+	}
+	
+	/**
+	* CTelemetryReader::GetLifeTimeInMicroseconds - Get telemetry session life time in microseconds.
+	* @return Telemetry life time in microseconds.
+	*/
+	LibMCData_uint64 CTelemetryReader::GetLifeTimeInMicroseconds()
+	{
+		LibMCData_uint64 resultLifeTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetLifeTimeInMicroseconds(m_pHandle, &resultLifeTime));
+		
+		return resultLifeTime;
+	}
+	
+	/**
+	* CTelemetryReader::GetChannelCount - Returns number of telemetry channels.
+	* @return Number of channels in session.
+	*/
+	LibMCData_uint32 CTelemetryReader::GetChannelCount()
+	{
+		LibMCData_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetChannelCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CTelemetryReader::GetChannelInformation - Returns the information for a channel.
+	* @param[in] nChannelIndex - Index of the channel (0-based).
+	* @param[out] sChannelUUID - UUID of the channel.
+	* @param[out] eChannelType - Type of the channel.
+	* @param[out] sIdentifier - Identifier of the channel.
+	* @param[out] sDescription - Description of the channel.
+	*/
+	void CTelemetryReader::GetChannelInformation(const LibMCData_uint32 nChannelIndex, std::string & sChannelUUID, eTelemetryChannelType & eChannelType, std::string & sIdentifier, std::string & sDescription)
+	{
+		LibMCData_uint32 bytesNeededChannelUUID = 0;
+		LibMCData_uint32 bytesWrittenChannelUUID = 0;
+		LibMCData_uint32 bytesNeededIdentifier = 0;
+		LibMCData_uint32 bytesWrittenIdentifier = 0;
+		LibMCData_uint32 bytesNeededDescription = 0;
+		LibMCData_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetChannelInformation(m_pHandle, nChannelIndex, 0, &bytesNeededChannelUUID, nullptr, &eChannelType, 0, &bytesNeededIdentifier, nullptr, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferChannelUUID(bytesNeededChannelUUID);
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetChannelInformation(m_pHandle, nChannelIndex, bytesNeededChannelUUID, &bytesWrittenChannelUUID, &bufferChannelUUID[0], &eChannelType, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0], bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		sChannelUUID = std::string(&bufferChannelUUID[0]);
+		sIdentifier = std::string(&bufferIdentifier[0]);
+		sDescription = std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CTelemetryReader::FindChannelByIdentifier - Finds a channel by its identifier.
+	* @param[in] sIdentifier - Channel identifier to search for.
+	* @param[out] nChannelIndex - Index of the channel if found.
+	* @return True if channel was found.
+	*/
+	bool CTelemetryReader::FindChannelByIdentifier(const std::string & sIdentifier, LibMCData_uint32 & nChannelIndex)
+	{
+		bool resultFound = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_FindChannelByIdentifier(m_pHandle, sIdentifier.c_str(), &nChannelIndex, &resultFound));
+		
+		return resultFound;
+	}
+	
+	/**
+	* CTelemetryReader::GetChunkCount - Returns number of telemetry chunks.
+	* @return Number of chunks in session.
+	*/
+	LibMCData_uint32 CTelemetryReader::GetChunkCount()
+	{
+		LibMCData_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetChunkCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CTelemetryReader::GetChunkInformation - Returns the information for a chunk.
+	* @param[in] nChunkIndex - Index of the chunk.
+	* @param[out] nStartTimeStamp - Start timestamp of the chunk in microseconds.
+	* @param[out] nEndTimeStamp - End timestamp of the chunk in microseconds.
+	* @param[out] nEntryCount - Number of entries in the chunk.
+	*/
+	void CTelemetryReader::GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp, LibMCData_uint64 & nEntryCount)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetChunkInformation(m_pHandle, nChunkIndex, &nStartTimeStamp, &nEndTimeStamp, &nEntryCount));
+	}
+	
+	/**
+	* CTelemetryReader::ReadChunkData - Reads telemetry chunk data from disk.
+	* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
+	* @return Telemetry Chunk Data Instance
+	*/
+	PTelemetryChunkData CTelemetryReader::ReadChunkData(const LibMCData_uint32 nChunkIndex)
+	{
+		LibMCDataHandle hChunkData = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_ReadChunkData(m_pHandle, nChunkIndex, &hChunkData));
+		
+		if (!hChunkData) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryChunkData>(m_pWrapper, hChunkData);
+	}
+	
+	/**
+	* CTelemetryReader::FindChunksInTimeRange - Finds all chunks that overlap with a time range.
+	* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+	* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+	* @param[out] ChunkIndicesBuffer - Array of chunk indices.
+	*/
+	void CTelemetryReader::FindChunksInTimeRange(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, std::vector<LibMCData_uint32> & ChunkIndicesBuffer)
+	{
+		LibMCData_uint64 elementsNeededChunkIndices = 0;
+		LibMCData_uint64 elementsWrittenChunkIndices = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_FindChunksInTimeRange(m_pHandle, nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, 0, &elementsNeededChunkIndices, nullptr));
+		ChunkIndicesBuffer.resize((size_t) elementsNeededChunkIndices);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_FindChunksInTimeRange(m_pHandle, nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, elementsNeededChunkIndices, &elementsWrittenChunkIndices, ChunkIndicesBuffer.data()));
+	}
+	
+	/**
+	* CTelemetryReader::QueryIntervals - Queries completed intervals (start+end marker pairs) within a time range.
+	* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+	* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+	* @param[in] nChannelIndex - Channel index to filter by. Use 0xFFFFFFFF for all channels.
+	* @param[out] IntervalsBuffer - Array of interval data.
+	*/
+	void CTelemetryReader::QueryIntervals(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, const LibMCData_uint32 nChannelIndex, std::vector<sTelemetryIntervalData> & IntervalsBuffer)
+	{
+		LibMCData_uint64 elementsNeededIntervals = 0;
+		LibMCData_uint64 elementsWrittenIntervals = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_QueryIntervals(m_pHandle, nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, nChannelIndex, 0, &elementsNeededIntervals, nullptr));
+		IntervalsBuffer.resize((size_t) elementsNeededIntervals);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_QueryIntervals(m_pHandle, nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, nChannelIndex, elementsNeededIntervals, &elementsWrittenIntervals, IntervalsBuffer.data()));
+	}
+	
+	/**
+	* CTelemetryReader::QueryInstantMarkers - Queries instant markers within a time range.
+	* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+	* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+	* @param[in] nChannelIndex - Channel index to filter by. Use 0xFFFFFFFF for all channels.
+	* @param[out] EntriesBuffer - Array of instant marker entries.
+	*/
+	void CTelemetryReader::QueryInstantMarkers(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, const LibMCData_uint32 nChannelIndex, std::vector<sTelemetryChunkEntry> & EntriesBuffer)
+	{
+		LibMCData_uint64 elementsNeededEntries = 0;
+		LibMCData_uint64 elementsWrittenEntries = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_QueryInstantMarkers(m_pHandle, nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, nChannelIndex, 0, &elementsNeededEntries, nullptr));
+		EntriesBuffer.resize((size_t) elementsNeededEntries);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_QueryInstantMarkers(m_pHandle, nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, nChannelIndex, elementsNeededEntries, &elementsWrittenEntries, EntriesBuffer.data()));
+	}
+	
+	/**
+	* CTelemetryReader::GetChannelStatistics - Gets aggregated statistics for a channel within a time range.
+	* @param[in] nChannelIndex - Channel index.
+	* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+	* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+	* @param[out] nIntervalCount - Number of completed intervals.
+	* @param[out] nInstantMarkerCount - Number of instant markers.
+	* @param[out] nTotalDurationInMicroseconds - Sum of all interval durations.
+	* @param[out] nMinDurationInMicroseconds - Minimum interval duration.
+	* @param[out] nMaxDurationInMicroseconds - Maximum interval duration.
+	* @param[out] nAvgDurationInMicroseconds - Average interval duration.
+	*/
+	void CTelemetryReader::GetChannelStatistics(const LibMCData_uint32 nChannelIndex, const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint64 & nIntervalCount, LibMCData_uint64 & nInstantMarkerCount, LibMCData_uint64 & nTotalDurationInMicroseconds, LibMCData_uint64 & nMinDurationInMicroseconds, LibMCData_uint64 & nMaxDurationInMicroseconds, LibMCData_uint64 & nAvgDurationInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryReader_GetChannelStatistics(m_pHandle, nChannelIndex, nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, &nIntervalCount, &nInstantMarkerCount, &nTotalDurationInMicroseconds, &nMinDurationInMicroseconds, &nMaxDurationInMicroseconds, &nAvgDurationInMicroseconds));
 	}
 	
 	/**
@@ -10344,6 +10938,22 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CTelemetrySession>(m_pWrapper, hTelemetrySessionInstance);
+	}
+	
+	/**
+	* CDataModel::CreateTelemetryReader - Creates an access instance to telemetry from a past journal session. Fails if telemetry cannot be accessed.
+	* @param[in] sJournalUUID - UUID of journal to load. UUID MUST NOT reference the current journaling session.
+	* @return TelemetryReader class instance.
+	*/
+	PTelemetryReader CDataModel::CreateTelemetryReader(const std::string & sJournalUUID)
+	{
+		LibMCDataHandle hTelemetryReader = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_CreateTelemetryReader(m_pHandle, sJournalUUID.c_str(), &hTelemetryReader));
+		
+		if (!hTelemetryReader) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryReader>(m_pWrapper, hTelemetryReader);
 	}
 	
 	/**

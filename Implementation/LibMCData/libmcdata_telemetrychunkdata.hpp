@@ -27,68 +27,73 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CJournalHandler_Current
+Abstract: This is the class declaration of CTelemetryChunkData
 
 */
 
 
-#ifndef __LIBMCENV_JOURNALHANDLER_CURRENT
-#define __LIBMCENV_JOURNALHANDLER_CURRENT
+#ifndef __LIBMCDATA_TELEMETRYCHUNKDATA
+#define __LIBMCDATA_TELEMETRYCHUNKDATA
 
-#include "libmcenv_interfaces.hpp"
+#include "libmcdata_interfaces.hpp"
 
 // Parent classes
-#include "libmcenv_base.hpp"
+#include "libmcdata_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "amc_statejournal.hpp"
 
-namespace LibMCEnv {
+
+namespace LibMCData {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CJournalHandler_Current 
+ Class declaration of CTelemetryChunkData 
 **************************************************************************************************************************/
 
-class CJournalHandler_Current : public virtual IJournalHandler, public virtual CBase {
-protected:
 
-    AMC::PStateJournal m_pStateJournal;
+class CTelemetryChunkData : public virtual ITelemetryChunkData, public virtual CBase {
+private:
+
+	uint64_t m_nChunkIndex;
+
+	uint64_t m_nStartTimeStamp;
+
+	uint64_t m_nEndTimeStamp;
+
+	std::vector<LibMCData::sTelemetryChunkEntry> m_Entries;
 
 public:
 
-    CJournalHandler_Current(AMC::PStateJournal pStateJournal);
+	CTelemetryChunkData(uint64_t nChunkIndex);
 
-    virtual ~CJournalHandler_Current();
+	virtual ~CTelemetryChunkData();
 
-    IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName) override;
+	LibMCData_uint64 GetChunkIndex() override;
 
-    IDateTime* GetStartTime() override;
+	LibMCData_uint64 GetStartTimeStamp() override;
 
-    IDateTime* GetEndTime() override;
+	LibMCData_uint64 GetEndTimeStamp() override;
 
-    LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds() override;
+	LibMCData_uint64 GetEntryCount() override;
 
-	ILogEntryList* RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
+	void GetEntries(LibMCData_uint64 nTelemetryEntriesBufferSize, LibMCData_uint64* pTelemetryEntriesNeededCount, LibMCData::sTelemetryChunkEntry * pTelemetryEntriesBuffer) override;
 
-	ILogEntryList* RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
+	// Internal methods for populating data
+	std::vector<LibMCData::sTelemetryChunkEntry>& getEntriesInternal();
 
-	IAlertIterator* RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
+	void setTimeInterval(uint64_t nStartTimeStamp, uint64_t nEndTimeStamp);
 
-	IAlertIterator* RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
-
-	ITelemetryHandler* LoadTelemetryHandler() override;
 };
 
 } // namespace Impl
-} // namespace LibMCEnv
+} // namespace LibMCData
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_JOURNALHANDLER_CURRENT
+#endif // __LIBMCDATA_TELEMETRYCHUNKDATA

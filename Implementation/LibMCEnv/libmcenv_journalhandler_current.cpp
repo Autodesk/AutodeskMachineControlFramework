@@ -104,3 +104,9 @@ IAlertIterator* CJournalHandler_Current::RetrieveAlertsFromTimeInterval(const Li
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
+ITelemetryHandler* CJournalHandler_Current::LoadTelemetryHandler()
+{
+	// Current session telemetry access is not supported yet - requires special handling for live data
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED, "Telemetry access for current session is not yet supported");
+}
+

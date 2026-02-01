@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CJournalHandler_Current
+Abstract: This is the class declaration of CTelemetryChannelStatistics
 
 */
 
 
-#ifndef __LIBMCENV_JOURNALHANDLER_CURRENT
-#define __LIBMCENV_JOURNALHANDLER_CURRENT
+#ifndef __LIBMCENV_TELEMETRYCHANNELSTATISTICS
+#define __LIBMCENV_TELEMETRYCHANNELSTATISTICS
 
 #include "libmcenv_interfaces.hpp"
 
@@ -45,44 +45,46 @@ Abstract: This is the class declaration of CJournalHandler_Current
 #endif
 
 // Include custom headers here.
-#include "amc_statejournal.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CJournalHandler_Current 
+ Class declaration of CTelemetryChannelStatistics 
 **************************************************************************************************************************/
 
-class CJournalHandler_Current : public virtual IJournalHandler, public virtual CBase {
-protected:
+class CTelemetryChannelStatistics : public virtual ITelemetryChannelStatistics, public virtual CBase {
+private:
 
-    AMC::PStateJournal m_pStateJournal;
+	std::string m_sChannelIdentifier;
+	uint64_t m_nIntervalCount;
+	uint64_t m_nInstantMarkerCount;
+	uint64_t m_nTotalDuration;
+	uint64_t m_nMinDuration;
+	uint64_t m_nMaxDuration;
+	uint64_t m_nAvgDuration;
 
 public:
 
-    CJournalHandler_Current(AMC::PStateJournal pStateJournal);
+	CTelemetryChannelStatistics(const std::string& sChannelIdentifier, uint64_t nIntervalCount, uint64_t nInstantMarkerCount, uint64_t nTotalDuration, uint64_t nMinDuration, uint64_t nMaxDuration, uint64_t nAvgDuration);
 
-    virtual ~CJournalHandler_Current();
+	virtual ~CTelemetryChannelStatistics();
 
-    IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName) override;
+	std::string GetChannelIdentifier() override;
 
-    IDateTime* GetStartTime() override;
+	LibMCEnv_uint64 GetIntervalCount() override;
 
-    IDateTime* GetEndTime() override;
+	LibMCEnv_uint64 GetInstantMarkerCount() override;
 
-    LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds() override;
+	LibMCEnv_uint64 GetTotalDuration() override;
 
-	ILogEntryList* RetrieveLogEntries(const LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
+	LibMCEnv_uint64 GetMinDuration() override;
 
-	ILogEntryList* RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv::eLogLevel& eMinLogLevel) override;
+	LibMCEnv_uint64 GetMaxDuration() override;
 
-	IAlertIterator* RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
+	LibMCEnv_uint64 GetAverageDuration() override;
 
-	IAlertIterator* RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
-
-	ITelemetryHandler* LoadTelemetryHandler() override;
 };
 
 } // namespace Impl
@@ -91,4 +93,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_JOURNALHANDLER_CURRENT
+#endif // __LIBMCENV_TELEMETRYCHANNELSTATISTICS

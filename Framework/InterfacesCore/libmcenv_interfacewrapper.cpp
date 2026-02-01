@@ -24909,6 +24909,837 @@ LibMCEnvResult libmcenv_journalhandler_retrievealertsfromtimeinterval(LibMCEnv_J
 	}
 }
 
+LibMCEnvResult libmcenv_journalhandler_loadtelemetryhandler(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_TelemetryHandler * pTelemetryHandlerInstance)
+{
+	IBase* pIBaseClass = (IBase *)pJournalHandler;
+
+	try {
+		if (pTelemetryHandlerInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseTelemetryHandlerInstance(nullptr);
+		IJournalHandler* pIJournalHandler = dynamic_cast<IJournalHandler*>(pIBaseClass);
+		if (!pIJournalHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseTelemetryHandlerInstance = pIJournalHandler->LoadTelemetryHandler();
+
+		*pTelemetryHandlerInstance = (IBase*)(pBaseTelemetryHandlerInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for TelemetryInterval
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_telemetryinterval_getmarkerid(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pMarkerID)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryInterval;
+
+	try {
+		if (pMarkerID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryInterval* pITelemetryInterval = dynamic_cast<ITelemetryInterval*>(pIBaseClass);
+		if (!pITelemetryInterval)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pMarkerID = pITelemetryInterval->GetMarkerID();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryinterval_getchannelidentifier(LibMCEnv_TelemetryInterval pTelemetryInterval, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryInterval;
+
+	try {
+		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier("");
+		ITelemetryInterval* pITelemetryInterval = dynamic_cast<ITelemetryInterval*>(pIBaseClass);
+		if (!pITelemetryInterval)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sIdentifier = pITelemetryInterval->GetChannelIdentifier();
+
+			pITelemetryInterval->_setCache (new ParameterCache_1<std::string> (sIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITelemetryInterval->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sIdentifier);
+			pITelemetryInterval->_setCache (nullptr);
+		}
+		
+		if (pIdentifierNeededChars)
+			*pIdentifierNeededChars = (LibMCEnv_uint32) (sIdentifier.size()+1);
+		if (pIdentifierBuffer) {
+			if (sIdentifier.size() >= nIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
+				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
+			pIdentifierBuffer[sIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryinterval_getstarttimestamp(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pTimestamp)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryInterval;
+
+	try {
+		if (pTimestamp == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryInterval* pITelemetryInterval = dynamic_cast<ITelemetryInterval*>(pIBaseClass);
+		if (!pITelemetryInterval)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimestamp = pITelemetryInterval->GetStartTimestamp();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryinterval_getendtimestamp(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pTimestamp)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryInterval;
+
+	try {
+		if (pTimestamp == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryInterval* pITelemetryInterval = dynamic_cast<ITelemetryInterval*>(pIBaseClass);
+		if (!pITelemetryInterval)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimestamp = pITelemetryInterval->GetEndTimestamp();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryinterval_getduration(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pDuration)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryInterval;
+
+	try {
+		if (pDuration == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryInterval* pITelemetryInterval = dynamic_cast<ITelemetryInterval*>(pIBaseClass);
+		if (!pITelemetryInterval)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDuration = pITelemetryInterval->GetDuration();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryinterval_getcontextdata(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pContextData)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryInterval;
+
+	try {
+		if (pContextData == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryInterval* pITelemetryInterval = dynamic_cast<ITelemetryInterval*>(pIBaseClass);
+		if (!pITelemetryInterval)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pContextData = pITelemetryInterval->GetContextData();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for TelemetryIntervalIterator
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_telemetryintervaliterator_getcurrentinterval(LibMCEnv_TelemetryIntervalIterator pTelemetryIntervalIterator, LibMCEnv_TelemetryInterval * pInterval)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryIntervalIterator;
+
+	try {
+		if (pInterval == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseInterval(nullptr);
+		ITelemetryIntervalIterator* pITelemetryIntervalIterator = dynamic_cast<ITelemetryIntervalIterator*>(pIBaseClass);
+		if (!pITelemetryIntervalIterator)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseInterval = pITelemetryIntervalIterator->GetCurrentInterval();
+
+		*pInterval = (IBase*)(pBaseInterval);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for TelemetryChannelStatistics
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_telemetrychannelstatistics_getchannelidentifier(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChannelStatistics;
+
+	try {
+		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier("");
+		ITelemetryChannelStatistics* pITelemetryChannelStatistics = dynamic_cast<ITelemetryChannelStatistics*>(pIBaseClass);
+		if (!pITelemetryChannelStatistics)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sIdentifier = pITelemetryChannelStatistics->GetChannelIdentifier();
+
+			pITelemetryChannelStatistics->_setCache (new ParameterCache_1<std::string> (sIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITelemetryChannelStatistics->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sIdentifier);
+			pITelemetryChannelStatistics->_setCache (nullptr);
+		}
+		
+		if (pIdentifierNeededChars)
+			*pIdentifierNeededChars = (LibMCEnv_uint32) (sIdentifier.size()+1);
+		if (pIdentifierBuffer) {
+			if (sIdentifier.size() >= nIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
+				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
+			pIdentifierBuffer[sIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetrychannelstatistics_getintervalcount(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChannelStatistics;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryChannelStatistics* pITelemetryChannelStatistics = dynamic_cast<ITelemetryChannelStatistics*>(pIBaseClass);
+		if (!pITelemetryChannelStatistics)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pITelemetryChannelStatistics->GetIntervalCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetrychannelstatistics_getinstantmarkercount(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChannelStatistics;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryChannelStatistics* pITelemetryChannelStatistics = dynamic_cast<ITelemetryChannelStatistics*>(pIBaseClass);
+		if (!pITelemetryChannelStatistics)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pITelemetryChannelStatistics->GetInstantMarkerCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetrychannelstatistics_gettotalduration(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChannelStatistics;
+
+	try {
+		if (pDuration == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryChannelStatistics* pITelemetryChannelStatistics = dynamic_cast<ITelemetryChannelStatistics*>(pIBaseClass);
+		if (!pITelemetryChannelStatistics)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDuration = pITelemetryChannelStatistics->GetTotalDuration();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetrychannelstatistics_getminduration(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChannelStatistics;
+
+	try {
+		if (pDuration == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryChannelStatistics* pITelemetryChannelStatistics = dynamic_cast<ITelemetryChannelStatistics*>(pIBaseClass);
+		if (!pITelemetryChannelStatistics)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDuration = pITelemetryChannelStatistics->GetMinDuration();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetrychannelstatistics_getmaxduration(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChannelStatistics;
+
+	try {
+		if (pDuration == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryChannelStatistics* pITelemetryChannelStatistics = dynamic_cast<ITelemetryChannelStatistics*>(pIBaseClass);
+		if (!pITelemetryChannelStatistics)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDuration = pITelemetryChannelStatistics->GetMaxDuration();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetrychannelstatistics_getaverageduration(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChannelStatistics;
+
+	try {
+		if (pDuration == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryChannelStatistics* pITelemetryChannelStatistics = dynamic_cast<ITelemetryChannelStatistics*>(pIBaseClass);
+		if (!pITelemetryChannelStatistics)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDuration = pITelemetryChannelStatistics->GetAverageDuration();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for TelemetryHandler
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_telemetryhandler_getsessionuuid(LibMCEnv_TelemetryHandler pTelemetryHandler, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if ( (!pUUIDBuffer) && !(pUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUUID("");
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sUUID = pITelemetryHandler->GetSessionUUID();
+
+			pITelemetryHandler->_setCache (new ParameterCache_1<std::string> (sUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITelemetryHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sUUID);
+			pITelemetryHandler->_setCache (nullptr);
+		}
+		
+		if (pUUIDNeededChars)
+			*pUUIDNeededChars = (LibMCEnv_uint32) (sUUID.size()+1);
+		if (pUUIDBuffer) {
+			if (sUUID.size() >= nUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iUUID = 0; iUUID < sUUID.size(); iUUID++)
+				pUUIDBuffer[iUUID] = sUUID[iUUID];
+			pUUIDBuffer[sUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_getstarttime(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_DateTime * pDateTimeInstance)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pDateTimeInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseDateTimeInstance(nullptr);
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseDateTimeInstance = pITelemetryHandler->GetStartTime();
+
+		*pDateTimeInstance = (IBase*)(pBaseDateTimeInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_getendtime(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_DateTime * pDateTimeInstance)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pDateTimeInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseDateTimeInstance(nullptr);
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseDateTimeInstance = pITelemetryHandler->GetEndTime();
+
+		*pDateTimeInstance = (IBase*)(pBaseDateTimeInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_getlifetimeinmicroseconds(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint64 * pLifeTime)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pLifeTime == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pLifeTime = pITelemetryHandler->GetLifeTimeInMicroseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_getchannelcount(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pITelemetryHandler->GetChannelCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_getchannelidentifier(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint32 nChannelIndex, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier("");
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIdentifierBuffer == nullptr);
+		if (isCacheCall) {
+			sIdentifier = pITelemetryHandler->GetChannelIdentifier(nChannelIndex);
+
+			pITelemetryHandler->_setCache (new ParameterCache_1<std::string> (sIdentifier));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITelemetryHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sIdentifier);
+			pITelemetryHandler->_setCache (nullptr);
+		}
+		
+		if (pIdentifierNeededChars)
+			*pIdentifierNeededChars = (LibMCEnv_uint32) (sIdentifier.size()+1);
+		if (pIdentifierBuffer) {
+			if (sIdentifier.size() >= nIdentifierBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
+				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
+			pIdentifierBuffer[sIdentifier.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_haschannel(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pIdentifier, bool * pExists)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pExists = pITelemetryHandler->HasChannel(sIdentifier);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_getchanneldescription(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pIdentifier, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDescriptionBuffer) && !(pDescriptionNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		std::string sDescription("");
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDescriptionBuffer == nullptr);
+		if (isCacheCall) {
+			sDescription = pITelemetryHandler->GetChannelDescription(sIdentifier);
+
+			pITelemetryHandler->_setCache (new ParameterCache_1<std::string> (sDescription));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITelemetryHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sDescription);
+			pITelemetryHandler->_setCache (nullptr);
+		}
+		
+		if (pDescriptionNeededChars)
+			*pDescriptionNeededChars = (LibMCEnv_uint32) (sDescription.size()+1);
+		if (pDescriptionBuffer) {
+			if (sDescription.size() >= nDescriptionBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iDescription = 0; iDescription < sDescription.size(); iDescription++)
+				pDescriptionBuffer[iDescription] = sDescription[iDescription];
+			pDescriptionBuffer[sDescription.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_queryintervalsfromtimedelta(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_TelemetryIntervalIterator * pIterator)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pChannelIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pIterator == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sChannelIdentifier(pChannelIdentifier);
+		IBase* pBaseIterator(nullptr);
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseIterator = pITelemetryHandler->QueryIntervalsFromTimeDelta(sChannelIdentifier, nTimeDeltaInMicroseconds);
+
+		*pIterator = (IBase*)(pBaseIterator);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_queryintervalsfromtimerange(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_TelemetryIntervalIterator * pIterator)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pChannelIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pIterator == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sChannelIdentifier(pChannelIdentifier);
+		IBase* pBaseIterator(nullptr);
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseIterator = pITelemetryHandler->QueryIntervalsFromTimeRange(sChannelIdentifier, nStartTimeInMicroseconds, nEndTimeInMicroseconds);
+
+		*pIterator = (IBase*)(pBaseIterator);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_telemetryhandler_getchannelstatistics(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_TelemetryChannelStatistics * pStatistics)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryHandler;
+
+	try {
+		if (pChannelIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pStatistics == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sChannelIdentifier(pChannelIdentifier);
+		IBase* pBaseStatistics(nullptr);
+		ITelemetryHandler* pITelemetryHandler = dynamic_cast<ITelemetryHandler*>(pIBaseClass);
+		if (!pITelemetryHandler)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseStatistics = pITelemetryHandler->GetChannelStatistics(sChannelIdentifier, nStartTimeInMicroseconds, nEndTimeInMicroseconds);
+
+		*pStatistics = (IBase*)(pBaseStatistics);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for UserDetailList
@@ -35574,6 +36405,58 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievealerts;
 	if (sProcName == "libmcenv_journalhandler_retrievealertsfromtimeinterval") 
 		*ppProcAddress = (void*) &libmcenv_journalhandler_retrievealertsfromtimeinterval;
+	if (sProcName == "libmcenv_journalhandler_loadtelemetryhandler") 
+		*ppProcAddress = (void*) &libmcenv_journalhandler_loadtelemetryhandler;
+	if (sProcName == "libmcenv_telemetryinterval_getmarkerid") 
+		*ppProcAddress = (void*) &libmcenv_telemetryinterval_getmarkerid;
+	if (sProcName == "libmcenv_telemetryinterval_getchannelidentifier") 
+		*ppProcAddress = (void*) &libmcenv_telemetryinterval_getchannelidentifier;
+	if (sProcName == "libmcenv_telemetryinterval_getstarttimestamp") 
+		*ppProcAddress = (void*) &libmcenv_telemetryinterval_getstarttimestamp;
+	if (sProcName == "libmcenv_telemetryinterval_getendtimestamp") 
+		*ppProcAddress = (void*) &libmcenv_telemetryinterval_getendtimestamp;
+	if (sProcName == "libmcenv_telemetryinterval_getduration") 
+		*ppProcAddress = (void*) &libmcenv_telemetryinterval_getduration;
+	if (sProcName == "libmcenv_telemetryinterval_getcontextdata") 
+		*ppProcAddress = (void*) &libmcenv_telemetryinterval_getcontextdata;
+	if (sProcName == "libmcenv_telemetryintervaliterator_getcurrentinterval") 
+		*ppProcAddress = (void*) &libmcenv_telemetryintervaliterator_getcurrentinterval;
+	if (sProcName == "libmcenv_telemetrychannelstatistics_getchannelidentifier") 
+		*ppProcAddress = (void*) &libmcenv_telemetrychannelstatistics_getchannelidentifier;
+	if (sProcName == "libmcenv_telemetrychannelstatistics_getintervalcount") 
+		*ppProcAddress = (void*) &libmcenv_telemetrychannelstatistics_getintervalcount;
+	if (sProcName == "libmcenv_telemetrychannelstatistics_getinstantmarkercount") 
+		*ppProcAddress = (void*) &libmcenv_telemetrychannelstatistics_getinstantmarkercount;
+	if (sProcName == "libmcenv_telemetrychannelstatistics_gettotalduration") 
+		*ppProcAddress = (void*) &libmcenv_telemetrychannelstatistics_gettotalduration;
+	if (sProcName == "libmcenv_telemetrychannelstatistics_getminduration") 
+		*ppProcAddress = (void*) &libmcenv_telemetrychannelstatistics_getminduration;
+	if (sProcName == "libmcenv_telemetrychannelstatistics_getmaxduration") 
+		*ppProcAddress = (void*) &libmcenv_telemetrychannelstatistics_getmaxduration;
+	if (sProcName == "libmcenv_telemetrychannelstatistics_getaverageduration") 
+		*ppProcAddress = (void*) &libmcenv_telemetrychannelstatistics_getaverageduration;
+	if (sProcName == "libmcenv_telemetryhandler_getsessionuuid") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_getsessionuuid;
+	if (sProcName == "libmcenv_telemetryhandler_getstarttime") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_getstarttime;
+	if (sProcName == "libmcenv_telemetryhandler_getendtime") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_getendtime;
+	if (sProcName == "libmcenv_telemetryhandler_getlifetimeinmicroseconds") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_getlifetimeinmicroseconds;
+	if (sProcName == "libmcenv_telemetryhandler_getchannelcount") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_getchannelcount;
+	if (sProcName == "libmcenv_telemetryhandler_getchannelidentifier") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_getchannelidentifier;
+	if (sProcName == "libmcenv_telemetryhandler_haschannel") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_haschannel;
+	if (sProcName == "libmcenv_telemetryhandler_getchanneldescription") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_getchanneldescription;
+	if (sProcName == "libmcenv_telemetryhandler_queryintervalsfromtimedelta") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_queryintervalsfromtimedelta;
+	if (sProcName == "libmcenv_telemetryhandler_queryintervalsfromtimerange") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_queryintervalsfromtimerange;
+	if (sProcName == "libmcenv_telemetryhandler_getchannelstatistics") 
+		*ppProcAddress = (void*) &libmcenv_telemetryhandler_getchannelstatistics;
 	if (sProcName == "libmcenv_userdetaillist_count") 
 		*ppProcAddress = (void*) &libmcenv_userdetaillist_count;
 	if (sProcName == "libmcenv_userdetaillist_getuserproperties") 

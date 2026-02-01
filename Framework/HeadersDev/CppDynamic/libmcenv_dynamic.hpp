@@ -129,6 +129,10 @@ class CAlert;
 class CAlertIterator;
 class CLogEntryList;
 class CJournalHandler;
+class CTelemetryInterval;
+class CTelemetryIntervalIterator;
+class CTelemetryChannelStatistics;
+class CTelemetryHandler;
 class CUserDetailList;
 class CUserManagementHandler;
 class CMachineConfigurationXSD;
@@ -218,6 +222,10 @@ typedef CAlert CLibMCEnvAlert;
 typedef CAlertIterator CLibMCEnvAlertIterator;
 typedef CLogEntryList CLibMCEnvLogEntryList;
 typedef CJournalHandler CLibMCEnvJournalHandler;
+typedef CTelemetryInterval CLibMCEnvTelemetryInterval;
+typedef CTelemetryIntervalIterator CLibMCEnvTelemetryIntervalIterator;
+typedef CTelemetryChannelStatistics CLibMCEnvTelemetryChannelStatistics;
+typedef CTelemetryHandler CLibMCEnvTelemetryHandler;
 typedef CUserDetailList CLibMCEnvUserDetailList;
 typedef CUserManagementHandler CLibMCEnvUserManagementHandler;
 typedef CMachineConfigurationXSD CLibMCEnvMachineConfigurationXSD;
@@ -307,6 +315,10 @@ typedef std::shared_ptr<CAlert> PAlert;
 typedef std::shared_ptr<CAlertIterator> PAlertIterator;
 typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CJournalHandler> PJournalHandler;
+typedef std::shared_ptr<CTelemetryInterval> PTelemetryInterval;
+typedef std::shared_ptr<CTelemetryIntervalIterator> PTelemetryIntervalIterator;
+typedef std::shared_ptr<CTelemetryChannelStatistics> PTelemetryChannelStatistics;
+typedef std::shared_ptr<CTelemetryHandler> PTelemetryHandler;
 typedef std::shared_ptr<CUserDetailList> PUserDetailList;
 typedef std::shared_ptr<CUserManagementHandler> PUserManagementHandler;
 typedef std::shared_ptr<CMachineConfigurationXSD> PMachineConfigurationXSD;
@@ -396,6 +408,10 @@ typedef PAlert PLibMCEnvAlert;
 typedef PAlertIterator PLibMCEnvAlertIterator;
 typedef PLogEntryList PLibMCEnvLogEntryList;
 typedef PJournalHandler PLibMCEnvJournalHandler;
+typedef PTelemetryInterval PLibMCEnvTelemetryInterval;
+typedef PTelemetryIntervalIterator PLibMCEnvTelemetryIntervalIterator;
+typedef PTelemetryChannelStatistics PLibMCEnvTelemetryChannelStatistics;
+typedef PTelemetryHandler PLibMCEnvTelemetryHandler;
 typedef PUserDetailList PLibMCEnvUserDetailList;
 typedef PUserManagementHandler PLibMCEnvUserManagementHandler;
 typedef PMachineConfigurationXSD PLibMCEnvMachineConfigurationXSD;
@@ -742,6 +758,7 @@ public:
 			case LIBMCENV_ERROR_MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED: return "MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED";
 			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "NOCONFIGURATIONVERSIONFOUND";
 			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "NOCONFIGURATIONVERSIONACTIVE";
+			case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "TELEMETRYCHANNELNOTFOUND";
 		}
 		return "UNKNOWN";
 	}
@@ -1003,6 +1020,7 @@ public:
 			case LIBMCENV_ERROR_MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED: return "Schema type already registered, but with a different name.";
 			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "No configuration version found.";
 			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "No configuration version active.";
+			case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
 		}
 		return "unknown error";
 	}
@@ -1189,6 +1207,10 @@ private:
 	friend class CAlertIterator;
 	friend class CLogEntryList;
 	friend class CJournalHandler;
+	friend class CTelemetryInterval;
+	friend class CTelemetryIntervalIterator;
+	friend class CTelemetryChannelStatistics;
+	friend class CTelemetryHandler;
 	friend class CUserDetailList;
 	friend class CUserManagementHandler;
 	friend class CMachineConfigurationXSD;
@@ -3151,6 +3173,96 @@ public:
 	inline PLogEntryList RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, eLogLevel & eMinLogLevel);
 	inline PAlertIterator RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
 	inline PAlertIterator RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
+	inline PTelemetryHandler LoadTelemetryHandler();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryInterval 
+**************************************************************************************************************************/
+class CTelemetryInterval : public CBase {
+public:
+	
+	/**
+	* CTelemetryInterval::CTelemetryInterval - Constructor for TelemetryInterval class.
+	*/
+	CTelemetryInterval(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 GetMarkerID();
+	inline std::string GetChannelIdentifier();
+	inline LibMCEnv_uint64 GetStartTimestamp();
+	inline LibMCEnv_uint64 GetEndTimestamp();
+	inline LibMCEnv_uint64 GetDuration();
+	inline LibMCEnv_uint64 GetContextData();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryIntervalIterator 
+**************************************************************************************************************************/
+class CTelemetryIntervalIterator : public CIterator {
+public:
+	
+	/**
+	* CTelemetryIntervalIterator::CTelemetryIntervalIterator - Constructor for TelemetryIntervalIterator class.
+	*/
+	CTelemetryIntervalIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PTelemetryInterval GetCurrentInterval();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryChannelStatistics 
+**************************************************************************************************************************/
+class CTelemetryChannelStatistics : public CBase {
+public:
+	
+	/**
+	* CTelemetryChannelStatistics::CTelemetryChannelStatistics - Constructor for TelemetryChannelStatistics class.
+	*/
+	CTelemetryChannelStatistics(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetChannelIdentifier();
+	inline LibMCEnv_uint64 GetIntervalCount();
+	inline LibMCEnv_uint64 GetInstantMarkerCount();
+	inline LibMCEnv_uint64 GetTotalDuration();
+	inline LibMCEnv_uint64 GetMinDuration();
+	inline LibMCEnv_uint64 GetMaxDuration();
+	inline LibMCEnv_uint64 GetAverageDuration();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryHandler 
+**************************************************************************************************************************/
+class CTelemetryHandler : public CBase {
+public:
+	
+	/**
+	* CTelemetryHandler::CTelemetryHandler - Constructor for TelemetryHandler class.
+	*/
+	CTelemetryHandler(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetSessionUUID();
+	inline PDateTime GetStartTime();
+	inline PDateTime GetEndTime();
+	inline LibMCEnv_uint64 GetLifeTimeInMicroseconds();
+	inline LibMCEnv_uint32 GetChannelCount();
+	inline std::string GetChannelIdentifier(const LibMCEnv_uint32 nChannelIndex);
+	inline bool HasChannel(const std::string & sIdentifier);
+	inline std::string GetChannelDescription(const std::string & sIdentifier);
+	inline PTelemetryIntervalIterator QueryIntervalsFromTimeDelta(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
+	inline PTelemetryIntervalIterator QueryIntervalsFromTimeRange(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
+	inline PTelemetryChannelStatistics GetChannelStatistics(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
 };
 	
 /*************************************************************************************************************************
@@ -4504,6 +4616,32 @@ public:
 		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveAlerts = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval = nullptr;
+		pWrapperTable->m_JournalHandler_LoadTelemetryHandler = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetMarkerID = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetChannelIdentifier = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetStartTimestamp = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetEndTimestamp = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetDuration = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetContextData = nullptr;
+		pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetSessionUUID = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetStartTime = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetEndTime = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetChannelCount = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetChannelIdentifier = nullptr;
+		pWrapperTable->m_TelemetryHandler_HasChannel = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetChannelDescription = nullptr;
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta = nullptr;
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetChannelStatistics = nullptr;
 		pWrapperTable->m_UserDetailList_Count = nullptr;
 		pWrapperTable->m_UserDetailList_GetUserProperties = nullptr;
 		pWrapperTable->m_UserDetailList_GetUsername = nullptr;
@@ -11894,6 +12032,240 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_LoadTelemetryHandler = (PLibMCEnvJournalHandler_LoadTelemetryHandlerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_loadtelemetryhandler");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_LoadTelemetryHandler = (PLibMCEnvJournalHandler_LoadTelemetryHandlerPtr) dlsym(hLibrary, "libmcenv_journalhandler_loadtelemetryhandler");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_LoadTelemetryHandler == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetMarkerID = (PLibMCEnvTelemetryInterval_GetMarkerIDPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getmarkerid");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetMarkerID = (PLibMCEnvTelemetryInterval_GetMarkerIDPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getmarkerid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetMarkerID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetChannelIdentifier = (PLibMCEnvTelemetryInterval_GetChannelIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getchannelidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetChannelIdentifier = (PLibMCEnvTelemetryInterval_GetChannelIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getchannelidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetChannelIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetStartTimestamp = (PLibMCEnvTelemetryInterval_GetStartTimestampPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetStartTimestamp = (PLibMCEnvTelemetryInterval_GetStartTimestampPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetStartTimestamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetEndTimestamp = (PLibMCEnvTelemetryInterval_GetEndTimestampPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getendtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetEndTimestamp = (PLibMCEnvTelemetryInterval_GetEndTimestampPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getendtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetEndTimestamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetDuration = (PLibMCEnvTelemetryInterval_GetDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetDuration = (PLibMCEnvTelemetryInterval_GetDurationPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetContextData = (PLibMCEnvTelemetryInterval_GetContextDataPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getcontextdata");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetContextData = (PLibMCEnvTelemetryInterval_GetContextDataPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getcontextdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetContextData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval = (PLibMCEnvTelemetryIntervalIterator_GetCurrentIntervalPtr) GetProcAddress(hLibrary, "libmcenv_telemetryintervaliterator_getcurrentinterval");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval = (PLibMCEnvTelemetryIntervalIterator_GetCurrentIntervalPtr) dlsym(hLibrary, "libmcenv_telemetryintervaliterator_getcurrentinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier = (PLibMCEnvTelemetryChannelStatistics_GetChannelIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getchannelidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier = (PLibMCEnvTelemetryChannelStatistics_GetChannelIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getchannelidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount = (PLibMCEnvTelemetryChannelStatistics_GetIntervalCountPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getintervalcount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount = (PLibMCEnvTelemetryChannelStatistics_GetIntervalCountPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getintervalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount = (PLibMCEnvTelemetryChannelStatistics_GetInstantMarkerCountPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getinstantmarkercount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount = (PLibMCEnvTelemetryChannelStatistics_GetInstantMarkerCountPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getinstantmarkercount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration = (PLibMCEnvTelemetryChannelStatistics_GetTotalDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_gettotalduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration = (PLibMCEnvTelemetryChannelStatistics_GetTotalDurationPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_gettotalduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration = (PLibMCEnvTelemetryChannelStatistics_GetMinDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getminduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration = (PLibMCEnvTelemetryChannelStatistics_GetMinDurationPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getminduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration = (PLibMCEnvTelemetryChannelStatistics_GetMaxDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getmaxduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration = (PLibMCEnvTelemetryChannelStatistics_GetMaxDurationPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getmaxduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration = (PLibMCEnvTelemetryChannelStatistics_GetAverageDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getaverageduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration = (PLibMCEnvTelemetryChannelStatistics_GetAverageDurationPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getaverageduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetSessionUUID = (PLibMCEnvTelemetryHandler_GetSessionUUIDPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getsessionuuid");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetSessionUUID = (PLibMCEnvTelemetryHandler_GetSessionUUIDPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getsessionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetSessionUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetStartTime = (PLibMCEnvTelemetryHandler_GetStartTimePtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getstarttime");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetStartTime = (PLibMCEnvTelemetryHandler_GetStartTimePtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getstarttime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetStartTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetEndTime = (PLibMCEnvTelemetryHandler_GetEndTimePtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getendtime");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetEndTime = (PLibMCEnvTelemetryHandler_GetEndTimePtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getendtime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetEndTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds = (PLibMCEnvTelemetryHandler_GetLifeTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getlifetimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds = (PLibMCEnvTelemetryHandler_GetLifeTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getlifetimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelCount = (PLibMCEnvTelemetryHandler_GetChannelCountPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getchannelcount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelCount = (PLibMCEnvTelemetryHandler_GetChannelCountPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getchannelcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetChannelCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelIdentifier = (PLibMCEnvTelemetryHandler_GetChannelIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getchannelidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelIdentifier = (PLibMCEnvTelemetryHandler_GetChannelIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getchannelidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetChannelIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_HasChannel = (PLibMCEnvTelemetryHandler_HasChannelPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_haschannel");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_HasChannel = (PLibMCEnvTelemetryHandler_HasChannelPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_haschannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_HasChannel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelDescription = (PLibMCEnvTelemetryHandler_GetChannelDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getchanneldescription");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelDescription = (PLibMCEnvTelemetryHandler_GetChannelDescriptionPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getchanneldescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetChannelDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta = (PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeDeltaPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_queryintervalsfromtimedelta");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta = (PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeDeltaPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_queryintervalsfromtimedelta");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange = (PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeRangePtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_queryintervalsfromtimerange");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange = (PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeRangePtr) dlsym(hLibrary, "libmcenv_telemetryhandler_queryintervalsfromtimerange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelStatistics = (PLibMCEnvTelemetryHandler_GetChannelStatisticsPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getchannelstatistics");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelStatistics = (PLibMCEnvTelemetryHandler_GetChannelStatisticsPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getchannelstatistics");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetChannelStatistics == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UserDetailList_Count = (PLibMCEnvUserDetailList_CountPtr) GetProcAddress(hLibrary, "libmcenv_userdetaillist_count");
 		#else // _WIN32
 		pWrapperTable->m_UserDetailList_Count = (PLibMCEnvUserDetailList_CountPtr) dlsym(hLibrary, "libmcenv_userdetaillist_count");
@@ -17436,6 +17808,110 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievealertsfromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_loadtelemetryhandler", (void**)&(pWrapperTable->m_JournalHandler_LoadTelemetryHandler));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_LoadTelemetryHandler == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getmarkerid", (void**)&(pWrapperTable->m_TelemetryInterval_GetMarkerID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetMarkerID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getchannelidentifier", (void**)&(pWrapperTable->m_TelemetryInterval_GetChannelIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetChannelIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getstarttimestamp", (void**)&(pWrapperTable->m_TelemetryInterval_GetStartTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetStartTimestamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getendtimestamp", (void**)&(pWrapperTable->m_TelemetryInterval_GetEndTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetEndTimestamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getduration", (void**)&(pWrapperTable->m_TelemetryInterval_GetDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getcontextdata", (void**)&(pWrapperTable->m_TelemetryInterval_GetContextData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetContextData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryintervaliterator_getcurrentinterval", (void**)&(pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getchannelidentifier", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getintervalcount", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getinstantmarkercount", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_gettotalduration", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getminduration", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getmaxduration", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getaverageduration", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getsessionuuid", (void**)&(pWrapperTable->m_TelemetryHandler_GetSessionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetSessionUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getstarttime", (void**)&(pWrapperTable->m_TelemetryHandler_GetStartTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetStartTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getendtime", (void**)&(pWrapperTable->m_TelemetryHandler_GetEndTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetEndTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getlifetimeinmicroseconds", (void**)&(pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getchannelcount", (void**)&(pWrapperTable->m_TelemetryHandler_GetChannelCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetChannelCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getchannelidentifier", (void**)&(pWrapperTable->m_TelemetryHandler_GetChannelIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetChannelIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_haschannel", (void**)&(pWrapperTable->m_TelemetryHandler_HasChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_HasChannel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getchanneldescription", (void**)&(pWrapperTable->m_TelemetryHandler_GetChannelDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetChannelDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_queryintervalsfromtimedelta", (void**)&(pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_queryintervalsfromtimerange", (void**)&(pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getchannelstatistics", (void**)&(pWrapperTable->m_TelemetryHandler_GetChannelStatistics));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetChannelStatistics == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_userdetaillist_count", (void**)&(pWrapperTable->m_UserDetailList_Count));
@@ -29163,6 +29639,381 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CJournalHandler::LoadTelemetryHandler - Loads the telemetry handler for this journal.
+	* @return Telemetry handler instance.
+	*/
+	PTelemetryHandler CJournalHandler::LoadTelemetryHandler()
+	{
+		LibMCEnvHandle hTelemetryHandlerInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_LoadTelemetryHandler(m_pHandle, &hTelemetryHandlerInstance));
+		
+		if (!hTelemetryHandlerInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryHandler>(m_pWrapper, hTelemetryHandlerInstance);
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryInterval
+	 */
+	
+	/**
+	* CTelemetryInterval::GetMarkerID - Returns the marker ID.
+	* @return Marker ID
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetMarkerID()
+	{
+		LibMCEnv_uint64 resultMarkerID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetMarkerID(m_pHandle, &resultMarkerID));
+		
+		return resultMarkerID;
+	}
+	
+	/**
+	* CTelemetryInterval::GetChannelIdentifier - Returns the channel identifier.
+	* @return Channel identifier
+	*/
+	std::string CTelemetryInterval::GetChannelIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetChannelIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetChannelIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryInterval::GetStartTimestamp - Returns the start timestamp in microseconds.
+	* @return Start timestamp
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetStartTimestamp()
+	{
+		LibMCEnv_uint64 resultTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetStartTimestamp(m_pHandle, &resultTimestamp));
+		
+		return resultTimestamp;
+	}
+	
+	/**
+	* CTelemetryInterval::GetEndTimestamp - Returns the end timestamp in microseconds.
+	* @return End timestamp
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetEndTimestamp()
+	{
+		LibMCEnv_uint64 resultTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetEndTimestamp(m_pHandle, &resultTimestamp));
+		
+		return resultTimestamp;
+	}
+	
+	/**
+	* CTelemetryInterval::GetDuration - Returns the duration in microseconds.
+	* @return Duration
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	* CTelemetryInterval::GetContextData - Returns the context data.
+	* @return Context data
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetContextData()
+	{
+		LibMCEnv_uint64 resultContextData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetContextData(m_pHandle, &resultContextData));
+		
+		return resultContextData;
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryIntervalIterator
+	 */
+	
+	/**
+	* CTelemetryIntervalIterator::GetCurrentInterval - Returns the current interval.
+	* @return Current interval
+	*/
+	PTelemetryInterval CTelemetryIntervalIterator::GetCurrentInterval()
+	{
+		LibMCEnvHandle hInterval = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryIntervalIterator_GetCurrentInterval(m_pHandle, &hInterval));
+		
+		if (!hInterval) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryInterval>(m_pWrapper, hInterval);
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryChannelStatistics
+	 */
+	
+	/**
+	* CTelemetryChannelStatistics::GetChannelIdentifier - Returns the channel identifier.
+	* @return Channel identifier
+	*/
+	std::string CTelemetryChannelStatistics::GetChannelIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetChannelIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetChannelIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetIntervalCount - Returns the number of completed intervals.
+	* @return Number of intervals
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetIntervalCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetIntervalCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetInstantMarkerCount - Returns the number of instant markers.
+	* @return Number of instant markers
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetInstantMarkerCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetInstantMarkerCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetTotalDuration - Returns the total duration of all intervals.
+	* @return Total duration in microseconds
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetTotalDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetTotalDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetMinDuration - Returns the minimum interval duration.
+	* @return Min duration in microseconds
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetMinDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetMinDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetMaxDuration - Returns the maximum interval duration.
+	* @return Max duration in microseconds
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetMaxDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetMaxDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetAverageDuration - Returns the average interval duration.
+	* @return Average duration in microseconds
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetAverageDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetAverageDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryHandler
+	 */
+	
+	/**
+	* CTelemetryHandler::GetSessionUUID - Returns the session UUID.
+	* @return Session UUID
+	*/
+	std::string CTelemetryHandler::GetSessionUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetSessionUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetSessionUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CTelemetryHandler::GetStartTime - Returns the session start time.
+	* @return DateTime Instance
+	*/
+	PDateTime CTelemetryHandler::GetStartTime()
+	{
+		LibMCEnvHandle hDateTimeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetStartTime(m_pHandle, &hDateTimeInstance));
+		
+		if (!hDateTimeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
+	}
+	
+	/**
+	* CTelemetryHandler::GetEndTime - Returns the session end time.
+	* @return DateTime Instance
+	*/
+	PDateTime CTelemetryHandler::GetEndTime()
+	{
+		LibMCEnvHandle hDateTimeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetEndTime(m_pHandle, &hDateTimeInstance));
+		
+		if (!hDateTimeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
+	}
+	
+	/**
+	* CTelemetryHandler::GetLifeTimeInMicroseconds - Returns the session lifetime in microseconds.
+	* @return Lifetime
+	*/
+	LibMCEnv_uint64 CTelemetryHandler::GetLifeTimeInMicroseconds()
+	{
+		LibMCEnv_uint64 resultLifeTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetLifeTimeInMicroseconds(m_pHandle, &resultLifeTime));
+		
+		return resultLifeTime;
+	}
+	
+	/**
+	* CTelemetryHandler::GetChannelCount - Returns the number of telemetry channels.
+	* @return Number of channels
+	*/
+	LibMCEnv_uint32 CTelemetryHandler::GetChannelCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CTelemetryHandler::GetChannelIdentifier - Returns the identifier for a channel by index.
+	* @param[in] nChannelIndex - Channel index (0-based)
+	* @return Channel identifier
+	*/
+	std::string CTelemetryHandler::GetChannelIdentifier(const LibMCEnv_uint32 nChannelIndex)
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelIdentifier(m_pHandle, nChannelIndex, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelIdentifier(m_pHandle, nChannelIndex, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryHandler::HasChannel - Checks if a channel exists.
+	* @param[in] sIdentifier - Channel identifier
+	* @return True if channel exists
+	*/
+	bool CTelemetryHandler::HasChannel(const std::string & sIdentifier)
+	{
+		bool resultExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_HasChannel(m_pHandle, sIdentifier.c_str(), &resultExists));
+		
+		return resultExists;
+	}
+	
+	/**
+	* CTelemetryHandler::GetChannelDescription - Returns the description of a channel.
+	* @param[in] sIdentifier - Channel identifier
+	* @return Channel description
+	*/
+	std::string CTelemetryHandler::GetChannelDescription(const std::string & sIdentifier)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelDescription(m_pHandle, sIdentifier.c_str(), 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelDescription(m_pHandle, sIdentifier.c_str(), bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CTelemetryHandler::QueryIntervalsFromTimeDelta - Queries intervals from the last N microseconds.
+	* @param[in] sChannelIdentifier - Channel identifier. Empty string for all channels.
+	* @param[in] nTimeDeltaInMicroseconds - Time delta from the end of the session.
+	* @return Iterator over intervals
+	*/
+	PTelemetryIntervalIterator CTelemetryHandler::QueryIntervalsFromTimeDelta(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
+	{
+		LibMCEnvHandle hIterator = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_QueryIntervalsFromTimeDelta(m_pHandle, sChannelIdentifier.c_str(), nTimeDeltaInMicroseconds, &hIterator));
+		
+		if (!hIterator) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryIntervalIterator>(m_pWrapper, hIterator);
+	}
+	
+	/**
+	* CTelemetryHandler::QueryIntervalsFromTimeRange - Queries intervals within a time range.
+	* @param[in] sChannelIdentifier - Channel identifier. Empty string for all channels.
+	* @param[in] nStartTimeInMicroseconds - Start time.
+	* @param[in] nEndTimeInMicroseconds - End time.
+	* @return Iterator over intervals
+	*/
+	PTelemetryIntervalIterator CTelemetryHandler::QueryIntervalsFromTimeRange(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+	{
+		LibMCEnvHandle hIterator = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_QueryIntervalsFromTimeRange(m_pHandle, sChannelIdentifier.c_str(), nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hIterator));
+		
+		if (!hIterator) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryIntervalIterator>(m_pWrapper, hIterator);
+	}
+	
+	/**
+	* CTelemetryHandler::GetChannelStatistics - Gets aggregated statistics for a channel.
+	* @param[in] sChannelIdentifier - Channel identifier.
+	* @param[in] nStartTimeInMicroseconds - Start time (0 for beginning of session).
+	* @param[in] nEndTimeInMicroseconds - End time (0 for end of session).
+	* @return Statistics instance
+	*/
+	PTelemetryChannelStatistics CTelemetryHandler::GetChannelStatistics(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+	{
+		LibMCEnvHandle hStatistics = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelStatistics(m_pHandle, sChannelIdentifier.c_str(), nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hStatistics));
+		
+		if (!hStatistics) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryChannelStatistics>(m_pWrapper, hStatistics);
 	}
 	
 	/**

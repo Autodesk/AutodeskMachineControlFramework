@@ -8416,6 +8416,277 @@ typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveAlertsPtr) (LibMCEnv_Jo
 */
 typedef LibMCEnvResult (*PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_AlertIterator * pIteratorInstance);
 
+/**
+* Loads the telemetry handler for this journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pTelemetryHandlerInstance - Telemetry handler instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvJournalHandler_LoadTelemetryHandlerPtr) (LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_TelemetryHandler * pTelemetryHandlerInstance);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryInterval
+**************************************************************************************************************************/
+
+/**
+* Returns the marker ID.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pMarkerID - Marker ID
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryInterval_GetMarkerIDPtr) (LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pMarkerID);
+
+/**
+* Returns the channel identifier.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Channel identifier, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryInterval_GetChannelIdentifierPtr) (LibMCEnv_TelemetryInterval pTelemetryInterval, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the start timestamp in microseconds.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pTimestamp - Start timestamp
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryInterval_GetStartTimestampPtr) (LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pTimestamp);
+
+/**
+* Returns the end timestamp in microseconds.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pTimestamp - End timestamp
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryInterval_GetEndTimestampPtr) (LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pTimestamp);
+
+/**
+* Returns the duration in microseconds.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pDuration - Duration
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryInterval_GetDurationPtr) (LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pDuration);
+
+/**
+* Returns the context data.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pContextData - Context data
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryInterval_GetContextDataPtr) (LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pContextData);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryIntervalIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the current interval.
+*
+* @param[in] pTelemetryIntervalIterator - TelemetryIntervalIterator instance.
+* @param[out] pInterval - Current interval
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryIntervalIterator_GetCurrentIntervalPtr) (LibMCEnv_TelemetryIntervalIterator pTelemetryIntervalIterator, LibMCEnv_TelemetryInterval * pInterval);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryChannelStatistics
+**************************************************************************************************************************/
+
+/**
+* Returns the channel identifier.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Channel identifier, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryChannelStatistics_GetChannelIdentifierPtr) (LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the number of completed intervals.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pCount - Number of intervals
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryChannelStatistics_GetIntervalCountPtr) (LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns the number of instant markers.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pCount - Number of instant markers
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryChannelStatistics_GetInstantMarkerCountPtr) (LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns the total duration of all intervals.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pDuration - Total duration in microseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryChannelStatistics_GetTotalDurationPtr) (LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration);
+
+/**
+* Returns the minimum interval duration.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pDuration - Min duration in microseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryChannelStatistics_GetMinDurationPtr) (LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration);
+
+/**
+* Returns the maximum interval duration.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pDuration - Max duration in microseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryChannelStatistics_GetMaxDurationPtr) (LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration);
+
+/**
+* Returns the average interval duration.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pDuration - Average duration in microseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryChannelStatistics_GetAverageDurationPtr) (LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryHandler
+**************************************************************************************************************************/
+
+/**
+* Returns the session UUID.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_GetSessionUUIDPtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the session start time.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[out] pDateTimeInstance - DateTime Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_GetStartTimePtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Returns the session end time.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[out] pDateTimeInstance - DateTime Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_GetEndTimePtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Returns the session lifetime in microseconds.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[out] pLifeTime - Lifetime
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_GetLifeTimeInMicrosecondsPtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint64 * pLifeTime);
+
+/**
+* Returns the number of telemetry channels.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[out] pCount - Number of channels
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_GetChannelCountPtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns the identifier for a channel by index.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] nChannelIndex - Channel index (0-based)
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Channel identifier, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_GetChannelIdentifierPtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint32 nChannelIndex, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Checks if a channel exists.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pIdentifier - Channel identifier
+* @param[out] pExists - True if channel exists
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_HasChannelPtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pIdentifier, bool * pExists);
+
+/**
+* Returns the description of a channel.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pIdentifier - Channel identifier
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Channel description, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_GetChannelDescriptionPtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pIdentifier, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Queries intervals from the last N microseconds.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pChannelIdentifier - Channel identifier. Empty string for all channels.
+* @param[in] nTimeDeltaInMicroseconds - Time delta from the end of the session.
+* @param[out] pIterator - Iterator over intervals
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeDeltaPtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_TelemetryIntervalIterator * pIterator);
+
+/**
+* Queries intervals within a time range.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pChannelIdentifier - Channel identifier. Empty string for all channels.
+* @param[in] nStartTimeInMicroseconds - Start time.
+* @param[in] nEndTimeInMicroseconds - End time.
+* @param[out] pIterator - Iterator over intervals
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeRangePtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_TelemetryIntervalIterator * pIterator);
+
+/**
+* Gets aggregated statistics for a channel.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pChannelIdentifier - Channel identifier.
+* @param[in] nStartTimeInMicroseconds - Start time (0 for beginning of session).
+* @param[in] nEndTimeInMicroseconds - End time (0 for end of session).
+* @param[out] pStatistics - Statistics instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTelemetryHandler_GetChannelStatisticsPtr) (LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_TelemetryChannelStatistics * pStatistics);
+
 /*************************************************************************************************************************
  Class definition for UserDetailList
 **************************************************************************************************************************/
@@ -12082,6 +12353,32 @@ typedef struct {
 	PLibMCEnvJournalHandler_RetrieveLogEntriesFromTimeIntervalPtr m_JournalHandler_RetrieveLogEntriesFromTimeInterval;
 	PLibMCEnvJournalHandler_RetrieveAlertsPtr m_JournalHandler_RetrieveAlerts;
 	PLibMCEnvJournalHandler_RetrieveAlertsFromTimeIntervalPtr m_JournalHandler_RetrieveAlertsFromTimeInterval;
+	PLibMCEnvJournalHandler_LoadTelemetryHandlerPtr m_JournalHandler_LoadTelemetryHandler;
+	PLibMCEnvTelemetryInterval_GetMarkerIDPtr m_TelemetryInterval_GetMarkerID;
+	PLibMCEnvTelemetryInterval_GetChannelIdentifierPtr m_TelemetryInterval_GetChannelIdentifier;
+	PLibMCEnvTelemetryInterval_GetStartTimestampPtr m_TelemetryInterval_GetStartTimestamp;
+	PLibMCEnvTelemetryInterval_GetEndTimestampPtr m_TelemetryInterval_GetEndTimestamp;
+	PLibMCEnvTelemetryInterval_GetDurationPtr m_TelemetryInterval_GetDuration;
+	PLibMCEnvTelemetryInterval_GetContextDataPtr m_TelemetryInterval_GetContextData;
+	PLibMCEnvTelemetryIntervalIterator_GetCurrentIntervalPtr m_TelemetryIntervalIterator_GetCurrentInterval;
+	PLibMCEnvTelemetryChannelStatistics_GetChannelIdentifierPtr m_TelemetryChannelStatistics_GetChannelIdentifier;
+	PLibMCEnvTelemetryChannelStatistics_GetIntervalCountPtr m_TelemetryChannelStatistics_GetIntervalCount;
+	PLibMCEnvTelemetryChannelStatistics_GetInstantMarkerCountPtr m_TelemetryChannelStatistics_GetInstantMarkerCount;
+	PLibMCEnvTelemetryChannelStatistics_GetTotalDurationPtr m_TelemetryChannelStatistics_GetTotalDuration;
+	PLibMCEnvTelemetryChannelStatistics_GetMinDurationPtr m_TelemetryChannelStatistics_GetMinDuration;
+	PLibMCEnvTelemetryChannelStatistics_GetMaxDurationPtr m_TelemetryChannelStatistics_GetMaxDuration;
+	PLibMCEnvTelemetryChannelStatistics_GetAverageDurationPtr m_TelemetryChannelStatistics_GetAverageDuration;
+	PLibMCEnvTelemetryHandler_GetSessionUUIDPtr m_TelemetryHandler_GetSessionUUID;
+	PLibMCEnvTelemetryHandler_GetStartTimePtr m_TelemetryHandler_GetStartTime;
+	PLibMCEnvTelemetryHandler_GetEndTimePtr m_TelemetryHandler_GetEndTime;
+	PLibMCEnvTelemetryHandler_GetLifeTimeInMicrosecondsPtr m_TelemetryHandler_GetLifeTimeInMicroseconds;
+	PLibMCEnvTelemetryHandler_GetChannelCountPtr m_TelemetryHandler_GetChannelCount;
+	PLibMCEnvTelemetryHandler_GetChannelIdentifierPtr m_TelemetryHandler_GetChannelIdentifier;
+	PLibMCEnvTelemetryHandler_HasChannelPtr m_TelemetryHandler_HasChannel;
+	PLibMCEnvTelemetryHandler_GetChannelDescriptionPtr m_TelemetryHandler_GetChannelDescription;
+	PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeDeltaPtr m_TelemetryHandler_QueryIntervalsFromTimeDelta;
+	PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeRangePtr m_TelemetryHandler_QueryIntervalsFromTimeRange;
+	PLibMCEnvTelemetryHandler_GetChannelStatisticsPtr m_TelemetryHandler_GetChannelStatistics;
 	PLibMCEnvUserDetailList_CountPtr m_UserDetailList_Count;
 	PLibMCEnvUserDetailList_GetUserPropertiesPtr m_UserDetailList_GetUserProperties;
 	PLibMCEnvUserDetailList_GetUsernamePtr m_UserDetailList_GetUsername;

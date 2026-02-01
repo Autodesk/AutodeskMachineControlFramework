@@ -878,6 +878,8 @@ typedef LibMCDataHandle LibMCData_Alert;
 typedef LibMCDataHandle LibMCData_AlertIterator;
 typedef LibMCDataHandle LibMCData_AlertSession;
 typedef LibMCDataHandle LibMCData_TelemetrySession;
+typedef LibMCDataHandle LibMCData_TelemetryChunkData;
+typedef LibMCDataHandle LibMCData_TelemetryReader;
 typedef LibMCDataHandle LibMCData_JournalChunkIntegerData;
 typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_JournalReader;
@@ -1008,6 +1010,15 @@ namespace LibMCData {
       LibMCData_uint64 m_ContextData;
   } sTelemetryChunkEntry;
   
+  typedef struct sTelemetryIntervalData {
+      LibMCData_uint64 m_MarkerID;
+      LibMCData_uint32 m_ChannelIndex;
+      LibMCData_uint64 m_StartTimeStamp;
+      LibMCData_uint64 m_EndTimeStamp;
+      LibMCData_uint64 m_DurationInMicroseconds;
+      LibMCData_uint64 m_ContextData;
+  } sTelemetryIntervalData;
+  
   #pragma pack ()
   
   /*************************************************************************************************************************
@@ -1058,6 +1069,7 @@ typedef LibMCData::eTelemetryChunkEntryType eLibMCDataTelemetryChunkEntryType;
 typedef LibMCData::eBuildJobExecutionStatus eLibMCDataBuildJobExecutionStatus;
 typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
 typedef LibMCData::sTelemetryChunkEntry sLibMCDataTelemetryChunkEntry;
+typedef LibMCData::sTelemetryIntervalData sLibMCDataTelemetryIntervalData;
 typedef LibMCData::LogCallback LibMCDataLogCallback;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;

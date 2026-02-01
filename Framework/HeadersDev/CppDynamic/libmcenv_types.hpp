@@ -349,6 +349,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED 10252 /** Schema type already registered, but with a different name. */
 #define LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND 10253 /** No configuration version found. */
 #define LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE 10254 /** No configuration version active. */
+#define LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND 10255 /** Telemetry channel not found. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -610,6 +611,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED: return "Schema type already registered, but with a different name.";
     case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "No configuration version found.";
     case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "No configuration version active.";
+    case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
     default: return "unknown error";
   }
 }
@@ -688,6 +690,10 @@ typedef LibMCEnvHandle LibMCEnv_Alert;
 typedef LibMCEnvHandle LibMCEnv_AlertIterator;
 typedef LibMCEnvHandle LibMCEnv_LogEntryList;
 typedef LibMCEnvHandle LibMCEnv_JournalHandler;
+typedef LibMCEnvHandle LibMCEnv_TelemetryInterval;
+typedef LibMCEnvHandle LibMCEnv_TelemetryIntervalIterator;
+typedef LibMCEnvHandle LibMCEnv_TelemetryChannelStatistics;
+typedef LibMCEnvHandle LibMCEnv_TelemetryHandler;
 typedef LibMCEnvHandle LibMCEnv_UserDetailList;
 typedef LibMCEnvHandle LibMCEnv_UserManagementHandler;
 typedef LibMCEnvHandle LibMCEnv_MachineConfigurationXSD;

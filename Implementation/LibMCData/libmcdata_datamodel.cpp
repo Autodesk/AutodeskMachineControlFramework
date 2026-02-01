@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_journalreader.hpp"
 #include "libmcdata_alertsession.hpp"
 #include "libmcdata_telemetrysession.hpp"
+#include "libmcdata_telemetryreader.hpp"
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
 #include "libmcdata_persistencyhandler.hpp"
@@ -235,6 +236,13 @@ ITelemetrySession* CDataModel::CreateTelemetrySession()
 
     return new CTelemetrySession(m_pJournal);
 
+}
+
+ITelemetryReader* CDataModel::CreateTelemetryReader(const std::string& sJournalUUID)
+{
+    auto sJournalBasePath = m_pStorageState->getJournalBasePath(m_sTimeFileName);
+
+    return new CTelemetryReader(m_pSQLHandler, sJournalUUID, sJournalBasePath);
 }
 
 

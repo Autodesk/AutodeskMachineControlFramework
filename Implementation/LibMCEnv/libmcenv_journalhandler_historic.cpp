@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CJournalHandler
 #include "libmcenv_journalhandler_historic.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_journalvariable_historic.hpp"
+#include "libmcenv_telemetryhandler.hpp"
 
 // Include custom headers here.
 #include "libmcenv_datetime.hpp"
@@ -45,10 +46,14 @@ using namespace LibMCEnv::Impl;
  Class definition of CJournalHandler_Historic 
 **************************************************************************************************************************/
 
-CJournalHandler_Historic::CJournalHandler_Historic(AMC::PStateJournalReader pJournalReader)
-	: m_pJournalReader (pJournalReader)
+CJournalHandler_Historic::CJournalHandler_Historic(AMC::PStateJournalReader pJournalReader, LibMCData::PDataModel pDataModel, const std::string& sJournalUUID, AMCCommon::PChrono pGlobalChrono)
+	: m_pJournalReader(pJournalReader), m_pDataModel(pDataModel), m_sJournalUUID(sJournalUUID), m_pGlobalChrono(pGlobalChrono)
 {
 	if (pJournalReader.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pDataModel.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
@@ -102,5 +107,12 @@ IAlertIterator* CJournalHandler_Historic::RetrieveAlerts(const LibMCEnv_uint64 n
 IAlertIterator* CJournalHandler_Historic::RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+ITelemetryHandler* CJournalHandler_Historic::LoadTelemetryHandler()
+{
+	auto pTelemetryReader = m_pDataModel->CreateTelemetryReader(m_sJournalUUID);
+	std::string sStartTime = m_pJournalReader->getStartTimeAsUTC();
+	return new CTelemetryHandler(pTelemetryReader, m_pGlobalChrono, sStartTime);
 }
 
