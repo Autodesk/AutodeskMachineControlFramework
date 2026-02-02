@@ -67,6 +67,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_unittests_libmcdata_users.hpp"
 #include "amc_unittests_libmcdata_persistency.hpp"
 
+// New LibMCData unit tests for coverage
+#include "amc_unittests_libmcdata_datamodel.hpp"
+#include "amc_unittests_libmcdata_installationinfo.hpp"
+#include "amc_unittests_libmcdata_machineconfig.hpp"
+#include "amc_unittests_libmcdata_customdata.hpp"
+
 
 using namespace AMCUnitTest;
 
@@ -110,4 +116,10 @@ CUnitTests::CUnitTests (PUnitTestIO pIO)
 	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_BuildJobs>());
 	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_Users>());
 	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_Persistency>());
+
+	// New LibMCData unit tests for coverage
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_DataModel>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_InstallationInfo>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_MachineConfig>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_CustomData>());
 }

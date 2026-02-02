@@ -66,6 +66,14 @@ namespace AMCUnitTest {
 			registerTest("FilterErrors", "Filter errors only", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testFilterErrors, this));
 			registerTest("SequentialTimestamps", "Sequential timestamps", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testSequentialTimestamps, this));
 			registerTest("SpecialCharacters", "Special characters in messages", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testSpecialCharacters, this));
+			
+			// Additional Logging Tests for Coverage (6 tests)
+			registerTest("UnicodeMessages", "Unicode characters in messages", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testUnicodeMessages, this));
+			registerTest("MaxMessageLength", "Maximum message length", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testMaxMessageLength, this));
+			registerTest("LogSessionUUID", "Log session UUID format", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testLogSessionUUID, this));
+			registerTest("LongSubsystemName", "Long subsystem name", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testLongSubsystemName, this));
+			registerTest("FatalErrorLevel", "Fatal error level filtering", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testFatalErrorLevel, this));
+			registerTest("EmptySubsystem", "Empty subsystem name", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Logging::testEmptySubsystem, this));
 		}
 
 		void initializeTests() override {
@@ -379,6 +387,112 @@ namespace AMCUnitTest {
 			pEntryList->GetEntryByIndex(0, nID, sMessage, sSubsystem, level, sTimestamp);
 			
 			assertTrue(sMessage == sSpecialMsg, "Special characters message mismatch");
+		}
+		
+		// ============= Additional Logging Tests for Coverage (6 tests) =============
+		
+		void testUnicodeMessages()
+		{
+			auto fixture = createFixture("unicode");
+			
+			// Test various Unicode characters
+			std::string sUnicodeMsg = u8"Unicode test: äöü ñ 日本語 中文 한국어 🎉";
+			
+			fixture.m_pLogSession->AddEntry(sUnicodeMsg, "unicode_subsystem", LibMCData::eLogLevel::Message, "2025-01-01T12:00:00Z");
+			
+			auto pEntryList = fixture.m_pLogSession->RetrieveLogEntriesByID(1, 1, LibMCData::eLogLevel::Debug);
+			
+			uint32_t nID;
+			std::string sMessage, sSubsystem, sTimestamp;
+			LibMCData::eLogLevel level;
+			pEntryList->GetEntryByIndex(0, nID, sMessage, sSubsystem, level, sTimestamp);
+			
+			assertTrue(sMessage == sUnicodeMsg, "Unicode message should be preserved");
+		}
+		
+		void testMaxMessageLength()
+		{
+			auto fixture = createFixture("max_length");
+			
+			// Create a very long message (10KB)
+			std::string sVeryLongMsg(10240, 'L');
+			
+			fixture.m_pLogSession->AddEntry(sVeryLongMsg, "subsystem", LibMCData::eLogLevel::Message, "2025-01-01T12:00:00Z");
+			
+			auto pEntryList = fixture.m_pLogSession->RetrieveLogEntriesByID(1, 1, LibMCData::eLogLevel::Debug);
+			
+			uint32_t nID;
+			std::string sMessage, sSubsystem, sTimestamp;
+			LibMCData::eLogLevel level;
+			pEntryList->GetEntryByIndex(0, nID, sMessage, sSubsystem, level, sTimestamp);
+			
+			assertTrue(sMessage.size() == sVeryLongMsg.size(), "Very long message should be preserved");
+		}
+		
+		void testLogSessionUUID()
+		{
+			auto fixture = createFixture("session_uuid");
+			
+			std::string sSessionUUID = fixture.m_pLogSession->GetSessionUUID();
+			
+			// UUID should be valid format
+			assertFalse(sSessionUUID.empty(), "Session UUID should not be empty");
+			assertTrue(sSessionUUID.length() == 36, "Session UUID should be 36 characters");
+			assertTrue(sSessionUUID[8] == '-' && sSessionUUID[13] == '-' && sSessionUUID[18] == '-' && sSessionUUID[23] == '-', "UUID should have dashes in correct positions");
+		}
+		
+		void testLongSubsystemName()
+		{
+			auto fixture = createFixture("long_subsystem");
+			
+			std::string sLongSubsystem(200, 'S');
+			
+			fixture.m_pLogSession->AddEntry("Test message", sLongSubsystem, LibMCData::eLogLevel::Message, "2025-01-01T12:00:00Z");
+			
+			auto pEntryList = fixture.m_pLogSession->RetrieveLogEntriesByID(1, 1, LibMCData::eLogLevel::Debug);
+			
+			uint32_t nID;
+			std::string sMessage, sSubsystem, sTimestamp;
+			LibMCData::eLogLevel level;
+			pEntryList->GetEntryByIndex(0, nID, sMessage, sSubsystem, level, sTimestamp);
+			
+			assertTrue(sSubsystem == sLongSubsystem, "Long subsystem name should be preserved");
+		}
+		
+		void testFatalErrorLevel()
+		{
+			auto fixture = createFixture("fatal");
+			
+			fixture.m_pLogSession->AddEntry("Fatal message 1", "subsystem", LibMCData::eLogLevel::FatalError, "2025-01-01T12:00:00Z");
+			fixture.m_pLogSession->AddEntry("Fatal message 2", "subsystem", LibMCData::eLogLevel::FatalError, "2025-01-01T12:00:01Z");
+			
+			// Retrieve only FatalError level
+			auto pEntryList = fixture.m_pLogSession->RetrieveLogEntriesByID(1, 2, LibMCData::eLogLevel::FatalError);
+			
+			assertTrue(pEntryList->Count() == 2, "Should have 2 fatal error entries");
+			
+			uint32_t nID;
+			std::string sMessage, sSubsystem, sTimestamp;
+			LibMCData::eLogLevel level;
+			pEntryList->GetEntryByIndex(0, nID, sMessage, sSubsystem, level, sTimestamp);
+			
+			assertTrue(level == LibMCData::eLogLevel::FatalError, "Level should be FatalError");
+		}
+		
+		void testEmptySubsystem()
+		{
+			auto fixture = createFixture("empty_sub");
+			
+			fixture.m_pLogSession->AddEntry("Message with empty subsystem", "", LibMCData::eLogLevel::Message, "2025-01-01T12:00:00Z");
+			
+			auto pEntryList = fixture.m_pLogSession->RetrieveLogEntriesByID(1, 1, LibMCData::eLogLevel::Debug);
+			
+			uint32_t nID;
+			std::string sMessage, sSubsystem, sTimestamp;
+			LibMCData::eLogLevel level;
+			pEntryList->GetEntryByIndex(0, nID, sMessage, sSubsystem, level, sTimestamp);
+			
+			assertTrue(sSubsystem.empty(), "Empty subsystem should be preserved");
 		}
 	};
 

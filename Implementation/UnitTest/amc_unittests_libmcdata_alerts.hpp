@@ -60,6 +60,15 @@ namespace AMCUnitTest {
 			// Additional AlertSession tests for coverage
 			registerTest("RetrieveByType", "Retrieve alerts by type", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testRetrieveByType, this));
 			registerTest("RetrieveActiveByType", "Retrieve active alerts by type", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testRetrieveActiveByType, this));
+			
+			// Additional Alert Tests for Coverage (7 tests)
+			registerTest("AlertIteratorMoveNext", "Alert iterator MoveNext", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testAlertIteratorMoveNext, this));
+			registerTest("AlertIteratorGetCurrent", "Alert iterator GetCurrent", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testAlertIteratorGetCurrent, this));
+			registerTest("EmptyDescription", "Empty alert description", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testEmptyDescription, this));
+			registerTest("LongContextInfo", "Long context information", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testLongContextInfo, this));
+			registerTest("AlertUUIDFormat", "Alert UUID format", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testAlertUUIDFormat, this));
+			registerTest("MultipleAcknowledgement", "Multiple acknowledgement test", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testMultipleAcknowledgement, this));
+			registerTest("AllAlertLevels", "All alert levels test", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testAllAlertLevels, this));
 		}
 
 		void initializeTests() override {
@@ -410,6 +419,187 @@ namespace AMCUnitTest {
 			auto pAllIterator = fixture.m_pAlertSession->RetrieveAlertsByType(sTypeIdentifier, false);
 			uint64_t nAllCount = pAllIterator->Count();
 			assertTrue(nAllCount >= 2, "Should have at least 2 total alerts of type");
+		}
+		
+		// ============= Additional Alert Tests for Coverage (7 tests) =============
+		
+		void testAlertIteratorMoveNext()
+		{
+			auto fixture = createFixture("iter_movenext");
+			
+			// Create multiple alerts
+			for (int i = 0; i < 5; i++) {
+				std::string sUUID = AMCCommon::CUtils::createUUID();
+				fixture.m_pAlertSession->AddAlert(
+					sUUID,
+					"iteralert" + std::to_string(i),
+					LibMCData::eAlertLevel::Warning,
+					"Iterator test " + std::to_string(i),
+					"",
+					"",
+					false,
+					"2025-01-01T12:00:0" + std::to_string(i) + "Z"
+				);
+			}
+			
+			auto pIterator = fixture.m_pAlertSession->RetrieveAlerts(false);
+			
+			uint64_t nCount = 0;
+			while (pIterator->MoveNext()) {
+				auto pAlert = pIterator->GetCurrentAlert();
+				assertAssigned(pAlert.get(), "Alert should be returned");
+				assertFalse(pAlert->GetUUID().empty(), "Alert UUID should not be empty");
+				nCount++;
+			}
+			assertTrue(nCount >= 5, "Should have iterated through at least 5 alerts");
+		}
+		
+		void testAlertIteratorGetCurrent()
+		{
+			auto fixture = createFixture("iter_getcurrent");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			fixture.m_pAlertSession->AddAlert(
+				sUUID,
+				"getcurrentalert",
+				LibMCData::eAlertLevel::CriticalError,
+				"GetCurrent test",
+				"getcurrentdesc",
+				"Context info",
+				true,
+				"2025-01-01T12:00:00Z"
+			);
+			
+			auto pIterator = fixture.m_pAlertSession->RetrieveAlerts(false);
+			
+			assertTrue(pIterator->MoveNext(), "Should be able to move to first alert");
+			
+			auto pAlert = pIterator->GetCurrentAlert();
+			assertAssigned(pAlert.get(), "GetCurrentAlert should return an alert");
+			assertFalse(pAlert->GetDescription().empty(), "Alert should have description");
+		}
+		
+		void testEmptyDescription()
+		{
+			auto fixture = createFixture("empty_desc");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			auto pAlert = fixture.m_pAlertSession->AddAlert(
+				sUUID,
+				"emptydescalert",
+				LibMCData::eAlertLevel::Message,
+				"", // Empty description
+				"emptydescid",
+				"",
+				false,
+				"2025-01-01T12:00:00Z"
+			);
+			
+			assertTrue(pAlert->GetDescription().empty(), "Empty description should be preserved");
+		}
+		
+		void testLongContextInfo()
+		{
+			auto fixture = createFixture("long_context");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sLongContext(5000, 'C'); // 5KB of context
+			
+			auto pAlert = fixture.m_pAlertSession->AddAlert(
+				sUUID,
+				"longcontextalert",
+				LibMCData::eAlertLevel::Warning,
+				"Long context test",
+				"longcontextdesc",
+				sLongContext,
+				false,
+				"2025-01-01T12:00:00Z"
+			);
+			
+			assertTrue(pAlert->GetReadableContextInformation() == sLongContext, "Long context should be preserved");
+		}
+		
+		void testAlertUUIDFormat()
+		{
+			auto fixture = createFixture("uuid_format");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			auto pAlert = fixture.m_pAlertSession->AddAlert(
+				sUUID,
+				"uuidformatalert",
+				LibMCData::eAlertLevel::Warning,
+				"UUID format test",
+				"",
+				"",
+				false,
+				"2025-01-01T12:00:00Z"
+			);
+			
+			std::string sRetrievedUUID = pAlert->GetUUID();
+			
+			// UUID should be in standard format
+			assertTrue(sRetrievedUUID.length() == 36, "UUID should be 36 characters");
+			assertTrue(sRetrievedUUID[8] == '-', "UUID should have dash at position 8");
+			assertTrue(sRetrievedUUID[13] == '-', "UUID should have dash at position 13");
+			assertTrue(sRetrievedUUID[18] == '-', "UUID should have dash at position 18");
+			assertTrue(sRetrievedUUID[23] == '-', "UUID should have dash at position 23");
+		}
+		
+		void testMultipleAcknowledgement()
+		{
+			auto fixture = createFixture("multi_ack");
+			
+			std::string sAlertUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID1 = AMCCommon::CUtils::createUUID();
+			
+			auto pAlert = fixture.m_pAlertSession->AddAlert(
+				sAlertUUID,
+				"multiacktest",
+				LibMCData::eAlertLevel::Warning,
+				"Multi ack test",
+				"",
+				"",
+				true, // Needs acknowledgement
+				"2025-01-01T12:00:00Z"
+			);
+			
+			// First acknowledgement
+			pAlert->AcknowledgeForUser(sUserUUID1, "First acknowledgement", "2025-01-01T12:30:00Z");
+			assertTrue(pAlert->HasBeenAcknowledged(), "Alert should be acknowledged");
+			
+			// Get acknowledgement info
+			std::string sAckUser, sAckComment, sAckTime;
+			pAlert->GetAcknowledgementInformation(sAckUser, sAckComment, sAckTime);
+			assertTrue(sAckComment == "First acknowledgement", "Acknowledgement comment should be preserved");
+		}
+		
+		void testAllAlertLevels()
+		{
+			auto fixture = createFixture("all_levels");
+			
+			LibMCData::eAlertLevel levels[] = {
+				LibMCData::eAlertLevel::Message,
+				LibMCData::eAlertLevel::Warning,
+				LibMCData::eAlertLevel::CriticalError,
+				LibMCData::eAlertLevel::FatalError
+			};
+			
+			for (auto level : levels) {
+				std::string sUUID = AMCCommon::CUtils::createUUID();
+				auto pAlert = fixture.m_pAlertSession->AddAlert(
+					sUUID,
+					"levelalert",
+					level,
+					"Level test",
+					"",
+					"",
+					false,
+					"2025-01-01T12:00:00Z"
+				);
+				
+				assertTrue(pAlert->GetLevel() == level, "Alert level should match");
+				assertFalse(pAlert->GetLevelString().empty(), "Level string should not be empty");
+			}
 		}
 	};
 

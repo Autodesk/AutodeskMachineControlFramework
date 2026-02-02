@@ -103,6 +103,20 @@ namespace AMCUnitTest {
 			registerTest("JobMetaDataUpdate", "Update job metadata", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testJobMetaDataUpdate, this));
 			registerTest("ExecutionIterator", "Execution iterator", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testExecutionIterator, this));
 			registerTest("JobGetJobData", "Get job data array", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testJobGetJobData, this));
+			
+			// Additional BuildJob Tests for Coverage (12 tests)
+			registerTest("AddJobData", "Add custom data to job", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testAddJobData, this));
+			registerTest("AddJobDataFromStream", "Add job data from stream", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testAddJobDataFromStream, this));
+			registerTest("ListJobData", "List job data entries", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testListJobData, this));
+			registerTest("RetrieveJobData", "Retrieve job data by identifier", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testRetrieveJobData, this));
+			registerTest("HasJobData", "Check job data existence", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testHasJobData, this));
+			registerTest("AddExecutionData", "Add execution data", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testAddExecutionData, this));
+			registerTest("ListExecutionData", "List execution data", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testListExecutionData, this));
+			registerTest("RetrieveExecutionData", "Retrieve execution data", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testRetrieveExecutionData, this));
+			registerTest("JobIteratorMoveNext", "Job iterator MoveNext", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testJobIteratorMoveNext, this));
+			registerTest("JobIteratorGetCurrent", "Job iterator GetCurrent", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testJobIteratorGetCurrent, this));
+			registerTest("JobLongName", "Job with long name", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testJobLongName, this));
+			registerTest("ExecMultipleMetaData", "Execution multiple metadata", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_BuildJobs::testExecMultipleMetaData, this));
 		}
 
 		void initializeTests() override {
@@ -937,6 +951,257 @@ namespace AMCUnitTest {
 			
 			std::string sRetrieved(streamData.begin(), streamData.end());
 			assertTrue(sRetrieved == sContent, "Job data content should match");
+		}
+		
+		// ============= Additional BuildJob Tests for Coverage (12 tests) =============
+		
+		void testAddJobData()
+		{
+			auto fixture = createFixture("add_job_data");
+			
+			auto pJob = createValidatedJob(fixture, "Job With Custom Data");
+			
+			// Create a storage stream for the custom data
+			std::string sDataContent = "Custom job data content";
+			std::string sDataStreamUUID = createTestStream(fixture, sDataContent);
+			auto pStream = fixture.m_pStorage->RetrieveStream(sDataStreamUUID);
+			
+			// Add custom data to the job
+			std::string sIdentifier = "customdata.test";
+			std::string sName = "Test Custom Data";
+			
+			pJob->AddJobData(sIdentifier, sName, pStream.get(), LibMCData::eCustomDataType::CustomBinaryData, fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			// Verify data was added
+			assertTrue(pJob->HasJobDataIdentifier(sIdentifier), "Job should have custom data");
+		}
+		
+		void testAddJobDataFromStream()
+		{
+			auto fixture = createFixture("add_data_stream");
+			
+			auto pJob = createValidatedJob(fixture, "Job With Stream Data");
+			
+			// Create multiple data entries
+			for (int i = 0; i < 3; i++) {
+				std::string sContent = "Data content " + std::to_string(i);
+				std::string sStreamUUID = createTestStream(fixture, sContent);
+				auto pStream = fixture.m_pStorage->RetrieveStream(sStreamUUID);
+				std::string sIdentifier = "data." + std::to_string(i);
+				
+				pJob->AddJobData(sIdentifier, "Data " + std::to_string(i), pStream.get(), LibMCData::eCustomDataType::CustomBinaryData, fixture.m_sUserUUID, getCurrentTimestamp());
+			}
+			
+			// Verify all data exists
+			for (int i = 0; i < 3; i++) {
+				std::string sIdentifier = "data." + std::to_string(i);
+				assertTrue(pJob->HasJobDataIdentifier(sIdentifier), "Should have data " + std::to_string(i));
+			}
+		}
+		
+		void testListJobData()
+		{
+			auto fixture = createFixture("list_job_data");
+			
+			auto pJob = createValidatedJob(fixture, "Job With Multiple Data");
+			
+			// Add multiple data entries
+			for (int i = 0; i < 5; i++) {
+				std::string sContent = "List data content " + std::to_string(i);
+				std::string sStreamUUID = createTestStream(fixture, sContent);
+				auto pStream = fixture.m_pStorage->RetrieveStream(sStreamUUID);
+				std::string sIdentifier = "listdata." + std::to_string(i);
+				
+				pJob->AddJobData(sIdentifier, "List Data " + std::to_string(i), pStream.get(), LibMCData::eCustomDataType::CustomBinaryData, fixture.m_sUserUUID, getCurrentTimestamp());
+			}
+			
+			// List all job data
+			auto pIterator = pJob->ListJobData();
+			assertTrue(pIterator->Count() >= 5, "Should have at least 5 data entries");
+		}
+		
+		void testRetrieveJobData()
+		{
+			auto fixture = createFixture("retrieve_job_data");
+			
+			auto pJob = createValidatedJob(fixture, "Job For Retrieve Data");
+			
+			std::string sContent = "Retrievable content";
+			std::string sStreamUUID = createTestStream(fixture, sContent);
+			auto pStream = fixture.m_pStorage->RetrieveStream(sStreamUUID);
+			std::string sIdentifier = "retrieve.test";
+			std::string sName = "Retrievable Data";
+			
+			pJob->AddJobData(sIdentifier, sName, pStream.get(), LibMCData::eCustomDataType::CustomBinaryData, fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			auto pCustomData = pJob->RetrieveJobDataByIdentifier(sIdentifier);
+			
+			assertAssigned(pCustomData.get(), "Custom data should be retrieved");
+			assertTrue(pCustomData->GetName() == sName, "Data name should match");
+			assertTrue(pCustomData->GetIdentifier() == sIdentifier, "Data identifier should match");
+		}
+		
+		void testHasJobData()
+		{
+			auto fixture = createFixture("has_job_data");
+			
+			auto pJob = createValidatedJob(fixture, "Job For Has Data Check");
+			
+			std::string sIdentifier = "hasdata.test";
+			
+			// Initially should not have data
+			assertFalse(pJob->HasJobDataIdentifier(sIdentifier), "Should not have data initially");
+			
+			// Add data
+			std::string sStreamUUID = createTestStream(fixture, "Content");
+			auto pStream = fixture.m_pStorage->RetrieveStream(sStreamUUID);
+			pJob->AddJobData(sIdentifier, "Has Data Test", pStream.get(), LibMCData::eCustomDataType::CustomBinaryData, fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			// Now should have data
+			assertTrue(pJob->HasJobDataIdentifier(sIdentifier), "Should have data after adding");
+			
+			// Non-existent identifier
+			assertFalse(pJob->HasJobDataIdentifier("nonexistent.data"), "Should not have non-existent data");
+		}
+		
+		void testAddExecutionData()
+		{
+			auto fixture = createFixture("add_exec_data");
+			
+			auto pJob = createValidatedJob(fixture, "Job For Exec Data");
+			auto pExec = pJob->CreateBuildJobExecution("Execution with data", fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			std::string sContent = "Execution data content";
+			std::string sStreamUUID = createTestStream(fixture, sContent);
+			auto pStream = fixture.m_pStorage->RetrieveStream(sStreamUUID);
+			std::string sIdentifier = "execdata.test";
+			
+			pExec->AddJobExecutionData(sIdentifier, "Exec Data", pStream.get(), LibMCData::eCustomDataType::CustomBinaryData, fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			assertTrue(pExec->HasJobExecutionDataIdentifier(sIdentifier), "Execution should have data");
+		}
+		
+		void testListExecutionData()
+		{
+			auto fixture = createFixture("list_exec_data");
+			
+			auto pJob = createValidatedJob(fixture, "Job For Exec Data List");
+			auto pExec = pJob->CreateBuildJobExecution("Execution with multiple data", fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			// Add multiple data entries
+			for (int i = 0; i < 3; i++) {
+				std::string sContent = "Exec data content " + std::to_string(i);
+				std::string sStreamUUID = createTestStream(fixture, sContent);
+				auto pStream = fixture.m_pStorage->RetrieveStream(sStreamUUID);
+				std::string sIdentifier = "execlistdata." + std::to_string(i);
+				
+				pExec->AddJobExecutionData(sIdentifier, "Exec Data " + std::to_string(i), pStream.get(), LibMCData::eCustomDataType::CustomBinaryData, fixture.m_sUserUUID, getCurrentTimestamp());
+			}
+			
+			auto pIterator = pExec->ListJobExecutionData();
+			assertTrue(pIterator->Count() >= 3, "Should have at least 3 execution data entries");
+		}
+		
+		void testRetrieveExecutionData()
+		{
+			auto fixture = createFixture("retrieve_exec_data");
+			
+			auto pJob = createValidatedJob(fixture, "Job For Retrieve Exec Data");
+			auto pExec = pJob->CreateBuildJobExecution("Execution for retrieve", fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			std::string sContent = "Retrievable exec content";
+			std::string sStreamUUID = createTestStream(fixture, sContent);
+			auto pStream = fixture.m_pStorage->RetrieveStream(sStreamUUID);
+			std::string sIdentifier = "retrieveexec.test";
+			std::string sName = "Retrievable Exec Data";
+			
+			pExec->AddJobExecutionData(sIdentifier, sName, pStream.get(), LibMCData::eCustomDataType::CustomBinaryData, fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			auto pCustomData = pExec->RetrieveJobExecutionDataByIdentifier(sIdentifier);
+			
+			assertAssigned(pCustomData.get(), "Execution data should be retrieved");
+			assertTrue(pCustomData->GetName() == sName, "Exec data name should match");
+		}
+		
+		void testJobIteratorMoveNext()
+		{
+			auto fixture = createFixture("job_iter_movenext");
+			
+			// Create multiple jobs
+			std::vector<std::string> createdJobUUIDs;
+			for (int i = 0; i < 5; i++) {
+				std::string sJobUUID = AMCCommon::CUtils::createUUID();
+				std::string sStreamUUID = createTestStream(fixture, "Job content " + std::to_string(i));
+				auto pJob = fixture.m_pBuildJobHandler->CreateJob(sJobUUID, "Iterator Job " + std::to_string(i), fixture.m_sUserUUID, sStreamUUID, getCurrentTimestamp());
+				createdJobUUIDs.push_back(sJobUUID);
+			}
+			
+			// Verify all jobs were created
+			for (const auto& sJobUUID : createdJobUUIDs) {
+				auto pJob = fixture.m_pBuildJobHandler->RetrieveJob(sJobUUID);
+				assertAssigned(pJob.get(), "Job should be retrievable");
+				assertFalse(pJob->GetUUID().empty(), "Job UUID should not be empty");
+			}
+			
+			assertTrue(createdJobUUIDs.size() == 5, "Should have created 5 jobs");
+		}
+		
+		void testJobIteratorGetCurrent()
+		{
+			auto fixture = createFixture("job_iter_getcurrent");
+			
+			// Create a job
+			std::string sJobUUID = AMCCommon::CUtils::createUUID();
+			std::string sStreamUUID = createTestStream(fixture, "Job content");
+			fixture.m_pBuildJobHandler->CreateJob(sJobUUID, "GetCurrent Job", fixture.m_sUserUUID, sStreamUUID, getCurrentTimestamp());
+			
+			auto pIterator = fixture.m_pBuildJobHandler->ListJobsByStatus(LibMCData::eBuildJobStatus::Created);
+			
+			assertTrue(pIterator->MoveNext(), "Should be able to move to first job");
+			
+			auto pJob = pIterator->GetCurrentJob();
+			assertAssigned(pJob.get(), "GetCurrentJob should return a job");
+			assertFalse(pJob->GetUUID().empty(), "Job should have UUID");
+			assertFalse(pJob->GetName().empty(), "Job should have name");
+		}
+		
+		void testJobLongName()
+		{
+			auto fixture = createFixture("job_long_name");
+			
+			std::string sJobUUID = AMCCommon::CUtils::createUUID();
+			std::string sStreamUUID = createTestStream(fixture, "Content");
+			
+			// Create a job with a reasonably long name (within database limits)
+			std::string sLongName(200, 'N');
+			
+			auto pJob = fixture.m_pBuildJobHandler->CreateJob(sJobUUID, sLongName, fixture.m_sUserUUID, sStreamUUID, getCurrentTimestamp());
+			
+			assertTrue(pJob->GetName() == sLongName, "Long job name should be preserved");
+		}
+		
+		void testExecMultipleMetaData()
+		{
+			auto fixture = createFixture("exec_multi_meta");
+			
+			auto pJob = createValidatedJob(fixture, "Job For Multi Meta");
+			auto pExec = pJob->CreateBuildJobExecution("Execution with metadata", fixture.m_sUserUUID, getCurrentTimestamp());
+			
+			// Add many metadata entries
+			for (int i = 0; i < 20; i++) {
+				std::string sKey = "key_" + std::to_string(i);
+				std::string sValue = "value_" + std::to_string(i);
+				pExec->StoreMetaDataString(sKey, sValue, getCurrentTimestamp());
+			}
+			
+			// Verify all metadata exists
+			for (int i = 0; i < 20; i++) {
+				std::string sKey = "key_" + std::to_string(i);
+				std::string sExpectedValue = "value_" + std::to_string(i);
+				
+				assertTrue(pExec->HasMetaDataString(sKey), "Should have metadata key " + sKey);
+				assertTrue(pExec->GetMetaDataString(sKey) == sExpectedValue, "Metadata value should match for " + sKey);
+			}
 		}
 	};
 

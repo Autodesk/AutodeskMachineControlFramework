@@ -450,6 +450,9 @@
 		<error name="TELEMETRYCHANNELALREADYEXISTS" code="449" description="Telemetry channel already exists." />
 		<error name="TELEMETRYCHANNELNOTFOUND" code="450" description="Telemetry channel not found." />					
 
+		<error name="JOBNAMETOOLONG" code="451" description="Job name exceeds maximum allowed length" />
+		<error name="STRINGPARAMETERTOOLONG" code="452" description="String parameter exceeds maximum allowed length" />
+
 	</errors>
 	
 		

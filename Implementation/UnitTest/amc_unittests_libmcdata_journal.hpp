@@ -70,6 +70,14 @@ namespace AMCUnitTest {
 			registerTest("VariableUnits", "Variable units in journal", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testVariableUnits, this));
 			registerTest("VarDataTypes", "Variable data types", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testVarDataTypes, this));
 			registerTest("AliasMapping", "Verify alias to source mapping", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testAliasMapping, this));
+			
+			// Additional Journal Tests for Coverage (6 tests)
+			registerTest("JournalUUIDFormat", "Journal UUID format", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testJournalUUIDFormat, this));
+			registerTest("ReaderMultipleAccess", "Multiple readers access", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testReaderMultipleAccess, this));
+			registerTest("VariableIndexUniqueness", "Variable index uniqueness", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testVariableIndexUniqueness, this));
+			registerTest("LongVariableName", "Long variable name", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testLongVariableName, this));
+			registerTest("LongAliasName", "Long alias name", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testLongAliasName, this));
+			registerTest("VariableNegativeUnits", "Variable negative units", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Journal::testVariableNegativeUnits, this));
 		}
 
 		void initializeTests() override {
@@ -419,6 +427,145 @@ namespace AMCUnitTest {
 			
 			assertTrue(sRetrievedAlias == sAliasName, "Alias name should match");
 			assertTrue(sRetrievedSource == sSourceName, "Source name should match");
+		}
+		
+		// ============= Additional Journal Tests for Coverage (6 tests) =============
+		
+		void testJournalUUIDFormat()
+		{
+			auto fixture = createFixture("uuid_format");
+			
+			std::string sJournalUUID = fixture.m_pJournalSession->GetSessionUUID();
+			
+			// UUID should be in standard format
+			assertTrue(sJournalUUID.length() == 36, "Journal UUID should be 36 characters");
+			assertTrue(sJournalUUID[8] == '-', "UUID should have dash at position 8");
+			assertTrue(sJournalUUID[13] == '-', "UUID should have dash at position 13");
+			assertTrue(sJournalUUID[18] == '-', "UUID should have dash at position 18");
+			assertTrue(sJournalUUID[23] == '-', "UUID should have dash at position 23");
+		}
+		
+		void testReaderMultipleAccess()
+		{
+			auto fixture = createFixture("multi_access");
+			
+			fixture.m_pJournalSession->CreateVariableInJournalDB("multi_access_var", 1, 1, LibMCData::eParameterDataType::Double, 1.0);
+			
+			std::string sJournalUUID = fixture.m_pJournalSession->GetSessionUUID();
+			
+			// Create multiple readers for the same journal
+			auto pReader1 = fixture.m_pDataModel->CreateJournalReader(sJournalUUID);
+			auto pReader2 = fixture.m_pDataModel->CreateJournalReader(sJournalUUID);
+			auto pReader3 = fixture.m_pDataModel->CreateJournalReader(sJournalUUID);
+			
+			// All should work independently
+			assertTrue(pReader1->GetVariableCount() >= 1, "Reader1 should see variables");
+			assertTrue(pReader2->GetVariableCount() >= 1, "Reader2 should see variables");
+			assertTrue(pReader3->GetVariableCount() >= 1, "Reader3 should see variables");
+			
+			// All should have same UUID
+			assertTrue(pReader1->GetJournalUUID() == sJournalUUID, "Reader1 UUID should match");
+			assertTrue(pReader2->GetJournalUUID() == sJournalUUID, "Reader2 UUID should match");
+			assertTrue(pReader3->GetJournalUUID() == sJournalUUID, "Reader3 UUID should match");
+		}
+		
+		void testVariableIndexUniqueness()
+		{
+			auto fixture = createFixture("index_unique");
+			
+			// Create variables with unique indices
+			fixture.m_pJournalSession->CreateVariableInJournalDB("var_idx_1", 1, 1, LibMCData::eParameterDataType::Double, 1.0);
+			fixture.m_pJournalSession->CreateVariableInJournalDB("var_idx_2", 2, 2, LibMCData::eParameterDataType::Double, 1.0);
+			fixture.m_pJournalSession->CreateVariableInJournalDB("var_idx_3", 3, 3, LibMCData::eParameterDataType::Double, 1.0);
+			
+			std::string sJournalUUID = fixture.m_pJournalSession->GetSessionUUID();
+			auto pReader = fixture.m_pDataModel->CreateJournalReader(sJournalUUID);
+			
+			uint32_t nVarCount = pReader->GetVariableCount();
+			assertTrue(nVarCount >= 3, "Should have at least 3 variables");
+		}
+		
+		void testLongVariableName()
+		{
+			auto fixture = createFixture("long_name");
+			
+			// Create a variable with a long name
+			std::string sLongName(200, 'V');
+			
+			fixture.m_pJournalSession->CreateVariableInJournalDB(sLongName, 1, 1, LibMCData::eParameterDataType::Double, 1.0);
+			
+			std::string sJournalUUID = fixture.m_pJournalSession->GetSessionUUID();
+			auto pReader = fixture.m_pDataModel->CreateJournalReader(sJournalUUID);
+			
+			// Should be able to retrieve it
+			uint32_t nVarCount = pReader->GetVariableCount();
+			assertTrue(nVarCount >= 1, "Should have at least 1 variable");
+			
+			// Find and verify the long name
+			bool bFound = false;
+			for (uint32_t i = 0; i < nVarCount; i++) {
+				std::string sName;
+				uint32_t nID;
+				LibMCData::eParameterDataType eDataType;
+				double dUnits;
+				
+				pReader->GetVariableInformation(i, sName, nID, eDataType, dUnits);
+				if (sName == sLongName) {
+					bFound = true;
+					break;
+				}
+			}
+			assertTrue(bFound, "Long variable name should be preserved");
+		}
+		
+		void testLongAliasName()
+		{
+			auto fixture = createFixture("long_alias");
+			
+			std::string sSourceName = "source_var";
+			std::string sLongAlias(200, 'A');
+			
+			fixture.m_pJournalSession->CreateVariableInJournalDB(sSourceName, 1, 1, LibMCData::eParameterDataType::Double, 1.0);
+			fixture.m_pJournalSession->CreateVariableAliasInJournalDB(sLongAlias, sSourceName);
+			
+			std::string sJournalUUID = fixture.m_pJournalSession->GetSessionUUID();
+			auto pReader = fixture.m_pDataModel->CreateJournalReader(sJournalUUID);
+			
+			uint32_t nAliasCount = pReader->GetAliasCount();
+			assertTrue(nAliasCount >= 1, "Should have at least 1 alias");
+			
+			// Verify alias name is preserved
+			std::string sRetrievedAlias, sRetrievedSource;
+			pReader->GetAliasInformation(0, sRetrievedAlias, sRetrievedSource);
+			assertTrue(sRetrievedAlias == sLongAlias, "Long alias name should be preserved");
+		}
+		
+		void testVariableNegativeUnits()
+		{
+			auto fixture = createFixture("neg_units");
+			
+			// Create a variable with negative units (edge case)
+			fixture.m_pJournalSession->CreateVariableInJournalDB("neg_units_var", 1, 1, LibMCData::eParameterDataType::Double, -1.0);
+			
+			std::string sJournalUUID = fixture.m_pJournalSession->GetSessionUUID();
+			auto pReader = fixture.m_pDataModel->CreateJournalReader(sJournalUUID);
+			
+			uint32_t nVarCount = pReader->GetVariableCount();
+			assertTrue(nVarCount >= 1, "Should have at least 1 variable");
+			
+			// Find and verify the units
+			for (uint32_t i = 0; i < nVarCount; i++) {
+				std::string sName;
+				uint32_t nID;
+				LibMCData::eParameterDataType eDataType;
+				double dUnits;
+				
+				pReader->GetVariableInformation(i, sName, nID, eDataType, dUnits);
+				if (sName == "neg_units_var") {
+					assertTrue(dUnits == -1.0, "Negative units should be preserved");
+					break;
+				}
+			}
 		}
 	};
 

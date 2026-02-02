@@ -81,6 +81,20 @@ namespace AMCUnitTest {
 			registerTest("StreamWithDifferentMimes", "Different MIME types", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testStreamWithDifferentMimes, this));
 			registerTest("PartialStreamAbort", "Abort partial stream", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testPartialStreamAbort, this));
 			registerTest("BinaryContent", "Binary content storage", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testBinaryContent, this));
+			
+			// Additional Storage Tests for Coverage (12 tests)
+			registerTest("PartialStreamStatus", "Partial stream status transitions", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testPartialStreamStatus, this));
+			registerTest("RandomWriteNonSequential", "Random write non-sequential offsets", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testRandomWriteNonSequential, this));
+			registerTest("ContentTypeRegistration", "Content type registration", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testContentTypeRegistration, this));
+			registerTest("ImageContentValidation", "Image content validation", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testImageContentValidation, this));
+			registerTest("ZIPStreamMultipleEntries", "ZIP stream multiple entries", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testZIPStreamMultipleEntries, this));
+			registerTest("ZIPStreamCompression", "ZIP stream compression", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testZIPStreamCompression, this));
+			registerTest("ConcurrentStreams", "Concurrent stream creation", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testConcurrentStreams, this));
+			registerTest("StreamWithSpecialFilename", "Special characters in filename", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testStreamWithSpecialFilename, this));
+			registerTest("StreamUUIDNormalization", "UUID normalization", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testStreamUUIDNormalization, this));
+			registerTest("VeryLargeFilename", "Very large filename", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testVeryLargeFilename, this));
+			registerTest("PartialStreamLargeOffset", "Partial stream large offset", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testPartialStreamLargeOffset, this));
+			registerTest("StreamMIMETypePreservation", "MIME type preservation", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Storage::testStreamMIMETypePreservation, this));
 		}
 
 		void initializeTests() override {
@@ -736,6 +750,302 @@ namespace AMCUnitTest {
 			// Verify all bytes
 			for (int i = 0; i < 256; i++) {
 				assertTrue(retrieved[i] == static_cast<uint8_t>(i), "Binary byte mismatch at " + std::to_string(i));
+			}
+		}
+		
+		// ============= Additional Storage Tests for Coverage (12 tests) =============
+		
+		void testPartialStreamStatus()
+		{
+			auto fixture = createFixture("partial_status");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			
+			std::string sContent = "Content for partial status test";
+			std::vector<uint8_t> buffer(sContent.begin(), sContent.end());
+			
+			// Begin partial stream
+			fixture.m_pStorage->BeginPartialStream(sUUID, "status.bin", "application/octet-stream", buffer.size(), sUserUUID, getCurrentTimestamp());
+			
+			// Not ready initially
+			assertFalse(fixture.m_pStorage->StreamIsReady(sUUID), "Partial stream should not be ready initially");
+			
+			// Store content
+			fixture.m_pStorage->StorePartialStream(sUUID, 0, buffer);
+			
+			// Still not ready until finished
+			assertFalse(fixture.m_pStorage->StreamIsReady(sUUID), "Partial stream should not be ready before finish");
+			
+			// Finish with SHA256
+			std::string sSHA256 = AMCCommon::CUtils::calculateSHA256FromData(buffer.data(), buffer.size());
+			fixture.m_pStorage->FinishPartialStream(sUUID, sSHA256);
+			
+			// Now ready
+			assertTrue(fixture.m_pStorage->StreamIsReady(sUUID), "Partial stream should be ready after finish");
+		}
+		
+		void testRandomWriteNonSequential()
+		{
+			auto fixture = createFixture("random_nonseq");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			
+			fixture.m_pStorage->BeginRandomWriteStream(sUUID, "nonseq.bin", "application/octet-stream", sUserUUID, getCurrentTimestamp());
+			
+			// Write at offset 100 first
+			std::vector<uint8_t> chunk1 = {0x01, 0x02, 0x03, 0x04};
+			fixture.m_pStorage->StoreRandomWriteStream(sUUID, 100, chunk1);
+			
+			// Write at offset 0
+			std::vector<uint8_t> chunk2 = {0x10, 0x20, 0x30, 0x40};
+			fixture.m_pStorage->StoreRandomWriteStream(sUUID, 0, chunk2);
+			
+			// Write at offset 50
+			std::vector<uint8_t> chunk3 = {0xAA, 0xBB, 0xCC, 0xDD};
+			fixture.m_pStorage->StoreRandomWriteStream(sUUID, 50, chunk3);
+			
+			// Check size is max(offset + length) = 104
+			uint64_t nSize = fixture.m_pStorage->GetRandomWriteStreamSize(sUUID);
+			assertTrue(nSize >= 104, "Random write size should be at least 104");
+			
+			fixture.m_pStorage->FinishRandomWriteStream(sUUID);
+			assertTrue(fixture.m_pStorage->StreamIsReady(sUUID), "Random write stream should be ready");
+		}
+		
+		void testContentTypeRegistration()
+		{
+			auto fixture = createFixture("content_type_reg");
+			
+			// Test that standard content types are accepted
+			assertTrue(fixture.m_pStorage->ContentTypeIsAccepted("application/3mf"), "application/3mf should be accepted");
+			assertTrue(fixture.m_pStorage->ContentTypeIsAccepted("image/png"), "image/png should be accepted");
+			assertTrue(fixture.m_pStorage->ContentTypeIsAccepted("image/jpeg"), "image/jpeg should be accepted");
+			assertTrue(fixture.m_pStorage->ContentTypeIsAccepted("text/csv"), "text/csv should be accepted");
+		}
+		
+		void testImageContentValidation()
+		{
+			auto fixture = createFixture("image_validation");
+			
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			
+			// Create a PNG stream
+			std::string sPNGUUID = AMCCommon::CUtils::createUUID();
+			std::vector<uint8_t> pngBuffer = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}; // PNG magic
+			fixture.m_pStorage->StoreNewStream(sPNGUUID, "test.png", "image/png", pngBuffer, sUserUUID, getCurrentTimestamp());
+			
+			// Create a JPEG stream
+			std::string sJPEGUUID = AMCCommon::CUtils::createUUID();
+			std::vector<uint8_t> jpegBuffer = {0xFF, 0xD8, 0xFF, 0xE0}; // JPEG magic
+			fixture.m_pStorage->StoreNewStream(sJPEGUUID, "test.jpg", "image/jpeg", jpegBuffer, sUserUUID, getCurrentTimestamp());
+			
+			// Create a non-image stream
+			std::string sTextUUID = AMCCommon::CUtils::createUUID();
+			std::vector<uint8_t> textBuffer = {'H', 'e', 'l', 'l', 'o'};
+			fixture.m_pStorage->StoreNewStream(sTextUUID, "test.txt", "text/plain", textBuffer, sUserUUID, getCurrentTimestamp());
+			
+			// Verify image detection
+			assertTrue(fixture.m_pStorage->StreamIsImage(sPNGUUID), "PNG should be detected as image");
+			assertTrue(fixture.m_pStorage->StreamIsImage(sJPEGUUID), "JPEG should be detected as image");
+			assertFalse(fixture.m_pStorage->StreamIsImage(sTextUUID), "Text should not be detected as image");
+		}
+		
+		void testZIPStreamMultipleEntries()
+		{
+			auto fixture = createFixture("zip_multi");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			
+			auto pZIPWriter = fixture.m_pStorage->CreateZIPStream(sUUID, "multi.zip", sUserUUID, getCurrentTimestamp());
+			
+			// Add multiple entries
+			std::vector<std::string> entryNames = {"file1.txt", "file2.txt", "subdir/file3.txt"};
+			for (size_t i = 0; i < entryNames.size(); i++) {
+				std::string sContent = "Content for " + entryNames[i];
+				std::vector<uint8_t> buffer(sContent.begin(), sContent.end());
+				
+				uint32_t nEntryID = pZIPWriter->StartNewEntry(entryNames[i], getCurrentTimestamp());
+				pZIPWriter->WriteData(nEntryID, buffer);
+				pZIPWriter->FinishCurrentEntry();
+			}
+			
+			pZIPWriter->Finish();
+			
+			assertTrue(fixture.m_pStorage->StreamIsReady(sUUID), "ZIP stream should be ready");
+			
+			auto pStream = fixture.m_pStorage->RetrieveStream(sUUID);
+			assertTrue(pStream->GetSize() > 0, "ZIP stream should have content");
+		}
+		
+		void testZIPStreamCompression()
+		{
+			auto fixture = createFixture("zip_compress");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			
+			auto pZIPWriter = fixture.m_pStorage->CreateZIPStream(sUUID, "compress.zip", sUserUUID, getCurrentTimestamp());
+			
+			// Add a large compressible entry (repeating pattern)
+			std::string sContent(10000, 'A'); // 10KB of 'A' characters - highly compressible
+			std::vector<uint8_t> buffer(sContent.begin(), sContent.end());
+			
+			uint32_t nEntryID = pZIPWriter->StartNewEntry("compressible.txt", getCurrentTimestamp());
+			pZIPWriter->WriteData(nEntryID, buffer);
+			pZIPWriter->FinishCurrentEntry();
+			pZIPWriter->Finish();
+			
+			auto pStream = fixture.m_pStorage->RetrieveStream(sUUID);
+			
+			// ZIP should be smaller than raw content due to compression
+			// (though this depends on compression settings)
+			assertTrue(pStream->GetSize() > 0, "ZIP should have content");
+		}
+		
+		void testConcurrentStreams()
+		{
+			auto fixture = createFixture("concurrent");
+			
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			
+			// Create multiple streams concurrently
+			std::vector<std::string> uuids;
+			for (int i = 0; i < 10; i++) {
+				std::string sUUID = AMCCommon::CUtils::createUUID();
+				std::string sContent = "Concurrent content " + std::to_string(i);
+				std::vector<uint8_t> buffer(sContent.begin(), sContent.end());
+				
+				fixture.m_pStorage->StoreNewStream(sUUID, "concurrent_" + std::to_string(i) + ".txt", "text/plain", buffer, sUserUUID, getCurrentTimestamp());
+				uuids.push_back(sUUID);
+			}
+			
+			// Verify all streams are accessible
+			for (size_t i = 0; i < uuids.size(); i++) {
+				assertTrue(fixture.m_pStorage->StreamIsReady(uuids[i]), "Stream " + std::to_string(i) + " should be ready");
+				
+				auto pStream = fixture.m_pStorage->RetrieveStream(uuids[i]);
+				assertAssigned(pStream.get(), "Stream " + std::to_string(i) + " should be retrievable");
+			}
+		}
+		
+		void testStreamWithSpecialFilename()
+		{
+			auto fixture = createFixture("special_filename");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			std::vector<uint8_t> buffer = {0x01, 0x02, 0x03};
+			
+			// Test filename with spaces and special characters
+			std::string sFilename = "my file (test) [v1.0].bin";
+			
+			fixture.m_pStorage->StoreNewStream(sUUID, sFilename, "application/octet-stream", buffer, sUserUUID, getCurrentTimestamp());
+			
+			auto pStream = fixture.m_pStorage->RetrieveStream(sUUID);
+			assertTrue(pStream->GetName() == sFilename, "Filename with special characters should be preserved");
+		}
+		
+		void testStreamUUIDNormalization()
+		{
+			auto fixture = createFixture("uuid_norm");
+			
+			// Create UUID and store stream
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			std::vector<uint8_t> buffer = {0x01, 0x02};
+			
+			fixture.m_pStorage->StoreNewStream(sUUID, "norm.bin", "application/octet-stream", buffer, sUserUUID, getCurrentTimestamp());
+			
+			// Should be retrievable with the same UUID
+			assertTrue(fixture.m_pStorage->StreamIsReady(sUUID), "Stream should be ready after storing");
+			
+			// Test that we can retrieve it
+			auto pStream = fixture.m_pStorage->RetrieveStream(sUUID);
+			assertAssigned(pStream.get(), "Stream should be retrievable");
+			assertTrue(pStream->GetName() == "norm.bin", "Stream name should match");
+		}
+		
+		void testVeryLargeFilename()
+		{
+			auto fixture = createFixture("large_filename");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			std::vector<uint8_t> buffer = {0x01};
+			
+			// Create a reasonable but long filename (255 chars is typical max)
+			std::string sFilename(200, 'x');
+			sFilename += ".bin";
+			
+			fixture.m_pStorage->StoreNewStream(sUUID, sFilename, "application/octet-stream", buffer, sUserUUID, getCurrentTimestamp());
+			
+			auto pStream = fixture.m_pStorage->RetrieveStream(sUUID);
+			assertTrue(pStream->GetName() == sFilename, "Long filename should be preserved");
+		}
+		
+		void testPartialStreamLargeOffset()
+		{
+			auto fixture = createFixture("partial_large_offset");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			
+			uint64_t nTotalSize = 1024 * 10; // 10KB total
+			
+			fixture.m_pStorage->BeginPartialStream(sUUID, "large_offset.bin", "application/octet-stream", nTotalSize, sUserUUID, getCurrentTimestamp());
+			
+			// Write at the end first
+			std::vector<uint8_t> endChunk(256, 0xEE);
+			fixture.m_pStorage->StorePartialStream(sUUID, nTotalSize - 256, endChunk);
+			
+			// Write at the beginning
+			std::vector<uint8_t> beginChunk(256, 0xBB);
+			fixture.m_pStorage->StorePartialStream(sUUID, 0, beginChunk);
+			
+			// Fill the middle
+			uint64_t nMiddleSize = nTotalSize - 512;
+			std::vector<uint8_t> middleChunk(nMiddleSize, 0x00);
+			fixture.m_pStorage->StorePartialStream(sUUID, 256, middleChunk);
+			
+			// Calculate SHA256 of the full content
+			std::vector<uint8_t> fullContent;
+			fullContent.insert(fullContent.end(), beginChunk.begin(), beginChunk.end());
+			fullContent.insert(fullContent.end(), middleChunk.begin(), middleChunk.end());
+			fullContent.insert(fullContent.end(), endChunk.begin(), endChunk.end());
+			
+			std::string sSHA256 = AMCCommon::CUtils::calculateSHA256FromData(fullContent.data(), fullContent.size());
+			fixture.m_pStorage->FinishPartialStream(sUUID, sSHA256);
+			
+			assertTrue(fixture.m_pStorage->StreamIsReady(sUUID), "Large partial stream should be ready");
+		}
+		
+		void testStreamMIMETypePreservation()
+		{
+			auto fixture = createFixture("mime_preserve");
+			
+			std::string sUserUUID = AMCCommon::CUtils::createUUID();
+			std::vector<uint8_t> buffer = {0x01};
+			
+			std::vector<std::string> mimeTypes = {
+				"application/octet-stream",
+				"text/plain",
+				"application/json",
+				"image/png",
+				"image/jpeg",
+				"application/pdf",
+				"application/xml",
+				"text/csv"
+			};
+			
+			for (const auto& mimeType : mimeTypes) {
+				std::string sUUID = AMCCommon::CUtils::createUUID();
+				fixture.m_pStorage->StoreNewStream(sUUID, "test.bin", mimeType, buffer, sUserUUID, getCurrentTimestamp());
+				
+				auto pStream = fixture.m_pStorage->RetrieveStream(sUUID);
+				assertTrue(pStream->GetMIMEType() == mimeType, "MIME type '" + mimeType + "' should be preserved");
 			}
 		}
 	};

@@ -65,6 +65,16 @@ namespace AMCUnitTest {
 			registerTest("GetDescriptionByUUID", "Get description by UUID", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testGetDescriptionByUUID, this));
 			registerTest("SetDescriptionByUUID", "Set description by UUID", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testSetDescriptionByUUID, this));
 			registerTest("UserListIteration", "Iterate user list", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testUserListIteration, this));
+			
+			// Additional User Tests for Coverage (8 tests)
+			registerTest("SpecialCharUsername", "Username with special chars", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testSpecialCharUsername, this));
+			registerTest("UserListPagination", "User list pagination", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testUserListPagination, this));
+			registerTest("NonExistentUser", "Non-existent user checks", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testNonExistentUser, this));
+			registerTest("LongUsername", "Long username", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testLongUsername, this));
+			registerTest("LongDescription", "Long description", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testLongDescription, this));
+			registerTest("EmptyDescription", "Empty description", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testEmptyDescription, this));
+			registerTest("MultipleRoleChanges", "Multiple role changes", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testMultipleRoleChanges, this));
+			registerTest("UserUUIDFormat", "User UUID format", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testUserUUIDFormat, this));
 		}
 
 		void initializeTests() override {
@@ -409,6 +419,148 @@ namespace AMCUnitTest {
 				assertFalse(sUUID.empty(), "User UUID should not be empty");
 				assertFalse(sUsername.empty(), "Username should not be empty");
 			}
+		}
+		
+		// ============= Additional User Tests for Coverage (8 tests) =============
+		
+		void testSpecialCharUsername()
+		{
+			auto fixture = createFixture("special_chars");
+			
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			// Username with underscores and numbers (common valid characters)
+			std::string sUsername = "test_user_123_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "Special user");
+			
+			assertFalse(sUserUUID.empty(), "User UUID should be created");
+			assertTrue(fixture.m_pLoginHandler->UserExists(sUsername), "User should exist");
+			assertTrue(fixture.m_pLoginHandler->GetUsernameByUUID(sUserUUID) == sUsername, "Username should be preserved");
+		}
+		
+		void testUserListPagination()
+		{
+			auto fixture = createFixture("pagination");
+			
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			// Create many users
+			for (int i = 0; i < 25; i++) {
+				std::string sUsername = "pageuser" + std::to_string(i) + "_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+				fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "Page User " + std::to_string(i));
+			}
+			
+			auto pUserList = fixture.m_pLoginHandler->GetActiveUsers();
+			uint32_t nCount = pUserList->Count();
+			assertTrue(nCount >= 25, "Should have at least 25 users");
+			
+			// Verify we can access all users by index
+			for (uint32_t i = 0; i < 25 && i < nCount; i++) {
+				std::string sUsername, sUUID, sDescription, sRole, sLanguage;
+				pUserList->GetUserProperties(i, sUsername, sUUID, sDescription, sRole, sLanguage);
+				assertFalse(sUsername.empty(), "User " + std::to_string(i) + " should have username");
+			}
+		}
+		
+		void testNonExistentUser()
+		{
+			auto fixture = createFixture("nonexistent");
+			
+			std::string sNonExistentUsername = "nonexistent_user_" + AMCCommon::CUtils::createUUID();
+			std::string sNonExistentUUID = AMCCommon::CUtils::createUUID();
+			
+			assertFalse(fixture.m_pLoginHandler->UserExists(sNonExistentUsername), "Non-existent user should not exist");
+			assertFalse(fixture.m_pLoginHandler->UserUUIDExists(sNonExistentUUID), "Non-existent UUID should not exist");
+		}
+		
+		void testLongUsername()
+		{
+			auto fixture = createFixture("long_username");
+			
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			// Create a reasonably long username (64 chars)
+			std::string sUsername(60, 'u');
+			sUsername += "_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "Long username user");
+			
+			assertFalse(sUserUUID.empty(), "User should be created with long username");
+			assertTrue(fixture.m_pLoginHandler->UserExists(sUsername), "User with long username should exist");
+		}
+		
+		void testLongDescription()
+		{
+			auto fixture = createFixture("long_desc");
+			
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			std::string sUsername = "longdescuser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			std::string sLongDescription(1000, 'D');
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, sLongDescription);
+			
+			std::string sRetrieved = fixture.m_pLoginHandler->GetUserDescription(sUsername);
+			assertTrue(sRetrieved == sLongDescription, "Long description should be preserved");
+		}
+		
+		void testEmptyDescription()
+		{
+			auto fixture = createFixture("empty_desc");
+			
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			std::string sUsername = "emptydescuser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "");
+			
+			std::string sRetrieved = fixture.m_pLoginHandler->GetUserDescription(sUsername);
+			assertTrue(sRetrieved.empty(), "Empty description should be preserved");
+		}
+		
+		void testMultipleRoleChanges()
+		{
+			auto fixture = createFixture("multi_role");
+			
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			std::string sUsername = "multiroleuser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			
+			fixture.m_pLoginHandler->CreateUser(sUsername, "viewer", sSalt, sHash, "Multi role user");
+			assertTrue(fixture.m_pLoginHandler->GetUserRole(sUsername) == "viewer", "Initial role should be viewer");
+			
+			// Change role multiple times
+			std::vector<std::string> roles = {"operator", "admin", "superadmin", "viewer", "editor"};
+			for (const auto& role : roles) {
+				fixture.m_pLoginHandler->SetUserRole(sUsername, role);
+				assertTrue(fixture.m_pLoginHandler->GetUserRole(sUsername) == role, "Role should be " + role);
+			}
+		}
+		
+		void testUserUUIDFormat()
+		{
+			auto fixture = createFixture("uuid_format");
+			
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			std::string sUsername = "uuidformatuser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "UUID format user");
+			
+			// UUID should be in standard format (36 chars with dashes)
+			assertTrue(sUserUUID.length() == 36, "UUID should be 36 characters");
+			assertTrue(sUserUUID[8] == '-', "UUID should have dash at position 8");
+			assertTrue(sUserUUID[13] == '-', "UUID should have dash at position 13");
+			assertTrue(sUserUUID[18] == '-', "UUID should have dash at position 18");
+			assertTrue(sUserUUID[23] == '-', "UUID should have dash at position 23");
 		}
 	};
 

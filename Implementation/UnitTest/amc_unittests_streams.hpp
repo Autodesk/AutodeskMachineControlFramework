@@ -62,7 +62,10 @@ namespace AMCUnitTest {
 			std::string m_sPath;
 			CScopedTempDir()
 			{
-				m_sPath = std::string("amc_unittest_streams_") + AMCCommon::CUtils::createUUID();
+				std::string sRootPath = "temp";
+				if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sRootPath))
+					AMCCommon::CUtils::createDirectoryOnDisk(sRootPath);
+				m_sPath = sRootPath + "/amc_unittest_streams_" + AMCCommon::CUtils::createUUID();
 				AMCCommon::CUtils::createDirectoryOnDisk(m_sPath);
 			}
 			~CScopedTempDir()

@@ -64,8 +64,10 @@ IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::s
 {
     auto sParsedJobUUID = AMCCommon::CUtils::normalizeUUIDString(sJobUUID);
 
-    if ((sName.length() == 0) || (sName.length() >= 255))
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+    if (sName.length() == 0)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBNAME, "job name is empty");
+    if (sName.length() >= 255)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOBNAMETOOLONG, "job name exceeds maximum allowed length of 255 characters");
     std::string sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 	std::string sNormalizedStorageStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStorageStreamUUID);
 

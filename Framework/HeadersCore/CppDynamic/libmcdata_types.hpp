@@ -475,6 +475,8 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER 448 /** Invalid telemetry channel identifier. */
 #define LIBMCDATA_ERROR_TELEMETRYCHANNELALREADYEXISTS 449 /** Telemetry channel already exists. */
 #define LIBMCDATA_ERROR_TELEMETRYCHANNELNOTFOUND 450 /** Telemetry channel not found. */
+#define LIBMCDATA_ERROR_JOBNAMETOOLONG 451 /** Job name exceeds maximum allowed length */
+#define LIBMCDATA_ERROR_STRINGPARAMETERTOOLONG 452 /** String parameter exceeds maximum allowed length */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -862,6 +864,8 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER: return "Invalid telemetry channel identifier.";
     case LIBMCDATA_ERROR_TELEMETRYCHANNELALREADYEXISTS: return "Telemetry channel already exists.";
     case LIBMCDATA_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
+    case LIBMCDATA_ERROR_JOBNAMETOOLONG: return "Job name exceeds maximum allowed length";
+    case LIBMCDATA_ERROR_STRINGPARAMETERTOOLONG: return "String parameter exceeds maximum allowed length";
     default: return "unknown error";
   }
 }

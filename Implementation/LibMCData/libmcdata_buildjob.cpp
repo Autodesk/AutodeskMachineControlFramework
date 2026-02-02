@@ -371,7 +371,7 @@ void CBuildJob::ChangeName(const std::string& sName)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBNAME);
 
     if (sName.length () > AMC_BUILDJOBDATA_MAXNAMELENGTH)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBNAME, "invalid job name: " + sName);
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOBNAMETOOLONG, "job name exceeds maximum allowed length");
 
 	auto updateUUID = AMCCommon::CUtils::createUUID();
 
