@@ -351,13 +351,15 @@ namespace AMCUnitTest {
 			pJob->StartValidating();
 			pJob->FinishValidating(10);
 			
-			auto pExec = pJob->CreateBuildJobExecution("Execution", fixture.m_sUserUUID, getCurrentTimestamp());
+			uint64_t nStartTime = getCurrentTimestamp();
+			auto pExec = pJob->CreateBuildJobExecution("Execution", fixture.m_sUserUUID, nStartTime);
 			
 			// Initial status should be InProcess
 			assertTrue(pExec->GetStatus() == LibMCData::eBuildJobExecutionStatus::InProcess, "Initial status should be InProcess");
 			
 			// Change status - ChangeStatus(eNewStatus, nAbsoluteEndTimeStamp)
-			pExec->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Finished, getCurrentTimestamp());
+			// End timestamp must be after start timestamp
+			pExec->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Finished, nStartTime + 1000);
 			assertTrue(pExec->GetStatus() == LibMCData::eBuildJobExecutionStatus::Finished, "Status should be Finished");
 		}
 
@@ -750,11 +752,13 @@ namespace AMCUnitTest {
 			auto fixture = createFixture("exec_failed");
 			
 			auto pJob = createValidatedJob(fixture, "Job For Failed Test");
-			auto pExec = pJob->CreateBuildJobExecution("Execution", fixture.m_sUserUUID, getCurrentTimestamp());
+			uint64_t nStartTime = getCurrentTimestamp();
+			auto pExec = pJob->CreateBuildJobExecution("Execution", fixture.m_sUserUUID, nStartTime);
 			
 			assertTrue(pExec->GetStatus() == LibMCData::eBuildJobExecutionStatus::InProcess, "Should be InProcess");
 			
-			pExec->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, getCurrentTimestamp());
+			// End timestamp must be after start timestamp
+			pExec->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, nStartTime + 1000);
 			assertTrue(pExec->GetStatus() == LibMCData::eBuildJobExecutionStatus::Failed, "Should be Failed");
 		}
 		
@@ -798,13 +802,16 @@ namespace AMCUnitTest {
 			auto pJob = createValidatedJob(fixture, "Job For Status Filter Test");
 			
 			// Create executions with different statuses
-			auto pExec1 = pJob->CreateBuildJobExecution("Exec 1", fixture.m_sUserUUID, getCurrentTimestamp());
-			auto pExec2 = pJob->CreateBuildJobExecution("Exec 2", fixture.m_sUserUUID, getCurrentTimestamp());
+			uint64_t nStart1 = getCurrentTimestamp();
+			auto pExec1 = pJob->CreateBuildJobExecution("Exec 1", fixture.m_sUserUUID, nStart1);
+			uint64_t nStart2 = getCurrentTimestamp();
+			auto pExec2 = pJob->CreateBuildJobExecution("Exec 2", fixture.m_sUserUUID, nStart2);
 			auto pExec3 = pJob->CreateBuildJobExecution("Exec 3", fixture.m_sUserUUID, getCurrentTimestamp());
 			
 			// All start as InProcess, finish some
-			pExec1->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Finished, getCurrentTimestamp());
-			pExec2->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, getCurrentTimestamp());
+			// End timestamp must be after start timestamp
+			pExec1->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Finished, nStart1 + 1000);
+			pExec2->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, nStart2 + 1000);
 			// pExec3 stays InProcess
 			
 			// Query by status
