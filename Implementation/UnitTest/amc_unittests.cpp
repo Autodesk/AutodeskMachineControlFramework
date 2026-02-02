@@ -57,6 +57,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_unittests_parameters.hpp"
 #include "amc_unittests_telemetry.hpp"
 
+// LibMCData unit tests
+#include "amc_unittests_libmcdata_storage.hpp"
+#include "amc_unittests_libmcdata_logging.hpp"
+#include "amc_unittests_libmcdata_journal.hpp"
+#include "amc_unittests_libmcdata_alerts.hpp"
+#include "amc_unittests_libmcdata_telemetryreader.hpp"
+#include "amc_unittests_libmcdata_buildjobs.hpp"
+#include "amc_unittests_libmcdata_users.hpp"
+#include "amc_unittests_libmcdata_persistency.hpp"
+
 
 using namespace AMCUnitTest;
 
@@ -90,4 +100,14 @@ CUnitTests::CUnitTests (PUnitTestIO pIO)
 	registerTestGroup(std::make_shared <CUnitTestGroup_Mesh>());
 	registerTestGroup(std::make_shared <CUnitTestGroup_Parameters>());
 	registerTestGroup(std::make_shared <CUnitTestGroup_Telemetry>());
+
+	// LibMCData unit tests
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_Storage>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_Logging>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_Journal>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_Alerts>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_TelemetryReader>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_BuildJobs>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_Users>());
+	registerTestGroup(std::make_shared <CUnitTestGroup_LibMCData_Persistency>());
 }

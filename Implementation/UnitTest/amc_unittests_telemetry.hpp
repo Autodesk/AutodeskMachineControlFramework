@@ -84,7 +84,7 @@ namespace AMCUnitTest {
 		{
 			sTelemetryFixture fixture;
 
-			std::string sRootPath = "Output/temp";
+			std::string sRootPath = "temp";
 			if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sRootPath))
 				AMCCommon::CUtils::createDirectoryOnDisk(sRootPath);
 

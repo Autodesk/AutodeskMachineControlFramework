@@ -85,7 +85,7 @@ namespace AMCUnitTest {
     private:
         void initializeTelemetry()
         {
-            std::string sRootPath = "Output/temp";
+            std::string sRootPath = "temp";
             if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sRootPath))
                 AMCCommon::CUtils::createDirectoryOnDisk(sRootPath);
 
