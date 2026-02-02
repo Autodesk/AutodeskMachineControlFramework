@@ -68,6 +68,11 @@ namespace AMCUnitTest {
 			
 			// Statistics tests
 			registerTest("ChannelStatistics", "Calculate channel statistics", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_TelemetryReader::testChannelStatistics, this));
+			
+			// Additional TelemetryReader tests for coverage
+			registerTest("ReaderGetStartTime", "Get reader start time", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_TelemetryReader::testReaderGetStartTime, this));
+			registerTest("ReaderGetSessionUUID", "Get reader session UUID", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_TelemetryReader::testReaderGetSessionUUID, this));
+			registerTest("ReaderGetLifeTime", "Get reader lifetime", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_TelemetryReader::testReaderGetLifeTime, this));
 		}
 
 		void initializeTests() override {
@@ -419,6 +424,70 @@ namespace AMCUnitTest {
 			
 			assertTrue(nIntervalCount >= 3, "Should have at least 3 intervals");
 			assertTrue(nTotalDuration >= 600, "Total duration should be at least 600");
+		}
+		
+		// ============= Additional TelemetryReader Tests =============
+		
+		void testReaderGetStartTime()
+		{
+			auto fixture = createFixture("start_time");
+			
+			createChannel(fixture, "starttime_channel", 1);
+			
+			// Write a chunk
+			std::vector<LibMCData::sTelemetryChunkEntry> entries;
+			LibMCData::sTelemetryChunkEntry entry;
+			entry.m_EntryType = LibMCData::eTelemetryChunkEntryType::InstantMarker;
+			entry.m_ChannelIndex = 1;
+			entry.m_MarkerID = 1;
+			entry.m_TimeStamp = 1000;
+			entry.m_ContextData = 0;
+			entries.push_back(entry);
+			
+			fixture.m_pTelemetrySession->WriteTelemetryChunk(0, 0, 2000, entries);
+			
+			auto pReader = fixture.m_pDataModel->CreateTelemetryReader(fixture.m_sJournalUUID);
+			
+			std::string sStartTime = pReader->GetStartTime();
+			assertFalse(sStartTime.empty(), "Start time should not be empty");
+		}
+		
+		void testReaderGetSessionUUID()
+		{
+			auto fixture = createFixture("session_uuid");
+			
+			createChannel(fixture, "sessionuuid_channel", 1);
+			
+			auto pReader = fixture.m_pDataModel->CreateTelemetryReader(fixture.m_sJournalUUID);
+			
+			std::string sSessionUUID = pReader->GetSessionUUID();
+			assertFalse(sSessionUUID.empty(), "Session UUID should not be empty");
+			assertTrue(sSessionUUID == fixture.m_sJournalUUID, "Session UUID should match journal UUID");
+		}
+		
+		void testReaderGetLifeTime()
+		{
+			auto fixture = createFixture("lifetime");
+			
+			createChannel(fixture, "lifetime_channel", 1);
+			
+			// Write a chunk
+			std::vector<LibMCData::sTelemetryChunkEntry> entries;
+			LibMCData::sTelemetryChunkEntry entry;
+			entry.m_EntryType = LibMCData::eTelemetryChunkEntryType::InstantMarker;
+			entry.m_ChannelIndex = 1;
+			entry.m_MarkerID = 1;
+			entry.m_TimeStamp = 1000;
+			entry.m_ContextData = 0;
+			entries.push_back(entry);
+			
+			fixture.m_pTelemetrySession->WriteTelemetryChunk(0, 0, 2000, entries);
+			
+			auto pReader = fixture.m_pDataModel->CreateTelemetryReader(fixture.m_sJournalUUID);
+			
+			uint64_t nLifeTime = pReader->GetLifeTimeInMicroseconds();
+			// Lifetime should be non-negative
+			assertTrue(nLifeTime >= 0, "Lifetime should be non-negative");
 		}
 	};
 

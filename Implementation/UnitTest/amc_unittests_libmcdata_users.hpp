@@ -55,6 +55,16 @@ namespace AMCUnitTest {
 			registerTest("SetRole", "Set user role", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testSetRole, this));
 			registerTest("SetDescription", "Set user description", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testSetDescription, this));
 			registerTest("GetActiveUsers", "Get active users list", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testGetActiveUsers, this));
+			
+			// Additional LoginHandler tests for coverage
+			registerTest("GetUserDetails", "Get user details", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testGetUserDetails, this));
+			registerTest("GetUserPropsAll", "Get all user properties", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testGetUserPropsAll, this));
+			registerTest("GetUserPropsByUUID", "Get user properties by UUID", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testGetUserPropsByUUID, this));
+			registerTest("SetUserPassword", "Set user password", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testSetUserPassword, this));
+			registerTest("SetUserPasswordByUUID", "Set password by UUID", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testSetUserPasswordByUUID, this));
+			registerTest("GetDescriptionByUUID", "Get description by UUID", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testGetDescriptionByUUID, this));
+			registerTest("SetDescriptionByUUID", "Set description by UUID", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testSetDescriptionByUUID, this));
+			registerTest("UserListIteration", "Iterate user list", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Users::testUserListIteration, this));
 		}
 
 		void initializeTests() override {
@@ -224,6 +234,181 @@ namespace AMCUnitTest {
 			
 			auto pUserList = fixture.m_pLoginHandler->GetActiveUsers();
 			assertTrue(pUserList->Count() == nInitialCount + 5, "Should have 5 more active users than initial");
+		}
+		
+		// ============= Additional LoginHandler Tests =============
+		
+		void testGetUserDetails()
+		{
+			auto fixture = createFixture("details");
+			
+			std::string sUsername = "detailsuser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "admin", sSalt, sHash, "Detailed user");
+			
+			std::string sRetrievedSalt, sRetrievedHash;
+			fixture.m_pLoginHandler->GetUserDetails(sUsername, sRetrievedSalt, sRetrievedHash);
+			
+			assertTrue(sRetrievedSalt == sSalt, "Salt should match");
+			assertTrue(sRetrievedHash == sHash, "Hash should match");
+		}
+		
+		void testGetUserPropsAll()
+		{
+			auto fixture = createFixture("props_all");
+			
+			std::string sUsername = "propsalluser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			std::string sRole = "operator";
+			std::string sDescription = "Props all user";
+			
+			fixture.m_pLoginHandler->CreateUser(sUsername, sRole, sSalt, sHash, sDescription);
+			fixture.m_pLoginHandler->SetUserLanguage(sUsername, "de");
+			
+			// GetUserProperties(sUsername, out sUUID, out sDescription, out sRole, out sLanguageIdentifier)
+			std::string sRetrievedUUID, sRetrievedDescription, sRetrievedRole, sRetrievedLanguage;
+			fixture.m_pLoginHandler->GetUserProperties(sUsername, sRetrievedUUID, sRetrievedDescription, sRetrievedRole, sRetrievedLanguage);
+			
+			assertFalse(sRetrievedUUID.empty(), "UUID should not be empty");
+			assertTrue(sRetrievedRole == sRole, "Role should match");
+			assertTrue(sRetrievedLanguage == "de", "Language should match");
+			assertTrue(sRetrievedDescription == sDescription, "Description should match");
+		}
+		
+		void testGetUserPropsByUUID()
+		{
+			auto fixture = createFixture("props_uuid");
+			
+			std::string sUsername = "propsuuiduser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			std::string sRole = "viewer";
+			std::string sDescription = "Props by UUID user";
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, sRole, sSalt, sHash, sDescription);
+			fixture.m_pLoginHandler->SetUserLanguageByUUID(sUserUUID, "fr");
+			
+			// GetUserPropertiesByUUID(sUUID, out sUsername, out sDescription, out sRole, out sLanguageIdentifier)
+			std::string sRetrievedUsername, sRetrievedDescription, sRetrievedRole, sRetrievedLanguage;
+			fixture.m_pLoginHandler->GetUserPropertiesByUUID(sUserUUID, sRetrievedUsername, sRetrievedDescription, sRetrievedRole, sRetrievedLanguage);
+			
+			assertTrue(sRetrievedUsername == sUsername, "Username should match");
+			assertTrue(sRetrievedRole == sRole, "Role should match");
+			assertTrue(sRetrievedLanguage == "fr", "Language should match");
+			assertTrue(sRetrievedDescription == sDescription, "Description should match");
+		}
+		
+		void testSetUserPassword()
+		{
+			auto fixture = createFixture("password");
+			
+			std::string sUsername = "pwduser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "desc");
+			
+			// Change password
+			std::string sNewSalt = "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789";
+			std::string sNewHash = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			
+			fixture.m_pLoginHandler->SetUserPassword(sUsername, sNewSalt, sNewHash);
+			
+			// Verify new credentials
+			std::string sRetrievedSalt, sRetrievedHash;
+			fixture.m_pLoginHandler->GetUserDetails(sUsername, sRetrievedSalt, sRetrievedHash);
+			
+			assertTrue(sRetrievedSalt == sNewSalt, "New salt should match");
+			assertTrue(sRetrievedHash == sNewHash, "New hash should match");
+		}
+		
+		void testSetUserPasswordByUUID()
+		{
+			auto fixture = createFixture("pwd_uuid");
+			
+			std::string sUsername = "pwduuiduser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "desc");
+			
+			// Change password by UUID
+			std::string sNewSalt = "1111111111111111111111111111111111111111111111111111111111111111";
+			std::string sNewHash = "2222222222222222222222222222222222222222222222222222222222222222";
+			
+			fixture.m_pLoginHandler->SetUserPasswordByUUID(sUserUUID, sNewSalt, sNewHash);
+			
+			// Verify new credentials
+			std::string sRetrievedSalt, sRetrievedHash;
+			fixture.m_pLoginHandler->GetUserDetails(sUsername, sRetrievedSalt, sRetrievedHash);
+			
+			assertTrue(sRetrievedSalt == sNewSalt, "New salt by UUID should match");
+			assertTrue(sRetrievedHash == sNewHash, "New hash by UUID should match");
+		}
+		
+		void testGetDescriptionByUUID()
+		{
+			auto fixture = createFixture("desc_by_uuid");
+			
+			std::string sUsername = "descuuiduser_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			std::string sDescription = "Description by UUID test";
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, sDescription);
+			
+			std::string sRetrieved = fixture.m_pLoginHandler->GetUserDescriptionByUUID(sUserUUID);
+			assertTrue(sRetrieved == sDescription, "Description by UUID should match");
+		}
+		
+		void testSetDescriptionByUUID()
+		{
+			auto fixture = createFixture("set_desc_uuid");
+			
+			std::string sUsername = "setdescuuid_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			std::string sUserUUID = fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "Original");
+			
+			// Set new description by UUID
+			fixture.m_pLoginHandler->SetUserDescriptionByUUID(sUserUUID, "Updated by UUID");
+			
+			// Verify
+			std::string sRetrieved = fixture.m_pLoginHandler->GetUserDescriptionByUUID(sUserUUID);
+			assertTrue(sRetrieved == "Updated by UUID", "Description should be updated");
+		}
+		
+		void testUserListIteration()
+		{
+			auto fixture = createFixture("list_iter");
+			
+			std::string sSalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+			std::string sHash = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+			
+			// Create users
+			std::vector<std::string> usernames;
+			for (int i = 0; i < 3; i++) {
+				std::string sUsername = "iteruser" + std::to_string(i) + "_" + AMCCommon::CUtils::createUUID().substr(0, 8);
+				fixture.m_pLoginHandler->CreateUser(sUsername, "role", sSalt, sHash, "User " + std::to_string(i));
+				usernames.push_back(sUsername);
+			}
+			
+			auto pUserList = fixture.m_pLoginHandler->GetActiveUsers();
+			uint32_t nCount = pUserList->Count();
+			assertTrue(nCount >= 3, "Should have at least 3 users");
+			
+			// Iterate through users using GetUserProperties(index, out sUsername, out sUUID, out sDescription, out sRole, out sLanguageIdentifier)
+			for (uint32_t i = 0; i < 3 && i < nCount; i++) {
+				std::string sUsername, sUUID, sDescription, sRole, sLanguage;
+				pUserList->GetUserProperties(i, sUsername, sUUID, sDescription, sRole, sLanguage);
+				
+				assertFalse(sUUID.empty(), "User UUID should not be empty");
+				assertFalse(sUsername.empty(), "Username should not be empty");
+			}
 		}
 	};
 

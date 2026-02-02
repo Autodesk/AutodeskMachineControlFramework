@@ -57,6 +57,19 @@ namespace AMCUnitTest {
 			registerTest("StoreAndRetrieveUUID", "Store and retrieve UUID parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testStoreAndRetrieveUUID, this));
 			registerTest("HasParameter", "Check parameter existence", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testHasParameter, this));
 			registerTest("DeleteParameter", "Delete parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testDeleteParameter, this));
+			
+			// Additional Persistency tests for coverage
+			registerTest("UpdateStringParam", "Update existing string parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testUpdateStringParam, this));
+			registerTest("UpdateIntegerParam", "Update existing integer parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testUpdateIntegerParam, this));
+			registerTest("UpdateDoubleParam", "Update existing double parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testUpdateDoubleParam, this));
+			registerTest("UpdateBoolParam", "Update existing bool parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testUpdateBoolParam, this));
+			registerTest("MultipleParameters", "Store multiple parameters", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testMultipleParameters, this));
+			registerTest("EmptyStringParam", "Store empty string parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testEmptyStringParam, this));
+			registerTest("LargeStringParam", "Store large string parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testLargeStringParam, this));
+			registerTest("EdgeCaseIntegers", "Test edge case integers", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testEdgeCaseIntegers, this));
+			registerTest("EdgeCaseDoubles", "Test edge case doubles", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testEdgeCaseDoubles, this));
+			registerTest("DeleteNonExistent", "Delete non-existent parameter", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testDeleteNonExistent, this));
+			registerTest("RetrieveAfterUpdate", "Retrieve after multiple updates", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Persistency::testRetrieveAfterUpdate, this));
 		}
 
 		void initializeTests() override {
@@ -211,6 +224,183 @@ namespace AMCUnitTest {
 			// Delete and verify - just check the parameter is gone
 			fixture.m_pPersistencyHandler->DeletePersistentParameter(sUUID);
 			assertFalse(fixture.m_pPersistencyHandler->HasPersistentParameter(sUUID), "Should not exist after delete");
+		}
+		
+		// ============= Additional Persistency Tests =============
+		
+		void testUpdateStringParam()
+		{
+			auto fixture = createFixture("update_string");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			
+			fixture.m_pPersistencyHandler->StorePersistentStringParameter(sUUID, "update_param", "original", getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentStringParameter(sUUID) == "original", "Original value mismatch");
+			
+			fixture.m_pPersistencyHandler->StorePersistentStringParameter(sUUID, "update_param", "updated", getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentStringParameter(sUUID) == "updated", "Updated value mismatch");
+		}
+		
+		void testUpdateIntegerParam()
+		{
+			auto fixture = createFixture("update_integer");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			
+			fixture.m_pPersistencyHandler->StorePersistentIntegerParameter(sUUID, "update_int", 100, getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentIntegerParameter(sUUID) == 100, "Original integer mismatch");
+			
+			fixture.m_pPersistencyHandler->StorePersistentIntegerParameter(sUUID, "update_int", 200, getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentIntegerParameter(sUUID) == 200, "Updated integer mismatch");
+		}
+		
+		void testUpdateDoubleParam()
+		{
+			auto fixture = createFixture("update_double");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			
+			fixture.m_pPersistencyHandler->StorePersistentDoubleParameter(sUUID, "update_dbl", 1.5, getCurrentTimestamp());
+			double dRetrieved1 = fixture.m_pPersistencyHandler->RetrievePersistentDoubleParameter(sUUID);
+			assertTrue(std::abs(dRetrieved1 - 1.5) < 0.001, "Original double mismatch");
+			
+			fixture.m_pPersistencyHandler->StorePersistentDoubleParameter(sUUID, "update_dbl", 2.5, getCurrentTimestamp());
+			double dRetrieved2 = fixture.m_pPersistencyHandler->RetrievePersistentDoubleParameter(sUUID);
+			assertTrue(std::abs(dRetrieved2 - 2.5) < 0.001, "Updated double mismatch");
+		}
+		
+		void testUpdateBoolParam()
+		{
+			auto fixture = createFixture("update_bool");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			
+			fixture.m_pPersistencyHandler->StorePersistentBoolParameter(sUUID, "update_bool", true, getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentBoolParameter(sUUID) == true, "Original bool mismatch");
+			
+			fixture.m_pPersistencyHandler->StorePersistentBoolParameter(sUUID, "update_bool", false, getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentBoolParameter(sUUID) == false, "Updated bool mismatch");
+		}
+		
+		void testMultipleParameters()
+		{
+			auto fixture = createFixture("multiple");
+			
+			// Store multiple different parameters
+			for (int i = 0; i < 10; i++) {
+				std::string sUUID = AMCCommon::CUtils::createUUID();
+				std::string sName = "param_" + std::to_string(i);
+				std::string sValue = "value_" + std::to_string(i);
+				
+				fixture.m_pPersistencyHandler->StorePersistentStringParameter(sUUID, sName, sValue, getCurrentTimestamp());
+				assertTrue(fixture.m_pPersistencyHandler->HasPersistentParameter(sUUID), "Parameter should exist");
+				assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentStringParameter(sUUID) == sValue, "Value mismatch for param " + std::to_string(i));
+			}
+		}
+		
+		void testEmptyStringParam()
+		{
+			auto fixture = createFixture("empty_string");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			
+			fixture.m_pPersistencyHandler->StorePersistentStringParameter(sUUID, "empty_param", "", getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->HasPersistentParameter(sUUID), "Empty string param should exist");
+			
+			std::string sRetrieved = fixture.m_pPersistencyHandler->RetrievePersistentStringParameter(sUUID);
+			assertTrue(sRetrieved.empty(), "Retrieved empty string should be empty");
+		}
+		
+		void testLargeStringParam()
+		{
+			auto fixture = createFixture("large_string");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			
+			// Create a large string (10KB)
+			std::string sLargeValue(10240, 'X');
+			
+			fixture.m_pPersistencyHandler->StorePersistentStringParameter(sUUID, "large_param", sLargeValue, getCurrentTimestamp());
+			
+			std::string sRetrieved = fixture.m_pPersistencyHandler->RetrievePersistentStringParameter(sUUID);
+			assertTrue(sRetrieved.size() == sLargeValue.size(), "Large string size mismatch");
+			assertTrue(sRetrieved == sLargeValue, "Large string content mismatch");
+		}
+		
+		void testEdgeCaseIntegers()
+		{
+			auto fixture = createFixture("edge_integers");
+			
+			// Test zero
+			std::string sUUID1 = AMCCommon::CUtils::createUUID();
+			fixture.m_pPersistencyHandler->StorePersistentIntegerParameter(sUUID1, "zero", 0, getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentIntegerParameter(sUUID1) == 0, "Zero mismatch");
+			
+			// Test max int64
+			std::string sUUID2 = AMCCommon::CUtils::createUUID();
+			int64_t nMaxInt = 9223372036854775807LL;
+			fixture.m_pPersistencyHandler->StorePersistentIntegerParameter(sUUID2, "max_int", nMaxInt, getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentIntegerParameter(sUUID2) == nMaxInt, "Max int mismatch");
+			
+			// Test min int64
+			std::string sUUID3 = AMCCommon::CUtils::createUUID();
+			int64_t nMinInt = -9223372036854775807LL;
+			fixture.m_pPersistencyHandler->StorePersistentIntegerParameter(sUUID3, "min_int", nMinInt, getCurrentTimestamp());
+			assertTrue(fixture.m_pPersistencyHandler->RetrievePersistentIntegerParameter(sUUID3) == nMinInt, "Min int mismatch");
+		}
+		
+		void testEdgeCaseDoubles()
+		{
+			auto fixture = createFixture("edge_doubles");
+			
+			// Test zero
+			std::string sUUID1 = AMCCommon::CUtils::createUUID();
+			fixture.m_pPersistencyHandler->StorePersistentDoubleParameter(sUUID1, "zero", 0.0, getCurrentTimestamp());
+			double dRetrieved1 = fixture.m_pPersistencyHandler->RetrievePersistentDoubleParameter(sUUID1);
+			assertTrue(std::abs(dRetrieved1) < 0.0001, "Zero double mismatch");
+			
+			// Test very small value
+			std::string sUUID2 = AMCCommon::CUtils::createUUID();
+			double dSmall = 0.000001;
+			fixture.m_pPersistencyHandler->StorePersistentDoubleParameter(sUUID2, "small", dSmall, getCurrentTimestamp());
+			double dRetrieved2 = fixture.m_pPersistencyHandler->RetrievePersistentDoubleParameter(sUUID2);
+			assertTrue(std::abs(dRetrieved2 - dSmall) < 0.0000001, "Small double mismatch");
+			
+			// Test negative value
+			std::string sUUID3 = AMCCommon::CUtils::createUUID();
+			fixture.m_pPersistencyHandler->StorePersistentDoubleParameter(sUUID3, "negative", -123.456, getCurrentTimestamp());
+			double dRetrieved3 = fixture.m_pPersistencyHandler->RetrievePersistentDoubleParameter(sUUID3);
+			assertTrue(std::abs(dRetrieved3 - (-123.456)) < 0.001, "Negative double mismatch");
+		}
+		
+		void testDeleteNonExistent()
+		{
+			auto fixture = createFixture("delete_nonexist");
+			
+			std::string sNonExistentUUID = AMCCommon::CUtils::createUUID();
+			
+			// Delete non-existent - should not throw
+			fixture.m_pPersistencyHandler->DeletePersistentParameter(sNonExistentUUID);
+			
+			// Verify still doesn't exist
+			assertFalse(fixture.m_pPersistencyHandler->HasPersistentParameter(sNonExistentUUID), "Non-existent should not exist");
+		}
+		
+		void testRetrieveAfterUpdate()
+		{
+			auto fixture = createFixture("retrieve_update");
+			
+			std::string sUUID = AMCCommon::CUtils::createUUID();
+			
+			// Multiple updates
+			for (int i = 0; i < 5; i++) {
+				std::string sValue = "iteration_" + std::to_string(i);
+				fixture.m_pPersistencyHandler->StorePersistentStringParameter(sUUID, "multi_update", sValue, getCurrentTimestamp());
+			}
+			
+			// Final value should be the last one
+			std::string sFinal = fixture.m_pPersistencyHandler->RetrievePersistentStringParameter(sUUID);
+			assertTrue(sFinal == "iteration_4", "Final value should be iteration_4");
 		}
 	};
 

@@ -56,6 +56,10 @@ namespace AMCUnitTest {
 			registerTest("Acknowledgement", "Test alert acknowledgement", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testAcknowledgement, this));
 			registerTest("RetrieveAlerts", "Test retrieving multiple alerts", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testRetrieveAlerts, this));
 			registerTest("AlertProperties", "Test alert properties", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testAlertProperties, this));
+			
+			// Additional AlertSession tests for coverage
+			registerTest("RetrieveByType", "Retrieve alerts by type", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testRetrieveByType, this));
+			registerTest("RetrieveActiveByType", "Retrieve active alerts by type", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_Alerts::testRetrieveActiveByType, this));
 		}
 
 		void initializeTests() override {
@@ -315,6 +319,97 @@ namespace AMCUnitTest {
 			// Test level string
 			std::string sLevelString = pAlert->GetLevelString();
 			assertFalse(sLevelString.empty(), "Level string should not be empty");
+		}
+		
+		// ============= Additional AlertSession Tests =============
+		
+		void testRetrieveByType()
+		{
+			auto fixture = createFixture("by_type");
+			
+			// Use the same identifier for all alerts we want to retrieve together
+			std::string sTypeIdentifier = "typealert";
+			
+			// Create 3 alerts with the SAME identifier (this is the key for RetrieveAlertsByType)
+			for (int i = 0; i < 3; i++) {
+				std::string sUUID = AMCCommon::CUtils::createUUID();
+				fixture.m_pAlertSession->AddAlert(
+					sUUID,
+					sTypeIdentifier,  // Same identifier for all
+					LibMCData::eAlertLevel::Warning,
+					"Type test " + std::to_string(i),
+					"",
+					"",
+					false,
+					"2025-01-01T12:00:0" + std::to_string(i) + "Z"
+				);
+			}
+			
+			// Create alerts with different identifier
+			for (int i = 0; i < 2; i++) {
+				std::string sUUID = AMCCommon::CUtils::createUUID();
+				fixture.m_pAlertSession->AddAlert(
+					sUUID,
+					"othertype",  // Different identifier
+					LibMCData::eAlertLevel::Message,
+					"Other type " + std::to_string(i),
+					"",
+					"",
+					false,
+					"2025-01-01T13:00:0" + std::to_string(i) + "Z"
+				);
+			}
+			
+			// Retrieve by type (bOnlyActive = false)
+			auto pIterator = fixture.m_pAlertSession->RetrieveAlertsByType(sTypeIdentifier, false);
+			
+			uint64_t nCount = pIterator->Count();
+			assertTrue(nCount >= 3, "Should have at least 3 alerts of type");
+		}
+		
+		void testRetrieveActiveByType()
+		{
+			auto fixture = createFixture("active_by_type");
+			
+			// Use the same identifier for both alerts
+			std::string sTypeIdentifier = "activetyp";
+			
+			// Create active alert
+			std::string sActiveUUID = AMCCommon::CUtils::createUUID();
+			auto pActiveAlert = fixture.m_pAlertSession->AddAlert(
+				sActiveUUID,
+				sTypeIdentifier,  // Same identifier
+				LibMCData::eAlertLevel::Warning,
+				"Active type test",
+				"",
+				"",
+				false,
+				"2025-01-01T12:00:00Z"
+			);
+			
+			// Create another alert with same identifier, then deactivate
+			std::string sInactiveUUID = AMCCommon::CUtils::createUUID();
+			auto pInactiveAlert = fixture.m_pAlertSession->AddAlert(
+				sInactiveUUID,
+				sTypeIdentifier,  // Same identifier
+				LibMCData::eAlertLevel::Warning,
+				"Inactive type test",
+				"",
+				"",
+				false,
+				"2025-01-01T12:00:01Z"
+			);
+			pInactiveAlert->DeactivateAlert();
+			
+			// Retrieve only active by type
+			auto pActiveIterator = fixture.m_pAlertSession->RetrieveAlertsByType(sTypeIdentifier, true);
+			uint64_t nActiveCount = pActiveIterator->Count();
+			assertTrue(nActiveCount >= 1, "Should have at least 1 active alert of type");
+			
+			// Retrieve all by type
+			auto pAllIterator = fixture.m_pAlertSession->RetrieveAlertsByType(sTypeIdentifier, false);
+			uint64_t nAllCount = pAllIterator->Count();
+			assertTrue(nAllCount >= 2, "Should have at least 2 total alerts of type");
 		}
 	};
 
