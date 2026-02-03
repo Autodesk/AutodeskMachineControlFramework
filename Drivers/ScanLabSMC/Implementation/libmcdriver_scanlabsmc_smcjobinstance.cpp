@@ -247,7 +247,6 @@ void CSMCJobInstance::drawHatchesEx(const LibMCDriver_ScanLabSMC_uint64 nHatches
 
         m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
         m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
-        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_write_analog_x(contextHandle, slsc_AnalogOutput::slsc_AnalogOutput_1, dPowerFactor, 0.0));
 
         for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchesBufferSize; nHatchIndex++) {
             auto& hatch = pHatchesBuffer[nHatchIndex];
@@ -260,14 +259,13 @@ void CSMCJobInstance::drawHatchesEx(const LibMCDriver_ScanLabSMC_uint64 nHatches
             point2[0] = hatch.m_X2;
             point2[1] = hatch.m_Y2;
             point2[2] = 0.0;
-
+                        
+            std::array<double, 1> paraPower;
+            paraPower[0] = dPowerFactor;
 
             m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_jump(contextHandle, point1.data()));
-            m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_line(contextHandle, point2.data()));
-
-            //m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_para_enable(contextHandle, paraPower.data()));
-            //m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_para_line(contextHandle, point2.data(), paraPower.data()));
-
+            m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_para_enable(contextHandle, paraPower.data()));
+            m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_para_line(contextHandle, point2.data(), paraPower.data()));
         }
     }
 
