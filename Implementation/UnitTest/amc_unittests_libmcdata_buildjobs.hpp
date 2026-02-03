@@ -692,8 +692,9 @@ namespace AMCUnitTest {
 			uint64_t nRetrievedStart = pExec->GetStartTimeStampInMicroseconds();
 			assertTrue(nRetrievedStart == nStartTime, "Start timestamp should match");
 			
-			// Finish the execution first before trying to get end timestamp
-			uint64_t nFinishTime = getCurrentTimestamp();
+			// Finish the execution - use fixed offset to avoid race condition on fast systems
+			// where getCurrentTimestamp() could return the same or earlier value
+			uint64_t nFinishTime = nStartTime + 1000000; // 1 second after start
 			pExec->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Finished, nFinishTime);
 			
 			// Now end timestamp should be available
