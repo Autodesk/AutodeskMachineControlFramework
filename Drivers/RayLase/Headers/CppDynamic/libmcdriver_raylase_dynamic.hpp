@@ -64,6 +64,7 @@ class CBase;
 class CDriver;
 class CRaylaseCommandLog;
 class CNLightDriverBoard;
+class CRaylaseCycle;
 class CRaylaseCard;
 class CDriver_Raylase;
 
@@ -75,6 +76,7 @@ typedef CBase CLibMCDriver_RaylaseBase;
 typedef CDriver CLibMCDriver_RaylaseDriver;
 typedef CRaylaseCommandLog CLibMCDriver_RaylaseRaylaseCommandLog;
 typedef CNLightDriverBoard CLibMCDriver_RaylaseNLightDriverBoard;
+typedef CRaylaseCycle CLibMCDriver_RaylaseRaylaseCycle;
 typedef CRaylaseCard CLibMCDriver_RaylaseRaylaseCard;
 typedef CDriver_Raylase CLibMCDriver_RaylaseDriver_Raylase;
 
@@ -86,6 +88,7 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<CRaylaseCommandLog> PRaylaseCommandLog;
 typedef std::shared_ptr<CNLightDriverBoard> PNLightDriverBoard;
+typedef std::shared_ptr<CRaylaseCycle> PRaylaseCycle;
 typedef std::shared_ptr<CRaylaseCard> PRaylaseCard;
 typedef std::shared_ptr<CDriver_Raylase> PDriver_Raylase;
 
@@ -97,6 +100,7 @@ typedef PBase PLibMCDriver_RaylaseBase;
 typedef PDriver PLibMCDriver_RaylaseDriver;
 typedef PRaylaseCommandLog PLibMCDriver_RaylaseRaylaseCommandLog;
 typedef PNLightDriverBoard PLibMCDriver_RaylaseNLightDriverBoard;
+typedef PRaylaseCycle PLibMCDriver_RaylaseRaylaseCycle;
 typedef PRaylaseCard PLibMCDriver_RaylaseRaylaseCard;
 typedef PDriver_Raylase PLibMCDriver_RaylaseDriver_Raylase;
 
@@ -419,6 +423,7 @@ private:
 	friend class CDriver;
 	friend class CRaylaseCommandLog;
 	friend class CNLightDriverBoard;
+	friend class CRaylaseCycle;
 	friend class CRaylaseCard;
 	friend class CDriver_Raylase;
 
@@ -554,6 +559,26 @@ public:
 	inline bool IsWaterFlow();
 	inline void SetModeChangeDelays(const LibMCDriver_Raylase_uint32 nModeChangeSignalDelayInMicroseconds, const LibMCDriver_Raylase_uint32 nModeChangeApplyDelayInMicroseconds);
 	inline void GetModeChangeDelays(LibMCDriver_Raylase_uint32 & nModeChangeSignalDelayInMicroseconds, LibMCDriver_Raylase_uint32 & nModeChangeApplyDelayInMicroseconds);
+};
+	
+/*************************************************************************************************************************
+ Class CRaylaseCycle 
+**************************************************************************************************************************/
+class CRaylaseCycle : public CBase {
+public:
+	
+	/**
+	* CRaylaseCycle::CRaylaseCycle - Constructor for RaylaseCycle class.
+	*/
+	CRaylaseCycle(CWrapper* pWrapper, LibMCDriver_RaylaseHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetCycleID(const LibMCDriver_Raylase_uint32 nCycleID);
+	inline void AddSignalOut(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin);
+	inline void AddWaitForSignal(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
+	inline void AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds);
 };
 	
 /*************************************************************************************************************************
@@ -772,6 +797,10 @@ public:
 		pWrapperTable->m_NLightDriverBoard_IsWaterFlow = nullptr;
 		pWrapperTable->m_NLightDriverBoard_SetModeChangeDelays = nullptr;
 		pWrapperTable->m_NLightDriverBoard_GetModeChangeDelays = nullptr;
+		pWrapperTable->m_RaylaseCycle_GetCycleID = nullptr;
+		pWrapperTable->m_RaylaseCycle_AddSignalOut = nullptr;
+		pWrapperTable->m_RaylaseCycle_AddWaitForSignal = nullptr;
+		pWrapperTable->m_RaylaseCycle_AddDelay = nullptr;
 		pWrapperTable->m_RaylaseCard_IsConnected = nullptr;
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = nullptr;
 		pWrapperTable->m_RaylaseCard_EnableCommandLogging = nullptr;
@@ -1105,6 +1134,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_NLightDriverBoard_GetModeChangeDelays == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCycle_GetCycleID = (PLibMCDriver_RaylaseRaylaseCycle_GetCycleIDPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecycle_getcycleid");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCycle_GetCycleID = (PLibMCDriver_RaylaseRaylaseCycle_GetCycleIDPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecycle_getcycleid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCycle_GetCycleID == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCycle_AddSignalOut = (PLibMCDriver_RaylaseRaylaseCycle_AddSignalOutPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecycle_addsignalout");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCycle_AddSignalOut = (PLibMCDriver_RaylaseRaylaseCycle_AddSignalOutPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecycle_addsignalout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCycle_AddSignalOut == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCycle_AddWaitForSignal = (PLibMCDriver_RaylaseRaylaseCycle_AddWaitForSignalPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecycle_addwaitforsignal");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCycle_AddWaitForSignal = (PLibMCDriver_RaylaseRaylaseCycle_AddWaitForSignalPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecycle_addwaitforsignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCycle_AddWaitForSignal == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCycle_AddDelay = (PLibMCDriver_RaylaseRaylaseCycle_AddDelayPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecycle_adddelay");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCycle_AddDelay = (PLibMCDriver_RaylaseRaylaseCycle_AddDelayPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecycle_adddelay");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCycle_AddDelay == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1609,6 +1674,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_GetModeChangeDelays == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecycle_getcycleid", (void**)&(pWrapperTable->m_RaylaseCycle_GetCycleID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCycle_GetCycleID == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecycle_addsignalout", (void**)&(pWrapperTable->m_RaylaseCycle_AddSignalOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCycle_AddSignalOut == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecycle_addwaitforsignal", (void**)&(pWrapperTable->m_RaylaseCycle_AddWaitForSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCycle_AddWaitForSignal == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecycle_adddelay", (void**)&(pWrapperTable->m_RaylaseCycle_AddDelay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCycle_AddDelay == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_isconnected", (void**)&(pWrapperTable->m_RaylaseCard_IsConnected));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_IsConnected == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2091,6 +2172,49 @@ public:
 	void CNLightDriverBoard::GetModeChangeDelays(LibMCDriver_Raylase_uint32 & nModeChangeSignalDelayInMicroseconds, LibMCDriver_Raylase_uint32 & nModeChangeApplyDelayInMicroseconds)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_NLightDriverBoard_GetModeChangeDelays(m_pHandle, &nModeChangeSignalDelayInMicroseconds, &nModeChangeApplyDelayInMicroseconds));
+	}
+	
+	/**
+	 * Method definitions for class CRaylaseCycle
+	 */
+	
+	/**
+	* CRaylaseCycle::GetCycleID - Returns the cycle ID as Integer.
+	* @param[in] nCycleID - Cycle ID. MUST NOT be 0.
+	*/
+	void CRaylaseCycle::GetCycleID(const LibMCDriver_Raylase_uint32 nCycleID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCycle_GetCycleID(m_pHandle, nCycleID));
+	}
+	
+	/**
+	* CRaylaseCycle::AddSignalOut - Enables a GPIO Output signal during the list cycle.
+	* @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
+	* @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+	*/
+	void CRaylaseCycle::AddSignalOut(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCycle_AddSignalOut(m_pHandle, eIOPort, nIOPin));
+	}
+	
+	/**
+	* CRaylaseCycle::AddWaitForSignal - Enables to wait for an Input signal during the list cycle.
+	* @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
+	* @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+	* @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
+	*/
+	void CRaylaseCycle::AddWaitForSignal(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCycle_AddWaitForSignal(m_pHandle, eIOPort, nIOPin, nTimeoutInMicroseconds));
+	}
+	
+	/**
+	* CRaylaseCycle::AddDelay - Adds a delay to the list cycle.
+	* @param[in] nDelayInMicroseconds - Delay in Microseconds.
+	*/
+	void CRaylaseCycle::AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCycle_AddDelay(m_pHandle, nDelayInMicroseconds));
 	}
 	
 	/**

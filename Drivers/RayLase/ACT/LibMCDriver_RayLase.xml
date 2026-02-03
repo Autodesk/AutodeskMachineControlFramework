@@ -182,6 +182,14 @@ Custom implementation
 		<param name="Abort" type="bool" pass="return" description="Returns whether the exposure should be aborted"/>
 	</functiontype>
 
+	<enum name="IOPort">
+	   <option name="Unknown" value="0" />
+	   <option name="PortA" value="1" />
+	   <option name="PortB" value="2" />
+	   <option name="PortC" value="3" />
+	   <option name="PortD" value="4" />
+	   <option name="PortE" value="5" />
+	</enum>
 
 
 	<class name="RaylaseCommandLog" parent="Driver" description="A class that implements a raylase command log.">
@@ -273,6 +281,30 @@ Custom implementation
 		<method name="GetModeChangeDelays" description="Returns the mode change delays.">
 			<param name="ModeChangeSignalDelayInMicroseconds" type="uint32" pass="out" description="Current mode change signal delay in microseconds. This is the length of the signal peak to the AFX laser. Default value is 10 microseconds." />
 			<param name="ModeChangeApplyDelayInMicroseconds" type="uint32" pass="out" description="Current mode change apply delay in microseconds. This is the wait delay after the new mode has sent. Default value is 30000 microseconds." />
+		</method>
+		
+	</class>
+
+
+	<class name="RaylaseCycle" parent="Base" description="Object to control a raylase list cycle.">
+
+		<method name="GetCycleID" description="Returns the cycle ID as Integer.">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID. MUST NOT be 0." />
+		</method>
+
+		<method name="AddSignalOut" description="Enables a GPIO Output signal during the list cycle.">
+			<param name="IOPort" type="enum" class="IOPort" pass="in" description="IO Port to write out to. MUST be configured as output pin." />
+			<param name="IOPin" type="uint32" pass="in" description="IO Pin to write out to. MUST be configured as output pin." />
+		</method>
+		
+		<method name="AddWaitForSignal" description="Enables to wait for an Input signal during the list cycle.">
+			<param name="IOPort" type="enum" class="IOPort" pass="in" description="IO Port to read from. MUST be configured as input pin." />
+			<param name="IOPin" type="uint32" pass="in" description="IO Pin to read from. MUST be configured as input pin." />
+			<param name="TimeoutInMicroseconds" type="uint32" pass="in" description="Timeout in Microseconds." />
+		</method>
+
+		<method name="AddDelay" description="Adds a delay to the list cycle.">
+			<param name="DelayInMicroseconds" type="uint32" pass="in" description="Delay in Microseconds." />
 		</method>
 		
 	</class>
@@ -390,6 +422,7 @@ Custom implementation
 			<param name="OffsetX" type="double" pass="out" description="Translation in X in mm." />
 			<param name="OffsetY" type="double" pass="out" description="Translation in Y in mm." />
 		</method>
+
 
 	</class>
 

@@ -326,6 +326,49 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nligh
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_getmodechangedelays(LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 * pModeChangeSignalDelayInMicroseconds, LibMCDriver_Raylase_uint32 * pModeChangeApplyDelayInMicroseconds);
 
 /*************************************************************************************************************************
+ Class definition for RaylaseCycle
+**************************************************************************************************************************/
+
+/**
+* Returns the cycle ID as Integer.
+*
+* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] nCycleID - Cycle ID. MUST NOT be 0.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecycle_getcycleid(LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase_uint32 nCycleID);
+
+/**
+* Enables a GPIO Output signal during the list cycle.
+*
+* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
+* @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecycle_addsignalout(LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin);
+
+/**
+* Enables to wait for an Input signal during the list cycle.
+*
+* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
+* @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+* @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecycle_addwaitforsignal(LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
+
+/**
+* Adds a delay to the list cycle.
+*
+* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] nDelayInMicroseconds - Delay in Microseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecycle_adddelay(LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase_uint32 nDelayInMicroseconds);
+
+/*************************************************************************************************************************
  Class definition for RaylaseCard
 **************************************************************************************************************************/
 

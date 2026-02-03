@@ -873,6 +873,106 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_nlightdriverboard_getmodechangedel
 
 
 /*************************************************************************************************************************
+ Class implementation for RaylaseCycle
+**************************************************************************************************************************/
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecycle_getcycleid(LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase_uint32 nCycleID)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCycle;
+
+	try {
+		IRaylaseCycle* pIRaylaseCycle = dynamic_cast<IRaylaseCycle*>(pIBaseClass);
+		if (!pIRaylaseCycle)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIRaylaseCycle->GetCycleID(nCycleID);
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecycle_addsignalout(LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, eLibMCDriver_RaylaseIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCycle;
+
+	try {
+		IRaylaseCycle* pIRaylaseCycle = dynamic_cast<IRaylaseCycle*>(pIBaseClass);
+		if (!pIRaylaseCycle)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIRaylaseCycle->AddSignalOut(eIOPort, nIOPin);
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecycle_addwaitforsignal(LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, eLibMCDriver_RaylaseIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCycle;
+
+	try {
+		IRaylaseCycle* pIRaylaseCycle = dynamic_cast<IRaylaseCycle*>(pIBaseClass);
+		if (!pIRaylaseCycle)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIRaylaseCycle->AddWaitForSignal(eIOPort, nIOPin, nTimeoutInMicroseconds);
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecycle_adddelay(LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase_uint32 nDelayInMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pRaylaseCycle;
+
+	try {
+		IRaylaseCycle* pIRaylaseCycle = dynamic_cast<IRaylaseCycle*>(pIBaseClass);
+		if (!pIRaylaseCycle)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIRaylaseCycle->AddDelay(nDelayInMicroseconds);
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for RaylaseCard
 **************************************************************************************************************************/
 LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_isconnected(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pIsConnected)
@@ -1875,6 +1975,14 @@ LibMCDriver_RaylaseResult LibMCDriver_Raylase::Impl::LibMCDriver_Raylase_GetProc
 		*ppProcAddress = (void*) &libmcdriver_raylase_nlightdriverboard_setmodechangedelays;
 	if (sProcName == "libmcdriver_raylase_nlightdriverboard_getmodechangedelays") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_nlightdriverboard_getmodechangedelays;
+	if (sProcName == "libmcdriver_raylase_raylasecycle_getcycleid") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecycle_getcycleid;
+	if (sProcName == "libmcdriver_raylase_raylasecycle_addsignalout") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecycle_addsignalout;
+	if (sProcName == "libmcdriver_raylase_raylasecycle_addwaitforsignal") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecycle_addwaitforsignal;
+	if (sProcName == "libmcdriver_raylase_raylasecycle_adddelay") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecycle_adddelay;
 	if (sProcName == "libmcdriver_raylase_raylasecard_isconnected") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_raylasecard_isconnected;
 	if (sProcName == "libmcdriver_raylase_raylasecard_resettosystemdefaults") 

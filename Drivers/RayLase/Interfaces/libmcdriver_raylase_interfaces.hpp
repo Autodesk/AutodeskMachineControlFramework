@@ -59,6 +59,7 @@ class IBase;
 class IDriver;
 class IRaylaseCommandLog;
 class INLightDriverBoard;
+class IRaylaseCycle;
 class IRaylaseCard;
 class IDriver_Raylase;
 
@@ -456,6 +457,44 @@ public:
 };
 
 typedef IBaseSharedPtr<INLightDriverBoard> PINLightDriverBoard;
+
+
+/*************************************************************************************************************************
+ Class interface for RaylaseCycle 
+**************************************************************************************************************************/
+
+class IRaylaseCycle : public virtual IBase {
+public:
+	/**
+	* IRaylaseCycle::GetCycleID - Returns the cycle ID as Integer.
+	* @param[in] nCycleID - Cycle ID. MUST NOT be 0.
+	*/
+	virtual void GetCycleID(const LibMCDriver_Raylase_uint32 nCycleID) = 0;
+
+	/**
+	* IRaylaseCycle::AddSignalOut - Enables a GPIO Output signal during the list cycle.
+	* @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
+	* @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+	*/
+	virtual void AddSignalOut(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin) = 0;
+
+	/**
+	* IRaylaseCycle::AddWaitForSignal - Enables to wait for an Input signal during the list cycle.
+	* @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
+	* @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+	* @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
+	*/
+	virtual void AddWaitForSignal(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds) = 0;
+
+	/**
+	* IRaylaseCycle::AddDelay - Adds a delay to the list cycle.
+	* @param[in] nDelayInMicroseconds - Delay in Microseconds.
+	*/
+	virtual void AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds) = 0;
+
+};
+
+typedef IBaseSharedPtr<IRaylaseCycle> PIRaylaseCycle;
 
 
 /*************************************************************************************************************************

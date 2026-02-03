@@ -313,6 +313,49 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_SetMod
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_GetModeChangeDelaysPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 * pModeChangeSignalDelayInMicroseconds, LibMCDriver_Raylase_uint32 * pModeChangeApplyDelayInMicroseconds);
 
 /*************************************************************************************************************************
+ Class definition for RaylaseCycle
+**************************************************************************************************************************/
+
+/**
+* Returns the cycle ID as Integer.
+*
+* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] nCycleID - Cycle ID. MUST NOT be 0.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCycle_GetCycleIDPtr) (LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase_uint32 nCycleID);
+
+/**
+* Enables a GPIO Output signal during the list cycle.
+*
+* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
+* @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCycle_AddSignalOutPtr) (LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin);
+
+/**
+* Enables to wait for an Input signal during the list cycle.
+*
+* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
+* @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+* @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCycle_AddWaitForSignalPtr) (LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
+
+/**
+* Adds a delay to the list cycle.
+*
+* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] nDelayInMicroseconds - Delay in Microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCycle_AddDelayPtr) (LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase_uint32 nDelayInMicroseconds);
+
+/*************************************************************************************************************************
  Class definition for RaylaseCard
 **************************************************************************************************************************/
 
@@ -760,6 +803,10 @@ typedef struct {
 	PLibMCDriver_RaylaseNLightDriverBoard_IsWaterFlowPtr m_NLightDriverBoard_IsWaterFlow;
 	PLibMCDriver_RaylaseNLightDriverBoard_SetModeChangeDelaysPtr m_NLightDriverBoard_SetModeChangeDelays;
 	PLibMCDriver_RaylaseNLightDriverBoard_GetModeChangeDelaysPtr m_NLightDriverBoard_GetModeChangeDelays;
+	PLibMCDriver_RaylaseRaylaseCycle_GetCycleIDPtr m_RaylaseCycle_GetCycleID;
+	PLibMCDriver_RaylaseRaylaseCycle_AddSignalOutPtr m_RaylaseCycle_AddSignalOut;
+	PLibMCDriver_RaylaseRaylaseCycle_AddWaitForSignalPtr m_RaylaseCycle_AddWaitForSignal;
+	PLibMCDriver_RaylaseRaylaseCycle_AddDelayPtr m_RaylaseCycle_AddDelay;
 	PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr m_RaylaseCard_IsConnected;
 	PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr m_RaylaseCard_ResetToSystemDefaults;
 	PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr m_RaylaseCard_EnableCommandLogging;

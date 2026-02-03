@@ -224,6 +224,7 @@ typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Base;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCommandLog;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_NLightDriverBoard;
+typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCycle;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCard;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver_Raylase;
 
@@ -237,6 +238,15 @@ namespace LibMCDriver_Raylase {
     DontSuppress = 0, /** Part is exposed with full power. */
     SkipPart = 1, /** Part is skipped and not exposed at all. */
     NoPower = 2 /** Part is exposed with a power of 0 Watts. */
+  };
+  
+  enum class eIOPort : LibMCDriver_Raylase_int32 {
+    Unknown = 0,
+    PortA = 1,
+    PortB = 2,
+    PortC = 3,
+    PortD = 4,
+    PortE = 5
   };
   
   /*************************************************************************************************************************
@@ -276,6 +286,7 @@ namespace LibMCDriver_Raylase {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCDriver_Raylase::ePartSuppressionMode eLibMCDriver_RaylasePartSuppressionMode;
+typedef LibMCDriver_Raylase::eIOPort eLibMCDriver_RaylaseIOPort;
 typedef LibMCDriver_Raylase::sPoint2D sLibMCDriver_RaylasePoint2D;
 typedef LibMCDriver_Raylase::sHatch2D sLibMCDriver_RaylaseHatch2D;
 typedef LibMCDriver_Raylase::ExposureCancellationCallback LibMCDriver_RaylaseExposureCancellationCallback;
