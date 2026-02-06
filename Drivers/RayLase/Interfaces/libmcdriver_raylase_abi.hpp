@@ -339,25 +339,27 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_nligh
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_getcycleid(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase_uint32 * pCycleID);
 
 /**
-* Enables a GPIO Output signal during the list cycle.
+* Sets or clears a GPIO Output signal during the list cycle.
 *
 * @param[in] pRaylaseIOCycle - RaylaseIOCycle instance.
 * @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
 * @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+* @param[in] bHighNotLow - If true, sets the pin high. If false, sets the pin low.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addsignalout(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin);
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addsignalout(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, bool bHighNotLow);
 
 /**
-* Enables to wait for an Input signal during the list cycle.
+* Waits for an Input signal to be high or low during the list cycle.
 *
 * @param[in] pRaylaseIOCycle - RaylaseIOCycle instance.
 * @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
 * @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+* @param[in] bHighNotLow - If true, waits for the pin to be high. If false, waits for the pin to be low.
 * @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addwaitforsignal(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addwaitforsignal(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, bool bHighNotLow, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
 
 /**
 * Adds a delay to the list cycle.

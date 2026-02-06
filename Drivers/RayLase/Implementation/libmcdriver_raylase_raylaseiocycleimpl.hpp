@@ -54,12 +54,14 @@ struct sIOCycleEntry {
 	eIOPort m_IOPort;
 	uint32_t m_nIOPin;
 	uint32_t m_nTimeoutOrDelayInMicroseconds;
+	bool m_bHighNotLow;
 
 	sIOCycleEntry()
 		: m_EntryType(eIOCycleEntryType::Unknown),
 		  m_IOPort(eIOPort::Unknown),
 		  m_nIOPin(0),
-		  m_nTimeoutOrDelayInMicroseconds(0)
+		  m_nTimeoutOrDelayInMicroseconds(0),
+		  m_bHighNotLow(true)
 	{
 	}
 };
@@ -79,9 +81,9 @@ public:
 
 	uint32_t getCycleID() const;
 
-	void addSignalOut(const eIOPort ePort, const uint32_t nIOPin);
+	void addSignalOut(const eIOPort ePort, const uint32_t nIOPin, const bool bHighNotLow);
 
-	void addWaitForSignal(const eIOPort ePort, const uint32_t nIOPin, const uint32_t nTimeoutInMicroseconds);
+	void addWaitForSignal(const eIOPort ePort, const uint32_t nIOPin, const bool bHighNotLow, const uint32_t nTimeoutInMicroseconds);
 
 	void addDelay(const uint32_t nDelayInMicroseconds);
 

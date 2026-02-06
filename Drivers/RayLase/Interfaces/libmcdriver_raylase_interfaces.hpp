@@ -472,19 +472,21 @@ public:
 	virtual LibMCDriver_Raylase_uint32 GetCycleID() = 0;
 
 	/**
-	* IRaylaseIOCycle::AddSignalOut - Enables a GPIO Output signal during the list cycle.
+	* IRaylaseIOCycle::AddSignalOut - Sets or clears a GPIO Output signal during the list cycle.
 	* @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
 	* @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+	* @param[in] bHighNotLow - If true, sets the pin high. If false, sets the pin low.
 	*/
-	virtual void AddSignalOut(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin) = 0;
+	virtual void AddSignalOut(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow) = 0;
 
 	/**
-	* IRaylaseIOCycle::AddWaitForSignal - Enables to wait for an Input signal during the list cycle.
+	* IRaylaseIOCycle::AddWaitForSignal - Waits for an Input signal to be high or low during the list cycle.
 	* @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
 	* @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+	* @param[in] bHighNotLow - If true, waits for the pin to be high. If false, waits for the pin to be low.
 	* @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
 	*/
-	virtual void AddWaitForSignal(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds) = 0;
+	virtual void AddWaitForSignal(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds) = 0;
 
 	/**
 	* IRaylaseIOCycle::AddDelay - Adds a delay to the list cycle.

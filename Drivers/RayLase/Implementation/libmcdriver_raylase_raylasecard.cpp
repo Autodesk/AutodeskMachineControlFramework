@@ -198,6 +198,9 @@ void CRaylaseCard::DrawLayerWithCallback(const std::string& sStreamUUID, const L
 	if (bVerbose)
     	pDriverEnvironment->LogMessage("Loading layer");
 
+    pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.raylase.com/iocontrol/2026/01", "precycleid", LibMCEnv::eToolpathAttributeType::Integer);
+    pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.raylase.com/iocontrol/2026/01", "postcycleid", LibMCEnv::eToolpathAttributeType::Integer);
+
     auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
     auto pList = m_pRaylaseCardImpl->createNewList();

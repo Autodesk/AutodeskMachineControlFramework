@@ -901,7 +901,7 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_getcycleid(LibMCDri
 	}
 }
 
-LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addsignalout(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, eLibMCDriver_RaylaseIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin)
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addsignalout(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, eLibMCDriver_RaylaseIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, bool bHighNotLow)
 {
 	IBase* pIBaseClass = (IBase *)pRaylaseIOCycle;
 
@@ -910,7 +910,7 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addsignalout(LibMCD
 		if (!pIRaylaseIOCycle)
 			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
 		
-		pIRaylaseIOCycle->AddSignalOut(eIOPort, nIOPin);
+		pIRaylaseIOCycle->AddSignalOut(eIOPort, nIOPin, bHighNotLow);
 
 		return LIBMCDRIVER_RAYLASE_SUCCESS;
 	}
@@ -925,7 +925,7 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addsignalout(LibMCD
 	}
 }
 
-LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addwaitforsignal(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, eLibMCDriver_RaylaseIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
+LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addwaitforsignal(LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, eLibMCDriver_RaylaseIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, bool bHighNotLow, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
 {
 	IBase* pIBaseClass = (IBase *)pRaylaseIOCycle;
 
@@ -934,7 +934,7 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_raylaseiocycle_addwaitforsignal(Li
 		if (!pIRaylaseIOCycle)
 			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
 		
-		pIRaylaseIOCycle->AddWaitForSignal(eIOPort, nIOPin, nTimeoutInMicroseconds);
+		pIRaylaseIOCycle->AddWaitForSignal(eIOPort, nIOPin, bHighNotLow, nTimeoutInMicroseconds);
 
 		return LIBMCDRIVER_RAYLASE_SUCCESS;
 	}

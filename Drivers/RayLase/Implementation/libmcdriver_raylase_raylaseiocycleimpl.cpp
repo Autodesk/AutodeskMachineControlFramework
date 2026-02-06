@@ -52,7 +52,7 @@ uint32_t CRaylaseIOCycleImpl::getCycleID() const
 	return m_nCycleID;
 }
 
-void CRaylaseIOCycleImpl::addSignalOut(const eIOPort ePort, const uint32_t nIOPin)
+void CRaylaseIOCycleImpl::addSignalOut(const eIOPort ePort, const uint32_t nIOPin, const bool bHighNotLow)
 {
 	if (ePort == eIOPort::Unknown)
 		throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT);
@@ -62,11 +62,12 @@ void CRaylaseIOCycleImpl::addSignalOut(const eIOPort ePort, const uint32_t nIOPi
 	entry.m_IOPort = ePort;
 	entry.m_nIOPin = nIOPin;
 	entry.m_nTimeoutOrDelayInMicroseconds = 0;
+	entry.m_bHighNotLow = bHighNotLow;
 
 	m_Entries.push_back(entry);
 }
 
-void CRaylaseIOCycleImpl::addWaitForSignal(const eIOPort ePort, const uint32_t nIOPin, const uint32_t nTimeoutInMicroseconds)
+void CRaylaseIOCycleImpl::addWaitForSignal(const eIOPort ePort, const uint32_t nIOPin, const bool bHighNotLow, const uint32_t nTimeoutInMicroseconds)
 {
 	if (ePort == eIOPort::Unknown)
 		throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT);
@@ -76,6 +77,7 @@ void CRaylaseIOCycleImpl::addWaitForSignal(const eIOPort ePort, const uint32_t n
 	entry.m_IOPort = ePort;
 	entry.m_nIOPin = nIOPin;
 	entry.m_nTimeoutOrDelayInMicroseconds = nTimeoutInMicroseconds;
+	entry.m_bHighNotLow = bHighNotLow;
 
 	m_Entries.push_back(entry);
 }

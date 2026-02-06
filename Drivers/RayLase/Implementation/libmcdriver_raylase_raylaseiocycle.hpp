@@ -65,9 +65,9 @@ public:
 
 	LibMCDriver_Raylase_uint32 GetCycleID() override;
 
-	void AddSignalOut(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin) override;
+	void AddSignalOut(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow) override;
 
-	void AddWaitForSignal(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds) override;
+	void AddWaitForSignal(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds) override;
 
 	void AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds) override;
 

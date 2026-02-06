@@ -584,8 +584,8 @@ public:
 	}
 	
 	inline LibMCDriver_Raylase_uint32 GetCycleID();
-	inline void AddSignalOut(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin);
-	inline void AddWaitForSignal(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
+	inline void AddSignalOut(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow);
+	inline void AddWaitForSignal(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
 	inline void AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds);
 };
 	
@@ -2259,24 +2259,26 @@ public:
 	}
 	
 	/**
-	* CRaylaseIOCycle::AddSignalOut - Enables a GPIO Output signal during the list cycle.
+	* CRaylaseIOCycle::AddSignalOut - Sets or clears a GPIO Output signal during the list cycle.
 	* @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
 	* @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+	* @param[in] bHighNotLow - If true, sets the pin high. If false, sets the pin low.
 	*/
-	void CRaylaseIOCycle::AddSignalOut(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin)
+	void CRaylaseIOCycle::AddSignalOut(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseIOCycle_AddSignalOut(m_pHandle, eIOPort, nIOPin));
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseIOCycle_AddSignalOut(m_pHandle, eIOPort, nIOPin, bHighNotLow));
 	}
 	
 	/**
-	* CRaylaseIOCycle::AddWaitForSignal - Enables to wait for an Input signal during the list cycle.
+	* CRaylaseIOCycle::AddWaitForSignal - Waits for an Input signal to be high or low during the list cycle.
 	* @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
 	* @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+	* @param[in] bHighNotLow - If true, waits for the pin to be high. If false, waits for the pin to be low.
 	* @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
 	*/
-	void CRaylaseIOCycle::AddWaitForSignal(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
+	void CRaylaseIOCycle::AddWaitForSignal(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseIOCycle_AddWaitForSignal(m_pHandle, eIOPort, nIOPin, nTimeoutInMicroseconds));
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseIOCycle_AddWaitForSignal(m_pHandle, eIOPort, nIOPin, bHighNotLow, nTimeoutInMicroseconds));
 	}
 	
 	/**

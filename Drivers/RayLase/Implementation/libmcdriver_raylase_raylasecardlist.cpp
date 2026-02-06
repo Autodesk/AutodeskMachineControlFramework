@@ -494,9 +494,10 @@ void CRaylaseCardList::executeIOCycle(PRaylaseIOCycleImpl pIOCycle)
                 throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT);
             }
 
-            // Set the pin high using the pin mask
+            // Set or clear the pin based on m_bHighNotLow
             uint32_t nPinMask = (1u << entry.m_nIOPin);
-            m_pSDK->checkError(m_pSDK->rlListAppendGpioValue(m_ListHandle, rlPort, eRLPinAction::paSet, nPinMask), "rlListAppendGpioValue");
+            eRLPinAction pinAction = entry.m_bHighNotLow ? eRLPinAction::paSet : eRLPinAction::paClear;
+            m_pSDK->checkError(m_pSDK->rlListAppendGpioValue(m_ListHandle, rlPort, pinAction, nPinMask), "rlListAppendGpioValue");
             break;
         }
 
@@ -515,9 +516,13 @@ void CRaylaseCardList::executeIOCycle(PRaylaseIOCycleImpl pIOCycle)
             }
 
             // Wait for input signal on the specified pin
+            // ifNotTrue: if false, waits for condition to be true (pin high when m_bHighNotLow is true)
+            //            if true, waits for condition to be false (pin low when m_bHighNotLow is true)
+            // So we invert m_bHighNotLow for the ifNotTrue parameter
             uint32_t nPinMask = (1u << entry.m_nIOPin);
             int32_t nTimeoutInMicroseconds = (int32_t)entry.m_nTimeoutOrDelayInMicroseconds;
-            m_pSDK->checkError(m_pSDK->rlListAppendWaitForInput(m_ListHandle, nPinMask, rlPort, true, false, nPinMask, nTimeoutInMicroseconds), "rlListAppendWaitForInput");
+            bool bIfNotTrue = !entry.m_bHighNotLow;
+            m_pSDK->checkError(m_pSDK->rlListAppendWaitForInput(m_ListHandle, nPinMask, rlPort, true, bIfNotTrue, nPinMask, nTimeoutInMicroseconds), "rlListAppendWaitForInput");
             break;
         }
 

@@ -52,14 +52,14 @@ LibMCDriver_Raylase_uint32 CRaylaseIOCycle::GetCycleID()
 	return m_pIOCycleImpl->getCycleID();
 }
 
-void CRaylaseIOCycle::AddSignalOut(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin)
+void CRaylaseIOCycle::AddSignalOut(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow)
 {
-	m_pIOCycleImpl->addSignalOut(eIOPort, nIOPin);
+	m_pIOCycleImpl->addSignalOut(eIOPort, nIOPin, bHighNotLow);
 }
 
-void CRaylaseIOCycle::AddWaitForSignal(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
+void CRaylaseIOCycle::AddWaitForSignal(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
 {
-	m_pIOCycleImpl->addWaitForSignal(eIOPort, nIOPin, nTimeoutInMicroseconds);
+	m_pIOCycleImpl->addWaitForSignal(eIOPort, nIOPin, bHighNotLow, nTimeoutInMicroseconds);
 }
 
 void CRaylaseIOCycle::AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds)
