@@ -95,8 +95,10 @@
 		<error name="COULDNOTRECEIVESPIPACKET" code="1044" description="Could not receive SPI Packet" />		
 		<error name="INVALIDLASERMODE" code="1045" description="Invalid laser mode" />
 		<error name="NLIGHTLASERMODEHASNOPOWEROVERRIDE" code="1046" description="nLight laser mode has no power override" />
-		
-		
+		<error name="INVALIDIOCYCLEID" code="1047" description="Invalid IO Cycle ID" />
+		<error name="IOCYCLEALREADYEXISTS" code="1048" description="IO Cycle already exists" />
+		<error name="IOCYCLENOTFOUND" code="1049" description="IO Cycle not found" />
+		<error name="INVALIDIOPORT" code="1050" description="Invalid IO Port" />
 		
 		
 		
@@ -286,10 +288,10 @@ Custom implementation
 	</class>
 
 
-	<class name="RaylaseCycle" parent="Base" description="Object to control a raylase list cycle.">
+	<class name="RaylaseIOCycle" parent="Base" description="Object to control a raylase list cycle.">
 
 		<method name="GetCycleID" description="Returns the cycle ID as Integer.">
-			<param name="CycleID" type="uint32" pass="in" description="Cycle ID. MUST NOT be 0." />
+			<param name="CycleID" type="uint32" pass="return" description="Cycle ID. Will not be 0." />
 		</method>
 
 		<method name="AddSignalOut" description="Enables a GPIO Output signal during the list cycle.">
@@ -334,6 +336,25 @@ Custom implementation
 
 		<method name="GetNLightDriverBoard" description="Returns the NLight Driver Board Handler class.">
 			<param name="DriverBoard" type="class" class="NLightDriverBoard" pass="return" description="NLight Driver Board Instance" />
+		</method>
+
+		<method name="CreateIOCycle" description="Creates a new IO cycle with a certain ID. Fails if cycle ID is already existing..">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID to use. MUST NOT be 0." />
+			<param name="IOCycle" type="class" class="RaylaseIOCycle" pass="return" description="IO Cycle Instance" />
+		</method>
+
+		<method name="IOCycleExists" description="Returns if a IO cycle exists.">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID to return." />
+			<param name="IOCycleDoesExist" type="bool" pass="return" description="Returns true, if IO Cycle exists." />
+		</method>
+
+		<method name="GetIOCycle" description="Returns a new cycle. Fails if cycle ID does not exist..">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID to return." />
+			<param name="IOCycle" type="class" class="RaylaseIOCycle" pass="return" description="IO Cycle Instance" />
+		</method>
+
+		<method name="RemoveIOCycle" description="Removes an IO Cycle of a certain ID. Does nothing if IO cycle does not exist..">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID to remove." />
 		</method>
 
 		<method name="LaserOff" description="Turns the laser off.">

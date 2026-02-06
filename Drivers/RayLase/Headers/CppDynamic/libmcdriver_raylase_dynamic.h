@@ -313,47 +313,47 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_SetMod
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseNLightDriverBoard_GetModeChangeDelaysPtr) (LibMCDriver_Raylase_NLightDriverBoard pNLightDriverBoard, LibMCDriver_Raylase_uint32 * pModeChangeSignalDelayInMicroseconds, LibMCDriver_Raylase_uint32 * pModeChangeApplyDelayInMicroseconds);
 
 /*************************************************************************************************************************
- Class definition for RaylaseCycle
+ Class definition for RaylaseIOCycle
 **************************************************************************************************************************/
 
 /**
 * Returns the cycle ID as Integer.
 *
-* @param[in] pRaylaseCycle - RaylaseCycle instance.
-* @param[in] nCycleID - Cycle ID. MUST NOT be 0.
+* @param[in] pRaylaseIOCycle - RaylaseIOCycle instance.
+* @param[out] pCycleID - Cycle ID. Will not be 0.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCycle_GetCycleIDPtr) (LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase_uint32 nCycleID);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseIOCycle_GetCycleIDPtr) (LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase_uint32 * pCycleID);
 
 /**
 * Enables a GPIO Output signal during the list cycle.
 *
-* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] pRaylaseIOCycle - RaylaseIOCycle instance.
 * @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
 * @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCycle_AddSignalOutPtr) (LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseIOCycle_AddSignalOutPtr) (LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin);
 
 /**
 * Enables to wait for an Input signal during the list cycle.
 *
-* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] pRaylaseIOCycle - RaylaseIOCycle instance.
 * @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
 * @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
 * @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCycle_AddWaitForSignalPtr) (LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseIOCycle_AddWaitForSignalPtr) (LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase::eIOPort eIOPort, LibMCDriver_Raylase_uint32 nIOPin, LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
 
 /**
 * Adds a delay to the list cycle.
 *
-* @param[in] pRaylaseCycle - RaylaseCycle instance.
+* @param[in] pRaylaseIOCycle - RaylaseIOCycle instance.
 * @param[in] nDelayInMicroseconds - Delay in Microseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCycle_AddDelayPtr) (LibMCDriver_Raylase_RaylaseCycle pRaylaseCycle, LibMCDriver_Raylase_uint32 nDelayInMicroseconds);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseIOCycle_AddDelayPtr) (LibMCDriver_Raylase_RaylaseIOCycle pRaylaseIOCycle, LibMCDriver_Raylase_uint32 nDelayInMicroseconds);
 
 /*************************************************************************************************************************
  Class definition for RaylaseCard
@@ -417,6 +417,45 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr) 
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetNLightDriverBoardPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_NLightDriverBoard * pDriverBoard);
+
+/**
+* Creates a new IO cycle with a certain ID. Fails if cycle ID is already existing..
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] nCycleID - Cycle ID to use. MUST NOT be 0.
+* @param[out] pIOCycle - IO Cycle Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_CreateIOCyclePtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 nCycleID, LibMCDriver_Raylase_RaylaseIOCycle * pIOCycle);
+
+/**
+* Returns if a IO cycle exists.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] nCycleID - Cycle ID to return.
+* @param[out] pIOCycleDoesExist - Returns true, if IO Cycle exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_IOCycleExistsPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 nCycleID, bool * pIOCycleDoesExist);
+
+/**
+* Returns a new cycle. Fails if cycle ID does not exist..
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] nCycleID - Cycle ID to return.
+* @param[out] pIOCycle - IO Cycle Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_GetIOCyclePtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 nCycleID, LibMCDriver_Raylase_RaylaseIOCycle * pIOCycle);
+
+/**
+* Removes an IO Cycle of a certain ID. Does nothing if IO cycle does not exist..
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[in] nCycleID - Cycle ID to remove.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_RemoveIOCyclePtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, LibMCDriver_Raylase_uint32 nCycleID);
 
 /**
 * Turns the laser off.
@@ -803,10 +842,10 @@ typedef struct {
 	PLibMCDriver_RaylaseNLightDriverBoard_IsWaterFlowPtr m_NLightDriverBoard_IsWaterFlow;
 	PLibMCDriver_RaylaseNLightDriverBoard_SetModeChangeDelaysPtr m_NLightDriverBoard_SetModeChangeDelays;
 	PLibMCDriver_RaylaseNLightDriverBoard_GetModeChangeDelaysPtr m_NLightDriverBoard_GetModeChangeDelays;
-	PLibMCDriver_RaylaseRaylaseCycle_GetCycleIDPtr m_RaylaseCycle_GetCycleID;
-	PLibMCDriver_RaylaseRaylaseCycle_AddSignalOutPtr m_RaylaseCycle_AddSignalOut;
-	PLibMCDriver_RaylaseRaylaseCycle_AddWaitForSignalPtr m_RaylaseCycle_AddWaitForSignal;
-	PLibMCDriver_RaylaseRaylaseCycle_AddDelayPtr m_RaylaseCycle_AddDelay;
+	PLibMCDriver_RaylaseRaylaseIOCycle_GetCycleIDPtr m_RaylaseIOCycle_GetCycleID;
+	PLibMCDriver_RaylaseRaylaseIOCycle_AddSignalOutPtr m_RaylaseIOCycle_AddSignalOut;
+	PLibMCDriver_RaylaseRaylaseIOCycle_AddWaitForSignalPtr m_RaylaseIOCycle_AddWaitForSignal;
+	PLibMCDriver_RaylaseRaylaseIOCycle_AddDelayPtr m_RaylaseIOCycle_AddDelay;
 	PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr m_RaylaseCard_IsConnected;
 	PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr m_RaylaseCard_ResetToSystemDefaults;
 	PLibMCDriver_RaylaseRaylaseCard_EnableCommandLoggingPtr m_RaylaseCard_EnableCommandLogging;
@@ -814,6 +853,10 @@ typedef struct {
 	PLibMCDriver_RaylaseRaylaseCard_RetrieveLatestLogPtr m_RaylaseCard_RetrieveLatestLog;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr m_RaylaseCard_LaserOn;
 	PLibMCDriver_RaylaseRaylaseCard_GetNLightDriverBoardPtr m_RaylaseCard_GetNLightDriverBoard;
+	PLibMCDriver_RaylaseRaylaseCard_CreateIOCyclePtr m_RaylaseCard_CreateIOCycle;
+	PLibMCDriver_RaylaseRaylaseCard_IOCycleExistsPtr m_RaylaseCard_IOCycleExists;
+	PLibMCDriver_RaylaseRaylaseCard_GetIOCyclePtr m_RaylaseCard_GetIOCycle;
+	PLibMCDriver_RaylaseRaylaseCard_RemoveIOCyclePtr m_RaylaseCard_RemoveIOCycle;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOffPtr m_RaylaseCard_LaserOff;
 	PLibMCDriver_RaylaseRaylaseCard_ArmLaserPtr m_RaylaseCard_ArmLaser;
 	PLibMCDriver_RaylaseRaylaseCard_IsLaserArmedPtr m_RaylaseCard_IsLaserArmed;

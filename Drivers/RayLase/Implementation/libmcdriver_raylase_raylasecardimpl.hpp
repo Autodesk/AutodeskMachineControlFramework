@@ -39,6 +39,7 @@ Abstract: This is the class declaration of CRaylaseCard
 #include "libmcdriver_raylase_sdk.hpp"
 #include "libmcdriver_raylase_raylasecardlist.hpp"
 #include "libmcdriver_raylase_nlightdriverimpl.hpp"
+#include "libmcdriver_raylase_raylaseiocycleimpl.hpp"
 
 namespace LibMCDriver_Raylase {
 namespace Impl {
@@ -86,6 +87,7 @@ private:
 	PNLightDriverImpl m_pNLightDriverImpl;
 
 	std::map<std::string, ePartSuppressionMode> m_PartSuppressions;
+	std::map<uint32_t, PRaylaseIOCycleImpl> m_IOCycles;
 
 public:
 	
@@ -148,6 +150,14 @@ public:
 	PNLightDriverImpl getNlightImplementation ();
 
 	double getMaxLaserPowerInWatts ();
+
+	PRaylaseIOCycleImpl createIOCycle(uint32_t nCycleID);
+
+	bool ioCycleExists(uint32_t nCycleID) const;
+
+	PRaylaseIOCycleImpl getIOCycle(uint32_t nCycleID) const;
+
+	void removeIOCycle(uint32_t nCycleID);
 
 };
 

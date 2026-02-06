@@ -382,3 +382,38 @@ double CRaylaseCardImpl::getMaxLaserPowerInWatts()
 {
     return m_dMaxLaserPowerInWatts;
 }
+
+PRaylaseIOCycleImpl CRaylaseCardImpl::createIOCycle(uint32_t nCycleID)
+{
+    if (nCycleID == 0)
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOCYCLEID);
+
+    auto iIter = m_IOCycles.find(nCycleID);
+    if (iIter != m_IOCycles.end())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_IOCYCLEALREADYEXISTS);
+
+    auto pIOCycle = std::make_shared<CRaylaseIOCycleImpl>(nCycleID);
+    m_IOCycles.insert(std::make_pair(nCycleID, pIOCycle));
+
+    return pIOCycle;
+}
+
+bool CRaylaseCardImpl::ioCycleExists(uint32_t nCycleID) const
+{
+    auto iIter = m_IOCycles.find(nCycleID);
+    return (iIter != m_IOCycles.end());
+}
+
+PRaylaseIOCycleImpl CRaylaseCardImpl::getIOCycle(uint32_t nCycleID) const
+{
+    auto iIter = m_IOCycles.find(nCycleID);
+    if (iIter == m_IOCycles.end())
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND);
+
+    return iIter->second;
+}
+
+void CRaylaseCardImpl::removeIOCycle(uint32_t nCycleID)
+{
+    m_IOCycles.erase(nCycleID);
+}

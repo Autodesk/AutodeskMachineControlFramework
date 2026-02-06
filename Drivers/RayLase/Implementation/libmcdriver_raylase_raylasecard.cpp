@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CRaylaseCard
 #include "libmcdriver_raylase_raylasecard.hpp"
 #include "libmcdriver_raylase_interfaceexception.hpp"
 #include "libmcdriver_raylase_nlightdriverboard.hpp"
+#include "libmcdriver_raylase_raylaseiocycle.hpp"
 
 using namespace LibMCDriver_Raylase::Impl;
 //#include <iostream>
@@ -310,4 +311,26 @@ bool CRaylaseCard::IsConnected()
 INLightDriverBoard* CRaylaseCard::GetNLightDriverBoard() 
 {
     return new CNLightDriverBoard(m_pRaylaseCardImpl);
+}
+
+IRaylaseIOCycle* CRaylaseCard::CreateIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+{
+    auto pIOCycleImpl = m_pRaylaseCardImpl->createIOCycle(nCycleID);
+    return new CRaylaseIOCycle(pIOCycleImpl);
+}
+
+bool CRaylaseCard::IOCycleExists(const LibMCDriver_Raylase_uint32 nCycleID)
+{
+    return m_pRaylaseCardImpl->ioCycleExists(nCycleID);
+}
+
+IRaylaseIOCycle* CRaylaseCard::GetIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+{
+    auto pIOCycleImpl = m_pRaylaseCardImpl->getIOCycle(nCycleID);
+    return new CRaylaseIOCycle(pIOCycleImpl);
+}
+
+void CRaylaseCard::RemoveIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+{
+    m_pRaylaseCardImpl->removeIOCycle(nCycleID);
 }

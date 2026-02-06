@@ -150,6 +150,10 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_COULDNOTRECEIVESPIPACKET 1044 /** Could not receive SPI Packet */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERMODE 1045 /** Invalid laser mode */
 #define LIBMCDRIVER_RAYLASE_ERROR_NLIGHTLASERMODEHASNOPOWEROVERRIDE 1046 /** nLight laser mode has no power override */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOCYCLEID 1047 /** Invalid IO Cycle ID */
+#define LIBMCDRIVER_RAYLASE_ERROR_IOCYCLEALREADYEXISTS 1048 /** IO Cycle already exists */
+#define LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND 1049 /** IO Cycle not found */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT 1050 /** Invalid IO Port */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -212,6 +216,10 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_COULDNOTRECEIVESPIPACKET: return "Could not receive SPI Packet";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERMODE: return "Invalid laser mode";
     case LIBMCDRIVER_RAYLASE_ERROR_NLIGHTLASERMODEHASNOPOWEROVERRIDE: return "nLight laser mode has no power override";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOCYCLEID: return "Invalid IO Cycle ID";
+    case LIBMCDRIVER_RAYLASE_ERROR_IOCYCLEALREADYEXISTS: return "IO Cycle already exists";
+    case LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND: return "IO Cycle not found";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT: return "Invalid IO Port";
     default: return "unknown error";
   }
 }
@@ -224,7 +232,7 @@ typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Base;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCommandLog;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_NLightDriverBoard;
-typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCycle;
+typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseIOCycle;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCard;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver_Raylase;
 

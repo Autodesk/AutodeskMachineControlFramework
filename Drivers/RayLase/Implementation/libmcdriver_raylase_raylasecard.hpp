@@ -78,6 +78,14 @@ public:
 
 	INLightDriverBoard* GetNLightDriverBoard() override;
 
+	IRaylaseIOCycle* CreateIOCycle(const LibMCDriver_Raylase_uint32 nCycleID) override;
+
+	bool IOCycleExists(const LibMCDriver_Raylase_uint32 nCycleID) override;
+
+	IRaylaseIOCycle* GetIOCycle(const LibMCDriver_Raylase_uint32 nCycleID) override;
+
+	void RemoveIOCycle(const LibMCDriver_Raylase_uint32 nCycleID) override;
+
 	IRaylaseCommandLog* RetrieveLatestLog() override;
 
 	void LaserOn() override;
