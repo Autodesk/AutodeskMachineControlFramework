@@ -127,6 +127,8 @@ CRaylaseSDK::CRaylaseSDK(const std::string& sDLLNameUTF8)
 	this->ptrListAppendJumpAbs3D = (PrlListAppendJumpAbs3D)_loadRaylaseAddress(hLibrary, "rlListAppendJumpAbs3D");
 	this->ptrListAppendMarkAbs3D = (PrlListAppendMarkAbs3D)_loadRaylaseAddress(hLibrary, "rlListAppendMarkAbs3D");
 	this->ptrListAppendGpioValue = (PrlListAppendGpioValue)_loadRaylaseAddress(hLibrary, "rlListAppendGpioValue");
+	this->ptrListAppendDacValue = (PrlListAppendDacValue)_loadRaylaseAddress(hLibrary, "rlListAppendDacValue");
+	this->ptrListAppendWaitForInput = (PrlListAppendWaitForInput)_loadRaylaseAddress(hLibrary, "rlListAppendWaitForInput");
 	this->ptrListAppendSleep = (PrlListAppendSleep)_loadRaylaseAddress(hLibrary, "rlListAppendSleep");
 
 	this->ptrListSet = (PrlListSet)_loadRaylaseAddress(hLibrary, "rlListSet");
@@ -430,6 +432,8 @@ void CRaylaseSDK::resetFunctionPtrs()
 	ptrListAppendJumpAbs3D = nullptr;
 	ptrListAppendMarkAbs3D = nullptr;
 	ptrListAppendGpioValue = nullptr;
+	ptrListAppendDacValue = nullptr;
+	ptrListAppendWaitForInput = nullptr;
 	ptrListAppendSleep = nullptr;
 
 	ptrListSet = nullptr;
@@ -930,6 +934,26 @@ rlResult CRaylaseSDK::rlListAppendGpioValue(rlListHandle handle, eRLIOPort port,
 	}
 
 	return ptrListAppendGpioValue(handle, port, action, nValue);
+
+}
+
+rlResult CRaylaseSDK::rlListAppendDacValue(rlListHandle handle, eRLPowerChannels dac, uint32_t nValue)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlListAppendDacValue (" + std::to_string(handle) + ", " + std::to_string((uint32_t)dac) + ", " + std::to_string(nValue) + "); ");
+	}
+
+	return ptrListAppendDacValue(handle, dac, nValue);
+
+}
+
+rlResult CRaylaseSDK::rlListAppendWaitForInput(rlListHandle handle, uint32_t cond, eRLIOPort port, bool compareCondAsMask, bool ifNotTrue, uint32_t mask, int32_t timeout)
+{
+	if (m_bEnableJournal) {
+		logJournal("rlListAppendWaitForInput (" + std::to_string(handle) + ", " + std::to_string(cond) + ", " + std::to_string((uint32_t)port) + ", " + std::to_string(compareCondAsMask) + ", " + std::to_string(ifNotTrue) + ", " + std::to_string(mask) + ", " + std::to_string(timeout) + "); ");
+	}
+
+	return ptrListAppendWaitForInput(handle, cond, port, compareCondAsMask, ifNotTrue, mask, timeout);
 
 }
 

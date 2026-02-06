@@ -249,6 +249,8 @@ namespace LibMCDriver_Raylase {
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendJumpAbs3D) (rlListHandle handle, double x, double y, double z);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendMarkAbs3D) (rlListHandle handle, double x, double y, double z);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendGpioValue) (rlListHandle handle, eRLIOPort port, eRLPinAction action, uint32_t nValue);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendDacValue) (rlListHandle handle, eRLPowerChannels dac, uint32_t nValue);
+		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendWaitForInput) (rlListHandle handle, uint32_t cond, eRLIOPort port, bool compareCondAsMask, bool ifNotTrue, uint32_t mask, int32_t timeout);
 		typedef rlResult(RAYLASE_CALLINGCONVENTION* PrlListAppendSleep) (rlListHandle handle, double dDelay);
 		
 
@@ -527,6 +529,8 @@ namespace LibMCDriver_Raylase {
 			PrlListAbortExecution ptrListAbortExecution = nullptr;
 			PrlListIsExecutionInProgress ptrListIsExecutionInProgress = nullptr;
 			PrlListAppendGpioValue ptrListAppendGpioValue = nullptr;
+			PrlListAppendDacValue ptrListAppendDacValue = nullptr;
+			PrlListAppendWaitForInput ptrListAppendWaitForInput = nullptr;
 			PrlListAppendSleep ptrListAppendSleep = nullptr;
 
 			PrlGetLastError ptrGetLastError = nullptr;
@@ -782,7 +786,9 @@ namespace LibMCDriver_Raylase {
 			rlResult rlListAppendMarkAbs2D (rlListHandle handle, double x, double y);
 			rlResult rlListAppendJumpAbs3D(rlListHandle handle, double x, double y, double z);
 			rlResult rlListAppendMarkAbs3D(rlListHandle handle, double x, double y, double z);
-			rlResult rlListAppendGpioValue (rlListHandle, eRLIOPort port, eRLPinAction action, uint32_t nValue);
+			rlResult rlListAppendGpioValue (rlListHandle handle, eRLIOPort port, eRLPinAction action, uint32_t nValue);
+			rlResult rlListAppendDacValue (rlListHandle handle, eRLPowerChannels dac, uint32_t nValue);
+			rlResult rlListAppendWaitForInput (rlListHandle handle, uint32_t cond, eRLIOPort port, bool compareCondAsMask, bool ifNotTrue, uint32_t mask, int32_t timeout);
 			rlResult rlListAppendSleep (rlListHandle handle, double dDelay);
 
 			rlResult rlListSet (rlHandle handle, int32_t listID, rlListHandle listHandle, bool append, int32_t executionLimit);
