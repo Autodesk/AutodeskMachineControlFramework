@@ -803,16 +803,18 @@ namespace AMCUnitTest {
 			auto pJob = createValidatedJob(fixture, "Job For Status Filter Test");
 			
 			// Create executions with different statuses
+			// Use fixed offsets to avoid race conditions on fast systems
 			uint64_t nStart1 = getCurrentTimestamp();
 			auto pExec1 = pJob->CreateBuildJobExecution("Exec 1", fixture.m_sUserUUID, nStart1);
-			uint64_t nStart2 = getCurrentTimestamp();
+			uint64_t nStart2 = nStart1 + 1000000; // 1 second after first
 			auto pExec2 = pJob->CreateBuildJobExecution("Exec 2", fixture.m_sUserUUID, nStart2);
-			auto pExec3 = pJob->CreateBuildJobExecution("Exec 3", fixture.m_sUserUUID, getCurrentTimestamp());
+			uint64_t nStart3 = nStart2 + 1000000; // 1 second after second
+			auto pExec3 = pJob->CreateBuildJobExecution("Exec 3", fixture.m_sUserUUID, nStart3);
 			
 			// All start as InProcess, finish some
-			// End timestamp must be after start timestamp
-			pExec1->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Finished, nStart1 + 1000);
-			pExec2->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, nStart2 + 1000);
+			// End timestamp must be after start timestamp - use 1 second offset for safety
+			pExec1->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Finished, nStart1 + 1000000);
+			pExec2->ChangeStatus(LibMCData::eBuildJobExecutionStatus::Failed, nStart2 + 1000000);
 			// pExec3 stays InProcess
 			
 			// Query by status
