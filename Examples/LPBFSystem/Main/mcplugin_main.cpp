@@ -81,6 +81,7 @@ __DECLARESTATE(init)
 	}
 
 	pVideoDevice->SetToSupportedResolution(0) ;
+	
 
 	auto pImage = pStateEnvironment->CreateEmptyImage (pVideoDevice->GetCurrentResolutionX(), pVideoDevice->GetCurrentResolutionY(), 100.0, 100.0, LibMCEnv::eImagePixelFormat::RGB24bit);
 	if (pVideoDevice->CaptureRawImage(pImage)) {
@@ -105,6 +106,13 @@ __DECLARESTATE(init)
 	pJPEGStream->WriteData(dataStream);
 	pJPEGStream->Finish();
 		
+
+	auto pVideoStream = pStateEnvironment->CreateVideoStream (
+		pVideoDevice->GetCurrentResolutionX (), pVideoDevice->GetCurrentResolutionY (), 33333, 100000, 66666);
+
+	pVideoDevice->StartStreamCapture(pVideoStream);
+
+	pStateEnvironment->LogMessage("video stream uuid: " + pVideoStream->GetUUID());
 
 
 	pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", 0);
