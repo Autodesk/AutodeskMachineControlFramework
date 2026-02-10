@@ -73,6 +73,7 @@ namespace AMC {
 	class CDataSeriesHandler;
 	class CAlertHandler;
 	class CTelemetryHandler;
+	class CStreamRegistry;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -90,6 +91,7 @@ namespace AMC {
 	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
 	typedef std::shared_ptr<CDataSeriesHandler> PDataSeriesHandler;
 	typedef std::shared_ptr<CTelemetryHandler> PTelemetryHandler;
+	typedef std::shared_ptr<CStreamRegistry> PStreamRegistry;
 
 	class CSystemState {
 	private:
@@ -115,6 +117,7 @@ namespace AMC {
 		AMC::PParameterHandler m_pSystemParameterHandler;
 		AMC::PParameterGroup m_pSystemMemoryGroup;
 		AMC::PTelemetryHandler m_pTelemetryHandler;
+		AMC::PStreamRegistry m_pStreamRegistry;
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
@@ -159,6 +162,7 @@ namespace AMC {
 		PDataSeriesHandler getDataSeriesHandlerInstance();
 		PAlertHandler getAlertHandlerInstance();
 		PTelemetryHandler getTelemetryHandlerInstance();
+		PStreamRegistry getStreamRegistryInstance();
 
 		LibMCData::PDataModel getDataModelInstance ();
 

@@ -759,6 +759,13 @@ public:
 			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "NOCONFIGURATIONVERSIONFOUND";
 			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "NOCONFIGURATIONVERSIONACTIVE";
 			case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "TELEMETRYCHANNELNOTFOUND";
+			case LIBMCENV_ERROR_VIDEOSTREAMNOTFOUND: return "VIDEOSTREAMNOTFOUND";
+			case LIBMCENV_ERROR_INVALIDVIDEOSTREAMWIDTH: return "INVALIDVIDEOSTREAMWIDTH";
+			case LIBMCENV_ERROR_INVALIDVIDEOSTREAMHEIGHT: return "INVALIDVIDEOSTREAMHEIGHT";
+			case LIBMCENV_ERROR_INVALIDFRAMEDURATION: return "INVALIDFRAMEDURATION";
+			case LIBMCENV_ERROR_INVALIDPAUSETOLERANCE: return "INVALIDPAUSETOLERANCE";
+			case LIBMCENV_ERROR_INVALIDFRAMECACHEDURATION: return "INVALIDFRAMECACHEDURATION";
+			case LIBMCENV_ERROR_VIDEOSTREAMFRAMEENCODINGERROR: return "VIDEOSTREAMFRAMEENCODINGERROR";
 		}
 		return "UNKNOWN";
 	}
@@ -1021,6 +1028,13 @@ public:
 			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "No configuration version found.";
 			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "No configuration version active.";
 			case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
+			case LIBMCENV_ERROR_VIDEOSTREAMNOTFOUND: return "Video stream not found.";
+			case LIBMCENV_ERROR_INVALIDVIDEOSTREAMWIDTH: return "Invalid video stream width.";
+			case LIBMCENV_ERROR_INVALIDVIDEOSTREAMHEIGHT: return "Invalid video stream height.";
+			case LIBMCENV_ERROR_INVALIDFRAMEDURATION: return "Invalid frame duration.";
+			case LIBMCENV_ERROR_INVALIDPAUSETOLERANCE: return "Invalid pause tolerance.";
+			case LIBMCENV_ERROR_INVALIDFRAMECACHEDURATION: return "Invalid frame cache duration.";
+			case LIBMCENV_ERROR_VIDEOSTREAMFRAMEENCODINGERROR: return "Video stream frame encoding error.";
 		}
 		return "unknown error";
 	}
@@ -2874,6 +2888,8 @@ public:
 	inline PTelemetryChannel FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageLoader CreateImageLoader();
+	inline PVideoStream CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds);
+	inline PVideoStream FindVideoStream(const std::string & sStreamUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
@@ -3581,6 +3597,8 @@ public:
 	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageLoader CreateImageLoader();
+	inline PVideoStream CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds);
+	inline PVideoStream FindVideoStream(const std::string & sStreamUUID);
 	inline PMachineConfigurationHandler CreateMachineConfigurationHandler();
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
@@ -3693,6 +3711,8 @@ public:
 	inline void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageLoader CreateImageLoader();
+	inline PVideoStream CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds);
+	inline PVideoStream FindVideoStream(const std::string & sStreamUUID);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline LibMCEnv_uint64 GetGlobalTimerInMicroseconds();
 	inline PTestEnvironment GetTestEnvironment();
@@ -4509,6 +4529,8 @@ public:
 		pWrapperTable->m_DriverEnvironment_FindTelemetryChannel = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateImageLoader = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateVideoStream = nullptr;
+		pWrapperTable->m_DriverEnvironment_FindVideoStream = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
@@ -4768,6 +4790,8 @@ public:
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateImageLoader = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateVideoStream = nullptr;
+		pWrapperTable->m_StateEnvironment_FindVideoStream = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateMachineConfigurationHandler = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = nullptr;
@@ -4848,6 +4872,8 @@ public:
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateImageLoader = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateVideoStream = nullptr;
+		pWrapperTable->m_UIEnvironment_FindVideoStream = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetTestEnvironment = nullptr;
@@ -11069,6 +11095,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateVideoStream = (PLibMCEnvDriverEnvironment_CreateVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createvideostream");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateVideoStream = (PLibMCEnvDriverEnvironment_CreateVideoStreamPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateVideoStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_FindVideoStream = (PLibMCEnvDriverEnvironment_FindVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_findvideostream");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_FindVideoStream = (PLibMCEnvDriverEnvironment_FindVideoStreamPtr) dlsym(hLibrary, "libmcenv_driverenvironment_findvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_FindVideoStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_creatediscretefield2d");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = (PLibMCEnvDriverEnvironment_CreateDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_driverenvironment_creatediscretefield2d");
@@ -13400,6 +13444,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateVideoStream = (PLibMCEnvStateEnvironment_CreateVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createvideostream");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateVideoStream = (PLibMCEnvStateEnvironment_CreateVideoStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateVideoStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_FindVideoStream = (PLibMCEnvStateEnvironment_FindVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findvideostream");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_FindVideoStream = (PLibMCEnvStateEnvironment_FindVideoStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_FindVideoStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_CreateMachineConfigurationHandler = (PLibMCEnvStateEnvironment_CreateMachineConfigurationHandlerPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createmachineconfigurationhandler");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_CreateMachineConfigurationHandler = (PLibMCEnvStateEnvironment_CreateMachineConfigurationHandlerPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createmachineconfigurationhandler");
@@ -14117,6 +14179,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_CreateImageLoader == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateVideoStream = (PLibMCEnvUIEnvironment_CreateVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createvideostream");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateVideoStream = (PLibMCEnvUIEnvironment_CreateVideoStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_createvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateVideoStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_FindVideoStream = (PLibMCEnvUIEnvironment_FindVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findvideostream");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_FindVideoStream = (PLibMCEnvUIEnvironment_FindVideoStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_findvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_FindVideoStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -17382,6 +17462,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateImageLoader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createvideostream", (void**)&(pWrapperTable->m_DriverEnvironment_CreateVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateVideoStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_findvideostream", (void**)&(pWrapperTable->m_DriverEnvironment_FindVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_FindVideoStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -18418,6 +18506,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateImageLoader == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createvideostream", (void**)&(pWrapperTable->m_StateEnvironment_CreateVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateVideoStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_findvideostream", (void**)&(pWrapperTable->m_StateEnvironment_FindVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindVideoStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createmachineconfigurationhandler", (void**)&(pWrapperTable->m_StateEnvironment_CreateMachineConfigurationHandler));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateMachineConfigurationHandler == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -18736,6 +18832,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_createimageloader", (void**)&(pWrapperTable->m_UIEnvironment_CreateImageLoader));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateImageLoader == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createvideostream", (void**)&(pWrapperTable->m_UIEnvironment_CreateVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateVideoStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_findvideostream", (void**)&(pWrapperTable->m_UIEnvironment_FindVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindVideoStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds));
@@ -28182,6 +28286,43 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	PVideoStream CDriverEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateVideoStream(m_pHandle, nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds, &hVideoStreamInstance));
+		
+		if (!hVideoStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	PVideoStream CDriverEnvironment::FindVideoStream(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_FindVideoStream(m_pHandle, sStreamUUID.c_str(), &hVideoStreamInstance));
+		
+		if (hVideoStreamInstance) {
+			return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
 	* CDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
 	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
 	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
@@ -31917,6 +32058,43 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	PVideoStream CStateEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateVideoStream(m_pHandle, nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds, &hVideoStreamInstance));
+		
+		if (!hVideoStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+	}
+	
+	/**
+	* CStateEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	PVideoStream CStateEnvironment::FindVideoStream(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindVideoStream(m_pHandle, sStreamUUID.c_str(), &hVideoStreamInstance));
+		
+		if (hVideoStreamInstance) {
+			return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
 	* CStateEnvironment::CreateMachineConfigurationHandler - creates a machine configuration handler, dealing with all persistent machine settings that the user will store in the local database.
 	* @return MachineConfigurationHandler instance.
 	*/
@@ -33062,6 +33240,43 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
+	}
+	
+	/**
+	* CUIEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	PVideoStream CUIEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateVideoStream(m_pHandle, nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds, &hVideoStreamInstance));
+		
+		if (!hVideoStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+	}
+	
+	/**
+	* CUIEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	PVideoStream CUIEnvironment::FindVideoStream(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindVideoStream(m_pHandle, sStreamUUID.c_str(), &hVideoStreamInstance));
+		
+		if (hVideoStreamInstance) {
+			return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**

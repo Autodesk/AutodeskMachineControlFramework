@@ -352,8 +352,8 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 									if (!sink.is_writable())
 										return false;
 
-									// Initial connection response
-									{
+									// Send initial SSE comment only on first invocation (offset == 0)
+									if (offset == 0 && streamType == LibMC::eStreamConnectionType::JSONEventStream) {
 										std::string sInitial = ": connected\n\n"; // SSE comment
 										sink.os.write(sInitial.c_str(), sInitial.length());
 										sink.os.flush();
@@ -382,12 +382,15 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 												}
 
 												case LibMC::eStreamConnectionType::JPEGImageStream: {
-													std::string sHeader = sBoundary + "\r\n" +
+													std::string sHeader = "--" + sBoundary + "\r\n" +
 														"Content-Type: " + sMIMEType + "\r\n" +
 														"Content-Length: " + std::to_string (dataBuffer.size()) + "\r\n\r\n";
 
 													sink.os.write(sHeader.c_str(), sHeader.length());
 													sink.os.write((char*)dataBuffer.data(), dataBuffer.size());
+													std::string sTrailer = "\r\n";
+													sink.os.write(sTrailer.c_str(), sTrailer.length());
+													sink.os.flush(); // Force immediate sending of frame
 
 													break;
 												}

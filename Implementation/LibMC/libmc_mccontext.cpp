@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 #include "libmc_apirequesthandler.hpp"
 #include "libmc_streamconnection.hpp"
+#include "amc_streamregistry.hpp"
 
 #include "pugixml.hpp"
 
@@ -1224,7 +1225,12 @@ IStreamConnection* CMCContext::CreateStreamConnection(const std::string& sStream
 {
     std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
 
-    return new CStreamConnection(sNormalizedStreamUUID);
+    // Look up the stream in the registry
+    AMC::PStreamInstance pStream;
+    auto pRegistry = m_pSystemState->getStreamRegistryInstance();
+    if (pRegistry.get() != nullptr) {
+        pStream = pRegistry->findStream(sNormalizedStreamUUID);
+    }
 
-
+    return new CStreamConnection(sNormalizedStreamUUID, pStream);
 }

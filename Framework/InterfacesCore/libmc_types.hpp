@@ -1392,6 +1392,7 @@ namespace LibMC {
   };
   
   enum class eStreamConnectionType : LibMC_int32 {
+    Unknown = 0,
     JSONEventStream = 1,
     JPEGImageStream = 2
   };

@@ -41,6 +41,7 @@ Abstract: This is the class declaration of CDriverEnvironment
 #include "amc_resourcepackage.hpp"
 #include "amc_toolpathhandler.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_streamregistry.hpp"
 #include "common_chrono.hpp"
 #include "amc_telemetry.hpp"
 #include "amc_logger.hpp"
@@ -84,12 +85,13 @@ protected:
 	AMC::PLogger m_pLogger;
 	AMC::PStateJournal m_pStateJournal;
 	AMC::PTelemetryHandler m_pTelemetryHandler;
+	AMC::PStreamRegistry m_pStreamRegistry;
 
 	AMCCommon::PChrono m_pGlobalChrono;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName, AMC::PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName, AMC::PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler, AMC::PStreamRegistry pStreamRegistry);
 
 	virtual ~CDriverEnvironment();
 
@@ -160,6 +162,10 @@ public:
 	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
 	IImageLoader* CreateImageLoader() override;
+
+	IVideoStream* CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) override;
+
+	IVideoStream* FindVideoStream(const std::string& sStreamUUID) override;
 
 	IXMLDocument* CreateXMLDocument(const std::string& sRootNodeName, const std::string& sDefaultNamespace) override;
 

@@ -45,6 +45,8 @@ Abstract: This is the class declaration of CStreamConnection
 #endif
 
 // Include custom headers here.
+#include "amc_streaminstance.hpp"
+#include "amc_videostreaminstance.hpp"
 
 
 namespace LibMC {
@@ -59,11 +61,13 @@ class CStreamConnection : public virtual IStreamConnection, public virtual CBase
 private:
 
     std::string m_sStreamUUID;
-    uint32_t m_nDummy;
+    AMC::PStreamInstance m_pStream;
+    AMC::PVideoStreamInstance m_pVideoStream;  // Cached downcast for video streams
+    uint64_t m_nLastFrameVersion;
 
 public:
 
-    CStreamConnection(const std::string & sStreamUUID);
+    CStreamConnection(const std::string & sStreamUUID, AMC::PStreamInstance pStream);
 
     virtual ~CStreamConnection();
 

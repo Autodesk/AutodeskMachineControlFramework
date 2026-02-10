@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_stringresourcehandler.hpp"
 #include "amc_languagehandler.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_streamregistry.hpp"
 
 #include "libmcdata_dynamic.hpp"
 #include "libmc_types.hpp"
@@ -99,14 +100,15 @@ namespace AMC {
 
 		m_pMeshHandler = std::make_shared<CMeshHandler>();
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pDataModel);
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pMeshHandler, m_pLogger, m_pDataModel, m_pGlobalChrono, m_pStateJournal, m_pTelemetryHandler);
+		m_pStreamRegistry = std::make_shared<CStreamRegistry>();
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pMeshHandler, m_pLogger, m_pDataModel, m_pGlobalChrono, m_pStateJournal, m_pTelemetryHandler, m_pStreamRegistry);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>(m_pTelemetryHandler);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
 		m_pLanguageHandler = std::make_shared<CLanguageHandler>();
 		m_pDataSeriesHandler = std::make_shared<CDataSeriesHandler>();
 		m_pAlertHandler = std::make_shared<CAlertHandler>();
 
-		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), m_pAccessControl, m_pLanguageHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono, m_pAlertHandler, m_pDataModel);
+		auto pUISystemState = std::make_shared<CUISystemState>(m_pStateMachineData, m_pToolpathHandler, m_pSignalHandler, m_pLogger, m_pStateJournal, getTestEnvironmentPath(), m_pAccessControl, m_pLanguageHandler, m_pMeshHandler, m_pDataSeriesHandler, m_pGlobalChrono, m_pAlertHandler, m_pDataModel, m_pStreamRegistry);
 		m_pUIHandler = std::make_shared<CUIHandler>(pEnvWrapper, pUISystemState);
 
 		m_pSystemParameterHandler = std::make_shared<CParameterHandler>("System", m_pGlobalChrono);
@@ -215,6 +217,11 @@ namespace AMC {
 	PTelemetryHandler CSystemState::getTelemetryHandlerInstance()
 	{
 		return m_pTelemetryHandler;
+	}
+
+	PStreamRegistry CSystemState::getStreamRegistryInstance()
+	{
+		return m_pStreamRegistry;
 	}
 
 	PLogger CSystemState::getLoggerInstance()

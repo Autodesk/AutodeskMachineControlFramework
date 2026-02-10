@@ -48,7 +48,8 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_datatable.hpp"
 #include "libmcenv_imageloader.hpp"
 #include "libmcenv_jsonobject.hpp"
-#include "libmcenv_telemetrychannel.hpp"    
+#include "libmcenv_telemetrychannel.hpp"
+#include "libmcenv_videostream.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -67,7 +68,7 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName, AMC::PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName, AMC::PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler, AMC::PStreamRegistry pStreamRegistry)
     : m_bIsInitializing(false), 
     m_pParameterGroup(pParameterGroup), 
     m_pDriverResourcePackage (pDriverResourcePackage), 
@@ -80,7 +81,8 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
     m_pDataModel (pDataModel), 
     m_pGlobalChrono (pGlobalChrono),
     m_pStateJournal (pStateJournal),
-	m_pTelemetryHandler(pTelemetryHandler)
+	m_pTelemetryHandler(pTelemetryHandler),
+	m_pStreamRegistry(pStreamRegistry)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -370,6 +372,28 @@ IImageData* CDriverEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSiz
 IImageLoader* CDriverEnvironment::CreateImageLoader()
 {
     return new CImageLoader(m_pMachineResourcePackage);
+}
+
+IVideoStream* CDriverEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+{
+    if (m_pStreamRegistry.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pInstance = m_pStreamRegistry->createVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+    return new CVideoStream(pInstance);
+}
+
+IVideoStream* CDriverEnvironment::FindVideoStream(const std::string& sStreamUUID)
+{
+    if (m_pStreamRegistry.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pInstance = m_pStreamRegistry->findVideoStream(sStreamUUID);
+    if (pInstance.get() == nullptr)
+        return nullptr;
+
+    return new CVideoStream(pInstance);
 }
 
 

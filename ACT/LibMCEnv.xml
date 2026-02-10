@@ -293,6 +293,13 @@
 		<error name="NOCONFIGURATIONVERSIONFOUND" code="10253" description="No configuration version found." />	
 		<error name="NOCONFIGURATIONVERSIONACTIVE" code="10254" description="No configuration version active." />	
 		<error name="TELEMETRYCHANNELNOTFOUND" code="10255" description="Telemetry channel not found." />	
+		<error name="VIDEOSTREAMNOTFOUND" code="10256" description="Video stream not found." />	
+		<error name="INVALIDVIDEOSTREAMWIDTH" code="10257" description="Invalid video stream width." />	
+		<error name="INVALIDVIDEOSTREAMHEIGHT" code="10258" description="Invalid video stream height." />	
+		<error name="INVALIDFRAMEDURATION" code="10259" description="Invalid frame duration." />	
+		<error name="INVALIDPAUSETOLERANCE" code="10260" description="Invalid pause tolerance." />	
+		<error name="INVALIDFRAMECACHEDURATION" code="10261" description="Invalid frame cache duration." />	
+		<error name="VIDEOSTREAMFRAMEENCODINGERROR" code="10262" description="Video stream frame encoding error." />	
 		
 		
 	</errors>
@@ -4114,7 +4121,21 @@
 		<method name="CreateImageLoader" description="creates an image loader object.">			
 			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
 		</method>		
-		
+
+		<method name="CreateVideoStream" description="creates a video stream object for MJPEG streaming.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Width of the video stream in pixels. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Height of the video stream in pixels. MUST be positive." />
+			<param name="DesiredFrameDurationInMicroseconds" type="uint32" pass="in" description="Duration of a frame in microseconds. MUST be between 10000 and 60000000." />
+			<param name="PauseToleranceInMicroseconds" type="uint32" pass="in" description="How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration." />
+			<param name="FrameCacheDurationInMicroseconds" type="uint32" pass="in" description="How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration." />
+			<param name="VideoStreamInstance" type="class" class="VideoStream" pass="return" description="Video stream instance." />
+		</method>		
+
+		<method name="FindVideoStream" description="Finds a video stream by UUID. Returns null if the stream does not exist.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the video stream to find." />
+			<param name="VideoStreamInstance" type="optionalclass" class="VideoStream" pass="return" description="Video stream instance, or null if not found." />
+		</method>		
+
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
 			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
@@ -5491,6 +5512,20 @@
 			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
 		</method>		
 
+		<method name="CreateVideoStream" description="creates a video stream object for MJPEG streaming.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Width of the video stream in pixels. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Height of the video stream in pixels. MUST be positive." />
+			<param name="DesiredFrameDurationInMicroseconds" type="uint32" pass="in" description="Duration of a frame in microseconds. MUST be between 10000 and 60000000." />
+			<param name="PauseToleranceInMicroseconds" type="uint32" pass="in" description="How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration." />
+			<param name="FrameCacheDurationInMicroseconds" type="uint32" pass="in" description="How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration." />
+			<param name="VideoStreamInstance" type="class" class="VideoStream" pass="return" description="Video stream instance." />
+		</method>		
+
+		<method name="FindVideoStream" description="Finds a video stream by UUID. Returns null if the stream does not exist.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the video stream to find." />
+			<param name="VideoStreamInstance" type="optionalclass" class="VideoStream" pass="return" description="Video stream instance, or null if not found." />
+		</method>		
+
 		<method name="CreateMachineConfigurationHandler" description="creates a machine configuration handler, dealing with all persistent machine settings that the user will store in the local database.">			
 			<param name="MachineConfigurationHandlerInstance" type="class" class="MachineConfigurationHandler" pass="return" description="MachineConfigurationHandler instance." />
 		</method>		
@@ -5924,6 +5959,20 @@
 		
 		<method name="CreateImageLoader" description="creates an image loader object.">			
 			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
+		</method>		
+
+		<method name="CreateVideoStream" description="creates a video stream object for MJPEG streaming.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Width of the video stream in pixels. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Height of the video stream in pixels. MUST be positive." />
+			<param name="DesiredFrameDurationInMicroseconds" type="uint32" pass="in" description="Duration of a frame in microseconds. MUST be between 10000 and 60000000." />
+			<param name="PauseToleranceInMicroseconds" type="uint32" pass="in" description="How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration." />
+			<param name="FrameCacheDurationInMicroseconds" type="uint32" pass="in" description="How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration." />
+			<param name="VideoStreamInstance" type="class" class="VideoStream" pass="return" description="Video stream instance." />
+		</method>		
+
+		<method name="FindVideoStream" description="Finds a video stream by UUID. Returns null if the stream does not exist.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the video stream to find." />
+			<param name="VideoStreamInstance" type="optionalclass" class="VideoStream" pass="return" description="Video stream instance, or null if not found." />
 		</method>		
 
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">

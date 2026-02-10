@@ -57,7 +57,7 @@ template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_p
 	return pExternalInstance;
 }
 
-CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PMeshHandler pMeshHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono,  PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PMeshHandler pMeshHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono,  PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler, AMC::PStreamRegistry pStreamRegistry)
 	: m_pEnvironmentWrapper (pEnvironmentWrapper), 
 	m_pToolpathHandler (pToolpathHandler), 
 	m_pMeshHandler (pMeshHandler),
@@ -65,7 +65,8 @@ CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpath
 	m_pDataModel (pDataModel),
 	m_pGlobalChrono (pGlobalChrono),
 	m_pStateJournal(pStateJournal),
-	m_pTelemetryHandler (pTelemetryHandler)
+	m_pTelemetryHandler (pTelemetryHandler),
+	m_pStreamRegistry (pStreamRegistry)
 {
 	LibMCAssertNotNull(pEnvironmentWrapper.get());
 	LibMCAssertNotNull(pToolpathHandler.get());
@@ -75,6 +76,7 @@ CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpath
 	LibMCAssertNotNull(pGlobalChrono.get());
 	LibMCAssertNotNull(pStateJournal.get());
 	LibMCAssertNotNull(pTelemetryHandler.get());
+	LibMCAssertNotNull(pStreamRegistry.get());
 
 }
 
@@ -110,7 +112,7 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	auto pParameterGroup = std::make_shared<CParameterGroup>(m_pGlobalChrono);
 	pParameterGroup->setJournal(m_pStateJournal, sName);
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_pMeshHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, sName, m_pStateJournal, m_pTelemetryHandler);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_pMeshHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, sName, m_pStateJournal, m_pTelemetryHandler, m_pStreamRegistry);
 
 	pInternalEnvironment->setIsInitializing(true);
 

@@ -755,6 +755,7 @@
 	</enum>	
 
 	<enum name="StreamConnectionType">
+		<option name="Unknown" value="0"/>
 		<option name="JSONEventStream" value="1"/>
 		<option name="JPEGImageStream" value="2"/>
 	</enum>	

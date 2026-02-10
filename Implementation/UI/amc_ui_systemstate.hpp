@@ -53,6 +53,7 @@ namespace AMC {
 	class CAccessControl;
 	class CAlertHandler;
 	class CLanguageHandler;
+	class CStreamRegistry;
 
 	amcDeclareDependingClass(CLogger, PLogger);
 	amcDeclareDependingClass(CStateJournal, PStateJournal);
@@ -65,6 +66,7 @@ namespace AMC {
 	amcDeclareDependingClass(CAccessControl, PAccessControl);
 	amcDeclareDependingClass(CAlertHandler, PAlertHandler);
 	amcDeclareDependingClass(CLanguageHandler, PLanguageHandler);
+	amcDeclareDependingClass(CStreamRegistry, PStreamRegistry);
 	amcDeclareDependingClass(CUISystemState, PUISystemState);
 
 	class CUISystemState {
@@ -79,6 +81,7 @@ namespace AMC {
 		PLanguageHandler m_pLanguageHandler;
 		PDataSeriesHandler m_pDataSeriesHandler;
 		PAlertHandler m_pAlertHandler;
+		PStreamRegistry m_pStreamRegistry;
 				
 		// LibMCData::PDataModel is thread safe, so it can be shared between contexts.
 		LibMCData::PDataModel m_pDataModel;
@@ -90,7 +93,7 @@ namespace AMC {
 		std::string m_sTestOutputPath;
 
 	public:
-		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel);
+		CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel, PStreamRegistry pStreamRegistry);
 
 		virtual ~CUISystemState();
 
@@ -108,6 +111,7 @@ namespace AMC {
 		PToolpathHandler getToolpathHandler();
 		PMeshHandler getMeshHandler();
 		PDataSeriesHandler getDataSeriesHandler();
+		PStreamRegistry getStreamRegistry();
 		AMCCommon::PChrono getGlobalChronoInstance();
 
 		std::string getTestOutputPath();

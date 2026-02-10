@@ -165,6 +165,10 @@ public:
 
 	IImageLoader* CreateImageLoader() override;
 
+	IVideoStream* CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) override;
+
+	IVideoStream* FindVideoStream(const std::string& sStreamUUID) override;
+
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
 	LibMCEnv_uint64 GetGlobalTimerInMicroseconds() override;

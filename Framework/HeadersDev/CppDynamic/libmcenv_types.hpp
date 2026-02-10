@@ -350,6 +350,13 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND 10253 /** No configuration version found. */
 #define LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE 10254 /** No configuration version active. */
 #define LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND 10255 /** Telemetry channel not found. */
+#define LIBMCENV_ERROR_VIDEOSTREAMNOTFOUND 10256 /** Video stream not found. */
+#define LIBMCENV_ERROR_INVALIDVIDEOSTREAMWIDTH 10257 /** Invalid video stream width. */
+#define LIBMCENV_ERROR_INVALIDVIDEOSTREAMHEIGHT 10258 /** Invalid video stream height. */
+#define LIBMCENV_ERROR_INVALIDFRAMEDURATION 10259 /** Invalid frame duration. */
+#define LIBMCENV_ERROR_INVALIDPAUSETOLERANCE 10260 /** Invalid pause tolerance. */
+#define LIBMCENV_ERROR_INVALIDFRAMECACHEDURATION 10261 /** Invalid frame cache duration. */
+#define LIBMCENV_ERROR_VIDEOSTREAMFRAMEENCODINGERROR 10262 /** Video stream frame encoding error. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -612,6 +619,13 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "No configuration version found.";
     case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "No configuration version active.";
     case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
+    case LIBMCENV_ERROR_VIDEOSTREAMNOTFOUND: return "Video stream not found.";
+    case LIBMCENV_ERROR_INVALIDVIDEOSTREAMWIDTH: return "Invalid video stream width.";
+    case LIBMCENV_ERROR_INVALIDVIDEOSTREAMHEIGHT: return "Invalid video stream height.";
+    case LIBMCENV_ERROR_INVALIDFRAMEDURATION: return "Invalid frame duration.";
+    case LIBMCENV_ERROR_INVALIDPAUSETOLERANCE: return "Invalid pause tolerance.";
+    case LIBMCENV_ERROR_INVALIDFRAMECACHEDURATION: return "Invalid frame cache duration.";
+    case LIBMCENV_ERROR_VIDEOSTREAMFRAMEENCODINGERROR: return "Video stream frame encoding error.";
     default: return "unknown error";
   }
 }

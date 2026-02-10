@@ -49,9 +49,11 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_tempstreamwriter.hpp"
 #include "libmcenv_zipstreamwriter.hpp"
 #include "libmcenv_imageloader.hpp"
+#include "libmcenv_videostream.hpp"
 #include "libmcenv_machineconfigurationhandler.hpp"
 
 #include "amc_systemstate.hpp"
+#include "amc_streamregistry.hpp"
 #include "amc_accesscontrol.hpp"
 #include "amc_meshhandler.hpp"
 #include "amc_dataserieshandler.hpp"
@@ -411,6 +413,30 @@ IImageLoader* CUIEnvironment::CreateImageLoader()
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
     return new CImageLoader (pCoreResourcePackage);
+}
+
+IVideoStream* CUIEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+{
+    auto pRegistry = m_pUISystemState->getStreamRegistry();
+    if (pRegistry.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pInstance = pRegistry->createVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+    return new CVideoStream(pInstance);
+}
+
+IVideoStream* CUIEnvironment::FindVideoStream(const std::string& sStreamUUID)
+{
+    auto pRegistry = m_pUISystemState->getStreamRegistry();
+    if (pRegistry.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pInstance = pRegistry->findVideoStream(sStreamUUID);
+    if (pInstance.get() == nullptr)
+        return nullptr;
+
+    return new CVideoStream(pInstance);
 }
 
 

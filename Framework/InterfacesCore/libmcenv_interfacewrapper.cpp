@@ -21411,6 +21411,65 @@ LibMCEnvResult libmcenv_driverenvironment_createimageloader(LibMCEnv_DriverEnvir
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_createvideostream(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pVideoStreamInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseVideoStreamInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVideoStreamInstance = pIDriverEnvironment->CreateVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+		*pVideoStreamInstance = (IBase*)(pBaseVideoStreamInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_findvideostream(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pVideoStreamInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		IBase* pBaseVideoStreamInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVideoStreamInstance = pIDriverEnvironment->FindVideoStream(sStreamUUID);
+
+		*pVideoStreamInstance = (IBase*)(pBaseVideoStreamInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_driverenvironment_creatediscretefield2d(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelCountX, LibMCEnv_uint32 nPixelCountY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv_double dOriginX, LibMCEnv_double dOriginY, LibMCEnv_double dDefaultValue, LibMCEnv_DiscreteFieldData2D * pFieldDataInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
@@ -30487,6 +30546,65 @@ LibMCEnvResult libmcenv_stateenvironment_createimageloader(LibMCEnv_StateEnviron
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_createvideostream(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pVideoStreamInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseVideoStreamInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVideoStreamInstance = pIStateEnvironment->CreateVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+		*pVideoStreamInstance = (IBase*)(pBaseVideoStreamInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_findvideostream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pVideoStreamInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		IBase* pBaseVideoStreamInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVideoStreamInstance = pIStateEnvironment->FindVideoStream(sStreamUUID);
+
+		*pVideoStreamInstance = (IBase*)(pBaseVideoStreamInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_createmachineconfigurationhandler(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_MachineConfigurationHandler * pMachineConfigurationHandlerInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -33114,6 +33232,65 @@ LibMCEnvResult libmcenv_uienvironment_createimageloader(LibMCEnv_UIEnvironment p
 		pBaseImageLoaderInstance = pIUIEnvironment->CreateImageLoader();
 
 		*pImageLoaderInstance = (IBase*)(pBaseImageLoaderInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_createvideostream(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pVideoStreamInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseVideoStreamInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVideoStreamInstance = pIUIEnvironment->CreateVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+		*pVideoStreamInstance = (IBase*)(pBaseVideoStreamInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_findvideostream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pVideoStreamInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		IBase* pBaseVideoStreamInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVideoStreamInstance = pIUIEnvironment->FindVideoStream(sStreamUUID);
+
+		*pVideoStreamInstance = (IBase*)(pBaseVideoStreamInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -36191,6 +36368,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createemptyimage;
 	if (sProcName == "libmcenv_driverenvironment_createimageloader") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createimageloader;
+	if (sProcName == "libmcenv_driverenvironment_createvideostream") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createvideostream;
+	if (sProcName == "libmcenv_driverenvironment_findvideostream") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_findvideostream;
 	if (sProcName == "libmcenv_driverenvironment_creatediscretefield2d") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_creatediscretefield2d;
 	if (sProcName == "libmcenv_driverenvironment_creatediscretefield2dfromimage") 
@@ -36709,6 +36890,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createemptyimage;
 	if (sProcName == "libmcenv_stateenvironment_createimageloader") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createimageloader;
+	if (sProcName == "libmcenv_stateenvironment_createvideostream") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_createvideostream;
+	if (sProcName == "libmcenv_stateenvironment_findvideostream") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_findvideostream;
 	if (sProcName == "libmcenv_stateenvironment_createmachineconfigurationhandler") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createmachineconfigurationhandler;
 	if (sProcName == "libmcenv_stateenvironment_creatediscretefield2d") 
@@ -36869,6 +37054,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_createemptyimage;
 	if (sProcName == "libmcenv_uienvironment_createimageloader") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_createimageloader;
+	if (sProcName == "libmcenv_uienvironment_createvideostream") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_createvideostream;
+	if (sProcName == "libmcenv_uienvironment_findvideostream") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_findvideostream;
 	if (sProcName == "libmcenv_uienvironment_getglobaltimerinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getglobaltimerinmilliseconds;
 	if (sProcName == "libmcenv_uienvironment_getglobaltimerinmicroseconds") 

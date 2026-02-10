@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_modeldatacomponentinstance.hpp"
 #include "libmcenv_imageloader.hpp"
 #include "libmcenv_jsonobject.hpp"
+#include "libmcenv_videostream.hpp"
 
 #include "amc_telemetry.hpp"
 #include "amc_logger.hpp"
@@ -72,6 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_meshhandler.hpp"
 #include "amc_alerthandler.hpp"
 #include "amc_dataserieshandler.hpp"
+#include "amc_streamregistry.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -575,6 +577,30 @@ IImageLoader* CStateEnvironment::CreateImageLoader()
 
 	return new CImageLoader(pResourcePackage);
 
+}
+
+IVideoStream* CStateEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+{
+	auto pRegistry = m_pSystemState->getStreamRegistryInstance();
+	if (pRegistry.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pInstance = pRegistry->createVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+	return new CVideoStream(pInstance);
+}
+
+IVideoStream* CStateEnvironment::FindVideoStream(const std::string& sStreamUUID)
+{
+	auto pRegistry = m_pSystemState->getStreamRegistryInstance();
+	if (pRegistry.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pInstance = pRegistry->findVideoStream(sStreamUUID);
+	if (pInstance.get() == nullptr)
+		return nullptr;
+
+	return new CVideoStream(pInstance);
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()

@@ -7296,6 +7296,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createemptyimage(Lib
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createimageloader(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
 
 /**
+* creates a video stream object for MJPEG streaming.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+* @param[out] pVideoStreamInstance - Video stream instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createvideostream(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance);
+
+/**
+* Finds a video stream by UUID. Returns null if the stream does not exist.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pStreamUUID - UUID of the video stream to find.
+* @param[out] pVideoStreamInstance - Video stream instance, or null if not found.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_findvideostream(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance);
+
+/**
 * Creates an empty discrete field.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -10111,6 +10135,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createemptyimage(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createimageloader(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
 
 /**
+* creates a video stream object for MJPEG streaming.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+* @param[out] pVideoStreamInstance - Video stream instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createvideostream(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance);
+
+/**
+* Finds a video stream by UUID. Returns null if the stream does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pStreamUUID - UUID of the video stream to find.
+* @param[out] pVideoStreamInstance - Video stream instance, or null if not found.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findvideostream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance);
+
+/**
 * creates a machine configuration handler, dealing with all persistent machine settings that the user will store in the local database.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -10966,6 +11014,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createemptyimage(LibMCEn
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createimageloader(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
+
+/**
+* creates a video stream object for MJPEG streaming.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+* @param[out] pVideoStreamInstance - Video stream instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createvideostream(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance);
+
+/**
+* Finds a video stream by UUID. Returns null if the stream does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pStreamUUID - UUID of the video stream to find.
+* @param[out] pVideoStreamInstance - Video stream instance, or null if not found.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findvideostream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance);
 
 /**
 * Returns the global timer in milliseconds.

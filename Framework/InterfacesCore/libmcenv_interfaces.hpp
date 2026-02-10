@@ -5755,6 +5755,24 @@ public:
 	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
+	* IDriverEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	virtual IVideoStream * CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) = 0;
+
+	/**
+	* IDriverEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	virtual IVideoStream * FindVideoStream(const std::string & sStreamUUID) = 0;
+
+	/**
 	* IDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
 	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
 	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.
@@ -7821,6 +7839,24 @@ public:
 	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
+	* IStateEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	virtual IVideoStream * CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) = 0;
+
+	/**
+	* IStateEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	virtual IVideoStream * FindVideoStream(const std::string & sStreamUUID) = 0;
+
+	/**
 	* IStateEnvironment::CreateMachineConfigurationHandler - creates a machine configuration handler, dealing with all persistent machine settings that the user will store in the local database.
 	* @return MachineConfigurationHandler instance.
 	*/
@@ -8424,6 +8460,24 @@ public:
 	* @return Image loader instance.
 	*/
 	virtual IImageLoader * CreateImageLoader() = 0;
+
+	/**
+	* IUIEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	virtual IVideoStream * CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) = 0;
+
+	/**
+	* IUIEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	virtual IVideoStream * FindVideoStream(const std::string & sStreamUUID) = 0;
 
 	/**
 	* IUIEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
