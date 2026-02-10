@@ -877,6 +877,11 @@ export default class AMCApplication extends Common.AMCObject {
         return this.API.baseURL + '/ui/download/' + uuid;
     }
 
+    getStreamURL(uuid) {
+        let streamBase = this.API.baseURL.replace(/\/api$/, '');
+        return streamBase + '/stream/' + uuid;
+    }
+
     triggerUIEvent(eventname, senderuuid, eventValues, executionCallback) {
 
         this.axiosPostRequest("/ui/event", {

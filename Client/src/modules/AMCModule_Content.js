@@ -44,6 +44,7 @@ import AMCApplicationItem_Content_Paragraph from "./AMCModule_ContentItem_Paragr
 import AMCApplicationItem_Content_ParameterList from "./AMCModule_ContentItem_ParameterList.js"
 import AMCApplicationItem_Content_Upload from "./AMCModule_ContentItem_Upload.js"
 import AMCApplicationItem_Content_ConfigurationList from "./AMCModule_ContentItem_ConfigurationList.js"
+import AMCApplicationItem_Content_VideoStream from "./AMCModule_ContentItem_VideoStream.js"
 
 
 
@@ -102,6 +103,9 @@ export default class AMCApplicationModule_Content extends Common.AMCApplicationM
 
 			if (itemJSON.type === "configurationlist") 
 				item = new AMCApplicationItem_Content_ConfigurationList (this, itemJSON);
+
+			if (itemJSON.type === "videostream") 
+				item = new AMCApplicationItem_Content_VideoStream (this, itemJSON);
 			
 			if (item) {
 				this.items.push (item);
