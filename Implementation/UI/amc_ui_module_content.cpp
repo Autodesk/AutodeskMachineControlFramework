@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem_upload.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
 #include "amc_ui_module_contentitem_configurationlist.hpp"
+#include "amc_ui_module_contentitem_videostream.hpp"
 
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
@@ -118,6 +119,8 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, const std::string&
 			addItem(CUIModule_ContentParameterList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
 		if (sChildName == "configurationlist")
 			addItem(CUIModule_ContentConfigurationList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "videostream")
+			addItem(CUIModule_ContentVideoStream::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
 
 
 
