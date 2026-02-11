@@ -263,6 +263,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERPOWERMAPPING 1158 /** Invalid laser power mapping. */
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOWATTS 1159 /** Could not convert laser power to watts. */
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOPERCENT 1160 /** Could not convert laser power to percent. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE 1161 /** Invalid defocus correction table. */
+#define LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED 1162 /** Defocus correction by power is not enabled. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -438,6 +440,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERPOWERMAPPING: return "Invalid laser power mapping.";
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOWATTS: return "Could not convert laser power to watts.";
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOPERCENT: return "Could not convert laser power to percent.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE: return "Invalid defocus correction table.";
+    case LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED: return "Defocus correction by power is not enabled.";
     default: return "unknown error";
   }
 }
@@ -590,6 +594,11 @@ namespace LibMCDriver_ScanLab {
       LibMCDriver_ScanLab_double m_PowerOutputInWatts;
   } sLaserCalibrationPoint;
   
+  typedef struct sDefocusCorrectionPoint {
+      LibMCDriver_ScanLab_double m_PowerInWatts;
+      LibMCDriver_ScanLab_double m_DefocusOffsetInMM;
+  } sDefocusCorrectionPoint;
+  
   typedef struct sMicroVector {
       LibMCDriver_ScanLab_double m_X;
       LibMCDriver_ScanLab_double m_Y;
@@ -631,6 +640,7 @@ typedef LibMCDriver_ScanLab::sPoint2D sLibMCDriver_ScanLabPoint2D;
 typedef LibMCDriver_ScanLab::sOIEMeasurementTagData sLibMCDriver_ScanLabOIEMeasurementTagData;
 typedef LibMCDriver_ScanLab::sHatch2D sLibMCDriver_ScanLabHatch2D;
 typedef LibMCDriver_ScanLab::sLaserCalibrationPoint sLibMCDriver_ScanLabLaserCalibrationPoint;
+typedef LibMCDriver_ScanLab::sDefocusCorrectionPoint sLibMCDriver_ScanLabDefocusCorrectionPoint;
 typedef LibMCDriver_ScanLab::sMicroVector sLibMCDriver_ScanLabMicroVector;
 typedef LibMCDriver_ScanLab::SpatialPowerModulationCallback LibMCDriver_ScanLabSpatialPowerModulationCallback;
 

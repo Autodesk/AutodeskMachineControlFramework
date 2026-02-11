@@ -2152,6 +2152,54 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_mappowerwattstopercent(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserPowerInWatts, LibMCDriver_ScanLab_double * pLaserPowerInPercent);
 
 /**
+* Sets a piecewise linear defocus correction table that maps laser power (in watts) to a defocus offset (in mm). This compensates for focus shift caused by thermal lensing at different power levels. The correction is automatically added to the Z defocus value during marking operations.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[in] pCalibrationPointsBuffer - DefocusCorrectionPoint buffer of Defocus correction points that map laser power to defocus offset. Power values MUST be non-negative and strictly increasing in the array. Array MUST NOT be empty.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setpiecewiselineardefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer);
+
+/**
+* Disables the defocus correction by laser power. After calling this, no power-dependent defocus adjustment will be applied.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disabledefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns whether defocus correction by laser power is currently enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pIsEnabled - True if defocus correction by power is enabled.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_defocuscorrectionbypowerisenabled(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pIsEnabled);
+
+/**
+* Returns the current defocus correction table. Fails if defocus correction is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[out] pCalibrationPointsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pCalibrationPointsBuffer - DefocusCorrectionPoint  buffer of Defocus Correction Points
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getdefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext, const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer);
+
+/**
+* Looks up the defocus correction offset for a given laser power. Fails if defocus correction is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dLaserPowerInWatts - Laser Power in Watts
+* @param[out] pDefocusOffsetInMM - Defocus offset in millimeters
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_mapdefocuscorrectionfrompower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserPowerInWatts, LibMCDriver_ScanLab_double * pDefocusOffsetInMM);
+
+/**
 * Enables a spatial laser power modulation via callback.
 *
 * @param[in] pRTCContext - RTCContext instance.

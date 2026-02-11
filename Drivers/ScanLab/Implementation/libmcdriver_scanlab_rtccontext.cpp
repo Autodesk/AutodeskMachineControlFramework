@@ -297,6 +297,124 @@ void CRTCPowerMapping::buildAndValidateMappings(const std::map<double, double>& 
 	}
 }
 
+/*************************************************************************************************************************
+ Class definition of CRTCDefocusCorrectionByPower
+**************************************************************************************************************************/
+
+CRTCDefocusCorrectionByPower::CRTCDefocusCorrectionByPower()
+	: m_dEpsilon(1.0e-6)
+{
+}
+
+CRTCDefocusCorrectionByPower::~CRTCDefocusCorrectionByPower()
+{
+}
+
+void CRTCDefocusCorrectionByPower::setDefocusCorrectionTable(const std::map<double, double>& defocusByPowerMap)
+{
+	if (defocusByPowerMap.empty())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE,
+			"defocus correction table must not be empty");
+
+	// Build knot table sorted by power (std::map is already sorted by key)
+	std::vector<sDefocusKnot> table;
+	table.reserve(defocusByPowerMap.size());
+
+	for (const auto& kv : defocusByPowerMap) {
+		double dPowerInWatts = kv.first;
+		double dDefocusInMM = kv.second;
+
+		if (dPowerInWatts < 0.0)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE,
+				"defocus correction power value must be non-negative: " + std::to_string(dPowerInWatts));
+
+		table.push_back({ dPowerInWatts, dDefocusInMM });
+	}
+
+	// Validate strict monotonicity of power values (x)
+	for (size_t i = 1; i < table.size(); ++i) {
+		if (!(table[i - 1].x < table[i].x - m_dEpsilon)) {
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE,
+				"duplicate or non-increasing power value in defocus correction table at " + std::to_string(table[i].x) + " W");
+		}
+	}
+
+	m_DefocusTable = std::move(table);
+}
+
+bool CRTCDefocusCorrectionByPower::mapPowerToDefocusOffset(double dLaserPowerInWatts, double& dDefocusOffsetInMM)
+{
+	if (m_DefocusTable.empty()) {
+		dDefocusOffsetInMM = 0.0;
+		return false;
+	}
+
+	if (m_DefocusTable.size() == 1) {
+		dDefocusOffsetInMM = m_DefocusTable.front().y;
+		return true;
+	}
+
+	return interpolate(m_DefocusTable, dLaserPowerInWatts, dDefocusOffsetInMM);
+}
+
+size_t CRTCDefocusCorrectionByPower::getTableSize()
+{
+	return m_DefocusTable.size();
+}
+
+const std::vector<CRTCDefocusCorrectionByPower::sDefocusKnot>& CRTCDefocusCorrectionByPower::getTable()
+{
+	return m_DefocusTable;
+}
+
+bool CRTCDefocusCorrectionByPower::interpolate(const std::vector<sDefocusKnot>& pts, double x, double& y)
+{
+	if (pts.size() < 2) {
+		y = 0.0;
+		return false;
+	}
+
+	// Below domain -> clamp to first value
+	if (x < pts.front().x) {
+		y = pts.front().y;
+		return false;
+	}
+	// Above domain -> clamp to last value
+	if (x > pts.back().x) {
+		y = pts.back().y;
+		return false;
+	}
+
+	// Find first knot with x_k >= x
+	auto it = std::lower_bound(pts.begin(), pts.end(), x,
+		[](const sDefocusKnot& k, double xv) { return k.x < xv; });
+
+	// Exact hit?
+	if (nearlyEqual(it->x, x, m_dEpsilon)) {
+		y = it->y;
+		return true;
+	}
+
+	const sDefocusKnot& hi = *it;
+	const sDefocusKnot& lo = *(it - 1);
+
+	const double dx = hi.x - lo.x;
+	if (dx <= 0.0) {
+		y = lo.y;
+		return true;
+	}
+
+	const double t = (x - lo.x) / dx;
+	y = lo.y + t * (hi.y - lo.y);
+	return true;
+}
+
+bool CRTCDefocusCorrectionByPower::nearlyEqual(double a, double b, double eps)
+{
+	return std::abs(a - b) <= eps * std::max({ 1.0, std::abs(a), std::abs(b) });
+}
+
+
 CRTCContextOwnerData::CRTCContextOwnerData()
 	: m_nAttributeFilterValue (0), m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled)
 {
@@ -1030,8 +1148,16 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	bool bOIEControlFlag = (nOIEPIDControlIndex != 0);
 	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, bOIEControlFlag);
 
-	// Z Plane
-	double defocusZ = round(fZValue * m_dZCorrectionFactor * m_dDefocusFactor);
+	// Z Plane - apply optional defocus correction based on laser power
+	double dEffectiveZValue = (double)fZValue;
+	if (m_pDefocusCorrectionByPower != nullptr) {
+		double dPowerInWatts = 0.0;
+		m_pPowerMapping->mapLaserPowerFromPercentToWatts((double)fPower, dPowerInWatts);
+		double dDefocusOffset = 0.0;
+		m_pDefocusCorrectionByPower->mapPowerToDefocusOffset(dPowerInWatts, dDefocusOffset);
+		dEffectiveZValue += dDefocusOffset;
+	}
+	double defocusZ = round(dEffectiveZValue * m_dZCorrectionFactor * m_dDefocusFactor);
 	int intDefocusZ = (int)defocusZ;
 	m_pScanLabSDK->n_set_defocus_list (m_CardNo, intDefocusZ);
 
@@ -1065,8 +1191,16 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 	bool bOIEControlFlag = (nOIEPIDControlIndex != 0);
 	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, bOIEControlFlag);
 
-	// Z Plane
-	double defocusZ = round(fZValue * m_dZCorrectionFactor * m_dDefocusFactor);
+	// Z Plane - apply optional defocus correction based on laser power
+	double dEffectiveZValue = (double)fZValue;
+	if (m_pDefocusCorrectionByPower != nullptr) {
+		double dPowerInWatts = 0.0;
+		m_pPowerMapping->mapLaserPowerFromPercentToWatts((double)fPower, dPowerInWatts);
+		double dDefocusOffset = 0.0;
+		m_pDefocusCorrectionByPower->mapPowerToDefocusOffset(dPowerInWatts, dDefocusOffset);
+		dEffectiveZValue += dDefocusOffset;
+	}
+	double defocusZ = round(dEffectiveZValue * m_dZCorrectionFactor * m_dDefocusFactor);
 	int intDefocusZ = (int)defocusZ;
 	m_pScanLabSDK->n_set_defocus_list(m_CardNo, intDefocusZ);
 
@@ -1269,6 +1403,67 @@ LibMCDriver_ScanLab_double CRTCContext::MapPowerWattsToPercent(const LibMCDriver
 
 }
 
+
+void CRTCContext::SetPiecewiseLinearDefocusCorrectionByPower(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint* pCalibrationPointsBuffer)
+{
+	if (nCalibrationPointsBufferSize == 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE, "defocus correction table must not be empty");
+
+	if (pCalibrationPointsBuffer == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	std::map<double, double> defocusMap;
+	for (uint64_t i = 0; i < nCalibrationPointsBufferSize; i++) {
+		const auto& point = pCalibrationPointsBuffer[i];
+		defocusMap.insert(std::make_pair(point.m_PowerInWatts, point.m_DefocusOffsetInMM));
+	}
+
+	auto pDefocusCorrection = std::make_shared<CRTCDefocusCorrectionByPower>();
+	pDefocusCorrection->setDefocusCorrectionTable(defocusMap);
+	m_pDefocusCorrectionByPower = pDefocusCorrection;
+}
+
+void CRTCContext::DisableDefocusCorrectionByPower()
+{
+	m_pDefocusCorrectionByPower = nullptr;
+}
+
+bool CRTCContext::DefocusCorrectionByPowerIsEnabled()
+{
+	return (m_pDefocusCorrectionByPower != nullptr);
+}
+
+void CRTCContext::GetDefocusCorrectionByPower(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint* pCalibrationPointsBuffer)
+{
+	if (m_pDefocusCorrectionByPower == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED, "defocus correction by power is not enabled");
+
+	auto& table = m_pDefocusCorrectionByPower->getTable();
+	size_t nTableSize = table.size();
+
+	if (pCalibrationPointsNeededCount != nullptr)
+		*pCalibrationPointsNeededCount = (LibMCDriver_ScanLab_uint64)nTableSize;
+
+	if (pCalibrationPointsBuffer != nullptr) {
+		if (nCalibrationPointsBufferSize < nTableSize)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BUFFERTOOSMALL);
+
+		for (size_t i = 0; i < nTableSize; i++) {
+			pCalibrationPointsBuffer[i].m_PowerInWatts = table[i].x;
+			pCalibrationPointsBuffer[i].m_DefocusOffsetInMM = table[i].y;
+		}
+	}
+}
+
+LibMCDriver_ScanLab_double CRTCContext::MapDefocusCorrectionFromPower(const LibMCDriver_ScanLab_double dLaserPowerInWatts)
+{
+	if (m_pDefocusCorrectionByPower == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED, "defocus correction by power is not enabled");
+
+	double dDefocusOffset = 0.0;
+	m_pDefocusCorrectionByPower->mapPowerToDefocusOffset(dLaserPowerInWatts, dDefocusOffset);
+	return dDefocusOffset;
+}
 
 void CRTCContext::EnableSpatialLaserPowerModulation(const LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData)
 {
