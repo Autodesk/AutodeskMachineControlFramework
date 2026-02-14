@@ -10065,6 +10065,27 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetIntegerParameterPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetBoolParameterPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
 /**
+* checks if a parameter group exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[out] pGroupExists - returns true if the parameter group exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasParameterGroupPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, bool * pGroupExists);
+
+/**
+* checks if a parameter exists within a given group.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pParameterExists - returns true if the parameter exists in the given group.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasParameterPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pParameterExists);
+
+/**
 * retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -12574,6 +12595,8 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetDoubleParameterPtr m_StateEnvironment_GetDoubleParameter;
 	PLibMCEnvStateEnvironment_GetIntegerParameterPtr m_StateEnvironment_GetIntegerParameter;
 	PLibMCEnvStateEnvironment_GetBoolParameterPtr m_StateEnvironment_GetBoolParameter;
+	PLibMCEnvStateEnvironment_HasParameterGroupPtr m_StateEnvironment_HasParameterGroup;
+	PLibMCEnvStateEnvironment_HasParameterPtr m_StateEnvironment_HasParameter;
 	PLibMCEnvStateEnvironment_HasResourceDataPtr m_StateEnvironment_HasResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceStringPtr m_StateEnvironment_LoadResourceString;

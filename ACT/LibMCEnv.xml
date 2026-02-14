@@ -5483,6 +5483,17 @@
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="bool" pass="return" description="Value to set" />
 		</method>
+
+		<method name="HasParameterGroup" description="checks if a parameter group exists.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="GroupExists" type="bool" pass="return" description="returns true if the parameter group exists." />
+		</method>
+
+		<method name="HasParameter" description="checks if a parameter exists within a given group.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="ParameterExists" type="bool" pass="return" description="returns true if the parameter exists in the given group." />
+		</method>
 		
 		<method name="HasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />

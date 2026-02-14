@@ -503,6 +503,20 @@ bool CStateEnvironment::GetBoolParameter(const std::string& sParameterGroup, con
 	return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
+bool CStateEnvironment::HasParameterGroup(const std::string& sParameterGroup)
+{
+	return m_pParameterHandler->hasGroup(sParameterGroup);
+}
+
+bool CStateEnvironment::HasParameter(const std::string& sParameterGroup, const std::string& sParameterName)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		return false;
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	return pGroup->hasParameter(sParameterName);
+}
+
 bool CStateEnvironment::HasResourceData(const std::string& sIdentifier)
 {
 	auto pUIHandler = m_pSystemState->uiHandler();

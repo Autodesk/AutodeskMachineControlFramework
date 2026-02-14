@@ -7799,6 +7799,21 @@ public:
 	virtual bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
+	* IStateEnvironment::HasParameterGroup - checks if a parameter group exists.
+	* @param[in] sParameterGroup - Parameter Group
+	* @return returns true if the parameter group exists.
+	*/
+	virtual bool HasParameterGroup(const std::string & sParameterGroup) = 0;
+
+	/**
+	* IStateEnvironment::HasParameter - checks if a parameter exists within a given group.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return returns true if the parameter exists in the given group.
+	*/
+	virtual bool HasParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
 	* IStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
 	* @return returns true if the resource exists in the machine resource package.

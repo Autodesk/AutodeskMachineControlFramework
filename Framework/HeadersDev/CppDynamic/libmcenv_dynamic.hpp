@@ -3592,6 +3592,8 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline bool HasParameterGroup(const std::string & sParameterGroup);
+	inline bool HasParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool HasResourceData(const std::string & sIdentifier);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 	inline std::string LoadResourceString(const std::string & sResourceName);
@@ -4785,6 +4787,8 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_HasParameterGroup = nullptr;
+		pWrapperTable->m_StateEnvironment_HasParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_HasResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
@@ -13399,6 +13403,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasParameterGroup = (PLibMCEnvStateEnvironment_HasParameterGroupPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasparametergroup");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasParameterGroup = (PLibMCEnvStateEnvironment_HasParameterGroupPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasparametergroup");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasParameterGroup == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasParameter = (PLibMCEnvStateEnvironment_HasParameterPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasparameter");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasParameter = (PLibMCEnvStateEnvironment_HasParameterPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
@@ -18484,6 +18506,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getboolparameter", (void**)&(pWrapperTable->m_StateEnvironment_GetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasparametergroup", (void**)&(pWrapperTable->m_StateEnvironment_HasParameterGroup));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasParameterGroup == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasparameter", (void**)&(pWrapperTable->m_StateEnvironment_HasParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_HasResourceData));
@@ -31977,6 +32007,33 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetBoolParameter(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* CStateEnvironment::HasParameterGroup - checks if a parameter group exists.
+	* @param[in] sParameterGroup - Parameter Group
+	* @return returns true if the parameter group exists.
+	*/
+	bool CStateEnvironment::HasParameterGroup(const std::string & sParameterGroup)
+	{
+		bool resultGroupExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasParameterGroup(m_pHandle, sParameterGroup.c_str(), &resultGroupExists));
+		
+		return resultGroupExists;
+	}
+	
+	/**
+	* CStateEnvironment::HasParameter - checks if a parameter exists within a given group.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return returns true if the parameter exists in the given group.
+	*/
+	bool CStateEnvironment::HasParameter(const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		bool resultParameterExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasParameter(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultParameterExists));
+		
+		return resultParameterExists;
 	}
 	
 	/**
