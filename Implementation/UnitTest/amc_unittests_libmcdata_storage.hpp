@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 #include "libmcdata_dynamic.hpp"
 
+#include <chrono>
 #include <cstdint>
 #include <string>
 #include <vector>

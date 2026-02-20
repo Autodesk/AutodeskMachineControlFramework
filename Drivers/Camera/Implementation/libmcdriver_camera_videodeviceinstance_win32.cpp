@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CVideoDevice
 #include "libmcdriver_camera_interfaceexception.hpp"
 
 #include <array>
+#include <chrono>
 #include <iostream>
 #include <cmath>
 #include <algorithm>
