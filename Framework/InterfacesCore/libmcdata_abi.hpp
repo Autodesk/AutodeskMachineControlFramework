@@ -2645,6 +2645,47 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_setuserpasswordbyuuid(
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getactiveusers(LibMCData_LoginHandler pLoginHandler, LibMCData_UserList * pActiveUsers);
 
+/**
+* Creates a new login session record in the database.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] nCreateTimeInMicroseconds - Creation timestamp in microseconds since epoch.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_createloginsession(LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, LibMCData_uint64 nCreateTimeInMicroseconds);
+
+/**
+* Updates a login session after successful authentication.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] pUserUUID - UUID of the authenticated user.
+* @param[in] pUsername - Login name of the authenticated user.
+* @param[in] pUserRole - Role of the authenticated user.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_updateloginsessionauthentication(LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, const char * pUserUUID, const char * pUsername, const char * pUserRole);
+
+/**
+* Updates the last activity timestamp of a login session.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] nTimestampInMicroseconds - New activity timestamp in microseconds since epoch.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_updateloginsessionactivity(LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, LibMCData_uint64 nTimestampInMicroseconds);
+
+/**
+* Marks a login session as inactive.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_deactivateloginsession(LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID);
+
 /*************************************************************************************************************************
  Class definition for PersistencyHandler
 **************************************************************************************************************************/

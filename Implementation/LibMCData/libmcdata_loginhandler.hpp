@@ -115,6 +115,14 @@ public:
 
 	IUserList* GetActiveUsers() override;
 
+	void CreateLoginSession(const std::string & sSessionUUID, const LibMCData_uint64 nCreateTimeInMicroseconds) override;
+
+	void UpdateLoginSessionAuthentication(const std::string & sSessionUUID, const std::string & sUserUUID, const std::string & sUsername, const std::string & sUserRole) override;
+
+	void UpdateLoginSessionActivity(const std::string & sSessionUUID, const LibMCData_uint64 nTimestampInMicroseconds) override;
+
+	void DeactivateLoginSession(const std::string & sSessionUUID) override;
+
 
 };
 

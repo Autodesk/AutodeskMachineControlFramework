@@ -2238,6 +2238,35 @@ public:
 	*/
 	virtual IUserList * GetActiveUsers() = 0;
 
+	/**
+	* ILoginHandler::CreateLoginSession - Creates a new login session record in the database.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] nCreateTimeInMicroseconds - Creation timestamp in microseconds since epoch.
+	*/
+	virtual void CreateLoginSession(const std::string & sSessionUUID, const LibMCData_uint64 nCreateTimeInMicroseconds) = 0;
+
+	/**
+	* ILoginHandler::UpdateLoginSessionAuthentication - Updates a login session after successful authentication.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] sUserUUID - UUID of the authenticated user.
+	* @param[in] sUsername - Login name of the authenticated user.
+	* @param[in] sUserRole - Role of the authenticated user.
+	*/
+	virtual void UpdateLoginSessionAuthentication(const std::string & sSessionUUID, const std::string & sUserUUID, const std::string & sUsername, const std::string & sUserRole) = 0;
+
+	/**
+	* ILoginHandler::UpdateLoginSessionActivity - Updates the last activity timestamp of a login session.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] nTimestampInMicroseconds - New activity timestamp in microseconds since epoch.
+	*/
+	virtual void UpdateLoginSessionActivity(const std::string & sSessionUUID, const LibMCData_uint64 nTimestampInMicroseconds) = 0;
+
+	/**
+	* ILoginHandler::DeactivateLoginSession - Marks a login session as inactive.
+	* @param[in] sSessionUUID - UUID of the session.
+	*/
+	virtual void DeactivateLoginSession(const std::string & sSessionUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<ILoginHandler> PILoginHandler;

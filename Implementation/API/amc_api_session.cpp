@@ -42,18 +42,19 @@ using namespace AMC;
 
 #define APISESSION_RANDOMKEYITERATIONS 16
 
-CAPISession::CAPISession(PUIFrontendDefinition pFrontendDefinition)
+CAPISession::CAPISession(PUIFrontendDefinition pFrontendDefinition, AMCCommon::PChrono pGlobalChrono)
 	: m_sUUID(AMCCommon::CUtils::createUUID()),
 	m_sKey(AMCCommon::CUtils::calculateRandomSHA256String(APISESSION_RANDOMKEYITERATIONS)),
 	m_sToken(AMCCommon::CUtils::calculateRandomSHA256String(APISESSION_RANDOMKEYITERATIONS)),
 	m_sUserName(""),
 	m_sUserUUID(AMCCommon::CUtils::createUUID ()),
-	m_bAuthenticated(false)
+	m_bAuthenticated(false),
+	m_nLastActivityMicroseconds(0)
 {
+	if (pGlobalChrono)
+		m_nLastActivityMicroseconds = pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
 	m_pFrontendState = std::make_shared<CUIFrontendState>(pFrontendDefinition);
-	
-	
 }
 	
 			
@@ -116,6 +117,20 @@ bool CAPISession::isAuthenticated()
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	return m_bAuthenticated;
+}
+
+uint64_t CAPISession::getLastActivityMicroseconds()
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	return m_nLastActivityMicroseconds;
+}
+
+void CAPISession::updateLastActivity(uint64_t nNowMicroseconds)
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	m_nLastActivityMicroseconds = nNowMicroseconds;
 }
 
 std::string CAPISession::getToken()

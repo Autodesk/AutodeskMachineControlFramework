@@ -1850,6 +1850,27 @@
 			<param name="ActiveUsers" type="class" class="UserList" pass="return" description="New instance of active users." />
 		</method>
 
+		<method name="CreateLoginSession" description="Creates a new login session record in the database.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the session." />
+			<param name="CreateTimeInMicroseconds" type="uint64" pass="in" description="Creation timestamp in microseconds since epoch." />
+		</method>
+
+		<method name="UpdateLoginSessionAuthentication" description="Updates a login session after successful authentication.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the session." />
+			<param name="UserUUID" type="string" pass="in" description="UUID of the authenticated user." />
+			<param name="Username" type="string" pass="in" description="Login name of the authenticated user." />
+			<param name="UserRole" type="string" pass="in" description="Role of the authenticated user." />
+		</method>
+
+		<method name="UpdateLoginSessionActivity" description="Updates the last activity timestamp of a login session.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the session." />
+			<param name="TimestampInMicroseconds" type="uint64" pass="in" description="New activity timestamp in microseconds since epoch." />
+		</method>
+
+		<method name="DeactivateLoginSession" description="Marks a login session as inactive.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the session." />
+		</method>
+
 	</class>
 
 

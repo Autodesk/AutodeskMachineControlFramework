@@ -98,7 +98,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, m_pStateJournal, "./testoutput", pGlobalChrono);
 
     // Create API Handlers for data model requests
-    m_pAPI = std::make_shared<AMC::CAPI>();
+    m_pAPI = std::make_shared<AMC::CAPI>(pGlobalChrono, pDataModel);
     CAPIFactory factory (m_pAPI, m_pSystemState, m_InstanceList);
 
     // Create API Documentation handler

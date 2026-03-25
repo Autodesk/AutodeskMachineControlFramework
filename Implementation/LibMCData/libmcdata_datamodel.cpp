@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amcdata_databasemigrator_persistentparameters.hpp"
 #include "amcdata_databasemigrator_journals.hpp"
 #include "amcdata_databasemigrator_machineconfiguration.hpp"
+#include "amcdata_databasemigrator_sessions.hpp"
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
@@ -137,6 +138,7 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_PersistentParameters>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Journals>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_MachineConfiguration>());
+    migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Sessions>());
     migrator.migrateDatabaseSchemas(m_pSQLHandler, m_sInstallationUUID, m_sInstallationSecret);
 
     // Store Database type after successful initialisation

@@ -541,5 +541,69 @@ IUserList* CLoginHandler::GetActiveUsers()
     return userList.release();
 }
 
+void CLoginHandler::CreateLoginSession(const std::string & sSessionUUID, const LibMCData_uint64 nCreateTimeInMicroseconds)
+{
+    if (sSessionUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "invalid param: sSessionUUID");
+
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSessionUUID);
+
+    std::string sQuery = "INSERT INTO login_sessions (uuid, createtime, lastactivity, authenticated, active) VALUES (?, ?, ?, 0, 1)";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sNormalizedUUID);
+    pStatement->setInt64(2, nCreateTimeInMicroseconds);
+    pStatement->setInt64(3, nCreateTimeInMicroseconds);
+    pStatement->execute();
+}
+
+void CLoginHandler::UpdateLoginSessionAuthentication(const std::string & sSessionUUID, const std::string & sUserUUID, const std::string & sUsername, const std::string & sUserRole)
+{
+    if (sSessionUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "invalid param: sSessionUUID");
+
+    std::string sNormalizedSessionUUID = AMCCommon::CUtils::normalizeUUIDString(sSessionUUID);
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+
+    std::string sQuery = "UPDATE login_sessions SET authenticated=1, useruuid=?, username=?, userrole=?, updateuuid=? WHERE uuid=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sUserUUID);
+    pStatement->setString(2, sUsername);
+    pStatement->setString(3, sUserRole);
+    pStatement->setString(4, sUpdateUUID);
+    pStatement->setString(5, sNormalizedSessionUUID);
+    pStatement->execute();
+}
+
+void CLoginHandler::UpdateLoginSessionActivity(const std::string & sSessionUUID, const LibMCData_uint64 nTimestampInMicroseconds)
+{
+    if (sSessionUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "invalid param: sSessionUUID");
+
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSessionUUID);
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+
+    std::string sQuery = "UPDATE login_sessions SET lastactivity=?, updateuuid=? WHERE uuid=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setInt64(1, nTimestampInMicroseconds);
+    pStatement->setString(2, sUpdateUUID);
+    pStatement->setString(3, sNormalizedUUID);
+    pStatement->execute();
+}
+
+void CLoginHandler::DeactivateLoginSession(const std::string & sSessionUUID)
+{
+    if (sSessionUUID.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "invalid param: sSessionUUID");
+
+    std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSessionUUID);
+    std::string sUpdateUUID = AMCCommon::CUtils::createUUID();
+
+    std::string sQuery = "UPDATE login_sessions SET active=0, updateuuid=? WHERE uuid=? AND active=1";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sUpdateUUID);
+    pStatement->setString(2, sNormalizedUUID);
+    pStatement->execute();
+}
+
 
 

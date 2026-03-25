@@ -1942,6 +1942,10 @@ public:
 	inline void SetUserDescriptionByUUID(const std::string & sUUID, const std::string & sDescription);
 	inline void SetUserPasswordByUUID(const std::string & sUUID, const std::string & sSalt, const std::string & sHashedPassword);
 	inline PUserList GetActiveUsers();
+	inline void CreateLoginSession(const std::string & sSessionUUID, const LibMCData_uint64 nCreateTimeInMicroseconds);
+	inline void UpdateLoginSessionAuthentication(const std::string & sSessionUUID, const std::string & sUserUUID, const std::string & sUsername, const std::string & sUserRole);
+	inline void UpdateLoginSessionActivity(const std::string & sSessionUUID, const LibMCData_uint64 nTimestampInMicroseconds);
+	inline void DeactivateLoginSession(const std::string & sSessionUUID);
 };
 	
 /*************************************************************************************************************************
@@ -2486,6 +2490,10 @@ public:
 		pWrapperTable->m_LoginHandler_SetUserDescriptionByUUID = nullptr;
 		pWrapperTable->m_LoginHandler_SetUserPasswordByUUID = nullptr;
 		pWrapperTable->m_LoginHandler_GetActiveUsers = nullptr;
+		pWrapperTable->m_LoginHandler_CreateLoginSession = nullptr;
+		pWrapperTable->m_LoginHandler_UpdateLoginSessionAuthentication = nullptr;
+		pWrapperTable->m_LoginHandler_UpdateLoginSessionActivity = nullptr;
+		pWrapperTable->m_LoginHandler_DeactivateLoginSession = nullptr;
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = nullptr;
 		pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails = nullptr;
 		pWrapperTable->m_PersistencyHandler_DeletePersistentParameter = nullptr;
@@ -4661,6 +4669,42 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_CreateLoginSession = (PLibMCDataLoginHandler_CreateLoginSessionPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_createloginsession");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_CreateLoginSession = (PLibMCDataLoginHandler_CreateLoginSessionPtr) dlsym(hLibrary, "libmcdata_loginhandler_createloginsession");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_CreateLoginSession == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_UpdateLoginSessionAuthentication = (PLibMCDataLoginHandler_UpdateLoginSessionAuthenticationPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_updateloginsessionauthentication");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_UpdateLoginSessionAuthentication = (PLibMCDataLoginHandler_UpdateLoginSessionAuthenticationPtr) dlsym(hLibrary, "libmcdata_loginhandler_updateloginsessionauthentication");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_UpdateLoginSessionAuthentication == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_UpdateLoginSessionActivity = (PLibMCDataLoginHandler_UpdateLoginSessionActivityPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_updateloginsessionactivity");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_UpdateLoginSessionActivity = (PLibMCDataLoginHandler_UpdateLoginSessionActivityPtr) dlsym(hLibrary, "libmcdata_loginhandler_updateloginsessionactivity");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_UpdateLoginSessionActivity == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LoginHandler_DeactivateLoginSession = (PLibMCDataLoginHandler_DeactivateLoginSessionPtr) GetProcAddress(hLibrary, "libmcdata_loginhandler_deactivateloginsession");
+		#else // _WIN32
+		pWrapperTable->m_LoginHandler_DeactivateLoginSession = (PLibMCDataLoginHandler_DeactivateLoginSessionPtr) dlsym(hLibrary, "libmcdata_loginhandler_deactivateloginsession");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LoginHandler_DeactivateLoginSession == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = (PLibMCDataPersistencyHandler_HasPersistentParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_haspersistentparameter");
 		#else // _WIN32
 		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = (PLibMCDataPersistencyHandler_HasPersistentParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_haspersistentparameter");
@@ -6311,6 +6355,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_loginhandler_getactiveusers", (void**)&(pWrapperTable->m_LoginHandler_GetActiveUsers));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetActiveUsers == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_createloginsession", (void**)&(pWrapperTable->m_LoginHandler_CreateLoginSession));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_CreateLoginSession == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_updateloginsessionauthentication", (void**)&(pWrapperTable->m_LoginHandler_UpdateLoginSessionAuthentication));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_UpdateLoginSessionAuthentication == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_updateloginsessionactivity", (void**)&(pWrapperTable->m_LoginHandler_UpdateLoginSessionActivity));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_UpdateLoginSessionActivity == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_loginhandler_deactivateloginsession", (void**)&(pWrapperTable->m_LoginHandler_DeactivateLoginSession));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_DeactivateLoginSession == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_persistencyhandler_haspersistentparameter", (void**)&(pWrapperTable->m_PersistencyHandler_HasPersistentParameter));
@@ -9984,6 +10044,47 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CUserList>(m_pWrapper, hActiveUsers);
+	}
+	
+	/**
+	* CLoginHandler::CreateLoginSession - Creates a new login session record in the database.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] nCreateTimeInMicroseconds - Creation timestamp in microseconds since epoch.
+	*/
+	void CLoginHandler::CreateLoginSession(const std::string & sSessionUUID, const LibMCData_uint64 nCreateTimeInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_CreateLoginSession(m_pHandle, sSessionUUID.c_str(), nCreateTimeInMicroseconds));
+	}
+	
+	/**
+	* CLoginHandler::UpdateLoginSessionAuthentication - Updates a login session after successful authentication.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] sUserUUID - UUID of the authenticated user.
+	* @param[in] sUsername - Login name of the authenticated user.
+	* @param[in] sUserRole - Role of the authenticated user.
+	*/
+	void CLoginHandler::UpdateLoginSessionAuthentication(const std::string & sSessionUUID, const std::string & sUserUUID, const std::string & sUsername, const std::string & sUserRole)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_UpdateLoginSessionAuthentication(m_pHandle, sSessionUUID.c_str(), sUserUUID.c_str(), sUsername.c_str(), sUserRole.c_str()));
+	}
+	
+	/**
+	* CLoginHandler::UpdateLoginSessionActivity - Updates the last activity timestamp of a login session.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] nTimestampInMicroseconds - New activity timestamp in microseconds since epoch.
+	*/
+	void CLoginHandler::UpdateLoginSessionActivity(const std::string & sSessionUUID, const LibMCData_uint64 nTimestampInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_UpdateLoginSessionActivity(m_pHandle, sSessionUUID.c_str(), nTimestampInMicroseconds));
+	}
+	
+	/**
+	* CLoginHandler::DeactivateLoginSession - Marks a login session as inactive.
+	* @param[in] sSessionUUID - UUID of the session.
+	*/
+	void CLoginHandler::DeactivateLoginSession(const std::string & sSessionUUID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_LoginHandler_DeactivateLoginSession(m_pHandle, sSessionUUID.c_str()));
 	}
 	
 	/**

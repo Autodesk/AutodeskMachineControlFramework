@@ -45,6 +45,7 @@ namespace AMC {
 		atUnknown = 0,
 		atNewSession = 1,
 		atAuthorize = 2,
+		atLogout = 3,
 	};
 
 	class CAPIHandler_Auth : public CAPIHandler {
@@ -62,6 +63,7 @@ namespace AMC {
 
 		void handleNewSessionRequest(const uint8_t* pBodyData, const size_t nBodyDataSize, CJSONWriter& writer, PAPIAuth pAuth);
 		void handleAuthorizeRequest(const uint8_t* pBodyData, const size_t nBodyDataSize, CJSONWriter& writer, std::string & sSessionUUID, PAPIAuth pAuth);
+		void handleLogoutRequest(CJSONWriter& writer, std::string & sSessionUUID, PAPIAuth pAuth);
 
 	public:
 

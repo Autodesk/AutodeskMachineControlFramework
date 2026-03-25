@@ -46,10 +46,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
+#define APISESSIONHANDLER_DEFAULT_AUTH_TIMEOUT_SECONDS 1800
+#define APISESSIONHANDLER_DEFAULT_UNAUTH_TIMEOUT_SECONDS 300
 
-CAPISessionHandler::CAPISessionHandler()
+CAPISessionHandler::CAPISessionHandler(AMCCommon::PChrono pGlobalChrono, LibMCData::PDataModel pDataModel)
+	: m_pGlobalChrono(pGlobalChrono),
+	m_pDataModel(pDataModel),
+	m_nSessionTimeoutSeconds(APISESSIONHANDLER_DEFAULT_AUTH_TIMEOUT_SECONDS),
+	m_nUnauthSessionTimeoutSeconds(APISESSIONHANDLER_DEFAULT_UNAUTH_TIMEOUT_SECONDS)
 {
-
 }
 
 CAPISessionHandler::~CAPISessionHandler()
@@ -75,6 +80,21 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 		if (pSession->getToken () != sToken)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONTOKEN);
 
+		uint64_t nNow = 0;
+		if (m_pGlobalChrono)
+			nNow = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+		pSession->updateLastActivity(nNow);
+
+		if (m_pDataModel) {
+			try {
+				auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+				pLoginHandler->UpdateLoginSessionActivity(sSessionUUID, nNow);
+			}
+			catch (...) {
+			}
+		}
+
 		return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->createUserInformation(), pSession->isAuthenticated(), pSession->getFrontendState ());
 	}
 	else {
@@ -86,10 +106,21 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 
 PAPIAuth CAPISessionHandler::createNewAuthenticationSession(PUIFrontendDefinition pFrontendDefinition)
 {
-	auto pSession = std::make_shared<CAPISession>(pFrontendDefinition);
+	cleanupExpiredSessions();
+
+	auto pSession = std::make_shared<CAPISession>(pFrontendDefinition, m_pGlobalChrono);
 
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 	m_SessionMap.insert (std::make_pair (pSession->getUUID(), pSession));
+
+	if (m_pDataModel) {
+		try {
+			auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+			pLoginHandler->CreateLoginSession(pSession->getUUID(), pSession->getLastActivityMicroseconds());
+		}
+		catch (...) {
+		}
+	}
 
 	return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->createUserInformation(), pSession->isAuthenticated(), pSession->getFrontendState());
 
@@ -116,6 +147,11 @@ void CAPISessionHandler::authorizeSession(const std::string& sSessionUUID, const
 	auto pSession = iIterator->second;
 	pSession->authorizeSessionByPassword(sSaltedPassword, sClientKey);
 
+	uint64_t nNow = 0;
+	if (m_pGlobalChrono)
+		nNow = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+	pSession->updateLastActivity(nNow);
+
 }
 
 
@@ -128,6 +164,15 @@ void CAPISessionHandler::setUserDetailsForSession(const std::string& sSessionUUI
 
 	auto pSession = iIterator->second;
 	pSession->setUserDetails(sUsername, sHashedPassword, sUserUUID, sUserDescription, sUserRoleIdentifier, sUserLanguageIdentifier);
+
+	if (m_pDataModel) {
+		try {
+			auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+			pLoginHandler->UpdateLoginSessionAuthentication(sSessionUUID, sUserUUID, sUsername, sUserRoleIdentifier);
+		}
+		catch (...) {
+		}
+	}
 }
 
 void CAPISessionHandler::getUserDetailsForSession(const std::string& sSessionUUID, std::string& sUsername, std::string& sUserUUID, std::string& sUserDescription, std::string& sUserRoleIdentifier, std::string& sUserLanguageIdentifier)
@@ -168,4 +213,69 @@ bool CAPISessionHandler::sessionIsAuthenticated(const std::string& sSessionUUID)
 	auto pSession = iIterator->second;
 	return pSession->isAuthenticated();
 
+}
+
+void CAPISessionHandler::setSessionTimeout(uint64_t nAuthSeconds, uint64_t nUnauthSeconds)
+{
+	m_nSessionTimeoutSeconds = nAuthSeconds;
+	m_nUnauthSessionTimeoutSeconds = nUnauthSeconds;
+}
+
+void CAPISessionHandler::deactivateSession(const std::string& sSessionUUID)
+{
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto iIterator = m_SessionMap.find(sSessionUUID);
+		if (iIterator != m_SessionMap.end())
+			m_SessionMap.erase(iIterator);
+	}
+
+	if (m_pDataModel) {
+		try {
+			auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+			pLoginHandler->DeactivateLoginSession(sSessionUUID);
+		}
+		catch (...) {
+		}
+	}
+}
+
+void CAPISessionHandler::cleanupExpiredSessions()
+{
+	if (!m_pGlobalChrono)
+		return;
+
+	uint64_t nNow = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+	uint64_t nAuthTimeoutMicroseconds = m_nSessionTimeoutSeconds * 1000000ULL;
+	uint64_t nUnauthTimeoutMicroseconds = m_nUnauthSessionTimeoutSeconds * 1000000ULL;
+
+	std::vector<std::string> expiredUUIDs;
+
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		for (auto iIterator = m_SessionMap.begin(); iIterator != m_SessionMap.end(); ) {
+			auto pSession = iIterator->second;
+			uint64_t nLastActivity = pSession->getLastActivityMicroseconds();
+			uint64_t nTimeout = pSession->isAuthenticated() ? nAuthTimeoutMicroseconds : nUnauthTimeoutMicroseconds;
+
+			if (nLastActivity > 0 && nNow > nLastActivity && (nNow - nLastActivity) > nTimeout) {
+				expiredUUIDs.push_back(iIterator->first);
+				iIterator = m_SessionMap.erase(iIterator);
+			}
+			else {
+				++iIterator;
+			}
+		}
+	}
+
+	if (m_pDataModel && !expiredUUIDs.empty()) {
+		try {
+			auto pLoginHandler = m_pDataModel->CreateLoginHandler();
+			for (const auto& sUUID : expiredUUIDs) {
+				pLoginHandler->DeactivateLoginSession(sUUID);
+			}
+		}
+		catch (...) {
+		}
+	}
 }

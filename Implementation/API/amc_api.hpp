@@ -35,6 +35,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "header_protection.hpp"
 #include "amc_api_types.hpp"
 
+#include <memory>
+
+namespace LibMCData {
+	class CDataModel;
+	typedef std::shared_ptr<CDataModel> PDataModel;
+}
+
+namespace AMCCommon {
+	class CChrono;
+	typedef std::shared_ptr<CChrono> PChrono;
+}
 
 namespace AMC {
 
@@ -58,7 +69,7 @@ namespace AMC {
 			
 	public:
 
-		CAPI();
+		CAPI(AMCCommon::PChrono pGlobalChrono, LibMCData::PDataModel pDataModel);
 
 		virtual ~CAPI();
 								

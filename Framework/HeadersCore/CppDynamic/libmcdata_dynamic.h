@@ -2632,6 +2632,47 @@ typedef LibMCDataResult (*PLibMCDataLoginHandler_SetUserPasswordByUUIDPtr) (LibM
 */
 typedef LibMCDataResult (*PLibMCDataLoginHandler_GetActiveUsersPtr) (LibMCData_LoginHandler pLoginHandler, LibMCData_UserList * pActiveUsers);
 
+/**
+* Creates a new login session record in the database.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] nCreateTimeInMicroseconds - Creation timestamp in microseconds since epoch.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_CreateLoginSessionPtr) (LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, LibMCData_uint64 nCreateTimeInMicroseconds);
+
+/**
+* Updates a login session after successful authentication.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] pUserUUID - UUID of the authenticated user.
+* @param[in] pUsername - Login name of the authenticated user.
+* @param[in] pUserRole - Role of the authenticated user.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_UpdateLoginSessionAuthenticationPtr) (LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, const char * pUserUUID, const char * pUsername, const char * pUserRole);
+
+/**
+* Updates the last activity timestamp of a login session.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] nTimestampInMicroseconds - New activity timestamp in microseconds since epoch.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_UpdateLoginSessionActivityPtr) (LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, LibMCData_uint64 nTimestampInMicroseconds);
+
+/**
+* Marks a login session as inactive.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_DeactivateLoginSessionPtr) (LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID);
+
 /*************************************************************************************************************************
  Class definition for PersistencyHandler
 **************************************************************************************************************************/
@@ -3734,6 +3775,10 @@ typedef struct {
 	PLibMCDataLoginHandler_SetUserDescriptionByUUIDPtr m_LoginHandler_SetUserDescriptionByUUID;
 	PLibMCDataLoginHandler_SetUserPasswordByUUIDPtr m_LoginHandler_SetUserPasswordByUUID;
 	PLibMCDataLoginHandler_GetActiveUsersPtr m_LoginHandler_GetActiveUsers;
+	PLibMCDataLoginHandler_CreateLoginSessionPtr m_LoginHandler_CreateLoginSession;
+	PLibMCDataLoginHandler_UpdateLoginSessionAuthenticationPtr m_LoginHandler_UpdateLoginSessionAuthentication;
+	PLibMCDataLoginHandler_UpdateLoginSessionActivityPtr m_LoginHandler_UpdateLoginSessionActivity;
+	PLibMCDataLoginHandler_DeactivateLoginSessionPtr m_LoginHandler_DeactivateLoginSession;
 	PLibMCDataPersistencyHandler_HasPersistentParameterPtr m_PersistencyHandler_HasPersistentParameter;
 	PLibMCDataPersistencyHandler_GetPersistentParameterDetailsPtr m_PersistencyHandler_GetPersistentParameterDetails;
 	PLibMCDataPersistencyHandler_DeletePersistentParameterPtr m_PersistencyHandler_DeletePersistentParameter;
