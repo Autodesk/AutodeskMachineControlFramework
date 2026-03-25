@@ -232,8 +232,14 @@ export default class AMCApplication extends Common.AMCObject {
     }
 
     performLogout() {
+        const sessionUUID = this.API.sessionUUID;
+        if (sessionUUID) {
+            this.axiosPostRequest("/auth/" + sessionUUID + "/logout", {})
+                .catch(() => {});
+        }
         this.API.authToken = Common.nullToken ();
         this.API.unsuccessfulUpdateCounter = 0;
+		this.API.sessionUUID = "";
 		this.API.userUUID = Common.nullUUID ();
 		this.API.userLogin = "";
 		this.API.userDescription = "";
@@ -259,6 +265,8 @@ export default class AMCApplication extends Common.AMCObject {
             let saltedpassword = asmCrypto.SHA256.hex(loginsalt + userPassword);
             let clientkeyhash = asmCrypto.SHA256.hex(clientkey + saltedpassword);
             let sessionkeyhash = asmCrypto.SHA256.hex(sessionkey + clientkeyhash);
+
+            this.API.sessionUUID = sessionuuid;
 
             this.axiosPostRequest("/auth/" + sessionuuid, {
                 "clientkey": clientkey,
