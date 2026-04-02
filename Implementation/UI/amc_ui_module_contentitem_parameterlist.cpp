@@ -32,9 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_CONSTANTS
 
 #include "amc_ui_module_contentitem_parameterlist.hpp"
+#include "amc_ui_expression.hpp"
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
@@ -301,5 +303,63 @@ void CUIModule_ContentParameterList::loadFromXML(const pugi::xml_node& xmlNode)
 		addEntry(sInstanceName, sGroupName, sParameterName);
 
 	}
+}
+
+std::string CUIModule_ContentParameterList::getItemType()
+{
+	return "parameterlist";
+}
+
+void CUIModule_ContentParameterList::registerFrontendAttributes()
+{
+	CUIExpression loadingTextExpr;
+	loadingTextExpr.setFixedValue(m_sLoadingText);
+	registerItemStringAttribute("loadingtext", loadingTextExpr);
+	CUIExpression entriesExpr;
+	entriesExpr.setFixedValue(std::to_string(m_nEntriesPerPage));
+	registerItemIntegerAttribute("entriesperpage", entriesExpr);
+}
+
+
+void CUIModule_ContentParameterList::frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (m_pItemModuleStore == nullptr)
+		return;
+
+	std::string sItemType = m_pItemModuleStore->getModuleType();
+	if (sItemType.empty())
+		return;
+
+	itemObject.addString("moduletype", sItemType);
+	itemObject.addString("uuid", m_pItemModuleStore->getUUID());
+
+	CJSONWriterObject attributesObject(writer);
+	pFrontendState->writeModuleAttributesToJSON(writer, attributesObject, m_pItemModuleStore.get(), pStateMachineData);
+
+	// Embed live parameter entries directly into the v2 attributes so the
+	// frontend can consume them without a separate polling call.
+	CJSONWriterArray entryArray(writer);
+
+	for (auto entry : m_List) {
+		auto pParameterHandler = m_pStateMachineData->getParameterHandler(entry->getInstance());
+		auto sParameterHandlerDescription = pParameterHandler->getDescription();
+
+		if (entry->isFullInstance()) {
+			uint32_t nGroupCount = pParameterHandler->getGroupCount();
+			for (uint32_t nGroupIndex = 0; nGroupIndex < nGroupCount; nGroupIndex++) {
+				auto pParameterGroup = pParameterHandler->getGroup(nGroupIndex);
+				addParameterGroupToJSON(writer, pParameterGroup, entryArray, true, "", sParameterHandlerDescription);
+			}
+		}
+		else {
+			auto pParameterGroup = pParameterHandler->findGroup(entry->getParameterGroup(), true);
+			addParameterGroupToJSON(writer, pParameterGroup, entryArray, entry->isFullGroup(), entry->getParameter(), sParameterHandlerDescription);
+		}
+	}
+
+	attributesObject.addArray("entries", entryArray);
+	itemObject.addObject("attributes", attributesObject);
 }
 

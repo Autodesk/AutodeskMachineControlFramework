@@ -359,6 +359,19 @@ int main(int argc, char* argv[])
 		std::string sCoreClient = buildNode.attribute("coreclient").as_string();
 		addRequiredEntryFromPackage(entries, entryNames, sPackageDir, sCoreClient, "core client");
 
+		auto coreClientsNode = buildNode.child("coreclients");
+		if (!coreClientsNode.empty()) {
+			for (auto coreClientNode : coreClientsNode.children("coreclient")) {
+				std::string sClientName = coreClientNode.attribute("name").as_string();
+				std::string sClientFile = coreClientNode.attribute("file").as_string();
+				if (sClientName.empty())
+					throw std::runtime_error("missing core client name");
+				if (sClientFile.empty())
+					throw std::runtime_error("missing core client file for: " + sClientName);
+				addRequiredEntryFromPackage(entries, entryNames, sPackageDir, sClientFile, "core client " + sClientName);
+			}
+		}
+
 		std::string sAPIDocs = buildNode.attribute("apidocs").as_string();
 		addEntryFromPackage(entries, entryNames, sPackageDir, sAPIDocs, "api docs", 0);
 

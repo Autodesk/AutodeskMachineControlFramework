@@ -41,6 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Libraries/PugiXML/pugixml.hpp"
 #include "amc_jsonwriter.hpp"
 #include "amc_ui_module_item.hpp"
+#include "amc_ui_frontenddefinition.hpp"
+#include "amc_ui_frontendstate.hpp"
+#include "amc_ui_expression.hpp"
 
 namespace AMC {
 
@@ -58,6 +61,8 @@ namespace AMC {
 	
 		std::string m_sUUID;
 		std::string m_sItemName;
+
+		PUIFrontendDefinitionModuleStore m_pItemModuleStore;
 		
 	public:
 
@@ -73,6 +78,18 @@ namespace AMC {
 		virtual std::list <std::string> getReferenceUUIDs();
 
 		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
+
+		/////////////////////////////////////////////////////////////////////////////////////
+		// New UI Frontend System
+		/////////////////////////////////////////////////////////////////////////////////////
+
+		void initFrontendModuleStore(CUIFrontendDefinition* pFrontendDefinition);
+		virtual void registerFrontendAttributes();
+		virtual std::string getItemType();
+		void frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData);
+
+		PUIFrontendDefinitionAttribute registerItemStringAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemNumberAttribute(const std::string& sName, const CUIExpression& expression);
 
 	};
 

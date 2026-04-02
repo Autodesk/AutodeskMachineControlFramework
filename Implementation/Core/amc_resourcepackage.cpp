@@ -134,6 +134,21 @@ namespace AMC {
 		}
 
 
+		uint64_t getFileSize(const std::string& sName)
+		{
+			auto iIter = m_ZIPEntries.find(sName);
+			if (iIter == m_ZIPEntries.end())
+				throw ELibMCCustomException(LIBMC_ERROR_ZIPENTRYNOTFOUND, m_sZIPDebugName + "|" + sName);
+
+			zip_stat_t Stat;
+			int32_t nResult = zip_stat_index(m_ZIParchive, iIter->second, ZIP_FL_UNCHANGED, &Stat);
+			if (nResult != 0)
+				throw ELibMCCustomException(LIBMC_ERROR_COULDNOTSTATZIPENTRY, m_sZIPDebugName + "|" + sName);
+
+			return Stat.size;
+		}
+
+
 		void unzipFileEx(const std::string& sName, uint8_t* pBuffer, const uint64_t nBufferSize)
 		{
 			auto iIter = m_ZIPEntries.find(sName);
@@ -251,7 +266,7 @@ namespace AMC {
 	
 
 
-	CResourcePackageEntry::CResourcePackageEntry(const std::string& sUUID,  const std::string& sName, const std::string& sFileName, const std::string& sExtension, const std::string& sContentType, uint32_t nSize)
+	CResourcePackageEntry::CResourcePackageEntry(const std::string& sUUID,  const std::string& sName, const std::string& sFileName, const std::string& sExtension, const std::string& sContentType, uint32_t nSize, const std::string& sSHA256)
 			: m_sName (sName), m_sFileName (sFileName), m_sContentType (sContentType), m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sExtension (sExtension)
 	{
 
@@ -261,6 +276,10 @@ namespace AMC {
 		if (!m_sExtension.empty()) {
 			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(m_sExtension))
 				throw ELibMCCustomException(LIBMC_ERROR_INVALIDPACKAGEENTRYEXTENSION, m_sExtension);
+		}
+
+		if (!sSHA256.empty()) {
+			m_sSHA256 = AMCCommon::CUtils::normalizeSHA256String(sSHA256);
 		}
 	}
 
@@ -292,6 +311,11 @@ namespace AMC {
 	std::string CResourcePackageEntry::getExtension()
 	{
 		return m_sExtension;
+	}
+
+	std::string CResourcePackageEntry::getSHA256()
+	{
+		return m_sSHA256;
 	}
 
 
@@ -378,14 +402,21 @@ namespace AMC {
 			if (contenttypeAttrib.empty())
 				throw ELibMCCustomException(LIBMC_ERROR_MISSINGRESOURCECONTENTTYPE, m_sPackageDebugName);
 
+			auto sha256Attrib = entryNode.attribute("sha256");
+
 			std::string sName = AMCCommon::CUtils::toLowerString (nameAttrib.as_string());
 			std::string sFileName = fileNameAttrib.as_string();
 			std::string sContentType = contenttypeAttrib.as_string();
 			std::string sUUID = AMCCommon::CUtils::createUUID();
 			std::string sExtension = extensionAttrib.as_string();
+			std::string sSHA256 = sha256Attrib.as_string();
 			uint32_t nSize = sizeAttrib.as_uint();
 
-			auto pEntry = std::make_shared <CResourcePackageEntry> (sUUID, sName, sFileName, sExtension, sContentType, nSize);
+			uint64_t nActualSize = m_pResourcePackageZIP->getFileSize(sFileName);
+			if (nActualSize != (uint64_t)nSize)
+				throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYSIZISMISMATCH, m_sPackageDebugName + "/" + sName);
+
+			auto pEntry = std::make_shared <CResourcePackageEntry> (sUUID, sName, sFileName, sExtension, sContentType, nSize, sSHA256);
 			m_Entries.push_back(pEntry);
 			m_NameMap.insert(std::make_pair(sName, pEntry));
 			m_UUIDMap.insert(std::make_pair (sUUID, pEntry));
@@ -457,6 +488,13 @@ namespace AMC {
 		auto sFileName = iIter->second->getFileName ();
 		m_pResourcePackageZIP->unzipFile(sFileName, Buffer);
 
+		std::string sExpectedSHA256 = iIter->second->getSHA256();
+		if (!sExpectedSHA256.empty()) {
+			std::string sActualSHA256 = AMCCommon::CUtils::calculateSHA256FromData(Buffer.data(), Buffer.size());
+			if (sActualSHA256 != sExpectedSHA256)
+				throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH, m_sPackageDebugName + "/" + sName);
+		}
+
 	}
 
 	std::string CResourcePackage::readEntryUTF8String(const std::string& sName)
@@ -471,6 +509,13 @@ namespace AMC {
 		auto sFileName = iIter->second->getFileName();
 		std::vector <uint8_t> Buffer;
 		m_pResourcePackageZIP->unzipFile(sFileName, Buffer);
+
+		std::string sExpectedSHA256 = iIter->second->getSHA256();
+		if (!sExpectedSHA256.empty()) {
+			std::string sActualSHA256 = AMCCommon::CUtils::calculateSHA256FromData(Buffer.data(), Buffer.size());
+			if (sActualSHA256 != sExpectedSHA256)
+				throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH, m_sPackageDebugName + "/" + sName);
+		}
 
 		Buffer.push_back(0);
 
@@ -493,6 +538,14 @@ namespace AMC {
 
 		auto sFileName = iIter->second->getFileName();
 		m_pResourcePackageZIP->unzipFileEx(sFileName, pBuffer, nBufferSize);
+
+		std::string sExpectedSHA256 = iIter->second->getSHA256();
+		if (!sExpectedSHA256.empty()) {
+			uint32_t nEntrySize = iIter->second->getSize();
+			std::string sActualSHA256 = AMCCommon::CUtils::calculateSHA256FromData(pBuffer, nEntrySize);
+			if (sActualSHA256 != sExpectedSHA256)
+				throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH, m_sPackageDebugName + "/" + sName);
+		}
 
 	}
 

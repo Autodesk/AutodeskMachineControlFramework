@@ -107,6 +107,11 @@ void CUIModuleCustomItem_Properties::registerProperty(const std::string& sName, 
 	m_Properties.insert (std::make_pair (sName, valueExpression));
 }
 
+const std::map<std::string, CUIExpression>& CUIModuleCustomItem_Properties::getProperties() const
+{
+	return m_Properties;
+}
+
 
 std::string CUIModuleCustomItem_Properties::findElementPathByUUID(const std::string& sUUID)
 {

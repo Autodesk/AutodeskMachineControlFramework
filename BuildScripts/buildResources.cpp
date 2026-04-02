@@ -99,6 +99,7 @@ struct SResourceEntry
 	uint64_t m_nSize;
 	std::string m_sContentType;
 	std::string m_sSourcePath;
+	std::string m_sSHA256;
 };
 
 class CStringXMLWriter : public pugi::xml_writer
@@ -188,8 +189,9 @@ int main(int argc, char* argv[])
 			resourceEntry.m_sContentType = getContentTypeFromExtension(sExtension);
 			resourceEntry.m_nSize = entry.file_size();
 			resourceEntry.m_sSourcePath = entry.path().u8string();
+			resourceEntry.m_sSHA256 = AMCCommon::CUtils::calculateSHA256FromFile(resourceEntry.m_sSourcePath);
 
-			std::cout << "Adding " << resourceEntry.m_sSourcePath << " as " << resourceEntry.m_sResourceName << " (" << resourceEntry.m_nSize << " bytes)" << std::endl;
+			std::cout << "Adding " << resourceEntry.m_sSourcePath << " as " << resourceEntry.m_sResourceName << " (" << resourceEntry.m_nSize << " bytes, sha256=" << resourceEntry.m_sSHA256 << ")" << std::endl;
 
 			entries.push_back(resourceEntry);
 		}
@@ -204,6 +206,7 @@ int main(int argc, char* argv[])
 			entryNode.append_attribute("filename").set_value(resourceEntry.m_sFileName.c_str());
 			entryNode.append_attribute("size").set_value(std::to_string(resourceEntry.m_nSize).c_str());
 			entryNode.append_attribute("contenttype").set_value(resourceEntry.m_sContentType.c_str());
+			entryNode.append_attribute("sha256").set_value(resourceEntry.m_sSHA256.c_str());
 		}
 
 		CStringXMLWriter xmlWriter;

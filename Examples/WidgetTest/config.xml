@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02" xmlns:i18n="http://schemas.autodesk.com/amc/internationalization/2023/08" client="svelte">
+	<services threadcount="32"/>
+
+	<internationalization default="en">
+		<language identifier="en" name="English" resource="language_english" />
+	</internationalization>
+
+	<accesscontrol>
+		<defaultusers>
+			<defaultuser name="test" salt="f735faa2ac49ac0a68dbf41d9cd57cfb426ef91eb19726afd8f075ac625cccb2" passwordhash="556080937385d8eb21ea0e8707d7cf3e94b79ed234596ba8a2ac98da1ff4fee3" description="Widget test user" />
+		</defaultusers>
+
+		<permissions>
+			<permission identifier="permission_view_builds" displayname="View Builds" description="Can view build files." />
+			<permission identifier="permission_acknowledgealerts" displayname="Acknowledge Alerts" description="Can acknowledge alerts." />
+		</permissions>
+
+		<roles default="administrator">
+			<role identifier="administrator" displayname="Administrator" description="Full access">
+				<permission identifier="permission_view_builds" />
+				<permission identifier="permission_acknowledgealerts" />
+			</role>
+		</roles>
+	</accesscontrol>
+
+	<alerts>
+		<alert identifier="alert_info"     level="message"       description="Informational test alert - all systems nominal." />
+		<alert identifier="alert_warning"  level="warning"       description="Warning test alert - temperature approaching threshold." acknowledgepermission="permission_acknowledgealerts" />
+		<alert identifier="alert_error"    level="criticalerror" description="Error test alert - sensor communication lost." acknowledgepermission="permission_acknowledgealerts" />
+		<alert identifier="alert_critical" level="fatalerror"    description="Critical test alert - emergency stop activated." acknowledgepermission="permission_acknowledgealerts" />
+	</alerts>
+
+	<!-- ================================================================================================ -->
+	<!-- Main state machine                                                                                -->
+	<!-- ================================================================================================ -->
+
+	<statemachine name="main" description="Widget Test System" initstate="init" failedstate="fatalerror" library="plugin_main">
+
+		<parametergroup name="sensors" description="Sensor Readings">
+			<parameter name="temperature"    description="Chamber Temperature (C)"  default="22.5"    type="double"/>
+			<parameter name="pressure"       description="Chamber Pressure (hPa)"   default="1013.25" type="double"/>
+			<parameter name="humidity"       description="Relative Humidity (%)"    default="45.0"    type="double"/>
+			<parameter name="laser_power"    description="Laser Power (W)"          default="0.0"     type="double"/>
+			<parameter name="gas_flow"       description="Gas Flow Rate (l/min)"    default="0.0"     type="double"/>
+			<parameter name="build_progress" description="Build Progress (%)"       default="0.0"     type="double"/>
+		</parametergroup>
+
+		<parametergroup name="counters" description="System Counters">
+			<parameter name="cycle_count"   description="State Machine Cycles"  default="0"   type="int"/>
+			<parameter name="layer_current" description="Current Layer"         default="0"   type="int"/>
+			<parameter name="layer_total"   description="Total Layers"          default="250" type="int"/>
+			<parameter name="error_count"   description="Error Count"           default="0"   type="int"/>
+			<parameter name="warning_count" description="Warning Count"         default="0"   type="int"/>
+		</parametergroup>
+
+		<parametergroup name="display" description="Display Values">
+			<parameter name="machine_state"  description="Current Machine State"  default="Initializing" type="string"/>
+			<parameter name="status_message" description="Status Message"         default="Starting up" type="string"/>
+			<parameter name="last_event"     description="Last UI Event"          default="none" type="string"/>
+			<parameter name="formatted_time" description="Uptime"                 default="00:00:00" type="string"/>
+		</parametergroup>
+
+		<parametergroup name="flags" description="System Flags">
+			<parameter name="is_running"  description="Process Running"  default="0" type="bool"/>
+			<parameter name="is_paused"   description="Process Paused"   default="0" type="bool"/>
+			<parameter name="heater_on"   description="Heater Active"    default="0" type="bool"/>
+			<parameter name="gas_flowing" description="Gas Flow Active"  default="0" type="bool"/>
+			<parameter name="door_locked" description="Door Locked"      default="1" type="bool"/>
+		</parametergroup>
+
+		<signaldefinition name="signal_start">
+		</signaldefinition>
+
+		<signaldefinition name="signal_stop">
+		</signaldefinition>
+
+		<signaldefinition name="signal_pause">
+		</signaldefinition>
+
+		<signaldefinition name="signal_resume">
+		</signaldefinition>
+
+		<signaldefinition name="signal_toggleheater">
+		</signaldefinition>
+
+		<signaldefinition name="signal_togglegasflow">
+		</signaldefinition>
+
+		<signaldefinition name="signal_resetcounters">
+		</signaldefinition>
+
+		<state name="init" repeatdelay="10">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="idle" repeatdelay="500">
+			<outstate target="idle"/>
+			<outstate target="running"/>
+		</state>
+
+		<state name="running" repeatdelay="200">
+			<outstate target="running"/>
+			<outstate target="idle"/>
+			<outstate target="paused"/>
+		</state>
+
+		<state name="paused" repeatdelay="500">
+			<outstate target="running"/>
+			<outstate target="idle"/>
+			<outstate target="paused"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="5000">
+			<outstate target="init"/>
+		</state>
+
+	</statemachine>
+
+
+	<!-- ================================================================================================ -->
+	<!-- User Interface                                                                                    -->
+	<!-- ================================================================================================ -->
+
+	<userinterface appname="AMCF Widget Test" copyright="2026 Autodesk Inc." mainpage="dashboard" library="plugin_userinterface">
+
+		<logo resource="ui_logo" aspectratio="3.0"/>
+
+		<login
+			backgroundresource="login_background"
+			loginstyle="classic"
+			loginsubtitle="Widget Test Environment"
+			welcomemessage="Widget Test Suite - verifying all AMCF UI components end to end."
+		/>
+
+		<colors>
+			<color name="primary" red="0.784" green="0.063" blue="0.180"/>
+			<color name="secondary" red="0.235" green="0.235" blue="0.235"/>
+			<color name="accent" red="0.784" green="0.063" blue="0.180"/>
+			<color name="error" red="0.867" green="0.133" blue="0.133"/>
+		</colors>
+
+		<!-- ================================ DIALOGS ================================ -->
+
+		<dialog name="testdialog">
+			<content name="dlgcontent" title="Test Dialog">
+
+				<statusbanner name="dlg_banner" severity="warning" title="Dialog Test" description="This is a modal dialog with a status banner, separator, and action buttons."/>
+
+				<separator name="dlg_sep1" orientation="horizontal" variant="light"/>
+
+				<paragraph text="Confirm or dismiss this dialog to test event handling." variant="subtext"/>
+
+				<separator name="dlg_sep2" orientation="horizontal" variant="light"/>
+
+				<buttongroup distribution="equal">
+					<button caption="Confirm" event="dismissdialog"/>
+					<button caption="Dismiss" event="dismissdialog"/>
+				</buttongroup>
+
+			</content>
+		</dialog>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 1: Dashboard                                                   -->
+		<!-- Tests: paragraph, statusbanner, separator, form, image, grid        -->
+		<!-- ================================================================== -->
+
+		<page name="dashboard">
+			<grid name="dashgrid">
+				<column width="5" unit="free"/>
+				<column width="3" unit="free"/>
+
+				<row height="1" unit="free"/>
+				<row height="100" unit="pt"/>
+
+				<content name="overview" cardstyle="elevated" title="System Overview" columnstart="1" rowstart="1" columnend="1" rowend="1">
+
+					<statusbanner name="dash_status" severity="ok" title="System Ready" description="All subsystems operational. Widget test environment is running."/>
+
+					<separator name="sep_dash_1" orientation="horizontal" variant="light"/>
+
+					<paragraph text="Machine State" variant="h2"/>
+
+					<form name="stateform">
+						<edit name="f_state"   caption="State"          sync:value="main.$state" readonly="1"/>
+						<edit name="f_status"  caption="Status"         sync:value="main.display.status_message" readonly="1"/>
+						<edit name="f_uptime"  caption="Uptime"         sync:value="main.display.formatted_time" readonly="1"/>
+						<edit name="f_cycles"  caption="Cycle Count"    sync:value="main.counters.cycle_count" readonly="1"/>
+					</form>
+
+					<separator name="sep_dash_2" orientation="horizontal" variant="light"/>
+
+					<paragraph text="Sensor Readings" variant="h2"/>
+
+					<form name="sensorform">
+						<edit name="f_temp"     caption="Temperature (C)"  sync:value="main.sensors.temperature" readonly="1"/>
+						<edit name="f_pressure" caption="Pressure (hPa)"   sync:value="main.sensors.pressure" readonly="1"/>
+						<edit name="f_humidity" caption="Humidity (%)"      sync:value="main.sensors.humidity" readonly="1"/>
+						<edit name="f_laser"    caption="Laser Power (W)"   sync:value="main.sensors.laser_power" readonly="1"/>
+						<edit name="f_gas"      caption="Gas Flow (l/min)"  sync:value="main.sensors.gas_flow" readonly="1"/>
+					</form>
+
+				</content>
+
+				<content name="machineimg" title="Machine View" columnstart="2" rowstart="1" columnend="2" rowend="1">
+					<image resource="ui_logo" aspectratio="2" maxheight="80"/>
+
+					<separator name="sep_dash_3" orientation="horizontal" variant="light"/>
+
+					<paragraph text="Quick Controls" variant="h2"/>
+
+					<form name="controlform">
+						<switch name="sw_heater"  caption="Heater" sync:value="main.flags.heater_on" changeevent="toggleheater"/>
+						<switch name="sw_gasflow" caption="Gas Flow" sync:value="main.flags.gas_flowing" changeevent="togglegasflow"/>
+					</form>
+
+					<separator name="sep_dash_4" orientation="horizontal" variant="light"/>
+
+					<paragraph text="Process Control" variant="h2"/>
+
+					<buttongroup distribution="equal">
+						<button caption="Start Process" event="startprocess"/>
+						<button caption="Stop Process" event="stopprocess"/>
+					</buttongroup>
+
+					<buttongroup distribution="equal">
+						<button caption="Pause" event="pauseprocess"/>
+						<button caption="Resume" event="resumeprocess"/>
+					</buttongroup>
+
+				</content>
+
+				<content name="dashquick" columnstart="1" rowstart="2" columnend="2" rowend="2" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Reset Counters" event="resetcounters"/>
+						<button caption="Create Alert" event="createtestalert"/>
+						<button caption="Generate Logs" event="generatelogmessages"/>
+						<button caption="Update Chart" event="updatechartdata"/>
+					</buttongroup>
+				</content>
+			</grid>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 2: Typography &amp; Layout                                     -->
+		<!-- Tests: paragraph (all variants), separator (h/v, light/dark)        -->
+		<!-- ================================================================== -->
+
+		<page name="typography">
+			<content name="typopanel" cardstyle="elevated" title="Typography &amp; Separators" scrollbars="1">
+
+				<paragraph text="Heading 1 - Main Title" variant="h1"/>
+				<paragraph text="Heading 2 - Section Title" variant="h2"/>
+				<paragraph text="Heading 3 - Subsection" variant="h3"/>
+
+				<separator name="sep_typo_1" orientation="horizontal" variant="light"/>
+
+				<paragraph text="Body Text - This is standard body paragraph text used for descriptions and content areas. It should be legible at normal reading distance with proper line height and spacing." variant="body"/>
+
+				<separator name="sep_typo_2" orientation="horizontal" variant="dark"/>
+
+				<paragraph text="Subtext - Used for secondary information, captions, and helper text." variant="subtext"/>
+
+				<separator name="sep_typo_3" orientation="horizontal" variant="light"/>
+
+				<paragraph text="Label - FIELD LABEL STYLE" variant="label"/>
+
+				<separator name="sep_typo_4" orientation="horizontal" variant="dark"/>
+
+				<paragraph text="This section verifies that all paragraph variants render correctly: h1, h2, h3, body, subtext, and label." variant="body"/>
+
+			</content>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 3: Form Fields                                                 -->
+		<!-- Tests: form with edit, switch, memo, combobox, number, slider       -->
+		<!-- ================================================================== -->
+
+		<page name="forms">
+			<grid name="formsgrid">
+				<column width="1" unit="free"/>
+				<column width="1" unit="free"/>
+
+				<row height="1" unit="free"/>
+
+				<content name="formpanel1" cardstyle="elevated" title="Input Fields" columnstart="1" rowstart="1" columnend="1" rowend="1" scrollbars="1">
+
+					<paragraph text="Text &amp; Numeric Inputs" variant="h2"/>
+
+					<form name="testform1" changeevent="formchanged">
+						<edit name="tf_text" caption="Text Input" value="Sample text"/>
+						<edit name="tf_readonly" caption="Read-Only Field" value="Cannot edit" readonly="1"/>
+						<edit name="tf_synced" caption="Synced Field" sync:value="main.display.machine_state" readonly="1"/>
+
+						<separator name="sep_form_1" orientation="horizontal" variant="light"/>
+
+						<memo name="tf_memo" caption="Multi-line Memo" value="Line 1&#10;Line 2&#10;Line 3"/>
+
+						<separator name="sep_form_2" orientation="horizontal" variant="light"/>
+
+						<combobox name="tf_combo" caption="Dropdown Select" value="1">
+							<item text="Option A" value="0"/>
+							<item text="Option B" value="1"/>
+							<item text="Option C" value="2"/>
+							<item text="Option D" value="3"/>
+						</combobox>
+					</form>
+
+				</content>
+
+				<content name="formpanel2" cardstyle="elevated" title="Toggle &amp; Range Fields" columnstart="2" rowstart="1" columnend="2" rowend="1" scrollbars="1">
+
+					<paragraph text="Switches &amp; Sliders" variant="h2"/>
+
+					<form name="testform2" changeevent="formchanged">
+						<switch name="tf_switch1" caption="Enable Feature A" value="1"/>
+						<switch name="tf_switch2" caption="Enable Feature B" value="0"/>
+						<switch name="tf_syncsw" caption="Heater Status" sync:value="main.flags.heater_on" changeevent="toggleheater"/>
+
+						<separator name="sep_form_3" orientation="horizontal" variant="light"/>
+
+						<edit name="tf_number" caption="Layer Count" value="250"/>
+
+						<separator name="sep_form_4" orientation="horizontal" variant="light"/>
+
+						<paragraph text="Synced Values" variant="h2"/>
+
+						<edit name="tf_temp"     caption="Temperature"  sync:value="main.sensors.temperature" readonly="1"/>
+						<edit name="tf_pressure" caption="Pressure"     sync:value="main.sensors.pressure" readonly="1"/>
+						<edit name="tf_progress" caption="Progress (%)" sync:value="main.sensors.build_progress" readonly="1"/>
+					</form>
+
+				</content>
+			</grid>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 4: Buttons &amp; Actions                                       -->
+		<!-- Tests: buttongroup (distributions), button (events, sync:disabled)  -->
+		<!-- ================================================================== -->
+
+		<page name="buttons">
+			<content name="buttonpanel" cardstyle="elevated" title="Buttons &amp; Button Groups" scrollbars="1">
+
+				<paragraph text="Equal Distribution" variant="h2"/>
+
+				<buttongroup distribution="equal">
+					<button caption="Start" event="startprocess"/>
+					<button caption="Stop" event="stopprocess"/>
+					<button caption="Pause" event="pauseprocess"/>
+					<button caption="Resume" event="resumeprocess"/>
+				</buttongroup>
+
+				<separator name="sep_btn_1" orientation="horizontal" variant="light"/>
+
+				<paragraph text="Equal Distribution - 2 Buttons" variant="h2"/>
+
+				<buttongroup distribution="equal">
+					<button caption="Create Alert" event="createtestalert"/>
+					<button caption="Generate Logs" event="generatelogmessages"/>
+				</buttongroup>
+
+				<separator name="sep_btn_2" orientation="horizontal" variant="light"/>
+
+				<paragraph text="Single Button" variant="h2"/>
+
+				<buttongroup distribution="equal">
+					<button caption="Reset All Counters" event="resetcounters"/>
+				</buttongroup>
+
+				<separator name="sep_btn_3" orientation="horizontal" variant="dark"/>
+
+				<paragraph text="Disabled Button (sync:disabled)" variant="h2"/>
+
+				<buttongroup distribution="equal">
+					<button caption="Only When Running" event="stopprocess" sync:disabled="!main.flags.is_running"/>
+					<button caption="Only When Paused" event="resumeprocess" sync:disabled="!main.flags.is_paused"/>
+				</buttongroup>
+
+				<separator name="sep_btn_4" orientation="horizontal" variant="light"/>
+
+				<paragraph text="Dialog Trigger" variant="h2"/>
+
+				<buttongroup distribution="equal">
+					<button caption="Show Test Dialog" event="showdialog"/>
+				</buttongroup>
+
+			</content>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 5: Data Tables                                                 -->
+		<!-- Tests: parameterlist, alertlist                                      -->
+		<!-- ================================================================== -->
+
+		<page name="datatables">
+			<grid name="datagrid">
+				<column width="1" unit="free"/>
+				<column width="1" unit="free"/>
+
+				<row height="1" unit="free"/>
+
+				<content name="paramspanel" cardstyle="elevated" title="Parameter List" columnstart="1" rowstart="1" columnend="1" rowend="1" scrollbars="1">
+
+					<paragraph text="Live system parameters from all parameter groups." variant="subtext"/>
+
+					<separator name="sep_data_1" orientation="horizontal" variant="light"/>
+
+					<parameterlist loadingtext="Loading parameters">
+						<entry statemachine="main" group="sensors"/>
+						<entry statemachine="main" group="counters"/>
+						<entry statemachine="main" group="display"/>
+						<entry statemachine="main" group="flags"/>
+					</parameterlist>
+
+				</content>
+
+				<content name="alertspanel" cardstyle="elevated" title="Alert List" columnstart="2" rowstart="1" columnend="2" rowend="1" scrollbars="1">
+
+					<paragraph text="Active alerts with severity levels and acknowledgement." variant="subtext"/>
+
+					<separator name="sep_data_2" orientation="horizontal" variant="light"/>
+
+					<alertlist name="alerts" loadingtext="Loading alerts" entriesperpage="20"/>
+
+					<separator name="sep_data_3" orientation="horizontal" variant="light"/>
+
+					<paragraph text="Test Actions" variant="label"/>
+
+					<buttongroup distribution="equal">
+						<button caption="Info Alert" event="createtestalert"/>
+						<button caption="Warning Alert" event="createtestalert"/>
+						<button caption="Error Alert" event="createtestalert"/>
+						<button caption="Critical Alert" event="createtestalert"/>
+					</buttongroup>
+
+				</content>
+			</grid>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 6: Build Workflow                                               -->
+		<!-- Tests: upload, buildlist, executionlist, tabs                        -->
+		<!-- ================================================================== -->
+
+		<page name="buildworkflow">
+			<tabs name="buildtabs">
+				<content name="uploadtab" caption="Upload">
+
+					<paragraph text="Upload Test" variant="h2"/>
+					<paragraph text="Upload a 3MF file to test the upload widget with progress indication and drag-and-drop." variant="subtext"/>
+
+					<separator name="sep_bw_1" orientation="horizontal" variant="light"/>
+
+					<upload class="build" caption="Select 3MF files to upload" successevent="onuploadfinished"/>
+
+				</content>
+
+				<content name="buildstab" caption="Build Library">
+
+					<paragraph text="Build Library" variant="h2"/>
+					<paragraph text="Browse uploaded builds with thumbnails, metadata, and action buttons." variant="subtext"/>
+
+					<separator name="sep_bw_2" orientation="horizontal" variant="light"/>
+
+					<buildlist loadingtext="Loading builds" entriesperpage="20" selectevent="onselectbuild">
+						<button name="selectbuild" caption="Select" event="onselectbuild"/>
+					</buildlist>
+
+				</content>
+
+				<content name="exectab" caption="Execution History">
+
+					<paragraph text="Execution History" variant="h2"/>
+					<paragraph text="Past build executions with status badges, timestamps, and duration." variant="subtext"/>
+
+					<separator name="sep_bw_3" orientation="horizontal" variant="light"/>
+
+					<executionlist loadingtext="Loading executions" entriesperpage="20">
+						<button name="details" caption="Details" event=""/>
+					</executionlist>
+
+				</content>
+			</tabs>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 7: Visualization (Charts)                                      -->
+		<!-- Tests: chart                                                         -->
+		<!-- ================================================================== -->
+
+		<page name="visualization">
+			<grid name="vizgrid">
+				<column width="1" unit="free"/>
+
+				<row height="1" unit="free"/>
+				<row height="80" unit="pt"/>
+
+				<content name="chartpanel" cardstyle="elevated" title="Chart Widget" columnstart="1" rowstart="1" columnend="1" rowend="1">
+
+					<paragraph text="Real-time data visualization chart." variant="subtext"/>
+
+					<separator name="sep_viz_1" orientation="horizontal" variant="light"/>
+
+					<chart name="testchart">
+					</chart>
+
+				</content>
+
+				<content name="chartactions" columnstart="1" rowstart="2" columnend="1" rowend="2" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Update Chart Data" event="updatechartdata"/>
+						<button caption="Generate Sine Wave" event="updatechartdata"/>
+					</buttongroup>
+				</content>
+			</grid>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 8: System Logs                                                  -->
+		<!-- Tests: logs                                                           -->
+		<!-- ================================================================== -->
+
+		<page name="systemlogs">
+			<grid name="loggrid">
+				<column width="1" unit="free"/>
+
+				<row height="1" unit="free"/>
+				<row height="80" unit="pt"/>
+
+				<content name="logpanel" cardstyle="elevated" title="System Log Messages" columnstart="1" rowstart="1" columnend="1" rowend="1">
+
+					<logs name="systemlog" caption="Log Messages">
+					</logs>
+
+				</content>
+
+				<content name="logactions" columnstart="1" rowstart="2" columnend="1" rowend="2" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Generate 10 Log Messages" event="generatelogmessages"/>
+						<button caption="Start Process (generates logs)" event="startprocess"/>
+					</buttongroup>
+				</content>
+			</grid>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 9: 3D Scene                                                     -->
+		<!-- Tests: glscene                                                       -->
+		<!-- ================================================================== -->
+
+		<page name="scene3d">
+			<glscene name="glscene_test">
+				<models>
+				</models>
+
+				<lights>
+					<spotlight name="spotlight">
+					</spotlight>
+				</lights>
+
+				<fog>
+				</fog>
+
+				<scene>
+				</scene>
+			</glscene>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 10: Stress &amp; Edge Cases                                    -->
+		<!-- Tests: deeply nested grids, many widgets, scrollbars, empty states   -->
+		<!-- ================================================================== -->
+
+		<page name="stress">
+			<grid name="stressgrid">
+				<column width="1" unit="free"/>
+				<column width="1" unit="free"/>
+				<column width="1" unit="free"/>
+
+				<row height="1" unit="free"/>
+				<row height="1" unit="free"/>
+
+				<content name="stress_params" cardstyle="elevated" title="Parameters (Full List)" columnstart="1" rowstart="1" columnend="1" rowend="1" scrollbars="1">
+					<parameterlist loadingtext="Loading parameters">
+						<entry statemachine="main" group="sensors"/>
+						<entry statemachine="main" group="counters"/>
+						<entry statemachine="main" group="display"/>
+						<entry statemachine="main" group="flags"/>
+					</parameterlist>
+				</content>
+
+				<content name="stress_alerts" cardstyle="elevated" title="Alerts" columnstart="2" rowstart="1" columnend="2" rowend="1" scrollbars="1">
+					<alertlist name="stress_alertlist" loadingtext="Loading alerts" entriesperpage="50"/>
+				</content>
+
+				<content name="stress_logs" cardstyle="elevated" title="Logs (High Volume)" columnstart="3" rowstart="1" columnend="3" rowend="1" scrollbars="1">
+					<logs name="stress_loglist" caption="Log Messages">
+					</logs>
+				</content>
+
+				<content name="stress_form" cardstyle="elevated" title="Large Form" columnstart="1" rowstart="2" columnend="2" rowend="2" scrollbars="1">
+					<form name="stressform">
+						<edit name="sf1" caption="Field 1" value="Value 1"/>
+						<edit name="sf2" caption="Field 2" value="Value 2"/>
+						<edit name="sf3" caption="Field 3" value="Value 3"/>
+						<edit name="sf4" caption="Field 4" value="Value 4"/>
+						<edit name="sf5" caption="Field 5" value="Value 5"/>
+						<switch name="sf_sw1" caption="Toggle A" value="1"/>
+						<switch name="sf_sw2" caption="Toggle B" value="0"/>
+						<switch name="sf_sw3" caption="Toggle C" value="1"/>
+						<edit name="sf6" caption="Field 6 (synced)" sync:value="main.sensors.temperature" readonly="1"/>
+						<edit name="sf7" caption="Field 7 (synced)" sync:value="main.sensors.pressure" readonly="1"/>
+						<edit name="sf8" caption="Field 8 (synced)" sync:value="main.sensors.humidity" readonly="1"/>
+						<edit name="sf9" caption="Field 9 (synced)" sync:value="main.sensors.laser_power" readonly="1"/>
+						<edit name="sf10" caption="Field 10 (synced)" sync:value="main.sensors.gas_flow" readonly="1"/>
+					</form>
+				</content>
+
+				<content name="stress_buttons" cardstyle="elevated" title="Button Stress" columnstart="3" rowstart="2" columnend="3" rowend="2" scrollbars="1">
+					<paragraph text="Many buttons at once" variant="h2"/>
+
+					<buttongroup distribution="equal">
+						<button caption="Alert" event="createtestalert"/>
+						<button caption="Logs" event="generatelogmessages"/>
+					</buttongroup>
+					<buttongroup distribution="equal">
+						<button caption="Chart" event="updatechartdata"/>
+						<button caption="Dialog" event="showdialog"/>
+					</buttongroup>
+					<buttongroup distribution="equal">
+						<button caption="Start" event="startprocess"/>
+						<button caption="Stop" event="stopprocess"/>
+					</buttongroup>
+					<buttongroup distribution="equal">
+						<button caption="Pause" event="pauseprocess"/>
+						<button caption="Resume" event="resumeprocess"/>
+					</buttongroup>
+					<buttongroup distribution="equal">
+						<button caption="Reset" event="resetcounters"/>
+						<button caption="Builds" event="gotobuilds"/>
+					</buttongroup>
+
+					<separator name="sep_stress_1" orientation="horizontal" variant="dark"/>
+
+					<paragraph text="All button events should fire and log correctly." variant="subtext"/>
+				</content>
+			</grid>
+		</page>
+
+
+		<!-- ================================================================== -->
+		<!-- PAGE 11: Workflow Editor                                            -->
+		<!-- Tests: workflow                                                      -->
+		<!-- ================================================================== -->
+
+		<page name="workfloweditor">
+			<content name="workflowpanel" cardstyle="elevated" title="Workflow Editor">
+				<workflow name="testworkflow" caption="Workflow Editor">
+					<step id="exposure"        label="Exposure"         category="functionblock" color="blue"/>
+					<step id="delay"           label="Delay"            category="functionblock" color="blue">
+						<param name="duration" type="int" unit="ms" default="1000"/>
+					</step>
+					<step id="beschichter_lr"  label="Beschichter L→R"  category="template" color="amber"/>
+					<step id="beschichter_rl"  label="Beschichter R→L"  category="template" color="amber"/>
+					<step id="dosierung_r"     label="Dosierung R"      category="template" color="amber"/>
+					<step id="dosierung_l"     label="Dosierung L"      category="template" color="amber"/>
+					<step id="heatup_layer"    label="Heatup Layer"     category="template" color="amber"/>
+					<step id="hold_temp"       label="Hold Temperature" category="template" color="amber"/>
+				</workflow>
+			</content>
+		</page>
+
+
+		<!-- ================================ MENU ================================ -->
+
+		<menu>
+			<item id="dashboard"     icon="mdi-view-dashboard"     caption="Dashboard"      description="System overview with live sensor data and controls."  targetpage="dashboard"/>
+			<item id="typography"    icon="mdi-format-text"        caption="Typography"     description="Paragraph variants and separator styles."            targetpage="typography"/>
+			<item id="forms"         icon="mdi-form-textbox"       caption="Forms"          description="All form field types: text, switch, memo, combo."    targetpage="forms"/>
+			<item id="buttons"       icon="mdi-gesture-tap-button" caption="Buttons"        description="Button groups, distributions, and disabled states."  targetpage="buttons"/>
+			<item id="datatables"    icon="mdi-table"              caption="Data Tables"    description="Parameter lists and alert lists with live data."      targetpage="datatables"/>
+			<item id="buildworkflow" icon="mdi-folder-open"        caption="Build Workflow" description="Upload, build library, and execution history."       targetpage="buildworkflow"/>
+			<item id="visualization" icon="mdi-chart-line"         caption="Charts"         description="Chart widget with dynamic data series."              targetpage="visualization"/>
+			<item id="systemlogs"    icon="mdi-text-box-outline"   caption="System Logs"    description="Log viewer with auto-scroll and timestamps."         targetpage="systemlogs"/>
+			<item id="scene3d"       icon="mdi-rotate-3d-variant"  caption="3D Scene"       description="WebGL 3D scene rendering."                           targetpage="scene3d"/>
+			<item id="stress"        icon="mdi-test-tube"          caption="Stress Test"    description="Edge cases, large forms, and concurrent widgets."    targetpage="stress"/>
+			<item id="workfloweditor" icon="mdi-sitemap"           caption="Workflow"       description="Workflow editor with drag-and-drop step management." targetpage="workfloweditor"/>
+		</menu>
+
+		<toolbar logoresource="ui_toolbarlogo">
+			<item id="logout" icon="mdi-logout"         caption="Log out"   event="logout"/>
+		</toolbar>
+
+	</userinterface>
+</machinedefinition>

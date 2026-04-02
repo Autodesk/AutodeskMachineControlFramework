@@ -102,6 +102,12 @@ IAlertIterator* CAlertSession::RetrieveAlerts(const bool bOnlyActive)
 }
 
 
+LibMCData_uint64 CAlertSession::GetAlertHeadID()
+{
+    return m_pJournal->getAlertHeadID();
+}
+
+
 IAlertIterator* CAlertSession::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
 {
     if (sIdentifier.empty())

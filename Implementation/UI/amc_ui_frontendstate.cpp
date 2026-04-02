@@ -65,3 +65,29 @@ void CUIFrontendState::writeModuleAttributesToJSON(CJSONWriter& writer, CJSONWri
 }
 
 
+void CUIFrontendState::writeModuleStoreToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendDefinitionModuleStore* pModuleStore, CStateMachineData* pStateMachineData)
+{
+	LibMCAssertNotNull(pModuleStore);
+
+	moduleObject.addString("moduletype", pModuleStore->getModuleType());
+	moduleObject.addString("uuid", pModuleStore->getUUID());
+
+	CJSONWriterObject attributesObject(writer);
+	writeModuleAttributesToJSON(writer, attributesObject, pModuleStore, pStateMachineData);
+	moduleObject.addObject("attributes", attributesObject);
+
+	if (pModuleStore->hasChildren()) {
+		CJSONWriterArray submodulesArray(writer);
+
+		auto childStores = pModuleStore->getChildStores();
+		for (auto& pChildStore : childStores) {
+			CJSONWriterObject childObject(writer);
+			writeModuleStoreToJSON(writer, childObject, pChildStore.get(), pStateMachineData);
+			submodulesArray.addObject(childObject);
+		}
+
+		moduleObject.addArray("submodules", submodulesArray);
+	}
+}
+
+

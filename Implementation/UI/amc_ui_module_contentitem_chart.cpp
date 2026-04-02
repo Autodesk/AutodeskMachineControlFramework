@@ -74,6 +74,54 @@ void CUIModule_ContentChart::populateClientVariables(CParameterHandler* pClientV
 	pGroup->addNewStringParameter("dataseries", "data series UUID", AMCCommon::CUtils::createEmptyUUID());
 }
 
+std::string CUIModule_ContentChart::getItemType()
+{
+	return "chart";
+}
+
+void CUIModule_ContentChart::registerFrontendAttributes()
+{
+	// Chart has no expression-based attributes at construction (dataseries is set at runtime)
+}
+
+void CUIModule_ContentChart::frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (m_pItemModuleStore == nullptr)
+		return;
+
+	std::string sItemType = m_pItemModuleStore->getModuleType();
+	if (sItemType.empty())
+		return;
+
+	itemObject.addString("moduletype", sItemType);
+	itemObject.addString("uuid", m_pItemModuleStore->getUUID());
+
+	CJSONWriterObject attributesObject(writer);
+	pFrontendState->writeModuleAttributesToJSON(writer, attributesObject, m_pItemModuleStore.get(), pStateMachineData);
+
+	std::string sDataSeriesUUID = AMCCommon::CUtils::createEmptyUUID();
+	uint32_t nDataSeriesVersion = 0;
+
+	auto pLegacyParameterHandler = pFrontendState->getLegacyParameterHandler();
+	if (pLegacyParameterHandler.get() != nullptr) {
+		auto pGroup = pLegacyParameterHandler->findGroup(getItemPath(), false);
+		if (pGroup.get() != nullptr) {
+			sDataSeriesUUID = pGroup->getParameterValueByName("dataseries");
+		}
+	}
+
+	if (!sDataSeriesUUID.empty()) {
+		auto pDataSeries = m_pDataSeriesHandler->findDataSeries(sDataSeriesUUID, false);
+		if (pDataSeries.get() != nullptr)
+			nDataSeriesVersion = pDataSeries->getVersion();
+	}
+
+	attributesObject.addString(AMC_API_KEY_UI_DATASERIES, sDataSeriesUUID);
+	attributesObject.addInteger(AMC_API_KEY_UI_VERSION, nDataSeriesVersion);
+	itemObject.addObject("attributes", attributesObject);
+}
 
 void CUIModule_ContentChart::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
@@ -89,4 +137,3 @@ void CUIModule_ContentChart::addLegacyContentToJSON(CJSONWriter& writer, CJSONWr
 			object.addInteger(AMC_API_KEY_UI_VERSION, pDataSeries->getVersion());
 	}
 }
-

@@ -45,6 +45,10 @@ namespace AMC {
 		std::vector <AMC::PStateMachineInstance>& m_Instances;
 		PStateMachineData m_pStateMachineData;
 
+		PStateMachineInstance findInstanceByName(const std::string& sInstanceName, bool bFailIfNotExisting);
+		void writeStateMachineSummaryToJSON(CJSONWriter& writer, CJSONWriterObject& instanceJSONObject, PStateMachineInstance pInstance);
+		void writeStateMachineDetailsToJSON(CJSONWriter& writer, CJSONWriterObject& instanceJSONObject, PStateMachineInstance pInstance);
+
 	public:
 
 		CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances, PStateMachineData pStateMachineData, const std::string & sClientHash);
@@ -62,4 +66,3 @@ namespace AMC {
 
 
 #endif //__AMC_API_HANDLER_STATUS
-

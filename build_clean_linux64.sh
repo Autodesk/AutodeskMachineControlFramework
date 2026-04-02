@@ -79,12 +79,12 @@ git rev-parse --verify HEAD > "$builddir/longgithash.txt"
 LONGGITHASH=$(<"$builddir/longgithash.txt")
 echo "long git hash: $LONGGITHASH"
 
-git log -n 1 --format="%H" -- "$basepath/Client" > "$builddir/clientdirhash.txt"
+git log -n 1 --format="%H" -- "$basepath/Client/core" "$basepath/Client/vue2" > "$builddir/clientdirhash.txt"
 CLIENTDIRHASH=$(<"$builddir/clientdirhash.txt")
 echo "client dir hash: $CLIENTDIRHASH"
 
-CLIENTDISTHASH=$(<"$basepath/Artifacts/clientdist/_githash_client.txt")
-echo "client dist hash: $CLIENTDISTHASH"
+CLIENTDISTHASH=$(<"$basepath/Artifacts/clientdist/_githash_client_vue2.txt")
+echo "client dist hash (vue2): $CLIENTDISTHASH"
 
 #if test $CLIENTDISTHASH != $CLIENTDIRHASH
 #then
@@ -94,8 +94,11 @@ echo "client dist hash: $CLIENTDISTHASH"
 
 cd "$basepath"
 
-
-cp "$basepath/Artifacts/clientdist/clientpackage.zip" "$builddir/Output/${GITHASH}_core.client"
+cp "$basepath/Artifacts/clientdist/clientpackage_vue2.zip" "$builddir/Output/${GITHASH}_core_vue2.client"
+if test -f "$basepath/Artifacts/clientdist/clientpackage_svelte.zip"
+then
+cp "$basepath/Artifacts/clientdist/clientpackage_svelte.zip" "$builddir/Output/${GITHASH}_core_svelte.client"
+fi
 cp "$basepath/Artifacts/apidocsdist/apidocspackage.zip" "$builddir/Output/${GITHASH}_core.apidocs"
 
 cd "$builddir"
@@ -136,7 +139,11 @@ cp ../Output/${GITHASH}_core_libmc.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_core_lib3mf.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_core_libmcdata.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_*.data Framework/Dist/
-cp ../Output/${GITHASH}_core.client Framework/Dist/
+cp ../Output/${GITHASH}_core_vue2.client Framework/Dist/
+if test -f ../Output/${GITHASH}_core_svelte.client
+then
+cp ../Output/${GITHASH}_core_svelte.client Framework/Dist/
+fi
 cp ../Output/${GITHASH}_package.xml Framework/Dist/
 cp ../Output/${GITHASH}_driver_*.${DLLEXT} Framework/Dist/ 2>/dev/null || echo "No driver libraries found"
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic

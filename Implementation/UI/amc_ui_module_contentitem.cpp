@@ -85,3 +85,74 @@ void CUIModule_ContentItem::populateClientVariables(CParameterHandler* pParamete
 {
 
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+
+void CUIModule_ContentItem::initFrontendModuleStore(CUIFrontendDefinition* pFrontendDefinition)
+{
+	LibMCAssertNotNull(pFrontendDefinition);
+	m_pItemModuleStore = pFrontendDefinition->registerModuleStore(m_sUUID, getItemPath(), getItemType());
+	registerFrontendAttributes();
+}
+
+void CUIModule_ContentItem::registerFrontendAttributes()
+{
+	// Default: no attributes. Subclasses override to register their specific attributes.
+}
+
+std::string CUIModule_ContentItem::getItemType()
+{
+	return "";
+}
+
+void CUIModule_ContentItem::frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	if (m_pItemModuleStore == nullptr)
+		return;
+
+	std::string sItemType = m_pItemModuleStore->getModuleType();
+	if (sItemType.empty())
+		return;
+
+	pFrontendState->writeModuleStoreToJSON(writer, itemObject, m_pItemModuleStore.get(), pStateMachineData);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemStringAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atString, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemBoolAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atBoolean, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemIntegerAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atInteger, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemNumberAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atNumber, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemUUIDAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atUUID, expression);
+}

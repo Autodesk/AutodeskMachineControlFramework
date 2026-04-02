@@ -80,6 +80,10 @@ namespace AMCUnitTest {
 			registerTest("MissingEntrySizeThrows", "Missing entry size attribute throws", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_ResourcePackage::testMissingEntrySizeThrows, this));
 			registerTest("MissingEntryContentTypeThrows", "Missing entry content type attribute throws", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_ResourcePackage::testMissingEntryContentTypeThrows, this));
 			registerTest("InvalidEntryExtensionThrows", "Invalid entry extension throws", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_ResourcePackage::testInvalidEntryExtensionThrows, this));
+			registerTest("SizeMismatchThrows", "Size mismatch between index and ZIP throws", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_ResourcePackage::testSizeMismatchThrows, this));
+			registerTest("SHA256ValidEntrySucceeds", "Valid SHA256 entry reads successfully", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_ResourcePackage::testSHA256ValidEntrySucceeds, this));
+			registerTest("SHA256MismatchThrows", "SHA256 mismatch on read throws", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_ResourcePackage::testSHA256MismatchThrows, this));
+			registerTest("SHA256AbsentStillWorks", "Missing SHA256 attribute is backwards compatible", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_ResourcePackage::testSHA256AbsentStillWorks, this));
 		}
 
 		void initializeTests() override {
@@ -95,6 +99,7 @@ namespace AMCUnitTest {
 			std::string m_sExtension;
 			std::string m_sContentType;
 			std::string m_sData;
+			std::string m_sSHA256;
 		};
 
 		struct CScopedTempDir {
@@ -132,6 +137,25 @@ namespace AMCUnitTest {
 				ss << "\t<entry name=\"" << entry.m_sName << "\" filename=\"" << entry.m_sFileName << "\" size=\"" << entry.m_sData.size() << "\" contenttype=\"" << entry.m_sContentType << "\"";
 				if (!entry.m_sExtension.empty())
 					ss << " extension=\"" << entry.m_sExtension << "\"";
+				if (!entry.m_sSHA256.empty())
+					ss << " sha256=\"" << entry.m_sSHA256 << "\"";
+				ss << " />\n";
+			}
+			ss << "</package>\n";
+			return ss.str();
+		}
+
+		std::string buildPackageXMLWithSize(const std::string& sSchemaNamespace, const std::vector<CPackageEntrySpec>& entries, uint64_t nOverrideSize)
+		{
+			std::stringstream ss;
+			ss << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+			ss << "<package xmlns=\"" << sSchemaNamespace << "\">\n";
+			for (const auto& entry : entries) {
+				ss << "\t<entry name=\"" << entry.m_sName << "\" filename=\"" << entry.m_sFileName << "\" size=\"" << nOverrideSize << "\" contenttype=\"" << entry.m_sContentType << "\"";
+				if (!entry.m_sExtension.empty())
+					ss << " extension=\"" << entry.m_sExtension << "\"";
+				if (!entry.m_sSHA256.empty())
+					ss << " sha256=\"" << entry.m_sSHA256 << "\"";
 				ss << " />\n";
 			}
 			ss << "</package>\n";
@@ -690,6 +714,95 @@ namespace AMCUnitTest {
 				thrown = true;
 			}
 			assertTrue(thrown, "Expected invalid entry extension to throw");
+		}
+
+		void testSizeMismatchThrows()
+		{
+			CScopedTempDir tempDir;
+			std::string zipPath = joinPath(tempDir.m_sPath, "size_mismatch.zip");
+
+			auto entry = makeEntry("Data", "data.bin", "bin", "application/octet-stream", "Hello World");
+			std::vector<CPackageEntrySpec> entries = { entry };
+			std::string packageXML = buildPackageXMLWithSize(m_sSchemaNamespace, entries, 999);
+
+			writeZIPFile(zipPath, packageXML, entries, true);
+
+			bool thrown = false;
+			try {
+				loadPackageFromZip(zipPath);
+			}
+			catch (...) {
+				thrown = true;
+			}
+			assertTrue(thrown, "Expected size mismatch to throw during loading");
+		}
+
+		void testSHA256ValidEntrySucceeds()
+		{
+			CScopedTempDir tempDir;
+			std::string zipPath = joinPath(tempDir.m_sPath, "sha256_valid.zip");
+
+			std::string sData = "Hello SHA256";
+			std::string sSHA256 = AMCCommon::CUtils::calculateSHA256FromData(
+				reinterpret_cast<const uint8_t*>(sData.data()), sData.size());
+
+			auto entry = makeEntry("Data", "data.bin", "bin", "application/octet-stream", sData);
+			entry.m_sSHA256 = sSHA256;
+			std::vector<CPackageEntrySpec> entries = { entry };
+			std::string packageXML = buildPackageXML(m_sSchemaNamespace, entries);
+
+			writeZIPFile(zipPath, packageXML, entries, true);
+			auto pPackage = loadPackageFromZip(zipPath);
+
+			std::vector<uint8_t> buffer;
+			pPackage->readEntry("data", buffer);
+			assertTrue(buffer.size() == sData.size());
+			assertTrue(std::memcmp(buffer.data(), sData.data(), buffer.size()) == 0);
+		}
+
+		void testSHA256MismatchThrows()
+		{
+			CScopedTempDir tempDir;
+			std::string zipPath = joinPath(tempDir.m_sPath, "sha256_mismatch.zip");
+
+			std::string sData = "Hello SHA256";
+			std::string sBadSHA256 = "a000000000000000000000000000000000000000000000000000000000000000";
+
+			auto entry = makeEntry("Data", "data.bin", "bin", "application/octet-stream", sData);
+			entry.m_sSHA256 = sBadSHA256;
+			std::vector<CPackageEntrySpec> entries = { entry };
+			std::string packageXML = buildPackageXML(m_sSchemaNamespace, entries);
+
+			writeZIPFile(zipPath, packageXML, entries, true);
+			auto pPackage = loadPackageFromZip(zipPath);
+
+			std::vector<uint8_t> buffer;
+			bool thrown = false;
+			try {
+				pPackage->readEntry("data", buffer);
+			}
+			catch (...) {
+				thrown = true;
+			}
+			assertTrue(thrown, "Expected SHA256 mismatch to throw on readEntry");
+		}
+
+		void testSHA256AbsentStillWorks()
+		{
+			CScopedTempDir tempDir;
+			std::string zipPath = joinPath(tempDir.m_sPath, "sha256_absent.zip");
+
+			auto entry = makeEntry("Data", "data.bin", "bin", "application/octet-stream", "BackwardsCompat");
+			std::vector<CPackageEntrySpec> entries = { entry };
+			std::string packageXML = buildPackageXML(m_sSchemaNamespace, entries);
+
+			writeZIPFile(zipPath, packageXML, entries, true);
+			auto pPackage = loadPackageFromZip(zipPath);
+
+			std::vector<uint8_t> buffer;
+			pPackage->readEntry("data", buffer);
+			std::string sResult(buffer.begin(), buffer.end());
+			assertTrue(sResult == "BackwardsCompat");
 		}
 	};
 

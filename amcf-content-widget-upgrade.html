@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AMCF — Content Widget Upgrade Plan</title>
+  <style>
+    :root {
+      --bg:       #f4f8fc;
+      --card:     #ffffff;
+      --text:     #112640;
+      --muted:    #4d627a;
+      --line:     #d4e0ef;
+      --head:     #eaf1fb;
+      --accent:   #005ea2;
+      --accent2:  #0079c9;
+      --green:    #1a7a45;
+      --greenlt:  #edf8f1;
+      --amber:    #7a4d00;
+      --amberlt:  #fff8e8;
+      --purple:   #50288a;
+      --purplelt: #f3eeff;
+      --red:      #8d2e00;
+      --redlt:    #fff2ee;
+      --code-bg:  #eef4fd;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(175deg, #f5faff 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    a { color: var(--accent2); }
+
+    /* ── Layout ──────────────────────────────────────────── */
+    .wrap        { max-width: 1280px; margin: 0 auto; padding: 28px 32px 60px; }
+    .two-col     { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .three-col   { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    @media (max-width: 860px) {
+      .two-col, .three-col { grid-template-columns: 1fr; }
+    }
+
+    /* ── Typography ──────────────────────────────────────── */
+    h1   { margin: 0 0 6px; font-size: 32px; font-weight: 700; letter-spacing: -.5px; }
+    h2   { margin: 36px 0 12px; font-size: 22px; font-weight: 700; border-bottom: 2px solid var(--line); padding-bottom: 6px; }
+    h3   { margin: 20px 0 8px; font-size: 17px; font-weight: 600; }
+    h4   { margin: 14px 0 6px; font-size: 14px; font-weight: 600; }
+    p    { margin: 0 0 10px; color: var(--muted); }
+    ul   { margin: 0 0 10px; padding-left: 20px; }
+    li   { color: var(--muted); margin-bottom: 3px; }
+    strong { color: var(--text); }
+
+    /* ── Cards ───────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 22px;
+      box-shadow: 0 4px 16px rgba(17,38,64,.06);
+    }
+    .card + .card { margin-top: 14px; }
+    .card.green  { background: var(--greenlt);  border-color: #b5dfc6; }
+    .card.amber  { background: var(--amberlt);  border-color: #f0d89a; }
+    .card.purple { background: var(--purplelt); border-color: #ccb8f0; }
+    .card.accent { background: #eaf1fb;         border-color: #b3cfe8; }
+
+    /* ── Header strip ────────────────────────────────────── */
+    .page-header {
+      background: linear-gradient(135deg, #005ea2 0%, #003366 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 32px 36px 28px;
+      margin-bottom: 32px;
+      box-shadow: 0 6px 30px rgba(0,60,100,.18);
+    }
+    .page-header h1 { color: #fff; }
+    .page-header p  { color: rgba(255,255,255,.78); font-size: 15px; margin: 0; }
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,.18);
+      color: #fff;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      margin-bottom: 12px;
+    }
+
+    /* ── Attribute table ─────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 10px 0 4px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 11px;
+      vertical-align: top;
+    }
+    th {
+      background: var(--head);
+      text-align: left;
+      font-weight: 600;
+      color: var(--text);
+    }
+    tr:nth-child(even) td { background: #f9fbfe; }
+
+    /* ── Code ────────────────────────────────────────────── */
+    code {
+      background: var(--code-bg);
+      border: 1px solid #cddff5;
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-family: "Cascadia Code", "Fira Mono", Consolas, monospace;
+      font-size: 12px;
+      color: #003a72;
+    }
+    pre {
+      background: #f0f6ff;
+      border: 1px solid #c8ddf5;
+      border-radius: 10px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      font-family: "Cascadia Code", "Fira Mono", Consolas, monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: #002244;
+      margin: 12px 0;
+    }
+    pre .kw  { color: #0055b3; font-weight: 600; }
+    pre .str { color: #6d2491; }
+    pre .cmt { color: #6a8a9e; font-style: italic; }
+    pre .att { color: #1a6e2e; }
+    pre .val { color: #a04000; }
+
+    /* ── Tag pills ───────────────────────────────────────── */
+    .pill {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 2px 11px;
+      font-size: 11.5px;
+      font-weight: 600;
+      margin: 2px 3px 2px 0;
+    }
+    .pill-blue   { background: #deeeff; color: #003a72; border: 1px solid #b0d4f7; }
+    .pill-green  { background: #dff3ea; color: #14572e; border: 1px solid #9fd7b8; }
+    .pill-amber  { background: #fff0d0; color: #6b3d00; border: 1px solid #f0cc80; }
+    .pill-purple { background: #ede0ff; color: #3a1272; border: 1px solid #c8a8f7; }
+    .pill-gray   { background: #eef1f5; color: #444c58; border: 1px solid #cdd5e0; }
+
+    /* ── File change rows ────────────────────────────────── */
+    .file-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .file-row:last-child { border-bottom: none; }
+    .file-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .file-icon.cpp  { background: #e4eeff; }
+    .file-icon.js   { background: #fff8dc; }
+    .file-icon.vue  { background: #e8fff0; }
+    .file-body { flex: 1; min-width: 0; }
+    .file-path { font-family: "Cascadia Code", Consolas, monospace; font-size: 12px; color: var(--accent); word-break: break-all; }
+    .file-desc { color: var(--muted); margin-top: 3px; }
+
+    /* ── Card style previews ─────────────────────────────── */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 14px 0;
+    }
+    @media (max-width: 860px) { .preview-grid { grid-template-columns: 1fr 1fr; } }
+    .preview-card {
+      border-radius: 12px;
+      padding: 14px 16px;
+      min-height: 120px;
+    }
+    .preview-card .card-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; margin-bottom: 10px; opacity: .6;
+    }
+    .preview-card .card-title   { font-size: 14px; font-weight: 700; color: var(--text); }
+    .preview-card .card-sub     { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .preview-card .card-content { display: flex; flex-direction: column; gap: 5px; }
+    .preview-card .child-block  { height: 14px; border-radius: 4px; background: rgba(0,0,0,.1); }
+
+    .preview-none     { background: transparent; border: 2px dashed #cdd5e0; }
+    .preview-elevated { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,.14); border: none; }
+    .preview-outlined { background: #fff; border: 2px solid #b3cfe8; }
+    .preview-tinted   { background: #e6f0ff; border: 1px solid #b3cfe8; }
+
+    /* ── Data flow diagram ───────────────────────────────── */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      padding: 8px 0;
+      margin: 10px 0;
+    }
+    .flow-node {
+      flex-shrink: 0;
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: center;
+      min-width: 140px;
+    }
+    .flow-node .fn-label  { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+    .flow-node .fn-detail { font-size: 12px; color: var(--muted); }
+    .flow-arrow { flex-shrink: 0; padding: 0 6px; color: #8aaccc; font-size: 20px; line-height: 1; }
+
+    /* ── Spacing diagram ─────────────────────────────────── */
+    .spacing-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      width: 200px;
+    }
+    .spacing-demo .sd-child {
+      height: 36px;
+      background: #d8eaff;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--muted);
+    }
+    .spacing-demo .sd-gap {
+      height: 12px;
+      background: repeating-linear-gradient(
+        90deg, #f0f6ff 0px, #f0f6ff 6px, #e0ecff 6px, #e0ecff 12px);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: #8aaccc;
+    }
+
+    /* ── Todo list ───────────────────────────────────────── */
+    .todo-list { list-style: none; padding: 0; margin: 0; }
+    .todo-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+    }
+    .todo-list li:last-child { border-bottom: none; }
+    .todo-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+
+    /* ── Sticky nav ──────────────────────────────────────── */
+    .toc {
+      position: sticky; top: 16px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 13px;
+      box-shadow: 0 2px 10px rgba(17,38,64,.06);
+      align-self: start;
+    }
+    .toc h4 { margin: 0 0 10px; font-size: 13px; }
+    .toc ul { padding-left: 14px; margin: 0; }
+    .toc li { margin-bottom: 5px; }
+    .toc a  { color: var(--muted); text-decoration: none; }
+    .toc a:hover { color: var(--accent); }
+
+    .page-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start; }
+    @media (max-width: 960px) { .page-layout { grid-template-columns: 1fr; } .toc { display: none; } }
+
+    hr { border: none; border-top: 2px solid var(--line); margin: 30px 0; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="badge">AMCF UI — Content Module</div>
+    <h1>Content Widget Upgrade</h1>
+    <p>Evolving the <code style="background:rgba(255,255,255,.15);border-color:transparent;color:#fff">content</code> module from a plain div wrapper into a configurable card widget — with card style variants, professional headers, vertical-stack spacing, and full-height layout.</p>
+  </div>
+
+  <div class="page-layout">
+
+    <!-- TOC -->
+    <nav class="toc">
+      <h4>On this page</h4>
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#attributes">New XML Attributes</a></li>
+        <li><a href="#card-styles">Card Style Variants</a></li>
+        <li><a href="#spacing">Spacing Control</a></li>
+        <li><a href="#dataflow">Data Flow</a></li>
+        <li><a href="#files">Files to Change</a></li>
+        <li><a href="#snippets">Key Snippets</a></li>
+        <li><a href="#todos">Implementation Tasks</a></li>
+        <li><a href="#compat">Backward Compatibility</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main content -->
+    <main>
+
+      <!-- Overview -->
+      <h2 id="overview">Overview</h2>
+      <div class="card accent">
+        <p>The <strong>Content module</strong> is the primary layout container for child sub-modules (forms, lists, charts, layer views, …). Today it renders as plain, unstyled divs with a raw title string — no visual grouping, no configurable spacing, and no consistent height behaviour.</p>
+        <p>This upgrade adds four configurable card styles, a vertical gap control between stacked children, and ensures the widget always fills 100 % of its allocated height in Grid cells and standalone page columns.</p>
+        <p style="margin:0">All new attributes have safe defaults, so <strong>existing XML configurations require no changes</strong>.</p>
+      </div>
+
+      <div class="two-col" style="margin-top:16px">
+        <div class="card">
+          <h4>What stays the same</h4>
+          <ul>
+            <li><code>headline</code>, <code>title</code>, <code>subtitle</code>, <code>caption</code> attributes</li>
+            <li><code>visible</code> dynamic expression support</li>
+            <li>Child sub-module rendering via <code>Module_Factory</code></li>
+            <li>Legacy JSON serialisation path</li>
+            <li>All existing XML configurations work without modification</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>What is added</h4>
+          <ul>
+            <li><code>cardstyle</code> — one of <code>none</code> / <code>elevated</code> / <code>outlined</code> / <code>tinted</code></li>
+            <li><code>spacing</code> — px gap between vertically stacked children</li>
+            <li><code>elevation</code> — shadow depth for the <em>elevated</em> style</li>
+            <li><code>cardcolor</code> — background colour override for <em>tinted</em> style</li>
+            <li>Full-height behaviour (<code>height: 100%</code> through the component tree)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- New XML Attributes -->
+      <h2 id="attributes">New XML Attributes</h2>
+      <div class="card">
+        <p>All attributes are optional. Defaults reproduce the pre-upgrade appearance.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>cardstyle</code></td>
+              <td>string enum</td>
+              <td><code>none</code></td>
+              <td>Visual card treatment. One of <code>none</code>, <code>elevated</code>, <code>outlined</code>, <code>tinted</code>.</td>
+            </tr>
+            <tr>
+              <td><code>spacing</code></td>
+              <td>integer (px)</td>
+              <td><code>0</code></td>
+              <td>Gap in pixels between vertically stacked child sub-modules.</td>
+            </tr>
+            <tr>
+              <td><code>elevation</code></td>
+              <td>integer 0–24</td>
+              <td><code>2</code></td>
+              <td>Vuetify shadow elevation for the <code>elevated</code> card style.</td>
+            </tr>
+            <tr>
+              <td><code>cardcolor</code></td>
+              <td>CSS color string</td>
+              <td><em>empty</em></td>
+              <td>Background colour override, primarily used with <code>tinted</code>. Accepts hex, <code>rgb()</code>, or named colours.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4 style="margin-top:16px">Example XML</h4>
+        <pre><span class="kw">&lt;content</span> <span class="att">name=</span><span class="str">"buildstatus"</span>
+         <span class="att">title=</span><span class="str">"Build Status"</span>
+         <span class="att">subtitle=</span><span class="str">"Live process information"</span>
+         <span class="att">cardstyle=</span><span class="str">"elevated"</span>
+         <span class="att">spacing=</span><span class="str">"12"</span>
+         <span class="att">elevation=</span><span class="str">"3"</span><span class="kw">&gt;</span>
+
+  <span class="kw">&lt;form</span> <span class="att">name=</span><span class="str">"status"</span> <span class="kw">/&gt;</span>
+  <span class="kw">&lt;layerview</span> <span class="att">name=</span><span class="str">"viewer"</span> <span class="kw">/&gt;</span>
+
+<span class="kw">&lt;/content&gt;</span>
+
+<span class="cmt">&lt;!-- Tinted, custom colour --&gt;</span>
+<span class="kw">&lt;content</span> <span class="att">name=</span><span class="str">"warnings"</span>
+         <span class="att">title=</span><span class="str">"System Alerts"</span>
+         <span class="att">cardstyle=</span><span class="str">"tinted"</span>
+         <span class="att">cardcolor=</span><span class="str">"#fff8e8"</span>
+         <span class="att">spacing=</span><span class="str">"8"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;alertlist</span> <span class="att">name=</span><span class="str">"alerts"</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;/content&gt;</span></pre>
+      </div>
+
+      <!-- Card Style Variants -->
+      <h2 id="card-styles">Card Style Variants</h2>
+      <p style="color:var(--muted)">Each style maps directly to a Vuetify <code>v-card</code> variant or, for <code>none</code>, plain divs.</p>
+      <div class="preview-grid">
+        <div class="preview-card preview-none">
+          <div class="card-label">none (default)</div>
+          <div class="card-title">Section Title</div>
+          <div class="card-sub">Optional subtitle</div>
+          <div class="card-content">
+            <div class="child-block"></div>
+            <div class="child-block" style="opacity:.6"></div>
+          </div>
+        </div>
+        <div class="preview-card preview-elevated">
+          <div class="card-label">elevated</div>
+          <div class="card-title">Section Title</div>
+          <div class="card-sub">Optional subtitle</div>
+          <div class="card-content">
+            <div class="child-block" style="background:#d0e6ff"></div>
+            <div class="child-block" style="background:#d0e6ff;opacity:.6"></div>
+          </div>
+        </div>
+        <div class="preview-card preview-outlined">
+          <div class="card-label">outlined</div>
+          <div class="card-title">Section Title</div>
+          <div class="card-sub">Optional subtitle</div>
+          <div class="card-content">
+            <div class="child-block" style="background:#c8dff5"></div>
+            <div class="child-block" style="background:#c8dff5;opacity:.6"></div>
+          </div>
+        </div>
+        <div class="preview-card preview-tinted">
+          <div class="card-label">tinted</div>
+          <div class="card-title">Section Title</div>
+          <div class="card-sub">Optional subtitle</div>
+          <div class="card-content">
+            <div class="child-block" style="background:#b0ccee"></div>
+            <div class="child-block" style="background:#b0ccee;opacity:.6"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <table>
+          <thead>
+            <tr><th>Style</th><th>Background</th><th>Border</th><th>Shadow</th><th>Header rendering</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>none</code></td>
+              <td>Transparent</td>
+              <td>None</td>
+              <td>None</td>
+              <td>Plain styled <code>&lt;div&gt;</code> elements</td>
+            </tr>
+            <tr>
+              <td><code>elevated</code></td>
+              <td>White</td>
+              <td>None</td>
+              <td>Vuetify elevation N</td>
+              <td><code>v-card-title</code> + <code>v-card-subtitle</code></td>
+            </tr>
+            <tr>
+              <td><code>outlined</code></td>
+              <td>White</td>
+              <td>Thin primary border</td>
+              <td>None</td>
+              <td><code>v-card-title</code> + <code>v-card-subtitle</code></td>
+            </tr>
+            <tr>
+              <td><code>tinted</code></td>
+              <td><code>cardcolor</code> or light primary</td>
+              <td>Subtle border</td>
+              <td>None</td>
+              <td><code>v-card-title</code> + <code>v-card-subtitle</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Spacing Control -->
+      <h2 id="spacing">Vertical Spacing Control</h2>
+      <div class="two-col">
+        <div class="card">
+          <h4>How it works</h4>
+          <p>The children wrapper uses <code>display: flex; flex-direction: column</code>. The <code>spacing</code> attribute maps directly to CSS <code>gap</code>:</p>
+          <pre>gap: <span class="val">12</span>px;   <span class="cmt">/* spacing="12" */</span>
+flex: <span class="val">1 1 0</span>;
+min-height: <span class="val">0</span>;  <span class="cmt">/* allows shrink */</span></pre>
+          <p>This is the same philosophy used by the Grid module's column/row <code>gap</code>. The children do <em>not</em> need to know about spacing — it is managed entirely by the parent container.</p>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+          <div style="display:flex;gap:32px;align-items:flex-start">
+            <div>
+              <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:6px">spacing="0"</div>
+              <div class="spacing-demo" style="gap:0">
+                <div class="sd-child">Form</div>
+                <div class="sd-child">LayerView</div>
+                <div class="sd-child" style="border-bottom:none">Chart</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:6px">spacing="12"</div>
+              <div class="spacing-demo">
+                <div class="sd-child">Form</div>
+                <div class="sd-gap">12 px</div>
+                <div class="sd-child">LayerView</div>
+                <div class="sd-gap">12 px</div>
+                <div class="sd-child" style="border-bottom:none">Chart</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Flow -->
+      <h2 id="dataflow">Data Flow</h2>
+      <div class="card">
+        <div class="flow">
+          <div class="flow-node">
+            <div class="fn-label">XML config</div>
+            <div class="fn-detail"><code>cardstyle</code><br><code>spacing</code><br><code>elevation</code><br><code>cardcolor</code></div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="fn-label">C++ backend</div>
+            <div class="fn-detail"><code>amc_ui_module_content.cpp</code><br>parse + register<br>string / integer attrs</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="fn-label">/api/frontend</div>
+            <div class="fn-detail">v2 attribute bundle<br>per module UUID</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="fn-label">JS module</div>
+            <div class="fn-detail"><code>AMCModule_Content.js</code><br><code>updateFromV2Attributes</code></div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="fn-label">Vue component</div>
+            <div class="fn-detail"><code>AMCModule_Content.vue</code><br>conditional <code>v-card</code><br>+ flex gap</div>
+          </div>
+        </div>
+        <p style="margin-top:10px">The same v2 attribute pipeline is used by Form, BuildList, LayerView, and Grid — no new infrastructure is required.</p>
+      </div>
+
+      <!-- Files to Change -->
+      <h2 id="files">Files to Change</h2>
+      <div class="card">
+        <div class="file-row">
+          <div class="file-icon cpp">🔷</div>
+          <div class="file-body">
+            <div class="file-path">Implementation/UI/amc_ui_module_content.hpp</div>
+            <div class="file-desc">Add four member variables: <code>m_sCardStyle</code>, <code>m_nSpacing</code>, <code>m_nElevation</code>, <code>m_sCardColor</code>.</div>
+          </div>
+        </div>
+        <div class="file-row">
+          <div class="file-icon cpp">🔷</div>
+          <div class="file-body">
+            <div class="file-path">Implementation/UI/amc_ui_module_content.cpp</div>
+            <div class="file-desc">Parse new XML attributes in constructor; call <code>registerStringAttribute</code> / <code>registerIntegerAttribute</code> for each; emit them in <code>writeLegacyDefinitionToJSON</code>.</div>
+          </div>
+        </div>
+        <div class="file-row">
+          <div class="file-icon js">🟡</div>
+          <div class="file-body">
+            <div class="file-path">Client/core/modules/AMCModule_Content.js</div>
+            <div class="file-desc">Read <code>cardstyle</code>, <code>spacing</code>, <code>elevation</code>, <code>cardcolor</code> from <code>moduleJSON</code> with defaults; handle in <code>updateFromV2Attributes</code>.</div>
+          </div>
+        </div>
+        <div class="file-row">
+          <div class="file-icon vue">🟢</div>
+          <div class="file-body">
+            <div class="file-path">Client/vue2/src/modules/AMCModule_Content.vue</div>
+            <div class="file-desc">
+              Refactor template to conditionally wrap children in <code>v-card</code>; render title/subtitle in <code>v-card-title</code> / <code>v-card-subtitle</code> for card styles; add flex-column gap layout; set <code>height: 100%</code> throughout.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Snippets -->
+      <h2 id="snippets">Key Snippets</h2>
+
+      <h3>C++ — constructor (content.cpp)</h3>
+      <pre><span class="cmt">// parse new attributes</span>
+<span class="kw">auto</span> cardStyleAttrib = xmlNode.attribute(<span class="str">"cardstyle"</span>);
+m_sCardStyle = cardStyleAttrib.empty() ? <span class="str">"none"</span> : cardStyleAttrib.as_string();
+
+m_nSpacing   = (<span class="kw">uint32_t</span>) xmlNode.attribute(<span class="str">"spacing"</span>).as_int(<span class="val">0</span>);
+m_nElevation = (<span class="kw">uint32_t</span>) xmlNode.attribute(<span class="str">"elevation"</span>).as_int(<span class="val">2</span>);
+m_sCardColor = xmlNode.attribute(<span class="str">"cardcolor"</span>).as_string();
+
+<span class="cmt">// register as v2 attributes</span>
+CUIExpression cardStyleExpr; cardStyleExpr.setFixedValue(m_sCardStyle);
+CUIExpression cardColorExpr; cardColorExpr.setFixedValue(m_sCardColor);
+registerStringAttribute(<span class="str">"cardstyle"</span>, cardStyleExpr);
+registerStringAttribute(<span class="str">"cardcolor"</span>, cardColorExpr);
+registerIntegerAttribute(<span class="str">"spacing"</span>,   CUIExpression::fromInteger(m_nSpacing));
+registerIntegerAttribute(<span class="str">"elevation"</span>,  CUIExpression::fromInteger(m_nElevation));</pre>
+
+      <h3>JavaScript — AMCModule_Content.js</h3>
+      <pre><span class="cmt">// constructor</span>
+<span class="kw">this</span>.cardstyle  = moduleJSON.cardstyle  || <span class="str">"none"</span>;
+<span class="kw">this</span>.spacing    = moduleJSON.spacing    || <span class="val">0</span>;
+<span class="kw">this</span>.elevation  = moduleJSON.elevation  || <span class="val">2</span>;
+<span class="kw">this</span>.cardcolor  = moduleJSON.cardcolor  || <span class="str">""</span>;
+
+<span class="cmt">// updateFromV2Attributes</span>
+<span class="kw">if</span> (attrs.cardstyle  !== undefined) <span class="kw">this</span>.cardstyle  = attrs.cardstyle;
+<span class="kw">if</span> (attrs.spacing    !== undefined) <span class="kw">this</span>.spacing    = parseInt(attrs.spacing)  || <span class="val">0</span>;
+<span class="kw">if</span> (attrs.elevation  !== undefined) <span class="kw">this</span>.elevation  = parseInt(attrs.elevation) || <span class="val">2</span>;
+<span class="kw">if</span> (attrs.cardcolor  !== undefined) <span class="kw">this</span>.cardcolor  = attrs.cardcolor;</pre>
+
+      <h3>Vue template — AMCModule_Content.vue (structure)</h3>
+      <pre><span class="kw">&lt;template&gt;</span>
+  <span class="kw">&lt;div</span> <span class="att">class=</span><span class="str">"content-root"</span><span class="kw">&gt;</span>
+
+    <span class="cmt">&lt;!-- Card styles: elevated / outlined / tinted --&gt;</span>
+    <span class="kw">&lt;v-card</span> <span class="att">v-if=</span><span class="str">"module.cardstyle !== 'none'"</span>
+            <span class="att">:outlined=</span><span class="str">"module.cardstyle === 'outlined'"</span>
+            <span class="att">:elevation=</span><span class="str">"module.cardstyle === 'elevated' ? module.elevation : 0"</span>
+            <span class="att">:color=</span><span class="str">"cardBackground"</span>
+            <span class="att">class=</span><span class="str">"content-card"</span><span class="kw">&gt;</span>
+      <span class="kw">&lt;v-card-title</span>    <span class="att">v-if=</span><span class="str">"module.title"</span><span class="kw">&gt;</span>{{ module.title }}<span class="kw">&lt;/v-card-title&gt;</span>
+      <span class="kw">&lt;v-card-subtitle</span> <span class="att">v-if=</span><span class="str">"module.subtitle"</span><span class="kw">&gt;</span>{{ module.subtitle }}<span class="kw">&lt;/v-card-subtitle&gt;</span>
+      <span class="kw">&lt;v-card-text</span> <span class="att">class=</span><span class="str">"content-children"</span> <span class="att">:style=</span><span class="str">"childStyle"</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;Module_Factory</span> <span class="att">v-for=</span><span class="str">"m in module.modules"</span> <span class="att">:key=</span><span class="str">"m.uuid"</span> … <span class="kw">/&gt;</span>
+      <span class="kw">&lt;/v-card-text&gt;</span>
+    <span class="kw">&lt;/v-card&gt;</span>
+
+    <span class="cmt">&lt;!-- style="none" — plain divs, unchanged appearance --&gt;</span>
+    <span class="kw">&lt;template</span> <span class="att">v-else</span><span class="kw">&gt;</span>
+      <span class="kw">&lt;div</span> <span class="att">v-if=</span><span class="str">"module.title"</span>    <span class="att">class=</span><span class="str">"content-title"</span><span class="kw">&gt;</span>…<span class="kw">&lt;/div&gt;</span>
+      <span class="kw">&lt;div</span> <span class="att">v-if=</span><span class="str">"module.subtitle"</span> <span class="att">class=</span><span class="str">"content-subtitle"</span><span class="kw">&gt;</span>…<span class="kw">&lt;/div&gt;</span>
+      <span class="kw">&lt;div</span> <span class="att">class=</span><span class="str">"content-children"</span> <span class="att">:style=</span><span class="str">"childStyle"</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;Module_Factory</span> … <span class="kw">/&gt;</span>
+      <span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;/template&gt;</span>
+
+  <span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;/template&gt;</span>
+
+<span class="cmt">// computed</span>
+childStyle () {
+  <span class="kw">return</span> { gap: <span class="kw">this</span>.module.spacing + <span class="str">'px'</span> };
+}
+cardBackground () {
+  <span class="kw">if</span> (<span class="kw">this</span>.module.cardstyle === <span class="str">'tinted'</span>)
+    <span class="kw">return this</span>.module.cardcolor || <span class="str">'#eaf1fb'</span>;
+  <span class="kw">return</span> <span class="str">''</span>;
+}</pre>
+
+      <h3>Vue CSS (scoped)</h3>
+      <pre>.content-root {
+  display: flex; flex-direction: column;
+  width: <span class="val">100%</span>; height: <span class="val">100%</span>;
+}
+.content-card {
+  flex: <span class="val">1 1 0</span>; min-height: <span class="val">0</span>;
+  display: flex; flex-direction: column;
+}
+<span class="cmt">/* override Vuetify's v-card__text padding for flex */</span>
+.content-card ::v-deep .v-card__text {
+  flex: <span class="val">1 1 0</span>; min-height: <span class="val">0</span>; overflow: auto;
+}
+.content-children {
+  flex: <span class="val">1 1 0</span>; min-height: <span class="val">0</span>;
+  display: flex; flex-direction: column;
+}</pre>
+
+      <!-- Implementation Tasks -->
+      <h2 id="todos">Implementation Tasks</h2>
+      <div class="card">
+        <ul class="todo-list">
+          <li>
+            <div class="todo-num">1</div>
+            <div>
+              <strong>C++ header</strong> — add <code>m_sCardStyle</code>, <code>m_nSpacing</code>, <code>m_nElevation</code>, <code>m_sCardColor</code> to <code>amc_ui_module_content.hpp</code>
+              <div><span class="pill pill-blue">amc_ui_module_content.hpp</span></div>
+            </div>
+          </li>
+          <li>
+            <div class="todo-num">2</div>
+            <div>
+              <strong>C++ implementation</strong> — parse and register new attributes in constructor; emit them in legacy JSON
+              <div><span class="pill pill-blue">amc_ui_module_content.cpp</span></div>
+            </div>
+          </li>
+          <li>
+            <div class="todo-num">3</div>
+            <div>
+              <strong>JavaScript module</strong> — read and store new attributes; handle in <code>updateFromV2Attributes</code>
+              <div><span class="pill pill-amber">AMCModule_Content.js</span></div>
+            </div>
+          </li>
+          <li>
+            <div class="todo-num">4</div>
+            <div>
+              <strong>Vue component</strong> — conditional <code>v-card</code> rendering, proper header elements, flex-column gap, <code>height: 100%</code> throughout
+              <div><span class="pill pill-green">AMCModule_Content.vue</span></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Backward Compatibility -->
+      <h2 id="compat">Backward Compatibility</h2>
+      <div class="two-col">
+        <div class="card green">
+          <h4>Safe defaults</h4>
+          <ul>
+            <li><code>cardstyle</code> defaults to <code>"none"</code> → existing plain-div rendering unchanged</li>
+            <li><code>spacing</code> defaults to <code>0</code> → no gap added</li>
+            <li><code>elevation</code> defaults to <code>2</code> → only visible when style is <em>elevated</em></li>
+            <li><code>cardcolor</code> defaults to <code>""</code> → falls back to primary theme tint</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>No API constant changes</h4>
+          <p>The four new attribute names (<code>cardstyle</code>, <code>spacing</code>, <code>elevation</code>, <code>cardcolor</code>) are short, unambiguous string literals used directly — no new <code>#define</code> entries in <code>amc_api_constants.hpp</code> are required.</p>
+          <h4>Legacy JSON path</h4>
+          <p>The new attributes are written to <code>writeLegacyDefinitionToJSON</code> so that any legacy polling path receives them too, preventing blank-screen regressions on older frontend builds.</p>
+        </div>
+      </div>
+
+      <hr>
+      <p style="font-size:12px;color:var(--muted);text-align:center">AMCF Content Widget Upgrade — generated Feb 2026</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>

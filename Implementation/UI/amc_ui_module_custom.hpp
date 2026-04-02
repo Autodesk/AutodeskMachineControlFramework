@@ -101,7 +101,13 @@ namespace AMC {
 
 		virtual void populateLegacyClientVariables(CParameterHandler* pParameterHandler) override;
 
+		/////////////////////////////////////////////////////////////////////////////////////
+		// New UI Frontend System
+		/////////////////////////////////////////////////////////////////////////////////////
 
+		void frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
+
+		bool isVersion2FrontendModule() override;
 
 	};
 

@@ -57,6 +57,11 @@ CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& a
 	readFromXML(xmlNode, attributeName, defaultValue, false);
 }
 
+CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, const char* defaultValue)
+{
+	readFromXML(xmlNode, attributeName, (defaultValue != nullptr) ? defaultValue : "", false);
+}
+
 void CUIExpression::setFixedValue(const std::string& sValue)
 {
 	m_sFixedValue = sValue;
@@ -331,6 +336,12 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 			sExpression = sTrimmedExpression;
 			bInvert = false;
 		}
+
+		// Handle "true" / "false" string literals (e.g. from XML boolean attributes)
+		if (sExpression == "true")
+			return !bInvert;
+		if (sExpression == "false")
+			return bInvert;
 
 		std::string::const_iterator it = sExpression.begin();
 		while (it != sExpression.end() && (std::isdigit(*it) || (*it == '+') || (*it == '-'))) ++it;

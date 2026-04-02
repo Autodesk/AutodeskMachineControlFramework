@@ -66,6 +66,7 @@ namespace AMC {
 		CUIExpression (const pugi::xml_node & xmlNode, const std::string & attributeName);
 		CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, bool bValueMustExist);
 		CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue);
+		CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, const char* defaultValue);
 
 		void setFixedValue(const std::string & sValue);
 

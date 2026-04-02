@@ -730,6 +730,11 @@
 		<error name="INVALIDTELEMETRYCHANNELTYPE" code="705" description="Invalid telemetry channel type." />	
 		<error name="MISSINGTELEMETRYCHANNELIDENTIFIER" code="706" description="Missing telemetry channel identifier." />	
 		<error name="MISSINGTELEMETRYCHANNELDESCRIPTION" code="707" description="Missing telemetry channel description." />	
+		<error name="XMLNODEHASNULLNAMESPACE" code="708" description="XML node has a null namespace. Ensure the XML document declares a namespace on the root element." />				
+		<error name="RESOURCEENTRYSIZISMISMATCH" code="709" description="Resource entry size mismatch between index and ZIP content." />
+		<error name="RESOURCEENTRYCHECKSUMMISMATCH" code="710" description="Resource entry SHA256 checksum mismatch." />
+		<error name="INVALIDRESOURCEENTRYSHA256" code="711" description="Invalid resource entry SHA256 value." />
+				
 		
 		
 		

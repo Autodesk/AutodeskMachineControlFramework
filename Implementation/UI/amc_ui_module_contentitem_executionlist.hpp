@@ -127,6 +127,11 @@ namespace AMC {
 
 		void addButton(const std::string& sButtonName, CUIExpression captionExpression, const std::string& sEvent);
 
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
+		virtual void frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
+
 	};
 
 

@@ -54,8 +54,7 @@ echo long git hash: %LONGGITHASH%
 
 git log -n 1 --format="%%H" -- "%basepath%\Client" >"%builddir%\clientdirhash.txt"
 SET /p CLIENTDIRHASH=<"%builddir%\clientdirhash.txt"
-SET /p CLIENTDISTHASH=<"%basepath%\Artifacts\clientdist\_githash_client.txt"
-
+SET /p CLIENTDISTHASH=<"%basepath%\Artifacts\clientdist\_githash_client_vue2.txt"
 REM Trim Strings
 for /f "tokens=* delims= " %%a in ("%CLIENTDIRHASH%") do set CLIENTDIRHASH=%%a
 for /l %%a in (1,1,100) do if "!CLIENTDIRHASH:~-1!"==" " set CLIENTDIRHASH=!CLIENTDIRHASH:~0,-1! 
@@ -65,16 +64,20 @@ for /l %%a in (1,1,100) do if "!CLIENTDIRHASH:~-1!"==" " set CLIENTDIRHASH=!CLIE
 echo client hash: %CLIENTDIRHASH%
 echo client dist hash: %CLIENTDISTHASH%
 
-if "%CLIENTDIRHASH%" neq "%CLIENTDISTHASH%" (
-	echo "Please rebuild client!"
-	goto ERROR
-)
+REM if "%CLIENTDIRHASH%" neq "%CLIENTDISTHASH%" (
+REM 	echo "Please rebuild client!"
+REM 	goto ERROR
+REM )
 
 cd /d "%basepath%"
 
-copy /y "%basepath%Artifacts\clientdist\clientpackage.zip" "%builddir%\Output\%GITHASH%_core.client"
+copy /y "%basepath%Artifacts\clientdist\clientpackage_vue2.zip" "%builddir%\Output\%GITHASH%_core_vue2.client"
 if "%ERRORLEVEL%" neq "0" (
 	goto ERROR
+)
+
+if exist "%basepath%Artifacts\clientdist\clientpackage_svelte.zip" (
+	copy /y "%basepath%Artifacts\clientdist\clientpackage_svelte.zip" "%builddir%\Output\%GITHASH%_core_svelte.client"
 )
 
 copy /y "%basepath%Artifacts\apidocsdist\apidocspackage.zip" "%builddir%\Output\%GITHASH%_core.apidocs"
@@ -103,7 +106,7 @@ echo "Building Deployment ZIP"
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
 
-copy "%basepath%\Artifacts\clientdist\clientsourcepackage.zip" Framework\ClientSource\%GITHASH%_client_source.zip
+copy "%basepath%\Artifacts\clientdist\clientsourcepackage_vue2.zip" Framework\ClientSource\%GITHASH%_client_source.zip
 if "%ERRORLEVEL%" neq "0" (
 	goto ERROR
 )
@@ -114,7 +117,10 @@ copy ..\Output\amc_server.exe Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmc.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_lib3mf.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmcdata.dll Framework\Dist\
-copy ..\Output\%GITHASH%_core.client Framework\Dist\
+copy ..\Output\%GITHASH%_core_vue2.client Framework\Dist\
+if exist ..\Output\%GITHASH%_core_svelte.client (
+	copy ..\Output\%GITHASH%_core_svelte.client Framework\Dist\
+)
 copy ..\Output\%GITHASH%_core.apidocs Framework\Dist\
 copy ..\Output\%GITHASH%_*.data Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\

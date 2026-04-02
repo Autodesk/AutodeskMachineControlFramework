@@ -40,7 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_resourcepackage.hpp"
 #include "amc_toolpathhandler.hpp"
 #include "amc_meshhandler.hpp"
+#include "amc_meshentity.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_toolpathpart.hpp"
+#include "amc_toolpathentity.hpp"
 
 #include "libmc_exceptiontypes.hpp"
 
@@ -209,7 +212,7 @@ void CUIModule_GLSceneItem::setEventPayloadValue(const std::string& sEventName, 
 void CUIModule_GLSceneItem::populateClientVariables(CParameterHandler* pClientVariableHandler)
 {
 	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "gl scene");
-
+	pGroup->addNewStringParameter("builduuid", "selected build UUID", AMCCommon::CUtils::createEmptyUUID());
 }
 
 
@@ -307,6 +310,18 @@ CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string&
 
 
 	m_pSceneItem = std::make_shared<CUIModule_GLSceneItem>(getModulePath (), m_sUUID, pUIModuleEnvironment, this);
+	m_pUIModuleEnvironment = pUIModuleEnvironment;
+
+	auto captionAttrib = xmlNode.attribute("caption");
+	m_sCaption = captionAttrib.as_string();
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(m_sCaption);
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr;
+	visibleExpr.setFixedValue("1");
+	registerBoolAttribute("visible", visibleExpr);
 
 }
 
@@ -399,4 +414,111 @@ void CUIModule_GLScene::populateLegacyClientVariables(CParameterHandler* pParame
 
 	m_pSceneItem->populateClientVariables(pParameterHandler);
 
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+
+bool CUIModule_GLScene::isVersion2FrontendModule()
+{
+	return true;
+}
+
+void CUIModule_GLScene::ensureBuildMeshesRegistered(const std::string& sBuildUUID, std::vector<DynamicMeshInstance>& instances)
+{
+	if (sBuildUUID.empty() || sBuildUUID == AMCCommon::CUtils::createEmptyUUID())
+		return;
+
+	auto pDataModel = m_pUIModuleEnvironment->dataModel();
+	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
+
+	auto pToolpathHandler = m_pUIModuleEnvironment->toolpathHandler();
+	auto pMeshHandler = m_pUIModuleEnvironment->meshHandler();
+
+	auto pToolpath = pToolpathHandler->findToolpathEntity(sStreamUUID, false);
+	if (pToolpath == nullptr)
+		pToolpath = pToolpathHandler->loadToolpathEntity(sStreamUUID);
+
+	uint32_t nPartCount = pToolpath->getPartCount();
+	for (uint32_t nPartIndex = 0; nPartIndex < nPartCount; nPartIndex++) {
+		auto pPart = pToolpath->getPart(nPartIndex);
+		std::string sMeshObjectUUID = pPart->getMeshUUID();
+
+		if (!pMeshHandler->hasMeshEntity(sMeshObjectUUID)) {
+			auto pModel = pPart->getModel();
+			auto pBuildItem = pPart->getBuildItem();
+			auto nResourceID = pBuildItem->GetObjectResourceID();
+			auto pObjectResource = pBuildItem->GetObjectResource();
+			if (pObjectResource->IsMeshObject()) {
+				Lib3MF::PMeshObject pMeshObject = pModel->GetMeshObjectByID(nResourceID);
+				auto pMeshEntity = std::make_shared<CMeshEntity>(sMeshObjectUUID, pPart->getName());
+				pMeshEntity->loadFrom3MF(pMeshObject.get());
+				pMeshHandler->registerEntity(pMeshEntity);
+			}
+		}
+
+		DynamicMeshInstance inst;
+		inst.uuid = sMeshObjectUUID;
+		inst.name = pPart->getName();
+		inst.meshUUID = sMeshObjectUUID;
+		instances.push_back(inst);
+	}
+}
+
+
+void CUIModule_GLScene::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	CUIModule::frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
+
+	std::vector<DynamicMeshInstance> dynamicInstances;
+	if (pFrontendState != nullptr) {
+		auto pParamHandler = pFrontendState->getLegacyParameterHandler();
+		auto pGroup = pParamHandler->findGroup(getModulePath(), false);
+		if (pGroup != nullptr) {
+			std::string sBuildUUID = pGroup->getParameterValueByName("builduuid");
+			try {
+				ensureBuildMeshesRegistered(sBuildUUID, dynamicInstances);
+			}
+			catch (std::exception& e) {
+				auto pLogger = m_pUIModuleEnvironment->getLogger();
+				pLogger->logMessage(std::string("GLScene: failed to load build meshes: ") + e.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Warning);
+			}
+		}
+	}
+
+	CJSONWriterArray submodulesArray(writer);
+
+	for (auto& instancePair : m_InstanceNameMap) {
+		auto pInstance = instancePair.second;
+		auto pModel = pInstance->getModel();
+
+		CJSONWriterObject subModuleObject(writer);
+		subModuleObject.addString("moduletype", "glsceneinstance");
+		subModuleObject.addString("uuid", pInstance->getUUID());
+
+		CJSONWriterObject attributesObject(writer);
+		attributesObject.addString("instancename", pInstance->getName());
+		attributesObject.addString("meshuuid", pModel->getMeshUUID());
+		subModuleObject.addObject("attributes", attributesObject);
+
+		submodulesArray.addObject(subModuleObject);
+	}
+
+	for (auto& dynInst : dynamicInstances) {
+		CJSONWriterObject subModuleObject(writer);
+		subModuleObject.addString("moduletype", "glsceneinstance");
+		subModuleObject.addString("uuid", dynInst.uuid);
+
+		CJSONWriterObject attributesObject(writer);
+		attributesObject.addString("instancename", dynInst.name);
+		attributesObject.addString("meshuuid", dynInst.meshUUID);
+		subModuleObject.addObject("attributes", attributesObject);
+
+		submodulesArray.addObject(subModuleObject);
+	}
+
+	moduleObject.addArray("submodules", submodulesArray);
 }

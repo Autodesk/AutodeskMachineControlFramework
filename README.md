@@ -135,7 +135,7 @@ Connect a web browser to `http://[server-ip]:[port]` to access the web interface
 
 ## Building Packages
 
-### Client Distribution
+### Client Distribution (Vue 2)
 ```bash
 # Windows
 Artifacts\build_client_clean.bat
@@ -143,7 +143,17 @@ Artifacts\build_client_clean.bat
 # Linux
 ./Artifacts/build_client_clean.sh
 ```
-Output: `Artifacts/clientdist/clientpackage.zip`
+Output: `Artifacts/clientdist/clientpackage_vue2.zip`
+
+### Client Distribution (Vue 3)
+```bash
+# Windows
+Artifacts\build_client_v3_clean.bat
+
+# Linux
+./Artifacts/build_client_v3_clean.sh
+```
+Output: `Artifacts/clientdist_v3/clientpackage_vue3.zip`
 
 ### API Documentation
 ```bash

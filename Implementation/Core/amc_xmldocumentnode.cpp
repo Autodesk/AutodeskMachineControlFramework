@@ -46,7 +46,7 @@ CXMLDocumentNodeInstance::CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocume
 	if (!checkXMLNodeName (sNodeName)) 
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLNODENAME, sNodeName);
 	if (pNameSpace.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNODEHASNULLNAMESPACE, sNodeName);
 
 }
 
@@ -379,7 +379,7 @@ PXMLDocumentNodeInstance CXMLDocumentNodeInstance::FindChild(CXMLDocumentNameSpa
 PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(PXMLDocumentNameSpace pNameSpace, const std::string& sName)
 {
 	if (pNameSpace.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNODEHASNULLNAMESPACE, sName);
 
 	if (!m_sTextContent.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_XMLNODEHASTEXTCONTENT);

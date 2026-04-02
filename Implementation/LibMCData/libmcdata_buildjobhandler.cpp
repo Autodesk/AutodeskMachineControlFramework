@@ -113,10 +113,12 @@ IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::s
     pInsertStatement->setString(6, sNormalizedUserUUID);
     pInsertStatement->setString(7, sUserName); // This is for legacy use
     pInsertStatement->execute();
+    pInsertStatement = nullptr;
 
+    CBuildJob::bumpIncrementalID(pTransaction.get(), sParsedJobUUID);
     pTransaction->commit ();
 
-    return CBuildJob::make(sParsedJobUUID, sName, eJobStatus, sTimeStamp, sNormalizedStorageStreamUUID, nStorageStreamSize, sNormalizedUserUUID, sUserName, 0, 0, AMCCommon::CUtils::createEmptyUUID (), m_pSQLHandler, m_pStorageState);
+    return CBuildJob::make(sParsedJobUUID, sName, eJobStatus, sTimeStamp, sNormalizedStorageStreamUUID, nStorageStreamSize, sNormalizedUserUUID, sUserName, 0, 0, AMCCommon::CUtils::createEmptyUUID (), 0, m_pSQLHandler, m_pStorageState);
     
 }
 
@@ -141,7 +143,7 @@ IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJob
 
     std::unique_ptr<CBuildJobIterator> pJobIterator(new CBuildJobIterator());
 
-    std::string sQuery = "SELECT buildjobs.uuid, buildjobs.name, buildjobs.status, buildjobs.timestamp, buildjobs.storagestreamuuid, buildjobs.layercount, buildjobs.useruuid, users.login, (SELECT count(buildjobexecutions.uuid) FROM buildjobexecutions WHERE buildjobexecutions.jobuuid=buildjobs.uuid), buildjobs.thumbnailuuid, storage_streams.size FROM buildjobs LEFT JOIN users On users.uuid=buildjobs.useruuid LEFT JOIN storage_streams ON storage_streams.uuid=buildjobs.storagestreamuuid WHERE buildjobs.status=? ORDER BY buildjobs.timestamp DESC";
+    std::string sQuery = "SELECT buildjobs.uuid, buildjobs.name, buildjobs.status, buildjobs.timestamp, buildjobs.storagestreamuuid, buildjobs.layercount, buildjobs.useruuid, users.login, (SELECT count(buildjobexecutions.uuid) FROM buildjobexecutions WHERE buildjobexecutions.jobuuid=buildjobs.uuid), buildjobs.thumbnailuuid, storage_streams.size, buildjobs.incremental_id FROM buildjobs LEFT JOIN users On users.uuid=buildjobs.useruuid LEFT JOIN storage_streams ON storage_streams.uuid=buildjobs.storagestreamuuid WHERE buildjobs.status=? ORDER BY buildjobs.timestamp DESC";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, CBuildJob::convertBuildJobStatusToString(eStatus));
     while (pStatement->nextRow()) {
@@ -165,9 +167,10 @@ IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJob
 
         std::string sThumbnailUUID = pStatement->getColumnString(10);
 
-		uint64_t nStorageStreamSize = pStatement->getColumnInt64 (11);
+		uint64_t nStorageStreamSize = pStatement->getColumnInt64(11);
+        uint64_t nIncrementalID = (uint64_t) pStatement->getColumnInt64(12);
 
-        pJobIterator->AddJob (CBuildJob::makeShared (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, nStorageStreamSize, sUserUUID, sUserName, nLayerCount, (uint32_t) nExecutionCount, sThumbnailUUID, m_pSQLHandler, m_pStorageState));
+        pJobIterator->AddJob (CBuildJob::makeShared (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, nStorageStreamSize, sUserUUID, sUserName, nLayerCount, (uint32_t) nExecutionCount, sThumbnailUUID, nIncrementalID, m_pSQLHandler, m_pStorageState));
     }
 
     return pJobIterator.release();
@@ -259,4 +262,22 @@ IBuildJobExecutionIterator* CBuildJobHandler::ListJobExecutions(const std::strin
     }
 
     return buildJobIterator.release();
+}
+
+LibMCData_uint64 CBuildJobHandler::GetBuildListHeadID()
+{
+    std::string sQuery = "SELECT COALESCE(MAX(incremental_id), 0) FROM buildjobs";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    if (!pStatement->nextRow())
+        return 0;
+    return (uint64_t) pStatement->getColumnInt64(1);
+}
+
+LibMCData_uint64 CBuildJobHandler::GetExecutionListHeadID()
+{
+    std::string sQuery = "SELECT COALESCE(MAX(incremental_id), 0) FROM buildjobexecutions";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    if (!pStatement->nextRow())
+        return 0;
+    return (uint64_t) pStatement->getColumnInt64(1);
 }

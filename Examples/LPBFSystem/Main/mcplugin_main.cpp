@@ -140,6 +140,8 @@ __DECLARESTATE(idle)
 	pDummyTrigger->SetInteger("timer", (int32_t)nTimer);
 	pDummyTrigger->Trigger();
 
+	pStateEnvironment->LogMessage("Timer: " + std::to_string(nTimer));
+
 	auto pTelemetryChannel = pStateEnvironment->FindTelemetryChannel("gasinitializationtime", true);
 	auto pMarker = pTelemetryChannel->StartMarkerScope(12345);
 

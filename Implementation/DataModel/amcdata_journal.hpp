@@ -156,6 +156,8 @@ namespace AMCData {
 		void acknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimeStampUTC);
 		void deactivateAlert(const std::string& sAlertUUID);
 
+		uint64_t getAlertHeadID();
+
 		uint64_t getChunkIntervalInMicroseconds ();
 
 		uint64_t getMaxMemoryQuotaInBytes ();

@@ -101,6 +101,8 @@ namespace AMC {
 
 		std::mutex m_Mutex;
 		std::map<std::string, uint32_t> m_Colors;
+		std::map<std::string, uint32_t> m_DarkColors;
+		std::string m_sDefaultTheme;
 
 		std::string m_sAppName;
 		std::string m_sCopyrightString;
@@ -109,6 +111,9 @@ namespace AMC {
 
 		CUIExpression m_LoginBackgroundUUID;
 		CUIExpression m_LoginWelcomeMessage;
+		std::string m_sLoginStyle;
+		CUIExpression m_LoginSubtitle;
+		std::string m_sPanelResourceName;
 
 		std::string m_sMainPageName;
 
@@ -174,9 +179,13 @@ namespace AMC {
 
 
 		/////////////////////////////////////////////////////////////////////////////////////
+		// Shared UI bootstrap configuration
+		/////////////////////////////////////////////////////////////////////////////////////
+		void writeConfigurationToJSON (CJSONWriter& writer);
+
+		/////////////////////////////////////////////////////////////////////////////////////
 		// Legacy UI System
 		/////////////////////////////////////////////////////////////////////////////////////
-		void writeLegacyConfigurationToJSON (CJSONWriter& writer);
 		void writeLegacyStateToJSON(CJSONWriter& writer, CParameterHandler* pLegacyClientVariableHandler);
 		PUIModuleItem findModuleItem(const std::string& sUUID);
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
@@ -198,4 +207,3 @@ namespace AMC {
 
 
 #endif //__AMC_UI_HANDLER
-

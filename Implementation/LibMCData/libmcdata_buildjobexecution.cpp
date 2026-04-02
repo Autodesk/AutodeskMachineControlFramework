@@ -150,6 +150,17 @@ std::shared_ptr<CBuildJobExecution> CBuildJobExecution::makeSharedFromStatement(
 }
 
 
+void CBuildJobExecution::bumpIncrementalID(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID)
+{
+	if (pSQLHandler.get() == nullptr)
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+	std::string sUpdateQuery = "UPDATE buildjobexecutions SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM buildjobexecutions) WHERE uuid=?";
+	auto pStatement = pSQLHandler->prepareStatement(sUpdateQuery);
+	pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString(sExecutionUUID));
+	pStatement->execute();
+}
+
 CBuildJobExecution* CBuildJobExecution::makeFrom(CBuildJobExecution* pBuildJobExecution)
 {
 	if (pBuildJobExecution == nullptr)
@@ -244,6 +255,11 @@ void CBuildJobExecution::ChangeStatus(const LibMCData::eBuildJobExecutionStatus 
 	pUpdateStatement->setString(2, AMCCommon::CChrono::convertToISO8601TimeUTC (nAbsoluteEndTimeStampInMicrosecondsSince1970));
 	pUpdateStatement->setString(3, m_sExecutionUUID);
 	pUpdateStatement->execute();
+
+	std::string sBumpQuery = "UPDATE buildjobexecutions SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM buildjobexecutions) WHERE uuid=?";
+	auto pBumpStatement = pTransaction->prepareStatement(sBumpQuery);
+	pBumpStatement->setString(1, m_sExecutionUUID);
+	pBumpStatement->execute();
 
 	pTransaction->commit();
 }

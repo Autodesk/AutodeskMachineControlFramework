@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Libraries/PugiXML/pugixml.hpp"
 #include <array>
+#include <vector>
 
 namespace AMC {
 
@@ -150,6 +151,16 @@ namespace AMC {
 
 		PUIModule_GLSceneItem m_pSceneItem;
 
+		PUIModuleEnvironment m_pUIModuleEnvironment;
+
+		struct DynamicMeshInstance {
+			std::string uuid;
+			std::string name;
+			std::string meshUUID;
+		};
+
+		void ensureBuildMeshesRegistered(const std::string& sBuildUUID, std::vector<DynamicMeshInstance>& instances);
+
 	public:
 
 		/////////////////////////////////////////////////////////////////////////////////////
@@ -184,6 +195,13 @@ namespace AMC {
 
 		virtual void populateLegacyClientVariables(CParameterHandler* pParameterHandler) override;
 
+		/////////////////////////////////////////////////////////////////////////////////////
+		// New UI Frontend System
+		/////////////////////////////////////////////////////////////////////////////////////
+
+		void frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
+
+		bool isVersion2FrontendModule() override;
 
 	};
 

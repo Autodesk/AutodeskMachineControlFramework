@@ -56,6 +56,10 @@ namespace AMC {
 
 		void writeModuleAttributesToJSON(CJSONWriter& writer, CJSONWriterObject &attributesObject, CUIFrontendDefinitionModuleStore * pModuleStore, CStateMachineData* pStateMachineData);
 
+		// Recursive serialization: writes moduletype, uuid, attributes, and submodules (if children exist).
+		// The definition tree owns the hierarchy; the stores hold flat attribute values.
+		void writeModuleStoreToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendDefinitionModuleStore* pModuleStore, CStateMachineData* pStateMachineData);
+
 	};
 
 }

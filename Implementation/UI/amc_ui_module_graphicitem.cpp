@@ -86,3 +86,55 @@ void CUIModuleGraphicItem::populateClientVariables(CParameterHandler* pParameter
 {
 
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+
+void CUIModuleGraphicItem::initFrontendModuleStore(CUIFrontendDefinition* pFrontendDefinition)
+{
+	LibMCAssertNotNull(pFrontendDefinition);
+	m_pItemModuleStore = pFrontendDefinition->registerModuleStore(m_sUUID, getItemPath());
+	registerFrontendAttributes();
+}
+
+void CUIModuleGraphicItem::registerFrontendAttributes()
+{
+}
+
+std::string CUIModuleGraphicItem::getItemType()
+{
+	return "";
+}
+
+void CUIModuleGraphicItem::frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	std::string sItemType = getItemType();
+	if (sItemType.empty())
+		return;
+
+	itemObject.addString("moduletype", sItemType);
+	itemObject.addString("uuid", m_sUUID);
+
+	CJSONWriterObject attributesObject(writer);
+	if (m_pItemModuleStore != nullptr)
+		pFrontendState->writeModuleAttributesToJSON(writer, attributesObject, m_pItemModuleStore.get(), pStateMachineData);
+	itemObject.addObject("attributes", attributesObject);
+}
+
+PUIFrontendDefinitionAttribute CUIModuleGraphicItem::registerItemStringAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atString, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModuleGraphicItem::registerItemNumberAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atNumber, expression);
+}

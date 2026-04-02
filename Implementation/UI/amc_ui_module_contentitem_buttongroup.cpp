@@ -164,6 +164,37 @@ void CUIModule_ContentButton::syncClientVariables(CParameterHandler* pClientVari
 }
 
 
+void CUIModule_ContentButton::registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore)
+{
+	LibMCAssertNotNull(pStore.get());
+	m_pFrontendStore = pStore;
+
+	pStore->registerValue("caption", eUIFrontendDefinitionAttributeType::atString, m_CaptionExpression);
+	pStore->registerValue("disabled", eUIFrontendDefinitionAttributeType::atBoolean, m_DisabledExpression);
+	pStore->registerValue("event", eUIFrontendDefinitionAttributeType::atString, m_EventExpression);
+	pStore->registerValue("targetpage", eUIFrontendDefinitionAttributeType::atString, m_TargetPageExpression);
+	pStore->registerValue("icon", eUIFrontendDefinitionAttributeType::atString, m_IconExpression);
+}
+
+
+void CUIModule_ContentButton::registerFrontendEventFormValues()
+{
+	if (m_pFrontendStore == nullptr)
+		return;
+
+	std::string sFormValueUUIDs;
+	for (auto& pFormValue : m_pFormValues) {
+		if (!sFormValueUUIDs.empty())
+			sFormValueUUIDs += " ";
+		sFormValueUUIDs += pFormValue->getUUID();
+	}
+
+	CUIExpression formValuesExpr;
+	formValuesExpr.setFixedValue(sFormValueUUIDs);
+	m_pFrontendStore->registerValue("eventformvalues", eUIFrontendDefinitionAttributeType::atString, formValuesExpr);
+}
+
+
 PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
 {
 	LibMCAssertNotNull(pUIModuleEnvironment);
@@ -325,6 +356,11 @@ void CUIModule_ContentButtonGroup::configurePostLoading()
 		 
 	}
 
+	// Register eventformvalues on each button's frontend store now that form values are resolved
+	for (auto& pButton : m_Buttons) {
+		pButton->registerFrontendEventFormValues();
+	}
+
 }
 
 
@@ -404,5 +440,22 @@ void CUIModule_ContentButtonGroup::populateClientVariables(CParameterHandler* pC
 	LibMCAssertNotNull(pClientVariableHandler);
 	for (auto pButton : m_Buttons) {
 		pButton->registerClientVariableGroup(pClientVariableHandler);
+	}
+}
+
+std::string CUIModule_ContentButtonGroup::getItemType()
+{
+	return "buttongroup";
+}
+
+void CUIModule_ContentButtonGroup::registerFrontendAttributes()
+{
+	CUIExpression distExpr;
+	distExpr.setFixedValue(buttonDistributionToString(m_ButtonDistribution));
+	registerItemStringAttribute("buttondistribution", distExpr);
+
+	for (auto& pButton : m_Buttons) {
+		auto pChildStore = m_pItemModuleStore->addChildStore(pButton->getUUID(), pButton->getElementPath(), "button");
+		pButton->registerFrontendAttributes(pChildStore);
 	}
 }

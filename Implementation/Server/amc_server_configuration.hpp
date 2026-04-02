@@ -72,6 +72,7 @@ namespace AMC {
 		std::string m_sPackageCoreClient;
 		std::string m_sPackageConfig;
 		std::string m_sPackageAPIDocs;
+		std::string m_sClientVariant;
 
 		bool m_bUseSSL;
 		std::string m_sServerCertificatePEM;

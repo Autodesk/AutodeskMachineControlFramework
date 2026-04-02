@@ -447,6 +447,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrievealerts(LibMCDa
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_retrievealertsbytype(LibMCData_AlertSession pAlertSession, const char * pIdentifier, bool bOnlyActive, LibMCData_AlertIterator * pIteratorInstance);
 
+/**
+* Returns the current maximum incremental ID across all alerts. Used by the frontend to detect when the alert list has changed.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[out] pHeadID - Maximum incremental ID, or 0 if no alerts exist.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_alertsession_getalertheadid(LibMCData_AlertSession pAlertSession, LibMCData_uint64 * pHeadID);
+
 /*************************************************************************************************************************
  Class definition for TelemetrySession
 **************************************************************************************************************************/
@@ -2209,6 +2218,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievebuildjobexecutions
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievebuildjobexecutionsbystatus(LibMCData_BuildJob pBuildJob, LibMCData::eBuildJobExecutionStatus eStatusFilter, const char * pJournalUUIDFilter, LibMCData_BuildJobExecutionIterator * pIteratorInstance);
 
+/**
+* Returns the monotonically increasing incremental ID of the build job. Used for frontend change detection.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[out] pIncrementalID - Incremental ID of the build job. Increases with every status change.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getincrementalid(LibMCData_BuildJob pBuildJob, LibMCData_uint64 * pIncrementalID);
+
 /*************************************************************************************************************************
  Class definition for BuildJobIterator
 **************************************************************************************************************************/
@@ -2323,6 +2341,24 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_retrievejobexecutio
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_listjobexecutions(LibMCData_BuildJobHandler pBuildJobHandler, const char * pMinTimestamp, const char * pMaxTimestamp, const char * pJournalUUIDFilter, LibMCData_BuildJobExecutionIterator * pIteratorInstance);
+
+/**
+* Returns the current maximum incremental ID across all build jobs. Used by the frontend to detect when the build list has changed.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[out] pHeadID - Maximum incremental ID, or 0 if no jobs exist.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_getbuildlistheadid(LibMCData_BuildJobHandler pBuildJobHandler, LibMCData_uint64 * pHeadID);
+
+/**
+* Returns the current maximum incremental ID across all build job executions. Used by the frontend to detect when the execution list has changed.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[out] pHeadID - Maximum incremental ID, or 0 if no executions exist.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_getexecutionlistheadid(LibMCData_BuildJobHandler pBuildJobHandler, LibMCData_uint64 * pHeadID);
 
 /*************************************************************************************************************************
  Class definition for UserList

@@ -216,6 +216,7 @@ namespace AMCData {
 		sAlertQuery += "`uuid`  varchar ( 64 ) NOT NULL, ";
 		sAlertQuery += "`identifier`  varchar ( 64 ) NOT NULL, ";
 		sAlertQuery += "`alertindex`	int DEFAULT 0, ";
+		sAlertQuery += "`incremental_id`	int DEFAULT 0, ";
 		sAlertQuery += "`alertlevel`	varchar (64) NOT NULL,";
 		sAlertQuery += "`description`	TEXT DEFAULT ``,";
 		sAlertQuery += "`descriptionidentifier`  varchar ( 64 ) NOT NULL, ";
@@ -652,7 +653,24 @@ namespace AMCData {
 		pStatement->execute();
 		pStatement = nullptr;
 
+		std::string sBumpQuery = "UPDATE alerts SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM alerts) WHERE uuid=?";
+		auto pBumpStatement = m_pSQLHandler->prepareStatement(sBumpQuery);
+		pBumpStatement->setString(1, sNormalizedUUID);
+		pBumpStatement->execute();
+		pBumpStatement = nullptr;
+
 		m_AlertID++;
+	}
+
+	uint64_t CJournal::getAlertHeadID()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
+
+		std::string sQuery = "SELECT COALESCE(MAX(incremental_id), 0) FROM alerts";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		if (pStatement->nextRow())
+			return (uint64_t) pStatement->getColumnInt64(1);
+		return 0;
 	}
 
 
@@ -836,38 +854,49 @@ namespace AMCData {
 
 	void CJournal::acknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment, const std::string& sTimeStampUTC)
 	{
+		std::string sNormalizedAlertUUID = AMCCommon::CUtils::normalizeUUIDString(sAlertUUID);
+
 		auto pTransaction = m_pSQLHandler->beginTransaction();
 		auto sDeactivateQuery = "UPDATE alerts SET active=0 WHERE uuid=?";
 		auto pDeactivateStatement = pTransaction->prepareStatement(sDeactivateQuery);
-		pDeactivateStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString(sAlertUUID));
+		pDeactivateStatement->setString(1, sNormalizedAlertUUID);
 		pDeactivateStatement->execute();
 
 		std::string sAcknowledgeUUID = AMCCommon::CUtils::createUUID();
 
 		auto sInsertAckQuery = "INSERT INTO alertacknowledgements (uuid, alertuuid, useruuid, usercomment, timestamp) VALUES (?, ?, ?, ?, ?)";
-
 		auto pInsertAckStatement = pTransaction->prepareStatement(sInsertAckQuery);
 		pInsertAckStatement->setString(1, sAcknowledgeUUID);
-		pInsertAckStatement->setString(2, AMCCommon::CUtils::normalizeUUIDString(sAlertUUID));
+		pInsertAckStatement->setString(2, sNormalizedAlertUUID);
 		pInsertAckStatement->setString(3, AMCCommon::CUtils::normalizeUUIDString(sUserUUID));
 		pInsertAckStatement->setString(4, sUserComment);
 		pInsertAckStatement->setString(5, sTimeStampUTC);
 		pInsertAckStatement->execute();
 
-		pTransaction->commit();
+		auto sBumpQuery = "UPDATE alerts SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM alerts) WHERE uuid=?";
+		auto pBumpStatement = pTransaction->prepareStatement(sBumpQuery);
+		pBumpStatement->setString(1, sNormalizedAlertUUID);
+		pBumpStatement->execute();
 
+		pTransaction->commit();
 	}
 
 	void CJournal::deactivateAlert(const std::string& sAlertUUID)
 	{
+		std::string sNormalizedAlertUUID = AMCCommon::CUtils::normalizeUUIDString(sAlertUUID);
+
 		auto pTransaction = m_pSQLHandler->beginTransaction();
 		auto sQuery = "UPDATE alerts SET active=0 WHERE uuid=?";
 		auto pStatement = pTransaction->prepareStatement(sQuery);
-		pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString (sAlertUUID));
+		pStatement->setString(1, sNormalizedAlertUUID);
 		pStatement->execute();
 
-		pTransaction->commit();
+		auto sBumpQuery = "UPDATE alerts SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM alerts) WHERE uuid=?";
+		auto pBumpStatement = pTransaction->prepareStatement(sBumpQuery);
+		pBumpStatement->setString(1, sNormalizedAlertUUID);
+		pBumpStatement->execute();
 
+		pTransaction->commit();
 	}
 
 	uint64_t CJournal::getChunkIntervalInMicroseconds()

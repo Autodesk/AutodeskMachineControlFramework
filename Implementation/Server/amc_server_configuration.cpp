@@ -42,6 +42,39 @@ using namespace AMC;
 #define XMLNS_SERVERCONFIG "http://schemas.autodesk.com/amc/2020/06"
 #define XMLNS_PACKAGECONFIG "http://schemas.autodesk.com/amcpackage/2020/06"
 
+static std::string getClientVariantFromConfig(const std::string& sConfigFileName)
+{
+	if (sConfigFileName.empty())
+		return "";
+
+	if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sConfigFileName))
+		return "";
+
+	AMCCommon::CImportStream_Native configStream(sConfigFileName);
+	std::string sConfigXML = configStream.readAsString();
+	if (sConfigXML.empty())
+		return "";
+
+	pugi::xml_document configDoc;
+	pugi::xml_parse_result result = configDoc.load_string(sConfigXML.c_str());
+	if (!result)
+		return "";
+
+	auto mainNode = configDoc.child("machinedefinition");
+	if (mainNode.empty())
+		mainNode = configDoc.child("testdefinition");
+
+	if (mainNode.empty())
+		return "";
+
+	auto clientAttrib = mainNode.attribute("client");
+	std::string sClientVariant = clientAttrib.as_string();
+	if (!sClientVariant.empty() && !AMCCommon::CUtils::stringIsValidAlphanumericNameString(sClientVariant))
+		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "Invalid client variant name in configuration: " + sClientVariant);
+
+	return sClientVariant;
+}
+
 CServerLibrary::CServerLibrary(const std::string& sLibraryPath, const std::string& sResourcePath)
 	: m_sLibraryPath (sLibraryPath), m_sResourcePath (sResourcePath)
 {
@@ -87,6 +120,13 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 	std::string xmlns(xmlnsAttrib.as_string());
 	if (xmlns != XMLNS_SERVERCONFIG)
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDXMLSCHEMA, "Invalid XML Schema: " + xmlns);
+
+	auto clientAttrib = amcNode.attribute("client");
+	m_sClientVariant = clientAttrib.as_string();
+	if (!m_sClientVariant.empty()) {
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(m_sClientVariant))
+			throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "Invalid client variant name: " + m_sClientVariant);
+	}
 
 
 	auto serverNode = amcNode.child("server");
@@ -303,15 +343,60 @@ void CServerConfiguration::loadPackageXML(const std::string sPackageFileName)
 	std::string sConfigurationName = buildNode.attribute("configuration").as_string();
 	if (sConfigurationName.empty())
 		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGCONFIGURATIONNAME, "Missing configuration name");
+	std::string sConfigurationPath = AMCCommon::CUtils::getFullPathName(sConfigurationName, true);
+	std::string sConfigClientVariant = getClientVariantFromConfig(sConfigurationPath);
+	if (!sConfigClientVariant.empty())
+		m_sClientVariant = sConfigClientVariant;
 
 	std::string sCoreClient = buildNode.attribute("coreclient").as_string();
-	if (sCoreClient.empty())
+	auto coreClientsNode = buildNode.child("coreclients");
+	std::map<std::string, std::string> coreClients;
+	std::string sDefaultClient = "";
+	if (!coreClientsNode.empty()) {
+		auto defaultAttrib = coreClientsNode.attribute("default");
+		sDefaultClient = defaultAttrib.as_string();
+		if (!sDefaultClient.empty() && !AMCCommon::CUtils::stringIsValidAlphanumericNameString(sDefaultClient))
+			throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "Invalid default client variant name: " + sDefaultClient);
+
+		for (auto coreClientNode : coreClientsNode.children("coreclient")) {
+			std::string sClientName = coreClientNode.attribute("name").as_string();
+			std::string sClientFile = coreClientNode.attribute("file").as_string();
+			if (sClientName.empty())
+				throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "Missing core client name in package");
+			if (sClientFile.empty())
+				throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "Missing core client file in package: " + sClientName);
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sClientName))
+				throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "Invalid core client name: " + sClientName);
+
+			coreClients.insert(std::make_pair(sClientName, sClientFile));
+		}
+	}
+
+	if (sCoreClient.empty() && coreClients.empty())
 		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGCORECLIENT, "Missing core client");
+
+	std::string sSelectedClient = m_sClientVariant;
+	if (sSelectedClient.empty())
+		sSelectedClient = sDefaultClient;
+
+	if (!sSelectedClient.empty() && !coreClients.empty()) {
+		auto iClient = coreClients.find(sSelectedClient);
+		if (iClient == coreClients.end())
+			throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGCORECLIENT, "Unknown core client variant: " + sSelectedClient);
+		sCoreClient = iClient->second;
+	}
+
+	if (sCoreClient.empty() && !coreClients.empty()) {
+		if (!sDefaultClient.empty() && coreClients.find(sDefaultClient) != coreClients.end())
+			sCoreClient = coreClients.at(sDefaultClient);
+		else
+			sCoreClient = coreClients.begin()->second;
+	}
 
 	std::string sAPIDocs = buildNode.attribute("apidocs").as_string();
 
 	m_sPackageName = sName;
-	m_sPackageConfig = AMCCommon::CUtils::getFullPathName(sConfigurationName, true);
+	m_sPackageConfig = sConfigurationPath;
 	m_sPackageCoreClient = AMCCommon::CUtils::getFullPathName(sCoreClient, true);
 	if (!sAPIDocs.empty ())
 		m_sPackageAPIDocs = AMCCommon::CUtils::getFullPathName(sAPIDocs, true);
@@ -355,4 +440,3 @@ std::string CServerConfiguration::getServerPrivateKeyPEM()
 {
 	return m_sServerPrivateKeyPEM;
 }
-

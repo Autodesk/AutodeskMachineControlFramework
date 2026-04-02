@@ -1,0 +1,111 @@
+/*
+ * AMCF Design Tokens
+ * 
+ * Default theme following the ScanLab corporate style guide.
+ * Light backgrounds, ScanLab red accent, clean industrial aesthetic.
+ * Every widget must consume these tokens exclusively — no hardcoded colors.
+ * Override any token via a JSON theme file loaded by themeLoader.js.
+ *
+ * Copyright (C) 2026 Autodesk Inc.  All rights reserved.
+ * BSD-3-Clause — see LICENSE for details.
+ */
+
+:root {
+
+	/* ── Surface colors (light industrial) ────────────────────────── */
+	--amcf-color-bg:              #E0E3E7;
+	--amcf-color-surface:         #FFFFFF;
+	--amcf-color-surface-raised:  #F5F6F8;
+	--amcf-color-surface-inset:   #D8DBDF;
+	--amcf-color-surface-hover:   #ECEEF0;
+
+	/* ── Brand / accent — ScanLab red ────────────────────────────── */
+	--amcf-color-primary:         #C8102E;
+	--amcf-color-primary-hover:   #A00D24;
+	--amcf-color-primary-bg:      rgba(200, 16, 46, 0.06);
+
+	/* ── Status colors ────────────────────────────────────────────── */
+	--amcf-color-ok:              #43A047;
+	--amcf-color-ok-bg:           rgba(67, 160, 71, 0.08);
+	--amcf-color-ok-border:       rgba(67, 160, 71, 0.22);
+
+	--amcf-color-warn:            #F9A825;
+	--amcf-color-warn-bg:         rgba(249, 168, 37, 0.08);
+	--amcf-color-warn-border:     rgba(249, 168, 37, 0.22);
+
+	--amcf-color-error:           #C8102E;
+	--amcf-color-error-bg:        rgba(200, 16, 46, 0.06);
+	--amcf-color-error-border:    rgba(200, 16, 46, 0.18);
+
+	--amcf-color-info:            #2979FF;
+	--amcf-color-info-bg:         rgba(41, 121, 255, 0.06);
+
+	--amcf-color-archive:         #90A4AE;
+
+	/* ── Text colors ──────────────────────────────────────────────── */
+	--amcf-color-text:            #1E1E1E;
+	--amcf-color-text-muted:      #5F6368;
+	--amcf-color-text-dim:        #90A4AE;
+	--amcf-color-text-inverse:    #FFFFFF;
+
+	/* ── Borders ──────────────────────────────────────────────────── */
+	--amcf-color-border:          #C8CCD0;
+	--amcf-color-border-strong:   #9BA3AB;
+
+	/* ── Typography ───────────────────────────────────────────────── */
+	--amcf-font-family:           "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+	--amcf-font-family-mono:      "Cascadia Code", "Fira Code", Consolas, monospace;
+
+	--amcf-typo-h1-size:          24px;
+	--amcf-typo-h1-weight:        700;
+	--amcf-typo-h2-size:          16px;
+	--amcf-typo-h2-weight:        600;
+	--amcf-typo-body-size:        14px;
+	--amcf-typo-body-weight:      400;
+	--amcf-typo-label-size:       12px;
+	--amcf-typo-label-weight:     600;
+	--amcf-typo-subtext-size:     12px;
+	--amcf-typo-subtext-weight:   400;
+	--amcf-typo-code-size:        12px;
+
+	/* ── Spacing scale ────────────────────────────────────────────── */
+	--amcf-space-1:  4px;
+	--amcf-space-2:  8px;
+	--amcf-space-3:  12px;
+	--amcf-space-4:  16px;
+	--amcf-space-5:  20px;
+	--amcf-space-6:  24px;
+	--amcf-space-8:  32px;
+	--amcf-space-10: 40px;
+
+	/* ── Border radius ────────────────────────────────────────────── */
+	--amcf-radius-sm:   2px;
+	--amcf-radius-md:   4px;
+	--amcf-radius-lg:   6px;
+	--amcf-radius-xl:   8px;
+	--amcf-radius-pill: 999px;
+
+	/* ── Elevation / shadow (softer for light theme) ──────────────── */
+	--amcf-shadow-0: none;
+	--amcf-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);
+	--amcf-shadow-2: 0 2px 6px rgba(0, 0, 0, 0.10);
+	--amcf-shadow-3: 0 4px 12px rgba(0, 0, 0, 0.12);
+	--amcf-shadow-4: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+	/* ── Button tokens ────────────────────────────────────────────── */
+	--amcf-btn-primary-bg:         var(--amcf-color-primary);
+	--amcf-btn-primary-text:       #FFFFFF;
+	--amcf-btn-secondary-bg:       transparent;
+	--amcf-btn-secondary-border:   var(--amcf-color-border-strong);
+	--amcf-btn-secondary-text:     var(--amcf-color-text);
+	--amcf-btn-tertiary-text:      var(--amcf-color-primary);
+	--amcf-btn-danger-bg:          var(--amcf-color-error);
+	--amcf-btn-danger-text:        #FFFFFF;
+	--amcf-btn-disabled-opacity:   0.4;
+
+	/* ── Interactive targets ──────────────────────────────────────── */
+	--amcf-target-min-size:        44px;
+
+	/* ── Transition ───────────────────────────────────────────────── */
+	--amcf-transition-fast:        0.15s ease;
+}

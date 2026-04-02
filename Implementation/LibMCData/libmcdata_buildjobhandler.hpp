@@ -96,6 +96,10 @@ public:
 
     IBuildJobExecutionIterator* ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter) override;
 
+    LibMCData_uint64 GetBuildListHeadID() override;
+
+    LibMCData_uint64 GetExecutionListHeadID() override;
+
 };
 
 } // namespace Impl

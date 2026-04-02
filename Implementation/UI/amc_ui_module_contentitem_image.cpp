@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_CONSTANTS
 
 #include "amc_ui_module_contentitem_image.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
@@ -151,4 +152,65 @@ std::string CUIModule_ContentImage::findElementPathByUUID(const std::string& sUU
 		return getItemPath();
 
 	return "";
+}
+
+std::string CUIModule_ContentImage::getItemType()
+{
+	return "image";
+}
+
+void CUIModule_ContentImage::registerFrontendAttributes()
+{
+	registerItemStringAttribute("resource", m_ImageResource);
+	registerItemStringAttribute("aspectratio", m_AspectRatio);
+	registerItemStringAttribute("maxwidth", m_MaxWidth);
+	registerItemStringAttribute("maxheight", m_MaxHeight);
+}
+
+std::string CUIModule_ContentImage::resolveResourceToUUID(const std::string& sResourceValue)
+{
+	if (sResourceValue.empty())
+		return AMCCommon::CUtils::createEmptyUUID();
+
+	// If it's already a UUID, normalize and return it
+	if (AMCCommon::CUtils::stringIsUUIDString(sResourceValue))
+		return AMCCommon::CUtils::normalizeUUIDString(sResourceValue);
+
+	// Otherwise treat it as a resource name and look up the UUID
+	auto pEntry = m_pResourcePackage->findEntryByName(sResourceValue, false);
+	if (pEntry.get() != nullptr)
+		return pEntry->getUUID();
+
+	return AMCCommon::CUtils::createEmptyUUID();
+}
+
+
+void CUIModule_ContentImage::frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	std::string sItemType = getItemType();
+	if (sItemType.empty())
+		return;
+
+	itemObject.addString("moduletype", sItemType);
+	itemObject.addString("uuid", m_sUUID);
+
+	// Write attributes manually so we can resolve "resource" name -> UUID.
+	// (Cannot use base writeModuleAttributesToJSON because AddMember creates
+	// duplicate keys rather than overwriting.)
+	CJSONWriterObject attributesObject(writer);
+
+	std::string sResourceValue = m_ImageResource.evaluateStringValue(pStateMachineData);
+	attributesObject.addString("resource", resolveResourceToUUID(sResourceValue));
+
+	if (!m_AspectRatio.isEmpty(pStateMachineData))
+		attributesObject.addString("aspectratio", m_AspectRatio.evaluateStringValue(pStateMachineData));
+	if (!m_MaxWidth.isEmpty(pStateMachineData))
+		attributesObject.addString("maxwidth", m_MaxWidth.evaluateStringValue(pStateMachineData));
+	if (!m_MaxHeight.isEmpty(pStateMachineData))
+		attributesObject.addString("maxheight", m_MaxHeight.evaluateStringValue(pStateMachineData));
+
+	itemObject.addObject("attributes", attributesObject);
 }

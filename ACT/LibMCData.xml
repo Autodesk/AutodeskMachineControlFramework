@@ -770,7 +770,11 @@
 			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
 			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
-		</method>				
+		</method>
+
+		<method name="GetAlertHeadID" description="Returns the current maximum incremental ID across all alerts. Used by the frontend to detect when the alert list has changed.">
+			<param name="HeadID" type="uint64" pass="return" description="Maximum incremental ID, or 0 if no alerts exist." />
+		</method>
 		
 	</class>
 
@@ -1633,6 +1637,10 @@
 			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
 			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
 		</method>
+
+		<method name="GetIncrementalID" description="Returns the monotonically increasing incremental ID of the build job. Used for frontend change detection.">
+			<param name="IncrementalID" type="uint64" pass="return" description="Incremental ID of the build job. Increases with every status change." />
+		</method>
 		
 	</class>
 
@@ -1696,6 +1704,14 @@
 			<param name="MaxTimestamp" type="string" pass="in" description="Maximum Timestamp in ISO8601 UTC format. May be empty for no filter." />	
 			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
 			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
+		</method>
+
+		<method name="GetBuildListHeadID" description="Returns the current maximum incremental ID across all build jobs. Used by the frontend to detect when the build list has changed.">
+			<param name="HeadID" type="uint64" pass="return" description="Maximum incremental ID, or 0 if no jobs exist." />
+		</method>
+
+		<method name="GetExecutionListHeadID" description="Returns the current maximum incremental ID across all build job executions. Used by the frontend to detect when the execution list has changed.">
+			<param name="HeadID" type="uint64" pass="return" description="Maximum incremental ID, or 0 if no executions exist." />
 		</method>
 			
 	</class>

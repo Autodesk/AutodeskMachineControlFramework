@@ -79,6 +79,8 @@ namespace AMC {
 		std::string m_sEventFormValueSetting;
 		std::list<PUIModule_ContentFormEntity> m_pFormValues;
 
+		PUIFrontendDefinitionModuleStore m_pFrontendStore;
+
 		PParameterGroup getClientVariableGroup(CParameterHandler* pClientVariableHandler);
 
 	public:
@@ -104,6 +106,12 @@ namespace AMC {
 		PParameterGroup registerClientVariableGroup(CParameterHandler* pClientVariableHandler);
 
 		void syncClientVariables(CParameterHandler* pClientVariableHandler);
+
+		// v2 frontend: register button attributes on the given child store
+		void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore);
+
+		// v2 frontend: register eventformvalues after form values are resolved
+		void registerFrontendEventFormValues();
 
 	};
 
@@ -143,6 +151,9 @@ namespace AMC {
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 
 	};
 

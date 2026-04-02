@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
@@ -357,4 +358,65 @@ void CUIModule_ContentBuildList::addButton(const std::string& sButtonName, CUIEx
 	m_ButtonUUIDMap.insert(std::make_pair(pButton->getUUID (), pButton));
 
 
+}
+
+std::string CUIModule_ContentBuildList::getItemType()
+{
+	return "buildlist";
+}
+
+void CUIModule_ContentBuildList::registerFrontendAttributes()
+{
+	registerItemStringAttribute("loadingtext", m_LoadingText);
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectEvent);
+		registerItemStringAttribute("selectevent", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(std::to_string(m_nEntriesPerPage));
+		registerItemIntegerAttribute("entriesperpage", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectedBuildFieldUUID);
+		registerItemStringAttribute("selectionvalueuuid", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectedButtonFieldUUID);
+		registerItemStringAttribute("buttonvalueuuid", expr);
+	}
+}
+
+void CUIModule_ContentBuildList::frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (m_pItemModuleStore == nullptr)
+		return;
+
+	std::string sItemType = m_pItemModuleStore->getModuleType();
+	if (sItemType.empty())
+		return;
+
+	itemObject.addString("moduletype", sItemType);
+	itemObject.addString("uuid", m_pItemModuleStore->getUUID());
+
+	CJSONWriterObject attributesObject(writer);
+	pFrontendState->writeModuleAttributesToJSON(writer, attributesObject, m_pItemModuleStore.get(), pStateMachineData);
+
+	if (m_pDataModel) {
+		auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+		attributesObject.addInteger("buildlistheadid", (int64_t) pBuildJobHandler->GetBuildListHeadID());
+	}
+
+	attributesObject.addString(AMC_API_KEY_UI_ITEMDEFAULTTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
+
+	itemObject.addObject("attributes", attributesObject);
+
+	itemObject.addString(AMC_API_KEY_UI_ITEMSELECTIONVALUEUUID, m_sSelectedBuildFieldUUID);
+	itemObject.addString(AMC_API_KEY_UI_ITEMBUTTONVALUEUUID, m_sSelectedButtonFieldUUID);
+	writeButtonsToJSON(writer, itemObject);
 }

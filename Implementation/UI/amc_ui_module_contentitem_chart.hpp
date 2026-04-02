@@ -66,11 +66,15 @@ namespace AMC {
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
-	};
+			// New UI Frontend System
+			virtual std::string getItemType() override;
+			virtual void registerFrontendAttributes() override;
+			virtual void frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
+
+		};
 
 
 }
 
 
 #endif //__AMC_UI_MODULE_CONTENTITEM_CHART
-

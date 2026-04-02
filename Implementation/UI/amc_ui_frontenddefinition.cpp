@@ -107,8 +107,8 @@ void CUIFrontendDefinitionExpressionAttribute::writeToFrontendJSON(CJSONWriter& 
 }
 
 
-CUIFrontendDefinitionModuleStore::CUIFrontendDefinitionModuleStore(const std::string& sModuleUUID, const std::string& sModulePath)
-	: m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sModuleUUID)), m_sPath(sModulePath)
+CUIFrontendDefinitionModuleStore::CUIFrontendDefinitionModuleStore(const std::string& sModuleUUID, const std::string& sModulePath, const std::string& sModuleType)
+	: m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sModuleUUID)), m_sPath(sModulePath), m_sModuleType(sModuleType)
 {
 	if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString (sModulePath))
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDFRONTENDMODULEPATH, sModulePath);
@@ -145,6 +145,34 @@ std::vector<PUIFrontendDefinitionAttribute> CUIFrontendDefinitionModuleStore::ge
 }
 
 
+PUIFrontendDefinitionModuleStore CUIFrontendDefinitionModuleStore::addChildStore(const std::string& sChildUUID, const std::string& sChildPath, const std::string& sChildModuleType)
+{
+	auto pChildStore = std::make_shared<CUIFrontendDefinitionModuleStore>(sChildUUID, sChildPath, sChildModuleType);
+	m_ChildStores.push_back(pChildStore);
+	return pChildStore;
+}
+
+std::vector<PUIFrontendDefinitionModuleStore> CUIFrontendDefinitionModuleStore::getChildStores()
+{
+	return m_ChildStores;
+}
+
+bool CUIFrontendDefinitionModuleStore::hasChildren()
+{
+	return !m_ChildStores.empty();
+}
+
+std::string CUIFrontendDefinitionModuleStore::getModuleType()
+{
+	return m_sModuleType;
+}
+
+std::string CUIFrontendDefinitionModuleStore::getUUID()
+{
+	return m_sUUID;
+}
+
+
 CUIFrontendDefinition::CUIFrontendDefinition(AMCCommon::PChrono pGlobalChrono)
 	: m_pGlobalChrono (pGlobalChrono)
 {
@@ -157,9 +185,9 @@ CUIFrontendDefinition::~CUIFrontendDefinition()
 
 }
 
-PUIFrontendDefinitionModuleStore CUIFrontendDefinition::registerModuleStore(const std::string& sModuleUUID, const std::string& sPath)
+PUIFrontendDefinitionModuleStore CUIFrontendDefinition::registerModuleStore(const std::string& sModuleUUID, const std::string& sPath, const std::string& sModuleType)
 {
-	return std::make_shared<CUIFrontendDefinitionModuleStore>(sModuleUUID, sPath);
+	return std::make_shared<CUIFrontendDefinitionModuleStore>(sModuleUUID, sPath, sModuleType);
 
 }
 

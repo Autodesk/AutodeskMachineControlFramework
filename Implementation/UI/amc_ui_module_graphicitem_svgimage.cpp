@@ -202,3 +202,19 @@ void CUIModule_GraphicSVGImage::addTransform(PUIModule_GraphicSVGImageTransform 
 	LibMCAssertNotNull(pTransform);
 	m_Transforms.push_back(pTransform);
 }
+
+std::string CUIModule_GraphicSVGImage::getItemType()
+{
+	return "svgimage";
+}
+
+void CUIModule_GraphicSVGImage::registerFrontendAttributes()
+{
+	registerItemStringAttribute("resource", m_ResourceName);
+	registerItemNumberAttribute("x", m_X);
+	registerItemNumberAttribute("y", m_Y);
+	registerItemNumberAttribute("z", m_Z);
+	registerItemNumberAttribute("scalex", m_ScaleX);
+	registerItemNumberAttribute("scaley", m_ScaleY);
+	registerItemNumberAttribute("angle", m_Angle);
+}

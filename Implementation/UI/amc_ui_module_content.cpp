@@ -33,20 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module.hpp"
 #include "amc_ui_module_content.hpp"
-#include "amc_ui_module_contentitem.hpp"
-
-#include "amc_ui_module_contentitem_paragraph.hpp"
-#include "amc_ui_module_contentitem_image.hpp"
-#include "amc_ui_module_contentitem_chart.hpp"
-#include "amc_ui_module_contentitem_buttongroup.hpp"
-#include "amc_ui_module_contentitem_buildlist.hpp"
-#include "amc_ui_module_contentitem_executionlist.hpp"
-#include "amc_ui_module_contentitem_alertlist.hpp"
-#include "amc_ui_module_contentitem_parameterlist.hpp"
-#include "amc_ui_module_contentitem_upload.hpp"
-#include "amc_ui_module_contentitem_form.hpp"
-#include "amc_ui_module_contentitem_configurationlist.hpp"
-#include "amc_ui_module_contentitem_videostream.hpp"
+#include "amc_ui_modulefactory.hpp"
+#include "amc_ui_module_contentleaf.hpp"
 
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
@@ -92,40 +80,76 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, const std::string&
 	else
 		m_bVisible = true;
 
+	auto cardStyleAttrib = xmlNode.attribute("cardstyle");
+	m_sCardStyle = cardStyleAttrib.empty() ? "none" : cardStyleAttrib.as_string();
+
+	auto cardColorAttrib = xmlNode.attribute("cardcolor");
+	m_sCardColor = cardColorAttrib.empty() ? "" : cardColorAttrib.as_string();
+
+	m_nSpacing   = (uint32_t) xmlNode.attribute("spacing").as_int(0);
+	m_nElevation = (uint32_t) xmlNode.attribute("elevation").as_int(2);
+
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
 		std::string sChildName = childNode.name();
-		auto sItemName = readItemNameFromXML(childNode, sChildName);
+		if (sChildName.empty())
+			continue;
 
-		if (sChildName == "paragraph") 
-			addItem(CUIModule_ContentParagraph::makeFromXML(childNode, sItemName, m_sModulePath));
-		if (sChildName == "image") 
-			addItem(CUIModule_ContentImage::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "chart")
-			addItem(CUIModule_ContentChart::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "form")
-			addItem(CUIModule_ContentForm::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "buildlist")
-			addItem(CUIModule_ContentBuildList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "executionlist")
-			addItem(CUIModule_ContentExecutionList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "alertlist")
-			addItem(CUIModule_ContentAlertList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "buttongroup") 
-			addItem(CUIModule_ContentButtonGroup::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "upload")
-			addItem(CUIModule_ContentUpload::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "parameterlist")
-			addItem(CUIModule_ContentParameterList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "configurationlist")
-			addItem(CUIModule_ContentConfigurationList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		if (sChildName == "videostream")
-			addItem(CUIModule_ContentVideoStream::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (!CUIModule_ContentLeaf::isSupportedModuleType(sChildName) &&
+			!CUIModuleFactory::moduleTypeIsRegistered(sChildName))
+			continue;
 
+		auto sSubModuleName = readSubModuleNameFromXML(childNode, sChildName);
+		auto nameAttrib = childNode.attribute("name");
+		if (nameAttrib.empty())
+			childNode.append_attribute("name").set_value(sSubModuleName.c_str());
+		else
+			nameAttrib.set_value(sSubModuleName.c_str());
 
-
+		// Keep submodule paths under the content module path.
+		auto pSubModule = CUIModuleFactory::createModule(childNode, m_sModulePath, pUIModuleEnvironment);
+		addSubModule(pSubModule);
 
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// New UI Frontend System - register v2 attributes for this module and all items
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	CUIExpression headlineExpr;
+	headlineExpr.setFixedValue(m_sHeadLine);
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(m_sCaption);
+	CUIExpression titleExpr;
+	titleExpr.setFixedValue(m_sTitle);
+	CUIExpression subtitleExpr;
+	subtitleExpr.setFixedValue(m_sSubtitle);
+	// "visible" supports both fixed values (visible="true") and dynamic
+	// state-machine expressions (sync:visible="main.jobinfo.isactive").
+	// Default is "1" (visible) when the attribute is absent.
+	CUIExpression visibleExpr(xmlNode, "visible", std::string("1"));
+
+	registerStringAttribute("headline", headlineExpr);
+	registerStringAttribute("caption", captionExpr);
+	registerStringAttribute("title", titleExpr);
+	registerStringAttribute("subtitle", subtitleExpr);
+	registerBoolAttribute("visible", visibleExpr);
+
+	CUIExpression cardStyleExpr;
+	cardStyleExpr.setFixedValue(m_sCardStyle);
+	registerStringAttribute("cardstyle", cardStyleExpr);
+
+	CUIExpression cardColorExpr;
+	cardColorExpr.setFixedValue(m_sCardColor);
+	registerStringAttribute("cardcolor", cardColorExpr);
+
+	CUIExpression spacingExpr;
+	spacingExpr.setFixedValue(std::to_string(m_nSpacing));
+	registerStringAttribute("spacing", spacingExpr);
+
+	CUIExpression elevationExpr;
+	elevationExpr.setFixedValue(std::to_string(m_nElevation));
+	registerStringAttribute("elevation", elevationExpr);
 
 }
 
@@ -179,8 +203,8 @@ void CUIModule_Content::populateLegacyClientVariables(CParameterHandler* pParame
 	auto pGroup = pParameterHandler->addGroup(m_sModulePath, "content UI element");
 	pGroup->addNewBoolParameter(AMC_API_KEY_UI_VISIBLE, "visibility of the UI content", m_bVisible);
 
-	for (auto pItem : m_Items)
-		pItem->populateClientVariables(pParameterHandler);
+	for (auto pSubModule : m_SubModules)
+		pSubModule->populateLegacyClientVariables(pParameterHandler);
 
 }
 
@@ -194,14 +218,18 @@ void CUIModule_Content::writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWr
 	moduleObject.addString(AMC_API_KEY_UI_SUBTITLE, m_sSubtitle);
 	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
 	moduleObject.addBool(AMC_API_KEY_UI_VISIBLE, m_bVisible);
+	moduleObject.addString("cardstyle", m_sCardStyle);
+	moduleObject.addString("cardcolor", m_sCardColor);
+	moduleObject.addInteger("spacing",   (int64_t) m_nSpacing);
+	moduleObject.addInteger("elevation", (int64_t) m_nElevation);
 
-	CJSONWriterArray itemsNode(writer);
-	for (auto item : m_Items) {
-		CJSONWriterObject itemObject(writer);
-		item->addLegacyContentToJSON(writer, itemObject, pLegacyClientVariableHandler, 0);
-		itemsNode.addObject(itemObject);
+	CJSONWriterArray modulesNode(writer);
+	for (auto pSubModule : m_SubModules) {
+		CJSONWriterObject subModuleObject(writer);
+		pSubModule->writeLegacyDefinitionToJSON(writer, subModuleObject, pLegacyClientVariableHandler);
+		modulesNode.addObject(subModuleObject);
 	}
-	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);
+	moduleObject.addArray(AMC_API_KEY_UI_MODULES, modulesNode);
 
 }
 
@@ -216,44 +244,43 @@ void CUIModule_Content::addContentToJSON(CJSONWriter& writer, CJSONWriterObject&
 
 PUIModuleItem CUIModule_Content::findLegacyItem(const std::string& sUUID)
 {
-	auto iIter = m_ItemMap.find(sUUID);
-	if (iIter != m_ItemMap.end())
-		return iIter->second;
+	for (auto pSubModule : m_SubModules) {
+		auto pItem = pSubModule->findLegacyItem(sUUID);
+		if (pItem.get() != nullptr)
+			return pItem;
+	}
 
 	return nullptr;
 }
 
-void CUIModule_Content::addItem(PUIModule_ContentItem pItem)
+void CUIModule_Content::addSubModule(PUIModule pSubModule)
 {
-	LibMCAssertNotNull(pItem.get());
+	LibMCAssertNotNull(pSubModule.get());
 
-	m_Items.push_back(pItem);
-
-	auto referenceList = pItem->getReferenceUUIDs();
-	for (auto sUUID : referenceList)
-		m_ItemMap.insert(std::make_pair (sUUID, pItem));
+	m_SubModules.push_back(pSubModule);
+	m_SubModuleMap.insert(std::make_pair(pSubModule->getUUID(), pSubModule));
 
 }
 
 void CUIModule_Content::populateModuleMap(std::map<std::string, PUIModule>& moduleMap)
 {
 	moduleMap.insert(std::make_pair(m_sUUID, std::make_shared<CUIModule_Content>(*this)));
+	for (auto pSubModule : m_SubModules) {
+		moduleMap.insert(std::make_pair(pSubModule->getUUID(), pSubModule));
+		pSubModule->populateModuleMap(moduleMap);
+	}
 }
 
 void CUIModule_Content::populateLegacyItemMap(std::map<std::string, PUIModuleItem>& itemMap)
 {
-	for (auto item : m_Items) {
-		auto referenceList = item->getReferenceUUIDs();
-		for (auto sUUID : referenceList)
-			itemMap.insert(std::make_pair(sUUID, item));
-
-	}
+	for (auto pSubModule : m_SubModules)
+		pSubModule->populateLegacyItemMap(itemMap);
 }
 
 void CUIModule_Content::configureLegacyPostLoading()
 {
-	for (auto item : m_Items)
-		item->configurePostLoading();
+	for (auto pSubModule : m_SubModules)
+		pSubModule->configureLegacyPostLoading();
 }
 
 std::string CUIModule_Content::getDefaultContentName(const std::string& sPrefix)
@@ -272,17 +299,42 @@ std::string CUIModule_Content::getDefaultContentName(const std::string& sPrefix)
 }
 
 
-std::string CUIModule_Content::readItemNameFromXML(const pugi::xml_node& itemNode, const std::string& sPrefix)
+std::string CUIModule_Content::readSubModuleNameFromXML(const pugi::xml_node& moduleNode, const std::string& sPrefix)
 {
-	auto nameAttrib = itemNode.attribute("name");
-	std::string sItemName = nameAttrib.as_string();
-	if (sItemName.empty())
-		sItemName = getDefaultContentName(sPrefix);
+	auto nameAttrib = moduleNode.attribute("name");
+	std::string sSubModuleName = nameAttrib.as_string();
+	if (sSubModuleName.empty())
+		sSubModuleName = getDefaultContentName(sPrefix);
 
-	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sItemName))
-		throw ELibMCCustomException(LIBMC_ERROR_INVALIDITEMPATH, m_sModulePath + "." + sItemName);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sSubModuleName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDITEMPATH, m_sModulePath + "." + sSubModuleName);
 
-	return sItemName;
+	return sSubModuleName;
 }
 
 
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+
+bool CUIModule_Content::isVersion2FrontendModule()
+{
+	return true;
+}
+
+void CUIModule_Content::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	CUIModule::frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
+
+	CJSONWriterArray submodulesArray(writer);
+
+	for (auto& pSubModule : m_SubModules) {
+		if (pSubModule->isVersion2FrontendModule()) {
+			CJSONWriterObject subModuleObject(writer);
+			pSubModule->frontendWriteModuleStatusToJSON(writer, subModuleObject, pFrontendState, pStateMachineData);
+			submodulesArray.addObject(subModuleObject);
+		}
+	}
+
+	moduleObject.addArray("submodules", submodulesArray);
+}

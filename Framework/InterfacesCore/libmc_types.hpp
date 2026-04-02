@@ -721,6 +721,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDTELEMETRYCHANNELTYPE 705 /** Invalid telemetry channel type. */
 #define LIBMC_ERROR_MISSINGTELEMETRYCHANNELIDENTIFIER 706 /** Missing telemetry channel identifier. */
 #define LIBMC_ERROR_MISSINGTELEMETRYCHANNELDESCRIPTION 707 /** Missing telemetry channel description. */
+#define LIBMC_ERROR_XMLNODEHASNULLNAMESPACE 708 /** XML node has a null namespace. Ensure the XML document declares a namespace on the root element. */
+#define LIBMC_ERROR_RESOURCEENTRYSIZISMISMATCH 709 /** Resource entry size mismatch between index and ZIP content. */
+#define LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH 710 /** Resource entry SHA256 checksum mismatch. */
+#define LIBMC_ERROR_INVALIDRESOURCEENTRYSHA256 711 /** Invalid resource entry SHA256 value. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1354,6 +1358,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDTELEMETRYCHANNELTYPE: return "Invalid telemetry channel type.";
     case LIBMC_ERROR_MISSINGTELEMETRYCHANNELIDENTIFIER: return "Missing telemetry channel identifier.";
     case LIBMC_ERROR_MISSINGTELEMETRYCHANNELDESCRIPTION: return "Missing telemetry channel description.";
+    case LIBMC_ERROR_XMLNODEHASNULLNAMESPACE: return "XML node has a null namespace. Ensure the XML document declares a namespace on the root element.";
+    case LIBMC_ERROR_RESOURCEENTRYSIZISMISMATCH: return "Resource entry size mismatch between index and ZIP content.";
+    case LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH: return "Resource entry SHA256 checksum mismatch.";
+    case LIBMC_ERROR_INVALIDRESOURCEENTRYSHA256: return "Invalid resource entry SHA256 value.";
     default: return "unknown error";
   }
 }

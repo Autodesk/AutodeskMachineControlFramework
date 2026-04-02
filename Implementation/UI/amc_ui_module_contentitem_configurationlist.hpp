@@ -89,6 +89,7 @@ namespace AMC {
 		std::string m_sSelectEvent;
 		std::string m_sSelectedConfigurationFieldUUID;
 		std::string m_sSelectedButtonFieldUUID;
+		std::string m_sConfigurationSchema;
 		std::string m_sDefaultThumbnailResourceUUID;
 
 		std::vector<PUIModule_ContentConfigurationListButton> m_Buttons;
@@ -109,7 +110,7 @@ namespace AMC {
 
 		static PUIModule_ContentConfigurationList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentConfigurationList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData);
+		CUIModule_ContentConfigurationList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, const std::string& sConfigurationSchema, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentConfigurationList();
 
@@ -127,6 +128,11 @@ namespace AMC {
 
 		void addButton(const std::string& sButtonName, CUIExpression captionExpression, const std::string& sEvent);
 
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
+		virtual void frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
+
 	};
 
 
@@ -134,4 +140,3 @@ namespace AMC {
 
 
 #endif //__AMC_UI_MODULE_CONTENTITEM_CONFIGURATIONLIST
-

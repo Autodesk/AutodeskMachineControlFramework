@@ -51,11 +51,8 @@ namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
-	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
-	amcDeclareDependingClass(CUIModule_ContentForm, PUIModule_ContentForm);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
-	amcDeclareDependingClass(CUIModule_ContentFormRegistry, PUIModule_ContentFormRegistry);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 
@@ -67,17 +64,22 @@ namespace AMC {
 		std::string m_sTitle;
 		std::string m_sSubtitle;
 
+		std::string m_sCardStyle;
+		std::string m_sCardColor;
+		uint32_t    m_nSpacing;
+		uint32_t    m_nElevation;
+
 		uint32_t m_nNamingIDCounter;
 
 		bool m_bVisible;
 
-		std::map<std::string, PUIModule_ContentItem> m_ItemMap;
-		std::vector<PUIModule_ContentItem> m_Items;
+		std::map<std::string, PUIModule> m_SubModuleMap;
+		std::vector<PUIModule> m_SubModules;
 
-		void addItem(PUIModule_ContentItem pItem);
+		void addSubModule(PUIModule pSubModule);
 
 		std::string getDefaultContentName(const std::string & sPrefix);
-		std::string readItemNameFromXML (const pugi::xml_node & itemNode, const std::string & sPrefix);
+		std::string readSubModuleNameFromXML (const pugi::xml_node & moduleNode, const std::string & sPrefix);
 
 	public:
 
@@ -119,6 +121,14 @@ namespace AMC {
 
 		virtual void populateLegacyClientVariables(CParameterHandler* pParameterHandler) override;
 
+		/////////////////////////////////////////////////////////////////////////////////////
+		// New UI Frontend System
+		/////////////////////////////////////////////////////////////////////////////////////
+
+		void frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
+
+		bool isVersion2FrontendModule() override;
+
 	};
 
 	
@@ -126,4 +136,3 @@ namespace AMC {
 
 
 #endif //__AMC_UI_MODULE_CONTENT
-

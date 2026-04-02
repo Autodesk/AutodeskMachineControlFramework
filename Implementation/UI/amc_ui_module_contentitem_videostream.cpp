@@ -137,3 +137,16 @@ std::string CUIModule_ContentVideoStream::findElementPathByUUID(const std::strin
 
 	return "";
 }
+
+std::string CUIModule_ContentVideoStream::getItemType()
+{
+	return "videostream";
+}
+
+void CUIModule_ContentVideoStream::registerFrontendAttributes()
+{
+	registerItemStringAttribute("streamresource", m_StreamResource);
+	registerItemStringAttribute("aspectratio", m_AspectRatio);
+	registerItemStringAttribute("maxwidth", m_MaxWidth);
+	registerItemStringAttribute("maxheight", m_MaxHeight);
+}
