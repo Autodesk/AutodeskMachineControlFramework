@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
 
+#include <cstdlib>
+
 using namespace AMC;
 
 
@@ -420,23 +422,50 @@ PUIModule_ContentFormCombobox CUIModule_ContentFormCombobox::makeFromXML(const p
 	CUIExpression caption(xmlNode, "caption");
 	CUIExpression value(xmlNode, "value");
 
-	// Prepare vector to hold items
-	std::vector<std::pair<std::string, int>> items;
+	// Determine value type: "string" enables string-valued comboboxes, otherwise legacy integer behaviour.
+	std::string sValueType = xmlNode.attribute("valuetype").as_string();
+	bool bStringValue = (sValueType == "string");
 
-	// Iterate over all child nodes named "Item"
-	for (auto itemNode : xmlNode.children("item")) {
-		auto textAttrib = itemNode.attribute("text");
-		auto valueAttrib = itemNode.attribute("value");
-		std::string text = textAttrib.as_string();
-		int intValue = valueAttrib.as_int();
-		items.emplace_back(text, intValue);
+	// Prepare vector to hold items (display text, value as string)
+	std::vector<std::pair<std::string, std::string>> items;
+
+	// If "itemsource" is given, populate the items dynamically by enumerating the referenced
+	// parameter group ("instance.group"). Each parameter becomes one item, using the parameter
+	// name as the (string) value and its description (falling back to the name) as the display text.
+	std::string sItemSource = xmlNode.attribute("itemsource").as_string();
+	if (!sItemSource.empty()) {
+		std::string sInstance, sGroup, sDummyName;
+		CStateMachineData::extractParameterDetailsFromDotString(sItemSource, sInstance, sGroup, sDummyName, true, true);
+
+		auto pParameterHandler = pStateMachineData->getParameterHandler(sInstance);
+		auto pGroup = pParameterHandler->findGroup(sGroup, true);
+		uint32_t nParameterCount = pGroup->getParameterCount();
+		for (uint32_t nIndex = 0; nIndex < nParameterCount; nIndex++) {
+			std::string sParamName, sParamDescription, sParamDefault;
+			pGroup->getParameterInfo(nIndex, sParamName, sParamDescription, sParamDefault);
+			std::string sText = sParamDescription.empty() ? sParamName : sParamDescription;
+			items.emplace_back(sText, sParamName);
+		}
+
+		// A parameter-group item source always yields string values (parameter names).
+		bStringValue = true;
+	}
+	else {
+		// Iterate over all statically declared child nodes named "item"
+		for (auto itemNode : xmlNode.children("item")) {
+			auto textAttrib = itemNode.attribute("text");
+			auto valueAttrib = itemNode.attribute("value");
+			std::string text = textAttrib.as_string();
+			std::string valueStr = valueAttrib.as_string();
+			items.emplace_back(text, valueStr);
+		}
 	}
 
-	return std::make_shared<CUIModule_ContentFormCombobox>(nameAttrib.as_string(), sFormPath, caption, value, changeeventAttrib.as_string(), pStateMachineData, items);
+	return std::make_shared<CUIModule_ContentFormCombobox>(nameAttrib.as_string(), sFormPath, caption, value, changeeventAttrib.as_string(), pStateMachineData, items, bStringValue);
 }
 
-CUIModule_ContentFormCombobox::CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData, const std::vector<std::pair<std::string, int>>& items)
-	: CUIModule_ContentFormEntity(sName, sFormPath, Caption, pStateMachineData), m_ValueExpression(Value), m_sOnChangeEvent(sOnChangeEvent), m_Items(items)
+CUIModule_ContentFormCombobox::CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData, const std::vector<std::pair<std::string, std::string>>& items, bool bStringValue)
+	: CUIModule_ContentFormEntity(sName, sFormPath, Caption, pStateMachineData), m_ValueExpression(Value), m_sOnChangeEvent(sOnChangeEvent), m_Items(items), m_bStringValue(bStringValue)
 {
 
 }
@@ -461,8 +490,12 @@ void CUIModule_ContentFormCombobox::populateClientVariables(CParameterHandler* p
 void CUIModule_ContentFormCombobox::syncClientVariables(CParameterHandler* pClientVariableHandler)
 {
 	auto pGroup = getClientVariableGroup(pClientVariableHandler);
-	if (m_ValueExpression.needsSync())
-		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE, m_ValueExpression.evaluateIntegerValue(m_pStateMachineData));
+	if (m_ValueExpression.needsSync()) {
+		if (m_bStringValue)
+			pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE, m_ValueExpression.evaluateStringValue(m_pStateMachineData));
+		else
+			pGroup->setIntParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE, m_ValueExpression.evaluateIntegerValue(m_pStateMachineData));
+	}
 }
 
 void CUIModule_ContentFormCombobox::writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
@@ -470,7 +503,10 @@ void CUIModule_ContentFormCombobox::writeVariablesToJSON(CJSONWriter& writer, CJ
 	auto pGroup = getClientVariableGroup(pClientVariableHandler);
 
 	object.addString("type", "combobox");
-	object.addInteger(AMC_API_KEY_UI_FORMDEFAULTVALUE, pGroup->getIntParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE));
+	if (m_bStringValue)
+		object.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, pGroup->getParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE));
+	else
+		object.addInteger(AMC_API_KEY_UI_FORMDEFAULTVALUE, pGroup->getIntParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE));
 	object.addString("changeevent", m_sOnChangeEvent);
 
 	// Create an array for the items
@@ -478,7 +514,10 @@ void CUIModule_ContentFormCombobox::writeVariablesToJSON(CJSONWriter& writer, CJ
 	for (const auto& item : m_Items) {
 		CJSONWriterObject itemObject(writer);
 		itemObject.addString("text", item.first);
-		itemObject.addInteger("value", item.second);
+		if (m_bStringValue)
+			itemObject.addString("value", item.second);
+		else
+			itemObject.addInteger("value", (int64_t)std::atoll(item.second.c_str()));
 		itemsArray.addObject(itemObject);
 	}
 	object.addArray("items", itemsArray);
@@ -488,23 +527,25 @@ void CUIModule_ContentFormCombobox::registerFrontendAttributes(PUIFrontendDefini
 {
 	CUIModule_ContentFormEntity::registerFrontendAttributes(pStore);
 
-	pStore->registerValue("value", eUIFrontendDefinitionAttributeType::atInteger, m_ValueExpression);
+	pStore->registerValue("value", m_bStringValue ? eUIFrontendDefinitionAttributeType::atString : eUIFrontendDefinitionAttributeType::atInteger, m_ValueExpression);
 
 	CUIExpression changeEventExpr;
 	changeEventExpr.setFixedValue(m_sOnChangeEvent);
 	pStore->registerValue("changeevent", eUIFrontendDefinitionAttributeType::atString, changeEventExpr);
 
+	uint32_t nItemIndex = 0;
 	for (const auto& item : m_Items) {
 		std::string sItemUUID = AMCCommon::CUtils::createUUID();
-		auto pItemStore = pStore->addChildStore(sItemUUID, m_sElementPath + ".item" + std::to_string(item.second), "comboboxitem");
+		auto pItemStore = pStore->addChildStore(sItemUUID, m_sElementPath + ".item" + std::to_string(nItemIndex), "comboboxitem");
+		nItemIndex++;
 
 		CUIExpression textExpr;
 		textExpr.setFixedValue(item.first);
 		pItemStore->registerValue("text", eUIFrontendDefinitionAttributeType::atString, textExpr);
 
 		CUIExpression valueExpr;
-		valueExpr.setFixedValue(std::to_string(item.second));
-		pItemStore->registerValue("value", eUIFrontendDefinitionAttributeType::atInteger, valueExpr);
+		valueExpr.setFixedValue(item.second);
+		pItemStore->registerValue("value", m_bStringValue ? eUIFrontendDefinitionAttributeType::atString : eUIFrontendDefinitionAttributeType::atInteger, valueExpr);
 	}
 }
 

@@ -159,6 +159,12 @@ public:
 
 	bool HasParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
+	LibMCEnv_uint32 GetParameterGroupParameterCount(const std::string& sParameterGroup) override;
+
+	std::string GetParameterGroupParameterName(const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex) override;
+
+	std::string GetParameterGroupParameterDescription(const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex) override;
+
 	bool HasResourceData(const std::string& sIdentifier) override;
 
 	void LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer) override;

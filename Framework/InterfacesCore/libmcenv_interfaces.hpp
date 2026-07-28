@@ -7814,6 +7814,29 @@ public:
 	virtual bool HasParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
+	* IStateEnvironment::GetParameterGroupParameterCount - returns the number of parameters contained in a given parameter group.
+	* @param[in] sParameterGroup - Parameter Group
+	* @return Number of parameters in the group.
+	*/
+	virtual LibMCEnv_uint32 GetParameterGroupParameterCount(const std::string & sParameterGroup) = 0;
+
+	/**
+	* IStateEnvironment::GetParameterGroupParameterName - returns the name of a parameter in a given parameter group by index.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Name of the parameter.
+	*/
+	virtual std::string GetParameterGroupParameterName(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IStateEnvironment::GetParameterGroupParameterDescription - returns the description of a parameter in a given parameter group by index.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Description of the parameter.
+	*/
+	virtual std::string GetParameterGroupParameterDescription(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
 	* IStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -8378,6 +8401,32 @@ public:
 	* @return Current Parameter Value
 	*/
 	virtual bool GetMachineParameterAsBool(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineParameterGroupParameterCount - returns the number of parameters contained in a given parameter group of a state machine.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @return Number of parameters in the group.
+	*/
+	virtual LibMCEnv_uint32 GetMachineParameterGroupParameterCount(const std::string & sMachineInstance, const std::string & sParameterGroup) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineParameterGroupParameterName - returns the name of a parameter in a given parameter group of a state machine by index.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Name of the parameter.
+	*/
+	virtual std::string GetMachineParameterGroupParameterName(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineParameterGroupParameterDescription - returns the description of a parameter in a given parameter group of a state machine by index.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Description of the parameter.
+	*/
+	virtual std::string GetMachineParameterGroupParameterDescription(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
 	* IUIEnvironment::GetUIProperty - returns a string property of a UI element on the client

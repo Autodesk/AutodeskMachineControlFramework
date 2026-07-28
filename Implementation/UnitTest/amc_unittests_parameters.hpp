@@ -52,6 +52,7 @@ namespace AMCUnitTest {
 			registerTest("DerivedParameters", "Derived parameter behavior and readonly checks", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Parameters::testDerivedParameters, this));
 			registerTest("ParameterSerialization", "Parameter group JSON serialization", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Parameters::testParameterSerialization, this));
 			registerTest("ParameterHandlerBasics", "Parameter handler group management and duplication", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Parameters::testParameterHandlerBasics, this));
+			registerTest("ParameterGroupEnumeration", "Parameter group enumeration by index (count/name/description)", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Parameters::testParameterGroupEnumeration, this));
 		}
 
 		void initializeTests() override {
@@ -250,6 +251,47 @@ namespace AMCUnitTest {
 			assertTrue(dupGroup->getParameterValueByName("name") == "value");
 
 			duplicate->loadPersistentParameters(nullptr, 0);
+		}
+
+		void testParameterGroupEnumeration()
+		{
+			// Verifies index-based enumeration (getParameterCount / getParameterInfo), which backs the
+			// StateEnvironment / UIEnvironment parameter-group enumeration methods used for dynamic dropdowns.
+			auto chrono = std::make_shared<AMCCommon::CChrono>();
+			AMC::CParameterGroup group("sequences", "Selectable Operation Sequences", chrono);
+			group.setJournal(nullptr, "main");
+
+			assertTrue(group.getParameterCount() == 0);
+
+			group.addNewStringParameter("warmup", "Warmup Sequence", "sequence_warmup");
+			group.addNewStringParameter("layerloop", "Layer Loop Sequence", "sequence_layerloop");
+			group.addNewStringParameter("cooldown", "Cooldown Sequence", "sequence_cooldown");
+
+			assertTrue(group.getParameterCount() == 3);
+
+			// Enumeration preserves insertion order and returns matching name/description/default triples.
+			const char* expectedNames[3] = { "warmup", "layerloop", "cooldown" };
+			const char* expectedDescriptions[3] = { "Warmup Sequence", "Layer Loop Sequence", "Cooldown Sequence" };
+			const char* expectedDefaults[3] = { "sequence_warmup", "sequence_layerloop", "sequence_cooldown" };
+
+			for (uint32_t nIndex = 0; nIndex < group.getParameterCount(); nIndex++) {
+				std::string sName, sDescription, sDefaultValue;
+				group.getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+				assertTrue(sName == expectedNames[nIndex], "Unexpected parameter name during enumeration");
+				assertTrue(sDescription == expectedDescriptions[nIndex], "Unexpected parameter description during enumeration");
+				assertTrue(sDefaultValue == expectedDefaults[nIndex], "Unexpected parameter default during enumeration");
+			}
+
+			// Out-of-range indices must be rejected.
+			bool thrown = false;
+			try {
+				std::string sName, sDescription, sDefaultValue;
+				group.getParameterInfo(group.getParameterCount(), sName, sDescription, sDefaultValue);
+			}
+			catch (...) {
+				thrown = true;
+			}
+			assertTrue(thrown, "Expected getParameterInfo to throw on out-of-range index");
 		}
 	};
 

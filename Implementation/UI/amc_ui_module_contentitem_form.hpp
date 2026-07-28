@@ -204,12 +204,16 @@ namespace AMC {
 	protected:
 		CUIExpression m_ValueExpression;
 		std::string m_sOnChangeEvent;
-		std::vector<std::pair<std::string, int>> m_Items;
+		// Item list: pair of (display text, value as string). For legacy integer comboboxes
+		// the value string holds the integer literal; for string comboboxes it holds the value directly.
+		std::vector<std::pair<std::string, std::string>> m_Items;
+		// If true, the selected value is treated as a string; otherwise it is treated as a (legacy) integer.
+		bool m_bStringValue;
 	public:
 
 		static PUIModule_ContentFormCombobox makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
 
-		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData, const std::vector<std::pair<std::string, int>>& items);
+		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData, const std::vector<std::pair<std::string, std::string>>& items, bool bStringValue);
 
 		virtual ~CUIModule_ContentFormCombobox();
 

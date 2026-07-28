@@ -5494,7 +5494,24 @@
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="ParameterExists" type="bool" pass="return" description="returns true if the parameter exists in the given group." />
 		</method>
-		
+
+		<method name="GetParameterGroupParameterCount" description="returns the number of parameters contained in a given parameter group.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Count" type="uint32" pass="return" description="Number of parameters in the group." />
+		</method>
+
+		<method name="GetParameterGroupParameterName" description="returns the name of a parameter in a given parameter group by index.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
+			<param name="Name" type="string" pass="return" description="Name of the parameter." />
+		</method>
+
+		<method name="GetParameterGroupParameterDescription" description="returns the description of a parameter in a given parameter group by index.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
+			<param name="Description" type="string" pass="return" description="Description of the parameter." />
+		</method>
+
 		<method name="HasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
@@ -5894,6 +5911,26 @@
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="bool" pass="return" description="Current Parameter Value" />
+		</method>
+
+		<method name="GetMachineParameterGroupParameterCount" description="returns the number of parameters contained in a given parameter group of a state machine.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Count" type="uint32" pass="return" description="Number of parameters in the group." />
+		</method>
+
+		<method name="GetMachineParameterGroupParameterName" description="returns the name of a parameter in a given parameter group of a state machine by index.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
+			<param name="Name" type="string" pass="return" description="Name of the parameter." />
+		</method>
+
+		<method name="GetMachineParameterGroupParameterDescription" description="returns the description of a parameter in a given parameter group of a state machine by index.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
+			<param name="Description" type="string" pass="return" description="Description of the parameter." />
 		</method>
 
 

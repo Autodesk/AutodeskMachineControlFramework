@@ -130,6 +130,12 @@ public:
 
 	bool GetMachineParameterAsBool(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
 
+	LibMCEnv_uint32 GetMachineParameterGroupParameterCount(const std::string& sMachineInstance, const std::string& sParameterGroup) override;
+
+	std::string GetMachineParameterGroupParameterName(const std::string& sMachineInstance, const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex) override;
+
+	std::string GetMachineParameterGroupParameterDescription(const std::string& sMachineInstance, const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex) override;
+
 	std::string GetUIProperty(const std::string& sElementPath, const std::string& sPropertyName) override;
 
 	std::string GetUIPropertyAsUUID(const std::string& sElementPath, const std::string& sPropertyName) override;

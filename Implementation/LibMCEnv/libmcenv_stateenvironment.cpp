@@ -517,6 +517,43 @@ bool CStateEnvironment::HasParameter(const std::string& sParameterGroup, const s
 	return pGroup->hasParameter(sParameterName);
 }
 
+LibMCEnv_uint32 CStateEnvironment::GetParameterGroupParameterCount(const std::string& sParameterGroup)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	return pGroup->getParameterCount();
+}
+
+std::string CStateEnvironment::GetParameterGroupParameterName(const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (nIndex >= pGroup->getParameterCount())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "parameter index out of range: " + sParameterGroup + "/" + std::to_string(nIndex));
+
+	std::string sName, sDescription, sDefaultValue;
+	pGroup->getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+	return sName;
+}
+
+std::string CStateEnvironment::GetParameterGroupParameterDescription(const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (nIndex >= pGroup->getParameterCount())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "parameter index out of range: " + sParameterGroup + "/" + std::to_string(nIndex));
+
+	std::string sName, sDescription, sDefaultValue;
+	pGroup->getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+	return sDescription;
+}
+
 bool CStateEnvironment::HasResourceData(const std::string& sIdentifier)
 {
 	auto pUIHandler = m_pSystemState->uiHandler();

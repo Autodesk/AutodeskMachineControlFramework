@@ -292,6 +292,37 @@ bool CUIEnvironment::GetMachineParameterAsBool(const std::string& sMachineInstan
     return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
+LibMCEnv_uint32 CUIEnvironment::GetMachineParameterGroupParameterCount(const std::string& sMachineInstance, const std::string& sParameterGroup)
+{
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    return pGroup->getParameterCount();
+}
+
+std::string CUIEnvironment::GetMachineParameterGroupParameterName(const std::string& sMachineInstance, const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex)
+{
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    if (nIndex >= pGroup->getParameterCount())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "parameter index out of range: " + sParameterGroup + "/" + std::to_string(nIndex));
+
+    std::string sName, sDescription, sDefaultValue;
+    pGroup->getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+    return sName;
+}
+
+std::string CUIEnvironment::GetMachineParameterGroupParameterDescription(const std::string& sMachineInstance, const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex)
+{
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    if (nIndex >= pGroup->getParameterCount())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "parameter index out of range: " + sParameterGroup + "/" + std::to_string(nIndex));
+
+    std::string sName, sDescription, sDefaultValue;
+    pGroup->getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+    return sDescription;
+}
+
 
 std::string CUIEnvironment::GetUIProperty(const std::string& sElementPath, const std::string& sPropertyName) 
 {   

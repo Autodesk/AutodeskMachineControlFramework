@@ -10099,6 +10099,42 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasparametergroup(Lib
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pParameterExists);
 
 /**
+* returns the number of parameters contained in a given parameter group.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[out] pCount - Number of parameters in the group.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparametercount(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 * pCount);
+
+/**
+* returns the name of a parameter in a given parameter group by index.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparametername(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the description of a parameter in a given parameter group by index.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparameterdescription(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
 * retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -10898,6 +10934,45 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparameterasint
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparameterasbool(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue);
+
+/**
+* returns the number of parameters contained in a given parameter group of a state machine.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[out] pCount - Number of parameters in the group.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparametercount(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 * pCount);
+
+/**
+* returns the name of a parameter in a given parameter group of a state machine by index.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparametername(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the description of a parameter in a given parameter group of a state machine by index.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparameterdescription(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
 
 /**
 * returns a string property of a UI element on the client

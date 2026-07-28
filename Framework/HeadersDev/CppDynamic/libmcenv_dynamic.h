@@ -10086,6 +10086,42 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasParameterGroupPtr) (LibMCE
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_HasParameterPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pParameterExists);
 
 /**
+* returns the number of parameters contained in a given parameter group.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[out] pCount - Number of parameters in the group.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetParameterGroupParameterCountPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 * pCount);
+
+/**
+* returns the name of a parameter in a given parameter group by index.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetParameterGroupParameterNamePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the description of a parameter in a given parameter group by index.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetParameterGroupParameterDescriptionPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
 * retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -10885,6 +10921,45 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetMachineParameterAsIntegerPtr)
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetMachineParameterAsBoolPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue);
+
+/**
+* returns the number of parameters contained in a given parameter group of a state machine.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[out] pCount - Number of parameters in the group.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterCountPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 * pCount);
+
+/**
+* returns the name of a parameter in a given parameter group of a state machine by index.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterNamePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the description of a parameter in a given parameter group of a state machine by index.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterDescriptionPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
 
 /**
 * returns a string property of a UI element on the client
@@ -12597,6 +12672,9 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetBoolParameterPtr m_StateEnvironment_GetBoolParameter;
 	PLibMCEnvStateEnvironment_HasParameterGroupPtr m_StateEnvironment_HasParameterGroup;
 	PLibMCEnvStateEnvironment_HasParameterPtr m_StateEnvironment_HasParameter;
+	PLibMCEnvStateEnvironment_GetParameterGroupParameterCountPtr m_StateEnvironment_GetParameterGroupParameterCount;
+	PLibMCEnvStateEnvironment_GetParameterGroupParameterNamePtr m_StateEnvironment_GetParameterGroupParameterName;
+	PLibMCEnvStateEnvironment_GetParameterGroupParameterDescriptionPtr m_StateEnvironment_GetParameterGroupParameterDescription;
 	PLibMCEnvStateEnvironment_HasResourceDataPtr m_StateEnvironment_HasResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceStringPtr m_StateEnvironment_LoadResourceString;
@@ -12672,6 +12750,9 @@ typedef struct {
 	PLibMCEnvUIEnvironment_GetMachineParameterAsDoublePtr m_UIEnvironment_GetMachineParameterAsDouble;
 	PLibMCEnvUIEnvironment_GetMachineParameterAsIntegerPtr m_UIEnvironment_GetMachineParameterAsInteger;
 	PLibMCEnvUIEnvironment_GetMachineParameterAsBoolPtr m_UIEnvironment_GetMachineParameterAsBool;
+	PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterCountPtr m_UIEnvironment_GetMachineParameterGroupParameterCount;
+	PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterNamePtr m_UIEnvironment_GetMachineParameterGroupParameterName;
+	PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterDescriptionPtr m_UIEnvironment_GetMachineParameterGroupParameterDescription;
 	PLibMCEnvUIEnvironment_GetUIPropertyPtr m_UIEnvironment_GetUIProperty;
 	PLibMCEnvUIEnvironment_GetUIPropertyAsUUIDPtr m_UIEnvironment_GetUIPropertyAsUUID;
 	PLibMCEnvUIEnvironment_GetUIPropertyAsDoublePtr m_UIEnvironment_GetUIPropertyAsDouble;
