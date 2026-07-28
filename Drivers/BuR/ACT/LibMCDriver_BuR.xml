@@ -257,7 +257,10 @@ Custom implementation
 		<method name="FinishList" description="Finish command list.">
 		</method>		
 
-		<method name="ExecuteList" description="Execute command list.">
+		<method name="ExecuteList" description="Execute command list. The list is kept on the PLC and must be removed manually via DeleteList once it has finished executing.">
+		</method>		
+
+		<method name="ExecuteAndDeleteList" description="Executes the command list and instructs the PLC to delete it automatically once execution has finished. No manual DeleteList call is required afterwards.">
 		</method>		
 
 		<method name="WaitForList" description="Wait for command list to finish executing">

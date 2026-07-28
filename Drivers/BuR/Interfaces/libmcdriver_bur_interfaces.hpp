@@ -360,9 +360,14 @@ public:
 	virtual void FinishList() = 0;
 
 	/**
-	* IPLCCommandList::ExecuteList - Execute command list.
+	* IPLCCommandList::ExecuteList - Execute command list. The list is kept on the PLC and must be removed manually via DeleteList once it has finished executing.
 	*/
 	virtual void ExecuteList() = 0;
+
+	/**
+	* IPLCCommandList::ExecuteAndDeleteList - Executes the command list and instructs the PLC to delete it automatically once execution has finished. No manual DeleteList call is required afterwards.
+	*/
+	virtual void ExecuteAndDeleteList() = 0;
 
 	/**
 	* IPLCCommandList::WaitForList - Wait for command list to finish executing
