@@ -63,7 +63,7 @@ using namespace AMC;
 CUIModule_ContentLeaf::CUIModule_ContentLeaf(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 	: CUIModule(getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition()),
 	  m_sModuleType(getTypeFromXML(xmlNode)),
-	  m_VisibleExpression(CUIModule::makeVisibleExpressionFromXML(xmlNode)),
+	  m_VisibleExpression(xmlNode, "visible", "1"),
 	  m_pStateMachineData(pUIModuleEnvironment->stateMachineData())
 {
 	LibMCAssertNotNull(pUIModuleEnvironment.get());

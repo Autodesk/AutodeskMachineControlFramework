@@ -127,7 +127,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, const std::string&
 	// "visible" supports both fixed values (visible="true") and dynamic
 	// state-machine expressions (sync:visible="main.jobinfo.isactive").
 	// Default is "1" (visible) when the attribute is absent.
-	CUIExpression visibleExpr = CUIModule::makeVisibleExpressionFromXML(xmlNode);
+	CUIExpression visibleExpr(xmlNode, "visible", "1");
 
 	registerStringAttribute("headline", headlineExpr);
 	registerStringAttribute("caption", captionExpr);

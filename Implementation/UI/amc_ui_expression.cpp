@@ -68,6 +68,11 @@ void CUIExpression::setFixedValue(const std::string& sValue)
 	m_sExpressionValue = "";
 }
 
+void CUIExpression::setSyncValue(const std::string& sValue)
+{
+	m_sExpressionValue = sValue;
+	m_sFixedValue = "";
+}
 
 void CUIExpression::readFromXML(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue, bool bValueMustExist)
 {

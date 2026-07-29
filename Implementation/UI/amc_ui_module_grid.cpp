@@ -314,7 +314,7 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath
 	captionExpr.setFixedValue(xmlNode.attribute("caption").as_string());
 	registerStringAttribute("caption", captionExpr);
 
-	CUIExpression visibleExpr = CUIModule::makeVisibleExpressionFromXML(xmlNode);
+	CUIExpression visibleExpr(xmlNode, "visible", "1");
 	registerBoolAttribute("visible", visibleExpr);
 
 }

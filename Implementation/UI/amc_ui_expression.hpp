@@ -69,6 +69,7 @@ namespace AMC {
 		CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, const char* defaultValue);
 
 		void setFixedValue(const std::string & sValue);
+		void setSyncValue(const std::string & sValue);
 
 		std::string evaluateStringValue(CStateMachineData * pStateMachineData);
 		std::string evaluateStringValue(PStateMachineData pStateMachineData);
