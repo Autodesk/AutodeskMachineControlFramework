@@ -58,6 +58,7 @@ namespace AMC {
 		cbdLeftAligned = 1,
 		cbdCentered = 2,
 		cbdEquallyDistributed = 3,
+		cbdToolbar = 4,
 	};
 
 
@@ -73,6 +74,16 @@ namespace AMC {
 		CUIExpression m_TargetPageExpression;
 		CUIExpression m_EventExpression;
 		CUIExpression m_IconExpression;
+
+		// Static layout metadata (toolbar concept):
+		//   kind    = "button" | "spacer" | "spring"
+		//   variant = "default" | "primary"
+		//   width   = "auto" | "narrow" | "fixed"
+		//   iconresource = name of a packaged SVG icon resource (alternative to the named "icon")
+		std::string m_sKind;
+		std::string m_sVariant;
+		std::string m_sWidth;
+		std::string m_sIconResource;
 
 		PStateMachineData m_pStateMachineData;
 
@@ -96,6 +107,12 @@ namespace AMC {
 		std::string getEventFormValueSetting();
 
 		std::string getButtonName();
+
+		void setKind(const std::string& sKind);
+		std::string getKind();
+		void setVariant(const std::string& sVariant);
+		void setWidth(const std::string& sWidth);
+		void setIconResource(const std::string& sIconResource);
 
 		void addFormFieldValue(PUIModule_ContentFormEntity pEntity);
 

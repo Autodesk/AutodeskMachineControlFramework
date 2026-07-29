@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem_alertlist.hpp"
 #include "amc_ui_module_contentitem_buttongroup.hpp"
 #include "amc_ui_module_contentitem_parameterlist.hpp"
+#include "amc_ui_module_contentitem_statuslist.hpp"
+#include "amc_ui_module_contentitem_togglepanel.hpp"
 #include "amc_ui_module_contentitem_configurationlist.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
 #include "amc_ui_module_contentitem_videostream.hpp"
@@ -61,7 +63,7 @@ using namespace AMC;
 CUIModule_ContentLeaf::CUIModule_ContentLeaf(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 	: CUIModule(getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition()),
 	  m_sModuleType(getTypeFromXML(xmlNode)),
-	  m_VisibleExpression(xmlNode, "visible", std::string("1")),
+	  m_VisibleExpression(CUIModule::makeVisibleExpressionFromXML(xmlNode)),
 	  m_pStateMachineData(pUIModuleEnvironment->stateMachineData())
 {
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
@@ -96,6 +98,10 @@ CUIModule_ContentLeaf::CUIModule_ContentLeaf(pugi::xml_node& xmlNode, const std:
 		m_pItem = CUIModule_ContentButtonGroup::makeFromXML(xmlNode, m_sName, sPath, pUIModuleEnvironment);
 	if (m_sModuleType == "parameterlist")
 		m_pItem = CUIModule_ContentParameterList::makeFromXML(xmlNode, m_sName, sPath, pUIModuleEnvironment);
+	if (m_sModuleType == "statuslist")
+		m_pItem = CUIModule_ContentStatusList::makeFromXML(xmlNode, m_sName, sPath, pUIModuleEnvironment);
+	if (m_sModuleType == "togglepanel")
+		m_pItem = CUIModule_ContentTogglePanel::makeFromXML(xmlNode, m_sName, sPath, pUIModuleEnvironment);
 	if (m_sModuleType == "configurationlist")
 		m_pItem = CUIModule_ContentConfigurationList::makeFromXML(xmlNode, m_sName, sPath, pUIModuleEnvironment);
 	if (m_sModuleType == "form")
@@ -135,7 +141,7 @@ bool CUIModule_ContentLeaf::isSupportedModuleType(const std::string& sType)
 {
 	return (sType == "paragraph") || (sType == "image") || (sType == "chart") || (sType == "videostream") ||
 		(sType == "upload") || (sType == "buildlist") || (sType == "executionlist") || (sType == "alertlist") ||
-		(sType == "buttongroup") || (sType == "parameterlist") || (sType == "configurationlist") || (sType == "form") ||
+		(sType == "buttongroup") || (sType == "parameterlist") || (sType == "statuslist") || (sType == "togglepanel") || (sType == "configurationlist") || (sType == "form") ||
 		(sType == "separator") || (sType == "statusbanner") || (sType == "workflow") || (sType == "statemachinegraph");
 }
 

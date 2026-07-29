@@ -186,6 +186,9 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
 
+	// Optional inner padding applied to each grid cell, in pixels.
+	m_nPadding = xmlNode.attribute("padding").as_uint(0);
+
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
 
@@ -303,12 +306,15 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath
 	registerIntegerAttribute("columncount", columnsExpression);
 	registerIntegerAttribute("rowcount", rowsExpression);
 
+	CUIExpression paddingExpression;
+	paddingExpression.setFixedValue(std::to_string(m_nPadding));
+	registerIntegerAttribute("padding", paddingExpression);
+
 	CUIExpression captionExpr;
 	captionExpr.setFixedValue(xmlNode.attribute("caption").as_string());
 	registerStringAttribute("caption", captionExpr);
 
-	CUIExpression visibleExpr;
-	visibleExpr.setFixedValue("1");
+	CUIExpression visibleExpr = CUIModule::makeVisibleExpressionFromXML(xmlNode);
 	registerBoolAttribute("visible", visibleExpr);
 
 }
@@ -366,6 +372,7 @@ void CUIModule_Grid::writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWrite
 	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 	moduleObject.addString(AMC_API_KEY_UI_CAPTION, "");
+	moduleObject.addInteger("padding", m_nPadding);
 
 	CJSONWriterArray columnsNode(writer);
 	for (auto column : m_Columns) {
