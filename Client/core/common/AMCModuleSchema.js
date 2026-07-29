@@ -45,7 +45,7 @@ const MODULE_SCHEMAS = {
 	},
 	grid: {
 		required: ['uuid', 'type'],
-		optional: ['caption', 'visible', 'columns', 'rows', 'sections'],
+		optional: ['caption', 'visible', 'columns', 'rows', 'sections', 'padding'],
 	},
 	tabs: {
 		required: ['uuid', 'type'],

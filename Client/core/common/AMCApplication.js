@@ -424,6 +424,7 @@ export default class AMCApplication extends Common.AMCObject {
 			legacy.tabs = subs.map(sub => this._normalizeV2ToLegacy(sub));
 
 		} else if (moduleType === "grid") {
+			legacy.padding = parseInt(attrs.padding) || 0;
 			if (v2.columns && v2.columns.length > 0) {
 				legacy.columns = v2.columns;
 			} else {

@@ -287,6 +287,13 @@ export default class AMCApplicationModule_Form extends Common.AMCApplicationModu
 					return { value: String(ia.value !== undefined ? ia.value : ""), text: ia.text || String(ia.value !== undefined ? ia.value : "") };
 				});
 				dataObject.items = entity.items;
+
+				// Item values are normalized to strings above; coerce the current
+				// combobox value to a string too so the selected item resolves on
+				// first render (a numeric default like value="1" would otherwise
+				// fail the strict comparison against the string item value).
+				if (entity.type === "combobox" && dataObject.value !== undefined && dataObject.value !== null)
+					dataObject.value = String(dataObject.value);
 			}
 		}
 	}

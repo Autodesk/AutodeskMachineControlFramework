@@ -129,17 +129,17 @@
 			<Label class="text-sm text-muted-foreground">{entity.caption}</Label>
 			<Select.Root
 				type="single"
-				value={d(entity).value || ''}
+				value={String(d(entity).value ?? '')}
 				onValueChange={(v: string) => onComboChange(entity, v)}
 				disabled={d(entity).disabled}
 			>
 			<Select.Trigger class="h-8 text-sm">
-				{@const selectedItem = (d(entity).items || []).find((i: any) => (typeof i === 'string' ? i : i.value) === d(entity).value)}
-				{selectedItem ? (typeof selectedItem === 'string' ? selectedItem : selectedItem.text || selectedItem.value) : d(entity).value || 'Select...'}
+				{@const selectedItem = (d(entity).items || []).find((i: any) => String(typeof i === 'string' ? i : i.value) === String(d(entity).value ?? ''))}
+				{selectedItem ? (typeof selectedItem === 'string' ? selectedItem : selectedItem.text || selectedItem.value) : (d(entity).value != null && d(entity).value !== '' ? String(d(entity).value) : 'Select...')}
 			</Select.Trigger>
 			<Select.Content>
-				{#each (d(entity).items || entity.items || []) as item}
-					<Select.Item value={typeof item === 'string' ? item : item.value}>
+				{#each (d(entity).items || entity.items || []) as item (typeof item === 'string' ? item : item.value)}
+					<Select.Item value={String(typeof item === 'string' ? item : item.value)}>
 						{typeof item === 'string' ? item : item.text || item.value}
 					</Select.Item>
 				{/each}

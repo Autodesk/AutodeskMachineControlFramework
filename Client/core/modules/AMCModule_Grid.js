@@ -47,6 +47,9 @@ export default class AMCApplicationModule_Grid extends Common.AMCApplicationModu
 		// TODO: check input
 		this.columns = Assert.ArrayValue (moduleJSON.columns);
 		this.rows = Assert.ArrayValue (moduleJSON.rows);
+
+		// Optional inner padding applied to each grid cell, in pixels.
+		this.padding = parseInt (moduleJSON.padding) || 0;
 				
 		this.sections = []
 		
@@ -87,7 +90,9 @@ export default class AMCApplicationModule_Grid extends Common.AMCApplicationModu
 				overflowtype = "hidden";
 			}
 
-			section.cssstyle = "overflow:" + overflowtype + "; overflow-x:" + overflowtype + "; grid-area:" + section.name + ";" + marginx + marginy;
+			var paddingStyle = (this.padding > 0) ? ("padding:" + this.padding + "px; box-sizing:border-box;") : "";
+
+			section.cssstyle = "overflow:" + overflowtype + "; overflow-x:" + overflowtype + "; grid-area:" + section.name + ";" + marginx + marginy + paddingStyle;
 			
 			
 			if (section) {				
