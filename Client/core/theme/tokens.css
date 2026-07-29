@@ -42,6 +42,21 @@
 
 	--amcf-color-archive:         #90A4AE;
 
+	/* ── Status pill tokens (semantic badges: on/off/yes/no/map) ───── */
+	/* Consumed by the statuslist pills in both clients. Light defaults
+	   here; dark overrides in the .dark / .theme--dark block below.
+	   Override any of these via a server/JSON theme (they are --amcf-*). */
+	--amcf-status-success-bg:     rgba(67, 160, 71, 0.14);
+	--amcf-status-success-fg:     #2E7D32;
+	--amcf-status-warning-bg:     rgba(249, 168, 37, 0.16);
+	--amcf-status-warning-fg:     #E65100;
+	--amcf-status-error-bg:       rgba(200, 16, 46, 0.12);
+	--amcf-status-error-fg:       #C8102E;
+	--amcf-status-info-bg:        rgba(41, 121, 255, 0.12);
+	--amcf-status-info-fg:        #1565C0;
+	--amcf-status-neutral-bg:     rgba(140, 150, 165, 0.18);
+	--amcf-status-neutral-fg:     #607D8B;
+
 	/* ── Text colors ──────────────────────────────────────────────── */
 	--amcf-color-text:            #1E1E1E;
 	--amcf-color-text-muted:      #5F6368;
@@ -108,4 +123,25 @@
 
 	/* ── Transition ───────────────────────────────────────────────── */
 	--amcf-transition-fast:        0.15s ease;
+}
+
+/*
+ * Dark-mode overrides for the status pill tokens.
+ * `.dark` covers the Svelte client (class-based dark mode), `.theme--dark`
+ * covers the Vuetify-based Vue2 client. Only the semantic status colors are
+ * re-tinted here so pills stay legible on dark surfaces; everything else keeps
+ * inheriting the light values unless a server theme overrides them.
+ */
+.dark,
+.theme--dark {
+	--amcf-status-success-bg:     rgba(34, 197, 94, 0.18);
+	--amcf-status-success-fg:     #86EFAC;
+	--amcf-status-warning-bg:     rgba(245, 158, 11, 0.18);
+	--amcf-status-warning-fg:     #FCD34D;
+	--amcf-status-error-bg:       rgba(239, 68, 68, 0.20);
+	--amcf-status-error-fg:       #FCA5A5;
+	--amcf-status-info-bg:        rgba(59, 130, 246, 0.20);
+	--amcf-status-info-fg:        #93C5FD;
+	--amcf-status-neutral-bg:     rgba(148, 163, 184, 0.18);
+	--amcf-status-neutral-fg:     #CBD5E1;
 }

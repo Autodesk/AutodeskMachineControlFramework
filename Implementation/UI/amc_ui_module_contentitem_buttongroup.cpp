@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/common_utils.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_expression.hpp"
+#include "amc_resourcepackage.hpp"
 
 using namespace AMC;
 
@@ -311,8 +312,21 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 			pButton->setWidth(widthAttrib.as_string());
 
 		auto iconResourceAttrib = childNode.attribute("iconresource");
-		if (!iconResourceAttrib.empty())
-			pButton->setIconResource(iconResourceAttrib.as_string());
+		if (!iconResourceAttrib.empty()) {
+			// Resolve the packaged resource NAME to its resource UUID. The client
+			// addresses images by UUID via getImageURL()/the "/image/<uuid>" API
+			// endpoint, so passing the raw name results in an "invalid parameter"
+			// error. This mirrors how the <image> content item resolves resources.
+			std::string sIconResourceName = iconResourceAttrib.as_string();
+			std::string sIconResourceUUID;
+			auto pResourcePackage = pUIModuleEnvironment->resourcePackage();
+			if (pResourcePackage.get() != nullptr) {
+				auto pEntry = pResourcePackage->findEntryByName(sIconResourceName, false);
+				if (pEntry.get() != nullptr)
+					sIconResourceUUID = pEntry->getUUID();
+			}
+			pButton->setIconResource(sIconResourceUUID);
+		}
 	}
 
 	return pButtonGroup;

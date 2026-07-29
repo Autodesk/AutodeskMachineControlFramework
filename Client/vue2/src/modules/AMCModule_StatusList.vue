@@ -145,9 +145,13 @@ export default {
 	font-size: 11.5px;
 	font-weight: 600;
 }
-.amcf-status-list__pill--success { background: rgba(67, 160, 71, 0.14); color: #2E7D32; }
-.amcf-status-list__pill--warning { background: rgba(249, 168, 37, 0.16); color: #E65100; }
-.amcf-status-list__pill--error   { background: rgba(200, 16, 46, 0.12);  color: #C8102E; }
-.amcf-status-list__pill--info    { background: rgba(41, 121, 255, 0.12); color: #1565C0; }
-.amcf-status-list__pill--neutral { background: rgba(140, 150, 165, 0.18); color: #607D8B; }
+/* Semantic status colors come from theme tokens (defined per light/dark in
+   core/theme/tokens.css and overridable via a server theme), so the pills
+   follow the active color scheme and match the other client. Fallbacks keep
+   the light palette if the tokens are ever unavailable. */
+.amcf-status-list__pill--success { background: var(--amcf-status-success-bg, rgba(67, 160, 71, 0.14)); color: var(--amcf-status-success-fg, #2E7D32); }
+.amcf-status-list__pill--warning { background: var(--amcf-status-warning-bg, rgba(249, 168, 37, 0.16)); color: var(--amcf-status-warning-fg, #E65100); }
+.amcf-status-list__pill--error   { background: var(--amcf-status-error-bg, rgba(200, 16, 46, 0.12));  color: var(--amcf-status-error-fg, #C8102E); }
+.amcf-status-list__pill--info    { background: var(--amcf-status-info-bg, rgba(41, 121, 255, 0.12)); color: var(--amcf-status-info-fg, #1565C0); }
+.amcf-status-list__pill--neutral { background: var(--amcf-status-neutral-bg, rgba(140, 150, 165, 0.18)); color: var(--amcf-status-neutral-fg, #607D8B); }
 </style>

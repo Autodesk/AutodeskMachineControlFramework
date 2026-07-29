@@ -8,12 +8,15 @@
 	let title = $derived.by(() => { poll.v; return module.title || ''; });
 	let rows = $derived.by(() => { poll.v; return [...(module.rows || [])]; });
 
-	const severityClass: Record<string, string> = {
-		success: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
-		warning: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-		error: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
-		info: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
-		neutral: 'bg-muted text-muted-foreground',
+	// Semantic status colors come from theme tokens (defined per light/dark in
+	// core/theme/tokens.css and overridable via a server theme), so the pills
+	// follow the active color scheme and stay consistent across clients.
+	const severityStyle: Record<string, string> = {
+		success: 'background: var(--amcf-status-success-bg); color: var(--amcf-status-success-fg);',
+		warning: 'background: var(--amcf-status-warning-bg); color: var(--amcf-status-warning-fg);',
+		error: 'background: var(--amcf-status-error-bg); color: var(--amcf-status-error-fg);',
+		info: 'background: var(--amcf-status-info-bg); color: var(--amcf-status-info-fg);',
+		neutral: 'background: var(--amcf-status-neutral-bg); color: var(--amcf-status-neutral-fg);',
 	};
 
 	function isTruthy(value: string): boolean {
@@ -24,7 +27,7 @@
 	interface RowRender {
 		pill: boolean;
 		text: string;
-		cls: string;
+		style: string;
 	}
 
 	function renderRow(row: any): RowRender {
@@ -33,35 +36,35 @@
 
 		if (display === 'number') {
 			const unit = row.unit ? ` ${row.unit}` : '';
-			return { pill: false, text: `${value}${unit}`, cls: '' };
+			return { pill: false, text: `${value}${unit}`, style: '' };
 		}
 
 		if (display === 'text') {
-			return { pill: false, text: value, cls: '' };
+			return { pill: false, text: value, style: '' };
 		}
 
 		if (display === 'map') {
 			const maps = row.maps || [];
 			const match = maps.find((m: any) => (m.value ?? '').toString() === value);
 			if (match) {
-				return { pill: true, text: match.text ?? value, cls: severityClass[match.severity] || severityClass.neutral };
+				return { pill: true, text: match.text ?? value, style: severityStyle[match.severity] || severityStyle.neutral };
 			}
-			return { pill: true, text: value, cls: severityClass.neutral };
+			return { pill: true, text: value, style: severityStyle.neutral };
 		}
 
 		// boolean presets
 		const on = isTruthy(value);
 		if (display === 'yesno') {
-			return { pill: true, text: on ? 'Yes' : 'No', cls: on ? severityClass.success : severityClass.neutral };
+			return { pill: true, text: on ? 'Yes' : 'No', style: on ? severityStyle.success : severityStyle.neutral };
 		}
 		if (display === 'openclosed') {
-			return { pill: true, text: on ? 'Opened' : 'Closed', cls: on ? severityClass.success : severityClass.neutral };
+			return { pill: true, text: on ? 'Opened' : 'Closed', style: on ? severityStyle.success : severityStyle.neutral };
 		}
 		if (display === 'leftright') {
-			return { pill: true, text: on ? 'Right' : 'Left', cls: severityClass.neutral };
+			return { pill: true, text: on ? 'Right' : 'Left', style: severityStyle.neutral };
 		}
 		// default: onoff
-		return { pill: true, text: on ? 'On' : 'Off', cls: on ? severityClass.success : severityClass.neutral };
+		return { pill: true, text: on ? 'On' : 'Off', style: on ? severityStyle.success : severityStyle.neutral };
 	}
 </script>
 
@@ -79,7 +82,7 @@
 					<div class="flex items-center gap-2 py-1.5 border-b last:border-b-0 border-border/60">
 						<span class="flex-1 text-sm text-muted-foreground">{row.label}</span>
 						{#if r.pill}
-							<span class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold {r.cls}">{r.text}</span>
+							<span class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold" style={r.style}>{r.text}</span>
 						{:else}
 							<span class="text-sm tabular-nums">{r.text}</span>
 						{/if}
