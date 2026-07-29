@@ -112,6 +112,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			thumb-label hide-details="auto"
 			@end="$emit('change-event', { entity })"
 		/>
+		<div class="amcff-slider-bounds">
+			<span>{{ parseFloat(entity.dataObject.minvalue) || 0 }}<span v-if="entity.dataObject.unit"> {{ entity.dataObject.unit }}</span></span>
+			<span>{{ parseFloat(entity.dataObject.maxvalue) || 100 }}<span v-if="entity.dataObject.unit"> {{ entity.dataObject.unit }}</span></span>
+		</div>
 	</div>
 
 	<!-- multiselect -->
@@ -198,6 +202,10 @@ export default {
 .amcff-slider-label {
 	display: flex; justify-content: space-between;
 	font-size: 0.875rem; color: rgba(0,0,0,.87); margin-bottom: 2px;
+}
+.amcff-slider-bounds {
+	display: flex; justify-content: space-between;
+	font-size: 0.75rem; color: rgba(0,0,0,.55); margin-top: -6px;
 }
 
 .amcff-calc {

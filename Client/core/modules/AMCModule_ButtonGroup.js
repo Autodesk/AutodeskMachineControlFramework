@@ -47,8 +47,9 @@ export default class AMCApplicationModule_ButtonGroup extends Common.AMCApplicat
 
 		this.buttoncssstyle = "";
 		this.cssstyle = "";
+		this.buttondistribution = moduleJSON.buttondistribution || "";
 
-		let buttondistribution = moduleJSON.buttondistribution || "";
+		let buttondistribution = this.buttondistribution;
 
 		if (buttondistribution === "rightaligned")
 			this.cssstyle += "text-align: right;";
@@ -70,6 +71,8 @@ export default class AMCApplicationModule_ButtonGroup extends Common.AMCApplicat
 		Assert.ObjectValue (updateJSON);
 		if (updateJSON.buttons)
 			this.buttons = updateJSON.buttons;
+		if (updateJSON.buttondistribution !== undefined)
+			this.buttondistribution = updateJSON.buttondistribution;
 	}
 
 
@@ -95,10 +98,16 @@ export default class AMCApplicationModule_ButtonGroup extends Common.AMCApplicat
 					event:           a.event     || "",
 					targetpage:      a.targetpage || "",
 					icon:            a.icon      || "",
+					kind:            a.kind || "button",
+					variant:         a.variant || "default",
+					width:           a.width || "auto",
+					iconresource:    a.iconresource || "",
 					eventformvalues: formValues,
 				};
 			});
 		}
+		if (attrs && attrs.buttondistribution !== undefined)
+			this.buttondistribution = attrs.buttondistribution;
 		if (attrs && attrs.caption !== undefined)
 			this.caption = attrs.caption;
 		if (attrs && attrs.visible !== undefined)

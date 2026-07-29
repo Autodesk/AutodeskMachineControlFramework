@@ -173,23 +173,29 @@
 
 	<!-- slider -->
 	{:else if entity.type === 'slider'}
-		<div class="grid grid-cols-[140px_1fr] items-center gap-2">
-			<Label class="text-sm text-muted-foreground">{entity.caption}</Label>
-			<div class="flex items-center gap-3">
-				<input
-					type="range"
-					class="flex-1 accent-primary"
-					value={d(entity).value || 0}
-					min={parseFloat(d(entity).minvalue) || 0}
-					max={parseFloat(d(entity).maxvalue) || 100}
-					step={parseFloat(d(entity).step) || 1}
-					disabled={d(entity).disabled}
-					oninput={(e: Event) => { entity.dataObject.value = (e.target as HTMLInputElement).value; }}
-					onchange={() => onEditBlur(entity)}
-				/>
-				<span class="text-sm tabular-nums w-16 text-right">
-					{d(entity).value}{d(entity).unit ? ` ${d(entity).unit}` : ''}
-				</span>
+		<div class="grid grid-cols-[140px_1fr] items-start gap-2">
+			<Label class="text-sm text-muted-foreground pt-1">{entity.caption}</Label>
+			<div class="flex flex-col">
+				<div class="flex items-center gap-3">
+					<input
+						type="range"
+						class="flex-1 accent-primary"
+						value={d(entity).value || 0}
+						min={parseFloat(d(entity).minvalue) || 0}
+						max={parseFloat(d(entity).maxvalue) || 100}
+						step={parseFloat(d(entity).step) || 1}
+						disabled={d(entity).disabled}
+						oninput={(e: Event) => { entity.dataObject.value = (e.target as HTMLInputElement).value; }}
+						onchange={() => onEditBlur(entity)}
+					/>
+					<span class="text-sm tabular-nums w-16 text-right">
+						{d(entity).value}{d(entity).unit ? ` ${d(entity).unit}` : ''}
+					</span>
+				</div>
+				<div class="flex text-xs text-muted-foreground pr-[4.5rem]">
+					<span>{parseFloat(d(entity).minvalue) || 0}{d(entity).unit ? ` ${d(entity).unit}` : ''}</span>
+					<span class="ml-auto">{parseFloat(d(entity).maxvalue) || 100}{d(entity).unit ? ` ${d(entity).unit}` : ''}</span>
+				</div>
 			</div>
 		</div>
 

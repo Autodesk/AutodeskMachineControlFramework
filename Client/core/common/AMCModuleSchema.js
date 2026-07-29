@@ -71,6 +71,14 @@ const MODULE_SCHEMAS = {
 		required: ['uuid', 'type'],
 		optional: ['caption', 'visible', 'headers', 'entries', 'loadingtext', 'entriesperpage'],
 	},
+	statuslist: {
+		required: ['uuid', 'type'],
+		optional: ['caption', 'visible', 'title', 'rows', 'loadingtext'],
+	},
+	togglepanel: {
+		required: ['uuid', 'type'],
+		optional: ['caption', 'visible', 'columns', 'toggles'],
+	},
 	form: {
 		required: ['uuid', 'type'],
 		optional: ['caption', 'visible', 'entities'],

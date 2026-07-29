@@ -12,13 +12,28 @@
 			module.cardstyle === 'outlined' ||
 			module.cardstyle === 'tinted';
 	});
+	let isGroupbox = $derived.by(() => { poll.v; return module.cardstyle === 'groupbox'; });
 	let title = $derived.by(() => { poll.v; return module.title || ''; });
 	let subtitle = $derived.by(() => { poll.v; return module.subtitle || ''; });
 	let visible = $derived.by(() => { poll.v; return module.visible !== false; });
 	let modules = $derived.by(() => { poll.v; return [...(module.modules || [])]; });
 </script>
 
-{#if visible && isCard}
+{#if visible && isGroupbox}
+	<fieldset class="relative mt-2.5 rounded-lg border border-border px-3.5 pb-3 pt-4 bg-card">
+		{#if title}
+			<legend class="px-2 text-sm font-semibold">{title}</legend>
+		{/if}
+		{#if subtitle}
+			<p class="text-sm text-muted-foreground mb-2">{subtitle}</p>
+		{/if}
+		<div class="flex flex-col gap-2 w-full">
+			{#each modules as child (child.uuid)}
+				<ModuleFactory module={child} {app} />
+			{/each}
+		</div>
+	</fieldset>
+{:else if visible && isCard}
 	<Card.Root class="flex flex-col h-full min-h-0">
 		{#if title}
 			<Card.Header class="pb-1">

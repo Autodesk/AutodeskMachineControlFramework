@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	import Module_LayerView     from '../modules/AMCModule_LayerView.vue';
 	import Module_Logs          from '../modules/AMCModule_Logs.vue';
 	import Module_ParameterList from '../modules/AMCModule_ParameterList.vue';
+	import Module_StatusList    from '../modules/AMCModule_StatusList.vue';
+	import Module_TogglePanel   from '../modules/AMCModule_TogglePanel.vue';
 	import Module_Form          from '../modules/AMCModule_Form.vue';
 	import Module_Chart         from '../modules/AMCModule_Chart.vue';
 	import Module_Image         from '../modules/AMCModule_Image.vue';
@@ -74,6 +76,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		layerview:         Module_LayerView,
 		logs:              Module_Logs,
 		parameterlist:     Module_ParameterList,
+		statuslist:        Module_StatusList,
+		togglepanel:       Module_TogglePanel,
 		form:              Module_Form,
 		chart:             Module_Chart,
 		image:             Module_Image,

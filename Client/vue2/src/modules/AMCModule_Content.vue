@@ -59,6 +59,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			</v-card-text>
 		</v-card>
 
+		<!-- ── Groupbox: fieldset border with inset title ────────────────── -->
+		<fieldset v-else-if="isGroupbox" class="content-groupbox">
+			<legend v-if="module.title" class="content-groupbox-title">{{ module.title }}</legend>
+			<div v-if="module.subtitle" class="content-subtitle">{{ module.subtitle }}</div>
+			<div class="content-children" :style="childrenStyle">
+				<Module_Factory
+					v-for="childModule in module.modules"
+					:key="childModule.uuid"
+					:module="childModule"
+					:Application="Application"
+				/>
+			</div>
+		</fieldset>
+
 		<!-- ── Plain (cardstyle="none") — backward-compatible divs ───────── -->
 		<template v-else>
 			<div v-if="module.title"    class="content-title">{{ module.title }}</div>
@@ -94,6 +108,10 @@ export default {
 		isCard () {
 			const s = this.module.cardstyle;
 			return s === 'elevated' || s === 'outlined' || s === 'tinted';
+		},
+
+		isGroupbox () {
+			return this.module.cardstyle === 'groupbox';
 		},
 
 		cardBackground () {
@@ -159,6 +177,25 @@ export default {
 	flex: 1 1 0;
 	min-height: 0;
 	overflow: auto;
+}
+
+/* ── Groupbox (fieldset) variant ──────────────────────────────────── */
+.content-groupbox {
+	flex: 1 1 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--amcf-color-border, rgba(140, 150, 165, 0.35));
+	border-radius: var(--amcf-radius-lg, 8px);
+	margin-top: 10px;
+	padding: 8px 14px 12px;
+}
+.content-groupbox-title {
+	padding: 0 8px;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--amcf-color-text, #1E1E1E);
+	width: auto;
 }
 
 /* ── Plain (none) variant ─────────────────────────────────────────── */

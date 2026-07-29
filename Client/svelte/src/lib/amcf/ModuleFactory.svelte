@@ -9,6 +9,8 @@
 	import ModuleStatusBanner from './modules/ModuleStatusBanner.svelte';
 	import ModuleTabs from './modules/ModuleTabs.svelte';
 	import ModuleParameterList from './modules/ModuleParameterList.svelte';
+	import ModuleStatusList from './modules/ModuleStatusList.svelte';
+	import ModuleTogglePanel from './modules/ModuleTogglePanel.svelte';
 	import ModuleLogs from './modules/ModuleLogs.svelte';
 	import ModuleAlertList from './modules/ModuleAlertList.svelte';
 	import ModuleUpload from './modules/ModuleUpload.svelte';
@@ -37,6 +39,8 @@
 		statusbanner: ModuleStatusBanner,
 		tabs: ModuleTabs,
 		parameterlist: ModuleParameterList,
+		statuslist: ModuleStatusList,
+		togglepanel: ModuleTogglePanel,
 		logs: ModuleLogs,
 		alertlist: ModuleAlertList,
 		upload: ModuleUpload,

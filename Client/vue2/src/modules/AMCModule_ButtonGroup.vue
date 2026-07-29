@@ -30,19 +30,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <template>
 
-<div v-if="module.visible !== false" class="btngroup-root" :style="module.cssstyle">
-	<v-btn
-		v-for="button in module.buttons"
-		:key="button.uuid || button.name"
-		:disabled="button.disabled"
-		:color="button.color || 'primary'"
-		:style="module.buttoncssstyle"
-		class="btngroup-btn"
-		@click.stop="uiModuleButtonClick(button)"
-	>
-		<v-icon v-if="button.icon" small left>{{ button.icon }}</v-icon>
-		{{ button.caption }}
-	</v-btn>
+<div v-if="module.visible !== false" class="btngroup-root" :class="{ 'btngroup-root--toolbar': isToolbar }" :style="module.cssstyle">
+	<template v-for="(button, index) in module.buttons">
+		<div v-if="button.kind === 'spring'" :key="button.uuid || 'spring' + index" class="btngroup-spring"></div>
+		<div v-else-if="button.kind === 'spacer'" :key="button.uuid || 'spacer' + index" class="btngroup-spacer"></div>
+		<v-btn
+			v-else
+			:key="button.uuid || button.name"
+			:disabled="button.disabled"
+			:color="button.variant === 'primary' ? 'primary' : undefined"
+			:outlined="button.variant !== 'primary'"
+			:style="module.buttoncssstyle"
+			class="btngroup-btn"
+			:class="[widthClass(button), { 'btngroup-btn--iconlabel': hasIcon(button) }]"
+			@click.stop="uiModuleButtonClick(button)"
+		>
+			<div v-if="hasIcon(button)" class="btngroup-btn__stack">
+				<img v-if="button.iconresource" :src="iconResourceURL(button)" class="btngroup-btn__img" alt="" />
+				<v-icon v-else-if="button.icon" small>{{ button.icon }}</v-icon>
+				<span v-if="button.caption" class="btngroup-btn__label">{{ button.caption }}</span>
+			</div>
+			<template v-else>
+				{{ button.caption }}
+			</template>
+		</v-btn>
+	</template>
 </div>
 
 </template>
@@ -51,7 +63,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 export default {
 	props: ['Application', 'module'],
 
+	computed: {
+		isToolbar() {
+			return this.module.buttondistribution === 'toolbar';
+		},
+	},
+
 	methods: {
+		hasIcon(button) {
+			return !!(button.icon || button.iconresource);
+		},
+
+		widthClass(button) {
+			if (button.width === 'narrow')
+				return 'btngroup-btn--narrow';
+			if (button.width === 'fixed')
+				return 'btngroup-btn--fixed';
+			return '';
+		},
+
+		iconResourceURL(button) {
+			return button.iconresource ? this.Application.getImageURL(button.iconresource) : '';
+		},
+
 		uiModuleButtonClick(button) {
 			const formvalues = this.Application.assembleFormValues(button.eventformvalues);
 			if (button.event && button.event !== '')
@@ -77,5 +111,43 @@ export default {
 	letter-spacing: 0.01em;
 	text-transform: none;
 	font-weight: 500;
+}
+
+/* Toolbar layout: no wrapping so spacers/springs keep their positions. */
+.btngroup-root--toolbar {
+	flex-wrap: nowrap;
+	align-items: stretch;
+}
+.btngroup-spring {
+	flex: 1 1 0;
+	min-width: 0;
+}
+.btngroup-spacer {
+	flex: 0 0 24px;
+}
+.btngroup-btn--narrow {
+	min-width: 64px !important;
+	padding: 0 6px !important;
+}
+.btngroup-btn--fixed {
+	min-width: 112px !important;
+}
+.btngroup-btn--iconlabel {
+	height: auto !important;
+	min-height: 56px;
+	padding: 8px 4px !important;
+}
+.btngroup-btn__stack {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+}
+.btngroup-btn__img {
+	height: 24px;
+	width: auto;
+}
+.btngroup-btn__label {
+	font-size: 12px;
 }
 </style>

@@ -51,6 +51,8 @@ import AMCApplicationModule_Logs from "../modules/AMCModule_Logs.js"
 import AMCApplicationModule_LayerView from "../modules/AMCModule_LayerView.js"
 import AMCApplicationModule_Custom from "../modules/AMCModule_Custom.js"
 import AMCApplicationModule_ParameterList from "../modules/AMCModule_ParameterList.js"
+import AMCApplicationModule_StatusList from "../modules/AMCModule_StatusList.js"
+import AMCApplicationModule_TogglePanel from "../modules/AMCModule_TogglePanel.js"
 import AMCApplicationModule_Form from "../modules/AMCModule_Form.js"
 import AMCApplicationModule_Chart from "../modules/AMCModule_Chart.js"
 import AMCApplicationModule_Image from "../modules/AMCModule_Image.js"
@@ -361,6 +363,7 @@ export default class AMCApplication extends Common.AMCObject {
 		return (moduleType === "paragraph") || (moduleType === "image") || (moduleType === "chart") || (moduleType === "videostream") ||
 			(moduleType === "upload") || (moduleType === "buildlist") || (moduleType === "executionlist") ||
 			(moduleType === "alertlist") || (moduleType === "buttongroup") || (moduleType === "parameterlist") ||
+			(moduleType === "statuslist") || (moduleType === "togglepanel") ||
 			(moduleType === "configurationlist") || (moduleType === "form") || (moduleType === "workflow") || (moduleType === "statemachinegraph");
 	}
 
@@ -700,6 +703,10 @@ export default class AMCApplication extends Common.AMCObject {
 
 		if (def.type === "parameterlist")
 			return new AMCApplicationModule_ParameterList (page, def);
+		if (def.type === "statuslist")
+			return new AMCApplicationModule_StatusList (page, def);
+		if (def.type === "togglepanel")
+			return new AMCApplicationModule_TogglePanel (page, def);
 		if (def.type === "form")
 			return new AMCApplicationModule_Form (page, def);
 		if (def.type === "chart")
