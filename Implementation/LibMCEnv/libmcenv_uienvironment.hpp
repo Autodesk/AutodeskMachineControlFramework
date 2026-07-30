@@ -109,6 +109,8 @@ public:
 
 	std::string RetrieveEventSenderUUID() override;
 
+	bool SenderHasTag(const std::string & sTag) override;
+
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 
 	std::string GetMachineState(const std::string & sMachineInstance) override;

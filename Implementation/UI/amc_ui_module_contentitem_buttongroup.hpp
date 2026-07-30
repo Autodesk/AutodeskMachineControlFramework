@@ -85,6 +85,11 @@ namespace AMC {
 		std::string m_sWidth;
 		std::string m_sIconResource;
 
+		// Space-separated list of free-form tags. Exposed as the button's "tags"
+		// UI property so event handlers can identify a sender semantically
+		// (via GetUIProperty(sender, "tags")) instead of matching the sender path.
+		std::string m_sTags;
+
 		PStateMachineData m_pStateMachineData;
 
 		std::string m_sEventFormValueSetting;
@@ -113,6 +118,8 @@ namespace AMC {
 		void setVariant(const std::string& sVariant);
 		void setWidth(const std::string& sWidth);
 		void setIconResource(const std::string& sIconResource);
+		void setTags(const std::string& sTags);
+		std::string getTags();
 
 		void addFormFieldValue(PUIModule_ContentFormEntity pEntity);
 

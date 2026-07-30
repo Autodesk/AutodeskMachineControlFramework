@@ -5852,6 +5852,11 @@
 		<method name="RetrieveEventSenderUUID" description="returns uuid of the UI control that triggered the event.">
 			<param name="SenderUUID" type="string" pass="return" description="Name of the sender uuid." />
 		</method>
+
+		<method name="SenderHasTag" description="checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.">
+			<param name="Tag" type="string" pass="in" description="Tag to check for." />
+			<param name="TagExists" type="bool" pass="return" description="True if the sender declares the given tag." />
+		</method>
 				
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">

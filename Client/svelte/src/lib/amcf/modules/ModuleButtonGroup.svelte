@@ -53,7 +53,14 @@
 					class="{widthClass(btn)} {hasIcon ? 'h-auto flex-col gap-1 py-2' : ''}"
 				>
 					{#if btn.iconresource}
-						<img src={iconResourceURL(btn)} alt="" class="h-6 w-auto" />
+						<!-- Render the packaged SVG as a mask tinted with the button's
+						     text colour (currentColor), so the icon adapts to light/dark
+						     themes and to the primary/outline button variants. -->
+						<span
+							class="h-6 w-6 shrink-0"
+							style="background-color: currentColor; -webkit-mask: url('{iconResourceURL(btn)}') no-repeat center / contain; mask: url('{iconResourceURL(btn)}') no-repeat center / contain;"
+							aria-hidden="true"
+						></span>
 					{:else if btn.icon}
 						<MdiIcon icon={btn.icon} class="h-5 w-5" />
 					{/if}

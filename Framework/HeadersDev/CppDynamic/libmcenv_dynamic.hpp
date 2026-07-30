@@ -3694,6 +3694,7 @@ public:
 	inline std::string RetrieveEventSender();
 	inline std::string RetrieveEventSenderPage();
 	inline std::string RetrieveEventSenderUUID();
+	inline bool SenderHasTag(const std::string & sTag);
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline void LogMessage(const std::string & sLogString);
@@ -4863,6 +4864,7 @@ public:
 		pWrapperTable->m_UIEnvironment_RetrieveEventSender = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = nullptr;
+		pWrapperTable->m_UIEnvironment_SenderHasTag = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
@@ -14045,6 +14047,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SenderHasTag = (PLibMCEnvUIEnvironment_SenderHasTagPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_senderhastag");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SenderHasTag = (PLibMCEnvUIEnvironment_SenderHasTagPtr) dlsym(hLibrary, "libmcenv_uienvironment_senderhastag");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SenderHasTag == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
@@ -18852,6 +18863,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsenderuuid", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_senderhastag", (void**)&(pWrapperTable->m_UIEnvironment_SenderHasTag));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SenderHasTag == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
@@ -33127,6 +33142,19 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSenderUUID(m_pHandle, bytesNeededSenderUUID, &bytesWrittenSenderUUID, &bufferSenderUUID[0]));
 		
 		return std::string(&bufferSenderUUID[0]);
+	}
+	
+	/**
+	* CUIEnvironment::SenderHasTag - checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.
+	* @param[in] sTag - Tag to check for.
+	* @return True if the sender declares the given tag.
+	*/
+	bool CUIEnvironment::SenderHasTag(const std::string & sTag)
+	{
+		bool resultTagExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SenderHasTag(m_pHandle, sTag.c_str(), &resultTagExists));
+		
+		return resultTagExists;
 	}
 	
 	/**

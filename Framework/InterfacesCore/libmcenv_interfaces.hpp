@@ -8325,6 +8325,13 @@ public:
 	virtual std::string RetrieveEventSenderUUID() = 0;
 
 	/**
+	* IUIEnvironment::SenderHasTag - checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.
+	* @param[in] sTag - Tag to check for.
+	* @return True if the sender declares the given tag.
+	*/
+	virtual bool SenderHasTag(const std::string & sTag) = 0;
+
+	/**
 	* IUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.

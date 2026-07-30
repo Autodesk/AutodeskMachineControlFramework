@@ -32636,6 +32636,35 @@ LibMCEnvResult libmcenv_uienvironment_retrieveeventsenderuuid(LibMCEnv_UIEnviron
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_senderhastag(LibMCEnv_UIEnvironment pUIEnvironment, const char * pTag, bool * pTagExists)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pTag == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pTagExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sTag(pTag);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTagExists = pIUIEnvironment->SenderHasTag(sTag);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_preparesignal(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -37352,6 +37381,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_retrieveeventsenderpage;
 	if (sProcName == "libmcenv_uienvironment_retrieveeventsenderuuid") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_retrieveeventsenderuuid;
+	if (sProcName == "libmcenv_uienvironment_senderhastag") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_senderhastag;
 	if (sProcName == "libmcenv_uienvironment_preparesignal") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_preparesignal;
 	if (sProcName == "libmcenv_uienvironment_getmachinestate") 

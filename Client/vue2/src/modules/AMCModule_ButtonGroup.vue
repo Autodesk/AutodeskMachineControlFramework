@@ -46,7 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			@click.stop="uiModuleButtonClick(button)"
 		>
 			<div v-if="hasIcon(button)" class="btngroup-btn__stack">
-				<img v-if="button.iconresource" :src="iconResourceURL(button)" class="btngroup-btn__img" alt="" />
+				<!-- Render the packaged SVG as a mask tinted with currentColor so the
+				     icon follows the button text colour in light and dark themes. -->
+				<span v-if="button.iconresource" class="btngroup-btn__img" :style="iconMaskStyle(button)" aria-hidden="true"></span>
 				<v-icon v-else-if="button.icon" small>{{ button.icon }}</v-icon>
 				<span v-if="button.caption" class="btngroup-btn__label">{{ button.caption }}</span>
 			</div>
@@ -84,6 +86,16 @@ export default {
 
 		iconResourceURL(button) {
 			return button.iconresource ? this.Application.getImageURL(button.iconresource) : '';
+		},
+
+		iconMaskStyle(button) {
+			const url = this.iconResourceURL(button);
+			const mask = "url('" + url + "') no-repeat center / contain";
+			return {
+				backgroundColor: 'currentColor',
+				webkitMask: mask,
+				mask: mask,
+			};
 		},
 
 		uiModuleButtonClick(button) {
@@ -144,8 +156,9 @@ export default {
 	gap: 4px;
 }
 .btngroup-btn__img {
+	display: inline-block;
 	height: 24px;
-	width: auto;
+	width: 24px;
 }
 .btngroup-btn__label {
 	font-size: 12px;

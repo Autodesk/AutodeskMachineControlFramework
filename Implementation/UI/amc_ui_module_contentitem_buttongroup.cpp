@@ -121,6 +121,16 @@ void CUIModule_ContentButton::setIconResource(const std::string& sIconResource)
 	m_sIconResource = sIconResource;
 }
 
+void CUIModule_ContentButton::setTags(const std::string& sTags)
+{
+	m_sTags = sTags;
+}
+
+std::string CUIModule_ContentButton::getTags()
+{
+	return m_sTags;
+}
+
 
 
 void CUIModule_ContentButton::addFormFieldValue(PUIModule_ContentFormEntity pEntity)
@@ -146,6 +156,9 @@ PParameterGroup CUIModule_ContentButton::registerClientVariableGroup(CParameterH
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONTARGETPAGE, "button target page", m_TargetPageExpression.evaluateStringValue(m_pStateMachineData));
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONEVENT, "button event", m_EventExpression.evaluateStringValue(m_pStateMachineData));
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONICON, "button icon", m_IconExpression.evaluateStringValue(m_pStateMachineData));
+	// Readable by event handlers via GetUIProperty(sender, "tags"). Always registered
+	// (empty when unset) so the lookup never throws for untagged buttons.
+	pGroup->addNewStringParameter("tags", "button tags", m_sTags);
 
 	return pGroup;
 }
@@ -219,6 +232,8 @@ void CUIModule_ContentButton::registerFrontendAttributes(PUIFrontendDefinitionMo
 	pStore->registerValue("width", eUIFrontendDefinitionAttributeType::atString, widthExpr);
 	CUIExpression iconResourceExpr; iconResourceExpr.setFixedValue(m_sIconResource);
 	pStore->registerValue("iconresource", eUIFrontendDefinitionAttributeType::atString, iconResourceExpr);
+	CUIExpression tagsExpr; tagsExpr.setFixedValue(m_sTags);
+	pStore->registerValue("tags", eUIFrontendDefinitionAttributeType::atString, tagsExpr);
 }
 
 
@@ -327,6 +342,10 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 			}
 			pButton->setIconResource(sIconResourceUUID);
 		}
+
+		auto tagsAttrib = childNode.attribute("tags");
+		if (!tagsAttrib.empty())
+			pButton->setTags(tagsAttrib.as_string());
 	}
 
 	return pButtonGroup;

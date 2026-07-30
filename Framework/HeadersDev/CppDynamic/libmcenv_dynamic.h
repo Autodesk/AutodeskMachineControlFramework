@@ -10809,6 +10809,16 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveEventSenderPagePtr) (Lib
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderUUIDBufferSize, LibMCEnv_uint32* pSenderUUIDNeededChars, char * pSenderUUIDBuffer);
 
 /**
+* checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pTag - Tag to check for.
+* @param[out] pTagExists - True if the sender declares the given tag.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SenderHasTagPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pTag, bool * pTagExists);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -12740,6 +12750,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_RetrieveEventSenderPtr m_UIEnvironment_RetrieveEventSender;
 	PLibMCEnvUIEnvironment_RetrieveEventSenderPagePtr m_UIEnvironment_RetrieveEventSenderPage;
 	PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr m_UIEnvironment_RetrieveEventSenderUUID;
+	PLibMCEnvUIEnvironment_SenderHasTagPtr m_UIEnvironment_SenderHasTag;
 	PLibMCEnvUIEnvironment_PrepareSignalPtr m_UIEnvironment_PrepareSignal;
 	PLibMCEnvUIEnvironment_GetMachineStatePtr m_UIEnvironment_GetMachineState;
 	PLibMCEnvUIEnvironment_LogMessagePtr m_UIEnvironment_LogMessage;

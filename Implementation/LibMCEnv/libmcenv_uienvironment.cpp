@@ -78,6 +78,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "common_utils.hpp"
 
 #include <cmath>
+#include <sstream>
 
 #define DOWNLOADFILENAME_MAXLENGTH 256
 
@@ -222,6 +223,32 @@ std::string CUIEnvironment::RetrieveEventSenderPage()
 std::string CUIEnvironment::RetrieveEventSenderUUID()
 {
     return m_sSenderUUID;
+}
+
+
+bool CUIEnvironment::SenderHasTag(const std::string& sTag)
+{
+    if (sTag.empty())
+        return false;
+
+    // Tags are exposed as the sender element's "tags" UI property (a space-separated
+    // list). Reading it fails for elements that do not declare tags (e.g. non-button
+    // senders), which simply means "no such tag".
+    std::string sTags;
+    try {
+        sTags = GetUIProperty(m_sSenderName, "tags");
+    }
+    catch (...) {
+        return false;
+    }
+
+    std::stringstream tagStream(sTags);
+    std::string sCurrentTag;
+    while (tagStream >> sCurrentTag) {
+        if (sCurrentTag == sTag)
+            return true;
+    }
+    return false;
 }
 
 
