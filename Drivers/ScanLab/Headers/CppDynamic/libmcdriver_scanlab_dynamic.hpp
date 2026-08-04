@@ -1027,6 +1027,8 @@ public:
 	inline void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2);
 	inline void AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput);
 	inline void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask);
+	inline LibMCDriver_ScanLab_uint32 ReadDigitalInputs();
+	inline bool ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex);
 	inline void EnableOIE();
 	inline void DisableOIE();
 	inline PNLightAFXProfileSelector CreateNLightAFXBeamProfileSelector();
@@ -1508,6 +1510,8 @@ public:
 		pWrapperTable->m_RTCContext_AddLaserPinOutToList = nullptr;
 		pWrapperTable->m_RTCContext_AddWriteDigitalIOList = nullptr;
 		pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList = nullptr;
+		pWrapperTable->m_RTCContext_ReadDigitalInputs = nullptr;
+		pWrapperTable->m_RTCContext_ReadDigitalInputBit = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector = nullptr;
@@ -3096,6 +3100,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ReadDigitalInputs = (PLibMCDriver_ScanLabRTCContext_ReadDigitalInputsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_readdigitalinputs");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ReadDigitalInputs = (PLibMCDriver_ScanLabRTCContext_ReadDigitalInputsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_readdigitalinputs");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ReadDigitalInputs == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ReadDigitalInputBit = (PLibMCDriver_ScanLabRTCContext_ReadDigitalInputBitPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_readdigitalinputbit");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ReadDigitalInputBit = (PLibMCDriver_ScanLabRTCContext_ReadDigitalInputBitPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_readdigitalinputbit");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ReadDigitalInputBit == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5037,6 +5059,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist", (void**)&(pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_readdigitalinputs", (void**)&(pWrapperTable->m_RTCContext_ReadDigitalInputs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ReadDigitalInputs == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_readdigitalinputbit", (void**)&(pWrapperTable->m_RTCContext_ReadDigitalInputBit));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ReadDigitalInputBit == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoie", (void**)&(pWrapperTable->m_RTCContext_EnableOIE));
@@ -7362,6 +7392,31 @@ public:
 	void CRTCContext::AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_AddWriteMaskedDigitalIOList(m_pHandle, nDigitalOutput, nOutputMask));
+	}
+	
+	/**
+	* CRTCContext::ReadDigitalInputs - Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.
+	* @return Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15.
+	*/
+	LibMCDriver_ScanLab_uint32 CRTCContext::ReadDigitalInputs()
+	{
+		LibMCDriver_ScanLab_uint32 resultDigitalInput = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ReadDigitalInputs(m_pHandle, &resultDigitalInput));
+		
+		return resultDigitalInput;
+	}
+	
+	/**
+	* CRTCContext::ReadDigitalInputBit - Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.
+	* @param[in] nBitIndex - Index of the digital input bit to read. MUST be between 0 and 15.
+	* @return Current state of the requested digital input bit.
+	*/
+	bool CRTCContext::ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ReadDigitalInputBit(m_pHandle, nBitIndex, &resultValue));
+		
+		return resultValue;
 	}
 	
 	/**

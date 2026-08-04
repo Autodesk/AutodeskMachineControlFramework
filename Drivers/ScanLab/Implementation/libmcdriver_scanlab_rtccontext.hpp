@@ -386,6 +386,10 @@ public:
 
 	void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) override;
 
+	LibMCDriver_ScanLab_uint32 ReadDigitalInputs() override;
+
+	bool ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex) override;
+
 	void EnableOIE() override;
 
 	void DisableOIE() override;

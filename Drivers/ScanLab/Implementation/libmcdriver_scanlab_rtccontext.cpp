@@ -1964,6 +1964,27 @@ void CRTCContext::AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 n
 }
 
 
+LibMCDriver_ScanLab_uint32 CRTCContext::ReadDigitalInputs()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	// Only the lower 16 bits carry the digital input state (DIGITAL IN0..IN15).
+	uint32_t nInputValue = m_pScanLabSDK->n_read_io_port(m_CardNo) & 0x0000FFFFUL;
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	return nInputValue;
+}
+
+bool CRTCContext::ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex)
+{
+	if (nBitIndex > 15)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM, "digital input bit index must be between 0 and 15");
+
+	uint32_t nInputValue = ReadDigitalInputs();
+
+	return (nInputValue & (1UL << nBitIndex)) != 0;
+}
+
+
 void CRTCContext::callSetTriggerOIE(uint32_t nPeriod)
 {
 

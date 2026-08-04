@@ -1610,6 +1610,19 @@ public:
 	virtual void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) = 0;
 
 	/**
+	* IRTCContext::ReadDigitalInputs - Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.
+	* @return Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 ReadDigitalInputs() = 0;
+
+	/**
+	* IRTCContext::ReadDigitalInputBit - Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.
+	* @param[in] nBitIndex - Index of the digital input bit to read. MUST be between 0 and 15.
+	* @return Current state of the requested digital input bit.
+	*/
+	virtual bool ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex) = 0;
+
+	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
 	*/
 	virtual void EnableOIE() = 0;

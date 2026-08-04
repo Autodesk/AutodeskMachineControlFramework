@@ -1194,6 +1194,15 @@ Custom implementation
 			<param name="OutputMask" type="uint32" pass="in" description="Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535." />
 		</method>
 
+		<method name="ReadDigitalInputs" description="Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.">
+			<param name="DigitalInput" type="uint32" pass="return" description="Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15." />
+		</method>
+
+		<method name="ReadDigitalInputBit" description="Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.">
+			<param name="BitIndex" type="uint32" pass="in" description="Index of the digital input bit to read. MUST be between 0 and 15." />
+			<param name="Value" type="bool" pass="return" description="Current state of the requested digital input bit." />
+		</method>
+
 		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">
 		</method>
 

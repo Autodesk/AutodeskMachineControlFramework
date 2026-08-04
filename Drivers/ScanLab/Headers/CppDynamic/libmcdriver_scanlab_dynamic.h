@@ -1684,6 +1684,25 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddWriteDigit
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput, LibMCDriver_ScanLab_uint32 nOutputMask);
 
 /**
+* Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pDigitalInput - Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ReadDigitalInputsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pDigitalInput);
+
+/**
+* Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nBitIndex - Index of the digital input bit to read. MUST be between 0 and 15.
+* @param[out] pValue - Current state of the requested digital input bit.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ReadDigitalInputBitPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nBitIndex, bool * pValue);
+
+/**
 * Writes an OIE enabling command block to the open list.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -3338,6 +3357,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr m_RTCContext_AddLaserPinOutToList;
 	PLibMCDriver_ScanLabRTCContext_AddWriteDigitalIOListPtr m_RTCContext_AddWriteDigitalIOList;
 	PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr m_RTCContext_AddWriteMaskedDigitalIOList;
+	PLibMCDriver_ScanLabRTCContext_ReadDigitalInputsPtr m_RTCContext_ReadDigitalInputs;
+	PLibMCDriver_ScanLabRTCContext_ReadDigitalInputBitPtr m_RTCContext_ReadDigitalInputBit;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPtr m_RTCContext_EnableOIE;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
 	PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr m_RTCContext_CreateNLightAFXBeamProfileSelector;

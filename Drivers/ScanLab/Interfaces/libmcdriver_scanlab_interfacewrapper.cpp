@@ -4351,6 +4351,58 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addwritemaskeddigitalio
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readdigitalinputs(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pDigitalInput)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pDigitalInput == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pDigitalInput = pIRTCContext->ReadDigitalInputs();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readdigitalinputbit(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nBitIndex, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pValue = pIRTCContext->ReadDigitalInputBit(nBitIndex);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableoie(LibMCDriver_ScanLab_RTCContext pRTCContext)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -8407,6 +8459,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addwritedigitaliolist;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_readdigitalinputs") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_readdigitalinputs;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_readdigitalinputbit") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_readdigitalinputbit;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_enableoie") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enableoie;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disableoie") 

@@ -98,6 +98,7 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_mark_speed) (uint32_t nCardNo, double dSpeed);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_jump_speed) (uint32_t nCardNo, double dSpeed);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_io_port) (uint32_t nCardNo, uint32_t nValue);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_read_io_port) (uint32_t nCardNo);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_8bit_port) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2) (uint32_t nCardNo, uint32_t nValue);
@@ -294,6 +295,7 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_mark_speed ptr_n_set_mark_speed = nullptr;
 			PScanLabPtr_n_set_jump_speed ptr_n_set_jump_speed = nullptr;
 			PScanLabPtr_n_write_io_port ptr_n_write_io_port = nullptr;
+			PScanLabPtr_n_read_io_port ptr_n_read_io_port = nullptr;
 			PScanLabPtr_n_write_8bit_port ptr_n_write_8bit_port = nullptr;
 			PScanLabPtr_n_write_da_1 ptr_n_write_da_1 = nullptr;
 			PScanLabPtr_n_write_da_2 ptr_n_write_da_2 = nullptr;
@@ -460,6 +462,7 @@ namespace LibMCDriver_ScanLab {
 			void n_set_mark_speed (uint32_t nCardNo, double dSpeed);
 			void n_set_jump_speed (uint32_t nCardNo, double dSpeed);
 			void n_write_io_port (uint32_t nCardNo, uint32_t nValue);
+			uint32_t n_read_io_port (uint32_t nCardNo);
 			void n_write_8bit_port (uint32_t nCardNo, uint32_t nValue);
 			void n_write_da_1 (uint32_t nCardNo, uint32_t nValue);
 			void n_write_da_2 (uint32_t nCardNo, uint32_t nValue);
