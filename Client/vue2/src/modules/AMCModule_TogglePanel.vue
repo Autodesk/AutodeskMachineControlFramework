@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			:input-value="isTruthy(toggle.value)"
 			dense hide-details inset
 			class="amcf-togglepanel__switch"
-			@change="onToggle(toggle)"
+			@change="onToggle(toggle, $event)"
 		/>
 	</div>
 </div>
@@ -78,9 +78,18 @@ export default {
 			}
 		},
 
-		onToggle (toggle) {
-			if (toggle.event && toggle.event !== '')
-				this.Application.triggerUIEvent(toggle.event, toggle.uuid, {});
+		onToggle (toggle, newValue) {
+			if (toggle.event && toggle.event !== '') {
+				// Forward the intended new state explicitly. All toggles in a panel share
+				// the same sender path, so the handler cannot read a per-toggle value;
+				// passing it as the external event "value" parameter makes the handler
+				// reliable (inverting a read-back machine parameter was unreliable, e.g.
+				// for driver-backed laser signals).
+				const newState = (newValue === undefined || newValue === null)
+					? !this.isTruthy(toggle.value)
+					: this.isTruthy(newValue);
+				this.Application.triggerUIEvent(toggle.event, toggle.uuid, {}, undefined, { value: newState ? '1' : '0' });
+			}
 		},
 	},
 };

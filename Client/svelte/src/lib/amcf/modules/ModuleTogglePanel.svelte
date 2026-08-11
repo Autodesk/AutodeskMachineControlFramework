@@ -26,7 +26,12 @@
 
 	function onToggle(toggle: any) {
 		if (!app || !toggle.event) return;
-		app.triggerUIEvent(toggle.event, toggle.uuid, {});
+		// Send the intended new state explicitly. Every toggle in a panel resolves to
+		// the same sender path, so the handler cannot read a per-toggle value; passing
+		// it as an event parameter ("value") makes the handler reliable (the old
+		// inversion-of-read-back approach failed for e.g. driver-backed laser signals).
+		const newState = !isTruthy(toggle.value);
+		app.triggerUIEvent(toggle.event, toggle.uuid, {}, undefined, { value: newState ? '1' : '0' });
 	}
 </script>
 

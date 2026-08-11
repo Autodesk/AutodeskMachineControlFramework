@@ -1372,13 +1372,19 @@ export default class AMCApplication extends Common.AMCObject {
         return streamBase + '/stream/' + uuid;
     }
 
-    triggerUIEvent(eventname, senderuuid, eventValues, executionCallback) {
+    triggerUIEvent(eventname, senderuuid, eventValues, executionCallback, eventParameters) {
 
-        this.axiosPostRequest("/event", {
+        let requestBody = {
             "eventname": eventname,
             "senderuuid": senderuuid,
             "formvalues": eventValues
-        })
+        };
+        // Optional event parameters are forwarded as the external event "parameters"
+        // object, readable in the handler via UIEnvironment::GetExternalEventParameter.
+        if (eventParameters)
+            requestBody["parameters"] = eventParameters;
+
+        this.axiosPostRequest("/event", requestBody)
         .then(resultHandleEvent => {
 			
 			if (resultHandleEvent.data.actions) {

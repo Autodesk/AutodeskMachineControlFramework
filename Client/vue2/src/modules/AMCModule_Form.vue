@@ -117,7 +117,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<div :key="entity.uuid + '_slider'" v-if="entity.type === 'slider'" class="form-field form-field--slider">
 			<div class="form-slider-label">
 				<span>{{ entity.caption }}</span>
-				<span class="form-slider-value">{{ entity.dataObject.value }}<span v-if="entity.dataObject.unit" class="form-slider-unit"> {{ entity.dataObject.unit }}</span></span>
+				<!-- editable numeric override: shares the slider's value for precise entry -->
+				<span class="form-slider-value">
+					<input
+						type="number"
+						class="form-slider-input"
+						v-model.number="entity.dataObject.value"
+						:min="parseFloat(entity.dataObject.minvalue)"
+						:max="parseFloat(entity.dataObject.maxvalue)"
+						:step="parseFloat(entity.dataObject.step) || 1"
+						:disabled="entity.dataObject.disabled || entity.dataObject.readonly"
+						@change="uiEditBoxChange(entity)"
+						@keydown.enter="uiEditBoxChange(entity)"
+					/>
+					<span v-if="entity.dataObject.unit" class="form-slider-unit"> {{ entity.dataObject.unit }}</span>
+				</span>
 			</div>
 			<v-slider
 				v-model="entity.dataObject.value"
@@ -506,6 +520,21 @@ export default {
 
 .form-slider-value {
 	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.form-slider-input {
+	width: 4rem;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	font-weight: 500;
+	border: 1px solid var(--amcf-color-border, rgba(140, 150, 165, 0.35));
+	border-radius: 4px;
+	padding: 1px 4px;
+	background: transparent;
+	color: inherit;
 }
 
 .form-slider-unit {

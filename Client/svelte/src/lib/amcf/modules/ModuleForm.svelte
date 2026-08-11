@@ -188,9 +188,24 @@
 						oninput={(e: Event) => { entity.dataObject.value = (e.target as HTMLInputElement).value; }}
 						onchange={() => onEditBlur(entity)}
 					/>
-					<span class="text-sm tabular-nums w-16 text-right">
-						{d(entity).value}{d(entity).unit ? ` ${d(entity).unit}` : ''}
-					</span>
+					<!-- editable numeric override: shares the slider's value for precise entry -->
+					<div class="flex items-center gap-1 w-20 shrink-0">
+						<Input
+							type="number"
+							class="h-7 text-sm text-right tabular-nums px-1"
+							value={d(entity).value ?? ''}
+							min={parseFloat(d(entity).minvalue)}
+							max={parseFloat(d(entity).maxvalue)}
+							step={parseFloat(d(entity).step) || 1}
+							disabled={d(entity).disabled}
+							oninput={(e: Event) => { entity.dataObject.value = (e.target as HTMLInputElement).value; }}
+							onblur={() => onEditBlur(entity)}
+							onkeydown={(e: KeyboardEvent) => onEditEnter(entity, e)}
+						/>
+						{#if d(entity).unit}
+							<span class="text-xs text-muted-foreground">{d(entity).unit}</span>
+						{/if}
+					</div>
 				</div>
 				<div class="flex text-xs text-muted-foreground pr-[4.5rem]">
 					<span>{parseFloat(d(entity).minvalue) || 0}{d(entity).unit ? ` ${d(entity).unit}` : ''}</span>
