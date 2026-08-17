@@ -100,11 +100,29 @@ namespace AMC {
 		// Empty disables editing for the whole list.
 		std::string m_sEditEvent;
 
+		// Per-column configuration. Columns are addressed by the canonical
+		// identifiers "parameter", "value", "group" and "system" via <column>
+		// subnodes. width is a raw CSS length (empty or "auto" = flexible),
+		// sizeable enables drag-resizing on the frontend (Svelte only).
+		struct sColumnConfig {
+			bool visible = true;
+			std::string width;
+			bool sizeable = false;
+		};
+		sColumnConfig m_ColumnDescription;
+		sColumnConfig m_ColumnValue;
+		sColumnConfig m_ColumnGroup;
+		sColumnConfig m_ColumnSystem;
+
 		uint32_t m_nEntriesPerPage;
 
 		PStateMachineData m_pStateMachineData;
 
 		void addParameterGroupToJSON(CJSONWriter& writer, AMC::PParameterGroup pParameterGroup, CJSONWriterArray& entryArray, bool fullGroup, const std::string & sParameterName, const std::string & sInstanceName, const std::string & sParameterHandlerDescription, CUIModule_ContentParameterListEntry* pEntry);
+
+		// Emits the ordered per-column configuration array (identifier, frontend
+		// value key, caption, visible, width, sizeable) consumed by both clients.
+		void writeColumnsToJSON(CJSONWriter& writer, CJSONWriterObject& object);
 
 	public:
 

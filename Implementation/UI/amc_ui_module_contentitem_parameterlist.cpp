@@ -163,6 +163,12 @@ CUIModule_ContentParameterList::CUIModule_ContentParameterList(const std::string
 	m_sParameterGroupCaption = "Group";
 	m_sParameterSystemCaption = "System";
 
+	// Column defaults: all visible, flexible width, not resizable.
+	m_ColumnDescription = sColumnConfig();
+	m_ColumnValue = sColumnConfig();
+	m_ColumnGroup = sColumnConfig();
+	m_ColumnSystem = sColumnConfig();
+
 }
 
 CUIModule_ContentParameterList::~CUIModule_ContentParameterList()
@@ -241,6 +247,38 @@ void CUIModule_ContentParameterList::addParameterGroupToJSON(CJSONWriter& writer
 }
 
 
+void CUIModule_ContentParameterList::writeColumnsToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	struct sColumnDescriptor {
+		const char* pIdentifier;
+		const char* pValueKey;
+		const std::string& sCaption;
+		const sColumnConfig& config;
+	};
+
+	std::vector<sColumnDescriptor> columns = {
+		{ "parameter", AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION, m_sParameterDescCaption, m_ColumnDescription },
+		{ "value", AMC_API_KEY_UI_ITEMPARAMETERVALUE, m_sParameterValueCaption, m_ColumnValue },
+		{ "group", AMC_API_KEY_UI_ITEMPARAMETERGROUP, m_sParameterGroupCaption, m_ColumnGroup },
+		{ "system", AMC_API_KEY_UI_ITEMPARAMETERSYSTEM, m_sParameterSystemCaption, m_ColumnSystem }
+	};
+
+	CJSONWriterArray columnsArray(writer);
+	for (auto& column : columns) {
+		CJSONWriterObject columnObject(writer);
+		columnObject.addString(AMC_API_KEY_UI_ITEMCOLUMNIDENTIFIER, column.pIdentifier);
+		columnObject.addString(AMC_API_KEY_UI_ITEMVALUE, column.pValueKey);
+		columnObject.addString(AMC_API_KEY_UI_ITEMTEXT, column.sCaption);
+		columnObject.addBool(AMC_API_KEY_UI_ITEMCOLUMNVISIBLE, column.config.visible);
+		columnObject.addString(AMC_API_KEY_UI_ITEMCOLUMNWIDTH, column.config.width);
+		columnObject.addBool(AMC_API_KEY_UI_ITEMCOLUMNSIZEABLE, column.config.sizeable);
+		columnsArray.addObject(columnObject);
+	}
+
+	object.addArray(AMC_API_KEY_UI_ITEMCOLUMNS, columnsArray);
+}
+
+
 void CUIModule_ContentParameterList::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 
@@ -250,29 +288,7 @@ void CUIModule_ContentParameterList::addLegacyContentToJSON(CJSONWriter& writer,
 	object.addString(AMC_API_KEY_UI_ITEMEDITEVENT, m_sEditEvent);
 	object.addInteger(AMC_API_KEY_UI_ITEMENTRIESPERPAGE, m_nEntriesPerPage);
 
-	CJSONWriterArray headersArray(writer);
-
-	CJSONWriterObject headerObject1(writer);
-	headerObject1.addString(AMC_API_KEY_UI_ITEMTEXT, m_sParameterDescCaption);
-	headerObject1.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION);
-	headersArray.addObject(headerObject1);
-
-	CJSONWriterObject headerObject2(writer);
-	headerObject2.addString(AMC_API_KEY_UI_ITEMTEXT, m_sParameterValueCaption);
-	headerObject2.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMPARAMETERVALUE);
-	headersArray.addObject(headerObject2);
-
-	CJSONWriterObject headerObject3(writer);
-	headerObject3.addString(AMC_API_KEY_UI_ITEMTEXT, m_sParameterGroupCaption);
-	headerObject3.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMPARAMETERGROUP);
-	headersArray.addObject(headerObject3);
-
-	CJSONWriterObject headerObject4(writer);
-	headerObject4.addString(AMC_API_KEY_UI_ITEMTEXT, m_sParameterSystemCaption);
-	headerObject4.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMPARAMETERSYSTEM);
-	headersArray.addObject(headerObject4);
-
-	object.addArray(AMC_API_KEY_UI_ITEMHEADERS, headersArray);
+	writeColumnsToJSON(writer, object);
 
 	CJSONWriterArray entriesArray(writer);
 	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entriesArray);
@@ -339,6 +355,29 @@ void CUIModule_ContentParameterList::loadFromXML(const pugi::xml_node& xmlNode)
 	auto editEventAttrib = xmlNode.attribute("editevent");
 	m_sEditEvent = editEventAttrib.as_string();
 
+	// Optional per-column configuration via <column> subnodes. Columns not
+	// listed keep their defaults (visible, flexible width, not resizable).
+	auto columnNodes = xmlNode.children("column");
+	for (auto columnNode : columnNodes) {
+		std::string sIdentifier = columnNode.attribute("identifier").as_string();
+
+		sColumnConfig* pColumn = nullptr;
+		if (sIdentifier == "parameter")
+			pColumn = &m_ColumnDescription;
+		else if (sIdentifier == "value")
+			pColumn = &m_ColumnValue;
+		else if (sIdentifier == "group")
+			pColumn = &m_ColumnGroup;
+		else if (sIdentifier == "system")
+			pColumn = &m_ColumnSystem;
+		else
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		pColumn->visible = columnNode.attribute("visible").as_bool(true);
+		pColumn->width = columnNode.attribute("width").as_string();
+		pColumn->sizeable = columnNode.attribute("sizeable").as_bool(false);
+	}
+
 	auto entryNodes = xmlNode.children ("entry");
 	for (auto entryNode : entryNodes) {
 
@@ -392,6 +431,8 @@ void CUIModule_ContentParameterList::registerFrontendAttributes()
 	CUIExpression editEventExpr;
 	editEventExpr.setFixedValue(m_sEditEvent);
 	registerItemStringAttribute("editevent", editEventExpr);
+	// Per-column configuration is emitted as a structured array directly in
+	// frontendWriteItemToJSON (see writeColumnsToJSON), not as scalar attributes.
 }
 
 
@@ -411,6 +452,10 @@ void CUIModule_ContentParameterList::frontendWriteItemToJSON(CJSONWriter& writer
 
 	CJSONWriterObject attributesObject(writer);
 	pFrontendState->writeModuleAttributesToJSON(writer, attributesObject, m_pItemModuleStore.get(), pStateMachineData);
+
+	// Embed the per-column configuration so the frontend can build headers with
+	// visibility, widths and resize flags.
+	writeColumnsToJSON(writer, attributesObject);
 
 	// Embed live parameter entries directly into the v2 attributes so the
 	// frontend can consume them without a separate polling call.

@@ -20,6 +20,45 @@
 	let entries = $derived.by(() => { poll.v; return [...(module.entries || [])]; });
 	let editEvent = $derived.by(() => { poll.v; return module.editevent || ''; });
 
+	// Session-only column width overrides from drag-resizing, keyed by column value.
+	let widthOverrides = $state<Record<string, string>>({});
+
+	// A configured width is fixed unless it is empty or "auto" (= flexible).
+	function isFixedWidth(width: string | undefined): boolean {
+		return !!width && width !== 'auto';
+	}
+	function colWidth(h: any): string {
+		const override = widthOverrides[h.value];
+		if (isFixedWidth(override)) return override;
+		return isFixedWidth(h.width) ? h.width : '';
+	}
+	// Fixed table layout is only needed once a column pins an explicit width;
+	// otherwise the table keeps its natural content-based sizing.
+	let useFixedLayout = $derived.by(() => {
+		poll.v;
+		return headers.some((h: any) => isFixedWidth(colWidth(h)));
+	});
+
+	function startResize(e: PointerEvent, h: any) {
+		e.preventDefault();
+		e.stopPropagation();
+		const handle = e.currentTarget as HTMLElement;
+		const th = handle.closest('th') as HTMLElement | null;
+		if (!th) return;
+		const startX = e.clientX;
+		const startWidth = th.getBoundingClientRect().width;
+		const onMove = (ev: PointerEvent) => {
+			const newWidth = Math.max(40, startWidth + (ev.clientX - startX));
+			widthOverrides = { ...widthOverrides, [h.value]: `${Math.round(newWidth)}px` };
+		};
+		const onUp = () => {
+			window.removeEventListener('pointermove', onMove);
+			window.removeEventListener('pointerup', onUp);
+		};
+		window.addEventListener('pointermove', onMove);
+		window.addEventListener('pointerup', onUp);
+	}
+
 	// Only one row is edited at a time. editValue is a local buffer so live polling
 	// never clobbers what the user is typing.
 	let editingKey = $state<string | null>(null);
@@ -67,12 +106,24 @@
 {#if visible}
 	<div class="w-full min-h-0 flex-1 flex flex-col border rounded-md overflow-hidden">
 		<ScrollArea class="flex-1 min-h-0">
-			<Table.Root>
+			<Table.Root style={useFixedLayout ? 'table-layout: fixed; width: 100%;' : ''}>
 				<Table.Header class="sticky top-0 bg-muted z-10">
 					<Table.Row>
 						{#each headers as h (h.value)}
-							<Table.Head class="text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
+							<Table.Head
+								class="relative text-xs font-semibold uppercase tracking-wider overflow-hidden text-ellipsis whitespace-nowrap"
+								style={colWidth(h) ? `width: ${colWidth(h)};` : ''}
+							>
 								{h.text}
+								{#if h.sizeable}
+									<span
+										class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize select-none hover:bg-primary/40"
+										role="separator"
+										aria-orientation="vertical"
+										aria-label="Resize column"
+										onpointerdown={(e) => startResize(e, h)}
+									></span>
+								{/if}
 							</Table.Head>
 						{/each}
 					</Table.Row>
@@ -88,7 +139,10 @@
 						{#each entries as row, idx (idx)}
 							<Table.Row class="hover:bg-muted/50 transition-colors">
 								{#each headers as h (h.value)}
-									<Table.Cell class="text-sm py-1.5">
+									<Table.Cell
+										class="text-sm py-1.5 overflow-hidden text-ellipsis"
+										style={colWidth(h) ? `width: ${colWidth(h)};` : ''}
+									>
 										{#if h.value === 'paramValue' && isEditable(row)}
 											{#if editingKey === rowKey(row)}
 												<div class="flex items-center gap-1">

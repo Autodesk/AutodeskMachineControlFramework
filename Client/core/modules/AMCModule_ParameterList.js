@@ -45,12 +45,13 @@ export default class AMCApplicationModule_ParameterList extends Common.AMCApplic
 
 		this.entries = [];
 
-		this.headers = [
-			{ text: 'Parameter', value: 'paramDescription' },
-			{ text: 'Value',     value: 'paramValue' },
-			{ text: 'Group',     value: 'paramGroup' },
-			{ text: 'System',    value: 'paramSystem' },
-		];
+		// Per-column configuration (identifier -> {visible, width, sizeable}).
+		// Defaults: all visible, flexible width, not resizable. Overridable via
+		// <column> subnodes in config.xml.
+		this.columns = this.defaultColumns ();
+
+		this.headers = [];
+		this.rebuildHeaders ();
 
 		this.stateid = 1;
 		this.loadingtext = "";
@@ -58,6 +59,68 @@ export default class AMCApplicationModule_ParameterList extends Common.AMCApplic
 		this.editevent = "";
 
 		this.updateFromJSON (moduleJSON);
+	}
+
+
+	// Coerces a server flag (boolean or "1"/"0"/"true"/"false") to a boolean.
+	parseFlag (value, fallback)
+	{
+		if (value === undefined || value === null)
+			return fallback;
+		return (value === true || value === "1" || value === "true");
+	}
+
+
+	// The canonical column set in fixed order, all visible and flexible.
+	defaultColumns ()
+	{
+		return [
+			{ identifier: 'parameter', value: 'paramDescription', text: 'Parameter', visible: true, width: '', sizeable: false },
+			{ identifier: 'value',     value: 'paramValue',       text: 'Value',     visible: true, width: '', sizeable: false },
+			{ identifier: 'group',     value: 'paramGroup',       text: 'Group',     visible: true, width: '', sizeable: false },
+			{ identifier: 'system',    value: 'paramSystem',      text: 'System',    visible: true, width: '', sizeable: false },
+		];
+	}
+
+
+	// Replaces this.columns from a server-provided column array (if any). Unknown
+	// or missing entries fall back to the canonical defaults, preserving order.
+	applyColumns (incoming)
+	{
+		if (!Array.isArray (incoming) || incoming.length === 0)
+			return;
+
+		const byIdentifier = {};
+		for (let column of incoming) {
+			if (column && column.identifier)
+				byIdentifier[column.identifier] = column;
+		}
+
+		this.columns = this.defaultColumns ().map ((base) => {
+			const override = byIdentifier[base.identifier];
+			if (!override)
+				return base;
+			return {
+				identifier: base.identifier,
+				value: base.value,
+				text: (override.text !== undefined && override.text !== null && override.text !== '') ? override.text : base.text,
+				visible: this.parseFlag (override.visible, true),
+				width: (override.width !== undefined && override.width !== null) ? String (override.width) : '',
+				sizeable: this.parseFlag (override.sizeable, false),
+			};
+		});
+	}
+
+
+	// Assembles the visible headers, carrying width and resize flags to clients.
+	rebuildHeaders ()
+	{
+		const visibleColumns = this.columns
+			.filter ((column) => column.visible)
+			.map ((column) => ({ text: column.text, value: column.value, width: column.width, sizeable: column.sizeable }));
+
+		while (this.headers.length > 0) this.headers.pop ();
+		for (let column of visibleColumns) this.headers.push (column);
 	}
 
 
@@ -74,6 +137,9 @@ export default class AMCApplicationModule_ParameterList extends Common.AMCApplic
 			this.entriesperpage = Assert.IntegerValue (updateJSON.entriesperpage);
 		if (updateJSON.editevent !== undefined)
 			this.editevent = Assert.StringValue (updateJSON.editevent);
+
+		this.applyColumns (updateJSON.columns);
+		this.rebuildHeaders ();
 
 		let oldEntryCount = this.entries.length;
 		for (let index = 0; index < oldEntryCount; index++) {
@@ -96,6 +162,9 @@ export default class AMCApplicationModule_ParameterList extends Common.AMCApplic
 			this.entriesperpage = attrs.entriesperpage;
 		if (attrs.editevent !== undefined)
 			this.editevent = attrs.editevent;
+
+		this.applyColumns (attrs.columns);
+		this.rebuildHeaders ();
 		if (attrs.caption !== undefined)
 			this.caption = attrs.caption;
 		if (attrs.visible !== undefined)
