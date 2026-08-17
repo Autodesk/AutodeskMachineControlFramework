@@ -55,6 +55,7 @@ export default class AMCApplicationModule_ParameterList extends Common.AMCApplic
 		this.stateid = 1;
 		this.loadingtext = "";
 		this.entriesperpage = 25;
+		this.editevent = "";
 
 		this.updateFromJSON (moduleJSON);
 	}
@@ -71,6 +72,8 @@ export default class AMCApplicationModule_ParameterList extends Common.AMCApplic
 			this.loadingtext = Assert.StringValue (updateJSON.loadingtext);
 		if (updateJSON.entriesperpage)
 			this.entriesperpage = Assert.IntegerValue (updateJSON.entriesperpage);
+		if (updateJSON.editevent !== undefined)
+			this.editevent = Assert.StringValue (updateJSON.editevent);
 
 		let oldEntryCount = this.entries.length;
 		for (let index = 0; index < oldEntryCount; index++) {
@@ -91,6 +94,8 @@ export default class AMCApplicationModule_ParameterList extends Common.AMCApplic
 			this.loadingtext = attrs.loadingtext;
 		if (attrs.entriesperpage !== undefined)
 			this.entriesperpage = attrs.entriesperpage;
+		if (attrs.editevent !== undefined)
+			this.editevent = attrs.editevent;
 		if (attrs.caption !== undefined)
 			this.caption = attrs.caption;
 		if (attrs.visible !== undefined)

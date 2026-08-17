@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_frontendstate.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_parametertype.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_module.hpp"
 
@@ -50,8 +51,22 @@ using namespace AMC;
 
 
 
-CUIModule_ContentParameterListEntry::CUIModule_ContentParameterListEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter)
-	: m_sInstance(sInstance), m_sParameterGroup(sParameterGroup), m_sParameter(sParameter)
+// Maps an internal parameter data type to a stable frontend type string.
+static std::string parameterDataTypeToString(AMC::eParameterDataType eType)
+{
+	switch (eType) {
+		case AMC::eParameterDataType::String: return "string";
+		case AMC::eParameterDataType::UUID: return "uuid";
+		case AMC::eParameterDataType::Integer: return "integer";
+		case AMC::eParameterDataType::Double: return "double";
+		case AMC::eParameterDataType::Bool: return "bool";
+		default: return "unknown";
+	}
+}
+
+
+CUIModule_ContentParameterListEntry::CUIModule_ContentParameterListEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter, bool bEditable, const std::string& sMin, const std::string& sMax, const std::string& sStep)
+	: m_sInstance(sInstance), m_sParameterGroup(sParameterGroup), m_sParameter(sParameter), m_bEditable(bEditable), m_sMin(sMin), m_sMax(sMax), m_sStep(sStep)
 {
 
 }
@@ -74,6 +89,26 @@ std::string CUIModule_ContentParameterListEntry::getParameterGroup()
 std::string CUIModule_ContentParameterListEntry::getParameter()
 {
 	return m_sParameter;
+}
+
+bool CUIModule_ContentParameterListEntry::isEditable()
+{
+	return m_bEditable;
+}
+
+std::string CUIModule_ContentParameterListEntry::getMin()
+{
+	return m_sMin;
+}
+
+std::string CUIModule_ContentParameterListEntry::getMax()
+{
+	return m_sMax;
+}
+
+std::string CUIModule_ContentParameterListEntry::getStep()
+{
+	return m_sStep;
 }
 
 bool CUIModule_ContentParameterListEntry::isFullGroup()
@@ -137,27 +172,42 @@ CUIModule_ContentParameterList::~CUIModule_ContentParameterList()
 
 
 
-void CUIModule_ContentParameterList::addParameterGroupToJSON(CJSONWriter& writer, PParameterGroup pParameterGroup, CJSONWriterArray& entryArray, bool fullGroup, const std::string& sParameterName, const std::string& sParameterHandlerDescription)
+void CUIModule_ContentParameterList::addParameterGroupToJSON(CJSONWriter& writer, PParameterGroup pParameterGroup, CJSONWriterArray& entryArray, bool fullGroup, const std::string& sParameterName, const std::string& sInstanceName, const std::string& sParameterHandlerDescription, CUIModule_ContentParameterListEntry* pEntry)
 {
 	std::string sGroupDescription = pParameterGroup->getDescription();
+	std::string sGroupName = pParameterGroup->getName();
+
+	bool bEditable = (pEntry != nullptr) && pEntry->isEditable() && (!m_sEditEvent.empty());
+	std::string sMin = (pEntry != nullptr) ? pEntry->getMin() : "";
+	std::string sMax = (pEntry != nullptr) ? pEntry->getMax() : "";
+	std::string sStep = (pEntry != nullptr) ? pEntry->getStep() : "";
 
 	if (fullGroup) {
 
 		uint32_t nCount = pParameterGroup->getParameterCount();
 		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 
-			std::string sParameterName;
+			std::string sCurrentName;
 			std::string sDescription;
 			std::string sDefaultValue;
 
-			pParameterGroup->getParameterInfo(nIndex, sParameterName, sDescription, sDefaultValue);
+			pParameterGroup->getParameterInfo(nIndex, sCurrentName, sDescription, sDefaultValue);
 			std::string sValue = pParameterGroup->getParameterValueByIndex(nIndex);
+			std::string sType = parameterDataTypeToString(pParameterGroup->getParameterDataTypeByIndex(nIndex));
 
 			CJSONWriterObject entryObject(writer);
 			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION, sDescription);
 			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERVALUE, sValue);
 			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERGROUP, sGroupDescription);
 			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERSYSTEM, sParameterHandlerDescription);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERNAME, sCurrentName);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERINSTANCE, sInstanceName);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERGROUPNAME, sGroupName);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERTYPE, sType);
+			entryObject.addBool(AMC_API_KEY_UI_ITEMPARAMETEREDITABLE, bEditable);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERMIN, sMin);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERMAX, sMax);
+			entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERSTEP, sStep);
 			entryArray.addObject(entryObject);
 
 		}
@@ -169,12 +219,21 @@ void CUIModule_ContentParameterList::addParameterGroupToJSON(CJSONWriter& writer
 
 		pParameterGroup->getParameterInfoByName(sParameterName, sDescription, sDefaultValue);
 		sValue = pParameterGroup->getParameterValueByName(sParameterName);
+		std::string sType = parameterDataTypeToString(pParameterGroup->getParameterDataTypeByName(sParameterName));
 
 		CJSONWriterObject entryObject(writer);
 		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION, sDescription);
 		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERVALUE, sValue);
 		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERGROUP, sGroupDescription);
 		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERSYSTEM, sParameterHandlerDescription);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERNAME, sParameterName);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERINSTANCE, sInstanceName);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERGROUPNAME, sGroupName);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERTYPE, sType);
+		entryObject.addBool(AMC_API_KEY_UI_ITEMPARAMETEREDITABLE, bEditable);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERMIN, sMin);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERMAX, sMax);
+		entryObject.addString(AMC_API_KEY_UI_ITEMPARAMETERSTEP, sStep);
 		entryArray.addObject(entryObject);
 
 	}
@@ -188,6 +247,7 @@ void CUIModule_ContentParameterList::addLegacyContentToJSON(CJSONWriter& writer,
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "parameterlist");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
 	object.addString(AMC_API_KEY_UI_ITEMLOADINGTEXT, m_sLoadingText);
+	object.addString(AMC_API_KEY_UI_ITEMEDITEVENT, m_sEditEvent);
 	object.addInteger(AMC_API_KEY_UI_ITEMENTRIESPERPAGE, m_nEntriesPerPage);
 
 	CJSONWriterArray headersArray(writer);
@@ -229,7 +289,7 @@ void CUIModule_ContentParameterList::addLegacyContentToJSON(CJSONWriter& writer,
 			uint32_t nGroupCount = pParameterHandler->getGroupCount();
 			for (uint32_t nGroupIndex = 0; nGroupIndex < nGroupCount; nGroupIndex++) {
 				auto pParameterGroup = pParameterHandler->getGroup(nGroupIndex);
-				addParameterGroupToJSON(writer, pParameterGroup, entryArray, true, "", sParameterHandlerDescription);
+				addParameterGroupToJSON(writer, pParameterGroup, entryArray, true, "", entry->getInstance(), sParameterHandlerDescription, entry.get());
 
 			}
 
@@ -237,7 +297,7 @@ void CUIModule_ContentParameterList::addLegacyContentToJSON(CJSONWriter& writer,
 		else {
 
 			auto pParameterGroup = pParameterHandler->findGroup(entry->getParameterGroup(), true);
-			addParameterGroupToJSON(writer, pParameterGroup, entryArray, entry->isFullGroup(), entry->getParameter(), sParameterHandlerDescription);
+			addParameterGroupToJSON(writer, pParameterGroup, entryArray, entry->isFullGroup(), entry->getParameter(), entry->getInstance(), sParameterHandlerDescription, entry.get());
 
 		}
 
@@ -249,12 +309,12 @@ void CUIModule_ContentParameterList::addLegacyContentToJSON(CJSONWriter& writer,
 }
 
 
-void CUIModule_ContentParameterList::addEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter)
+void CUIModule_ContentParameterList::addEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter, bool bEditable, const std::string& sMin, const std::string& sMax, const std::string& sStep)
 {
 	if (m_List.size() >= AMC_CONTENT_MAXENTRYCOUNT)
 		throw ELibMCInterfaceException(LIBMC_ERROR_TOOMANYCONTENTPARAMETERS);
 
-	m_List.push_back (std::make_shared <CUIModule_ContentParameterListEntry> (sInstance, sParameterGroup, sParameter));
+	m_List.push_back (std::make_shared <CUIModule_ContentParameterListEntry> (sInstance, sParameterGroup, sParameter, bEditable, sMin, sMax, sStep));
 }
 
 
@@ -274,6 +334,11 @@ CUIModule_ContentParameterListEntry* CUIModule_ContentParameterList::getEntry(co
 
 void CUIModule_ContentParameterList::loadFromXML(const pugi::xml_node& xmlNode)
 {
+	// Optional list-wide edit event. When present, entries flagged editable may
+	// be edited inline; the frontend triggers this event on commit.
+	auto editEventAttrib = xmlNode.attribute("editevent");
+	m_sEditEvent = editEventAttrib.as_string();
+
 	auto entryNodes = xmlNode.children ("entry");
 	for (auto entryNode : entryNodes) {
 
@@ -300,7 +365,13 @@ void CUIModule_ContentParameterList::loadFromXML(const pugi::xml_node& xmlNode)
 				throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN);
 		}
 
-		addEntry(sInstanceName, sGroupName, sParameterName);
+		// Optional per-entry inline-editing attributes.
+		bool bEditable = entryNode.attribute("editable").as_bool(false);
+		std::string sMin = entryNode.attribute("min").as_string();
+		std::string sMax = entryNode.attribute("max").as_string();
+		std::string sStep = entryNode.attribute("step").as_string();
+
+		addEntry(sInstanceName, sGroupName, sParameterName, bEditable, sMin, sMax, sStep);
 
 	}
 }
@@ -318,6 +389,9 @@ void CUIModule_ContentParameterList::registerFrontendAttributes()
 	CUIExpression entriesExpr;
 	entriesExpr.setFixedValue(std::to_string(m_nEntriesPerPage));
 	registerItemIntegerAttribute("entriesperpage", entriesExpr);
+	CUIExpression editEventExpr;
+	editEventExpr.setFixedValue(m_sEditEvent);
+	registerItemStringAttribute("editevent", editEventExpr);
 }
 
 
@@ -350,12 +424,12 @@ void CUIModule_ContentParameterList::frontendWriteItemToJSON(CJSONWriter& writer
 			uint32_t nGroupCount = pParameterHandler->getGroupCount();
 			for (uint32_t nGroupIndex = 0; nGroupIndex < nGroupCount; nGroupIndex++) {
 				auto pParameterGroup = pParameterHandler->getGroup(nGroupIndex);
-				addParameterGroupToJSON(writer, pParameterGroup, entryArray, true, "", sParameterHandlerDescription);
+				addParameterGroupToJSON(writer, pParameterGroup, entryArray, true, "", entry->getInstance(), sParameterHandlerDescription, entry.get());
 			}
 		}
 		else {
 			auto pParameterGroup = pParameterHandler->findGroup(entry->getParameterGroup(), true);
-			addParameterGroupToJSON(writer, pParameterGroup, entryArray, entry->isFullGroup(), entry->getParameter(), sParameterHandlerDescription);
+			addParameterGroupToJSON(writer, pParameterGroup, entryArray, entry->isFullGroup(), entry->getParameter(), entry->getInstance(), sParameterHandlerDescription, entry.get());
 		}
 	}
 

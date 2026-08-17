@@ -57,14 +57,27 @@ namespace AMC {
 		std::string m_sInstance;
 		std::string m_sParameterGroup;
 		std::string m_sParameter;
+
+		// Optional inline-editing configuration. When m_bEditable is set, the
+		// frontend renders the value cell as an editable field and triggers the
+		// list's edit event. min/max/step are advisory bounds (empty = unbounded).
+		bool m_bEditable;
+		std::string m_sMin;
+		std::string m_sMax;
+		std::string m_sStep;
 	public:
 
-		CUIModule_ContentParameterListEntry(const std::string & sInstance, const std::string & sParameterGroup, const std::string & sParameter);
+		CUIModule_ContentParameterListEntry(const std::string & sInstance, const std::string & sParameterGroup, const std::string & sParameter, bool bEditable = false, const std::string & sMin = "", const std::string & sMax = "", const std::string & sStep = "");
 		~CUIModule_ContentParameterListEntry();
 
 		std::string getInstance ();
 		std::string getParameterGroup ();
 		std::string getParameter ();
+
+		bool isEditable();
+		std::string getMin();
+		std::string getMax();
+		std::string getStep();
 
 		bool isFullGroup();
 		bool isFullInstance();
@@ -83,11 +96,15 @@ namespace AMC {
 		std::string m_sParameterGroupCaption;
 		std::string m_sParameterSystemCaption;
 
+		// UI event triggered by the frontend when a user commits an inline edit.
+		// Empty disables editing for the whole list.
+		std::string m_sEditEvent;
+
 		uint32_t m_nEntriesPerPage;
 
 		PStateMachineData m_pStateMachineData;
 
-		void addParameterGroupToJSON(CJSONWriter& writer, AMC::PParameterGroup pParameterGroup, CJSONWriterArray& entryArray, bool fullGroup, const std::string & sParameterName, const std::string & sParameterHandlerDescription);
+		void addParameterGroupToJSON(CJSONWriter& writer, AMC::PParameterGroup pParameterGroup, CJSONWriterArray& entryArray, bool fullGroup, const std::string & sParameterName, const std::string & sInstanceName, const std::string & sParameterHandlerDescription, CUIModule_ContentParameterListEntry* pEntry);
 
 	public:
 
@@ -99,7 +116,7 @@ namespace AMC {
 
 		void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
 
-		void addEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter);
+		void addEntry(const std::string& sInstance, const std::string& sParameterGroup, const std::string& sParameter, bool bEditable = false, const std::string& sMin = "", const std::string& sMax = "", const std::string& sStep = "");
 
 		uint32_t getEntryCount();
 
