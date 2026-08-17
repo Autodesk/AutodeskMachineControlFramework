@@ -332,6 +332,15 @@
 		<option name="ArrayType" value="5"/>
 		<option name="BoolType" value="6"/>
 	</enum>	
+
+	<enum name="ParameterDataType">
+		<option name="Unknown" value="0"/>
+		<option name="String" value="1"/>
+		<option name="UUID" value="2"/>
+		<option name="Integer" value="3"/>
+		<option name="Double" value="4"/>
+		<option name="Bool" value="5"/>
+	</enum>	
 	
 		
 	<enum name="ImagePixelFormat">
@@ -5512,6 +5521,12 @@
 			<param name="Description" type="string" pass="return" description="Description of the parameter." />
 		</method>
 
+		<method name="GetParameterGroupParameterType" description="returns the data type of a parameter in a given parameter group by name.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="ParameterType" type="enum" class="ParameterDataType" pass="return" description="Data type of the parameter." />
+		</method>
+
 		<method name="HasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
@@ -5936,6 +5951,13 @@
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
 			<param name="Description" type="string" pass="return" description="Description of the parameter." />
+		</method>
+
+		<method name="GetMachineParameterGroupParameterType" description="returns the data type of a parameter in a given parameter group of a state machine by name.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="ParameterType" type="enum" class="ParameterDataType" pass="return" description="Data type of the parameter." />
 		</method>
 
 
