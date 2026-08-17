@@ -7837,6 +7837,14 @@ public:
 	virtual std::string GetParameterGroupParameterDescription(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
+	* IStateEnvironment::GetParameterGroupParameterType - returns the data type of a parameter in a given parameter group by name.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Data type of the parameter.
+	*/
+	virtual LibMCEnv::eParameterDataType GetParameterGroupParameterType(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
 	* IStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -8434,6 +8442,15 @@ public:
 	* @return Description of the parameter.
 	*/
 	virtual std::string GetMachineParameterGroupParameterDescription(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineParameterGroupParameterType - returns the data type of a parameter in a given parameter group of a state machine by name.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Data type of the parameter.
+	*/
+	virtual LibMCEnv::eParameterDataType GetMachineParameterGroupParameterType(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
 	* IUIEnvironment::GetUIProperty - returns a string property of a UI element on the client

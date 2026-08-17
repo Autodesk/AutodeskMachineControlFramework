@@ -10122,6 +10122,17 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetParameterGroupParameterNam
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetParameterGroupParameterDescriptionPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
 
 /**
+* returns the data type of a parameter in a given parameter group by name.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pParameterType - Data type of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetParameterGroupParameterTypePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, LibMCEnv::eParameterDataType * pParameterType);
+
+/**
 * retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -10970,6 +10981,18 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetMachineParameterGroupParamete
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterDescriptionPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* returns the data type of a parameter in a given parameter group of a state machine by name.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pParameterType - Data type of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterTypePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv::eParameterDataType * pParameterType);
 
 /**
 * returns a string property of a UI element on the client
@@ -12685,6 +12708,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetParameterGroupParameterCountPtr m_StateEnvironment_GetParameterGroupParameterCount;
 	PLibMCEnvStateEnvironment_GetParameterGroupParameterNamePtr m_StateEnvironment_GetParameterGroupParameterName;
 	PLibMCEnvStateEnvironment_GetParameterGroupParameterDescriptionPtr m_StateEnvironment_GetParameterGroupParameterDescription;
+	PLibMCEnvStateEnvironment_GetParameterGroupParameterTypePtr m_StateEnvironment_GetParameterGroupParameterType;
 	PLibMCEnvStateEnvironment_HasResourceDataPtr m_StateEnvironment_HasResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
 	PLibMCEnvStateEnvironment_LoadResourceStringPtr m_StateEnvironment_LoadResourceString;
@@ -12764,6 +12788,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterCountPtr m_UIEnvironment_GetMachineParameterGroupParameterCount;
 	PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterNamePtr m_UIEnvironment_GetMachineParameterGroupParameterName;
 	PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterDescriptionPtr m_UIEnvironment_GetMachineParameterGroupParameterDescription;
+	PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterTypePtr m_UIEnvironment_GetMachineParameterGroupParameterType;
 	PLibMCEnvUIEnvironment_GetUIPropertyPtr m_UIEnvironment_GetUIProperty;
 	PLibMCEnvUIEnvironment_GetUIPropertyAsUUIDPtr m_UIEnvironment_GetUIPropertyAsUUID;
 	PLibMCEnvUIEnvironment_GetUIPropertyAsDoublePtr m_UIEnvironment_GetUIPropertyAsDouble;

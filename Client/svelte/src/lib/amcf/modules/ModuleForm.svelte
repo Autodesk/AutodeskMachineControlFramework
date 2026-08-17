@@ -151,7 +151,7 @@
 	{:else if entity.type === 'number'}
 		<div class="grid grid-cols-[140px_1fr] items-center gap-2">
 			<Label class="text-sm text-muted-foreground">{entity.caption}</Label>
-			<div class="flex items-center gap-1">
+			<div class="flex items-center gap-1" style={d(entity).inputwidth ? `width:${d(entity).inputwidth}` : ''}>
 				<Input
 					type="number"
 					value={d(entity).value || ''}
@@ -160,7 +160,7 @@
 					min={d(entity).minvalue}
 					max={d(entity).maxvalue}
 					step={d(entity).step}
-					class="h-8 text-sm"
+					class="h-8 text-sm w-full"
 					onblur={() => onEditBlur(entity)}
 					onkeydown={(e: KeyboardEvent) => onEditEnter(entity, e)}
 					oninput={(e: Event) => { entity.dataObject.value = (e.target as HTMLInputElement).value; }}
@@ -188,11 +188,12 @@
 						oninput={(e: Event) => { entity.dataObject.value = (e.target as HTMLInputElement).value; }}
 						onchange={() => onEditBlur(entity)}
 					/>
-					<!-- editable numeric override: shares the slider's value for precise entry -->
-					<div class="flex items-center gap-1 w-20 shrink-0">
+					<!-- editable numeric override: shares the slider's value for precise entry.
+					     Width is configurable via the "inputwidth" attribute (e.g. "8rem", "120px"). -->
+					<div class="flex items-center gap-1.5 shrink-0" style={`width:${d(entity).inputwidth || '8rem'}`}>
 						<Input
 							type="number"
-							class="h-7 text-sm text-right tabular-nums px-1"
+							class="h-9 w-full text-base text-right tabular-nums px-2"
 							value={d(entity).value ?? ''}
 							min={parseFloat(d(entity).minvalue)}
 							max={parseFloat(d(entity).maxvalue)}
@@ -206,10 +207,6 @@
 							<span class="text-xs text-muted-foreground">{d(entity).unit}</span>
 						{/if}
 					</div>
-				</div>
-				<div class="flex text-xs text-muted-foreground pr-[4.5rem]">
-					<span>{parseFloat(d(entity).minvalue) || 0}{d(entity).unit ? ` ${d(entity).unit}` : ''}</span>
-					<span class="ml-auto">{parseFloat(d(entity).maxvalue) || 100}{d(entity).unit ? ` ${d(entity).unit}` : ''}</span>
 				</div>
 			</div>
 		</div>

@@ -10135,6 +10135,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergrouppara
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparameterdescription(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
 
 /**
+* returns the data type of a parameter in a given parameter group by name.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pParameterType - Data type of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparametertype(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, LibMCEnv::eParameterDataType * pParameterType);
+
+/**
 * retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -10983,6 +10994,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroup
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparameterdescription(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* returns the data type of a parameter in a given parameter group of a state machine by name.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pParameterType - Data type of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparametertype(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv::eParameterDataType * pParameterType);
 
 /**
 * returns a string property of a UI element on the client

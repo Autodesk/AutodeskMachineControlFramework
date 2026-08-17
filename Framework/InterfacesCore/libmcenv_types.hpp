@@ -757,6 +757,15 @@ namespace LibMCEnv {
     BoolType = 6
   };
   
+  enum class eParameterDataType : LibMCEnv_int32 {
+    Unknown = 0,
+    String = 1,
+    UUID = 2,
+    Integer = 3,
+    Double = 4,
+    Bool = 5
+  };
+  
   enum class eImagePixelFormat : LibMCEnv_int32 {
     Unknown = 0,
     GreyScale8bit = 1,
@@ -967,6 +976,7 @@ namespace LibMCEnv {
 typedef LibMCEnv::eAlertLevel eLibMCEnvAlertLevel;
 typedef LibMCEnv::eLogLevel eLibMCEnvLogLevel;
 typedef LibMCEnv::eJSONObjectType eLibMCEnvJSONObjectType;
+typedef LibMCEnv::eParameterDataType eLibMCEnvParameterDataType;
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::ePNGStorageFormat eLibMCEnvPNGStorageFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;

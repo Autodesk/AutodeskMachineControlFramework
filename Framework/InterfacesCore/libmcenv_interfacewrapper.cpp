@@ -30573,6 +30573,38 @@ LibMCEnvResult libmcenv_stateenvironment_getparametergroupparameterdescription(L
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_getparametergroupparametertype(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, eLibMCEnvParameterDataType * pParameterType)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pParameterGroup == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pParameterType == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterGroup(pParameterGroup);
+		std::string sParameterName(pParameterName);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pParameterType = pIStateEnvironment->GetParameterGroupParameterType(sParameterGroup, sParameterName);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_hasresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pIdentifier, bool * pHasResourceData)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -33177,6 +33209,41 @@ LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparameterdescripti
 				pDescriptionBuffer[iDescription] = sDescription[iDescription];
 			pDescriptionBuffer[sDescription.size()] = 0;
 		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparametertype(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, eLibMCEnvParameterDataType * pParameterType)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pMachineInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pParameterGroup == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pParameterType == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sMachineInstance(pMachineInstance);
+		std::string sParameterGroup(pParameterGroup);
+		std::string sParameterName(pParameterName);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pParameterType = pIUIEnvironment->GetMachineParameterGroupParameterType(sMachineInstance, sParameterGroup, sParameterName);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -37251,6 +37318,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getparametergroupparametername;
 	if (sProcName == "libmcenv_stateenvironment_getparametergroupparameterdescription") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getparametergroupparameterdescription;
+	if (sProcName == "libmcenv_stateenvironment_getparametergroupparametertype") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_getparametergroupparametertype;
 	if (sProcName == "libmcenv_stateenvironment_hasresourcedata") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_hasresourcedata;
 	if (sProcName == "libmcenv_stateenvironment_loadresourcedata") 
@@ -37409,6 +37478,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineparametergroupparametername;
 	if (sProcName == "libmcenv_uienvironment_getmachineparametergroupparameterdescription") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineparametergroupparameterdescription;
+	if (sProcName == "libmcenv_uienvironment_getmachineparametergroupparametertype") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineparametergroupparametertype;
 	if (sProcName == "libmcenv_uienvironment_getuiproperty") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getuiproperty;
 	if (sProcName == "libmcenv_uienvironment_getuipropertyasuuid") 

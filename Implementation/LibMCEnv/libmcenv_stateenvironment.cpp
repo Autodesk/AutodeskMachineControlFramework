@@ -554,6 +554,28 @@ std::string CStateEnvironment::GetParameterGroupParameterDescription(const std::
 	return sDescription;
 }
 
+// Maps an internal parameter data type to the plugin-facing enum.
+static LibMCEnv::eParameterDataType parameterDataTypeToEnum(AMC::eParameterDataType eType)
+{
+	switch (eType) {
+		case AMC::eParameterDataType::String: return LibMCEnv::eParameterDataType::String;
+		case AMC::eParameterDataType::UUID: return LibMCEnv::eParameterDataType::UUID;
+		case AMC::eParameterDataType::Integer: return LibMCEnv::eParameterDataType::Integer;
+		case AMC::eParameterDataType::Double: return LibMCEnv::eParameterDataType::Double;
+		case AMC::eParameterDataType::Bool: return LibMCEnv::eParameterDataType::Bool;
+		default: return LibMCEnv::eParameterDataType::Unknown;
+	}
+}
+
+LibMCEnv::eParameterDataType CStateEnvironment::GetParameterGroupParameterType(const std::string& sParameterGroup, const std::string& sParameterName)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	return parameterDataTypeToEnum(pGroup->getParameterDataTypeByName(sParameterName));
+}
+
 bool CStateEnvironment::HasResourceData(const std::string& sIdentifier)
 {
 	auto pUIHandler = m_pSystemState->uiHandler();

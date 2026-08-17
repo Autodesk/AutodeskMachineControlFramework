@@ -350,6 +350,26 @@ std::string CUIEnvironment::GetMachineParameterGroupParameterDescription(const s
     return sDescription;
 }
 
+// Maps an internal parameter data type to the plugin-facing enum.
+static LibMCEnv::eParameterDataType parameterDataTypeToEnum(AMC::eParameterDataType eType)
+{
+    switch (eType) {
+        case AMC::eParameterDataType::String: return LibMCEnv::eParameterDataType::String;
+        case AMC::eParameterDataType::UUID: return LibMCEnv::eParameterDataType::UUID;
+        case AMC::eParameterDataType::Integer: return LibMCEnv::eParameterDataType::Integer;
+        case AMC::eParameterDataType::Double: return LibMCEnv::eParameterDataType::Double;
+        case AMC::eParameterDataType::Bool: return LibMCEnv::eParameterDataType::Bool;
+        default: return LibMCEnv::eParameterDataType::Unknown;
+    }
+}
+
+LibMCEnv::eParameterDataType CUIEnvironment::GetMachineParameterGroupParameterType(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
+{
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    return parameterDataTypeToEnum(pGroup->getParameterDataTypeByName(sParameterName));
+}
+
 
 std::string CUIEnvironment::GetUIProperty(const std::string& sElementPath, const std::string& sPropertyName) 
 {   

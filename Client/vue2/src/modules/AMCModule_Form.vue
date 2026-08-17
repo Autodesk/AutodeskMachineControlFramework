@@ -117,11 +117,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<div :key="entity.uuid + '_slider'" v-if="entity.type === 'slider'" class="form-field form-field--slider">
 			<div class="form-slider-label">
 				<span>{{ entity.caption }}</span>
-				<!-- editable numeric override: shares the slider's value for precise entry -->
+				<!-- editable numeric override: shares the slider's value for precise entry.
+				     Width is configurable via the "inputwidth" attribute (e.g. "8rem", "120px"). -->
 				<span class="form-slider-value">
 					<input
 						type="number"
 						class="form-slider-input"
+						:style="entity.dataObject.inputwidth ? { width: entity.dataObject.inputwidth } : {}"
 						v-model.number="entity.dataObject.value"
 						:min="parseFloat(entity.dataObject.minvalue)"
 						:max="parseFloat(entity.dataObject.maxvalue)"
@@ -526,13 +528,14 @@ export default {
 }
 
 .form-slider-input {
-	width: 4rem;
+	width: 6.5rem;
+	font-size: 1rem;
 	text-align: right;
 	font-variant-numeric: tabular-nums;
 	font-weight: 500;
 	border: 1px solid var(--amcf-color-border, rgba(140, 150, 165, 0.35));
 	border-radius: 4px;
-	padding: 1px 4px;
+	padding: 4px 8px;
 	background: transparent;
 	color: inherit;
 }

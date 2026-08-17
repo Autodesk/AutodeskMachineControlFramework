@@ -3597,6 +3597,7 @@ public:
 	inline LibMCEnv_uint32 GetParameterGroupParameterCount(const std::string & sParameterGroup);
 	inline std::string GetParameterGroupParameterName(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex);
 	inline std::string GetParameterGroupParameterDescription(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex);
+	inline eParameterDataType GetParameterGroupParameterType(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool HasResourceData(const std::string & sIdentifier);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 	inline std::string LoadResourceString(const std::string & sResourceName);
@@ -3708,6 +3709,7 @@ public:
 	inline LibMCEnv_uint32 GetMachineParameterGroupParameterCount(const std::string & sMachineInstance, const std::string & sParameterGroup);
 	inline std::string GetMachineParameterGroupParameterName(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex);
 	inline std::string GetMachineParameterGroupParameterDescription(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex);
+	inline eParameterDataType GetMachineParameterGroupParameterType(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
 	inline std::string GetUIProperty(const std::string & sElementPath, const std::string & sPropertyName);
 	inline std::string GetUIPropertyAsUUID(const std::string & sElementPath, const std::string & sPropertyName);
 	inline LibMCEnv_double GetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName);
@@ -4799,6 +4801,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterCount = nullptr;
 		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterName = nullptr;
 		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterDescription = nullptr;
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType = nullptr;
 		pWrapperTable->m_StateEnvironment_HasResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
@@ -4878,6 +4881,7 @@ public:
 		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterCount = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterName = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType = nullptr;
 		pWrapperTable->m_UIEnvironment_GetUIProperty = nullptr;
 		pWrapperTable->m_UIEnvironment_GetUIPropertyAsUUID = nullptr;
 		pWrapperTable->m_UIEnvironment_GetUIPropertyAsDouble = nullptr;
@@ -13462,6 +13466,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType = (PLibMCEnvStateEnvironment_GetParameterGroupParameterTypePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getparametergroupparametertype");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType = (PLibMCEnvStateEnvironment_GetParameterGroupParameterTypePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getparametergroupparametertype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
@@ -14170,6 +14183,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterTypePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparametertype");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterTypePtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparametertype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -18605,6 +18627,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterDescription == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getparametergroupparametertype", (void**)&(pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_HasResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -18919,6 +18945,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparametergroupparameterdescription", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparametergroupparametertype", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getuiproperty", (void**)&(pWrapperTable->m_UIEnvironment_GetUIProperty));
@@ -32189,6 +32219,20 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::GetParameterGroupParameterType - returns the data type of a parameter in a given parameter group by name.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Data type of the parameter.
+	*/
+	eParameterDataType CStateEnvironment::GetParameterGroupParameterType(const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		eParameterDataType resultParameterType = (eParameterDataType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetParameterGroupParameterType(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultParameterType));
+		
+		return resultParameterType;
+	}
+	
+	/**
 	* CStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -33346,6 +33390,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterGroupParameterDescription(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), nIndex, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
 		
 		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetMachineParameterGroupParameterType - returns the data type of a parameter in a given parameter group of a state machine by name.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Data type of the parameter.
+	*/
+	eParameterDataType CUIEnvironment::GetMachineParameterGroupParameterType(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		eParameterDataType resultParameterType = (eParameterDataType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterGroupParameterType(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultParameterType));
+		
+		return resultParameterType;
 	}
 	
 	/**
