@@ -118,7 +118,7 @@ export default {
 				instance: item.paramInstance || '',
 				group: item.paramGroupName || '',
 				parameter: item.paramName || '',
-				value: this.editValue,
+				value: String(this.editValue != null ? this.editValue : ''),
 				type: item.paramType || '',
 			};
 			if (item.paramMin)

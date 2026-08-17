@@ -46,7 +46,7 @@
 			instance: row.paramInstance ?? '',
 			group: row.paramGroupName ?? '',
 			parameter: row.paramName ?? '',
-			value: editValue,
+			value: String(editValue ?? ''),
 			type: row.paramType ?? '',
 		};
 		if (row.paramMin) params.min = String(row.paramMin);
