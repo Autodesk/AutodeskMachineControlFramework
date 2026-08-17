@@ -40,6 +40,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		hide-default-footer
 		width="100%"
 	>
+		<template v-slot:item.paramValue="{ item }">
+			<div v-if="isEditable(item) && editingKey === rowKey(item)" class="plist-edit-wrap">
+				<input
+					class="plist-edit-input"
+					:type="isNumeric(item) ? 'number' : 'text'"
+					:min="item.paramMin || null"
+					:max="item.paramMax || null"
+					:step="item.paramStep || null"
+					v-model="editValue"
+					v-focus
+					@keydown.enter.prevent="acceptEdit(item)"
+					@keydown.esc.prevent="cancelEdit()"
+				/>
+				<v-icon small class="plist-icon-btn plist-accept" @click="acceptEdit(item)">mdi-check</v-icon>
+				<v-icon small class="plist-icon-btn plist-cancel" @click="cancelEdit()">mdi-close</v-icon>
+			</div>
+			<span
+				v-else-if="isEditable(item)"
+				class="plist-value-display"
+				title="Click to edit"
+				@click="startEdit(item)"
+			>{{ item.paramValue }}</span>
+			<span v-else>{{ item.paramValue }}</span>
+		</template>
+
 		<template v-slot:no-data>
 			<div class="plist-empty">No entries available</div>
 		</template>
@@ -51,6 +76,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <script>
 export default {
 	props: ['Application', 'module'],
+
+	directives: {
+		focus: {
+			inserted(el) {
+				el.focus();
+				if (typeof el.select === 'function')
+					el.select();
+			},
+		},
+	},
+
+	data() {
+		return {
+			// Only one row is edited at a time. editValue is a local buffer so live
+			// polling never clobbers what the user is typing.
+			editingKey: null,
+			editValue: '',
+		};
+	},
+
+	methods: {
+		rowKey(item) {
+			return (item.paramInstance || '') + '.' + (item.paramGroupName || '') + '.' + (item.paramName || '');
+		},
+		isEditable(item) {
+			return !!this.module.editevent && (item.paramEditable === true || item.paramEditable === 'true');
+		},
+		isNumeric(item) {
+			return item.paramType === 'integer' || item.paramType === 'double';
+		},
+		startEdit(item) {
+			this.editingKey = this.rowKey(item);
+			this.editValue = String(item.paramValue !== undefined && item.paramValue !== null ? item.paramValue : '');
+		},
+		cancelEdit() {
+			this.editingKey = null;
+		},
+		acceptEdit(item) {
+			const params = {
+				instance: item.paramInstance || '',
+				group: item.paramGroupName || '',
+				parameter: item.paramName || '',
+				value: this.editValue,
+				type: item.paramType || '',
+			};
+			if (item.paramMin)
+				params.min = String(item.paramMin);
+			if (item.paramMax)
+				params.max = String(item.paramMax);
+			this.Application.triggerUIEvent(this.module.editevent, this.module.uuid, {}, undefined, params);
+			this.editingKey = null;
+		},
+	},
 };
 </script>
 
@@ -107,5 +185,43 @@ export default {
 	font-size: 0.875rem;
 	font-style: italic;
 	color: rgba(0, 0, 0, 0.38);
+}
+
+/* Inline editing */
+.plist-value-display {
+	cursor: pointer;
+	border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
+}
+
+.plist-value-display:hover {
+	background: rgba(0, 0, 0, 0.04);
+}
+
+.plist-edit-wrap {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.plist-edit-input {
+	width: 6rem;
+	padding: 2px 6px;
+	font-size: 0.875rem;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	border-radius: 4px;
+	background: #fff;
+	color: rgba(0, 0, 0, 0.87);
+}
+
+.plist-icon-btn {
+	cursor: pointer;
+}
+
+.plist-accept {
+	color: #2e7d32 !important;
+}
+
+.plist-cancel {
+	color: #c62828 !important;
 }
 </style>
