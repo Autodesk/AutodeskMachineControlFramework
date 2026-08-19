@@ -531,6 +531,14 @@
 		<member name="Value" type="double" />
 	</struct>
 
+	<struct name="TimeStreamEnvelopeEntry" description="A downsampled bucket of a variable history, carrying min/max/average/last over the bucket time span.">
+		<member name="TimestampInMicroSeconds" type="uint64" />
+		<member name="MinValue" type="double" />
+		<member name="MaxValue" type="double" />
+		<member name="AverageValue" type="double" />
+		<member name="LastValue" type="double" />
+	</struct>
+
 	<enum name="SignalPhase">
 		<option name="Invalid" value="0" description="Invalid phase. Should not happen." />
 		<option name="InPreparation" value="10" description="Signal has not been triggered yet. Parameters can change." />
@@ -4546,6 +4554,10 @@
 			<param name="Samples" type="structarray" class="TimeStreamEntry" pass="out" description="Array of Timestream entries, in increasing order." />
 		</method>
 
+		<method name="GetAllSamplesWithBounds" description="Returns all timestamps together with the min/max/average/last value of each bucket of the sampling. Enables faithful multi-scale visualisation of large journals.">
+			<param name="Samples" type="structarray" class="TimeStreamEnvelopeEntry" pass="out" description="Array of Timestream envelope entries, in increasing order." />
+		</method>
+
 	</class>
 
 
@@ -4563,6 +4575,13 @@
 		<method name="ComputeIntegerSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
 			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
 			<param name="SampleValue" type="int64" pass="return" description="Value of the variable at the time step in integer." />
+		</method>
+
+		<method name="SampleUniform" description="Downsamples the variable's history over a time range into a fixed number of min/max/average/last buckets. Used for multi-scale visualisation of large journals.">
+			<param name="StartTimeStamp" type="uint64" pass="in" description="Start time stamp to sample in microseconds. MUST be smaller than end time stamp." />
+			<param name="EndTimeStamp" type="uint64" pass="in" description="End time stamp to sample in microseconds. MUST be larger than start time stamp." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of buckets to generate. MUST be greater than 0." />
+			<param name="Sampling" type="class" class="UniformJournalSampling" pass="return" description="Resulting uniform sampling instance." />
 		</method>
 
 	</class>
@@ -4655,7 +4674,18 @@
 			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
-						
+
+		<method name="GetVariableCount" description="Returns the number of recorded variables in the journal.">
+			<param name="Count" type="uint32" pass="return" description="Number of recorded variables." />
+		</method>
+
+		<method name="GetVariableInformation" description="Returns metadata of a recorded variable by index.">
+			<param name="Index" type="uint32" pass="in" description="Index of the variable. 0-based. MUST be smaller than the variable count." />
+			<param name="Name" type="string" pass="out" description="Name (parameter path) of the variable." />
+			<param name="DataType" type="enum" class="ParameterDataType" pass="out" description="Data type of the variable." />
+			<param name="Units" type="double" pass="out" description="Quantization units of the variable (0 for non-double variables)." />
+		</method>
+
 		<method name="GetStartTime" description="Retrieves the reference start time of the journal.">
 			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
 		</method>

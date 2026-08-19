@@ -968,6 +968,14 @@ namespace LibMCEnv {
       LibMCEnv_double m_Value;
   } sTimeStreamEntry;
   
+  typedef struct sTimeStreamEnvelopeEntry {
+      LibMCEnv_uint64 m_TimestampInMicroSeconds;
+      LibMCEnv_double m_MinValue;
+      LibMCEnv_double m_MaxValue;
+      LibMCEnv_double m_AverageValue;
+      LibMCEnv_double m_LastValue;
+  } sTimeStreamEnvelopeEntry;
+  
   #pragma pack ()
   
 } // namespace LibMCEnv;
@@ -1004,5 +1012,6 @@ typedef LibMCEnv::sHatch2DSubInterpolationData sLibMCEnvHatch2DSubInterpolationD
 typedef LibMCEnv::sModelDataTransform sLibMCEnvModelDataTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
 typedef LibMCEnv::sTimeStreamEntry sLibMCEnvTimeStreamEntry;
+typedef LibMCEnv::sTimeStreamEnvelopeEntry sLibMCEnvTimeStreamEnvelopeEntry;
 
 #endif // __LIBMCENV_TYPES_HEADER_CPP

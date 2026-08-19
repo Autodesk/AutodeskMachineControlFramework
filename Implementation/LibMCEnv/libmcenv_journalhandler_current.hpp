@@ -68,6 +68,10 @@ public:
 
     IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName) override;
 
+    LibMCEnv_uint32 GetVariableCount() override;
+
+    void GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string& sName, LibMCEnv::eParameterDataType& eDataType, LibMCEnv_double& dUnits) override;
+
     IDateTime* GetStartTime() override;
 
     IDateTime* GetEndTime() override;

@@ -8154,6 +8154,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getsample(LibMC
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getallsamples(LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry * pSamplesBuffer);
 
+/**
+* Returns all timestamps together with the min/max/average/last value of each bucket of the sampling. Enables faithful multi-scale visualisation of large journals.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[in] nSamplesBufferSize - Number of elements in buffer
+* @param[out] pSamplesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pSamplesBuffer - TimeStreamEnvelopeEntry  buffer of Array of Timestream envelope entries, in increasing order.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getallsampleswithbounds(LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEnvelopeEntry * pSamplesBuffer);
+
 /*************************************************************************************************************************
  Class definition for JournalVariable
 **************************************************************************************************************************/
@@ -8188,6 +8199,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computedoublesample(Li
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeintegersample(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_int64 * pSampleValue);
+
+/**
+* Downsamples the variable's history over a time range into a fixed number of min/max/average/last buckets. Used for multi-scale visualisation of large journals.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nStartTimeStamp - Start time stamp to sample in microseconds. MUST be smaller than end time stamp.
+* @param[in] nEndTimeStamp - End time stamp to sample in microseconds. MUST be larger than start time stamp.
+* @param[in] nNumberOfSamples - Number of buckets to generate. MUST be greater than 0.
+* @param[out] pSampling - Resulting uniform sampling instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_sampleuniform(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeStamp, LibMCEnv_uint64 nEndTimeStamp, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pSampling);
 
 /*************************************************************************************************************************
  Class definition for Alert
@@ -8381,6 +8404,29 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_logentrylist_getentrytime(LibMCEnv_Log
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_JournalVariable * pJournalVariable);
+
+/**
+* Returns the number of recorded variables in the journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pCount - Number of recorded variables.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_getvariablecount(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns metadata of a recorded variable by index.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nIndex - Index of the variable. 0-based. MUST be smaller than the variable count.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name (parameter path) of the variable., may be NULL
+* @param[out] pDataType - Data type of the variable.
+* @param[out] pUnits - Quantization units of the variable (0 for non-double variables).
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_getvariableinformation(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer, LibMCEnv::eParameterDataType * pDataType, LibMCEnv_double * pUnits);
 
 /**
 * Retrieves the reference start time of the journal.

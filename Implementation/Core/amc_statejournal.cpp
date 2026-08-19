@@ -42,6 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <future>
 #include <iostream>
 #include <mutex>
+#include <vector>
+#include <limits>
+#include <cmath>
 
 namespace AMC {
 
@@ -77,9 +80,21 @@ namespace AMC {
 
 		virtual LibMCData::eParameterDataType getType() = 0;
 
+		virtual double getUnits()
+		{
+			return 0.0;
+		}
+
 		virtual double computeNumericSample(const uint64_t nTimeStampInMicroseconds)
 		{
 			throw ELibMCCustomException(LIBMC_ERROR_JOURNALVARIABLEISNOTNUMERIC, m_sName);
+		}
+
+		// Unconditionally writes the variable's current (initial) value to the stream. This
+		// seeds the recording with the registered default so variables that never change (or
+		// whose first update equals their default) are sampled as their default instead of 0.
+		virtual void writeInitialValueToStream(const uint64_t nAbsoluteTimeStampInMicroSeconds)
+		{
 		}
 
 	};
@@ -112,6 +127,11 @@ namespace AMC {
 		void setInitialValue(const bool bValue)
 		{
 			m_bCurrentValue = bValue;
+		}
+
+		void writeInitialValueToStream(const uint64_t nAbsoluteTimeStampInMicroSeconds) override
+		{
+			m_pStream->writeBool_MicroSecond(nAbsoluteTimeStampInMicroSeconds, m_nStorageIndex, m_bCurrentValue);
 		}
 
 		/*void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
@@ -159,6 +179,11 @@ namespace AMC {
 			m_nCurrentValue = nValue;
 		}
 
+		void writeInitialValueToStream(const uint64_t nAbsoluteTimeStampInMicroSeconds) override
+		{
+			m_pStream->writeInt64_MicroSecond(nAbsoluteTimeStampInMicroSeconds, m_nStorageIndex, m_nCurrentValue);
+		}
+
 
 		/*void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamInt64Entry>& timeStream)
 		{
@@ -192,6 +217,11 @@ namespace AMC {
 		virtual LibMCData::eParameterDataType getType()
 		{
 			return LibMCData::eParameterDataType::Double;
+		}
+
+		virtual double getUnits() override
+		{
+			return m_dUnits;
 		}
 
 		void setUnits(const double dUnits)
@@ -230,6 +260,12 @@ namespace AMC {
 			int64_t nValueInUnits = (int64_t)(dValue / m_dUnits);
 			m_nCurrentValueInUnits = nValueInUnits;
 
+		}
+
+		void writeInitialValueToStream(const uint64_t nAbsoluteTimeStampInMicroSeconds) override
+		{
+			if (m_bHasUnits)
+				m_pStream->writeDouble_MicroSecond(nAbsoluteTimeStampInMicroSeconds, m_nStorageIndex, m_nCurrentValueInUnits);
 		}
 
 		/*void readTimeStream(const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream)
@@ -330,6 +366,10 @@ namespace AMC {
 		//void readDoubleTimeStream(const std::string& sName, const sStateJournalInterval& interval, std::vector<sJournalTimeStreamDoubleEntry>& timeStream);
 
 		double computeSample(const std::string& sName, const uint64_t nTimeStampInMicroseconds);
+
+		uint32_t getVariableCount();
+		void getVariableInformation(const uint32_t nIndex, std::string& sName, LibMCData::eParameterDataType& eDataType, double& dUnits);
+		void sampleVariableEnvelope(const std::string& sName, const uint64_t nStartTimeInMicroSeconds, const uint64_t nEndTimeInMicroSeconds, const uint32_t nBucketCount, std::vector<sJournalEnvelopeSample>& envelope);
 
 		void recordingThread();
 		
@@ -448,6 +488,16 @@ namespace AMC {
 		}
 
 		m_pStream->setVariableCount(m_VariableList.size());
+
+		// Seed the stream with each variable's registered initial value at timestamp 0 so that
+		// variables which never change (or whose first update equals their default) are sampled
+		// as their default value rather than 0. This creates the baseline entry in the first
+		// chunk and populates the stream's carry-forward values for all subsequent chunks.
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+			for (auto pVariable : m_VariableList)
+				pVariable->writeInitialValueToStream(0);
+		}
 
 		m_ThreadStopFlag = false;
 		m_ThreadFuture = std::async(std::launch::async, [this] { this->recordingThread(); });
@@ -602,6 +652,100 @@ namespace AMC {
 		auto pVariable = findVariable(sName);
 		return pVariable->computeNumericSample(nTimeStampInMicroseconds);
 
+	}
+
+	uint32_t CStateJournalImpl::getVariableCount()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		return (uint32_t)m_VariableList.size();
+	}
+
+	void CStateJournalImpl::getVariableInformation(const uint32_t nIndex, std::string& sName, LibMCData::eParameterDataType& eDataType, double& dUnits)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		if (nIndex >= m_VariableList.size())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		auto pVariable = m_VariableList.at(nIndex);
+		sName = pVariable->getName();
+		eDataType = pVariable->getType();
+		dUnits = pVariable->getUnits();
+	}
+
+	void CStateJournalImpl::sampleVariableEnvelope(const std::string& sName, const uint64_t nStartTimeInMicroSeconds, const uint64_t nEndTimeInMicroSeconds, const uint32_t nBucketCount, std::vector<sJournalEnvelopeSample>& envelope)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		if (m_JournalMode != eStateJournalMode::sjmRecording)
+			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTRECORDING);
+
+		if (nBucketCount == 0)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (nEndTimeInMicroSeconds <= nStartTimeInMicroSeconds)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		auto pVariable = findVariable(sName);
+
+		envelope.resize(0);
+		envelope.reserve(nBucketCount);
+
+		// Oversample the recorded step function at a finer resolution than the requested
+		// bucket count so that peaks that occurred inside a bucket remain visible. The total
+		// number of sub-samples is capped to keep the cost bounded for very wide ranges.
+		const uint64_t nRange = nEndTimeInMicroSeconds - nStartTimeInMicroSeconds;
+		const uint32_t nOverSampleFactor = 8;
+		const uint64_t nMaxTotalSubSamples = 2000000ULL;
+
+		uint64_t nSubSamplesPerBucket = nOverSampleFactor;
+		if ((uint64_t)nBucketCount * nSubSamplesPerBucket > nMaxTotalSubSamples)
+			nSubSamplesPerBucket = 1;
+
+		const double dBucketWidth = (double)nRange / (double)nBucketCount;
+		const double dSubStep = dBucketWidth / (double)nSubSamplesPerBucket;
+
+		for (uint32_t nBucket = 0; nBucket < nBucketCount; nBucket++) {
+			const uint64_t nBucketStart = nStartTimeInMicroSeconds + (uint64_t)((double)nBucket * dBucketWidth);
+
+			double dMin = std::numeric_limits<double>::infinity();
+			double dMax = -std::numeric_limits<double>::infinity();
+			double dSum = 0.0;
+			double dLast = 0.0;
+			uint32_t nValidSamples = 0;
+
+			for (uint32_t nSub = 0; nSub < nSubSamplesPerBucket; nSub++) {
+				const uint64_t nSampleTime = nBucketStart + (uint64_t)(((double)nSub + 0.5) * dSubStep);
+
+				double dValue = 0.0;
+				try {
+					dValue = pVariable->computeNumericSample(nSampleTime);
+				}
+				catch (std::exception&) {
+					// No data available at this timestamp yet - skip this sub-sample.
+					continue;
+				}
+
+				if (dValue < dMin) dMin = dValue;
+				if (dValue > dMax) dMax = dValue;
+				dSum += dValue;
+				dLast = dValue;
+				nValidSamples++;
+			}
+
+			sJournalEnvelopeSample sSample;
+			sSample.m_nTimeStampInMicroSeconds = nBucketStart;
+			if (nValidSamples > 0) {
+				sSample.m_dMinValue = dMin;
+				sSample.m_dMaxValue = dMax;
+				sSample.m_dAverageValue = dSum / (double)nValidSamples;
+				sSample.m_dLastValue = dLast;
+			}
+			else {
+				sSample.m_dMinValue = 0.0;
+				sSample.m_dMaxValue = 0.0;
+				sSample.m_dAverageValue = 0.0;
+				sSample.m_dLastValue = 0.0;
+			}
+			envelope.push_back(sSample);
+		}
 	}
 
 
@@ -786,6 +930,21 @@ namespace AMC {
 	double CStateJournal::computeSample(const std::string& sName, const uint64_t nTimeStamp)
 	{
 		return m_pImpl->computeSample(sName, nTimeStamp);
+	}
+
+	uint32_t CStateJournal::getVariableCount()
+	{
+		return m_pImpl->getVariableCount();
+	}
+
+	void CStateJournal::getVariableInformation(const uint32_t nIndex, std::string& sName, LibMCData::eParameterDataType& eDataType, double& dUnits)
+	{
+		m_pImpl->getVariableInformation(nIndex, sName, eDataType, dUnits);
+	}
+
+	void CStateJournal::sampleVariableEnvelope(const std::string& sName, const uint64_t nStartTimeInMicroSeconds, const uint64_t nEndTimeInMicroSeconds, const uint32_t nBucketCount, std::vector<sJournalEnvelopeSample>& envelope)
+	{
+		m_pImpl->sampleVariableEnvelope(sName, nStartTimeInMicroSeconds, nEndTimeInMicroSeconds, nBucketCount, envelope);
 	}
 
 

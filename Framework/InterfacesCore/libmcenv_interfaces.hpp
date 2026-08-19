@@ -6382,6 +6382,14 @@ public:
 	*/
 	virtual void GetAllSamples(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry * pSamplesBuffer) = 0;
 
+	/**
+	* IUniformJournalSampling::GetAllSamplesWithBounds - Returns all timestamps together with the min/max/average/last value of each bucket of the sampling. Enables faithful multi-scale visualisation of large journals.
+	* @param[in] nSamplesBufferSize - Number of elements in buffer
+	* @param[out] pSamplesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSamplesBuffer - TimeStreamEnvelopeEntry buffer of Array of Timestream envelope entries, in increasing order.
+	*/
+	virtual void GetAllSamplesWithBounds(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEnvelopeEntry * pSamplesBuffer) = 0;
+
 };
 
 typedef IBaseSharedPtr<IUniformJournalSampling> PIUniformJournalSampling;
@@ -6412,6 +6420,15 @@ public:
 	* @return Value of the variable at the time step in integer.
 	*/
 	virtual LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
+
+	/**
+	* IJournalVariable::SampleUniform - Downsamples the variable's history over a time range into a fixed number of min/max/average/last buckets. Used for multi-scale visualisation of large journals.
+	* @param[in] nStartTimeStamp - Start time stamp to sample in microseconds. MUST be smaller than end time stamp.
+	* @param[in] nEndTimeStamp - End time stamp to sample in microseconds. MUST be larger than start time stamp.
+	* @param[in] nNumberOfSamples - Number of buckets to generate. MUST be greater than 0.
+	* @return Resulting uniform sampling instance.
+	*/
+	virtual IUniformJournalSampling * SampleUniform(const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples) = 0;
 
 };
 
@@ -6566,6 +6583,21 @@ public:
 	* @return Journal Instance.
 	*/
 	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName) = 0;
+
+	/**
+	* IJournalHandler::GetVariableCount - Returns the number of recorded variables in the journal.
+	* @return Number of recorded variables.
+	*/
+	virtual LibMCEnv_uint32 GetVariableCount() = 0;
+
+	/**
+	* IJournalHandler::GetVariableInformation - Returns metadata of a recorded variable by index.
+	* @param[in] nIndex - Index of the variable. 0-based. MUST be smaller than the variable count.
+	* @param[out] sName - Name (parameter path) of the variable.
+	* @param[out] eDataType - Data type of the variable.
+	* @param[out] dUnits - Quantization units of the variable (0 for non-double variables).
+	*/
+	virtual void GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string & sName, LibMCEnv::eParameterDataType & eDataType, LibMCEnv_double & dUnits) = 0;
 
 	/**
 	* IJournalHandler::GetStartTime - Retrieves the reference start time of the journal.

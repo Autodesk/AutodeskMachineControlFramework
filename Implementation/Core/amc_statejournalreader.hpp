@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_dynamic.hpp"
 #include "common_chrono.hpp"
 #include "amc_statejournalstreamcache.hpp"
+#include "amc_statejournal.hpp"
 
 namespace AMC {
 
@@ -142,6 +143,12 @@ namespace AMC {
 		double computeDoubleSample(const std::string& sName, const uint64_t nTimeStamp);
 
 		int64_t computeIntegerSample(const std::string& sName, const uint64_t nTimeStamp);
+
+		// Enumeration + downsampling parity with the live CStateJournal, so the same
+		// history-browser abstractions work for past sessions.
+		uint32_t getVariableCount();
+		void getVariableInformation(const uint32_t nIndex, std::string& sName, LibMCData::eParameterDataType& eDataType, double& dUnits);
+		void sampleVariableEnvelope(const std::string& sName, const uint64_t nStartTimeInMicroSeconds, const uint64_t nEndTimeInMicroSeconds, const uint32_t nBucketCount, std::vector<sJournalEnvelopeSample>& envelope);
 
 		std::string getStartTimeAsUTC();
 

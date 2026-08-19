@@ -70,6 +70,32 @@ IJournalVariable* CJournalHandler_Historic::RetrieveJournalVariable(const std::s
 
 }
 
+namespace {
+	LibMCEnv::eParameterDataType convertHistoricParameterDataType(LibMCData::eParameterDataType eDataType)
+	{
+		switch (eDataType) {
+		case LibMCData::eParameterDataType::String: return LibMCEnv::eParameterDataType::String;
+		case LibMCData::eParameterDataType::UUID: return LibMCEnv::eParameterDataType::UUID;
+		case LibMCData::eParameterDataType::Integer: return LibMCEnv::eParameterDataType::Integer;
+		case LibMCData::eParameterDataType::Double: return LibMCEnv::eParameterDataType::Double;
+		case LibMCData::eParameterDataType::Bool: return LibMCEnv::eParameterDataType::Bool;
+		default: return LibMCEnv::eParameterDataType::Unknown;
+		}
+	}
+}
+
+LibMCEnv_uint32 CJournalHandler_Historic::GetVariableCount()
+{
+	return m_pJournalReader->getVariableCount();
+}
+
+void CJournalHandler_Historic::GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string& sName, LibMCEnv::eParameterDataType& eDataType, LibMCEnv_double& dUnits)
+{
+	LibMCData::eParameterDataType eCoreDataType = LibMCData::eParameterDataType::Unknown;
+	m_pJournalReader->getVariableInformation(nIndex, sName, eCoreDataType, dUnits);
+	eDataType = convertHistoricParameterDataType(eCoreDataType);
+}
+
 
 IDateTime* CJournalHandler_Historic::GetStartTime()
 {

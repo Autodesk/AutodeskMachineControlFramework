@@ -3082,6 +3082,7 @@ public:
 	inline LibMCEnv_uint64 GetEndTimeStamp();
 	inline void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue);
 	inline void GetAllSamples(std::vector<sTimeStreamEntry> & SamplesBuffer);
+	inline void GetAllSamplesWithBounds(std::vector<sTimeStreamEnvelopeEntry> & SamplesBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -3101,6 +3102,7 @@ public:
 	inline std::string GetVariableName();
 	inline LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
 	inline LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
+	inline PUniformJournalSampling SampleUniform(const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples);
 };
 	
 /*************************************************************************************************************************
@@ -3182,6 +3184,8 @@ public:
 	}
 	
 	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName);
+	inline LibMCEnv_uint32 GetVariableCount();
+	inline void GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string & sName, eParameterDataType & eDataType, LibMCEnv_double & dUnits);
 	inline PDateTime GetStartTime();
 	inline PDateTime GetEndTime();
 	inline LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds();
@@ -4622,9 +4626,11 @@ public:
 		pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetSample = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetAllSamples = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds = nullptr;
 		pWrapperTable->m_JournalVariable_GetVariableName = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeDoubleSample = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeIntegerSample = nullptr;
+		pWrapperTable->m_JournalVariable_SampleUniform = nullptr;
 		pWrapperTable->m_Alert_GetUUID = nullptr;
 		pWrapperTable->m_Alert_IsActive = nullptr;
 		pWrapperTable->m_Alert_GetAlertLevel = nullptr;
@@ -4642,6 +4648,8 @@ public:
 		pWrapperTable->m_LogEntryList_GetEntry = nullptr;
 		pWrapperTable->m_LogEntryList_GetEntryTime = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
+		pWrapperTable->m_JournalHandler_GetVariableCount = nullptr;
+		pWrapperTable->m_JournalHandler_GetVariableInformation = nullptr;
 		pWrapperTable->m_JournalHandler_GetStartTime = nullptr;
 		pWrapperTable->m_JournalHandler_GetEndTime = nullptr;
 		pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds = nullptr;
@@ -11855,6 +11863,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds = (PLibMCEnvUniformJournalSampling_GetAllSamplesWithBoundsPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getallsampleswithbounds");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds = (PLibMCEnvUniformJournalSampling_GetAllSamplesWithBoundsPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getallsampleswithbounds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalVariable_GetVariableName = (PLibMCEnvJournalVariable_GetVariableNamePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getvariablename");
 		#else // _WIN32
 		pWrapperTable->m_JournalVariable_GetVariableName = (PLibMCEnvJournalVariable_GetVariableNamePtr) dlsym(hLibrary, "libmcenv_journalvariable_getvariablename");
@@ -11879,6 +11896,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalVariable_ComputeIntegerSample == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_SampleUniform = (PLibMCEnvJournalVariable_SampleUniformPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_sampleuniform");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_SampleUniform = (PLibMCEnvJournalVariable_SampleUniformPtr) dlsym(hLibrary, "libmcenv_journalvariable_sampleuniform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_SampleUniform == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12032,6 +12058,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_GetVariableCount = (PLibMCEnvJournalHandler_GetVariableCountPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getvariablecount");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_GetVariableCount = (PLibMCEnvJournalHandler_GetVariableCountPtr) dlsym(hLibrary, "libmcenv_journalhandler_getvariablecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_GetVariableCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_GetVariableInformation = (PLibMCEnvJournalHandler_GetVariableInformationPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getvariableinformation");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_GetVariableInformation = (PLibMCEnvJournalHandler_GetVariableInformationPtr) dlsym(hLibrary, "libmcenv_journalhandler_getvariableinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_GetVariableInformation == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -17911,6 +17955,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetAllSamples == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getallsampleswithbounds", (void**)&(pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_getvariablename", (void**)&(pWrapperTable->m_JournalVariable_GetVariableName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetVariableName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17921,6 +17969,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_computeintegersample", (void**)&(pWrapperTable->m_JournalVariable_ComputeIntegerSample));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeIntegerSample == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_sampleuniform", (void**)&(pWrapperTable->m_JournalVariable_SampleUniform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_SampleUniform == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_alert_getuuid", (void**)&(pWrapperTable->m_Alert_GetUUID));
@@ -17989,6 +18041,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievejournalvariable", (void**)&(pWrapperTable->m_JournalHandler_RetrieveJournalVariable));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_getvariablecount", (void**)&(pWrapperTable->m_JournalHandler_GetVariableCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetVariableCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_getvariableinformation", (void**)&(pWrapperTable->m_JournalHandler_GetVariableInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetVariableInformation == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_getstarttime", (void**)&(pWrapperTable->m_JournalHandler_GetStartTime));
@@ -29537,6 +29597,19 @@ public:
 	}
 	
 	/**
+	* CUniformJournalSampling::GetAllSamplesWithBounds - Returns all timestamps together with the min/max/average/last value of each bucket of the sampling. Enables faithful multi-scale visualisation of large journals.
+	* @param[out] SamplesBuffer - Array of Timestream envelope entries, in increasing order.
+	*/
+	void CUniformJournalSampling::GetAllSamplesWithBounds(std::vector<sTimeStreamEnvelopeEntry> & SamplesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededSamples = 0;
+		LibMCEnv_uint64 elementsWrittenSamples = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamplesWithBounds(m_pHandle, 0, &elementsNeededSamples, nullptr));
+		SamplesBuffer.resize((size_t) elementsNeededSamples);
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamplesWithBounds(m_pHandle, elementsNeededSamples, &elementsWrittenSamples, SamplesBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CJournalVariable
 	 */
 	
@@ -29579,6 +29652,24 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeIntegerSample(m_pHandle, nTimeInMicroSeconds, &resultSampleValue));
 		
 		return resultSampleValue;
+	}
+	
+	/**
+	* CJournalVariable::SampleUniform - Downsamples the variable's history over a time range into a fixed number of min/max/average/last buckets. Used for multi-scale visualisation of large journals.
+	* @param[in] nStartTimeStamp - Start time stamp to sample in microseconds. MUST be smaller than end time stamp.
+	* @param[in] nEndTimeStamp - End time stamp to sample in microseconds. MUST be larger than start time stamp.
+	* @param[in] nNumberOfSamples - Number of buckets to generate. MUST be greater than 0.
+	* @return Resulting uniform sampling instance.
+	*/
+	PUniformJournalSampling CJournalVariable::SampleUniform(const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples)
+	{
+		LibMCEnvHandle hSampling = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_SampleUniform(m_pHandle, nStartTimeStamp, nEndTimeStamp, nNumberOfSamples, &hSampling));
+		
+		if (!hSampling) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hSampling);
 	}
 	
 	/**
@@ -29835,6 +29926,35 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CJournalVariable>(m_pWrapper, hJournalVariable);
+	}
+	
+	/**
+	* CJournalHandler::GetVariableCount - Returns the number of recorded variables in the journal.
+	* @return Number of recorded variables.
+	*/
+	LibMCEnv_uint32 CJournalHandler::GetVariableCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetVariableCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CJournalHandler::GetVariableInformation - Returns metadata of a recorded variable by index.
+	* @param[in] nIndex - Index of the variable. 0-based. MUST be smaller than the variable count.
+	* @param[out] sName - Name (parameter path) of the variable.
+	* @param[out] eDataType - Data type of the variable.
+	* @param[out] dUnits - Quantization units of the variable (0 for non-double variables).
+	*/
+	void CJournalHandler::GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string & sName, eParameterDataType & eDataType, LibMCEnv_double & dUnits)
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetVariableInformation(m_pHandle, nIndex, 0, &bytesNeededName, nullptr, &eDataType, &dUnits));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetVariableInformation(m_pHandle, nIndex, bytesNeededName, &bytesWrittenName, &bufferName[0], &eDataType, &dUnits));
+		sName = std::string(&bufferName[0]);
 	}
 	
 	/**
