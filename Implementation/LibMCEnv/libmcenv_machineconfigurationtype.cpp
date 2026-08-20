@@ -39,6 +39,7 @@ Abstract: This is a stub class definition of CMachineConfigurationType
 #include "libmcenv_machineconfigurationxsditerator.hpp"
 #include "libmcenv_machineconfigurationversion.hpp"
 #include "libmcenv_machineconfigurationversioniterator.hpp"
+#include "libmcenv_machineconfiguration.hpp"
 #include "libmcenv_xmldocument.hpp"
 
 using namespace LibMCEnv::Impl;
@@ -234,4 +235,48 @@ LibMCEnv::Impl::IXMLDocument* CMachineConfigurationType::GetLatestConfigurationX
 
 	return new CXMLDocument(pXMLDocumentInstance);
 
+}
+
+IMachineConfiguration* CMachineConfigurationType::GetActiveConfiguration()
+{
+	auto pActiveVersion = m_pMachineConfigurationType->GetActiveConfigurationVersion();
+
+	if (pActiveVersion.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE, "no active configuration version for configuration type: " + GetName());
+
+	return new CMachineConfiguration(m_pMachineConfigurationType, pActiveVersion);
+}
+
+IMachineConfiguration* CMachineConfigurationType::EnsureActiveConfiguration()
+{
+	auto pActiveVersion = m_pMachineConfigurationType->GetActiveConfigurationVersion();
+
+	if (pActiveVersion.get() == nullptr) {
+		// No active version yet: activate the latest one if any exists.
+		auto pLatestVersion = m_pMachineConfigurationType->GetLatestConfigurationVersion();
+		if (pLatestVersion.get() == nullptr)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND, "no configuration version for configuration type: " + GetName());
+
+		m_pMachineConfigurationType->SetActiveConfigurationVersion(pLatestVersion->GetVersionUUID());
+		pActiveVersion = pLatestVersion;
+	}
+
+	return new CMachineConfiguration(m_pMachineConfigurationType, pActiveVersion);
+}
+
+IMachineConfigurationXSD* CMachineConfigurationType::EnsureXSDVersion(const std::string& sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string& sDefaultXML)
+{
+	auto nLatestXSDVersion = m_pMachineConfigurationType->GetLatestXSDNumericVersion();
+
+	// Only register if the given version is newer than the latest registered XSD.
+	if (nLatestXSDVersion >= nXSDVersion)
+		return nullptr;
+
+	auto pXSD = m_pMachineConfigurationType->RegisterNewXSD(sXSDString, nXSDVersion);
+	if (pXSD.get() == nullptr)
+		return nullptr;
+
+	m_pMachineConfigurationType->CreateDefaultConfiguration(pXSD->GetUUID(), sDefaultXML, pXSD->GetTimestamp());
+
+	return new CMachineConfigurationXSD(pXSD);
 }

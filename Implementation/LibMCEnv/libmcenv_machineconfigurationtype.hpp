@@ -105,6 +105,12 @@ public:
 	IXMLDocument* GetLatestConfigurationXML() override;
 	
 	void SetActiveConfigurationVersion(const std::string& sVersionUUID) override;
+
+	IMachineConfiguration* GetActiveConfiguration() override;
+
+	IMachineConfiguration* EnsureActiveConfiguration() override;
+
+	IMachineConfigurationXSD* EnsureXSDVersion(const std::string& sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string& sDefaultXML) override;
 };
 
 } // namespace Impl
