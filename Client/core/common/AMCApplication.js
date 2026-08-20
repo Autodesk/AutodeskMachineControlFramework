@@ -55,6 +55,7 @@ import AMCApplicationModule_StatusList from "../modules/AMCModule_StatusList.js"
 import AMCApplicationModule_TogglePanel from "../modules/AMCModule_TogglePanel.js"
 import AMCApplicationModule_Form from "../modules/AMCModule_Form.js"
 import AMCApplicationModule_Chart from "../modules/AMCModule_Chart.js"
+import AMCApplicationModule_JournalHistory from "../modules/AMCModule_JournalHistory.js"
 import AMCApplicationModule_Image from "../modules/AMCModule_Image.js"
 import AMCApplicationModule_StateMachineGraph from "../modules/AMCModule_StateMachineGraph.js"
 import AMCApplicationModule_Paragraph from "../modules/AMCModule_Paragraph.js"
@@ -712,6 +713,8 @@ export default class AMCApplication extends Common.AMCObject {
 			return new AMCApplicationModule_Form (page, def);
 		if (def.type === "chart")
 			return new AMCApplicationModule_Chart (page, def);
+		if (def.type === "journalhistory")
+			return new AMCApplicationModule_JournalHistory (page, def);
 		if (def.type === "image")
 			return new AMCApplicationModule_Image (page, def);
 		if (def.type === "paragraph")

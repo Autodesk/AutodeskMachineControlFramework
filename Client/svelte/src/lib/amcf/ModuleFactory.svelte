@@ -24,6 +24,7 @@
 	import ModuleGraphic from './modules/ModuleGraphic.svelte';
 	import ModuleWorkflow from './modules/ModuleWorkflow.svelte';
 	import ModuleStateMachineGraph from './modules/ModuleStateMachineGraph.svelte';
+	import ModuleHistoryBrowser from './modules/ModuleHistoryBrowser.svelte';
 	import ModuleFallback from './modules/ModuleFallback.svelte';
 
 	let { module, app }: { module: any; app: any } = $props();
@@ -54,6 +55,7 @@
 		graphic: ModuleGraphic,
 		workflow: ModuleWorkflow,
 		statemachinegraph: ModuleStateMachineGraph,
+		journalhistory: ModuleHistoryBrowser,
 	};
 
 	let Component = $derived(componentMap[module?.type] || ModuleFallback);
