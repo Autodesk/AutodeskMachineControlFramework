@@ -134,6 +134,7 @@ class IMachineConfigurationXSD;
 class IMachineConfigurationXSDIterator;
 class IMachineConfigurationVersion;
 class IMachineConfigurationVersionIterator;
+class IMachineConfiguration;
 class IMachineConfigurationType;
 class IMachineConfigurationTypeIterator;
 class IMachineConfigurationHandler;
@@ -7256,6 +7257,164 @@ typedef IBaseSharedPtr<IMachineConfigurationVersionIterator> PIMachineConfigurat
 
 
 /*************************************************************************************************************************
+ Class interface for MachineConfiguration 
+**************************************************************************************************************************/
+
+class IMachineConfiguration : public virtual IBase {
+public:
+	/**
+	* IMachineConfiguration::GetVersionUUID - Returns the UUID of the underlying configuration version this working copy was created from.
+	* @return UUID of the configuration version.
+	*/
+	virtual std::string GetVersionUUID() = 0;
+
+	/**
+	* IMachineConfiguration::GetNumericVersion - Returns the numeric version of the underlying configuration version.
+	* @return Returns the configuration numeric version.
+	*/
+	virtual LibMCEnv_uint32 GetNumericVersion() = 0;
+
+	/**
+	* IMachineConfiguration::GetXSDUUID - Returns the UUID of the XSD used by this configuration.
+	* @return UUID of the configuration XSD.
+	*/
+	virtual std::string GetXSDUUID() = 0;
+
+	/**
+	* IMachineConfiguration::GetXMLDocument - Returns the current in-memory configuration as an XML document instance for advanced access. The returned document reflects any uncommitted changes.
+	* @return XML Document.
+	*/
+	virtual IXMLDocument * GetXMLDocument() = 0;
+
+	/**
+	* IMachineConfiguration::HasParameter - Returns whether a parameter exists at the given path.
+	* @param[in] sPath - Slash-separated element path beneath the root, e.g. 'PLCConfig/IPAddress'.
+	* @return True if the parameter node and its value attribute exist.
+	*/
+	virtual bool HasParameter(const std::string & sPath) = 0;
+
+	/**
+	* IMachineConfiguration::GetStringParameter - Returns the string value of a parameter. Fails if the parameter does not exist.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @return Parameter value.
+	*/
+	virtual std::string GetStringParameter(const std::string & sPath) = 0;
+
+	/**
+	* IMachineConfiguration::GetIntegerParameter - Returns the integer value of a parameter. Fails if the parameter does not exist or is not an integer in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @return Parameter value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetDoubleParameter - Returns the double value of a parameter. Fails if the parameter does not exist or is not a double in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dMinValue - Minimum allowed value.
+	* @param[in] dMaxValue - Maximum allowed value.
+	* @return Parameter value.
+	*/
+	virtual LibMCEnv_double GetDoubleParameter(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetBoolParameter - Returns the boolean value of a parameter. Fails if the parameter does not exist or is not a boolean.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @return Parameter value.
+	*/
+	virtual bool GetBoolParameter(const std::string & sPath) = 0;
+
+	/**
+	* IMachineConfiguration::GetStringParameterDef - Returns the string value of a parameter. Returns the default value if the parameter does not exist.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] sDefaultValue - Default value.
+	* @return Parameter value.
+	*/
+	virtual std::string GetStringParameterDef(const std::string & sPath, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetIntegerParameterDef - Returns the integer value of a parameter. Returns the default value if the parameter does not exist or is not a valid integer in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @param[in] nDefaultValue - Default value. MUST be in valid range.
+	* @return Parameter value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerParameterDef(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetDoubleParameterDef - Returns the double value of a parameter. Returns the default value if the parameter does not exist or is not a valid double in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dMinValue - Minimum allowed value.
+	* @param[in] dMaxValue - Maximum allowed value.
+	* @param[in] dDefaultValue - Default value. MUST be in valid range.
+	* @return Parameter value.
+	*/
+	virtual LibMCEnv_double GetDoubleParameterDef(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetBoolParameterDef - Returns the boolean value of a parameter. Returns the default value if the parameter does not exist or is not a valid boolean.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] bDefaultValue - Default value.
+	* @return Parameter value.
+	*/
+	virtual bool GetBoolParameterDef(const std::string & sPath, const bool bDefaultValue) = 0;
+
+	/**
+	* IMachineConfiguration::SetStringParameter - Sets the string value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] sValue - Value to set.
+	*/
+	virtual void SetStringParameter(const std::string & sPath, const std::string & sValue) = 0;
+
+	/**
+	* IMachineConfiguration::SetIntegerParameter - Sets the integer value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nValue - Value to set.
+	*/
+	virtual void SetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IMachineConfiguration::SetDoubleParameter - Sets the double value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dValue - Value to set.
+	*/
+	virtual void SetDoubleParameter(const std::string & sPath, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IMachineConfiguration::SetBoolParameter - Sets the boolean value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] bValue - Value to set.
+	*/
+	virtual void SetBoolParameter(const std::string & sPath, const bool bValue) = 0;
+
+	/**
+	* IMachineConfiguration::HasChanges - Returns whether the in-memory working copy has uncommitted changes.
+	* @return True if there are uncommitted changes.
+	*/
+	virtual bool HasChanges() = 0;
+
+	/**
+	* IMachineConfiguration::Commit - Commits the current in-memory state as a new configuration version (child of the version this working copy is based on). Does not change the active version. After committing, the working copy is rebased on the new version.
+	* @param[in] sUserUUID - User UUID for logging who initiated the change.
+	* @return Returns the newly created configuration version.
+	*/
+	virtual IMachineConfigurationVersion * Commit(const std::string & sUserUUID) = 0;
+
+	/**
+	* IMachineConfiguration::CommitAndActivate - Commits the current in-memory state as a new configuration version and sets it as the active version for the type. After committing, the working copy is rebased on the new version.
+	* @param[in] sUserUUID - User UUID for logging who initiated the change.
+	* @return Returns the newly created and now active configuration version.
+	*/
+	virtual IMachineConfigurationVersion * CommitAndActivate(const std::string & sUserUUID) = 0;
+
+};
+
+typedef IBaseSharedPtr<IMachineConfiguration> PIMachineConfiguration;
+
+
+/*************************************************************************************************************************
  Class interface for MachineConfigurationType 
 **************************************************************************************************************************/
 
@@ -7393,6 +7552,27 @@ public:
 	* @param[in] sVersionUUID - UUID of the version to set as active.
 	*/
 	virtual void SetActiveConfigurationVersion(const std::string & sVersionUUID) = 0;
+
+	/**
+	* IMachineConfigurationType::GetActiveConfiguration - Returns an ergonomic, typed working copy of the currently active configuration version. Fails if no version is active.
+	* @return Working copy of the active configuration.
+	*/
+	virtual IMachineConfiguration * GetActiveConfiguration() = 0;
+
+	/**
+	* IMachineConfigurationType::EnsureActiveConfiguration - Returns an ergonomic, typed working copy of the active configuration, activating the latest version first if none is currently active. Fails if no configuration version exists at all.
+	* @return Working copy of the active configuration.
+	*/
+	virtual IMachineConfiguration * EnsureActiveConfiguration() = 0;
+
+	/**
+	* IMachineConfigurationType::EnsureXSDVersion - Registers a new XSD version together with its default configuration, but only if the given version is newer than the latest registered XSD. Returns null if the given version is not newer (no-op). Collapses the common bootstrap pattern of RegisterNewXSD + CreateDefaultConfiguration.
+	* @param[in] sXSDString - XSD String of the version. MUST be a valid schema of this type.
+	* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+	* @param[in] sDefaultXML - Default configuration XML string conforming to the given XSD.
+	* @return The newly registered XSD, or null if the version was not newer than the latest.
+	*/
+	virtual IMachineConfigurationXSD * EnsureXSDVersion(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string & sDefaultXML) = 0;
 
 };
 

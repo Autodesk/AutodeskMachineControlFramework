@@ -139,6 +139,7 @@ class CMachineConfigurationXSD;
 class CMachineConfigurationXSDIterator;
 class CMachineConfigurationVersion;
 class CMachineConfigurationVersionIterator;
+class CMachineConfiguration;
 class CMachineConfigurationType;
 class CMachineConfigurationTypeIterator;
 class CMachineConfigurationHandler;
@@ -232,6 +233,7 @@ typedef CMachineConfigurationXSD CLibMCEnvMachineConfigurationXSD;
 typedef CMachineConfigurationXSDIterator CLibMCEnvMachineConfigurationXSDIterator;
 typedef CMachineConfigurationVersion CLibMCEnvMachineConfigurationVersion;
 typedef CMachineConfigurationVersionIterator CLibMCEnvMachineConfigurationVersionIterator;
+typedef CMachineConfiguration CLibMCEnvMachineConfiguration;
 typedef CMachineConfigurationType CLibMCEnvMachineConfigurationType;
 typedef CMachineConfigurationTypeIterator CLibMCEnvMachineConfigurationTypeIterator;
 typedef CMachineConfigurationHandler CLibMCEnvMachineConfigurationHandler;
@@ -325,6 +327,7 @@ typedef std::shared_ptr<CMachineConfigurationXSD> PMachineConfigurationXSD;
 typedef std::shared_ptr<CMachineConfigurationXSDIterator> PMachineConfigurationXSDIterator;
 typedef std::shared_ptr<CMachineConfigurationVersion> PMachineConfigurationVersion;
 typedef std::shared_ptr<CMachineConfigurationVersionIterator> PMachineConfigurationVersionIterator;
+typedef std::shared_ptr<CMachineConfiguration> PMachineConfiguration;
 typedef std::shared_ptr<CMachineConfigurationType> PMachineConfigurationType;
 typedef std::shared_ptr<CMachineConfigurationTypeIterator> PMachineConfigurationTypeIterator;
 typedef std::shared_ptr<CMachineConfigurationHandler> PMachineConfigurationHandler;
@@ -418,6 +421,7 @@ typedef PMachineConfigurationXSD PLibMCEnvMachineConfigurationXSD;
 typedef PMachineConfigurationXSDIterator PLibMCEnvMachineConfigurationXSDIterator;
 typedef PMachineConfigurationVersion PLibMCEnvMachineConfigurationVersion;
 typedef PMachineConfigurationVersionIterator PLibMCEnvMachineConfigurationVersionIterator;
+typedef PMachineConfiguration PLibMCEnvMachineConfiguration;
 typedef PMachineConfigurationType PLibMCEnvMachineConfigurationType;
 typedef PMachineConfigurationTypeIterator PLibMCEnvMachineConfigurationTypeIterator;
 typedef PMachineConfigurationHandler PLibMCEnvMachineConfigurationHandler;
@@ -1231,6 +1235,7 @@ private:
 	friend class CMachineConfigurationXSDIterator;
 	friend class CMachineConfigurationVersion;
 	friend class CMachineConfigurationVersionIterator;
+	friend class CMachineConfiguration;
 	friend class CMachineConfigurationType;
 	friend class CMachineConfigurationTypeIterator;
 	friend class CMachineConfigurationHandler;
@@ -3428,6 +3433,42 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CMachineConfiguration 
+**************************************************************************************************************************/
+class CMachineConfiguration : public CBase {
+public:
+	
+	/**
+	* CMachineConfiguration::CMachineConfiguration - Constructor for MachineConfiguration class.
+	*/
+	CMachineConfiguration(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetVersionUUID();
+	inline LibMCEnv_uint32 GetNumericVersion();
+	inline std::string GetXSDUUID();
+	inline PXMLDocument GetXMLDocument();
+	inline bool HasParameter(const std::string & sPath);
+	inline std::string GetStringParameter(const std::string & sPath);
+	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
+	inline LibMCEnv_double GetDoubleParameter(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline bool GetBoolParameter(const std::string & sPath);
+	inline std::string GetStringParameterDef(const std::string & sPath, const std::string & sDefaultValue);
+	inline LibMCEnv_int64 GetIntegerParameterDef(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue);
+	inline LibMCEnv_double GetDoubleParameterDef(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue);
+	inline bool GetBoolParameterDef(const std::string & sPath, const bool bDefaultValue);
+	inline void SetStringParameter(const std::string & sPath, const std::string & sValue);
+	inline void SetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nValue);
+	inline void SetDoubleParameter(const std::string & sPath, const LibMCEnv_double dValue);
+	inline void SetBoolParameter(const std::string & sPath, const bool bValue);
+	inline bool HasChanges();
+	inline PMachineConfigurationVersion Commit(const std::string & sUserUUID);
+	inline PMachineConfigurationVersion CommitAndActivate(const std::string & sUserUUID);
+};
+	
+/*************************************************************************************************************************
  Class CMachineConfigurationType 
 **************************************************************************************************************************/
 class CMachineConfigurationType : public CBase {
@@ -3461,6 +3502,9 @@ public:
 	inline PXMLDocument GetActiveConfigurationXML();
 	inline PXMLDocument GetLatestConfigurationXML();
 	inline void SetActiveConfigurationVersion(const std::string & sVersionUUID);
+	inline PMachineConfiguration GetActiveConfiguration();
+	inline PMachineConfiguration EnsureActiveConfiguration();
+	inline PMachineConfigurationXSD EnsureXSDVersion(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string & sDefaultXML);
 };
 	
 /*************************************************************************************************************************
@@ -4729,6 +4773,26 @@ public:
 		pWrapperTable->m_MachineConfigurationVersion_CreateNewVersion = nullptr;
 		pWrapperTable->m_MachineConfigurationVersion_MigrateToNewXSD = nullptr;
 		pWrapperTable->m_MachineConfigurationVersionIterator_GetCurrent = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetVersionUUID = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetNumericVersion = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetXSDUUID = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetXMLDocument = nullptr;
+		pWrapperTable->m_MachineConfiguration_HasParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetStringParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetBoolParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetStringParameterDef = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetBoolParameterDef = nullptr;
+		pWrapperTable->m_MachineConfiguration_SetStringParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_SetIntegerParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_SetDoubleParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_SetBoolParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_HasChanges = nullptr;
+		pWrapperTable->m_MachineConfiguration_Commit = nullptr;
+		pWrapperTable->m_MachineConfiguration_CommitAndActivate = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetUUID = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetName = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetSchemaType = nullptr;
@@ -4749,6 +4813,9 @@ public:
 		pWrapperTable->m_MachineConfigurationType_GetActiveConfigurationXML = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationXML = nullptr;
 		pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion = nullptr;
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration = nullptr;
+		pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration = nullptr;
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion = nullptr;
 		pWrapperTable->m_MachineConfigurationTypeIterator_GetCurrent = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_RegisterMachineConfigurationType = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_HasMachineConfigurationType = nullptr;
@@ -12790,6 +12857,186 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetVersionUUID = (PLibMCEnvMachineConfiguration_GetVersionUUIDPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getversionuuid");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetVersionUUID = (PLibMCEnvMachineConfiguration_GetVersionUUIDPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getversionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetVersionUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetNumericVersion = (PLibMCEnvMachineConfiguration_GetNumericVersionPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getnumericversion");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetNumericVersion = (PLibMCEnvMachineConfiguration_GetNumericVersionPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getnumericversion");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetNumericVersion == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetXSDUUID = (PLibMCEnvMachineConfiguration_GetXSDUUIDPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getxsduuid");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetXSDUUID = (PLibMCEnvMachineConfiguration_GetXSDUUIDPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getxsduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetXSDUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetXMLDocument = (PLibMCEnvMachineConfiguration_GetXMLDocumentPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getxmldocument");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetXMLDocument = (PLibMCEnvMachineConfiguration_GetXMLDocumentPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getxmldocument");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetXMLDocument == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_HasParameter = (PLibMCEnvMachineConfiguration_HasParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_hasparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_HasParameter = (PLibMCEnvMachineConfiguration_HasParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_hasparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_HasParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetStringParameter = (PLibMCEnvMachineConfiguration_GetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetStringParameter = (PLibMCEnvMachineConfiguration_GetStringParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameter = (PLibMCEnvMachineConfiguration_GetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameter = (PLibMCEnvMachineConfiguration_GetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameter = (PLibMCEnvMachineConfiguration_GetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameter = (PLibMCEnvMachineConfiguration_GetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetBoolParameter = (PLibMCEnvMachineConfiguration_GetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetBoolParameter = (PLibMCEnvMachineConfiguration_GetBoolParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetStringParameterDef = (PLibMCEnvMachineConfiguration_GetStringParameterDefPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getstringparameterdef");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetStringParameterDef = (PLibMCEnvMachineConfiguration_GetStringParameterDefPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getstringparameterdef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetStringParameterDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef = (PLibMCEnvMachineConfiguration_GetIntegerParameterDefPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getintegerparameterdef");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef = (PLibMCEnvMachineConfiguration_GetIntegerParameterDefPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getintegerparameterdef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef = (PLibMCEnvMachineConfiguration_GetDoubleParameterDefPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getdoubleparameterdef");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef = (PLibMCEnvMachineConfiguration_GetDoubleParameterDefPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getdoubleparameterdef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetBoolParameterDef = (PLibMCEnvMachineConfiguration_GetBoolParameterDefPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getboolparameterdef");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetBoolParameterDef = (PLibMCEnvMachineConfiguration_GetBoolParameterDefPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getboolparameterdef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetBoolParameterDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_SetStringParameter = (PLibMCEnvMachineConfiguration_SetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_setstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_SetStringParameter = (PLibMCEnvMachineConfiguration_SetStringParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_setstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_SetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_SetIntegerParameter = (PLibMCEnvMachineConfiguration_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_SetIntegerParameter = (PLibMCEnvMachineConfiguration_SetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_SetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_SetDoubleParameter = (PLibMCEnvMachineConfiguration_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_SetDoubleParameter = (PLibMCEnvMachineConfiguration_SetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_SetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_SetBoolParameter = (PLibMCEnvMachineConfiguration_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_SetBoolParameter = (PLibMCEnvMachineConfiguration_SetBoolParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_SetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_HasChanges = (PLibMCEnvMachineConfiguration_HasChangesPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_haschanges");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_HasChanges = (PLibMCEnvMachineConfiguration_HasChangesPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_haschanges");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_HasChanges == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_Commit = (PLibMCEnvMachineConfiguration_CommitPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_commit");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_Commit = (PLibMCEnvMachineConfiguration_CommitPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_commit");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_Commit == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_CommitAndActivate = (PLibMCEnvMachineConfiguration_CommitAndActivatePtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_commitandactivate");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_CommitAndActivate = (PLibMCEnvMachineConfiguration_CommitAndActivatePtr) dlsym(hLibrary, "libmcenv_machineconfiguration_commitandactivate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_CommitAndActivate == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_MachineConfigurationType_GetUUID = (PLibMCEnvMachineConfigurationType_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_getuuid");
 		#else // _WIN32
 		pWrapperTable->m_MachineConfigurationType_GetUUID = (PLibMCEnvMachineConfigurationType_GetUUIDPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_getuuid");
@@ -12967,6 +13214,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration = (PLibMCEnvMachineConfigurationType_GetActiveConfigurationPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_getactiveconfiguration");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration = (PLibMCEnvMachineConfigurationType_GetActiveConfigurationPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_getactiveconfiguration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration = (PLibMCEnvMachineConfigurationType_EnsureActiveConfigurationPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_ensureactiveconfiguration");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration = (PLibMCEnvMachineConfigurationType_EnsureActiveConfigurationPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_ensureactiveconfiguration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion = (PLibMCEnvMachineConfigurationType_EnsureXSDVersionPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_ensurexsdversion");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion = (PLibMCEnvMachineConfigurationType_EnsureXSDVersionPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_ensurexsdversion");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -18367,6 +18641,86 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationVersionIterator_GetCurrent == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getversionuuid", (void**)&(pWrapperTable->m_MachineConfiguration_GetVersionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetVersionUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getnumericversion", (void**)&(pWrapperTable->m_MachineConfiguration_GetNumericVersion));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetNumericVersion == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getxsduuid", (void**)&(pWrapperTable->m_MachineConfiguration_GetXSDUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetXSDUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getxmldocument", (void**)&(pWrapperTable->m_MachineConfiguration_GetXMLDocument));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetXMLDocument == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_hasparameter", (void**)&(pWrapperTable->m_MachineConfiguration_HasParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_HasParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getstringparameter", (void**)&(pWrapperTable->m_MachineConfiguration_GetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getintegerparameter", (void**)&(pWrapperTable->m_MachineConfiguration_GetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getdoubleparameter", (void**)&(pWrapperTable->m_MachineConfiguration_GetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getboolparameter", (void**)&(pWrapperTable->m_MachineConfiguration_GetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getstringparameterdef", (void**)&(pWrapperTable->m_MachineConfiguration_GetStringParameterDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetStringParameterDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getintegerparameterdef", (void**)&(pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getdoubleparameterdef", (void**)&(pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getboolparameterdef", (void**)&(pWrapperTable->m_MachineConfiguration_GetBoolParameterDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetBoolParameterDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_setstringparameter", (void**)&(pWrapperTable->m_MachineConfiguration_SetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_SetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_setintegerparameter", (void**)&(pWrapperTable->m_MachineConfiguration_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_SetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_setdoubleparameter", (void**)&(pWrapperTable->m_MachineConfiguration_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_SetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_setboolparameter", (void**)&(pWrapperTable->m_MachineConfiguration_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_haschanges", (void**)&(pWrapperTable->m_MachineConfiguration_HasChanges));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_HasChanges == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_commit", (void**)&(pWrapperTable->m_MachineConfiguration_Commit));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_Commit == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_commitandactivate", (void**)&(pWrapperTable->m_MachineConfiguration_CommitAndActivate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_CommitAndActivate == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_getuuid", (void**)&(pWrapperTable->m_MachineConfigurationType_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_GetUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -18445,6 +18799,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_setactiveconfigurationversion", (void**)&(pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_getactiveconfiguration", (void**)&(pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_ensureactiveconfiguration", (void**)&(pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_ensurexsdversion", (void**)&(pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtypeiterator_getcurrent", (void**)&(pWrapperTable->m_MachineConfigurationTypeIterator_GetCurrent));
@@ -31180,6 +31546,286 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CMachineConfiguration
+	 */
+	
+	/**
+	* CMachineConfiguration::GetVersionUUID - Returns the UUID of the underlying configuration version this working copy was created from.
+	* @return UUID of the configuration version.
+	*/
+	std::string CMachineConfiguration::GetVersionUUID()
+	{
+		LibMCEnv_uint32 bytesNeededVersionUUID = 0;
+		LibMCEnv_uint32 bytesWrittenVersionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetVersionUUID(m_pHandle, 0, &bytesNeededVersionUUID, nullptr));
+		std::vector<char> bufferVersionUUID(bytesNeededVersionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetVersionUUID(m_pHandle, bytesNeededVersionUUID, &bytesWrittenVersionUUID, &bufferVersionUUID[0]));
+		
+		return std::string(&bufferVersionUUID[0]);
+	}
+	
+	/**
+	* CMachineConfiguration::GetNumericVersion - Returns the numeric version of the underlying configuration version.
+	* @return Returns the configuration numeric version.
+	*/
+	LibMCEnv_uint32 CMachineConfiguration::GetNumericVersion()
+	{
+		LibMCEnv_uint32 resultConfigurationNumericVersion = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetNumericVersion(m_pHandle, &resultConfigurationNumericVersion));
+		
+		return resultConfigurationNumericVersion;
+	}
+	
+	/**
+	* CMachineConfiguration::GetXSDUUID - Returns the UUID of the XSD used by this configuration.
+	* @return UUID of the configuration XSD.
+	*/
+	std::string CMachineConfiguration::GetXSDUUID()
+	{
+		LibMCEnv_uint32 bytesNeededXSDUUID = 0;
+		LibMCEnv_uint32 bytesWrittenXSDUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetXSDUUID(m_pHandle, 0, &bytesNeededXSDUUID, nullptr));
+		std::vector<char> bufferXSDUUID(bytesNeededXSDUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetXSDUUID(m_pHandle, bytesNeededXSDUUID, &bytesWrittenXSDUUID, &bufferXSDUUID[0]));
+		
+		return std::string(&bufferXSDUUID[0]);
+	}
+	
+	/**
+	* CMachineConfiguration::GetXMLDocument - Returns the current in-memory configuration as an XML document instance for advanced access. The returned document reflects any uncommitted changes.
+	* @return XML Document.
+	*/
+	PXMLDocument CMachineConfiguration::GetXMLDocument()
+	{
+		LibMCEnvHandle hXMLInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetXMLDocument(m_pHandle, &hXMLInstance));
+		
+		if (!hXMLInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLInstance);
+	}
+	
+	/**
+	* CMachineConfiguration::HasParameter - Returns whether a parameter exists at the given path.
+	* @param[in] sPath - Slash-separated element path beneath the root, e.g. 'PLCConfig/IPAddress'.
+	* @return True if the parameter node and its value attribute exist.
+	*/
+	bool CMachineConfiguration::HasParameter(const std::string & sPath)
+	{
+		bool resultParameterExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_HasParameter(m_pHandle, sPath.c_str(), &resultParameterExists));
+		
+		return resultParameterExists;
+	}
+	
+	/**
+	* CMachineConfiguration::GetStringParameter - Returns the string value of a parameter. Fails if the parameter does not exist.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @return Parameter value.
+	*/
+	std::string CMachineConfiguration::GetStringParameter(const std::string & sPath)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetStringParameter(m_pHandle, sPath.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetStringParameter(m_pHandle, sPath.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CMachineConfiguration::GetIntegerParameter - Returns the integer value of a parameter. Fails if the parameter does not exist or is not an integer in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @return Parameter value.
+	*/
+	LibMCEnv_int64 CMachineConfiguration::GetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetIntegerParameter(m_pHandle, sPath.c_str(), nMinValue, nMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetDoubleParameter - Returns the double value of a parameter. Fails if the parameter does not exist or is not a double in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dMinValue - Minimum allowed value.
+	* @param[in] dMaxValue - Maximum allowed value.
+	* @return Parameter value.
+	*/
+	LibMCEnv_double CMachineConfiguration::GetDoubleParameter(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetDoubleParameter(m_pHandle, sPath.c_str(), dMinValue, dMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetBoolParameter - Returns the boolean value of a parameter. Fails if the parameter does not exist or is not a boolean.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @return Parameter value.
+	*/
+	bool CMachineConfiguration::GetBoolParameter(const std::string & sPath)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetBoolParameter(m_pHandle, sPath.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetStringParameterDef - Returns the string value of a parameter. Returns the default value if the parameter does not exist.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] sDefaultValue - Default value.
+	* @return Parameter value.
+	*/
+	std::string CMachineConfiguration::GetStringParameterDef(const std::string & sPath, const std::string & sDefaultValue)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetStringParameterDef(m_pHandle, sPath.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetStringParameterDef(m_pHandle, sPath.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CMachineConfiguration::GetIntegerParameterDef - Returns the integer value of a parameter. Returns the default value if the parameter does not exist or is not a valid integer in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @param[in] nDefaultValue - Default value. MUST be in valid range.
+	* @return Parameter value.
+	*/
+	LibMCEnv_int64 CMachineConfiguration::GetIntegerParameterDef(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetIntegerParameterDef(m_pHandle, sPath.c_str(), nMinValue, nMaxValue, nDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetDoubleParameterDef - Returns the double value of a parameter. Returns the default value if the parameter does not exist or is not a valid double in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dMinValue - Minimum allowed value.
+	* @param[in] dMaxValue - Maximum allowed value.
+	* @param[in] dDefaultValue - Default value. MUST be in valid range.
+	* @return Parameter value.
+	*/
+	LibMCEnv_double CMachineConfiguration::GetDoubleParameterDef(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetDoubleParameterDef(m_pHandle, sPath.c_str(), dMinValue, dMaxValue, dDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetBoolParameterDef - Returns the boolean value of a parameter. Returns the default value if the parameter does not exist or is not a valid boolean.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] bDefaultValue - Default value.
+	* @return Parameter value.
+	*/
+	bool CMachineConfiguration::GetBoolParameterDef(const std::string & sPath, const bool bDefaultValue)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetBoolParameterDef(m_pHandle, sPath.c_str(), bDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::SetStringParameter - Sets the string value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] sValue - Value to set.
+	*/
+	void CMachineConfiguration::SetStringParameter(const std::string & sPath, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_SetStringParameter(m_pHandle, sPath.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CMachineConfiguration::SetIntegerParameter - Sets the integer value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nValue - Value to set.
+	*/
+	void CMachineConfiguration::SetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_SetIntegerParameter(m_pHandle, sPath.c_str(), nValue));
+	}
+	
+	/**
+	* CMachineConfiguration::SetDoubleParameter - Sets the double value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dValue - Value to set.
+	*/
+	void CMachineConfiguration::SetDoubleParameter(const std::string & sPath, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_SetDoubleParameter(m_pHandle, sPath.c_str(), dValue));
+	}
+	
+	/**
+	* CMachineConfiguration::SetBoolParameter - Sets the boolean value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] bValue - Value to set.
+	*/
+	void CMachineConfiguration::SetBoolParameter(const std::string & sPath, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_SetBoolParameter(m_pHandle, sPath.c_str(), bValue));
+	}
+	
+	/**
+	* CMachineConfiguration::HasChanges - Returns whether the in-memory working copy has uncommitted changes.
+	* @return True if there are uncommitted changes.
+	*/
+	bool CMachineConfiguration::HasChanges()
+	{
+		bool resultHasUncommittedChanges = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_HasChanges(m_pHandle, &resultHasUncommittedChanges));
+		
+		return resultHasUncommittedChanges;
+	}
+	
+	/**
+	* CMachineConfiguration::Commit - Commits the current in-memory state as a new configuration version (child of the version this working copy is based on). Does not change the active version. After committing, the working copy is rebased on the new version.
+	* @param[in] sUserUUID - User UUID for logging who initiated the change.
+	* @return Returns the newly created configuration version.
+	*/
+	PMachineConfigurationVersion CMachineConfiguration::Commit(const std::string & sUserUUID)
+	{
+		LibMCEnvHandle hVersionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_Commit(m_pHandle, sUserUUID.c_str(), &hVersionInstance));
+		
+		if (!hVersionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfigurationVersion>(m_pWrapper, hVersionInstance);
+	}
+	
+	/**
+	* CMachineConfiguration::CommitAndActivate - Commits the current in-memory state as a new configuration version and sets it as the active version for the type. After committing, the working copy is rebased on the new version.
+	* @param[in] sUserUUID - User UUID for logging who initiated the change.
+	* @return Returns the newly created and now active configuration version.
+	*/
+	PMachineConfigurationVersion CMachineConfiguration::CommitAndActivate(const std::string & sUserUUID)
+	{
+		LibMCEnvHandle hVersionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_CommitAndActivate(m_pHandle, sUserUUID.c_str(), &hVersionInstance));
+		
+		if (!hVersionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfigurationVersion>(m_pWrapper, hVersionInstance);
+	}
+	
+	/**
 	 * Method definitions for class CMachineConfigurationType
 	 */
 	
@@ -31489,6 +32135,55 @@ public:
 	void CMachineConfigurationType::SetActiveConfigurationVersion(const std::string & sVersionUUID)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_SetActiveConfigurationVersion(m_pHandle, sVersionUUID.c_str()));
+	}
+	
+	/**
+	* CMachineConfigurationType::GetActiveConfiguration - Returns an ergonomic, typed working copy of the currently active configuration version. Fails if no version is active.
+	* @return Working copy of the active configuration.
+	*/
+	PMachineConfiguration CMachineConfigurationType::GetActiveConfiguration()
+	{
+		LibMCEnvHandle hConfigurationInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_GetActiveConfiguration(m_pHandle, &hConfigurationInstance));
+		
+		if (!hConfigurationInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfiguration>(m_pWrapper, hConfigurationInstance);
+	}
+	
+	/**
+	* CMachineConfigurationType::EnsureActiveConfiguration - Returns an ergonomic, typed working copy of the active configuration, activating the latest version first if none is currently active. Fails if no configuration version exists at all.
+	* @return Working copy of the active configuration.
+	*/
+	PMachineConfiguration CMachineConfigurationType::EnsureActiveConfiguration()
+	{
+		LibMCEnvHandle hConfigurationInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_EnsureActiveConfiguration(m_pHandle, &hConfigurationInstance));
+		
+		if (!hConfigurationInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfiguration>(m_pWrapper, hConfigurationInstance);
+	}
+	
+	/**
+	* CMachineConfigurationType::EnsureXSDVersion - Registers a new XSD version together with its default configuration, but only if the given version is newer than the latest registered XSD. Returns null if the given version is not newer (no-op). Collapses the common bootstrap pattern of RegisterNewXSD + CreateDefaultConfiguration.
+	* @param[in] sXSDString - XSD String of the version. MUST be a valid schema of this type.
+	* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+	* @param[in] sDefaultXML - Default configuration XML string conforming to the given XSD.
+	* @return The newly registered XSD, or null if the version was not newer than the latest.
+	*/
+	PMachineConfigurationXSD CMachineConfigurationType::EnsureXSDVersion(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string & sDefaultXML)
+	{
+		LibMCEnvHandle hXSDInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_EnsureXSDVersion(m_pHandle, sXSDString.c_str(), nXSDVersion, sDefaultXML.c_str(), &hXSDInstance));
+		
+		if (hXSDInstance) {
+			return std::make_shared<CMachineConfigurationXSD>(m_pWrapper, hXSDInstance);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**

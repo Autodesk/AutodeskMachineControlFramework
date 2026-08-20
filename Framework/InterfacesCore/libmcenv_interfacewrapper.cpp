@@ -27985,6 +27985,667 @@ LibMCEnvResult libmcenv_machineconfigurationversioniterator_getcurrent(LibMCEnv_
 
 
 /*************************************************************************************************************************
+ Class implementation for MachineConfiguration
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_machineconfiguration_getversionuuid(LibMCEnv_MachineConfiguration pMachineConfiguration, const LibMCEnv_uint32 nVersionUUIDBufferSize, LibMCEnv_uint32* pVersionUUIDNeededChars, char * pVersionUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if ( (!pVersionUUIDBuffer) && !(pVersionUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sVersionUUID("");
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pVersionUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sVersionUUID = pIMachineConfiguration->GetVersionUUID();
+
+			pIMachineConfiguration->_setCache (new ParameterCache_1<std::string> (sVersionUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMachineConfiguration->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sVersionUUID);
+			pIMachineConfiguration->_setCache (nullptr);
+		}
+		
+		if (pVersionUUIDNeededChars)
+			*pVersionUUIDNeededChars = (LibMCEnv_uint32) (sVersionUUID.size()+1);
+		if (pVersionUUIDBuffer) {
+			if (sVersionUUID.size() >= nVersionUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iVersionUUID = 0; iVersionUUID < sVersionUUID.size(); iVersionUUID++)
+				pVersionUUIDBuffer[iVersionUUID] = sVersionUUID[iVersionUUID];
+			pVersionUUIDBuffer[sVersionUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getnumericversion(LibMCEnv_MachineConfiguration pMachineConfiguration, LibMCEnv_uint32 * pConfigurationNumericVersion)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pConfigurationNumericVersion == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pConfigurationNumericVersion = pIMachineConfiguration->GetNumericVersion();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getxsduuid(LibMCEnv_MachineConfiguration pMachineConfiguration, const LibMCEnv_uint32 nXSDUUIDBufferSize, LibMCEnv_uint32* pXSDUUIDNeededChars, char * pXSDUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if ( (!pXSDUUIDBuffer) && !(pXSDUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sXSDUUID("");
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pXSDUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sXSDUUID = pIMachineConfiguration->GetXSDUUID();
+
+			pIMachineConfiguration->_setCache (new ParameterCache_1<std::string> (sXSDUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMachineConfiguration->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sXSDUUID);
+			pIMachineConfiguration->_setCache (nullptr);
+		}
+		
+		if (pXSDUUIDNeededChars)
+			*pXSDUUIDNeededChars = (LibMCEnv_uint32) (sXSDUUID.size()+1);
+		if (pXSDUUIDBuffer) {
+			if (sXSDUUID.size() >= nXSDUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iXSDUUID = 0; iXSDUUID < sXSDUUID.size(); iXSDUUID++)
+				pXSDUUIDBuffer[iXSDUUID] = sXSDUUID[iXSDUUID];
+			pXSDUUIDBuffer[sXSDUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getxmldocument(LibMCEnv_MachineConfiguration pMachineConfiguration, LibMCEnv_XMLDocument * pXMLInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pXMLInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseXMLInstance(nullptr);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseXMLInstance = pIMachineConfiguration->GetXMLDocument();
+
+		*pXMLInstance = (IBase*)(pBaseXMLInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_hasparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool * pParameterExists)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pParameterExists == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pParameterExists = pIMachineConfiguration->HasParameter(sPath);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getstringparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pValueBuffer) && !(pValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		std::string sValue("");
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pValueBuffer == nullptr);
+		if (isCacheCall) {
+			sValue = pIMachineConfiguration->GetStringParameter(sPath);
+
+			pIMachineConfiguration->_setCache (new ParameterCache_1<std::string> (sValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMachineConfiguration->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sValue);
+			pIMachineConfiguration->_setCache (nullptr);
+		}
+		
+		if (pValueNeededChars)
+			*pValueNeededChars = (LibMCEnv_uint32) (sValue.size()+1);
+		if (pValueBuffer) {
+			if (sValue.size() >= nValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
+				pValueBuffer[iValue] = sValue[iValue];
+			pValueBuffer[sValue.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getintegerparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIMachineConfiguration->GetIntegerParameter(sPath, nMinValue, nMaxValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getdoubleparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIMachineConfiguration->GetDoubleParameter(sPath, dMinValue, dMaxValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getboolparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIMachineConfiguration->GetBoolParameter(sPath);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getstringparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDefaultValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pValueBuffer) && !(pValueNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		std::string sDefaultValue(pDefaultValue);
+		std::string sValue("");
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pValueBuffer == nullptr);
+		if (isCacheCall) {
+			sValue = pIMachineConfiguration->GetStringParameterDef(sPath, sDefaultValue);
+
+			pIMachineConfiguration->_setCache (new ParameterCache_1<std::string> (sValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMachineConfiguration->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sValue);
+			pIMachineConfiguration->_setCache (nullptr);
+		}
+		
+		if (pValueNeededChars)
+			*pValueNeededChars = (LibMCEnv_uint32) (sValue.size()+1);
+		if (pValueBuffer) {
+			if (sValue.size() >= nValueBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
+				pValueBuffer[iValue] = sValue[iValue];
+			pValueBuffer[sValue.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getintegerparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIMachineConfiguration->GetIntegerParameterDef(sPath, nMinValue, nMaxValue, nDefaultValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getdoubleparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIMachineConfiguration->GetDoubleParameterDef(sPath, dMinValue, dMaxValue, dDefaultValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_getboolparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool bDefaultValue, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIMachineConfiguration->GetBoolParameterDef(sPath, bDefaultValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_setstringparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		std::string sValue(pValue);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMachineConfiguration->SetStringParameter(sPath, sValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_setintegerparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMachineConfiguration->SetIntegerParameter(sPath, nValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_setdoubleparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMachineConfiguration->SetDoubleParameter(sPath, dValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_setboolparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pPath == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sPath(pPath);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIMachineConfiguration->SetBoolParameter(sPath, bValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_haschanges(LibMCEnv_MachineConfiguration pMachineConfiguration, bool * pHasUncommittedChanges)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pHasUncommittedChanges == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasUncommittedChanges = pIMachineConfiguration->HasChanges();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_commit(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pUserUUID, LibMCEnv_MachineConfigurationVersion * pVersionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pUserUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pVersionInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUserUUID(pUserUUID);
+		IBase* pBaseVersionInstance(nullptr);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVersionInstance = pIMachineConfiguration->Commit(sUserUUID);
+
+		*pVersionInstance = (IBase*)(pBaseVersionInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfiguration_commitandactivate(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pUserUUID, LibMCEnv_MachineConfigurationVersion * pVersionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfiguration;
+
+	try {
+		if (pUserUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pVersionInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUserUUID(pUserUUID);
+		IBase* pBaseVersionInstance(nullptr);
+		IMachineConfiguration* pIMachineConfiguration = dynamic_cast<IMachineConfiguration*>(pIBaseClass);
+		if (!pIMachineConfiguration)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVersionInstance = pIMachineConfiguration->CommitAndActivate(sUserUUID);
+
+		*pVersionInstance = (IBase*)(pBaseVersionInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for MachineConfigurationType
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_machineconfigurationtype_getuuid(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const LibMCEnv_uint32 nTypeUUIDBufferSize, LibMCEnv_uint32* pTypeUUIDNeededChars, char * pTypeUUIDBuffer)
@@ -28638,6 +29299,96 @@ LibMCEnvResult libmcenv_machineconfigurationtype_setactiveconfigurationversion(L
 		
 		pIMachineConfigurationType->SetActiveConfigurationVersion(sVersionUUID);
 
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfigurationtype_getactiveconfiguration(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_MachineConfiguration * pConfigurationInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfigurationType;
+
+	try {
+		if (pConfigurationInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseConfigurationInstance(nullptr);
+		IMachineConfigurationType* pIMachineConfigurationType = dynamic_cast<IMachineConfigurationType*>(pIBaseClass);
+		if (!pIMachineConfigurationType)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseConfigurationInstance = pIMachineConfigurationType->GetActiveConfiguration();
+
+		*pConfigurationInstance = (IBase*)(pBaseConfigurationInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfigurationtype_ensureactiveconfiguration(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_MachineConfiguration * pConfigurationInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfigurationType;
+
+	try {
+		if (pConfigurationInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseConfigurationInstance(nullptr);
+		IMachineConfigurationType* pIMachineConfigurationType = dynamic_cast<IMachineConfigurationType*>(pIBaseClass);
+		if (!pIMachineConfigurationType)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseConfigurationInstance = pIMachineConfigurationType->EnsureActiveConfiguration();
+
+		*pConfigurationInstance = (IBase*)(pBaseConfigurationInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfigurationtype_ensurexsdversion(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDString, LibMCEnv_uint32 nXSDVersion, const char * pDefaultXML, LibMCEnv_MachineConfigurationXSD * pXSDInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfigurationType;
+
+	try {
+		if (pXSDString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDefaultXML == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pXSDInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sXSDString(pXSDString);
+		std::string sDefaultXML(pDefaultXML);
+		IBase* pBaseXSDInstance(nullptr);
+		IMachineConfigurationType* pIMachineConfigurationType = dynamic_cast<IMachineConfigurationType*>(pIBaseClass);
+		if (!pIMachineConfigurationType)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseXSDInstance = pIMachineConfigurationType->EnsureXSDVersion(sXSDString, nXSDVersion, sDefaultXML);
+
+		*pXSDInstance = (IBase*)(pBaseXSDInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -37298,6 +38049,46 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationversion_migratetonewxsd;
 	if (sProcName == "libmcenv_machineconfigurationversioniterator_getcurrent") 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationversioniterator_getcurrent;
+	if (sProcName == "libmcenv_machineconfiguration_getversionuuid") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getversionuuid;
+	if (sProcName == "libmcenv_machineconfiguration_getnumericversion") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getnumericversion;
+	if (sProcName == "libmcenv_machineconfiguration_getxsduuid") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getxsduuid;
+	if (sProcName == "libmcenv_machineconfiguration_getxmldocument") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getxmldocument;
+	if (sProcName == "libmcenv_machineconfiguration_hasparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_hasparameter;
+	if (sProcName == "libmcenv_machineconfiguration_getstringparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getstringparameter;
+	if (sProcName == "libmcenv_machineconfiguration_getintegerparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getintegerparameter;
+	if (sProcName == "libmcenv_machineconfiguration_getdoubleparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getdoubleparameter;
+	if (sProcName == "libmcenv_machineconfiguration_getboolparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getboolparameter;
+	if (sProcName == "libmcenv_machineconfiguration_getstringparameterdef") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getstringparameterdef;
+	if (sProcName == "libmcenv_machineconfiguration_getintegerparameterdef") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getintegerparameterdef;
+	if (sProcName == "libmcenv_machineconfiguration_getdoubleparameterdef") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getdoubleparameterdef;
+	if (sProcName == "libmcenv_machineconfiguration_getboolparameterdef") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_getboolparameterdef;
+	if (sProcName == "libmcenv_machineconfiguration_setstringparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_setstringparameter;
+	if (sProcName == "libmcenv_machineconfiguration_setintegerparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_setintegerparameter;
+	if (sProcName == "libmcenv_machineconfiguration_setdoubleparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_setdoubleparameter;
+	if (sProcName == "libmcenv_machineconfiguration_setboolparameter") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_setboolparameter;
+	if (sProcName == "libmcenv_machineconfiguration_haschanges") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_haschanges;
+	if (sProcName == "libmcenv_machineconfiguration_commit") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_commit;
+	if (sProcName == "libmcenv_machineconfiguration_commitandactivate") 
+		*ppProcAddress = (void*) &libmcenv_machineconfiguration_commitandactivate;
 	if (sProcName == "libmcenv_machineconfigurationtype_getuuid") 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_getuuid;
 	if (sProcName == "libmcenv_machineconfigurationtype_getname") 
@@ -37338,6 +38129,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_getlatestconfigurationxml;
 	if (sProcName == "libmcenv_machineconfigurationtype_setactiveconfigurationversion") 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_setactiveconfigurationversion;
+	if (sProcName == "libmcenv_machineconfigurationtype_getactiveconfiguration") 
+		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_getactiveconfiguration;
+	if (sProcName == "libmcenv_machineconfigurationtype_ensureactiveconfiguration") 
+		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_ensureactiveconfiguration;
+	if (sProcName == "libmcenv_machineconfigurationtype_ensurexsdversion") 
+		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_ensurexsdversion;
 	if (sProcName == "libmcenv_machineconfigurationtypeiterator_getcurrent") 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationtypeiterator_getcurrent;
 	if (sProcName == "libmcenv_machineconfigurationhandler_registermachineconfigurationtype") 

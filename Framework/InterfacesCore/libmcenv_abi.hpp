@@ -9331,6 +9331,225 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_migrateton
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversioniterator_getcurrent(LibMCEnv_MachineConfigurationVersionIterator pMachineConfigurationVersionIterator, LibMCEnv_MachineConfigurationVersion * pInstance);
 
 /*************************************************************************************************************************
+ Class definition for MachineConfiguration
+**************************************************************************************************************************/
+
+/**
+* Returns the UUID of the underlying configuration version this working copy was created from.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] nVersionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pVersionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pVersionUUIDBuffer -  buffer of UUID of the configuration version., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getversionuuid(LibMCEnv_MachineConfiguration pMachineConfiguration, const LibMCEnv_uint32 nVersionUUIDBufferSize, LibMCEnv_uint32* pVersionUUIDNeededChars, char * pVersionUUIDBuffer);
+
+/**
+* Returns the numeric version of the underlying configuration version.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[out] pConfigurationNumericVersion - Returns the configuration numeric version.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getnumericversion(LibMCEnv_MachineConfiguration pMachineConfiguration, LibMCEnv_uint32 * pConfigurationNumericVersion);
+
+/**
+* Returns the UUID of the XSD used by this configuration.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] nXSDUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pXSDUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pXSDUUIDBuffer -  buffer of UUID of the configuration XSD., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getxsduuid(LibMCEnv_MachineConfiguration pMachineConfiguration, const LibMCEnv_uint32 nXSDUUIDBufferSize, LibMCEnv_uint32* pXSDUUIDNeededChars, char * pXSDUUIDBuffer);
+
+/**
+* Returns the current in-memory configuration as an XML document instance for advanced access. The returned document reflects any uncommitted changes.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[out] pXMLInstance - XML Document.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getxmldocument(LibMCEnv_MachineConfiguration pMachineConfiguration, LibMCEnv_XMLDocument * pXMLInstance);
+
+/**
+* Returns whether a parameter exists at the given path.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root, e.g. 'PLCConfig/IPAddress'.
+* @param[out] pParameterExists - True if the parameter node and its value attribute exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_hasparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool * pParameterExists);
+
+/**
+* Returns the string value of a parameter. Fails if the parameter does not exist.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Parameter value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getstringparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns the integer value of a parameter. Fails if the parameter does not exist or is not an integer in range.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] nMinValue - Minimum allowed value.
+* @param[in] nMaxValue - Maximum allowed value.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getintegerparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 * pValue);
+
+/**
+* Returns the double value of a parameter. Fails if the parameter does not exist or is not a double in range.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] dMinValue - Minimum allowed value.
+* @param[in] dMaxValue - Maximum allowed value.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getdoubleparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue);
+
+/**
+* Returns the boolean value of a parameter. Fails if the parameter does not exist or is not a boolean.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getboolparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool * pValue);
+
+/**
+* Returns the string value of a parameter. Returns the default value if the parameter does not exist.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] pDefaultValue - Default value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Parameter value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getstringparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns the integer value of a parameter. Returns the default value if the parameter does not exist or is not a valid integer in range.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] nMinValue - Minimum allowed value.
+* @param[in] nMaxValue - Maximum allowed value.
+* @param[in] nDefaultValue - Default value. MUST be in valid range.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getintegerparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue);
+
+/**
+* Returns the double value of a parameter. Returns the default value if the parameter does not exist or is not a valid double in range.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] dMinValue - Minimum allowed value.
+* @param[in] dMaxValue - Maximum allowed value.
+* @param[in] dDefaultValue - Default value. MUST be in valid range.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getdoubleparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
+
+/**
+* Returns the boolean value of a parameter. Returns the default value if the parameter does not exist or is not a valid boolean.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] bDefaultValue - Default value.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getboolparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool bDefaultValue, bool * pValue);
+
+/**
+* Sets the string value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] pValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_setstringparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const char * pValue);
+
+/**
+* Sets the integer value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] nValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_setintegerparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nValue);
+
+/**
+* Sets the double value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] dValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_setdoubleparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dValue);
+
+/**
+* Sets the boolean value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] bValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_setboolparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool bValue);
+
+/**
+* Returns whether the in-memory working copy has uncommitted changes.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[out] pHasUncommittedChanges - True if there are uncommitted changes.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_haschanges(LibMCEnv_MachineConfiguration pMachineConfiguration, bool * pHasUncommittedChanges);
+
+/**
+* Commits the current in-memory state as a new configuration version (child of the version this working copy is based on). Does not change the active version. After committing, the working copy is rebased on the new version.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pUserUUID - User UUID for logging who initiated the change.
+* @param[out] pVersionInstance - Returns the newly created configuration version.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_commit(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pUserUUID, LibMCEnv_MachineConfigurationVersion * pVersionInstance);
+
+/**
+* Commits the current in-memory state as a new configuration version and sets it as the active version for the type. After committing, the working copy is rebased on the new version.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pUserUUID - User UUID for logging who initiated the change.
+* @param[out] pVersionInstance - Returns the newly created and now active configuration version.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_commitandactivate(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pUserUUID, LibMCEnv_MachineConfigurationVersion * pVersionInstance);
+
+/*************************************************************************************************************************
  Class definition for MachineConfigurationType
 **************************************************************************************************************************/
 
@@ -9534,6 +9753,36 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getlatestconf
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_setactiveconfigurationversion(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pVersionUUID);
+
+/**
+* Returns an ergonomic, typed working copy of the currently active configuration version. Fails if no version is active.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[out] pConfigurationInstance - Working copy of the active configuration.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getactiveconfiguration(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_MachineConfiguration * pConfigurationInstance);
+
+/**
+* Returns an ergonomic, typed working copy of the active configuration, activating the latest version first if none is currently active. Fails if no configuration version exists at all.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[out] pConfigurationInstance - Working copy of the active configuration.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_ensureactiveconfiguration(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_MachineConfiguration * pConfigurationInstance);
+
+/**
+* Registers a new XSD version together with its default configuration, but only if the given version is newer than the latest registered XSD. Returns null if the given version is not newer (no-op). Collapses the common bootstrap pattern of RegisterNewXSD + CreateDefaultConfiguration.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[in] pXSDString - XSD String of the version. MUST be a valid schema of this type.
+* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+* @param[in] pDefaultXML - Default configuration XML string conforming to the given XSD.
+* @param[out] pXSDInstance - The newly registered XSD, or null if the version was not newer than the latest.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_ensurexsdversion(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDString, LibMCEnv_uint32 nXSDVersion, const char * pDefaultXML, LibMCEnv_MachineConfigurationXSD * pXSDInstance);
 
 /*************************************************************************************************************************
  Class definition for MachineConfigurationTypeIterator

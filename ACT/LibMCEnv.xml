@@ -5122,6 +5122,127 @@
 
 	</class>
 
+	<class name="MachineConfiguration" parent="Base" description="Ergonomic, typed, namespace-free working copy of a machine configuration version. Reads and writes individual parameters by a slash-separated path (relative to the root element, resolved in the document default namespace); leaf values are stored in the 'value' attribute. Changes are held in memory until committed as a new configuration version.">
+
+		<!-- VERSION METADATA -->
+
+		<method name="GetVersionUUID" description="Returns the UUID of the underlying configuration version this working copy was created from.">
+			<param name="VersionUUID" type="string" pass="return" description="UUID of the configuration version." />
+		</method>
+
+		<method name="GetNumericVersion" description="Returns the numeric version of the underlying configuration version.">
+			<param name="ConfigurationNumericVersion" type="uint32" pass="return" description="Returns the configuration numeric version." />
+		</method>
+
+		<method name="GetXSDUUID" description="Returns the UUID of the XSD used by this configuration.">
+			<param name="XSDUUID" type="string" pass="return" description="UUID of the configuration XSD." />
+		</method>
+
+		<method name="GetXMLDocument" description="Returns the current in-memory configuration as an XML document instance for advanced access. The returned document reflects any uncommitted changes.">
+			<param name="XMLInstance" type="class" class="XMLDocument" pass="return" description="XML Document." />
+		</method>
+
+		<!-- TYPED READ ACCESS -->
+
+		<method name="HasParameter" description="Returns whether a parameter exists at the given path.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root, e.g. 'PLCConfig/IPAddress'." />
+			<param name="ParameterExists" type="bool" pass="return" description="True if the parameter node and its value attribute exist." />
+		</method>
+
+		<method name="GetStringParameter" description="Returns the string value of a parameter. Fails if the parameter does not exist.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="string" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetIntegerParameter" description="Returns the integer value of a parameter. Fails if the parameter does not exist or is not an integer in range.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="Value" type="int64" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetDoubleParameter" description="Returns the double value of a parameter. Fails if the parameter does not exist or is not a double in range.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value." />
+			<param name="Value" type="double" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetBoolParameter" description="Returns the boolean value of a parameter. Fails if the parameter does not exist or is not a boolean.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="bool" pass="return" description="Parameter value." />
+		</method>
+
+		<!-- TYPED READ ACCESS WITH DEFAULTS -->
+
+		<method name="GetStringParameterDef" description="Returns the string value of a parameter. Returns the default value if the parameter does not exist.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="DefaultValue" type="string" pass="in" description="Default value." />
+			<param name="Value" type="string" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetIntegerParameterDef" description="Returns the integer value of a parameter. Returns the default value if the parameter does not exist or is not a valid integer in range.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="DefaultValue" type="int64" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="int64" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetDoubleParameterDef" description="Returns the double value of a parameter. Returns the default value if the parameter does not exist or is not a valid double in range.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="double" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetBoolParameterDef" description="Returns the boolean value of a parameter. Returns the default value if the parameter does not exist or is not a valid boolean.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="DefaultValue" type="bool" pass="in" description="Default value." />
+			<param name="Value" type="bool" pass="return" description="Parameter value." />
+		</method>
+
+		<!-- TYPED WRITE ACCESS (in memory until committed) -->
+
+		<method name="SetStringParameter" description="Sets the string value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="string" pass="in" description="Value to set." />
+		</method>
+
+		<method name="SetIntegerParameter" description="Sets the integer value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="int64" pass="in" description="Value to set." />
+		</method>
+
+		<method name="SetDoubleParameter" description="Sets the double value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="double" pass="in" description="Value to set." />
+		</method>
+
+		<method name="SetBoolParameter" description="Sets the boolean value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="bool" pass="in" description="Value to set." />
+		</method>
+
+		<!-- PERSISTENCE -->
+
+		<method name="HasChanges" description="Returns whether the in-memory working copy has uncommitted changes.">
+			<param name="HasUncommittedChanges" type="bool" pass="return" description="True if there are uncommitted changes." />
+		</method>
+
+		<method name="Commit" description="Commits the current in-memory state as a new configuration version (child of the version this working copy is based on). Does not change the active version. After committing, the working copy is rebased on the new version.">
+			<param name="UserUUID" type="string" pass="in" description="User UUID for logging who initiated the change." />
+			<param name="VersionInstance" type="class" class="MachineConfigurationVersion" pass="return" description="Returns the newly created configuration version." />
+		</method>
+
+		<method name="CommitAndActivate" description="Commits the current in-memory state as a new configuration version and sets it as the active version for the type. After committing, the working copy is rebased on the new version.">
+			<param name="UserUUID" type="string" pass="in" description="User UUID for logging who initiated the change." />
+			<param name="VersionInstance" type="class" class="MachineConfigurationVersion" pass="return" description="Returns the newly created and now active configuration version." />
+		</method>
+
+	</class>
+
 	<class name="MachineConfigurationType" parent="Base" description="Machine configuration type descriptor.">
 
 		<!-- TYPE INFORMATION -->
@@ -5222,6 +5343,23 @@
 
 		<method name="SetActiveConfigurationVersion" description="Sets the active configuration version for this type.">
 			<param name="VersionUUID" type="string" pass="in" description="UUID of the version to set as active." />
+		</method>
+
+		<!-- ERGONOMIC HELPERS -->
+
+		<method name="GetActiveConfiguration" description="Returns an ergonomic, typed working copy of the currently active configuration version. Fails if no version is active.">
+			<param name="ConfigurationInstance" type="class" class="MachineConfiguration" pass="return" description="Working copy of the active configuration." />
+		</method>
+
+		<method name="EnsureActiveConfiguration" description="Returns an ergonomic, typed working copy of the active configuration, activating the latest version first if none is currently active. Fails if no configuration version exists at all.">
+			<param name="ConfigurationInstance" type="class" class="MachineConfiguration" pass="return" description="Working copy of the active configuration." />
+		</method>
+
+		<method name="EnsureXSDVersion" description="Registers a new XSD version together with its default configuration, but only if the given version is newer than the latest registered XSD. Returns null if the given version is not newer (no-op). Collapses the common bootstrap pattern of RegisterNewXSD + CreateDefaultConfiguration.">
+			<param name="XSDString" type="string" pass="in" description="XSD String of the version. MUST be a valid schema of this type." />
+			<param name="XSDVersion" type="uint32" pass="in" description="Version to add. Registered only if larger than GetLatestXSDNumericVersion." />
+			<param name="DefaultXML" type="string" pass="in" description="Default configuration XML string conforming to the given XSD." />
+			<param name="XSDInstance" type="optionalclass" class="MachineConfigurationXSD" pass="return" description="The newly registered XSD, or null if the version was not newer than the latest." />
 		</method>
 
 	</class>
