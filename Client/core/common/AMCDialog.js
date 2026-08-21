@@ -37,7 +37,20 @@ export default class AMCApplicationDialog extends AMCApplicationPage {
 		super (application, dialogJSON);
 		this.registerClass ("amcDialog");
 		
+		// The base page class does not track the dialog title (sent as "title" in the
+		// dialog JSON); capture it so the client can render the dialog header.
+		this.title = dialogJSON.title || "";
 		this.dialogIsActive = false;
+	}
+
+	// A dialog is never the application's active page, so the inherited page-based
+	// activeness check would always report false and its modules would never be
+	// polled/updated (e.g. a configuration list would stay on its loading text and
+	// synced form values would never refresh). While the dialog is open its modules
+	// must be treated as active instead.
+	isActive ()
+	{
+		return this.dialogIsActive === true;
 	}
 
 

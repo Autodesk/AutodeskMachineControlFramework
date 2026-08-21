@@ -48,6 +48,10 @@
 	let toolbarItems= $derived.by(() => { poll.v; return [...(app?.AppContent?.ToolbarItems || [])]; });
 	let pages       = $derived.by(() => { poll.v; return [...(app?.AppContent?.Pages || [])]; });
 	let dialogs     = $derived.by(() => { poll.v; return [...(app?.AppContent?.Dialogs || [])]; });
+	// The active dialog is tracked as a reactive scalar (like activePage) rather than reading the
+	// mutated dialogIsActive flag directly: the dialog objects keep a stable identity across poll
+	// ticks, so a per-object property mutation would not re-trigger the {#each} item expressions.
+	let activeDialogName = $derived.by(() => { poll.v; return (app?.AppContent?.Dialogs || []).find((d: any) => d.dialogIsActive)?.name || ''; });
 	let appName     = $derived.by(() => { poll.v; return app?.AppDefinition?.TextApplicationName || 'AMCF'; });
 	let copyright   = $derived.by(() => { poll.v; return app?.AppDefinition?.TextCopyRight || ''; });
 	let toolbarLogoUUID = $derived.by(() => { poll.v; return app?.AppDefinition?.ToolbarLogoUUID || ''; });
@@ -426,7 +430,7 @@
 	<!-- Dialogs -->
 	{#each dialogs as dialog (dialog.name)}
 		<Dialog.Root
-			open={dialog.dialogIsActive || false}
+			open={dialog.name === activeDialogName}
 			onOpenChange={(open) => setDialogOpen(dialog, open)}
 		>
 			<Dialog.Content class="sm:max-w-[50vw] max-h-[80vh] overflow-hidden flex flex-col">
