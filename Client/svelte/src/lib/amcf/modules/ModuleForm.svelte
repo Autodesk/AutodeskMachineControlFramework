@@ -33,6 +33,8 @@
 	}
 
 	function onSwitchChange (entity: any, checked: boolean) {
+		// Read-only switches reflect state but must never be changed by the user.
+		if (d(entity).readonly) return;
 		entity.dataObject.value = checked;
 		fireChangeEvent(entity);
 	}
@@ -104,6 +106,8 @@
 					checked={toBool(d(entity).value)}
 					onCheckedChange={(v: boolean) => onSwitchChange(entity, v)}
 					disabled={d(entity).disabled}
+					aria-readonly={d(entity).readonly}
+					class={d(entity).readonly ? 'pointer-events-none' : ''}
 				/>
 				<span class="text-sm">{toBool(d(entity).value) ? 'On' : 'Off'}</span>
 			</div>

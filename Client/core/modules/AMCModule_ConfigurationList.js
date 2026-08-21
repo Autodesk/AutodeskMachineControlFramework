@@ -149,7 +149,11 @@ export default class AMCApplicationModule_ConfigurationList extends Common.AMCAp
 
 		if (attrs.configurationlistheadid !== undefined) {
 			let headID = parseInt(attrs.configurationlistheadid);
-			if (!isNaN(headID) && headID > this.lastKnownHeadID) {
+			// The head id is a content hash (see frontendWriteItemToJSON) that also encodes
+			// which version is active, so it can change in either direction. Refetch whenever
+			// it differs - not just when it grows - otherwise activating a version does not
+			// refresh the active-marker / list.
+			if (!isNaN(headID) && headID !== this.lastKnownHeadID) {
 				this.lastKnownHeadID = headID;
 				shouldFetch = true;
 			}
@@ -183,6 +187,9 @@ export default class AMCApplicationModule_ConfigurationList extends Common.AMCAp
 						configurationTimestamp: entry.configurationtimestamp || "",
 					});
 				}
+
+				// Show the most recent version first.
+				newEntries.sort((a, b) => b.configurationVersion - a.configurationVersion);
 
 				let oldCount = this.entries.length;
 				for (let i = 0; i < oldCount; i++) this.entries.pop();
