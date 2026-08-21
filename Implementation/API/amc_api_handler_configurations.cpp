@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <memory>
 #include <string>
+#include <map>
 
 using namespace AMC;
 
@@ -71,13 +72,44 @@ void CAPIHandler_Configurations::handleListConfigurationsRequest(CJSONWriter& wr
 			if (pActiveVersion.get() != nullptr)
 				sActiveUUID = pActiveVersion->GetVersionUUID();
 
+			// Resolve author user UUIDs to their (login) names for display. Unknown or
+			// system-created versions (empty/zero UUID) are reported as "system".
+			auto pLoginHandler = pDataModel->CreateLoginHandler();
+
+			// Cache resolved user names per UUID: a configuration type can have many
+			// versions authored by the same few users, so this avoids a login-handler
+			// lookup (and DB round-trip) for every single version.
+			std::map<std::string, std::string> userNameCache;
+
 			while (pVersionIterator->MoveNext()) {
 				auto pVersion = pVersionIterator->GetCurrent();
+
+				std::string sUserUUID = pVersion->GetUserUUID();
+				std::string sUserName;
+				if (sUserUUID.empty() || (sUserUUID == "00000000-0000-0000-0000-000000000000")) {
+					sUserName = "system";
+				}
+				else {
+					auto iCacheEntry = userNameCache.find(sUserUUID);
+					if (iCacheEntry != userNameCache.end()) {
+						sUserName = iCacheEntry->second;
+					}
+					else {
+						try {
+							sUserName = pLoginHandler->GetUsernameByUUID(sUserUUID);
+						}
+						catch (...) {
+							// User no longer exists - fall back to the raw UUID.
+							sUserName = sUserUUID;
+						}
+						userNameCache.insert(std::make_pair(sUserUUID, sUserName));
+					}
+				}
 
 				CJSONWriterObject entryObject(writer);
 				entryObject.addBool("configurationactive", pVersion->GetVersionUUID() == sActiveUUID);
 				entryObject.addInteger("configurationversion", pVersion->GetNumericVersion());
-				entryObject.addString("username", pVersion->GetUserUUID());
+				entryObject.addString("username", sUserName);
 				entryObject.addString("configurationuuid", pVersion->GetVersionUUID());
 				entryObject.addString("configurationtimestamp", pVersion->GetTimestamp());
 

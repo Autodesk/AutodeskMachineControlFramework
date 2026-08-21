@@ -420,8 +420,8 @@ void CUIModule_ContentConfigurationList::populateClientVariables(CParameterHandl
 	LibMCAssertNotNull(pClientVariableHandler);
 	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "configuration list UI element");
 	pGroup->addNewStringParameter("selecteduuid", "selected configuration UUID", AMCCommon::CUtils::createEmptyUUID());
-	//pGroup->addNewStringParameter("buttonuuid", "button UUID", AMCCommon::CUtils::createEmptyUUID());
-	//pGroup->addNewStringParameter("buttonname", "button Name", "");	
+	pGroup->addNewStringParameter("buttonuuid", "button UUID", AMCCommon::CUtils::createEmptyUUID());
+	pGroup->addNewStringParameter("buttonname", "button Name", "");	
 }
 
 void CUIModule_ContentConfigurationList::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
@@ -567,4 +567,8 @@ void CUIModule_ContentConfigurationList::frontendWriteItemToJSON(CJSONWriter& wr
 	uint32_t nHeadID = (uint32_t)(nConfigurationListHeadID & 0x7fffffffULL);
 	attributesObject.addInteger(AMC_API_KEY_CONFIGURATIONS_HEADID, (int64_t)nHeadID);
 	itemObject.addObject("attributes", attributesObject);
+
+	itemObject.addString(AMC_API_KEY_UI_ITEMSELECTIONVALUEUUID, m_sSelectedConfigurationFieldUUID);
+	itemObject.addString(AMC_API_KEY_UI_ITEMBUTTONVALUEUUID, m_sSelectedButtonFieldUUID);
+	writeButtonsToJSON(writer, itemObject);
 }
