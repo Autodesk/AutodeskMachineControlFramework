@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amc_api_handler_configurations.hpp"
+#include "amc_logger.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
 #include "common_utils.hpp"
@@ -99,8 +100,12 @@ void CAPIHandler_Configurations::handleListConfigurationsRequest(CJSONWriter& wr
 							sUserName = pLoginHandler->GetUsernameByUUID(sUserUUID);
 						}
 						catch (...) {
-							// User no longer exists - fall back to the raw UUID.
+							// User could not be resolved (e.g. deleted/inactive) - fall back to
+							// the raw UUID and log it so the mismatch is visible on the console.
 							sUserName = sUserUUID;
+							auto pLogger = m_pSystemState->logger();
+							if (pLogger != nullptr)
+								pLogger->logMessage("could not resolve configuration author to a username, falling back to UUID: " + sUserUUID, "api", AMC::eLogLevel::Warning);
 						}
 						userNameCache.insert(std::make_pair(sUserUUID, sUserName));
 					}

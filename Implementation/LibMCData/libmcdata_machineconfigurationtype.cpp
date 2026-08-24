@@ -43,6 +43,8 @@ Abstract: This is a stub class definition of CMachineConfigurationType
 #include "libmcdata_machineconfigurationversioniterator.hpp"
 #include "libmcdata_machineconfigurationtypeiterator.hpp"
 
+#include <memory>
+
 using namespace LibMCData::Impl;
 
 /*************************************************************************************************************************
@@ -296,7 +298,11 @@ IMachineConfigurationVersion* CMachineConfigurationType::GetActiveConfigurationV
 
 IMachineConfigurationVersion* CMachineConfigurationType::GetLatestConfigurationVersion()
 {
-	auto pLatestXSD = CMachineConfigurationXSD::getLatestXSDForType(m_pSQLHandler, m_sUUID);
+	// Wrap the returned raw pointer to avoid leaking it and to guard against a
+	// type that has been registered but has no XSD version yet (returns null).
+	std::unique_ptr<IMachineConfigurationXSD> pLatestXSD(CMachineConfigurationXSD::getLatestXSDForType(m_pSQLHandler, m_sUUID));
+	if (pLatestXSD.get() == nullptr)
+		return nullptr;
 
 	return CMachineConfigurationVersion::getLatestConfigurationVersionForXSD(m_pSQLHandler, pLatestXSD->GetUUID());
 }
