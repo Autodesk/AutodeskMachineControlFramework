@@ -53,7 +53,7 @@ using namespace LibMCDriver_CifX::Impl;
 
 CDriver_CifX::CDriver_CifX(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: m_sName (sName), m_bIsSimulationMode (false), m_pDriverEnvironment (pDriverEnvironment), m_hDriverHandle (nullptr),
-	  m_nMajorVersion (0), m_nMinorVersion (0), m_nPatchVersion (0)
+	  m_nMajorVersion (0), m_nMinorVersion (0), m_nPatchVersion (0), m_UpdateCounter (0)
 
 {
 	if (pDriverEnvironment.get() == nullptr)
@@ -110,6 +110,8 @@ void CDriver_CifX::Configure(const std::string& sConfigurationString)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOPATCHVERSION);
 	m_nPatchVersion = patchversionAttrib.as_uint(0);
 
+	m_pDriverEnvironment->RegisterTelemetryChannel("update", "update of CifX variables", LibMCEnv::eTelemetryChannelType::CustomMarker);
+
 	auto channelNodes = configurationNode.children("channel");
 	for (pugi::xml_node channelNode : channelNodes)
 	{
@@ -117,6 +119,9 @@ void CDriver_CifX::Configure(const std::string& sConfigurationString)
 		m_Channels.push_back(pChannel);
 
 		pChannel->RegisterVariables(m_pDriverEnvironment);
+
+		m_pDriverEnvironment->RegisterTelemetryChannel(pChannel->getTelemetryIOReadName(), "IORead of CifX board " + pChannel->getBoardName(), LibMCEnv::eTelemetryChannelType::RemoteQuery);
+		m_pDriverEnvironment->RegisterTelemetryChannel(pChannel->getTelemetryIOWriteName(), "IOWrite of CifX board " + pChannel->getBoardName(), LibMCEnv::eTelemetryChannelType::RemoteQuery);
 
 		uint32_t nInputCount = pChannel->getInputCount();
 		for (uint32_t nInputIndex = 0; nInputIndex < nInputCount; nInputIndex++) {
@@ -174,6 +179,12 @@ void CDriver_CifX::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDrive
 		return;
 
 	if (IsConnected()) {
+
+		auto pTelemetryChannel = pDriverUpdateInstance->FindTelemetryChannel("update", true);
+		uint64_t nCurrentUpdateCounter = m_UpdateCounter.fetch_add(1, std::memory_order_relaxed);
+
+		auto pScope = pTelemetryChannel->StartMarkerScope(nCurrentUpdateCounter + 1);
+
 		for (auto pOutputValueIter : m_GlobalOutputMap) {
 			auto pOutputValue = pOutputValueIter.second;
 			switch (pOutputValue->getAbstractType()) {
@@ -211,6 +222,8 @@ void CDriver_CifX::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDrive
 			}
 			
 		}
+
+		pScope = nullptr;
 
 	}
 }
@@ -307,7 +320,7 @@ void CDriver_CifX::Connect()
 		m_pCifXSDK->checkError(m_pCifXSDK->xDriverOpen(&m_hDriverHandle));
 
 		for (auto pChannel : m_Channels) {
-			pChannel->startSyncThread(m_pCifXSDK, m_hDriverHandle);
+			pChannel->startSyncThread(m_pCifXSDK, m_hDriverHandle, m_pDriverEnvironment->CreateStatusUpdateSession ());
 		}
 	}
 

@@ -774,6 +774,35 @@ public:
 			case LIBMC_ERROR_INVALIDROWRANGE: return "INVALIDROWRANGE";
 			case LIBMC_ERROR_CONFIGURATIONLISTNAMEMISSING: return "CONFIGURATIONLISTNAMEMISSING";
 			case LIBMC_ERROR_CONFIGURATIONLISTBUTTONNAMEMISSING: return "CONFIGURATIONLISTBUTTONNAMEMISSING";
+			case LIBMC_ERROR_NONLINEAROVERRIDEPARAMETERNOTINCREASING: return "NONLINEAROVERRIDEPARAMETERNOTINCREASING";
+			case LIBMC_ERROR_NONLINEAROVERRIDEPARAMETEROUTOFRANGE: return "NONLINEAROVERRIDEPARAMETEROUTOFRANGE";
+			case LIBMC_ERROR_NONLINEAROVERRIDEFACTOROUTOFRANGE: return "NONLINEAROVERRIDEFACTOROUTOFRANGE";
+			case LIBMC_ERROR_EMPTYSIGNALINSTANCENAME: return "EMPTYSIGNALINSTANCENAME";
+			case LIBMC_ERROR_INVALIDSIGNALINSTANCENAME: return "INVALIDSIGNALINSTANCENAME";
+			case LIBMC_ERROR_COULDNOTFINDSIGNAL: return "COULDNOTFINDSIGNAL";
+			case LIBMC_ERROR_DUPLICATESIGNALINSTANCENAME: return "DUPLICATESIGNALINSTANCENAME";
+			case LIBMC_ERROR_SIGNALINSTANCENOTFOUND: return "SIGNALINSTANCENOTFOUND";
+			case LIBMC_ERROR_INVALIDSIGNALARCHIVETIMEOUT: return "INVALIDSIGNALARCHIVETIMEOUT";
+			case LIBMC_ERROR_UNKNOWNTELEMETRYCHANNELTYPE: return "UNKNOWNTELEMETRYCHANNELTYPE";
+			case LIBMC_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER: return "INVALIDTELEMETRYCHANNELIDENTIFIER";
+			case LIBMC_ERROR_TELEMETRYCHANNELALREADYEXISTS: return "TELEMETRYCHANNELALREADYEXISTS";
+			case LIBMC_ERROR_TELEMETRYCHANNELNOTFOUND: return "TELEMETRYCHANNELNOTFOUND";
+			case LIBMC_ERROR_TELEMETRYMARKERHASALREADYBEENFINISHED: return "TELEMETRYMARKERHASALREADYBEENFINISHED";
+			case LIBMC_ERROR_INVALIDTELEMETRYMARKERFINISHTIMESTAMP: return "INVALIDTELEMETRYMARKERFINISHTIMESTAMP";
+			case LIBMC_ERROR_UNFINISHEDTELEMETRYMARKERSHAVENODURATION: return "UNFINISHEDTELEMETRYMARKERSHAVENODURATION";
+			case LIBMC_ERROR_TELEMETRYMARKERALREADYREGISTERED: return "TELEMETRYMARKERALREADYREGISTERED";
+			case LIBMC_ERROR_TELEMETRYCHUNKSTARTTIMESTAMPAFTEREND: return "TELEMETRYCHUNKSTARTTIMESTAMPAFTEREND";
+			case LIBMC_ERROR_TELEMETRYCHUNKINDEXOUTOFRANGE: return "TELEMETRYCHUNKINDEXOUTOFRANGE";
+			case LIBMC_ERROR_TELEMETRYCHUNKIDMISMATCH: return "TELEMETRYCHUNKIDMISMATCH";
+			case LIBMC_ERROR_TELEMETRYCHUNKISREADONLY: return "TELEMETRYCHUNKISREADONLY";
+			case LIBMC_ERROR_TELEMETRYCHUNKSCANONLYBEARCHIVEDIFREADONLY: return "TELEMETRYCHUNKSCANONLYBEARCHIVEDIFREADONLY";
+			case LIBMC_ERROR_INVALIDTELEMETRYCHANNELTYPE: return "INVALIDTELEMETRYCHANNELTYPE";
+			case LIBMC_ERROR_MISSINGTELEMETRYCHANNELIDENTIFIER: return "MISSINGTELEMETRYCHANNELIDENTIFIER";
+			case LIBMC_ERROR_MISSINGTELEMETRYCHANNELDESCRIPTION: return "MISSINGTELEMETRYCHANNELDESCRIPTION";
+			case LIBMC_ERROR_XMLNODEHASNULLNAMESPACE: return "XMLNODEHASNULLNAMESPACE";
+			case LIBMC_ERROR_RESOURCEENTRYSIZISMISMATCH: return "RESOURCEENTRYSIZISMISMATCH";
+			case LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH: return "RESOURCEENTRYCHECKSUMMISMATCH";
+			case LIBMC_ERROR_INVALIDRESOURCEENTRYSHA256: return "INVALIDRESOURCEENTRYSHA256";
 		}
 		return "UNKNOWN";
 	}
@@ -1382,6 +1411,35 @@ public:
 			case LIBMC_ERROR_INVALIDROWRANGE: return "Invalid row range.";
 			case LIBMC_ERROR_CONFIGURATIONLISTNAMEMISSING: return "Configuration list name missing";
 			case LIBMC_ERROR_CONFIGURATIONLISTBUTTONNAMEMISSING: return "Configuration list button name missing";
+			case LIBMC_ERROR_NONLINEAROVERRIDEPARAMETERNOTINCREASING: return "Nonlinear override parameter not increasing";
+			case LIBMC_ERROR_NONLINEAROVERRIDEPARAMETEROUTOFRANGE: return "Nonlinear override parameter out of range";
+			case LIBMC_ERROR_NONLINEAROVERRIDEFACTOROUTOFRANGE: return "Nonlinear override factor out of range";
+			case LIBMC_ERROR_EMPTYSIGNALINSTANCENAME: return "Empty signal instance name";
+			case LIBMC_ERROR_INVALIDSIGNALINSTANCENAME: return "Invalid signal instance name";
+			case LIBMC_ERROR_COULDNOTFINDSIGNAL: return "Could not find signal";
+			case LIBMC_ERROR_DUPLICATESIGNALINSTANCENAME: return "Duplicate signal instance name";
+			case LIBMC_ERROR_SIGNALINSTANCENOTFOUND: return "Signal instance not found";
+			case LIBMC_ERROR_INVALIDSIGNALARCHIVETIMEOUT: return "Invalid signal archive timeout";
+			case LIBMC_ERROR_UNKNOWNTELEMETRYCHANNELTYPE: return "Unknown telemetry channel type.";
+			case LIBMC_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER: return "Invalid telemetry channel identifier.";
+			case LIBMC_ERROR_TELEMETRYCHANNELALREADYEXISTS: return "Telemetry channel already exists.";
+			case LIBMC_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
+			case LIBMC_ERROR_TELEMETRYMARKERHASALREADYBEENFINISHED: return "Telemetry marker has already been finished.";
+			case LIBMC_ERROR_INVALIDTELEMETRYMARKERFINISHTIMESTAMP: return "Invalid telemetry marker finish timestamp.";
+			case LIBMC_ERROR_UNFINISHEDTELEMETRYMARKERSHAVENODURATION: return "Unfinished telemetry marker have no duration.";
+			case LIBMC_ERROR_TELEMETRYMARKERALREADYREGISTERED: return "Telemetry Marker has been already registered.";
+			case LIBMC_ERROR_TELEMETRYCHUNKSTARTTIMESTAMPAFTEREND: return "Telemetry Chunk Start timestamp is after end timestamp.";
+			case LIBMC_ERROR_TELEMETRYCHUNKINDEXOUTOFRANGE: return "Telemetry Chunk index out of range.";
+			case LIBMC_ERROR_TELEMETRYCHUNKIDMISMATCH: return "Telemetry Chunk ID mismatch.";
+			case LIBMC_ERROR_TELEMETRYCHUNKISREADONLY: return "Telemetry Chunk is readonly.";
+			case LIBMC_ERROR_TELEMETRYCHUNKSCANONLYBEARCHIVEDIFREADONLY: return "Telemetry Chunks can only be archived if readonly.";
+			case LIBMC_ERROR_INVALIDTELEMETRYCHANNELTYPE: return "Invalid telemetry channel type.";
+			case LIBMC_ERROR_MISSINGTELEMETRYCHANNELIDENTIFIER: return "Missing telemetry channel identifier.";
+			case LIBMC_ERROR_MISSINGTELEMETRYCHANNELDESCRIPTION: return "Missing telemetry channel description.";
+			case LIBMC_ERROR_XMLNODEHASNULLNAMESPACE: return "XML node has a null namespace. Ensure the XML document declares a namespace on the root element.";
+			case LIBMC_ERROR_RESOURCEENTRYSIZISMISMATCH: return "Resource entry size mismatch between index and ZIP content.";
+			case LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH: return "Resource entry SHA256 checksum mismatch.";
+			case LIBMC_ERROR_INVALIDRESOURCEENTRYSHA256: return "Invalid resource entry SHA256 value.";
 		}
 		return "unknown error";
 	}
@@ -1646,6 +1704,7 @@ public:
 	inline void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource);
 	inline void SetTempBasePath(const std::string & sTempBasePath);
 	inline void ParseConfiguration(const std::string & sXMLString);
+	inline void SetParameterOverride(const std::string & sParameterPath, const std::string & sParameterValue);
 	inline void StartAllThreads();
 	inline void TerminateAllThreads();
 	inline void StartInstanceThread(const std::string & sInstanceName);
@@ -1783,6 +1842,7 @@ public:
 		pWrapperTable->m_MCContext_RegisterLibraryPath = nullptr;
 		pWrapperTable->m_MCContext_SetTempBasePath = nullptr;
 		pWrapperTable->m_MCContext_ParseConfiguration = nullptr;
+		pWrapperTable->m_MCContext_SetParameterOverride = nullptr;
 		pWrapperTable->m_MCContext_StartAllThreads = nullptr;
 		pWrapperTable->m_MCContext_TerminateAllThreads = nullptr;
 		pWrapperTable->m_MCContext_StartInstanceThread = nullptr;
@@ -2001,6 +2061,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MCContext_ParseConfiguration == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MCContext_SetParameterOverride = (PLibMCMCContext_SetParameterOverridePtr) GetProcAddress(hLibrary, "libmc_mccontext_setparameteroverride");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_SetParameterOverride = (PLibMCMCContext_SetParameterOverridePtr) dlsym(hLibrary, "libmc_mccontext_setparameteroverride");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_SetParameterOverride == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2238,6 +2307,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmc_mccontext_parseconfiguration", (void**)&(pWrapperTable->m_MCContext_ParseConfiguration));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_ParseConfiguration == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_setparameteroverride", (void**)&(pWrapperTable->m_MCContext_SetParameterOverride));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_SetParameterOverride == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmc_mccontext_startallthreads", (void**)&(pWrapperTable->m_MCContext_StartAllThreads));
@@ -2544,6 +2617,16 @@ public:
 	void CMCContext::ParseConfiguration(const std::string & sXMLString)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_ParseConfiguration(m_pHandle, sXMLString.c_str()));
+	}
+	
+	/**
+	* CMCContext::SetParameterOverride - overrides a parameter with a certain value. Fails if parameter group or parameter does not exist. Fails if Value is not fitting the parameter type.
+	* @param[in] sParameterPath - Path of the parameter. Example: main.configgroup.currentjob
+	* @param[in] sParameterValue - New Value of the parameter
+	*/
+	void CMCContext::SetParameterOverride(const std::string & sParameterPath, const std::string & sParameterValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_SetParameterOverride(m_pHandle, sParameterPath.c_str(), sParameterValue.c_str()));
 	}
 	
 	/**

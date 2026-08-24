@@ -87,6 +87,44 @@ public:
 typedef std::shared_ptr<CRTCPowerMapping> PRTCPowerMapping;
 
 
+class CRTCDefocusCorrectionByPower {
+private:
+	struct sDefocusKnot { double x; double y; }; // x = power in watts, y = defocus offset in mm
+
+	// Sorted by x = watts, maps to y = defocus offset in mm
+	std::vector<sDefocusKnot> m_DefocusTable;
+
+	double m_dEpsilon;
+
+	bool nearlyEqual(double a, double b, double eps);
+	bool interpolate(const std::vector<sDefocusKnot>& pts, double x, double& y);
+
+public:
+
+	CRTCDefocusCorrectionByPower();
+
+	virtual ~CRTCDefocusCorrectionByPower();
+
+	// Sets the correction table from a map of (powerInWatts -> defocusOffsetInMM).
+	// Power values MUST be non-negative and strictly increasing.
+	void setDefocusCorrectionTable(const std::map<double, double>& defocusByPowerMap);
+
+	// Looks up the defocus offset in mm for a given laser power in watts.
+	// Returns true if the lookup was interpolated within the table range,
+	// false if it was clamped to an endpoint.
+	bool mapPowerToDefocusOffset(double dLaserPowerInWatts, double& dDefocusOffsetInMM);
+
+	// Returns the number of calibration points in the table.
+	size_t getTableSize();
+
+	// Returns the internal table for serialization / API retrieval.
+	const std::vector<sDefocusKnot>& getTable();
+
+};
+
+typedef std::shared_ptr<CRTCDefocusCorrectionByPower> PRTCDefocusCorrectionByPower;
+
+
 class CRTCContextOwnerData {
 private:
 
@@ -181,6 +219,10 @@ protected:
 	PNLightAFXProfileSelectorInstance m_pNLightAFXSelectorInstance;
 
 	PRTCPowerMapping m_pPowerMapping;
+
+	// Optional defocus correction based on laser power (for thermal lensing compensation).
+	// nullptr when disabled.
+	PRTCDefocusCorrectionByPower m_pDefocusCorrectionByPower;
 	
 	void writeJumpSpeed (float jumpSpeed);
 
@@ -212,6 +254,9 @@ protected:
 
 	// Calls the SetTriggerX Call that is necessary for the specific OIE board
 	void callSetTriggerOIE(uint32_t nPeriod);
+
+	// Converts a delay in seconds to RTC ticks
+	int32_t ConvertDelaySecondsToTicks(double delay);
 
 public:
 
@@ -340,6 +385,10 @@ public:
 	void AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput) override;
 
 	void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) override;
+
+	LibMCDriver_ScanLab_uint32 ReadDigitalInputs() override;
+
+	bool ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex) override;
 
 	void EnableOIE() override;
 
@@ -474,6 +523,16 @@ public:
 	LibMCDriver_ScanLab_double MapPowerPercentageToWatts(const LibMCDriver_ScanLab_double dLaserPowerInPercent) override;
 
 	LibMCDriver_ScanLab_double MapPowerWattsToPercent(const LibMCDriver_ScanLab_double dLaserPowerInWatts) override;
+
+	void SetPiecewiseLinearDefocusCorrectionByPower(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint* pCalibrationPointsBuffer) override;
+
+	void DisableDefocusCorrectionByPower() override;
+
+	bool DefocusCorrectionByPowerIsEnabled() override;
+
+	void GetDefocusCorrectionByPower(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint* pCalibrationPointsBuffer) override;
+
+	LibMCDriver_ScanLab_double MapDefocusCorrectionFromPower(const LibMCDriver_ScanLab_double dLaserPowerInWatts) override;
 
 	void EnableSpatialLaserPowerModulation(const LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData) override;
 

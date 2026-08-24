@@ -109,6 +109,8 @@ public:
 
 	std::string RetrieveEventSenderUUID() override;
 
+	bool SenderHasTag(const std::string & sTag) override;
+
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 
 	std::string GetMachineState(const std::string & sMachineInstance) override;
@@ -129,6 +131,14 @@ public:
 	LibMCEnv_int64 GetMachineParameterAsInteger(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
 
 	bool GetMachineParameterAsBool(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
+
+	LibMCEnv_uint32 GetMachineParameterGroupParameterCount(const std::string& sMachineInstance, const std::string& sParameterGroup) override;
+
+	std::string GetMachineParameterGroupParameterName(const std::string& sMachineInstance, const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex) override;
+
+	std::string GetMachineParameterGroupParameterDescription(const std::string& sMachineInstance, const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex) override;
+
+	LibMCEnv::eParameterDataType GetMachineParameterGroupParameterType(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
 
 	std::string GetUIProperty(const std::string& sElementPath, const std::string& sPropertyName) override;
 
@@ -153,6 +163,10 @@ public:
 	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
 	IImageLoader* CreateImageLoader() override;
+
+	IVideoStream* CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) override;
+
+	IVideoStream* FindVideoStream(const std::string& sStreamUUID) override;
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
@@ -197,6 +211,8 @@ public:
 	bool HasBuildExecution(const std::string& sExecutionUUID) override;
 
 	IBuildExecution* GetBuildExecution(const std::string& sExecutionUUID) override;
+
+	IBuildIterator* GetRecentBuildJobs(const LibMCEnv_uint32 nMaxCount) override;
 
 	IDiscreteFieldData2D* CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue) override;
 
@@ -267,6 +283,15 @@ public:
 	std::string GetExternalEventParameter(const std::string& sParameterName) override;
 
 	void AddExternalEventResultValue(const std::string& sReturnValueName, const std::string& sReturnValue) override;
+
+	// Typed result setters for /api/ext event handlers
+	void SetStringResult(const std::string& sReturnValueName, const std::string& sReturnValue) override;
+
+	void SetIntegerResult(const std::string& sReturnValueName, const LibMCEnv_int64 nReturnValue) override;
+
+	void SetBoolResult(const std::string& sReturnValueName, const bool bReturnValue) override;
+
+	void SetDoubleResult(const std::string& sReturnValueName, const LibMCEnv_double dReturnValue) override;
 
 	IJSONObject* GetExternalEventParameters() override;
 

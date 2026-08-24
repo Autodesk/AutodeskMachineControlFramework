@@ -258,6 +258,9 @@ void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAut
 
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+
+	writer.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBBUILDLISTHEADID, pBuildJobHandler->GetBuildListHeadID());
+
 	auto pBuildJobIterator = pBuildJobHandler->ListJobsByStatus(buildStatus);
 
 	CJSONWriterArray jobJSONArray(writer);
@@ -274,13 +277,13 @@ void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAut
 		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBLAYERCOUNT, pBuildJob->GetLayerCount());
 		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBSTATUS, pBuildJob->GetStatusString());
 		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBSIZE, pBuildJob->GetStorageStreamSize());
-		;
+		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBINCREMENTALID, pBuildJob->GetIncrementalID());
+		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBTIMESTAMP, pBuildJob->GetTimeStamp());
+		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBUSER, pBuildJob->GetCreatorName());
+		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBEXECUTIONCOUNT, pBuildJob->GetExecutionCount());
 
 		if (pBuildJob->HasThumbnailStream())
 			jobJSON.addString(AMC_API_KEY_UPLOAD_ITEMBUILDTHUMBNAIL, pBuildJob->GetThumbnailStreamUUID());
-
-		/*jobJSON.addString(AMC_API_KEY_UI_ITEMBUILDUSER, pBuildJob->GetCreatorName());
-		jobJSON.addInteger(AMC_API_KEY_UI_ITEMBUILDEXECUTIONCOUNT, pBuildJob->GetExecutionCount()); */
 
 		jobJSONArray.addObject(jobJSON);
 		

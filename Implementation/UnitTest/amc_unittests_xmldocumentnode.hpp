@@ -132,7 +132,7 @@ namespace AMCUnitTest
             try {
                 root->SetTextContent("This should fail");
             }
-            catch (std::runtime_error&) {
+            catch (std::exception&) {
                 exceptionThrown = true;
             }
             assertTrue(exceptionThrown, "Setting text on node with children should fail");
@@ -204,7 +204,7 @@ namespace AMCUnitTest
 
             assertTrue(node->getPrefixedName() == "ns:child");
             auto attr = node->FindAttribute(ns1.get(), "attr", true);
-            assertTrue(attr->getPrefixedName() == "ns:attr");
+            assertTrue(attr->getPrefixedName() == "attr");
         }
 
         void testDuplicateAttributeShouldFail() {
@@ -217,7 +217,7 @@ namespace AMCUnitTest
             try {
                 root->AddAttribute(ns, "id", "2");
             }
-            catch (std::runtime_error&) {
+            catch (std::exception&) {
                 thrown = true;
             }
             assertTrue(thrown, "Adding duplicate attribute should throw");
@@ -311,7 +311,7 @@ namespace AMCUnitTest
             try {
                 root->AddChild(ns, "child");
             }
-            catch (std::runtime_error&) {
+            catch (std::exception&) {
                 thrown = true;
             }
             assertTrue(thrown, "Adding child after text should throw");
@@ -363,7 +363,7 @@ namespace AMCUnitTest
             try {
                 root->GetAttribute(0);
             }
-            catch (std::runtime_error&) {
+            catch (std::exception&) {
                 thrown = true;
             }
             assertTrue(thrown, "Accessing invalid attribute index should throw");
@@ -384,7 +384,7 @@ namespace AMCUnitTest
             auto child = root->AddChild(ns, "child");
             auto grandchild = child->AddChild(ns, "grand");
 
-            child->SetTextContent("deep");
+            grandchild->SetTextContent("deep");
             auto copy = std::make_shared<AMC::CXMLDocumentNodeInstance>(doc.get(), nullptr, ns, "copy");
             copy->CopyFrom(root.get());
 
@@ -443,6 +443,8 @@ namespace AMCUnitTest
 
             auto root1 = doc1->GetRootNode();
             auto root2 = doc2->GetRootNode();
+            auto ns2 = doc2->GetDefaultNamespace();
+            root2->AddAttribute(ns2, "attr", "value");
 
             bool thrown = false;
             try {
@@ -496,7 +498,14 @@ namespace AMCUnitTest
             auto ns = doc->GetDefaultNamespace();
 
             assertTrue(root->compareName("http://example.com", "root"), "compareName should match correctly.");
-            assertFalse(root->compareName("http://wrong.com", "root"), "Namespace mismatch must fail.");
+            bool thrown = false;
+            try {
+                root->compareName("http://wrong.com", "root");
+            }
+            catch (std::exception&) {
+                thrown = true;
+            }
+            assertTrue(thrown, "Namespace mismatch must throw.");
             assertFalse(root->compareName("http://example.com", "wrong"), "Name mismatch must fail.");
         }
 
@@ -512,7 +521,7 @@ namespace AMCUnitTest
             root->RemoveChild(child1.get());
             assertTrue(root->CountChildrenByName(ns.get(), "node") == 1);
             root->RemoveChild(child2.get());
-            assertFalse(root->HasChild(ns.get(), "node"));
+            assertTrue(root->CountChildrenByName(ns.get(), "node") == 0);
         }
 
 

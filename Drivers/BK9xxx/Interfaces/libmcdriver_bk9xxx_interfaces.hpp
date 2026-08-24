@@ -435,6 +435,13 @@ public:
 	virtual bool AnalogOutputExists(const std::string & sName) = 0;
 
 	/**
+	* IDriver_BK9xxx::AnalogInputIsOutOfBounds - Returns if an analog input is out of bounds. The raw values itself will be clipped to the configured range.
+	* @param[in] sName - Name of variable. Fails if Variable does not exist or is not an analog variable.
+	* @return Flag if the raw value is out of bounds and has been clipped to the input window.
+	*/
+	virtual bool AnalogInputIsOutOfBounds(const std::string & sName) = 0;
+
+	/**
 	* IDriver_BK9xxx::GetDigitalInput - Reads a value from an digital input variable. Fails if variable does not exist.
 	* @param[in] sVariableName - Name of variable.
 	* @return Result value.

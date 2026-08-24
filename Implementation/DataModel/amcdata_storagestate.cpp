@@ -84,6 +84,11 @@ namespace AMCData {
 		return "journal_" + sTimeFileName + "_chunk";
 	}
 
+	std::string CStorageState::getTelemetryChunkBaseName(const std::string& sTimeFileName)
+	{
+		return "telemetry_" + sTimeFileName + "_chunk";
+	}
+
 	std::string CStorageState::getSessionUUID()
 	{
 		return m_sSessionUUID;

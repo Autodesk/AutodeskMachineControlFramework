@@ -641,6 +641,7 @@ void CRTCRecordingInstance::disableRecording()
 
 }
 
+#include <iostream>
 
 void CRTCRecordingInstance::readRecordedDataBlockFromRTC(uint32_t DataStart, uint32_t DataEnd)
 {
@@ -737,7 +738,8 @@ void CRTCRecordingInstance::executeListWithRecording()
 
 		}
 		else {
-			if (!MesBusy) {
+			//if (!MesBusy) {
+			if (!Busy) {
 				readRecordedDataBlockFromRTC(LastPosition, MesPosition);
 				LastPosition = MesPosition;
 			}
@@ -747,7 +749,8 @@ void CRTCRecordingInstance::executeListWithRecording()
 
 		m_pSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
 
-	} while (MesBusy || (MesPosition != LastPosition));           // Wait for the job to be finished executing
+	} while (Busy || (MesPosition != LastPosition));           // Wait for the job to be finished executing
+	//} while (MesBusy || (MesPosition != LastPosition));           // Wait for the job to be finished executing
 
 }
 

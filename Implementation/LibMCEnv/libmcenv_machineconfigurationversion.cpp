@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CMachineConfigurationVersion
 
 #include "libmcenv_machineconfigurationversion.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_xmldocument.hpp"
 
 // Include custom headers here.
 
@@ -78,6 +79,15 @@ std::string CMachineConfigurationVersion::GetConfigurationXMLString()
 {
     return m_pMachineConfigurationVersion->GetConfigurationXMLString();
 }
+
+LibMCEnv::Impl::IXMLDocument* CMachineConfigurationVersion::GetConfigurationXML()
+{
+    auto pXMLDocumentInstance = std::make_shared<AMC::CXMLDocumentInstance>();
+    pXMLDocumentInstance->parseXMLString(m_pMachineConfigurationVersion->GetConfigurationXMLString());
+
+	return new CXMLDocument(pXMLDocumentInstance);
+}
+
 
 std::string CMachineConfigurationVersion::GetUserUUID()
 {

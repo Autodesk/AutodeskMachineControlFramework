@@ -346,7 +346,7 @@ void CAPIHandler_UI::handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pA
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	m_pSystemState->uiHandler()->writeLegacyConfigurationToJSON(writer);
+	m_pSystemState->uiHandler()->writeConfigurationToJSON(writer);
 }
 
 void CAPIHandler_UI::handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth)
@@ -683,4 +683,3 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 
 
 		
-

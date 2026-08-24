@@ -147,6 +147,11 @@ uint32_t CAPIHandler_External::handleEventRequest(CJSONWriter& writer, const std
 						newObject.copyFromObject (iIter->value);
 						writer.addObject(sValueName, newObject);
 					}
+					if (iIter->value.IsArray()) {
+						AMC::CJSONWriterArray newArray (writer);
+						newArray.copyFromArray (iIter->value);
+						writer.addArray(sValueName, newArray);
+					}
 
 				}
 

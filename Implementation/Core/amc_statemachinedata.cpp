@@ -64,13 +64,18 @@ namespace AMC {
 
 	PParameterHandler CStateMachineData::getParameterHandler(const std::string& sInstanceName)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		PParameterHandler pHandler;
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-		auto iter = m_StateMachineParameters.find(sInstanceName);
-		if(iter == m_StateMachineParameters.end ())
-			throw ELibMCCustomException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
+			auto iter = m_StateMachineParameters.find(sInstanceName);
+			if (iter == m_StateMachineParameters.end())
+				throw ELibMCCustomException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
 
-		return iter->second;
+			pHandler = iter->second;
+		}
+
+		return pHandler;
 	}
 
 
@@ -161,5 +166,4 @@ namespace AMC {
 
 
 }
-
 

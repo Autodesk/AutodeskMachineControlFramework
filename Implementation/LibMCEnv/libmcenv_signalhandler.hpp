@@ -73,6 +73,7 @@ protected:
 public:
 
 	CSignalHandler(AMC::PStateSignalHandler pSignalHandler, std::string & sSignalUUID, AMCCommon::PChrono pGlobalChrono);
+	CSignalHandler(AMC::PStateSignalHandler pSignalHandler, const std::string& sInstanceName, const std::string& sSignalName, const std::string& sSignalUUID, const std::string& sParameterDataJSON, AMCCommon::PChrono pGlobalChrono);
 
 	LibMCEnv::eSignalPhase GetSignalPhase() override;
 

@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <mutex>
 #include <cmath>
+#include <limits>
+#include <vector>
 
 namespace AMC {
 
@@ -287,6 +289,91 @@ namespace AMC {
 		}
 
 		return 0;
+	}
+
+	uint32_t CStateJournalReader::getVariableCount()
+	{
+		return (uint32_t)m_Variables.size();
+	}
+
+	void CStateJournalReader::getVariableInformation(const uint32_t nIndex, std::string& sName, LibMCData::eParameterDataType& eDataType, double& dUnits)
+	{
+		if (nIndex >= m_Variables.size())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		auto pVariable = m_Variables.at(nIndex);
+		sName = pVariable->getVariableName();
+		eDataType = pVariable->getDataType();
+		dUnits = pVariable->getUnits();
+	}
+
+	void CStateJournalReader::sampleVariableEnvelope(const std::string& sName, const uint64_t nStartTimeInMicroSeconds, const uint64_t nEndTimeInMicroSeconds, const uint32_t nBucketCount, std::vector<sJournalEnvelopeSample>& envelope)
+	{
+		if (nBucketCount == 0)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (nEndTimeInMicroSeconds <= nStartTimeInMicroSeconds)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		// Throws if the variable does not exist.
+		findVariable(sName);
+
+		envelope.resize(0);
+		envelope.reserve(nBucketCount);
+
+		const uint64_t nRange = nEndTimeInMicroSeconds - nStartTimeInMicroSeconds;
+		const uint32_t nOverSampleFactor = 8;
+		const uint64_t nMaxTotalSubSamples = 2000000ULL;
+
+		uint32_t nSubSamplesPerBucket = nOverSampleFactor;
+		if ((uint64_t)nBucketCount * nSubSamplesPerBucket > nMaxTotalSubSamples)
+			nSubSamplesPerBucket = 1;
+
+		const double dBucketWidth = (double)nRange / (double)nBucketCount;
+		const double dSubStep = dBucketWidth / (double)nSubSamplesPerBucket;
+
+		for (uint32_t nBucket = 0; nBucket < nBucketCount; nBucket++) {
+			const uint64_t nBucketStart = nStartTimeInMicroSeconds + (uint64_t)((double)nBucket * dBucketWidth);
+
+			double dMin = std::numeric_limits<double>::infinity();
+			double dMax = -std::numeric_limits<double>::infinity();
+			double dSum = 0.0;
+			double dLast = 0.0;
+			uint32_t nValidSamples = 0;
+
+			for (uint32_t nSub = 0; nSub < nSubSamplesPerBucket; nSub++) {
+				const uint64_t nSampleTime = nBucketStart + (uint64_t)(((double)nSub + 0.5) * dSubStep);
+
+				double dValue = 0.0;
+				try {
+					dValue = computeDoubleSample(sName, nSampleTime);
+				}
+				catch (std::exception&) {
+					continue;
+				}
+
+				if (dValue < dMin) dMin = dValue;
+				if (dValue > dMax) dMax = dValue;
+				dSum += dValue;
+				dLast = dValue;
+				nValidSamples++;
+			}
+
+			sJournalEnvelopeSample sSample;
+			sSample.m_nTimeStampInMicroSeconds = nBucketStart;
+			if (nValidSamples > 0) {
+				sSample.m_dMinValue = dMin;
+				sSample.m_dMaxValue = dMax;
+				sSample.m_dAverageValue = dSum / (double)nValidSamples;
+				sSample.m_dLastValue = dLast;
+			}
+			else {
+				sSample.m_dMinValue = 0.0;
+				sSample.m_dMaxValue = 0.0;
+				sSample.m_dAverageValue = 0.0;
+				sSample.m_dLastValue = 0.0;
+			}
+			envelope.push_back(sSample);
+		}
 	}
 
 	std::string CStateJournalReader::getStartTimeAsUTC()

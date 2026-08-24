@@ -373,6 +373,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERPOWERMAPPING: return "INVALIDLASERPOWERMAPPING";
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOWATTS: return "COULDNOTCONVERTLASERPOWERTOWATTS";
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOPERCENT: return "COULDNOTCONVERTLASERPOWERTOPERCENT";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE: return "INVALIDDEFOCUSCORRECTIONTABLE";
+			case LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED: return "DEFOCUSCORRECTIONNOTENABLED";
 		}
 		return "UNKNOWN";
 	}
@@ -548,6 +550,8 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERPOWERMAPPING: return "Invalid laser power mapping.";
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOWATTS: return "Could not convert laser power to watts.";
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOPERCENT: return "Could not convert laser power to percent.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE: return "Invalid defocus correction table.";
+			case LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED: return "Defocus correction by power is not enabled.";
 		}
 		return "unknown error";
 	}
@@ -1023,6 +1027,8 @@ public:
 	inline void AddLaserPinOutToList(const bool bLaserOut1, const bool bLaserOut2);
 	inline void AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput);
 	inline void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask);
+	inline LibMCDriver_ScanLab_uint32 ReadDigitalInputs();
+	inline bool ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex);
 	inline void EnableOIE();
 	inline void DisableOIE();
 	inline PNLightAFXProfileSelector CreateNLightAFXBeamProfileSelector();
@@ -1070,6 +1076,11 @@ public:
 	inline void SetPiecewiseLinearLaserPowerCalibration(const LibMCDriver_ScanLab_double dLaserPowerAt0Percent, const LibMCDriver_ScanLab_double dLaserPowerAt100Percent, const CInputVector<sLaserCalibrationPoint> & CalibrationPointsBuffer);
 	inline LibMCDriver_ScanLab_double MapPowerPercentageToWatts(const LibMCDriver_ScanLab_double dLaserPowerInPercent);
 	inline LibMCDriver_ScanLab_double MapPowerWattsToPercent(const LibMCDriver_ScanLab_double dLaserPowerInWatts);
+	inline void SetPiecewiseLinearDefocusCorrectionByPower(const CInputVector<sDefocusCorrectionPoint> & CalibrationPointsBuffer);
+	inline void DisableDefocusCorrectionByPower();
+	inline bool DefocusCorrectionByPowerIsEnabled();
+	inline void GetDefocusCorrectionByPower(std::vector<sDefocusCorrectionPoint> & CalibrationPointsBuffer);
+	inline LibMCDriver_ScanLab_double MapDefocusCorrectionFromPower(const LibMCDriver_ScanLab_double dLaserPowerInWatts);
 	inline void EnableSpatialLaserPowerModulation(const SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData);
 	inline void DisablePowerModulation();
 	inline void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold);
@@ -1499,6 +1510,8 @@ public:
 		pWrapperTable->m_RTCContext_AddLaserPinOutToList = nullptr;
 		pWrapperTable->m_RTCContext_AddWriteDigitalIOList = nullptr;
 		pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList = nullptr;
+		pWrapperTable->m_RTCContext_ReadDigitalInputs = nullptr;
+		pWrapperTable->m_RTCContext_ReadDigitalInputBit = nullptr;
 		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
 		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
 		pWrapperTable->m_RTCContext_CreateNLightAFXBeamProfileSelector = nullptr;
@@ -1546,6 +1559,11 @@ public:
 		pWrapperTable->m_RTCContext_SetPiecewiseLinearLaserPowerCalibration = nullptr;
 		pWrapperTable->m_RTCContext_MapPowerPercentageToWatts = nullptr;
 		pWrapperTable->m_RTCContext_MapPowerWattsToPercent = nullptr;
+		pWrapperTable->m_RTCContext_SetPiecewiseLinearDefocusCorrectionByPower = nullptr;
+		pWrapperTable->m_RTCContext_DisableDefocusCorrectionByPower = nullptr;
+		pWrapperTable->m_RTCContext_DefocusCorrectionByPowerIsEnabled = nullptr;
+		pWrapperTable->m_RTCContext_GetDefocusCorrectionByPower = nullptr;
+		pWrapperTable->m_RTCContext_MapDefocusCorrectionFromPower = nullptr;
 		pWrapperTable->m_RTCContext_EnableSpatialLaserPowerModulation = nullptr;
 		pWrapperTable->m_RTCContext_DisablePowerModulation = nullptr;
 		pWrapperTable->m_RTCContext_EnableLineSubdivision = nullptr;
@@ -3085,6 +3103,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ReadDigitalInputs = (PLibMCDriver_ScanLabRTCContext_ReadDigitalInputsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_readdigitalinputs");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ReadDigitalInputs = (PLibMCDriver_ScanLabRTCContext_ReadDigitalInputsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_readdigitalinputs");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ReadDigitalInputs == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_ReadDigitalInputBit = (PLibMCDriver_ScanLabRTCContext_ReadDigitalInputBitPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_readdigitalinputbit");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_ReadDigitalInputBit = (PLibMCDriver_ScanLabRTCContext_ReadDigitalInputBitPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_readdigitalinputbit");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_ReadDigitalInputBit == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_EnableOIE = (PLibMCDriver_ScanLabRTCContext_EnableOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableoie");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_EnableOIE = (PLibMCDriver_ScanLabRTCContext_EnableOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableoie");
@@ -3505,6 +3541,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_MapPowerWattsToPercent == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetPiecewiseLinearDefocusCorrectionByPower = (PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearDefocusCorrectionByPowerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setpiecewiselineardefocuscorrectionbypower");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetPiecewiseLinearDefocusCorrectionByPower = (PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearDefocusCorrectionByPowerPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setpiecewiselineardefocuscorrectionbypower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetPiecewiseLinearDefocusCorrectionByPower == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableDefocusCorrectionByPower = (PLibMCDriver_ScanLabRTCContext_DisableDefocusCorrectionByPowerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disabledefocuscorrectionbypower");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableDefocusCorrectionByPower = (PLibMCDriver_ScanLabRTCContext_DisableDefocusCorrectionByPowerPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disabledefocuscorrectionbypower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableDefocusCorrectionByPower == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DefocusCorrectionByPowerIsEnabled = (PLibMCDriver_ScanLabRTCContext_DefocusCorrectionByPowerIsEnabledPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_defocuscorrectionbypowerisenabled");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DefocusCorrectionByPowerIsEnabled = (PLibMCDriver_ScanLabRTCContext_DefocusCorrectionByPowerIsEnabledPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_defocuscorrectionbypowerisenabled");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DefocusCorrectionByPowerIsEnabled == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetDefocusCorrectionByPower = (PLibMCDriver_ScanLabRTCContext_GetDefocusCorrectionByPowerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getdefocuscorrectionbypower");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetDefocusCorrectionByPower = (PLibMCDriver_ScanLabRTCContext_GetDefocusCorrectionByPowerPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getdefocuscorrectionbypower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetDefocusCorrectionByPower == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_MapDefocusCorrectionFromPower = (PLibMCDriver_ScanLabRTCContext_MapDefocusCorrectionFromPowerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_mapdefocuscorrectionfrompower");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_MapDefocusCorrectionFromPower = (PLibMCDriver_ScanLabRTCContext_MapDefocusCorrectionFromPowerPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_mapdefocuscorrectionfrompower");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_MapDefocusCorrectionFromPower == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4980,6 +5061,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_AddWriteMaskedDigitalIOList == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_readdigitalinputs", (void**)&(pWrapperTable->m_RTCContext_ReadDigitalInputs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ReadDigitalInputs == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_readdigitalinputbit", (void**)&(pWrapperTable->m_RTCContext_ReadDigitalInputBit));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_ReadDigitalInputBit == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoie", (void**)&(pWrapperTable->m_RTCContext_EnableOIE));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableOIE == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5166,6 +5255,26 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_mappowerwattstopercent", (void**)&(pWrapperTable->m_RTCContext_MapPowerWattsToPercent));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_MapPowerWattsToPercent == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setpiecewiselineardefocuscorrectionbypower", (void**)&(pWrapperTable->m_RTCContext_SetPiecewiseLinearDefocusCorrectionByPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetPiecewiseLinearDefocusCorrectionByPower == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disabledefocuscorrectionbypower", (void**)&(pWrapperTable->m_RTCContext_DisableDefocusCorrectionByPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableDefocusCorrectionByPower == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_defocuscorrectionbypowerisenabled", (void**)&(pWrapperTable->m_RTCContext_DefocusCorrectionByPowerIsEnabled));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DefocusCorrectionByPowerIsEnabled == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getdefocuscorrectionbypower", (void**)&(pWrapperTable->m_RTCContext_GetDefocusCorrectionByPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetDefocusCorrectionByPower == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_mapdefocuscorrectionfrompower", (void**)&(pWrapperTable->m_RTCContext_MapDefocusCorrectionFromPower));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_MapDefocusCorrectionFromPower == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation", (void**)&(pWrapperTable->m_RTCContext_EnableSpatialLaserPowerModulation));
@@ -7286,6 +7395,31 @@ public:
 	}
 	
 	/**
+	* CRTCContext::ReadDigitalInputs - Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.
+	* @return Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15.
+	*/
+	LibMCDriver_ScanLab_uint32 CRTCContext::ReadDigitalInputs()
+	{
+		LibMCDriver_ScanLab_uint32 resultDigitalInput = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ReadDigitalInputs(m_pHandle, &resultDigitalInput));
+		
+		return resultDigitalInput;
+	}
+	
+	/**
+	* CRTCContext::ReadDigitalInputBit - Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.
+	* @param[in] nBitIndex - Index of the digital input bit to read. MUST be between 0 and 15.
+	* @return Current state of the requested digital input bit.
+	*/
+	bool CRTCContext::ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_ReadDigitalInputBit(m_pHandle, nBitIndex, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
 	* CRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
 	*/
 	void CRTCContext::EnableOIE()
@@ -7803,6 +7937,61 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_MapPowerWattsToPercent(m_pHandle, dLaserPowerInWatts, &resultLaserPowerInPercent));
 		
 		return resultLaserPowerInPercent;
+	}
+	
+	/**
+	* CRTCContext::SetPiecewiseLinearDefocusCorrectionByPower - Sets a piecewise linear defocus correction table that maps laser power (in watts) to a defocus offset (in mm). This compensates for focus shift caused by thermal lensing at different power levels. The correction is automatically added to the Z defocus value during marking operations.
+	* @param[in] CalibrationPointsBuffer - Defocus correction points that map laser power to defocus offset. Power values MUST be non-negative and strictly increasing in the array. Array MUST NOT be empty.
+	*/
+	void CRTCContext::SetPiecewiseLinearDefocusCorrectionByPower(const CInputVector<sDefocusCorrectionPoint> & CalibrationPointsBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetPiecewiseLinearDefocusCorrectionByPower(m_pHandle, (LibMCDriver_ScanLab_uint64)CalibrationPointsBuffer.size(), CalibrationPointsBuffer.data()));
+	}
+	
+	/**
+	* CRTCContext::DisableDefocusCorrectionByPower - Disables the defocus correction by laser power. After calling this, no power-dependent defocus adjustment will be applied.
+	*/
+	void CRTCContext::DisableDefocusCorrectionByPower()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableDefocusCorrectionByPower(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DefocusCorrectionByPowerIsEnabled - Returns whether defocus correction by laser power is currently enabled.
+	* @return True if defocus correction by power is enabled.
+	*/
+	bool CRTCContext::DefocusCorrectionByPowerIsEnabled()
+	{
+		bool resultIsEnabled = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DefocusCorrectionByPowerIsEnabled(m_pHandle, &resultIsEnabled));
+		
+		return resultIsEnabled;
+	}
+	
+	/**
+	* CRTCContext::GetDefocusCorrectionByPower - Returns the current defocus correction table. Fails if defocus correction is not enabled.
+	* @param[out] CalibrationPointsBuffer - Defocus Correction Points
+	*/
+	void CRTCContext::GetDefocusCorrectionByPower(std::vector<sDefocusCorrectionPoint> & CalibrationPointsBuffer)
+	{
+		LibMCDriver_ScanLab_uint64 elementsNeededCalibrationPoints = 0;
+		LibMCDriver_ScanLab_uint64 elementsWrittenCalibrationPoints = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetDefocusCorrectionByPower(m_pHandle, 0, &elementsNeededCalibrationPoints, nullptr));
+		CalibrationPointsBuffer.resize((size_t) elementsNeededCalibrationPoints);
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetDefocusCorrectionByPower(m_pHandle, elementsNeededCalibrationPoints, &elementsWrittenCalibrationPoints, CalibrationPointsBuffer.data()));
+	}
+	
+	/**
+	* CRTCContext::MapDefocusCorrectionFromPower - Looks up the defocus correction offset for a given laser power. Fails if defocus correction is not enabled.
+	* @param[in] dLaserPowerInWatts - Laser Power in Watts
+	* @return Defocus offset in millimeters
+	*/
+	LibMCDriver_ScanLab_double CRTCContext::MapDefocusCorrectionFromPower(const LibMCDriver_ScanLab_double dLaserPowerInWatts)
+	{
+		LibMCDriver_ScanLab_double resultDefocusOffsetInMM = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_MapDefocusCorrectionFromPower(m_pHandle, dLaserPowerInWatts, &resultDefocusOffsetInMM));
+		
+		return resultDefocusOffsetInMM;
 	}
 	
 	/**

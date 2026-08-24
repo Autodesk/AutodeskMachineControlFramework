@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_jsonwriter.hpp"
 #include "amc_ui_module_item.hpp"
+#include "amc_ui_frontenddefinition.hpp"
+#include "amc_ui_frontendstate.hpp"
+#include "amc_ui_expression.hpp"
 
 #define AMC_CONTENT_MAXENTRYCOUNT (1024 * 1024)
 
@@ -49,6 +52,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 
 	class CUIModule_ContentItem : public CUIModuleItem {
 	protected:		
@@ -56,6 +60,7 @@ namespace AMC {
 		std::string m_sUUID;
 		std::string m_sItemName;
 
+		PUIFrontendDefinitionModuleStore m_pItemModuleStore;
 
 	public:
 
@@ -71,6 +76,29 @@ namespace AMC {
 		virtual std::list <std::string> getReferenceUUIDs();
 
 		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
+
+		/////////////////////////////////////////////////////////////////////////////////////
+		// New UI Frontend System
+		/////////////////////////////////////////////////////////////////////////////////////
+
+		// Initialize the v2 frontend module store for this item. Called after construction.
+		void initFrontendModuleStore(CUIFrontendDefinition* pFrontendDefinition);
+
+		// Override in subclasses to register v2 attributes with the module store.
+		virtual void registerFrontendAttributes();
+
+		// Returns the item type string for the v2 frontend (e.g. "paragraph", "image").
+		virtual std::string getItemType();
+
+		// Write this item as a submodule in the v2 frontend JSON output.
+		virtual void frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData);
+
+		// Helpers for registering v2 attributes
+		PUIFrontendDefinitionAttribute registerItemStringAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemBoolAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemIntegerAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemNumberAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemUUIDAttribute(const std::string& sName, const CUIExpression& expression);
 
 	};
 

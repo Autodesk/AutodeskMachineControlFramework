@@ -133,6 +133,7 @@ namespace AMC {
 
 		void getAllTriangles(uint64_t nTrianglesBufferSize, uint64_t* pTrianglesNeededCount, LibMCEnv::sMeshTriangle3D* pTrianglesBuffer);
 
+		uint64_t getMemoryUsageInBytes();
 
 	};
 
@@ -141,4 +142,3 @@ namespace AMC {
 
 
 #endif //__AMC_MESHENTITY
-

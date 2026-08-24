@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <mutex>
 #include <string>
+#include <functional>
 
 namespace LibMCData {
 	class CDataModel;
@@ -63,6 +64,7 @@ namespace AMC {
 	class CStateJournal;
 	class CUIHandler;
 	class CParameterHandler;
+	class CParameterGroup;
 	class CStateMachineData;
 	class CAccessControl;
 	class CStringResourceHandler;
@@ -70,6 +72,8 @@ namespace AMC {
 	class CMeshHandler;
 	class CDataSeriesHandler;
 	class CAlertHandler;
+	class CTelemetryHandler;
+	class CStreamRegistry;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -78,6 +82,7 @@ namespace AMC {
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
 	typedef std::shared_ptr<CStateJournal> PStateJournal;
 	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+	typedef std::shared_ptr<CParameterGroup> PParameterGroup;
 	typedef std::shared_ptr<CStateMachineData> PStateMachineData;
 	typedef std::shared_ptr<CAccessControl> PAccessControl;
 	typedef std::shared_ptr<CStringResourceHandler> PStringResourceHandler;
@@ -85,9 +90,17 @@ namespace AMC {
 	typedef std::shared_ptr<CAlertHandler> PAlertHandler;
 	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
 	typedef std::shared_ptr<CDataSeriesHandler> PDataSeriesHandler;
+	typedef std::shared_ptr<CTelemetryHandler> PTelemetryHandler;
+	typedef std::shared_ptr<CStreamRegistry> PStreamRegistry;
 
 	class CSystemState {
 	private:
+		typedef struct _sMemoryUsageProvider {
+			std::string m_sParameterName;
+			std::string m_sDescription;
+			std::function<uint64_t()> m_Callback;
+		} sMemoryUsageProvider;
+
 		AMC::PLogger m_pLogger;
 		AMC::PStateSignalHandler m_pSignalHandler;
 		AMC::PDriverHandler m_pDriverHandler;
@@ -101,6 +114,10 @@ namespace AMC {
 		AMC::PMeshHandler m_pMeshHandler;
 		AMC::PAlertHandler m_pAlertHandler;
 		AMC::PDataSeriesHandler m_pDataSeriesHandler;
+		AMC::PParameterHandler m_pSystemParameterHandler;
+		AMC::PParameterGroup m_pSystemMemoryGroup;
+		AMC::PTelemetryHandler m_pTelemetryHandler;
+		AMC::PStreamRegistry m_pStreamRegistry;
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
@@ -111,6 +128,8 @@ namespace AMC {
 		std::string m_sInstallationUUID;
 		std::string m_sInstallationSecret;		
 		std::string m_sTestEnvironmentPath;
+		std::map<std::string, sMemoryUsageProvider> m_MemoryUsageProviders;
+		std::mutex m_MemoryUsageMutex;
 
 
 	public:
@@ -127,6 +146,7 @@ namespace AMC {
 		CAccessControl * accessControl ();
 		CStringResourceHandler * stringResourceHandler ();
 		CAlertHandler* alertHandler();
+		CTelemetryHandler* telemetryHandler();
 
 		AMCCommon::CChrono * globalChrono();
 
@@ -141,6 +161,8 @@ namespace AMC {
 		PMeshHandler getMeshHandlerInstance();
 		PDataSeriesHandler getDataSeriesHandlerInstance();
 		PAlertHandler getAlertHandlerInstance();
+		PTelemetryHandler getTelemetryHandlerInstance();
+		PStreamRegistry getStreamRegistryInstance();
 
 		LibMCData::PDataModel getDataModelInstance ();
 
@@ -159,6 +181,10 @@ namespace AMC {
 
 		uint64_t getAbsoluteTimeStamp();
 
+		void registerMemoryUsageProvider(const std::string& sParameterName, const std::string& sDescription, std::function<uint64_t()> callback);
+		void updateMemoryUsageParameters();
+
+		void addDriverVersionInfo(const std::string& sDriverName);
 
 
 	};
@@ -169,4 +195,3 @@ namespace AMC {
 
 
 #endif //__AMC_SYSTEMSTATE
-

@@ -32,9 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_CONSTANTS
 
 #include "amc_ui_module_contentitem_alertlist.hpp"
+#include "amc_ui_expression.hpp"
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
@@ -227,4 +229,50 @@ std::list <std::string> CUIModule_ContentAlertList::getReferenceUUIDs()
 	sUUIDList.push_back(getUUID ());
 
 	return sUUIDList;
+}
+
+std::string CUIModule_ContentAlertList::getItemType()
+{
+	return "alertlist";
+}
+
+void CUIModule_ContentAlertList::registerFrontendAttributes()
+{
+	CUIExpression expr;
+	expr.setFixedValue(m_sLoadingText);
+	registerItemStringAttribute("loadingtext", expr);
+
+	expr.setFixedValue(m_sSelectEvent);
+	registerItemStringAttribute("selectevent", expr);
+
+	expr.setFixedValue(std::to_string(m_nEntriesPerPage));
+	registerItemIntegerAttribute("entriesperpage", expr);
+
+	expr.setFixedValue(m_sSelectedBuildField);
+	registerItemStringAttribute("selectionvalueuuid", expr);
+}
+
+void CUIModule_ContentAlertList::frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (m_pItemModuleStore == nullptr)
+		return;
+
+	std::string sItemType = m_pItemModuleStore->getModuleType();
+	if (sItemType.empty())
+		return;
+
+	itemObject.addString("moduletype", sItemType);
+	itemObject.addString("uuid", m_pItemModuleStore->getUUID());
+
+	CJSONWriterObject attributesObject(writer);
+	pFrontendState->writeModuleAttributesToJSON(writer, attributesObject, m_pItemModuleStore.get(), pStateMachineData);
+
+	if (m_pDataModel) {
+		auto pAlertSession = m_pDataModel->CreateAlertSession();
+		attributesObject.addInteger(AMC_API_KEY_ALERTS_HEADID, (int64_t) pAlertSession->GetAlertHeadID());
+	}
+
+	itemObject.addObject("attributes", attributesObject);
 }

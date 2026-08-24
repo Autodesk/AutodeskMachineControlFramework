@@ -45,7 +45,8 @@ Abstract: This is a stub class definition of CSMCJob
 #include <array>
 #include <thread>
 #include <cmath>
-//#include <iostream>
+#include <iostream>
+#include <cstring>
 #include <chrono>
 
 using namespace LibMCDriver_ScanLabSMC::Impl;
@@ -65,25 +66,45 @@ CSMCJobInstance::CSMCJobInstance(PSMCContextHandle pContextHandle, double dStart
     m_bSendToHardware (bSendToHardware),
     m_dMaxPowerInWatts (dMaxPowerInWatts)
 {
-
-
-
-
     if (m_pWorkingDirectory.get() == nullptr)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
     if (m_pContextHandle.get() == nullptr)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
 
-    m_pSDK = m_pContextHandle->getSDK();
+    m_pSDK = m_pContextHandle->getSDK();    
 
     auto contextHandle = m_pContextHandle->getHandle();
-    m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_begin(contextHandle, &m_JobID));
-    
 
-    slsc_RecordSet eRecordSetA = slsc_RecordSet::slsc_RecordSet_SetPositions;
-    slsc_RecordSet eRecordSetB = slsc_RecordSet::slsc_RecordSet_LaserSwitches;
+    if (m_bSendToHardware) {
 
-    //m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_start_record(contextHandle, eRecordSetA, eRecordSetB));
+        // Initialize digital output to 0
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_ctrl_write_digital_x(contextHandle, slsc_DigitalOutput::slsc_DigitalOutput_1, 0));
+
+        // Begin job
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_begin(contextHandle, &m_JobID));
+
+        // Set digital output to 1
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_write_digital_x(contextHandle, slsc_DigitalOutput::slsc_DigitalOutput_1, 1, 0));
+
+        slsc_RecordSet eRecordSetA = slsc_RecordSet::slsc_RecordSet_SetPositions;
+        slsc_RecordSet eRecordSetB = slsc_RecordSet::slsc_RecordSet_LaserSwitches;
+
+        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_start_record(contextHandle, eRecordSetA, eRecordSetB));
+    }
+    else
+    {
+        // To start Module recording at start position (0,0).
+        size_t JobID = 0;
+        double StartPosition[2] = { 0.0, 0.0 };
+            
+        m_tmpSimulationFile = m_pWorkingDirectory->AddManagedTempFile("slm");
+
+		auto sSimulationFileName = m_tmpSimulationFile->GetAbsoluteFileName();
+
+        std::cout << "Starting planning layer : module file name : " << sSimulationFileName << std::endl;
+        m_pSDK->slsc_job_begin_module(contextHandle, &JobID, StartPosition, sSimulationFileName.c_str());
+    }
+
 
     if (dMaxPowerInWatts < SCANLABSMC_MIN_MAXPOWERINWATTS || dMaxPowerInWatts > SCANLABSMC_MAX_MAXPOWERINWATTS)
 		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDMAXPOWERVALUE);
@@ -106,7 +127,11 @@ void CSMCJobInstance::Finalize()
     
     auto contextHandle = m_pContextHandle->getHandle();
 
-    //m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_stop_record(contextHandle));
+    // Set digital output to 0
+    m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_write_digital_x(contextHandle, slsc_DigitalOutput::slsc_DigitalOutput_1, 0, 0));
+
+	// Stop recording
+    m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_stop_record(contextHandle));
 
     m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_end(contextHandle));
     m_bIsFinalized = true;
@@ -129,9 +154,10 @@ void CSMCJobInstance::drawPolylineEx(slscHandle contextHandle, const uint64_t nP
     m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_write_analog_x(contextHandle, slsc_AnalogOutput::slsc_AnalogOutput_1, dPowerFactor, 0.0));
 
     auto& startPoint = pPointsBuffer[0];
-    std::array<double, 2> startPosition;
+    std::array<double, 3> startPosition;
     startPosition[0] = startPoint.m_X;
     startPosition[1] = startPoint.m_Y;
+    startPosition[2] = 0.0;
     m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_jump(contextHandle, startPosition.data()));
 
     slsc_PolylineOptions polyLineOptions;
@@ -146,9 +172,10 @@ void CSMCJobInstance::drawPolylineEx(slscHandle contextHandle, const uint64_t nP
 
     for (size_t nPointIndex = 1; nPointIndex < nPointsBufferSize; nPointIndex++) {
         auto& nextPoint = pPointsBuffer[nPointIndex];
-        std::array<double, 2> nextPosition;
+        std::array<double, 3> nextPosition;
         nextPosition[0] = nextPoint.m_X;
         nextPosition[1] = nextPoint.m_Y;
+		nextPosition[2] = 0.0;
         m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_line(contextHandle, nextPosition.data()));
     }
 
@@ -220,25 +247,25 @@ void CSMCJobInstance::drawHatchesEx(const LibMCDriver_ScanLabSMC_uint64 nHatches
 
         m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_jump_speed(contextHandle, dJumpSpeed));
         m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_set_mark_speed(contextHandle, dMarkSpeed));
-        m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_write_analog_x(contextHandle, slsc_AnalogOutput::slsc_AnalogOutput_1, dPowerFactor, 0.0));
 
         for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchesBufferSize; nHatchIndex++) {
             auto& hatch = pHatchesBuffer[nHatchIndex];
-            std::array<double, 2> point1;
+            std::array<double, 3> point1;
             point1[0] = hatch.m_X1;
             point1[1] = hatch.m_Y1;
+            point1[2] = 0.0;
 
-            std::array<double, 2> point2;
+            std::array<double, 3> point2;
             point2[0] = hatch.m_X2;
             point2[1] = hatch.m_Y2;
-
+            point2[2] = 0.0;
+                        
+            std::array<double, 1> paraPower;
+            paraPower[0] = dPowerFactor;
 
             m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_jump(contextHandle, point1.data()));
-            m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_line(contextHandle, point2.data()));
-
-            //m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_para_enable(contextHandle, paraPower.data()));
-            //m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_para_line(contextHandle, point2.data(), paraPower.data()));
-
+            m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_para_enable(contextHandle, paraPower.data()));
+            m_pSDK->checkError(contextHandle, m_pSDK->slsc_job_para_line(contextHandle, point2.data(), paraPower.data()));
         }
     }
 
@@ -265,13 +292,15 @@ void CSMCJobInstance::drawHatchesExLinearPower(const LibMCDriver_ScanLabSMC_uint
 
         for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchesBufferSize; nHatchIndex++) {
             auto& hatch = pHatchesBuffer[nHatchIndex];
-            std::array<double, 2> point1;
+            std::array<double, 3> point1;
             point1[0] = hatch.m_X1;
             point1[1] = hatch.m_Y1;
+            point1[2] = 0.0;
 
-            std::array<double, 2> point2;
+            std::array<double, 3> point2;
             point2[0] = hatch.m_X2;
             point2[1] = hatch.m_Y2;
+            point2[2] = 0.0;
 
             std::array<double, 1> paraPower1;
             paraPower1[0] = PowerValuesInWatts1.at (nHatchIndex) / m_dMaxPowerInWatts;
@@ -314,13 +343,15 @@ void CSMCJobInstance::drawHatchesExNonLinearPower(const LibMCDriver_ScanLabSMC_u
 
         for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchesBufferSize; nHatchIndex++) {
             auto& hatch = pHatchesBuffer[nHatchIndex];
-            std::array<double, 2> point1;
+            std::array<double, 3> point1;
             point1[0] = hatch.m_X1;
             point1[1] = hatch.m_Y1;
+            point1[2] = 0.0;
 
-            std::array<double, 2> point2;
+            std::array<double, 3> point2;
             point2[0] = hatch.m_X2;
             point2[1] = hatch.m_Y2;
+            point2[2] = 0.0;
 
             double dX = point2[0] - point1[0];
             double dY = point2[1] - point1[1];
@@ -342,7 +373,7 @@ void CSMCJobInstance::drawHatchesExNonLinearPower(const LibMCDriver_ScanLabSMC_u
                 double dSectionDelta = dCurrentSection - dLastSection;
 
                 if (dSectionDelta < 0.0)
-                    throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INTERPOLATIONDATAISNOTINCREASING);
+                    throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INTERPOLATIONDATAISNOTINCREASING, "interpolation data is not increasing: " + std::to_string (dLastSection) + " MUST be smaller than " + std::to_string (dCurrentSection));
 
                 auto& section = paraSections.at(nSubinterpolationIndex);
                 section.m_dS = dSectionDelta;
@@ -383,7 +414,7 @@ void CSMCJobInstance::Execute(const bool bBlocking)
 {
     auto contextHandle = m_pContextHandle->getHandle();
 
-    //std::cout << "Waiting for execution" << std::endl;
+    std::cout << "Waiting for execution" << std::endl;
 
     slsc_ExecState execState1 = slsc_ExecState::slsc_ExecState_NotInitOrError;
     while (execState1 != slsc_ExecState::slsc_ExecState_ReadyForExecution) {
@@ -391,11 +422,11 @@ void CSMCJobInstance::Execute(const bool bBlocking)
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     } 
 
-    //std::cout << "Starting execution" << std::endl;
+    std::cout << "Starting execution" << std::endl;
 
     m_pSDK->checkError(contextHandle, m_pSDK->slsc_ctrl_start_execution(contextHandle));
 
-    //std::cout << "Waiting for execution finished" << std::endl;
+    std::cout << "Waiting for execution finished" << std::endl;
 
     slsc_ExecState execState2 = slsc_ExecState::slsc_ExecState_Executing;
     while (execState2 == slsc_ExecState::slsc_ExecState_Executing) {
@@ -403,16 +434,16 @@ void CSMCJobInstance::Execute(const bool bBlocking)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     } 
 
-
+    std::cout << "Execution is finished" << std::endl;
 }
 
 bool CSMCJobInstance::IsExecuting()
-{
-    return false;
+{	
+	return false;
 }
 
 void CSMCJobInstance::WaitForExecution(const LibMCDriver_ScanLabSMC_uint32 nTimeOutInMilliseconds)
-{
+{    
 
 }
 
@@ -795,8 +826,10 @@ void CSMCJobInstance::ReadSimulationFile_SMC_v1_0(LibMCEnv::PDataTable pDataTabl
         {{CSMCCSVParser::FieldParserType::Double, CSMCCSVParser::FieldProcessingStep::Extend | CSMCCSVParser::FieldProcessingStep::Interpolate }, &scanheadY},
         {{CSMCCSVParser::FieldParserType::LaserSignal,CSMCCSVParser::FieldProcessingStep::Nop}, &laserSignal},
         {{CSMCCSVParser::FieldParserType::UInt32,CSMCCSVParser::FieldProcessingStep::Nop}, &laserToggle},
-        {{CSMCCSVParser::FieldParserType::None,CSMCCSVParser::FieldProcessingStep::Nop}, nullptr},
-        {{CSMCCSVParser::FieldParserType::None,CSMCCSVParser::FieldProcessingStep::Nop}, nullptr},
+        //{{CSMCCSVParser::FieldParserType::None,CSMCCSVParser::FieldProcessingStep::Nop}, nullptr},
+        //{{CSMCCSVParser::FieldParserType::None,CSMCCSVParser::FieldProcessingStep::Nop}, nullptr},
+        {{CSMCCSVParser::FieldParserType::Double,CSMCCSVParser::FieldProcessingStep::Nop}, &activeChannel0},
+        {{CSMCCSVParser::FieldParserType::Double,CSMCCSVParser::FieldProcessingStep::Nop}, &activeChannel1},
         {{CSMCCSVParser::FieldParserType::Int,CSMCCSVParser::FieldProcessingStep::Nop}, &cmdCount},
         {{CSMCCSVParser::FieldParserType::None,CSMCCSVParser::FieldProcessingStep::Nop}, nullptr},
         {{CSMCCSVParser::FieldParserType::None,CSMCCSVParser::FieldProcessingStep::Nop}, nullptr},
@@ -815,8 +848,8 @@ void CSMCJobInstance::ReadSimulationFile_SMC_v1_0(LibMCEnv::PDataTable pDataTabl
     pDataTable->AddColumn("x", "X", LibMCEnv::eDataTableColumnType::DoubleColumn);
     pDataTable->AddColumn("y", "Y", LibMCEnv::eDataTableColumnType::DoubleColumn);
     pDataTable->AddColumn("laseron", "LaserOn", LibMCEnv::eDataTableColumnType::Uint32Column);
+    pDataTable->AddColumn("power", "Laser Power", LibMCEnv::eDataTableColumnType::DoubleColumn);
     pDataTable->AddColumn("active1", "Active Channel 1", LibMCEnv::eDataTableColumnType::DoubleColumn);
-    pDataTable->AddColumn("active2", "Active Channel 2", LibMCEnv::eDataTableColumnType::DoubleColumn);
     pDataTable->AddColumn("cmdindex", "Command Index", LibMCEnv::eDataTableColumnType::Int32Column);
 
     m_dJobDuration = (double)timestampValues.size() / (double)SCANLABSMC_MICROSTEPSPERSECOND;
@@ -833,6 +866,12 @@ void CSMCJobInstance::ReadSimulationFile_SMC_v1_0(LibMCEnv::PDataTable pDataTabl
 
     pDataTable->SetUint32ColumnValues("laseron", laserSignal);
     laserSignal.resize(0);
+
+    pDataTable->SetDoubleColumnValues("power", activeChannel0);
+    activeChannel0.resize(0);
+
+    pDataTable->SetDoubleColumnValues("active1", activeChannel1);
+    activeChannel1.resize(0);    
 }
 
 void CSMCJobInstance::ReadLogRecordFile(LibMCEnv::PDataTable pDataTable)
@@ -1025,3 +1064,26 @@ void CSMCJobInstance::AddLayerToList(LibMCEnv::PToolpathLayer pLayer)
 
 }
 
+void CSMCJobInstance::LoadRawSimulationData(LibMCDriver_ScanLabSMC_uint64 nDataBufferSize, LibMCDriver_ScanLabSMC_uint64* pDataNeededCount, LibMCDriver_ScanLabSMC_uint8* pDataBuffer)
+{   
+    if(pDataNeededCount == nullptr)
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+    if (m_tmpSimulationFile.get() == nullptr)
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_SIMULATIONWORKINGFILEISNOTINITIALIZED);
+
+    size_t nDataSize = m_tmpSimulationFile->GetSize();
+    *pDataNeededCount = nDataSize;
+
+    if (pDataBuffer)
+    {		
+        std::vector<LibMCEnv_uint8> tmpFileContentBuffer;
+        m_tmpSimulationFile->ReadContent(tmpFileContentBuffer);
+
+        if (nDataSize != tmpFileContentBuffer.size ())
+            throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_SIMULATIONWORKINGFILESIZEMISMATCH);
+
+        if (tmpFileContentBuffer.size () > 0)
+            memcpy(pDataBuffer, tmpFileContentBuffer.data(), tmpFileContentBuffer.size());
+    }
+}

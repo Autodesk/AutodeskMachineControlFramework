@@ -399,6 +399,13 @@ public:
 	virtual void ParseConfiguration(const std::string & sXMLString) = 0;
 
 	/**
+	* IMCContext::SetParameterOverride - overrides a parameter with a certain value. Fails if parameter group or parameter does not exist. Fails if Value is not fitting the parameter type.
+	* @param[in] sParameterPath - Path of the parameter. Example: main.configgroup.currentjob
+	* @param[in] sParameterValue - New Value of the parameter
+	*/
+	virtual void SetParameterOverride(const std::string & sParameterPath, const std::string & sParameterValue) = 0;
+
+	/**
 	* IMCContext::StartAllThreads - starts the threads for all the state machines.
 	*/
 	virtual void StartAllThreads() = 0;

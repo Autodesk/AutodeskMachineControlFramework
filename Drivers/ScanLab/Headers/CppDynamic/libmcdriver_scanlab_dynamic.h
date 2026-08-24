@@ -1684,6 +1684,25 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddWriteDigit
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput, LibMCDriver_ScanLab_uint32 nOutputMask);
 
 /**
+* Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pDigitalInput - Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ReadDigitalInputsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pDigitalInput);
+
+/**
+* Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nBitIndex - Index of the digital input bit to read. MUST be between 0 and 15.
+* @param[out] pValue - Current state of the requested digital input bit.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ReadDigitalInputBitPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nBitIndex, bool * pValue);
+
+/**
 * Writes an OIE enabling command block to the open list.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -2137,6 +2156,54 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_MapPowerPerce
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_MapPowerWattsToPercentPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserPowerInWatts, LibMCDriver_ScanLab_double * pLaserPowerInPercent);
+
+/**
+* Sets a piecewise linear defocus correction table that maps laser power (in watts) to a defocus offset (in mm). This compensates for focus shift caused by thermal lensing at different power levels. The correction is automatically added to the Z defocus value during marking operations.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[in] pCalibrationPointsBuffer - DefocusCorrectionPoint buffer of Defocus correction points that map laser power to defocus offset. Power values MUST be non-negative and strictly increasing in the array. Array MUST NOT be empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearDefocusCorrectionByPowerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer);
+
+/**
+* Disables the defocus correction by laser power. After calling this, no power-dependent defocus adjustment will be applied.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableDefocusCorrectionByPowerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns whether defocus correction by laser power is currently enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pIsEnabled - True if defocus correction by power is enabled.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DefocusCorrectionByPowerIsEnabledPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pIsEnabled);
+
+/**
+* Returns the current defocus correction table. Fails if defocus correction is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[out] pCalibrationPointsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pCalibrationPointsBuffer - DefocusCorrectionPoint  buffer of Defocus Correction Points
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetDefocusCorrectionByPowerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer);
+
+/**
+* Looks up the defocus correction offset for a given laser power. Fails if defocus correction is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dLaserPowerInWatts - Laser Power in Watts
+* @param[out] pDefocusOffsetInMM - Defocus offset in millimeters
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_MapDefocusCorrectionFromPowerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserPowerInWatts, LibMCDriver_ScanLab_double * pDefocusOffsetInMM);
 
 /**
 * Enables a spatial laser power modulation via callback.
@@ -3290,6 +3357,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddLaserPinOutToListPtr m_RTCContext_AddLaserPinOutToList;
 	PLibMCDriver_ScanLabRTCContext_AddWriteDigitalIOListPtr m_RTCContext_AddWriteDigitalIOList;
 	PLibMCDriver_ScanLabRTCContext_AddWriteMaskedDigitalIOListPtr m_RTCContext_AddWriteMaskedDigitalIOList;
+	PLibMCDriver_ScanLabRTCContext_ReadDigitalInputsPtr m_RTCContext_ReadDigitalInputs;
+	PLibMCDriver_ScanLabRTCContext_ReadDigitalInputBitPtr m_RTCContext_ReadDigitalInputBit;
 	PLibMCDriver_ScanLabRTCContext_EnableOIEPtr m_RTCContext_EnableOIE;
 	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
 	PLibMCDriver_ScanLabRTCContext_CreateNLightAFXBeamProfileSelectorPtr m_RTCContext_CreateNLightAFXBeamProfileSelector;
@@ -3337,6 +3406,11 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearLaserPowerCalibrationPtr m_RTCContext_SetPiecewiseLinearLaserPowerCalibration;
 	PLibMCDriver_ScanLabRTCContext_MapPowerPercentageToWattsPtr m_RTCContext_MapPowerPercentageToWatts;
 	PLibMCDriver_ScanLabRTCContext_MapPowerWattsToPercentPtr m_RTCContext_MapPowerWattsToPercent;
+	PLibMCDriver_ScanLabRTCContext_SetPiecewiseLinearDefocusCorrectionByPowerPtr m_RTCContext_SetPiecewiseLinearDefocusCorrectionByPower;
+	PLibMCDriver_ScanLabRTCContext_DisableDefocusCorrectionByPowerPtr m_RTCContext_DisableDefocusCorrectionByPower;
+	PLibMCDriver_ScanLabRTCContext_DefocusCorrectionByPowerIsEnabledPtr m_RTCContext_DefocusCorrectionByPowerIsEnabled;
+	PLibMCDriver_ScanLabRTCContext_GetDefocusCorrectionByPowerPtr m_RTCContext_GetDefocusCorrectionByPower;
+	PLibMCDriver_ScanLabRTCContext_MapDefocusCorrectionFromPowerPtr m_RTCContext_MapDefocusCorrectionFromPower;
 	PLibMCDriver_ScanLabRTCContext_EnableSpatialLaserPowerModulationPtr m_RTCContext_EnableSpatialLaserPowerModulation;
 	PLibMCDriver_ScanLabRTCContext_DisablePowerModulationPtr m_RTCContext_DisablePowerModulation;
 	PLibMCDriver_ScanLabRTCContext_EnableLineSubdivisionPtr m_RTCContext_EnableLineSubdivision;

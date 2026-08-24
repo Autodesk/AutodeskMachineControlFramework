@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "libmcdata_abi.hpp"
+#include "Framework/InterfacesCore/libmcdata_abi.hpp"
 #include "libmcdata_interfaces.hpp"
 #include "libmcdata_interfaceexception.hpp"
 #include "libmcdata_datamodel.hpp"
@@ -66,5 +66,4 @@ IDataModel * CWrapper::CreateDataModelInstance()
 {
 	return new CDataModel();
 }
-
 

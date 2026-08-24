@@ -888,18 +888,10 @@ void CImageData::GetPixels(const LibMCEnv_uint32 nStartX, const LibMCEnv_uint32 
 {
 	if (m_PixelData.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
-
-	if (pValueBuffer == nullptr)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-
-	if (m_PixelData.get() == nullptr)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDIMAGEBUFFER);
-
 	if (nCountX <= 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELCOUNT);
 	if (nCountY <= 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELCOUNT);
-
 	if (nStartX >= m_nPixelCountX)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
 	if (nStartY >= m_nPixelCountY)

@@ -57,6 +57,7 @@ namespace AMCCommon {
 		~CPortableZIPWriter();
 
 		PExportStream createEntry(const std::string sName, uint64_t nUnixTimeStamp);
+		PExportStream createEntryWithExternalAttributes(const std::string sName, uint64_t nUnixTimeStamp, uint32_t nExternalFileAttributes);
 		void closeEntry();
 
 		void writeDeflatedBuffer(uint32_t nEntryKey, const void * pBuffer, uint32_t cbCompressedBytes);

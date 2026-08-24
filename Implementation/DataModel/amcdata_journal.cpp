@@ -151,11 +151,15 @@ namespace AMCData {
 		return m_nTotalSize;
 	}
 
-	CJournal::CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string& sSessionUUID)
+	CJournal::CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string& sTelemetryChunkBaseName, const std::string& sSessionUUID)
 		: m_LogID(1), m_AlertID(1), m_sSessionUUID(AMCCommon::CUtils::normalizeUUIDString(sSessionUUID)),
-		m_sJournalBasePath(sJournalBasePath), m_sChunkBaseName (sJournalChunkBaseName)		
+		m_sJournalBasePath(sJournalBasePath), m_sChunkBaseName (sJournalChunkBaseName), m_sTelemetryChunkBaseName(sTelemetryChunkBaseName)
 	{
-		
+		if (sJournalChunkBaseName.empty())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "Journal chunk base name is empty");
+		if (sTelemetryChunkBaseName.empty())
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "Telemetry chunk base name is empty");
+
 		m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(m_sJournalBasePath + sJournalName);
 
 		std::string sQuery = "CREATE TABLE `logs` (";
@@ -197,7 +201,7 @@ namespace AMCData {
 		pJournalVariableAliasesStatement = nullptr;
 
 		std::string sJournalQuery = "CREATE TABLE `journal_chunks` (";
-		sJournalQuery += "`chunkindex` int DEFAULT 0, ";
+		sJournalQuery += "`chunkindex` int UNIQUE NOT NULL, ";
 		sJournalQuery += "`fileindex` int DEFAULT 0, ";
 		sJournalQuery += "`starttimestamp` int DEFAULT 0, ";
 		sJournalQuery += "`endtimestamp` int DEFAULT 0, ";
@@ -212,6 +216,7 @@ namespace AMCData {
 		sAlertQuery += "`uuid`  varchar ( 64 ) NOT NULL, ";
 		sAlertQuery += "`identifier`  varchar ( 64 ) NOT NULL, ";
 		sAlertQuery += "`alertindex`	int DEFAULT 0, ";
+		sAlertQuery += "`incremental_id`	int DEFAULT 0, ";
 		sAlertQuery += "`alertlevel`	varchar (64) NOT NULL,";
 		sAlertQuery += "`description`	TEXT DEFAULT ``,";
 		sAlertQuery += "`descriptionidentifier`  varchar ( 64 ) NOT NULL, ";
@@ -235,7 +240,40 @@ namespace AMCData {
 		pAlertAckStatement->execute();
 		pAlertAckStatement = nullptr; 
 
+		std::string sTelemetryChannelQuery = "CREATE TABLE `telemetry_channels` (";
+		sTelemetryChannelQuery += "`uuid` varchar(64) UNIQUE NOT NULL, ";
+		sTelemetryChannelQuery += "`channeltype` varchar(64) NOT NULL, ";
+		sTelemetryChannelQuery += "`channelindex` int NOT NULL, ";
+		sTelemetryChannelQuery += "`identifier` text NOT NULL, ";
+		sTelemetryChannelQuery += "`description` text NOT NULL)";
+
+		auto pTelemetryChannelStatement = m_pSQLHandler->prepareStatement(sTelemetryChannelQuery);
+		pTelemetryChannelStatement->execute();
+		pTelemetryChannelStatement = nullptr;
+
+		std::string sTelemetryDataQuery = "CREATE TABLE `telemetry_datafiles` (";
+		sTelemetryDataQuery += "`fileindex` int UNIQUE NOT NULL, ";
+		sTelemetryDataQuery += "`filename` text NOT NULL)";
+
+		auto pTelemetryDataStatement = m_pSQLHandler->prepareStatement(sTelemetryDataQuery);
+		pTelemetryDataStatement->execute();
+		pTelemetryDataStatement = nullptr;
+
+		std::string sTelemetryChunkQuery = "CREATE TABLE `telemetry_chunks` (";
+		sTelemetryChunkQuery += "`chunkindex` int UNIQUE NOT NULL, ";
+		sTelemetryChunkQuery += "`fileindex` int DEFAULT 0, ";
+		sTelemetryChunkQuery += "`starttimestamp` int DEFAULT 0, ";
+		sTelemetryChunkQuery += "`endtimestamp` int DEFAULT 0, ";
+		sTelemetryChunkQuery += "`entrycount` int DEFAULT 0, ";
+		sTelemetryChunkQuery += "`dataoffset` int DEFAULT 0, ";
+		sTelemetryChunkQuery += "`datalength` int DEFAULT 0) ";
+
+		auto pTelemetryChunkStatement = m_pSQLHandler->prepareStatement(sTelemetryChunkQuery);
+		pTelemetryChunkStatement->execute();
+		pTelemetryChunkStatement = nullptr;
+
 		m_pCurrentJournalFile = createJournalFile();
+		m_pCurrentTelemetryFile = createTelemetryFile();
 
 	}
 
@@ -266,6 +304,30 @@ namespace AMCData {
 		m_JournalFiles.push_back(pJournalFile);
 
 		return pJournalFile;
+	}
+
+	PActiveJournalFile CJournal::createTelemetryFile()
+	{
+		uint32_t nFileIndex = (uint32_t)m_TelemetryFiles.size();
+		if (nFileIndex > JOURNAL_MAXFILESPERSESSION)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOURNALEXCEEDSMAXIMUMFILES);
+
+		std::stringstream sFileNameStream;
+		sFileNameStream << m_sTelemetryChunkBaseName << std::setw(JOURNAL_MAXFILEDIGITS) << std::setfill('0') << nFileIndex << ".data";
+
+		std::string sFileName = sFileNameStream.str();
+
+		std::string sQuery = "INSERT INTO telemetry_datafiles (fileindex, filename) VALUES (?, ?)";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setInt(1, nFileIndex);
+		pStatement->setString(2, sFileName);
+		pStatement->execute();
+		pStatement = nullptr;
+
+		auto pTelemetryFile = std::make_shared<CActiveJournalFile>(m_sJournalBasePath + sFileName, nFileIndex);
+		m_TelemetryFiles.push_back(pTelemetryFile);
+
+		return pTelemetryFile;
 	}
 
 	std::string CJournal::getSessionUUID()
@@ -591,7 +653,24 @@ namespace AMCData {
 		pStatement->execute();
 		pStatement = nullptr;
 
+		std::string sBumpQuery = "UPDATE alerts SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM alerts) WHERE uuid=?";
+		auto pBumpStatement = m_pSQLHandler->prepareStatement(sBumpQuery);
+		pBumpStatement->setString(1, sNormalizedUUID);
+		pBumpStatement->execute();
+		pBumpStatement = nullptr;
+
 		m_AlertID++;
+	}
+
+	uint64_t CJournal::getAlertHeadID()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_LogMutex);
+
+		std::string sQuery = "SELECT COALESCE(MAX(incremental_id), 0) FROM alerts";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		if (pStatement->nextRow())
+			return (uint64_t) pStatement->getColumnInt64(1);
+		return 0;
 	}
 
 
@@ -775,38 +854,49 @@ namespace AMCData {
 
 	void CJournal::acknowledgeAlertForUser(const std::string& sAlertUUID, const std::string& sUserUUID, const std::string& sUserComment, const std::string& sTimeStampUTC)
 	{
+		std::string sNormalizedAlertUUID = AMCCommon::CUtils::normalizeUUIDString(sAlertUUID);
+
 		auto pTransaction = m_pSQLHandler->beginTransaction();
 		auto sDeactivateQuery = "UPDATE alerts SET active=0 WHERE uuid=?";
 		auto pDeactivateStatement = pTransaction->prepareStatement(sDeactivateQuery);
-		pDeactivateStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString(sAlertUUID));
+		pDeactivateStatement->setString(1, sNormalizedAlertUUID);
 		pDeactivateStatement->execute();
 
 		std::string sAcknowledgeUUID = AMCCommon::CUtils::createUUID();
 
 		auto sInsertAckQuery = "INSERT INTO alertacknowledgements (uuid, alertuuid, useruuid, usercomment, timestamp) VALUES (?, ?, ?, ?, ?)";
-
 		auto pInsertAckStatement = pTransaction->prepareStatement(sInsertAckQuery);
 		pInsertAckStatement->setString(1, sAcknowledgeUUID);
-		pInsertAckStatement->setString(2, AMCCommon::CUtils::normalizeUUIDString(sAlertUUID));
+		pInsertAckStatement->setString(2, sNormalizedAlertUUID);
 		pInsertAckStatement->setString(3, AMCCommon::CUtils::normalizeUUIDString(sUserUUID));
 		pInsertAckStatement->setString(4, sUserComment);
 		pInsertAckStatement->setString(5, sTimeStampUTC);
 		pInsertAckStatement->execute();
 
-		pTransaction->commit();
+		auto sBumpQuery = "UPDATE alerts SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM alerts) WHERE uuid=?";
+		auto pBumpStatement = pTransaction->prepareStatement(sBumpQuery);
+		pBumpStatement->setString(1, sNormalizedAlertUUID);
+		pBumpStatement->execute();
 
+		pTransaction->commit();
 	}
 
 	void CJournal::deactivateAlert(const std::string& sAlertUUID)
 	{
+		std::string sNormalizedAlertUUID = AMCCommon::CUtils::normalizeUUIDString(sAlertUUID);
+
 		auto pTransaction = m_pSQLHandler->beginTransaction();
 		auto sQuery = "UPDATE alerts SET active=0 WHERE uuid=?";
 		auto pStatement = pTransaction->prepareStatement(sQuery);
-		pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString (sAlertUUID));
+		pStatement->setString(1, sNormalizedAlertUUID);
 		pStatement->execute();
 
-		pTransaction->commit();
+		auto sBumpQuery = "UPDATE alerts SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM alerts) WHERE uuid=?";
+		auto pBumpStatement = pTransaction->prepareStatement(sBumpQuery);
+		pBumpStatement->setString(1, sNormalizedAlertUUID);
+		pBumpStatement->execute();
 
+		pTransaction->commit();
 	}
 
 	uint64_t CJournal::getChunkIntervalInMicroseconds()
@@ -824,8 +914,104 @@ namespace AMCData {
 		return (512ULL * 1024ULL * 1024ULL); // create many 512MB files on disk
 	}
 
+	std::string CJournal::convertTelemetryTypeToString(LibMCData::eTelemetryChannelType telemetryType)
+	{
+
+
+		switch (telemetryType)
+		{
+			case LibMCData::eTelemetryChannelType::CustomMarker:
+				return "custommarker";
+			case LibMCData::eTelemetryChannelType::RemoteQuery:
+				return "remotequery";
+			case LibMCData::eTelemetryChannelType::StateExecution:
+				return "stateexecution";
+			case LibMCData::eTelemetryChannelType::StateRepeatDelay:
+				return "staterepeatdelay";
+			case LibMCData::eTelemetryChannelType::SignalQueue:
+				return "signalqueue";
+			case LibMCData::eTelemetryChannelType::SignalProcessing:
+				return "signalprocessing";
+			case LibMCData::eTelemetryChannelType::SignalAcknowledgement:
+				return "signalacknowledgement";
+
+		default:
+			return "unknown";
+		}
+
+	}
+
+	LibMCData::eTelemetryChannelType CJournal::convertStringToTelemetryType(const std::string& sValue)
+	{
+		if (sValue == "custommarker")
+			return LibMCData::eTelemetryChannelType::CustomMarker;
+		if (sValue == "remotequery")
+			return LibMCData::eTelemetryChannelType::RemoteQuery;
+		if (sValue == "stateexecution")
+			return LibMCData::eTelemetryChannelType::StateExecution;
+		if (sValue == "staterepeatdelay")
+			return LibMCData::eTelemetryChannelType::StateRepeatDelay;
+		if (sValue == "signalqueue")
+			return LibMCData::eTelemetryChannelType::SignalQueue;
+		if (sValue == "signalprocessing")
+			return LibMCData::eTelemetryChannelType::SignalProcessing;
+		if (sValue == "signalacknowledgement")
+			return LibMCData::eTelemetryChannelType::SignalAcknowledgement;
+
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNTELEMETRYCHANNELTYPE, "Unknown telemetry channel type: " + sValue);
+	}
+
+	void CJournal::createTelemetryChannelInDB(const std::string& sUUID, const LibMCData::eTelemetryChannelType eChannelType, const LibMCData_uint32 nChannelIndex, const std::string& sChannelIdentifier, const std::string& sChannelDescription)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString (sChannelIdentifier))
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER, "invalid telemetry channel identifier: " + sChannelIdentifier);
+
+		std::string sQuery = "INSERT INTO telemetry_channels (uuid, channeltype, channelindex, identifier, description) VALUES (?, ?, ?, ?, ?)";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setString(1, AMCCommon::CUtils::normalizeUUIDString (sUUID));
+		pStatement->setString(2, convertTelemetryTypeToString (eChannelType));
+		pStatement->setInt64(3, nChannelIndex);
+		pStatement->setString(4, sChannelIdentifier);
+		pStatement->setString(5, sChannelDescription);
+		pStatement->execute();
+		pStatement = nullptr;
+
+	}
+
+	void CJournal::writeTelemetryChunk(uint64_t nChunkID, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, uint64_t nTelemetryEntriesBufferSize, const LibMCData::sTelemetryChunkEntry* pTelemetryEntriesBuffer)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_JournalMutex);
+
+		if (nTelemetryEntriesBufferSize == 0)
+			return;
+		if (pTelemetryEntriesBuffer == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+		if (nStartTimeStamp > nEndTimeStamp)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+		if (m_pCurrentTelemetryFile->getTotalSize() > getMaxChunkFileSizeQuotaInBytes())
+			m_pCurrentTelemetryFile = createTelemetryFile();
+
+		uint64_t nDataLength = nTelemetryEntriesBufferSize * sizeof(LibMCData::sTelemetryChunkEntry);
+		uint64_t nDataOffset = m_pCurrentTelemetryFile->retrieveWritePosition();
+		m_pCurrentTelemetryFile->writeBuffer(pTelemetryEntriesBuffer, nDataLength);
+		m_pCurrentTelemetryFile->flushBuffers();
+
+		std::string sQuery = "INSERT INTO telemetry_chunks (chunkindex, fileindex, starttimestamp, endtimestamp, entrycount, dataoffset, datalength) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+		pStatement->setInt64(1, (int64_t)nChunkID);
+		pStatement->setInt64(2, m_pCurrentTelemetryFile->getFileIndex());
+		pStatement->setInt64(3, (int64_t)nStartTimeStamp);
+		pStatement->setInt64(4, (int64_t)nEndTimeStamp);
+		pStatement->setInt64(5, (int64_t)nTelemetryEntriesBufferSize);
+		pStatement->setInt64(6, (int64_t)nDataOffset);
+		pStatement->setInt64(7, (int64_t)nDataLength);
+		pStatement->execute();
+		pStatement = nullptr;
+
+	}
 
 
 }
-
-

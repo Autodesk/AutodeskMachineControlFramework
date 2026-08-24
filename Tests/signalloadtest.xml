@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
+
+	<statemachine name="ping" description="Signal Load Ping" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_signalloadtest">
+		<signaldefinition name="signal_pong" queuesize="1024" reactiontimeout="60000">
+			<parameter name="counter" type="int"/>
+		</signaldefinition>
+
+		<state name="init" repeatdelay="1">
+			<outstate target="run"/>
+		</state>
+
+		<state name="run" repeatdelay="1">
+			<outstate target="run"/>
+			<outstate target="success"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+		<state name="success" repeatdelay="10">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="10">
+			<outstate target="fatalerror"/>
+		</state>
+	</statemachine>
+
+	<statemachine name="pong" description="Signal Load Pong" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_signalloadtest">
+		<signaldefinition name="signal_ping" queuesize="1024" reactiontimeout="60000">
+			<parameter name="counter" type="int"/>
+		</signaldefinition>
+
+		<signaldefinition name="signal_stop" queuesize="4" reactiontimeout="60000">
+		</signaldefinition>
+
+		<state name="init" repeatdelay="1">
+			<outstate target="run"/>
+		</state>
+
+		<state name="run" repeatdelay="1">
+			<outstate target="run"/>
+			<outstate target="success"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+		<state name="success" repeatdelay="10">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="10">
+			<outstate target="fatalerror"/>
+		</state>
+	</statemachine>
+
+	<libraries>
+		<library name="plugin_signalloadtest" dll="%githash%_test_signalloadtest" />
+	</libraries>
+
+	<test description="Signal Load Ping/Pong Test">
+		<instance name="ping" />
+		<instance name="pong" />
+	</test>
+
+</testdefinition>

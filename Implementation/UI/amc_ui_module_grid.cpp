@@ -186,6 +186,9 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
 
+	// Optional inner padding applied to each grid cell, in pixels.
+	m_nPadding = xmlNode.attribute("padding").as_uint(0);
+
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
 
@@ -303,6 +306,17 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath
 	registerIntegerAttribute("columncount", columnsExpression);
 	registerIntegerAttribute("rowcount", rowsExpression);
 
+	CUIExpression paddingExpression;
+	paddingExpression.setFixedValue(std::to_string(m_nPadding));
+	registerIntegerAttribute("padding", paddingExpression);
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(xmlNode.attribute("caption").as_string());
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr(xmlNode, "visible", "1");
+	registerBoolAttribute("visible", visibleExpr);
+
 }
 
 
@@ -358,6 +372,7 @@ void CUIModule_Grid::writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWrite
 	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 	moduleObject.addString(AMC_API_KEY_UI_CAPTION, "");
+	moduleObject.addInteger("padding", m_nPadding);
 
 	CJSONWriterArray columnsNode(writer);
 	for (auto column : m_Columns) {
@@ -464,8 +479,25 @@ void CUIModule_Grid::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONW
 {
 	CUIModule::frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
 
-	CJSONWriterArray submodulesArray (writer);
+	CJSONWriterArray columnsArray(writer);
+	for (auto column : m_Columns) {
+		CJSONWriterObject columnObject(writer);
+		columnObject.addDouble(AMC_API_KEY_UI_COLUMNWIDTH, column->getWidth());
+		columnObject.addString(AMC_API_KEY_UI_COLUMNWIDTHUNIT, column->getWidthUnitString());
+		columnsArray.addObject(columnObject);
+	}
+	moduleObject.addArray(AMC_API_KEY_UI_COLUMNS, columnsArray);
 
+	CJSONWriterArray rowsArray(writer);
+	for (auto row : m_Rows) {
+		CJSONWriterObject rowObject(writer);
+		rowObject.addDouble(AMC_API_KEY_UI_ROWHEIGHT, row->getHeight());
+		rowObject.addString(AMC_API_KEY_UI_ROWHEIGHTUNIT, row->getHeightUnitString());
+		rowsArray.addObject(rowObject);
+	}
+	moduleObject.addArray(AMC_API_KEY_UI_ROWS, rowsArray);
+
+	CJSONWriterArray submodulesArray(writer);
 	for (auto section : m_SectionList) {
 
 		auto pSubmodule = section->getModule();
@@ -473,6 +505,9 @@ void CUIModule_Grid::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONW
 
 			CJSONWriterObject subModuleObject(writer);
 			pSubmodule->frontendWriteModuleStatusToJSON(writer, subModuleObject, pFrontendState, pStateMachineData);
+			subModuleObject.addBool(AMC_API_KEY_UI_SCROLLBARS, section->getScrollbars());
+			subModuleObject.addString(AMC_API_KEY_UI_COLUMNPOSITION, CUIModule_GridColumn::gridPositionToString(section->getColumnPosition()));
+			subModuleObject.addString(AMC_API_KEY_UI_ROWPOSITION, CUIModule_GridRow::gridPositionToString(section->getRowPosition()));
 			submodulesArray.addObject(subModuleObject);
 
 		}

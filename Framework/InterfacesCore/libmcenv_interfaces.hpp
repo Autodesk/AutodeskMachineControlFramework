@@ -92,6 +92,7 @@ class IToolpathLayer;
 class IToolpathAccessor;
 class IBuildExecution;
 class IBuildExecutionIterator;
+class IBuildIterator;
 class IBuild;
 class IWorkingFileProcess;
 class IWorkingFile;
@@ -123,15 +124,22 @@ class IAlert;
 class IAlertIterator;
 class ILogEntryList;
 class IJournalHandler;
+class ITelemetryInterval;
+class ITelemetryIntervalIterator;
+class ITelemetryChannelStatistics;
+class ITelemetryHandler;
 class IUserDetailList;
 class IUserManagementHandler;
 class IMachineConfigurationXSD;
 class IMachineConfigurationXSDIterator;
 class IMachineConfigurationVersion;
 class IMachineConfigurationVersionIterator;
+class IMachineConfiguration;
 class IMachineConfigurationType;
 class IMachineConfigurationTypeIterator;
 class IMachineConfigurationHandler;
+class ITelemetryMarkerScope;
+class ITelemetryChannel;
 class IStateEnvironment;
 class IUIItem;
 class IUIEnvironment;
@@ -788,9 +796,29 @@ public:
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* @return Image instance containing the JPEG image.
 	*/
 	virtual IImageData * LoadJPEGImage(const LibMCEnv_uint64 nJPEGDataBufferSize, const LibMCEnv_uint8 * pJPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::LoadPNGImageFromResource - creates an image object from a machine PNG resource data.
+	* @param[in] sResourceName - PNG Data Resource Name. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	virtual IImageData * LoadPNGImageFromResource(const std::string & sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageLoader::LoadJPEGImageFromResource - creates an image object from a machine JPEG resource data.
+	* @param[in] sResourceName - JPEG Data Resource Name. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the JPEG image.
+	*/
+	virtual IImageData * LoadJPEGImageFromResource(const std::string & sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 	/**
 	* IImageLoader::CreateImageFromRawRGB24Data - creates an image object from raw RGB24 Data. (3 bytes per pixel)
@@ -3498,6 +3526,23 @@ typedef IBaseSharedPtr<IBuildExecutionIterator> PIBuildExecutionIterator;
 
 
 /*************************************************************************************************************************
+ Class interface for BuildIterator 
+**************************************************************************************************************************/
+
+class IBuildIterator : public virtual IIterator {
+public:
+	/**
+	* IBuildIterator::GetCurrentBuild - Returns the build the iterator points at.
+	* @return returns the Build instance.
+	*/
+	virtual IBuild * GetCurrentBuild() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildIterator> PIBuildIterator;
+
+
+/*************************************************************************************************************************
  Class interface for Build 
 **************************************************************************************************************************/
 
@@ -3514,6 +3559,18 @@ public:
 	* @return UUID of the build.
 	*/
 	virtual std::string GetBuildUUID() = 0;
+
+	/**
+	* IBuild::GetCreatedTimestamp - Returns creation timestamp of the build in ISO-8601 format.
+	* @return Creation timestamp in ISO-8601 format (e.g., 2025-10-23T14:30:00.000Z).
+	*/
+	virtual std::string GetCreatedTimestamp() = 0;
+
+	/**
+	* IBuild::GetLastExecutionTimestamp - Returns the most recent execution timestamp in ISO-8601 format. Returns empty string if build has never been executed.
+	* @return Most recent execution timestamp in ISO-8601 format. Empty string if never executed.
+	*/
+	virtual std::string GetLastExecutionTimestamp() = 0;
 
 	/**
 	* IBuild::GetStorageUUID - Returns storage uuid of the build stream.
@@ -5390,6 +5447,14 @@ public:
 	*/
 	virtual bool GetBoolParameter(const std::string & sParameterName) = 0;
 
+	/**
+	* IDriverStatusUpdateSession::FindTelemetryChannel - Returns a telemetry channel from the current state machine.
+	* @param[in] sChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+	* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+	* @return Channel instance. NULL if Channel does not exist.
+	*/
+	virtual ITelemetryChannel * FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverStatusUpdateSession> PIDriverStatusUpdateSession;
@@ -5657,6 +5722,23 @@ public:
 	virtual void LogInfo(const std::string & sLogString) = 0;
 
 	/**
+	* IDriverEnvironment::RegisterTelemetryChannel - Registers a telemetry channel for the current state machine. Fails if identifier already exists.
+	* @param[in] sChannelIdentifier - Channel Identifier. Must be a alphanumerical path string.
+	* @param[in] sChannelDescription - Description of Channel. MUST NOT be empty.
+	* @param[in] eChannelType - Type of Channel.
+	* @return Channel instance.
+	*/
+	virtual ITelemetryChannel * RegisterTelemetryChannel(const std::string & sChannelIdentifier, const std::string & sChannelDescription, const LibMCEnv::eTelemetryChannelType eChannelType) = 0;
+
+	/**
+	* IDriverEnvironment::FindTelemetryChannel - Returns a telemetry channel from the current state machine.
+	* @param[in] sChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+	* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+	* @return Channel instance. NULL if Channel does not exist.
+	*/
+	virtual ITelemetryChannel * FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting) = 0;
+
+	/**
 	* IDriverEnvironment::CreateEmptyImage - creates an empty image object.
 	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
 	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
@@ -5672,6 +5754,24 @@ public:
 	* @return Image loader instance.
 	*/
 	virtual IImageLoader * CreateImageLoader() = 0;
+
+	/**
+	* IDriverEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	virtual IVideoStream * CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) = 0;
+
+	/**
+	* IDriverEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	virtual IVideoStream * FindVideoStream(const std::string & sStreamUUID) = 0;
 
 	/**
 	* IDriverEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
@@ -6283,6 +6383,14 @@ public:
 	*/
 	virtual void GetAllSamples(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry * pSamplesBuffer) = 0;
 
+	/**
+	* IUniformJournalSampling::GetAllSamplesWithBounds - Returns all timestamps together with the min/max/average/last value of each bucket of the sampling. Enables faithful multi-scale visualisation of large journals.
+	* @param[in] nSamplesBufferSize - Number of elements in buffer
+	* @param[out] pSamplesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSamplesBuffer - TimeStreamEnvelopeEntry buffer of Array of Timestream envelope entries, in increasing order.
+	*/
+	virtual void GetAllSamplesWithBounds(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEnvelopeEntry * pSamplesBuffer) = 0;
+
 };
 
 typedef IBaseSharedPtr<IUniformJournalSampling> PIUniformJournalSampling;
@@ -6313,6 +6421,15 @@ public:
 	* @return Value of the variable at the time step in integer.
 	*/
 	virtual LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds) = 0;
+
+	/**
+	* IJournalVariable::SampleUniform - Downsamples the variable's history over a time range into a fixed number of min/max/average/last buckets. Used for multi-scale visualisation of large journals.
+	* @param[in] nStartTimeStamp - Start time stamp to sample in microseconds. MUST be smaller than end time stamp.
+	* @param[in] nEndTimeStamp - End time stamp to sample in microseconds. MUST be larger than start time stamp.
+	* @param[in] nNumberOfSamples - Number of buckets to generate. MUST be greater than 0.
+	* @return Resulting uniform sampling instance.
+	*/
+	virtual IUniformJournalSampling * SampleUniform(const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples) = 0;
 
 };
 
@@ -6469,6 +6586,21 @@ public:
 	virtual IJournalVariable * RetrieveJournalVariable(const std::string & sVariableName) = 0;
 
 	/**
+	* IJournalHandler::GetVariableCount - Returns the number of recorded variables in the journal.
+	* @return Number of recorded variables.
+	*/
+	virtual LibMCEnv_uint32 GetVariableCount() = 0;
+
+	/**
+	* IJournalHandler::GetVariableInformation - Returns metadata of a recorded variable by index.
+	* @param[in] nIndex - Index of the variable. 0-based. MUST be smaller than the variable count.
+	* @param[out] sName - Name (parameter path) of the variable.
+	* @param[out] eDataType - Data type of the variable.
+	* @param[out] dUnits - Quantization units of the variable (0 for non-double variables).
+	*/
+	virtual void GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string & sName, LibMCEnv::eParameterDataType & eDataType, LibMCEnv_double & dUnits) = 0;
+
+	/**
 	* IJournalHandler::GetStartTime - Retrieves the reference start time of the journal.
 	* @return DateTime Instance
 	*/
@@ -6518,9 +6650,220 @@ public:
 	*/
 	virtual IAlertIterator * RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
 
+	/**
+	* IJournalHandler::LoadTelemetryHandler - Loads the telemetry handler for this journal.
+	* @return Telemetry handler instance.
+	*/
+	virtual ITelemetryHandler * LoadTelemetryHandler() = 0;
+
 };
 
 typedef IBaseSharedPtr<IJournalHandler> PIJournalHandler;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryInterval 
+**************************************************************************************************************************/
+
+class ITelemetryInterval : public virtual IBase {
+public:
+	/**
+	* ITelemetryInterval::GetMarkerID - Returns the marker ID.
+	* @return Marker ID
+	*/
+	virtual LibMCEnv_uint64 GetMarkerID() = 0;
+
+	/**
+	* ITelemetryInterval::GetChannelIdentifier - Returns the channel identifier.
+	* @return Channel identifier
+	*/
+	virtual std::string GetChannelIdentifier() = 0;
+
+	/**
+	* ITelemetryInterval::GetStartTimestamp - Returns the start timestamp in microseconds.
+	* @return Start timestamp
+	*/
+	virtual LibMCEnv_uint64 GetStartTimestamp() = 0;
+
+	/**
+	* ITelemetryInterval::GetEndTimestamp - Returns the end timestamp in microseconds.
+	* @return End timestamp
+	*/
+	virtual LibMCEnv_uint64 GetEndTimestamp() = 0;
+
+	/**
+	* ITelemetryInterval::GetDuration - Returns the duration in microseconds.
+	* @return Duration
+	*/
+	virtual LibMCEnv_uint64 GetDuration() = 0;
+
+	/**
+	* ITelemetryInterval::GetContextData - Returns the context data.
+	* @return Context data
+	*/
+	virtual LibMCEnv_uint64 GetContextData() = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryInterval> PITelemetryInterval;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryIntervalIterator 
+**************************************************************************************************************************/
+
+class ITelemetryIntervalIterator : public virtual IIterator {
+public:
+	/**
+	* ITelemetryIntervalIterator::GetCurrentInterval - Returns the current interval.
+	* @return Current interval
+	*/
+	virtual ITelemetryInterval * GetCurrentInterval() = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryIntervalIterator> PITelemetryIntervalIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryChannelStatistics 
+**************************************************************************************************************************/
+
+class ITelemetryChannelStatistics : public virtual IBase {
+public:
+	/**
+	* ITelemetryChannelStatistics::GetChannelIdentifier - Returns the channel identifier.
+	* @return Channel identifier
+	*/
+	virtual std::string GetChannelIdentifier() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetIntervalCount - Returns the number of completed intervals.
+	* @return Number of intervals
+	*/
+	virtual LibMCEnv_uint64 GetIntervalCount() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetInstantMarkerCount - Returns the number of instant markers.
+	* @return Number of instant markers
+	*/
+	virtual LibMCEnv_uint64 GetInstantMarkerCount() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetTotalDuration - Returns the total duration of all intervals.
+	* @return Total duration in microseconds
+	*/
+	virtual LibMCEnv_uint64 GetTotalDuration() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetMinDuration - Returns the minimum interval duration.
+	* @return Min duration in microseconds
+	*/
+	virtual LibMCEnv_uint64 GetMinDuration() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetMaxDuration - Returns the maximum interval duration.
+	* @return Max duration in microseconds
+	*/
+	virtual LibMCEnv_uint64 GetMaxDuration() = 0;
+
+	/**
+	* ITelemetryChannelStatistics::GetAverageDuration - Returns the average interval duration.
+	* @return Average duration in microseconds
+	*/
+	virtual LibMCEnv_uint64 GetAverageDuration() = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryChannelStatistics> PITelemetryChannelStatistics;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryHandler 
+**************************************************************************************************************************/
+
+class ITelemetryHandler : public virtual IBase {
+public:
+	/**
+	* ITelemetryHandler::GetSessionUUID - Returns the session UUID.
+	* @return Session UUID
+	*/
+	virtual std::string GetSessionUUID() = 0;
+
+	/**
+	* ITelemetryHandler::GetStartTime - Returns the session start time.
+	* @return DateTime Instance
+	*/
+	virtual IDateTime * GetStartTime() = 0;
+
+	/**
+	* ITelemetryHandler::GetEndTime - Returns the session end time.
+	* @return DateTime Instance
+	*/
+	virtual IDateTime * GetEndTime() = 0;
+
+	/**
+	* ITelemetryHandler::GetLifeTimeInMicroseconds - Returns the session lifetime in microseconds.
+	* @return Lifetime
+	*/
+	virtual LibMCEnv_uint64 GetLifeTimeInMicroseconds() = 0;
+
+	/**
+	* ITelemetryHandler::GetChannelCount - Returns the number of telemetry channels.
+	* @return Number of channels
+	*/
+	virtual LibMCEnv_uint32 GetChannelCount() = 0;
+
+	/**
+	* ITelemetryHandler::GetChannelIdentifier - Returns the identifier for a channel by index.
+	* @param[in] nChannelIndex - Channel index (0-based)
+	* @return Channel identifier
+	*/
+	virtual std::string GetChannelIdentifier(const LibMCEnv_uint32 nChannelIndex) = 0;
+
+	/**
+	* ITelemetryHandler::HasChannel - Checks if a channel exists.
+	* @param[in] sIdentifier - Channel identifier
+	* @return True if channel exists
+	*/
+	virtual bool HasChannel(const std::string & sIdentifier) = 0;
+
+	/**
+	* ITelemetryHandler::GetChannelDescription - Returns the description of a channel.
+	* @param[in] sIdentifier - Channel identifier
+	* @return Channel description
+	*/
+	virtual std::string GetChannelDescription(const std::string & sIdentifier) = 0;
+
+	/**
+	* ITelemetryHandler::QueryIntervalsFromTimeDelta - Queries intervals from the last N microseconds.
+	* @param[in] sChannelIdentifier - Channel identifier. Empty string for all channels.
+	* @param[in] nTimeDeltaInMicroseconds - Time delta from the end of the session.
+	* @return Iterator over intervals
+	*/
+	virtual ITelemetryIntervalIterator * QueryIntervalsFromTimeDelta(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nTimeDeltaInMicroseconds) = 0;
+
+	/**
+	* ITelemetryHandler::QueryIntervalsFromTimeRange - Queries intervals within a time range.
+	* @param[in] sChannelIdentifier - Channel identifier. Empty string for all channels.
+	* @param[in] nStartTimeInMicroseconds - Start time.
+	* @param[in] nEndTimeInMicroseconds - End time.
+	* @return Iterator over intervals
+	*/
+	virtual ITelemetryIntervalIterator * QueryIntervalsFromTimeRange(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
+
+	/**
+	* ITelemetryHandler::GetChannelStatistics - Gets aggregated statistics for a channel.
+	* @param[in] sChannelIdentifier - Channel identifier.
+	* @param[in] nStartTimeInMicroseconds - Start time (0 for beginning of session).
+	* @param[in] nEndTimeInMicroseconds - End time (0 for end of session).
+	* @return Statistics instance
+	*/
+	virtual ITelemetryChannelStatistics * GetChannelStatistics(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryHandler> PITelemetryHandler;
 
 
 /*************************************************************************************************************************
@@ -6857,6 +7200,12 @@ public:
 	virtual std::string GetConfigurationXMLString() = 0;
 
 	/**
+	* IMachineConfigurationVersion::GetConfigurationXML - Returns the configuration XML instance.
+	* @return XML Document.
+	*/
+	virtual IXMLDocument * GetConfigurationXML() = 0;
+
+	/**
 	* IMachineConfigurationVersion::GetUserUUID - Returns the User UUID.
 	* @return UUID of the User.
 	*/
@@ -6905,6 +7254,164 @@ public:
 };
 
 typedef IBaseSharedPtr<IMachineConfigurationVersionIterator> PIMachineConfigurationVersionIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for MachineConfiguration 
+**************************************************************************************************************************/
+
+class IMachineConfiguration : public virtual IBase {
+public:
+	/**
+	* IMachineConfiguration::GetVersionUUID - Returns the UUID of the underlying configuration version this working copy was created from.
+	* @return UUID of the configuration version.
+	*/
+	virtual std::string GetVersionUUID() = 0;
+
+	/**
+	* IMachineConfiguration::GetNumericVersion - Returns the numeric version of the underlying configuration version.
+	* @return Returns the configuration numeric version.
+	*/
+	virtual LibMCEnv_uint32 GetNumericVersion() = 0;
+
+	/**
+	* IMachineConfiguration::GetXSDUUID - Returns the UUID of the XSD used by this configuration.
+	* @return UUID of the configuration XSD.
+	*/
+	virtual std::string GetXSDUUID() = 0;
+
+	/**
+	* IMachineConfiguration::GetXMLDocument - Returns the current in-memory configuration as an XML document instance for advanced access. The returned document reflects any uncommitted changes.
+	* @return XML Document.
+	*/
+	virtual IXMLDocument * GetXMLDocument() = 0;
+
+	/**
+	* IMachineConfiguration::HasParameter - Returns whether a parameter exists at the given path.
+	* @param[in] sPath - Slash-separated element path beneath the root, e.g. 'PLCConfig/IPAddress'.
+	* @return True if the parameter node and its value attribute exist.
+	*/
+	virtual bool HasParameter(const std::string & sPath) = 0;
+
+	/**
+	* IMachineConfiguration::GetStringParameter - Returns the string value of a parameter. Fails if the parameter does not exist.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @return Parameter value.
+	*/
+	virtual std::string GetStringParameter(const std::string & sPath) = 0;
+
+	/**
+	* IMachineConfiguration::GetIntegerParameter - Returns the integer value of a parameter. Fails if the parameter does not exist or is not an integer in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @return Parameter value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetDoubleParameter - Returns the double value of a parameter. Fails if the parameter does not exist or is not a double in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dMinValue - Minimum allowed value.
+	* @param[in] dMaxValue - Maximum allowed value.
+	* @return Parameter value.
+	*/
+	virtual LibMCEnv_double GetDoubleParameter(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetBoolParameter - Returns the boolean value of a parameter. Fails if the parameter does not exist or is not a boolean.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @return Parameter value.
+	*/
+	virtual bool GetBoolParameter(const std::string & sPath) = 0;
+
+	/**
+	* IMachineConfiguration::GetStringParameterDef - Returns the string value of a parameter. Returns the default value if the parameter does not exist.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] sDefaultValue - Default value.
+	* @return Parameter value.
+	*/
+	virtual std::string GetStringParameterDef(const std::string & sPath, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetIntegerParameterDef - Returns the integer value of a parameter. Returns the default value if the parameter does not exist or is not a valid integer in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @param[in] nDefaultValue - Default value. MUST be in valid range.
+	* @return Parameter value.
+	*/
+	virtual LibMCEnv_int64 GetIntegerParameterDef(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetDoubleParameterDef - Returns the double value of a parameter. Returns the default value if the parameter does not exist or is not a valid double in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dMinValue - Minimum allowed value.
+	* @param[in] dMaxValue - Maximum allowed value.
+	* @param[in] dDefaultValue - Default value. MUST be in valid range.
+	* @return Parameter value.
+	*/
+	virtual LibMCEnv_double GetDoubleParameterDef(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IMachineConfiguration::GetBoolParameterDef - Returns the boolean value of a parameter. Returns the default value if the parameter does not exist or is not a valid boolean.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] bDefaultValue - Default value.
+	* @return Parameter value.
+	*/
+	virtual bool GetBoolParameterDef(const std::string & sPath, const bool bDefaultValue) = 0;
+
+	/**
+	* IMachineConfiguration::SetStringParameter - Sets the string value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] sValue - Value to set.
+	*/
+	virtual void SetStringParameter(const std::string & sPath, const std::string & sValue) = 0;
+
+	/**
+	* IMachineConfiguration::SetIntegerParameter - Sets the integer value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nValue - Value to set.
+	*/
+	virtual void SetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IMachineConfiguration::SetDoubleParameter - Sets the double value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dValue - Value to set.
+	*/
+	virtual void SetDoubleParameter(const std::string & sPath, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IMachineConfiguration::SetBoolParameter - Sets the boolean value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] bValue - Value to set.
+	*/
+	virtual void SetBoolParameter(const std::string & sPath, const bool bValue) = 0;
+
+	/**
+	* IMachineConfiguration::HasChanges - Returns whether the in-memory working copy has uncommitted changes.
+	* @return True if there are uncommitted changes.
+	*/
+	virtual bool HasChanges() = 0;
+
+	/**
+	* IMachineConfiguration::Commit - Commits the current in-memory state as a new configuration version (child of the version this working copy is based on). Does not change the active version. After committing, the working copy is rebased on the new version.
+	* @param[in] sUserUUID - User UUID for logging who initiated the change.
+	* @return Returns the newly created configuration version.
+	*/
+	virtual IMachineConfigurationVersion * Commit(const std::string & sUserUUID) = 0;
+
+	/**
+	* IMachineConfiguration::CommitAndActivate - Commits the current in-memory state as a new configuration version and sets it as the active version for the type. After committing, the working copy is rebased on the new version.
+	* @param[in] sUserUUID - User UUID for logging who initiated the change.
+	* @return Returns the newly created and now active configuration version.
+	*/
+	virtual IMachineConfigurationVersion * CommitAndActivate(const std::string & sUserUUID) = 0;
+
+};
+
+typedef IBaseSharedPtr<IMachineConfiguration> PIMachineConfiguration;
 
 
 /*************************************************************************************************************************
@@ -6964,6 +7471,16 @@ public:
 	virtual IMachineConfigurationXSD * RegisterNewXSD(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion) = 0;
 
 	/**
+	* IMachineConfigurationType::RegisterXSDFromResource - Registers a XSD from a resource file including its default configuration.
+	* @param[in] sXSDResourceName - XSD Resource Name. Resource MUST exist.
+	* @param[in] sDefaultXMLResourceName - Default XML Resource Name. Resource MUST exist.
+	* @param[in] nXSDVersion - New Version to add. MUST be larger than GetLatestXSDVersion if FailIfExisting is true.
+	* @param[in] bFailIfExisting - If true, the call will fail if XSDVersion is not larger than GetLatestXSDVersion. If false, the call will return the new XSDInstance, if XSDVersion is larger than GetLatestXSDVersion, null otherwise. 
+	* @return Returns the new XSD of the configuration type, if it has been newly registered.
+	*/
+	virtual IMachineConfigurationXSD * RegisterXSDFromResource(const std::string & sXSDResourceName, const std::string & sDefaultXMLResourceName, const LibMCEnv_uint32 nXSDVersion, const bool bFailIfExisting) = 0;
+
+	/**
 	* IMachineConfigurationType::FindXSDByNumericVersion - Finds a specific XSD of this type by its Numeric Version Number.
 	* @param[in] nXSDNumericVersion - Requested version number.
 	* @return XSD instance if exists.
@@ -7019,10 +7536,43 @@ public:
 	virtual IMachineConfigurationVersion * GetLatestConfigurationVersion() = 0;
 
 	/**
+	* IMachineConfigurationType::GetActiveConfigurationXML - Returns the currently active configuration XML for this type.
+	* @return XML Document.
+	*/
+	virtual IXMLDocument * GetActiveConfigurationXML() = 0;
+
+	/**
+	* IMachineConfigurationType::GetLatestConfigurationXML - Returns the most recently created configuration XML for this type.
+	* @return XML Document.
+	*/
+	virtual IXMLDocument * GetLatestConfigurationXML() = 0;
+
+	/**
 	* IMachineConfigurationType::SetActiveConfigurationVersion - Sets the active configuration version for this type.
 	* @param[in] sVersionUUID - UUID of the version to set as active.
 	*/
 	virtual void SetActiveConfigurationVersion(const std::string & sVersionUUID) = 0;
+
+	/**
+	* IMachineConfigurationType::GetActiveConfiguration - Returns an ergonomic, typed working copy of the currently active configuration version. Fails if no version is active.
+	* @return Working copy of the active configuration.
+	*/
+	virtual IMachineConfiguration * GetActiveConfiguration() = 0;
+
+	/**
+	* IMachineConfigurationType::EnsureActiveConfiguration - Returns an ergonomic, typed working copy of the active configuration, activating the latest version first if none is currently active. Fails if no configuration version exists at all.
+	* @return Working copy of the active configuration.
+	*/
+	virtual IMachineConfiguration * EnsureActiveConfiguration() = 0;
+
+	/**
+	* IMachineConfigurationType::EnsureXSDVersion - Registers a new XSD version together with its default configuration, but only if the given version is newer than the latest registered XSD. Returns null if the given version is not newer (no-op). Collapses the common bootstrap pattern of RegisterNewXSD + CreateDefaultConfiguration.
+	* @param[in] sXSDString - XSD String of the version. MUST be a valid schema of this type.
+	* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+	* @param[in] sDefaultXML - Default configuration XML string conforming to the given XSD.
+	* @return The newly registered XSD, or null if the version was not newer than the latest.
+	*/
+	virtual IMachineConfigurationXSD * EnsureXSDVersion(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string & sDefaultXML) = 0;
 
 };
 
@@ -7093,6 +7643,90 @@ typedef IBaseSharedPtr<IMachineConfigurationHandler> PIMachineConfigurationHandl
 
 
 /*************************************************************************************************************************
+ Class interface for TelemetryMarkerScope 
+**************************************************************************************************************************/
+
+class ITelemetryMarkerScope : public virtual IBase {
+public:
+	/**
+	* ITelemetryMarkerScope::GetMarkerID - Returns the global marker ID
+	* @return Global marker id.
+	*/
+	virtual LibMCEnv_uint64 GetMarkerID() = 0;
+
+	/**
+	* ITelemetryMarkerScope::GetParent - Returns the Identifier of the Parent (State machine or Driver) of the channel.
+	* @return Parent Identifier
+	*/
+	virtual std::string GetParent() = 0;
+
+	/**
+	* ITelemetryMarkerScope::GetIdentifier - Returns the Identifier of the Channel.
+	* @return Channel Identifier. Will be a alphanumerical path string.
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* ITelemetryMarkerScope::GetGlobalIdentifier - Returns the global Identifier of the Channel, which is ParentIdentifier.ChannelIdentifier
+	* @return Global Identifier. Will be a alphanumerical path string.
+	*/
+	virtual std::string GetGlobalIdentifier() = 0;
+
+	/**
+	* ITelemetryMarkerScope::GetStartTimestamp - Returns start timestamp of the marker
+	* @return Start timestamp.
+	*/
+	virtual LibMCEnv_uint64 GetStartTimestamp() = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryMarkerScope> PITelemetryMarkerScope;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryChannel 
+**************************************************************************************************************************/
+
+class ITelemetryChannel : public virtual IBase {
+public:
+	/**
+	* ITelemetryChannel::GetParent - Returns the Identifier of the Parent (State machine or Driver) of the channel.
+	* @return Parent Identifier
+	*/
+	virtual std::string GetParent() = 0;
+
+	/**
+	* ITelemetryChannel::GetIdentifier - Returns the Identifier of the Channel.
+	* @return Channel Identifier. Will be a alphanumerical path string.
+	*/
+	virtual std::string GetIdentifier() = 0;
+
+	/**
+	* ITelemetryChannel::GetGlobalIdentifier - Returns the global Identifier of the Channel, which is ParentIdentifier.ChannelIdentifier
+	* @return Global Identifier. Will be a alphanumerical path string.
+	*/
+	virtual std::string GetGlobalIdentifier() = 0;
+
+	/**
+	* ITelemetryChannel::StartMarkerScope - Starts a marker scope object.
+	* @param[in] nUserContextData - User data to be stored with the marker.
+	* @return Marker scope instance. Will finish when freed.
+	*/
+	virtual ITelemetryMarkerScope * StartMarkerScope(const LibMCEnv_uint64 nUserContextData) = 0;
+
+	/**
+	* ITelemetryChannel::CreateInstantMarker - Creates a marker of length 0.
+	* @param[in] nUserContextData - User data to be stored with the marker.
+	* @return Global marker ID.
+	*/
+	virtual LibMCEnv_uint64 CreateInstantMarker(const LibMCEnv_uint64 nUserContextData) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryChannel> PITelemetryChannel;
+
+
+/*************************************************************************************************************************
  Class interface for StateEnvironment 
 **************************************************************************************************************************/
 
@@ -7120,36 +7754,58 @@ public:
 	virtual ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
 
 	/**
-	* IStateEnvironment::WaitForSignal - Waits for a signal for a certain amount of time.
-	* @param[in] sSignalName - Name Of Signal
-	* @param[in] nTimeOut - Timeout in Milliseconds. 0 for Immediate return.
-	* @param[out] pHandlerInstance - Signal object. If Success is false, the Signal Handler Object will be null.
-	* @return Signal has been triggered
-	*/
-	virtual bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance) = 0;
-
-	/**
-	* IStateEnvironment::GetUnhandledSignal - Retrieves an unhandled signal By signal type name. Only affects signals with Phase InQueue.
+	* IStateEnvironment::ClaimSignalFromQueue - Retrieves an InQueue signal by type and changes its phase to InProcess. Recommended to use as it is robust against signal timeouts...
 	* @param[in] sSignalTypeName - Name Of Signal to be returned
-	* @return Signal object. If no signal has been found the signal handler object will be null.
+	* @return Signal object. If no signal is InQueue the signal handler object will be null.
 	*/
-	virtual ISignalHandler * GetUnhandledSignal(const std::string & sSignalTypeName) = 0;
+	virtual ISignalHandler * ClaimSignalFromQueue(const std::string & sSignalTypeName) = 0;
 
 	/**
-	* IStateEnvironment::ClearUnhandledSignalsOfType - Clears all unhandled signals of a certain type and marks them as Cleared. Only affects signals with Phase InQueue.
+	* IStateEnvironment::SignalQueueIsEmpty - Returns if a signal queue is empty for a specific type... Equivalent to NOT QueueHasSignal.
+	* @param[in] sSignalTypeName - Name Of Signal to be returned
+	* @return Returns if the signal queue is empty. Please be aware that even a false return value does not guarantee that ClaimSignalFromQueue returns a non-null value.
+	*/
+	virtual bool SignalQueueIsEmpty(const std::string & sSignalTypeName) = 0;
+
+	/**
+	* IStateEnvironment::QueueHasSignal - Returns if a signal queue has a signal of a specific type. Equivalent to NOT SignalQueueIsEmpty ().
+	* @param[in] sSignalTypeName - Name Of Signal to be returned
+	* @return Returns if there is a signal in a signal queue. Please be aware that even a true return value does not guarantee that ClaimSignalFromQueue returns a non-null value.
+	*/
+	virtual bool QueueHasSignal(const std::string & sSignalTypeName) = 0;
+
+	/**
+	* IStateEnvironment::ClearUnhandledSignalsOfType - Clears all InQueue or InProcess signals of a certain type and marks them as Cleared. Handled, failed or timedout signals are unaffected
 	* @param[in] sSignalTypeName - Name Of Signal to be cleared.
 	*/
 	virtual void ClearUnhandledSignalsOfType(const std::string & sSignalTypeName) = 0;
 
 	/**
-	* IStateEnvironment::ClearAllUnhandledSignals - Clears all unhandled signals and marks them Cleared. Only affects signals in the specific queue (as well as with Phase InQueue.
+	* IStateEnvironment::ClearAllUnhandledSignals - Clears all InQueue or InProcess signals of this state machine and marks them Cleared. Handled, failed or timedout signals are unaffected
 	*/
 	virtual void ClearAllUnhandledSignals() = 0;
 
 	/**
-	* IStateEnvironment::GetUnhandledSignalByUUID - retrieves an unhandled signal from the current state machine by UUID.
+	* IStateEnvironment::RegisterTelemetryChannel - Registers a telemetry channel for the current state machine. Fails if identifier already exists.
+	* @param[in] sChannelIdentifier - Channel Identifier. Must be a alphanumerical path string.
+	* @param[in] sChannelDescription - Description of Channel. MUST NOT be empty.
+	* @param[in] eChannelType - Type of Channel.
+	* @return Channel instance.
+	*/
+	virtual ITelemetryChannel * RegisterTelemetryChannel(const std::string & sChannelIdentifier, const std::string & sChannelDescription, const LibMCEnv::eTelemetryChannelType eChannelType) = 0;
+
+	/**
+	* IStateEnvironment::FindTelemetryChannel - Returns a telemetry channel from the current state machine.
+	* @param[in] sChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+	* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+	* @return Channel instance. NULL if Channel does not exist.
+	*/
+	virtual ITelemetryChannel * FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting) = 0;
+
+	/**
+	* IStateEnvironment::GetUnhandledSignalByUUID - Retrieves an InQueue or InProcess signal from the current state machine by UUID.
 	* @param[in] sUUID - Name
-	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.
+	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled, failed, cleared or timedout already.
 	* @return Signal handler instance. Returns null, if signal does not exist.
 	*/
 	virtual ISignalHandler * GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist) = 0;
@@ -7203,6 +7859,42 @@ public:
 	virtual void UnloadAllToolpathes() = 0;
 
 	/**
+	* IStateEnvironment::WaitForSignal - DEPRECIATED: Waits for an InQueue signal to exist for a certain amount of time. DOES NOT change signal phase to InProcess, and is not atomic. And so NOT robust against signal timeouts. USE claim signal instead.
+	* @param[in] sSignalName - Name Of Signal
+	* @param[in] nTimeOut - Timeout in Milliseconds. 0 for Immediate return.
+	* @param[out] pHandlerInstance - Signal object. If Success is false, the Signal Handler Object will be null.
+	* @return Signal has been triggered
+	*/
+	virtual bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance) = 0;
+
+	/**
+	* IStateEnvironment::GetUnhandledSignal - DEPRECIATED: Retrieves am InQueue signal by type. DOES NOT change signal phase to InProcess, and is not atomic. And so NOT robust against signal timeouts. USE ClaimSignalFromQueue instead.
+	* @param[in] sSignalTypeName - Name Of Signal to be returned
+	* @return Signal object. If no signal has been found the signal handler object will be null.
+	*/
+	virtual ISignalHandler * GetUnhandledSignal(const std::string & sSignalTypeName) = 0;
+
+	/**
+	* IStateEnvironment::StoreSignal - DEPRECIATED: stores a signal handler in the current state machine
+	* @param[in] sName - Name
+	* @param[in] pHandler - Signal handler to store.
+	*/
+	virtual void StoreSignal(const std::string & sName, ISignalHandler* pHandler) = 0;
+
+	/**
+	* IStateEnvironment::RetrieveSignal - DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
+	* @param[in] sName - Name
+	* @return Signal handler instance.
+	*/
+	virtual ISignalHandler * RetrieveSignal(const std::string & sName) = 0;
+
+	/**
+	* IStateEnvironment::ClearStoredValue - DEPRECIATED: deletes a value from the data store.
+	* @param[in] sName - Name
+	*/
+	virtual void ClearStoredValue(const std::string & sName) = 0;
+
+	/**
 	* IStateEnvironment::SetNextState - sets the next state
 	* @param[in] sStateName - Name of next state
 	*/
@@ -7237,26 +7929,6 @@ public:
 	* @return Returns if termination shall appear
 	*/
 	virtual bool CheckForTermination() = 0;
-
-	/**
-	* IStateEnvironment::StoreSignal - DEPRECIATED: stores a signal handler in the current state machine
-	* @param[in] sName - Name
-	* @param[in] pHandler - Signal handler to store.
-	*/
-	virtual void StoreSignal(const std::string & sName, ISignalHandler* pHandler) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveSignal - DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
-	* @param[in] sName - Name
-	* @return Signal handler instance.
-	*/
-	virtual ISignalHandler * RetrieveSignal(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::ClearStoredValue - DEPRECIATED: deletes a value from the data store.
-	* @param[in] sName - Name
-	*/
-	virtual void ClearStoredValue(const std::string & sName) = 0;
 
 	/**
 	* IStateEnvironment::SetStringParameter - sets a string parameter
@@ -7339,6 +8011,52 @@ public:
 	virtual bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
+	* IStateEnvironment::HasParameterGroup - checks if a parameter group exists.
+	* @param[in] sParameterGroup - Parameter Group
+	* @return returns true if the parameter group exists.
+	*/
+	virtual bool HasParameterGroup(const std::string & sParameterGroup) = 0;
+
+	/**
+	* IStateEnvironment::HasParameter - checks if a parameter exists within a given group.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return returns true if the parameter exists in the given group.
+	*/
+	virtual bool HasParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IStateEnvironment::GetParameterGroupParameterCount - returns the number of parameters contained in a given parameter group.
+	* @param[in] sParameterGroup - Parameter Group
+	* @return Number of parameters in the group.
+	*/
+	virtual LibMCEnv_uint32 GetParameterGroupParameterCount(const std::string & sParameterGroup) = 0;
+
+	/**
+	* IStateEnvironment::GetParameterGroupParameterName - returns the name of a parameter in a given parameter group by index.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Name of the parameter.
+	*/
+	virtual std::string GetParameterGroupParameterName(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IStateEnvironment::GetParameterGroupParameterDescription - returns the description of a parameter in a given parameter group by index.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Description of the parameter.
+	*/
+	virtual std::string GetParameterGroupParameterDescription(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IStateEnvironment::GetParameterGroupParameterType - returns the data type of a parameter in a given parameter group by name.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Data type of the parameter.
+	*/
+	virtual LibMCEnv::eParameterDataType GetParameterGroupParameterType(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
 	* IStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -7377,6 +8095,24 @@ public:
 	* @return Image loader instance.
 	*/
 	virtual IImageLoader * CreateImageLoader() = 0;
+
+	/**
+	* IStateEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	virtual IVideoStream * CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) = 0;
+
+	/**
+	* IStateEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	virtual IVideoStream * FindVideoStream(const std::string & sStreamUUID) = 0;
 
 	/**
 	* IStateEnvironment::CreateMachineConfigurationHandler - creates a machine configuration handler, dealing with all persistent machine settings that the user will store in the local database.
@@ -7809,6 +8545,13 @@ public:
 	virtual std::string RetrieveEventSenderUUID() = 0;
 
 	/**
+	* IUIEnvironment::SenderHasTag - checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.
+	* @param[in] sTag - Tag to check for.
+	* @return True if the sender declares the given tag.
+	*/
+	virtual bool SenderHasTag(const std::string & sTag) = 0;
+
+	/**
 	* IUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
@@ -7885,6 +8628,41 @@ public:
 	* @return Current Parameter Value
 	*/
 	virtual bool GetMachineParameterAsBool(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineParameterGroupParameterCount - returns the number of parameters contained in a given parameter group of a state machine.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @return Number of parameters in the group.
+	*/
+	virtual LibMCEnv_uint32 GetMachineParameterGroupParameterCount(const std::string & sMachineInstance, const std::string & sParameterGroup) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineParameterGroupParameterName - returns the name of a parameter in a given parameter group of a state machine by index.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Name of the parameter.
+	*/
+	virtual std::string GetMachineParameterGroupParameterName(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineParameterGroupParameterDescription - returns the description of a parameter in a given parameter group of a state machine by index.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Description of the parameter.
+	*/
+	virtual std::string GetMachineParameterGroupParameterDescription(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineParameterGroupParameterType - returns the data type of a parameter in a given parameter group of a state machine by name.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Data type of the parameter.
+	*/
+	virtual LibMCEnv::eParameterDataType GetMachineParameterGroupParameterType(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
 	* IUIEnvironment::GetUIProperty - returns a string property of a UI element on the client
@@ -7984,6 +8762,24 @@ public:
 	virtual IImageLoader * CreateImageLoader() = 0;
 
 	/**
+	* IUIEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	virtual IVideoStream * CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) = 0;
+
+	/**
+	* IUIEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	virtual IVideoStream * FindVideoStream(const std::string & sStreamUUID) = 0;
+
+	/**
 	* IUIEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
 	* @return Timer value in Milliseconds
 	*/
@@ -8078,6 +8874,13 @@ public:
 	* @return Build execution instance
 	*/
 	virtual IBuildExecution * GetBuildExecution(const std::string & sExecutionUUID) = 0;
+
+	/**
+	* IUIEnvironment::GetRecentBuildJobs - Returns an iterator for recent build jobs, ordered by timestamp (newest first).
+	* @param[in] nMaxCount - Maximum number of jobs to return. Must be greater than 0.
+	* @return Iterator for build jobs, ordered newest first.
+	*/
+	virtual IBuildIterator * GetRecentBuildJobs(const LibMCEnv_uint32 nMaxCount) = 0;
 
 	/**
 	* IUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
@@ -8312,6 +9115,34 @@ public:
 	* @param[in] sReturnValue - Return value.
 	*/
 	virtual void AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue) = 0;
+
+	/**
+	* IUIEnvironment::SetStringResult - Sets a string result value for external event return (typed convenience wrapper).
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] sReturnValue - Return value.
+	*/
+	virtual void SetStringResult(const std::string & sReturnValueName, const std::string & sReturnValue) = 0;
+
+	/**
+	* IUIEnvironment::SetIntegerResult - Sets an integer result value for external event return.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] nReturnValue - Return value.
+	*/
+	virtual void SetIntegerResult(const std::string & sReturnValueName, const LibMCEnv_int64 nReturnValue) = 0;
+
+	/**
+	* IUIEnvironment::SetBoolResult - Sets a boolean result value for external event return.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] bReturnValue - Return value.
+	*/
+	virtual void SetBoolResult(const std::string & sReturnValueName, const bool bReturnValue) = 0;
+
+	/**
+	* IUIEnvironment::SetDoubleResult - Sets a double result value for external event return.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] dReturnValue - Return value.
+	*/
+	virtual void SetDoubleResult(const std::string & sReturnValueName, const LibMCEnv_double dReturnValue) = 0;
 
 	/**
 	* IUIEnvironment::GetExternalEventParameters - Returns the external event parameters. This JSON Object was passed on from the external API.

@@ -81,6 +81,13 @@ namespace AMC {
 
 		PUIModule_LogsItem m_LogsItem;
 
+		PUIModuleEnvironment m_pUIModuleEnvironment;
+
+		uint32_t m_nDefaultCount;
+		bool m_bShowToolbar;
+		uint32_t m_nMaxClientEntries;
+		std::string m_sDownloadPrefix;
+
 	public:
 
 		/////////////////////////////////////////////////////////////////////////////////////
@@ -116,6 +123,8 @@ namespace AMC {
 		/////////////////////////////////////////////////////////////////////////////////////
 
 		bool isVersion2FrontendModule();
+
+		virtual void frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
 
 	};
 

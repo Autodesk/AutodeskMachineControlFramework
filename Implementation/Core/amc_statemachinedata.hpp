@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <map>
 #include <string>
+#include <functional>
 #include <mutex>
 
 namespace AMC {
@@ -75,4 +76,3 @@ namespace AMC {
 
 
 #endif //__AMC_PARAMETERHANDLER
-

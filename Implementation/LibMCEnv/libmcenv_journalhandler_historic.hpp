@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CJournalHandler
 
 #include "libmcdata_dynamic.hpp"
 #include "amc_statejournalstreamcache.hpp"
+#include "common_chrono.hpp"
 
 #include "amc_statejournalreader.hpp"
 #include <mutex>
@@ -61,14 +62,21 @@ namespace Impl {
 class CJournalHandler_Historic : public virtual IJournalHandler, public virtual CBase {
 protected:
     AMC::PStateJournalReader m_pJournalReader;
+    LibMCData::PDataModel m_pDataModel;
+    std::string m_sJournalUUID;
+    AMCCommon::PChrono m_pGlobalChrono;
 
 public:
 
-    CJournalHandler_Historic(AMC::PStateJournalReader pJournalReader);
+    CJournalHandler_Historic(AMC::PStateJournalReader pJournalReader, LibMCData::PDataModel pDataModel, const std::string& sJournalUUID, AMCCommon::PChrono pGlobalChrono);
 
     virtual ~CJournalHandler_Historic();
 
     IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName) override;
+
+    LibMCEnv_uint32 GetVariableCount() override;
+
+    void GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string& sName, LibMCEnv::eParameterDataType& eDataType, LibMCEnv_double& dUnits) override;
 
     IDateTime* GetStartTime() override;
 
@@ -83,6 +91,8 @@ public:
 	IAlertIterator* RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
 
 	IAlertIterator* RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
+
+	ITelemetryHandler* LoadTelemetryHandler() override;
 };
 
 } // namespace Impl

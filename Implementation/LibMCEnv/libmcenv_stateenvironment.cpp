@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_datetime.hpp"
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
+#include "libmcenv_telemetrychannel.hpp"
 #include "libmcenv_xmldocument.hpp"
 #include "libmcenv_discretefielddata2d.hpp"
 #include "libmcenv_journalhandler_current.hpp"
@@ -59,7 +60,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_modeldatacomponentinstance.hpp"
 #include "libmcenv_imageloader.hpp"
 #include "libmcenv_jsonobject.hpp"
+#include "libmcenv_videostream.hpp"
 
+#include "amc_telemetry.hpp"
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
 #include "amc_parameterhandler.hpp"
@@ -70,6 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_meshhandler.hpp"
 #include "amc_alerthandler.hpp"
 #include "amc_dataserieshandler.hpp"
+#include "amc_streamregistry.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -111,7 +115,8 @@ std::string CStateEnvironment::GetPreviousState()
 
 ISignalTrigger* CStateEnvironment::PrepareSignal(const std::string& sMachineInstance, const std::string& sSignalName)
 {
-	if (!m_pSystemState->stateSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
+	auto pSignalInstance = m_pSystemState->stateSignalHandler()->getInstance(sMachineInstance);
+	if (!pSignalInstance->hasSignalDefinition(sSignalName))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
 
 	return new CSignalTrigger (m_pSystemState->getStateSignalHandlerInstance (), sMachineInstance, sSignalName, m_pSystemState->getGlobalChronoInstance());
@@ -120,21 +125,28 @@ ISignalTrigger* CStateEnvironment::PrepareSignal(const std::string& sMachineInst
 
 bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance)
 {
-	auto startTime = std::chrono::high_resolution_clock::now();
-	auto endTime = startTime + std::chrono::milliseconds(nTimeOut);
+	auto pChronoInstance = m_pSystemState->getGlobalChronoInstance();
+	auto pSignalInstance = m_pSystemState->stateSignalHandler()->getInstance(m_sInstanceName);
+
+	uint64_t nStartTime = pChronoInstance->getElapsedMicroseconds();
+	uint64_t nEndTime = nStartTime + (static_cast<uint64_t>(nTimeOut) * 1000);
 
 	bool bIsTimeOut = false;
 	while (!bIsTimeOut) {
 
-		std::string sUnhandledSignalUUID = m_pSystemState->stateSignalHandler()->peekSignalMessageFromQueue(m_sInstanceName, sSignalName);
+		uint64_t nCurrentTime = pChronoInstance->getElapsedMicroseconds();
 
-		if (!sUnhandledSignalUUID.empty ()) {
-			pHandlerInstance = new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sUnhandledSignalUUID, m_pSystemState->getGlobalChronoInstance());
+		std::string sUnhandledSignalUUID;
+		std::string sParameterDataJSON;
+		bool bHasSignal = pSignalInstance->claimSignalMessage(sSignalName, true, nCurrentTime, nCurrentTime, sUnhandledSignalUUID, sParameterDataJSON, false);
+
+		if (bHasSignal) {
+			pHandlerInstance = new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), m_sInstanceName, sSignalName, sUnhandledSignalUUID, sParameterDataJSON, m_pSystemState->getGlobalChronoInstance());
 
 			return true;
 		}
 
-		bIsTimeOut = std::chrono::high_resolution_clock::now() >= endTime;
+		bIsTimeOut = nCurrentTime >= nEndTime;
 
 		if (!bIsTimeOut) {
 			if (CheckForTermination())
@@ -150,23 +162,60 @@ bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibM
 
 ISignalHandler* CStateEnvironment::GetUnhandledSignal(const std::string& sSignalTypeName)
 {
-	std::string sUnhandledSignalUUID = m_pSystemState->stateSignalHandler()->peekSignalMessageFromQueue(m_sInstanceName, sSignalTypeName);
+	auto pChronoInstance = m_pSystemState->getGlobalChronoInstance();
+	auto pSignalInstance = m_pSystemState->stateSignalHandler()->getInstance(m_sInstanceName);
 
-	if (!sUnhandledSignalUUID.empty ()) {
-		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sUnhandledSignalUUID, m_pSystemState->getGlobalChronoInstance());
+	std::string sUnhandledSignalUUID;
+	std::string sParameterDataJSON;
+	uint64_t nCurrentTime = pChronoInstance->getElapsedMicroseconds();
+	bool bHasSignal = pSignalInstance->claimSignalMessage(sSignalTypeName, true, nCurrentTime, nCurrentTime, sUnhandledSignalUUID, sParameterDataJSON, false);
+	if (bHasSignal) {
+		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), m_sInstanceName, sSignalTypeName, sUnhandledSignalUUID, sParameterDataJSON, pChronoInstance);
 	}
 
 	return nullptr;
 }
 
+ISignalHandler* CStateEnvironment::ClaimSignalFromQueue(const std::string& sSignalTypeName) 
+{
+	auto pChronoInstance = m_pSystemState->getGlobalChronoInstance();
+	auto pSignalInstance = m_pSystemState->stateSignalHandler()->getInstance(m_sInstanceName);
+
+	std::string sUnhandledSignalUUID;
+	std::string sParameterDataJSON;
+	uint64_t nCurrentTime = pChronoInstance->getElapsedMicroseconds();
+	bool bHasSignal = pSignalInstance->claimSignalMessage(sSignalTypeName, true, nCurrentTime, nCurrentTime, sUnhandledSignalUUID, sParameterDataJSON, true);
+	if (bHasSignal) {
+		return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), m_sInstanceName, sSignalTypeName, sUnhandledSignalUUID, sParameterDataJSON, pChronoInstance);
+	}
+
+	return nullptr;
+}
+
+bool CStateEnvironment::SignalQueueIsEmpty(const std::string& sSignalTypeName)
+{
+	auto pSignalInstance = m_pSystemState->stateSignalHandler()->getInstance(m_sInstanceName);
+	return pSignalInstance->queueIsEmpty(sSignalTypeName);
+}
+
+bool CStateEnvironment::QueueHasSignal(const std::string& sSignalTypeName)
+{
+	return !SignalQueueIsEmpty(sSignalTypeName);
+}
+
+
 void CStateEnvironment::ClearAllUnhandledSignals()
 {
-	m_pSystemState->stateSignalHandler()->clearUnhandledSignals(m_sInstanceName);
+	auto pChrono = m_pSystemState->globalChrono();
+	auto pSignalInstance = m_pSystemState->stateSignalHandler()->getInstance(m_sInstanceName);
+	pSignalInstance->clearUnhandledSignals(pChrono->getElapsedMicroseconds ());
 }
 
 void CStateEnvironment::ClearUnhandledSignalsOfType(const std::string& sSignalTypeName)
 {
-	m_pSystemState->stateSignalHandler()->clearUnhandledSignalsOfType(m_sInstanceName, sSignalTypeName);
+	auto pChrono = m_pSystemState->globalChrono();	
+	auto pSignalInstance = m_pSystemState->stateSignalHandler()->getInstance(m_sInstanceName);
+	pSignalInstance->clearUnhandledSignalsOfType(sSignalTypeName, pChrono->getElapsedMicroseconds ());
 }
 
 ISignalHandler* CStateEnvironment::GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist)
@@ -454,6 +503,79 @@ bool CStateEnvironment::GetBoolParameter(const std::string& sParameterGroup, con
 	return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
+bool CStateEnvironment::HasParameterGroup(const std::string& sParameterGroup)
+{
+	return m_pParameterHandler->hasGroup(sParameterGroup);
+}
+
+bool CStateEnvironment::HasParameter(const std::string& sParameterGroup, const std::string& sParameterName)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		return false;
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	return pGroup->hasParameter(sParameterName);
+}
+
+LibMCEnv_uint32 CStateEnvironment::GetParameterGroupParameterCount(const std::string& sParameterGroup)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	return pGroup->getParameterCount();
+}
+
+std::string CStateEnvironment::GetParameterGroupParameterName(const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (nIndex >= pGroup->getParameterCount())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "parameter index out of range: " + sParameterGroup + "/" + std::to_string(nIndex));
+
+	std::string sName, sDescription, sDefaultValue;
+	pGroup->getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+	return sName;
+}
+
+std::string CStateEnvironment::GetParameterGroupParameterDescription(const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (nIndex >= pGroup->getParameterCount())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "parameter index out of range: " + sParameterGroup + "/" + std::to_string(nIndex));
+
+	std::string sName, sDescription, sDefaultValue;
+	pGroup->getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+	return sDescription;
+}
+
+// Maps an internal parameter data type to the plugin-facing enum.
+static LibMCEnv::eParameterDataType parameterDataTypeToEnum(AMC::eParameterDataType eType)
+{
+	switch (eType) {
+		case AMC::eParameterDataType::String: return LibMCEnv::eParameterDataType::String;
+		case AMC::eParameterDataType::UUID: return LibMCEnv::eParameterDataType::UUID;
+		case AMC::eParameterDataType::Integer: return LibMCEnv::eParameterDataType::Integer;
+		case AMC::eParameterDataType::Double: return LibMCEnv::eParameterDataType::Double;
+		case AMC::eParameterDataType::Bool: return LibMCEnv::eParameterDataType::Bool;
+		default: return LibMCEnv::eParameterDataType::Unknown;
+	}
+}
+
+LibMCEnv::eParameterDataType CStateEnvironment::GetParameterGroupParameterType(const std::string& sParameterGroup, const std::string& sParameterName)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	return parameterDataTypeToEnum(pGroup->getParameterDataTypeByName(sParameterName));
+}
+
 bool CStateEnvironment::HasResourceData(const std::string& sIdentifier)
 {
 	auto pUIHandler = m_pSystemState->uiHandler();
@@ -518,7 +640,40 @@ IImageData* CStateEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSize
 
 IImageLoader* CStateEnvironment::CreateImageLoader()
 {
-	return new CImageLoader();
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	return new CImageLoader(pResourcePackage);
+
+}
+
+IVideoStream* CStateEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+{
+	auto pRegistry = m_pSystemState->getStreamRegistryInstance();
+	if (pRegistry.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pInstance = pRegistry->createVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+	return new CVideoStream(pInstance);
+}
+
+IVideoStream* CStateEnvironment::FindVideoStream(const std::string& sStreamUUID)
+{
+	auto pRegistry = m_pSystemState->getStreamRegistryInstance();
+	if (pRegistry.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pInstance = pRegistry->findVideoStream(sStreamUUID);
+	if (pInstance.get() == nullptr)
+		return nullptr;
+
+	return new CVideoStream(pInstance);
 }
 
 LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
@@ -1018,5 +1173,33 @@ IDateTime* CStateEnvironment::GetStartDateTime()
 {
 	auto pGlobalChrono = m_pSystemState->getGlobalChronoInstance();
 	return new CDateTime(pGlobalChrono->getStartTimeStampInMicrosecondsSince1970 ());
+}
+
+
+ITelemetryChannel* CStateEnvironment::RegisterTelemetryChannel(const std::string& sChannelIdentifier, const std::string& sChannelDescription, const LibMCEnv::eTelemetryChannelType eChannelType)
+{
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString (sChannelIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "invalid state machine telemetry channel identifier: " + sChannelIdentifier + " (state machine " + m_sInstanceName + ")");
+	
+	std::string sIdentifier = m_sInstanceName + "." + sChannelIdentifier;
+
+	auto pTelemetryHandler = m_pSystemState->getTelemetryHandlerInstance();
+	pTelemetryHandler->registerChannel(sIdentifier, sChannelDescription, CTelemetryChannel::mapEnvChannelTypeToDataChannelType (eChannelType));
+
+	return new CTelemetryChannel(pTelemetryHandler, m_sInstanceName, sChannelIdentifier);
+}
+
+ITelemetryChannel* CStateEnvironment::FindTelemetryChannel(const std::string& sChannelIdentifier, const bool bFailIfNotExisting)
+{
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sChannelIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "invalid state machine telemetry channel identifier: " + sChannelIdentifier + " (state machine " + m_sInstanceName + ")");
+
+	std::string sIdentifier = m_sInstanceName + "." + sChannelIdentifier;
+
+	auto pTelemetryHandler = m_pSystemState->getTelemetryHandlerInstance();
+	pTelemetryHandler->findChannelByIdentifier(sIdentifier, true);
+
+	return new CTelemetryChannel(pTelemetryHandler, m_sInstanceName, sChannelIdentifier);
+
 }
 

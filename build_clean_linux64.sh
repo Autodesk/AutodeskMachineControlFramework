@@ -1,24 +1,24 @@
 #!/bin/bash
 set -e
 
-# disable go modules
-export GO111MODULE="off" 
-
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 PLATFORMNAME="linux64"
+CMAKE_OPTIONS=""
 
 for var in "$@"
 do
-echo "command line parameter: $var"
-if test $var = "--buildrpi"
-then
-	PLATFORMNAME="rpi"	
-fi	
-if test $var = "--buildwin64"
-then
-	PLATFORMNAME="win64"	
-fi	
+  echo "command line parameter: $var"
+  if test "$var" = "--buildrpi"
+  then
+    PLATFORMNAME="rpi"
+  elif test "$var" = "--buildwin64"
+  then
+    PLATFORMNAME="win64"
+  elif [[ "$var" == -D* ]]
+  then
+    CMAKE_OPTIONS="$CMAKE_OPTIONS $var"
+  fi
 done
 
 builddir="$basepath/build_${PLATFORMNAME}"
@@ -56,6 +56,7 @@ dirs_to_make[25]="$builddir/Client/src/plugins"
 dirs_to_make[26]="$builddir/Client/dist"
 dirs_to_make[27]="$builddir/Artifacts"
 dirs_to_make[28]="$outputdir/data"
+dirs_to_make[29]="$builddir/Deployment"
 
 for dir in "${dirs_to_make[@]}"
 do
@@ -78,12 +79,12 @@ git rev-parse --verify HEAD > "$builddir/longgithash.txt"
 LONGGITHASH=$(<"$builddir/longgithash.txt")
 echo "long git hash: $LONGGITHASH"
 
-git log -n 1 --format="%H" -- "$basepath/Client" > "$builddir/clientdirhash.txt"
+git log -n 1 --format="%H" -- "$basepath/Client/core" "$basepath/Client/vue2" > "$builddir/clientdirhash.txt"
 CLIENTDIRHASH=$(<"$builddir/clientdirhash.txt")
 echo "client dir hash: $CLIENTDIRHASH"
 
-CLIENTDISTHASH=$(<"$basepath/Artifacts/clientdist/_githash_client.txt")
-echo "client dist hash: $CLIENTDISTHASH"
+CLIENTDISTHASH=$(<"$basepath/Artifacts/clientdist/_githash_client_vue2.txt")
+echo "client dist hash (vue2): $CLIENTDISTHASH"
 
 #if test $CLIENTDISTHASH != $CLIENTDIRHASH
 #then
@@ -93,41 +94,12 @@ echo "client dist hash: $CLIENTDISTHASH"
 
 cd "$basepath"
 
-if test $PLATFORMNAME = "rpi"
+cp "$basepath/Artifacts/clientdist/clientpackage_vue2.zip" "$builddir/Output/${GITHASH}_core_vue2.client"
+if test -f "$basepath/Artifacts/clientdist/clientpackage_svelte.zip"
 then
-
-	echo "Building Resource builder (LinuxARM)..."
-	export GOARCH=arm
-	export GOOS=linux
-	export GOARM=5
-	go build -o "$builddir/DevPackage/Framework/buildresources.rpi" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
-
-else
-
-if test $PLATFORMNAME = "win64"
-then
-
-	echo "Building Resource builder (Win64)..."
-	export GOARCH=amd64
-	export GOOS=windows
-	go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
-
-	echo "Building Resource builder (Linux64)..."
-	export GOARCH=amd64
-	export GOOS=linux
-	go build -o "$builddir/DevPackage/Framework/buildresources.linux64" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
-	
-else
-
-	echo "Building Resource builder (Linux64)..."
-	export GOARCH=amd64
-	export GOOS=linux
-	go build -o "$builddir/DevPackage/Framework/buildresources.linux64" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
-
-fi	
+cp "$basepath/Artifacts/clientdist/clientpackage_svelte.zip" "$builddir/Output/${GITHASH}_core_svelte.client"
 fi
-
-cp "$basepath/Artifacts/clientdist/clientpackage.zip" "$builddir/Output/${GITHASH}_core.client"
+cp "$basepath/Artifacts/apidocsdist/apidocspackage.zip" "$builddir/Output/${GITHASH}_core.apidocs"
 
 cd "$builddir"
 
@@ -135,9 +107,9 @@ cd "$builddir"
 echo "Building Core Modules"
 if test $PLATFORMNAME = "win64"
 then
-cmake -DOVERRIDE_PLATFORM=linux64 -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
+cmake -DOVERRIDE_PLATFORM=linux64 -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt $CMAKE_OPTIONS ..
 else
-cmake -DOVERRIDE_PLATFORM=$PLATFORMNAME ..
+cmake -DOVERRIDE_PLATFORM=$PLATFORMNAME $CMAKE_OPTIONS ..
 fi
 
 cmake --build . --config Release
@@ -146,6 +118,9 @@ cd $builddir
 echo "Building Package XML"
 
 "$builddir/DevPackage/Framework/create_package_xml" --config "$builddir/Output/${GITHASH}_config.xml" --devpackage ${GITHASH} --output "$builddir/Output/${GITHASH}_package.xml" --serveroutput "$builddir/Output/amc_server.xml"
+
+echo "Building Deployment ZIP"
+"$builddir/DevPackage/Framework/create_deployment_zip" --package "$builddir/Output/${GITHASH}_package.xml" --output "$builddir/Deployment/AMCF_Deploy_${GITHASH}.zip"
 
 echo "Building Developer Package"
 cd "$builddir/DevPackage"
@@ -164,16 +139,20 @@ cp ../Output/${GITHASH}_core_libmc.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_core_lib3mf.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_core_libmcdata.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_*.data Framework/Dist/
-cp ../Output/${GITHASH}_core.client Framework/Dist/
+cp ../Output/${GITHASH}_core_vue2.client Framework/Dist/
+if test -f ../Output/${GITHASH}_core_svelte.client
+then
+cp ../Output/${GITHASH}_core_svelte.client Framework/Dist/
+fi
 cp ../Output/${GITHASH}_package.xml Framework/Dist/
-cp ../Output/${GITHASH}_driver_*.${DLLEXT} Framework/Dist/
+cp ../Output/${GITHASH}_driver_*.${DLLEXT} Framework/Dist/ 2>/dev/null || echo "No driver libraries found"
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 rm Framework/Dist/${GITHASH}_core.data
 
 cd $builddir
-go run "$basepath/BuildScripts/createDevPackage.go" ./DevPackage/Framework ./DevPackage ${LONGGITHASH} $PLATFORMNAME
+"$builddir/DevPackage/Framework/create_dev_package" ./DevPackage/Framework ./DevPackage ${LONGGITHASH} $PLATFORMNAME
 
 cp "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "$builddir/Artifacts/devpackage_${PLATFORMNAME}.zip"
 

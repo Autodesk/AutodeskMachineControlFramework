@@ -38,6 +38,12 @@ Abstract: This is a stub class definition of CStreamConnection
 #include "common_utils.hpp"
 #include "libmc_streamdata.hpp"
 
+#define STREAMCONNECTION_MICROSECONDS_PER_MILLISECOND 1000
+#define STREAMCONNECTION_DEFAULT_IDLE_DELAY_IN_MS 100
+#define STREAMCONNECTION_MIN_IDLE_DELAY_IN_MS 5
+#define STREAMCONNECTION_MAX_IDLE_DELAY_IN_MS 100
+#define STREAMCONNECTION_IDLE_DELAY_FRAMEDURATION_DIVISOR 2
+
 using namespace LibMC::Impl;
 
 #include <iostream>
@@ -46,11 +52,14 @@ using namespace LibMC::Impl;
  Class definition of CStreamConnection 
 **************************************************************************************************************************/
 
-CStreamConnection::CStreamConnection(const std::string& sStreamUUID)
+CStreamConnection::CStreamConnection(const std::string& sStreamUUID, AMC::PStreamInstance pStream)
     : m_sStreamUUID (AMCCommon::CUtils::normalizeUUIDString (sStreamUUID)),
-    m_nDummy (0)
+    m_pStream (pStream),
+    m_nLastFrameVersion (0)
 {
-
+    // Cache the downcast for video streams
+    if (pStream.get() != nullptr)
+        m_pVideoStream = std::dynamic_pointer_cast<AMC::CVideoStreamInstance>(pStream);
 }
 
 
@@ -62,28 +71,49 @@ CStreamConnection::~CStreamConnection()
 
 IStreamData * CStreamConnection::GetNewContent()
 {
-	std::unique_ptr<CStreamData> pStreamData(new CStreamData("image/jpeg"));
+    if (m_pVideoStream.get() == nullptr)
+        return nullptr;
 
+    std::vector<uint8_t> jpegBuffer;
+    uint64_t newVersion = 0;
+
+    if (!m_pVideoStream->getLatestJPEGFrame(jpegBuffer, m_nLastFrameVersion, newVersion))
+        return nullptr;
+
+    m_nLastFrameVersion = newVersion;
+
+    std::unique_ptr<CStreamData> pStreamData(new CStreamData("image/jpeg"));
     auto & buffer = pStreamData->getBuffer();
-
-    std::string sString = "{ \"test\": \"abc" + std::to_string (m_nDummy)  + "\" }";
-    for (auto ch : sString) {
-        buffer.push_back(ch);
-    }
-
-    m_nDummy++;
+    buffer = std::move(jpegBuffer);
 
     return pStreamData.release();
-
-
 }
 
 uint32_t CStreamConnection::GetIdleDelay()
 {
-    return 50;
+    if (m_pVideoStream.get() == nullptr)
+        return STREAMCONNECTION_DEFAULT_IDLE_DELAY_IN_MS;
+
+    // Delay should be a fraction of the frame duration for responsive streaming
+    uint32_t nFrameDurationMs = m_pVideoStream->getDesiredFrameDurationInMicroseconds() / STREAMCONNECTION_MICROSECONDS_PER_MILLISECOND;
+    if (nFrameDurationMs < STREAMCONNECTION_MIN_IDLE_DELAY_IN_MS)
+        return STREAMCONNECTION_MIN_IDLE_DELAY_IN_MS;
+    if (nFrameDurationMs > STREAMCONNECTION_MAX_IDLE_DELAY_IN_MS)
+        return STREAMCONNECTION_MAX_IDLE_DELAY_IN_MS;
+    return nFrameDurationMs / STREAMCONNECTION_IDLE_DELAY_FRAMEDURATION_DIVISOR;
 }
 
 LibMC::eStreamConnectionType CStreamConnection::GetStreamType()
 {
-    return LibMC::eStreamConnectionType::JSONEventStream;
+    if (m_pStream.get() == nullptr)
+        return LibMC::eStreamConnectionType::Unknown;
+
+    switch (m_pStream->getStreamType()) {
+    case AMC::eStreamType::VideoStream:
+        return LibMC::eStreamConnectionType::JPEGImageStream;
+    case AMC::eStreamType::JSONEventStream:
+        return LibMC::eStreamConnectionType::JSONEventStream;
+    default:
+        return LibMC::eStreamConnectionType::Unknown;
+    }
 }

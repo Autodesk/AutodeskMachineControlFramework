@@ -37,11 +37,249 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_utils.hpp"
 
+#include "amc_telemetry.hpp"
+
 namespace AMC {
 	
-	
-	CStateSignalHandler::CStateSignalHandler()
+
+	CStateSignalInstance::CStateSignalInstance(const std::string& sInstanceName, CStateSignalRegistry* pRegistry)
+		: m_sInstanceName (sInstanceName), m_pRegistry (pRegistry)
 	{
+
+		if (pRegistry == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		if (sInstanceName.empty ())
+			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYSIGNALINSTANCENAME);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sInstanceName))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSIGNALINSTANCENAME, sInstanceName);
+
+	}
+
+	CStateSignalInstance::~CStateSignalInstance()
+	{
+
+	}
+
+	std::string CStateSignalInstance::getInstanceName() const
+	{
+		return m_sInstanceName;
+	}
+
+	PStateSignalSlot CStateSignalInstance::getSignalSlot(const std::string& sSignalName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_SlotMutex);
+		auto iIter = m_Slots.find(sSignalName);
+		if (iIter == m_Slots.end())
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDSIGNAL, sSignalName);
+
+		return iIter->second;
+	}
+
+	PStateSignalSlot CStateSignalInstance::getSignalSlotOrNull(const std::string& sSignalName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_SlotMutex);
+		auto iIter = m_Slots.find(sSignalName);
+		if (iIter == m_Slots.end())
+			return nullptr;
+
+		return iIter->second;
+
+	}
+
+
+	bool CStateSignalInstance::hasSignalDefinition(const std::string& sSignalName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_SlotMutex);
+		auto iIter = m_Slots.find(sSignalName);
+		return (iIter != m_Slots.end());
+
+	}
+
+	PStateSignalSlot CStateSignalInstance::addSignalDefinition(const std::string& sSignalName, const std::vector<CStateSignalParameter>& Parameters, const std::vector<CStateSignalParameter>& Results, uint32_t nSignalReactionTimeOutInMS, uint32_t nAutomaticArchiveTimeInMS, uint32_t nSignalQueueSize, PParameterGroup pSignalInformationGroup)
+	{
+		if (sSignalName.empty())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSIGNALNAME, sSignalName);
+
+		std::lock_guard<std::mutex> lockGuard(m_SlotMutex);
+
+		auto iter = m_Slots.find(sSignalName);
+		if (iter != m_Slots.end())
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATESIGNAL, m_sInstanceName + "/" + sSignalName);
+
+		auto pSignal = std::make_shared<CStateSignalSlot>(m_sInstanceName, sSignalName, Parameters, Results, nSignalReactionTimeOutInMS, nAutomaticArchiveTimeInMS, nSignalQueueSize, pSignalInformationGroup, m_pRegistry);
+		m_Slots.emplace(sSignalName, pSignal);
+
+		return pSignal;
+
+	}
+
+
+	bool CStateSignalInstance::addNewInQueueSignal(const std::string& sSignalName, const std::string& sSignalUUID, const std::string& sParameterData, uint32_t nResponseTimeOutInMS, uint64_t nTimestamp)
+	{
+
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
+		if (m_pRegistry->findSignalSlotOfMessage(sNormalizedUUID) != nullptr)
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALALREADYTRIGGERED, sNormalizedUUID);
+
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+
+		auto pMessage = pSlot->addNewInQueueSignalInternal(sNormalizedUUID, sParameterData, nResponseTimeOutInMS, nTimestamp);
+		if (pMessage.get() != nullptr) {
+			return true;
+		}
+
+		return false;
+
+	}
+
+	void CStateSignalInstance::clearUnhandledSignals(uint64_t nTimestamp)
+	{
+		std::vector<AMC::PStateSignalSlot> slotList;
+		{
+			slotList.reserve(m_Slots.size());
+
+			std::lock_guard<std::mutex> lockGuard(m_SlotMutex);
+			for (auto it = m_Slots.begin(); it != m_Slots.end(); it++) {
+				slotList.push_back(it->second);
+			}
+		}
+
+
+		for (auto pSlot : slotList) {
+			pSlot->clearQueueInternal();
+		}
+
+
+	}
+
+	void CStateSignalInstance::clearUnhandledSignalsOfType(const std::string& sSignalTypeName, uint64_t nTimestamp)
+	{
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalTypeName);
+		pSlot->clearQueueInternal();
+	}
+
+	bool CStateSignalInstance::canTrigger(const std::string& sSignalName)
+	{
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+		return !pSlot->queueIsFull();
+	}
+
+	bool CStateSignalInstance::queueIsEmpty(const std::string& sSignalName)
+	{
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+		return pSlot->queueIsEmpty();
+	}
+
+
+
+	bool CStateSignalInstance::claimSignalMessage(const std::string& sSignalName, bool bCheckForReactionTimeout, uint64_t nGlobalTimestamp, uint64_t nTimeStamp, std::string& sSignalUUID, std::string& sParameterDataJSON, bool bChangePhaseToInprocess)
+	{
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+
+		auto pMessage = pSlot->claimMessageFromQueueInternal(bCheckForReactionTimeout, nGlobalTimestamp, nTimeStamp, bChangePhaseToInprocess);
+		if (pMessage.get() == nullptr)
+			return false;
+
+		sSignalUUID = pMessage->getUUID();
+		sParameterDataJSON = pMessage->getParameterDataJSON();
+		return true;
+	}
+
+
+	uint32_t CStateSignalInstance::getAvailableSignalQueueEntryCount(const std::string& sSignalName)
+	{
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+
+		return pSlot->getAvailableSignalQueueEntriesInternal();
+	}
+
+	uint32_t CStateSignalInstance::getTotalSignalQueueSize(const std::string& sSignalName)
+	{
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+
+		return pSlot->getTotalSignalQueueSizeInternal();
+	}
+
+	uint32_t CStateSignalInstance::getDefaultReactionTimeout(const std::string& sSignalName)
+	{
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+
+		return pSlot->getDefaultReactionTimeoutInternal();
+	}
+
+	void CStateSignalInstance::populateParameterGroup(const std::string& sSignalName, CParameterGroup* pParameterGroup)
+	{
+		LibMCAssertNotNull(pParameterGroup);
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+
+		pSlot->populateParameterGroup(pParameterGroup);
+
+	}
+
+	void CStateSignalInstance::populateResultGroup(const std::string& sSignalName, CParameterGroup* pResultGroup)
+	{
+		LibMCAssertNotNull(pResultGroup);
+		AMC::PStateSignalSlot pSlot = getSignalSlot(sSignalName);
+
+		pSlot->populateResultGroup(pResultGroup);
+
+	}
+
+	void CStateSignalInstance::checkForReactionTimeouts(uint64_t nGlobalTimestamp)
+	{
+		std::vector<PStateSignalSlot> slots;
+		{
+			std::lock_guard<std::mutex> lockGuard(m_SlotMutex);
+			for (auto iIterator : m_Slots) {
+				slots.push_back(iIterator.second);
+			}
+		}
+
+		for (auto pSlot : slots) {
+			pSlot->checkForReactionTimeouts(nGlobalTimestamp);
+		}
+	}
+
+	void CStateSignalInstance::autoArchiveMessages(uint64_t nGlobalTimestamp)
+	{
+		std::vector<PStateSignalSlot> slots;
+		{
+			std::lock_guard<std::mutex> lockGuard(m_SlotMutex);
+			for (auto iIterator : m_Slots) {
+				slots.push_back(iIterator.second);
+			}
+		}
+
+		for (auto pSlot : slots) {
+			pSlot->autoArchiveMessages(nGlobalTimestamp);
+		}
+
+	}
+
+	void CStateSignalInstance::writeMessagesToArchive(CStateSignalArchiveWriter* pArchiveWriter)
+	{
+		std::vector<PStateSignalSlot> slots;
+		{
+			std::lock_guard<std::mutex> lockGuard(m_SlotMutex);
+			for (auto iIterator : m_Slots) {
+				slots.push_back(iIterator.second);
+			}
+		}
+
+		for (auto pSlot : slots) {
+			pSlot->writeMessagesToArchive(pArchiveWriter);
+		}
+
+	}
+
+	
+	CStateSignalHandler::CStateSignalHandler(PTelemetryHandler pTelemetryHandler)
+		: m_pTelemetryHandler(pTelemetryHandler)
+	{
+		if (pTelemetryHandler.get () == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	}
 	
 
@@ -49,122 +287,90 @@ namespace AMC {
 	{
 	}
 	
-	void CStateSignalHandler::addSignalDefinition(const std::string& sInstanceName, const std::string& sSignalName, const std::list<CStateSignalParameter>& Parameters, const std::list<CStateSignalParameter>& Results, uint32_t nSignalReactionTimeOutInMS, uint32_t nSignalQueueSize)
+
+	PStateSignalInstance CStateSignalHandler::registerInstance(const std::string& sInstanceName)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
+		std::lock_guard<std::mutex> lockGuard(m_SignalInstanceMutex);
 
-		if (sSignalName.empty ())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSIGNALNAME, sInstanceName);
+		auto iIter = m_Instances.find(sInstanceName);
+		if (iIter != m_Instances.end())
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATESIGNALINSTANCENAME, sInstanceName);
 
+		auto pInstance = std::make_shared<CStateSignalInstance>(sInstanceName, this);
 
-		auto iter = m_SignalMap.find(std::make_pair (sInstanceName, sSignalName));
-		if (iter != m_SignalMap.end())
-			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATESIGNAL, sInstanceName + "/" + sSignalName);
+		m_Instances.emplace(sInstanceName, pInstance);
 
-		auto pSignal = std::make_shared<CStateSignalSlot>(sInstanceName, sSignalName, Parameters, Results, nSignalReactionTimeOutInMS, nSignalQueueSize);
-		m_SignalMap.insert(std::make_pair(std::make_pair (sInstanceName, sSignalName), pSignal));
+		return pInstance;
 	}
 
-	bool CStateSignalHandler::addNewInQueueSignal(const std::string& sInstanceName, const std::string& sSignalName, const std::string& sSignalUUID, const std::string& sParameterData, uint32_t nResponseTimeOutInMS)
-	{		
+	PStateSignalInstance CStateSignalHandler::getInstance(const std::string& sInstanceName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_SignalInstanceMutex);
 
-		AMC::PStateSignalSlot pSlot;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
-			auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-			if (iter == m_SignalMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "addNewInQueueSignal: " + sInstanceName + "/" + sSignalName);
+		auto iIter = m_Instances.find(sInstanceName);
+		if (iIter == m_Instances.end())
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALINSTANCENOTFOUND, sInstanceName);
 
-			pSlot = iter->second;
-		}
-
-		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
-		
-		std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-
-		auto iUUIDIter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-		if (iUUIDIter != m_SignalUUIDLookupMap.end())
-			throw ELibMCCustomException(LIBMC_ERROR_SIGNALALREADYTRIGGERED, sNormalizedUUID);
-
-
-		if (pSlot->addNewInQueueSignalInternal (sNormalizedUUID, sParameterData, nResponseTimeOutInMS)) {
-			m_SignalUUIDLookupMap.insert(std::make_pair(sNormalizedUUID, pSlot));
-			return true;
-		}
-
-		return false;
+		return iIter->second;
 	}
 
-
-	bool CStateSignalHandler::hasSignalDefinition(const std::string& sInstanceName, const std::string& sSignalName)
+	void CStateSignalHandler::registerMessage(const std::string& sMessageUUID, CStateSignalSlot* pSignalSlot)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
-		auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-		return (iter != m_SignalMap.end());
-	}
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString (sMessageUUID);
 
+		if (pSignalSlot == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
+		std::string sInstanceName = pSignalSlot->getInstanceNameInternal();
+		std::string sSignalName = pSignalSlot->getNameInternal();
 
-	void CStateSignalHandler::clearUnhandledSignals(const std::string& sInstanceName)
-	{
-		std::vector<AMC::PStateSignalSlot> slotList;
+		auto pInstance = getInstance(sInstanceName);
+		auto pSlot = pInstance->getSignalSlot(sSignalName);
 		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
-			slotList.reserve(m_SignalMap.size());
-
-			for (auto it = m_SignalMap.begin(); it != m_SignalMap.end(); it++) {
-				// Check if the first element of the key matches
-				if (it->first.first == sInstanceName) {
-					slotList.push_back(it->second);					
-				}
-			}
-		}
-
-		std::vector<std::string> clearedUUIDs;
-		for (auto pSlot : slotList) {
-			pSlot->clearQueueInternal(clearedUUIDs);
-		}
-
-		if (!clearedUUIDs.empty ())
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-
-			for (auto& sUUID : clearedUUIDs)
-				m_SignalUUIDLookupMap.erase(sUUID);
+			std::lock_guard<std::mutex> lockGuard(m_MessageMapMutex);
+			auto insertResult = m_MessageSlotMap.emplace(sNormalizedUUID, pSlot);
+			if (!insertResult.second)
+				throw ELibMCCustomException(LIBMC_ERROR_SIGNALALREADYTRIGGERED, sNormalizedUUID);
 		}
 
 	}
 
-	void CStateSignalHandler::clearUnhandledSignalsOfType(const std::string& sInstanceName, const std::string& sSignalTypeName)
+	void CStateSignalHandler::unregisterMessage(const std::string& sMessageUUID)
 	{
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sMessageUUID);
 
-		std::vector<AMC::PStateSignalSlot> slotList;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
-			for (auto it = m_SignalMap.begin(); it != m_SignalMap.end(); it++) {
-				// Check if the first element of the key matches
-				if (it->first.first == sInstanceName) {
-					if (it->second->getNameInternal() == sSignalTypeName) {
-						slotList.push_back(it->second);						
-					}
-				}
-			}
+		std::lock_guard<std::mutex> lockGuard(m_MessageMapMutex);
+
+		m_MessageSlotMap.erase(sNormalizedUUID);
+
+	}
+
+	PStateSignalSlot CStateSignalHandler::findSignalSlotOfMessage(const std::string& sMessageUUID)
+	{
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sMessageUUID);
+		std::weak_ptr<CStateSignalSlot> pwSlot;
+
+		std::lock_guard<std::mutex> lockGuard(m_MessageMapMutex);
+
+		auto iMessageIter = m_MessageSlotMap.find(sNormalizedUUID);
+		if (iMessageIter == m_MessageSlotMap.end())
+			return nullptr;
+
+		pwSlot = iMessageIter->second;
+
+		auto pSlot = pwSlot.lock();
+		if (pSlot.get() == nullptr) {
+			// Slot has been deleted, prune dead entry
+			m_MessageSlotMap.erase(iMessageIter);
 		}
 
-		std::vector<std::string> clearedUUIDs;
+		return pSlot;
 
-		for (auto pSlot : slotList) {
-			pSlot->clearQueueInternal(clearedUUIDs);
-		}
+	}
 
-		if (!clearedUUIDs.empty())
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-
-			for (auto& sUUID : clearedUUIDs)
-				m_SignalUUIDLookupMap.erase(sUUID);
-		}
-
+	PTelemetryChannel CStateSignalHandler::registerTelemetryChannel(const std::string& sChannelIdentifier, const std::string& sChannelDescription, LibMCData::eTelemetryChannelType channelType)
+	{
+		return m_pTelemetryHandler->registerChannel(sChannelIdentifier, sChannelDescription, channelType);
 	}
 
 
@@ -172,176 +378,121 @@ namespace AMC {
 
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-		PStateSignalSlot pSlot;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-			auto iIter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-			if (iIter == m_SignalUUIDLookupMap.end())
-				return false;
+		PStateSignalSlot pSlot = findSignalSlotOfMessage (sNormalizedUUID);
+		if (pSlot != nullptr)
+			return pSlot->eraseMessage(sNormalizedUUID);
 
-			pSlot = iIter->second;
-			m_SignalUUIDLookupMap.erase(iIter);
-		}
-
-		return pSlot->eraseMessage(sNormalizedUUID);
-	}
-
-	bool CStateSignalHandler::canTrigger(const std::string& sInstanceName, const std::string& sSignalName)
-	{
-		AMC::PStateSignalSlot pSlot;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
-			auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-			if (iter == m_SignalMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "canTrigger: " + sInstanceName + "/" + sSignalName);
-
-			pSlot = iter->second;
-		}
-
-		return !pSlot->queueIsFull();
+		return false;
 	}
 
 
-	void CStateSignalHandler::changeSignalPhaseToHandled(const std::string& sSignalUUID, const std::string& sResultData)
+	void CStateSignalHandler::changeSignalPhaseToHandled(const std::string& sSignalUUID, const std::string& sResultData, uint64_t nTimestamp)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
 
-		auto iter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-		if (iter == m_SignalUUIDLookupMap.end())
+		PStateSignalSlot pSlot = findSignalSlotOfMessage(sNormalizedUUID);
+		if (pSlot == nullptr)
 			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "signal not found while changing phase to handled (" + sNormalizedUUID + ")");
 
-		iter->second->changeSignalPhaseToHandledInternal(sNormalizedUUID, sResultData);
+		pSlot->changeSignalPhaseToHandledInternal(sNormalizedUUID, sResultData, nTimestamp);
 	}
 
-	void CStateSignalHandler::changeSignalPhaseToInProcess(const std::string& sSignalUUID)
+	void CStateSignalHandler::changeSignalPhaseToInProcess(const std::string& sSignalUUID, uint64_t nTimestamp)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
 
-		auto iter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-		if (iter == m_SignalUUIDLookupMap.end())
+		PStateSignalSlot pSlot = findSignalSlotOfMessage(sNormalizedUUID);
+		if (pSlot == nullptr)
 			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "signal not found while changing phase to inprocess (" + sNormalizedUUID + ")");
 
-		iter->second->changeSignalPhaseToInProcessInternal (sNormalizedUUID);
+		pSlot->changeSignalPhaseToInProcessInternal (sNormalizedUUID, nTimestamp);
 	}
 
-	void CStateSignalHandler::changeSignalPhaseToFailed(const std::string& sSignalUUID, const std::string& sResultData, const std::string& sErrorMessage)
+	void CStateSignalHandler::changeSignalPhaseToFailed(const std::string& sSignalUUID, const std::string& sResultData, const std::string& sErrorMessage, uint64_t nTimestamp)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
 
-		auto iter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-		if (iter == m_SignalUUIDLookupMap.end())
+		PStateSignalSlot pSlot = findSignalSlotOfMessage(sNormalizedUUID);
+		if (pSlot == nullptr)
 			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "signal not found while changing phase to failed (" + sNormalizedUUID + ")");
 
-		iter->second->changeSignalPhaseToInFailedInternal(sNormalizedUUID, sResultData, sErrorMessage);
+		pSlot->changeSignalPhaseToInFailedInternal(sNormalizedUUID, sResultData, sErrorMessage, nTimestamp);
 	}
 
 	AMC::eAMCSignalPhase CStateSignalHandler::getSignalPhase(const std::string& sSignalUUID)
 	{
-		std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
 
-		auto iter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-		if (iter == m_SignalUUIDLookupMap.end())
+		PStateSignalSlot pSlot = findSignalSlotOfMessage(sNormalizedUUID);
+		if (pSlot == nullptr)
 			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "signal not found while getting signal phase (" + sNormalizedUUID + ")");
 
-		return iter->second->getSignalPhaseInternal (sNormalizedUUID);
+
+		return pSlot->getSignalPhaseInternal (sNormalizedUUID);
 	}
 
-	std::string CStateSignalHandler::peekSignalMessageFromQueue(const std::string& sInstanceName, const std::string& sSignalName)
+
+	void CStateSignalHandler::checkForReactionTimeouts(uint64_t nGlobalTimestamp)
 	{
-		AMC::PStateSignalSlot pSlot;
+		std::vector<AMC::PStateSignalInstance> instances;
 		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
+			instances.reserve(m_Instances.size());
 
-			auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-			if (iter == m_SignalMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "peekSignalMessageFromQueue: " + sInstanceName + "/" + sSignalName);
-
-			pSlot = iter->second;
+			std::lock_guard<std::mutex> lockGuard(m_SignalInstanceMutex);
+			for (auto iIter : m_Instances)
+				instances.push_back(iIter.second);
 		}
 
-		return pSlot->peekMessageFromQueueInternal();
-
+		for (auto pInstance : instances) {
+			pInstance->checkForReactionTimeouts(nGlobalTimestamp);
+		}
 	}
 
-
-	uint32_t CStateSignalHandler::getAvailableSignalQueueEntryCount(const std::string& sInstanceName, const std::string& sSignalName)
+	void CStateSignalHandler::autoArchiveMessages(uint64_t nGlobalTimestamp)
 	{
-		AMC::PStateSignalSlot pSlot;
+
+		std::vector<AMC::PStateSignalInstance> instances;
 		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
+			instances.reserve(m_Instances.size());
 
-			auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-			if (iter == m_SignalMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "getAvailableSignalQueueEntryCount:" + sInstanceName + "/" + sSignalName);
-
-			pSlot = iter->second;
+			std::lock_guard<std::mutex> lockGuard(m_SignalInstanceMutex);
+			for (auto iIter : m_Instances)
+				instances.push_back(iIter.second);
 		}
 
-		return pSlot->getAvailableSignalQueueEntriesInternal ();
-
+		for (auto pInstance : instances) {
+			pInstance->autoArchiveMessages(nGlobalTimestamp);
+		}
 	}
 
-	uint32_t CStateSignalHandler::getTotalSignalQueueSize(const std::string& sInstanceName, const std::string& sSignalName)
+	void CStateSignalHandler::writeMessagesToArchive(CStateSignalArchiveWriter* pArchiveWriter)
 	{
-		AMC::PStateSignalSlot pSlot;
+		std::vector<AMC::PStateSignalInstance> instances;
 		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
+			instances.reserve(m_Instances.size());
 
-			auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-			if (iter == m_SignalMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "getTotalSignalQueueSize: " + sInstanceName + "/" + sSignalName);
-			pSlot = iter->second;
-
+			std::lock_guard<std::mutex> lockGuard(m_SignalInstanceMutex);
+			for (auto iIter : m_Instances)
+				instances.push_back(iIter.second);
 		}
 
-		return pSlot->getTotalSignalQueueSizeInternal();
-
-	}
-
-	uint32_t CStateSignalHandler::getDefaultReactionTimeout(const std::string& sInstanceName, const std::string& sSignalName)
-	{
-		AMC::PStateSignalSlot pSlot;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
-
-			auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-			if (iter == m_SignalMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "getDefaultReactionTimeout: " + sInstanceName + "/" + sSignalName);
-
-			pSlot = iter->second;
+		for (auto pInstance : instances) {
+			pInstance->writeMessagesToArchive(pArchiveWriter);
 		}
 
-		return pSlot->getDefaultReactionTimeoutInternal();
-
-
 	}
+
+
 
 	uint32_t CStateSignalHandler::getReactionTimeout(const std::string& sSignalUUID)
 	{
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
 
-		AMC::PStateSignalSlot pSlot;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
+		AMC::PStateSignalSlot pSlot = findSignalSlotOfMessage(sNormalizedUUID);
+		if (pSlot == nullptr)
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "signal not found while getting reaction timeout (" + sNormalizedUUID + ")");
 
-			auto iter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-			if (iter == m_SignalUUIDLookupMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "signal not found while getting reaction timeout (" + sNormalizedUUID + ")");
-
-			pSlot = iter->second;
-
-
-			return pSlot->getReactionTimeoutInternal(sNormalizedUUID);
-
-		}
+		return pSlot->getReactionTimeoutInternal(sNormalizedUUID);
 
 	}
 
@@ -349,86 +500,24 @@ namespace AMC {
 	{
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
 
-		AMC::PStateSignalSlot pSlot;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
+		AMC::PStateSignalSlot pSlot = findSignalSlotOfMessage(sNormalizedUUID);
+		if (pSlot == nullptr)
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "signal not found while getting result data JSON (" + sNormalizedUUID + ")");
 
-			auto iter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-			if (iter == m_SignalUUIDLookupMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "signal not found while getting result data JSON (" + sNormalizedUUID + ")");
-
-			pSlot = iter->second;
-
-
-			return pSlot->getResultDataJSONInternal(sNormalizedUUID);
-		}
-
+		return pSlot->getResultDataJSONInternal(sNormalizedUUID);
 	}
 
 	bool CStateSignalHandler::findSignalPropertiesByUUID(const std::string& sSignalUUID, std::string& sInstanceName, std::string& sSignalName, std::string& sParameterData)
 	{
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sSignalUUID);
 
-		AMC::PStateSignalSlot pSlot;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalUUIDMapMutex);
-
-			auto iter = m_SignalUUIDLookupMap.find(sNormalizedUUID);
-			if (iter != m_SignalUUIDLookupMap.end()) {
-				pSlot = iter->second;
-			}
-
-
-
-			if (pSlot.get() != nullptr) {
-				sInstanceName = pSlot->getInstanceNameInternal();
-				sSignalName = pSlot->getNameInternal();
-				sParameterData = pSlot->getParameterDataJSONInternal(sNormalizedUUID);
-				return true;
-			}
-
-			return false;
-
+		AMC::PStateSignalSlot pSlot = findSignalSlotOfMessage(sNormalizedUUID);
+		if (pSlot != nullptr) {
+			return pSlot->getParameterPropertiesInternal(sNormalizedUUID, sInstanceName, sSignalName, sParameterData);
 		}
 
-	}
+		return false;
 
-
-	void CStateSignalHandler::populateParameterGroup(const std::string& sInstanceName, const std::string& sSignalName, CParameterGroup* pParameterGroup)
-	{
-		LibMCAssertNotNull(pParameterGroup);
-
-		AMC::PStateSignalSlot pSlot;
-		{
-
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
-
-			auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-			if (iter == m_SignalMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "populateParameterGroup: " + sInstanceName + "/" + sSignalName);
-			pSlot = iter->second;
-		}
-
-		pSlot->populateParameterGroup(pParameterGroup);
-	}
-
-	void CStateSignalHandler::populateResultGroup(const std::string& sInstanceName, const std::string& sSignalName, CParameterGroup* pResultGroup)
-	{
-
-		LibMCAssertNotNull(pResultGroup);
-		AMC::PStateSignalSlot pSlot;
-		{
-			std::lock_guard<std::mutex> lockGuard(m_SignalMapMutex);
-
-			auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
-			if (iter == m_SignalMap.end())
-				throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, "populateResultGroup: " + sInstanceName + "/" + sSignalName);
-
-			pSlot = iter->second;
-		}
-
-
-		pSlot->populateResultGroup(pResultGroup);
 	}
 
 

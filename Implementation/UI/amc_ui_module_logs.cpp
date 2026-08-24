@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_ui_handler.hpp"
+#include "amc_ui_frontendstate.hpp"
 
 #include "common_utils.hpp"
 
@@ -118,7 +120,8 @@ void CUIModule_LogsItem::setEventPayloadValue(const std::string& sEventName, con
 /////////////////////////////////////////////////////////////////////////////////////
 
 CUIModule_Logs::CUIModule_Logs(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
-: CUIModule (getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition ())
+: CUIModule (getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition ()),
+  m_pUIModuleEnvironment (pUIModuleEnvironment)
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
@@ -130,7 +133,36 @@ CUIModule_Logs::CUIModule_Logs(pugi::xml_node& xmlNode, const std::string& sPath
 
 	auto captionAttrib = xmlNode.attribute("caption");
 	m_sCaption = captionAttrib.as_string();
-	
+
+	m_nDefaultCount = xmlNode.attribute("defaultcount").as_uint(200);
+	m_bShowToolbar = xmlNode.attribute("showtoolbar").as_bool(true);
+	m_nMaxClientEntries = xmlNode.attribute("maxcliententries").as_uint(2000);
+	m_sDownloadPrefix = xmlNode.attribute("downloadprefix").as_string("log");
+
+	CUIExpression defaultCountExpr;
+	defaultCountExpr.setFixedValue(std::to_string(m_nDefaultCount));
+	registerIntegerAttribute("defaultcount", defaultCountExpr);
+
+	CUIExpression showToolbarExpr;
+	showToolbarExpr.setFixedValue(m_bShowToolbar ? "1" : "0");
+	registerBoolAttribute("showtoolbar", showToolbarExpr);
+
+	CUIExpression maxClientEntriesExpr;
+	maxClientEntriesExpr.setFixedValue(std::to_string(m_nMaxClientEntries));
+	registerIntegerAttribute("maxcliententries", maxClientEntriesExpr);
+
+	CUIExpression downloadPrefixExpr;
+	downloadPrefixExpr.setFixedValue(m_sDownloadPrefix);
+	registerStringAttribute("downloadprefix", downloadPrefixExpr);
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(m_sCaption);
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr;
+	visibleExpr.setFixedValue("1");
+	registerBoolAttribute("visible", visibleExpr);
+
 	m_LogsItem = std::make_shared<CUIModule_LogsItem>(getModulePath (), pUIModuleEnvironment);
 
 }
@@ -205,4 +237,23 @@ void CUIModule_Logs::populateLegacyItemMap(std::map<std::string, PUIModuleItem>&
 bool CUIModule_Logs::isVersion2FrontendModule()
 {
 	return true;
+}
+
+void CUIModule_Logs::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	moduleObject.addString("moduletype", getType());
+	moduleObject.addString("uuid", m_sUUID);
+
+	CJSONWriterObject attributesObject(writer);
+	pFrontendState->writeModuleAttributesToJSON(writer, attributesObject, m_pModuleStore.get(), pStateMachineData);
+
+	auto pLogger = m_pUIModuleEnvironment->getLogger();
+	if (pLogger->supportsLogMessagesRetrieval()) {
+		attributesObject.addInteger("logheadid", pLogger->getLogMessageHeadID());
+	}
+
+	moduleObject.addObject("attributes", attributesObject);
 }

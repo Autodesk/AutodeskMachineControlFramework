@@ -61,7 +61,7 @@ PDriver_BuRValue readParameterFromXMLNode(pugi::xml_node & xmlNode)
     PDriver_BuRValue pValue;
 
     std::string sChildName = xmlNode.name();
-    if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "lreal") || (sChildName == "dint") || (sChildName == "int")) {
+    if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "lreal") || (sChildName == "dint") || (sChildName == "int") || (sChildName == "sint")) {
 
         auto nameAttrib = xmlNode.attribute("name");
         auto addressAttrib = xmlNode.attribute("address");
@@ -112,6 +112,10 @@ PDriver_BuRValue readParameterFromXMLNode(pugi::xml_node & xmlNode)
 
         if (sChildName == "int") {
             pValue = std::make_shared<CDriver_BuRIntValue>(sName, sDescription, nAddress);
+        }
+
+        if (sChildName == "sint") {
+            pValue = std::make_shared<CDriver_BuRSIntValue>(sName, sDescription, nAddress);
         }
 
     }
@@ -285,6 +289,9 @@ void CDriver_BuR::Configure(const std::string& sConfigurationString)
             if (dynamic_cast<CDriver_BuRDIntValue*> (pValue.get()) != nullptr)
                 m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
 
+            if (dynamic_cast<CDriver_BuRSIntValue*> (pValue.get()) != nullptr)
+                m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+
             m_LegacyDriverParameters.push_back(pValue);
             m_LegacyDriverParameterMap.insert(std::make_pair(pValue->getName(), pValue));
         }
@@ -419,6 +426,10 @@ void CDriver_BuR::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriver
 
                             if (dynamic_cast<CDriver_BuRLRealValue*> (driverParameter.get()) != nullptr) {
                                 pDriverUpdateInstance->SetDoubleParameter(sName, pPacket->readDouble(driverParameter->getAddress()));
+                            }
+
+                            if (dynamic_cast<CDriver_BuRSIntValue*> (driverParameter.get()) != nullptr) {
+                                pDriverUpdateInstance->SetIntegerParameter(sName, pPacket->readUInt8(driverParameter->getAddress()));
                             }
 
                             if (dynamic_cast<CDriver_BuRBoolValue*> (driverParameter.get()) != nullptr) {

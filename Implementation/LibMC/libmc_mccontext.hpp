@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaces.hpp"
 #include "amc_statemachineinstance.hpp"
 #include "amc_logger_multi.hpp"
+#include "amc_logger.hpp"
 
 #include "amc_statesignalhandler.hpp"
 #include "amc_resourcepackage.hpp"
@@ -96,13 +97,25 @@ private:
 
 	AMC::PResourcePackage m_pCoreResourcePackage;
 
+	// System thread (executes repetitive maintenance tasks)
+	std::thread m_SystemThread;
+	std::promise<void> m_SystemTerminateSignal;
+	std::future<void> m_SystemTerminateFuture;
+
+	void startSystemThread();
+	void terminateSystemThread();
+	void executeSystemThread();
+	bool systemThreadIsRunning();
+	bool systemThreadShallTerminate();
+
+
 	void loadParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
 	void loadParameterGroupDerives (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup, const std::string & sStateMachineInstance);
 	void loadDriverParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
 	void loadAccessControl(const pugi::xml_node& xmlNode);
 	void loadAlertDefinitions(const pugi::xml_node& xmlNode);
 
-	void readSignalParameters(const std::string& sSignalName, const pugi::xml_node& xmlNode, std::list<AMC::CStateSignalParameter>& Parameters, std::list<AMC::CStateSignalParameter>& Results, uint32_t& nSignalReactionTimeOut, uint32_t& nSignalQueueSize);
+	void readSignalParameters(const std::string& sSignalName, const pugi::xml_node& xmlNode, std::vector<AMC::CStateSignalParameter>& Parameters, std::vector<AMC::CStateSignalParameter>& Results, uint32_t& nSignalReactionTimeOut, uint32_t & nAutomaticArchiveTimeInMS, uint32_t& nSignalQueueSize);
 
 
 protected:
@@ -115,6 +128,8 @@ public:
 	virtual ~CMCContext();
 
 	void ParseConfiguration(const std::string & sXMLString) override;
+
+	void SetParameterOverride(const std::string& sParameterPath, const std::string& sParameterValue) override;
 
 	void RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResource) override;
 

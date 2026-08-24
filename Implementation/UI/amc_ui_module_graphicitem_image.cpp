@@ -101,3 +101,17 @@ void CUIModule_GraphicImage::addLegacyContentToJSON(CJSONWriter& writer, CJSONWr
 	object.addDouble(AMC_API_KEY_UI_ITEMX, m_X.evaluateNumberValue(pStateMachineData));
 	object.addDouble(AMC_API_KEY_UI_ITEMY, m_Y.evaluateNumberValue (pStateMachineData));
 }
+
+std::string CUIModule_GraphicImage::getItemType()
+{
+	return "image";
+}
+
+void CUIModule_GraphicImage::registerFrontendAttributes()
+{
+	registerItemStringAttribute("resource", m_ResourceName);
+	registerItemNumberAttribute("x", m_X);
+	registerItemNumberAttribute("y", m_Y);
+	registerItemNumberAttribute("maxwidth", m_MaxWidth);
+	registerItemNumberAttribute("maxheight", m_MaxHeight);
+}

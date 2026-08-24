@@ -79,6 +79,44 @@ CUIModule_Graphic::CUIModule_Graphic(pugi::xml_node& xmlNode, const std::string&
 		}
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	// New UI Frontend System
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	auto pFrontendDefinition = pUIModuleEnvironment->getFrontendDefinition();
+
+	CUIExpression minXExpr;
+	minXExpr.setFixedValue(std::to_string(m_dMinX));
+	CUIExpression minYExpr;
+	minYExpr.setFixedValue(std::to_string(m_dMinY));
+	CUIExpression maxXExpr;
+	maxXExpr.setFixedValue(std::to_string(m_dMaxX));
+	CUIExpression maxYExpr;
+	maxYExpr.setFixedValue(std::to_string(m_dMaxY));
+	CUIExpression showGridExpr;
+	showGridExpr.setFixedValue(m_bShowGrid ? "1" : "0");
+
+	registerNumberAttribute("viewminx", minXExpr);
+	registerNumberAttribute("viewminy", minYExpr);
+	registerNumberAttribute("viewmaxx", maxXExpr);
+	registerNumberAttribute("viewmaxy", maxYExpr);
+	registerBoolAttribute("showgrid", showGridExpr);
+
+	auto captionAttrib = xmlNode.attribute("caption");
+	m_sCaption = captionAttrib.as_string();
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(m_sCaption);
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr;
+	visibleExpr.setFixedValue("1");
+	registerBoolAttribute("visible", visibleExpr);
+
+	for (auto pItem : m_Items) {
+		pItem->initFrontendModuleStore(pFrontendDefinition);
+	}
+
 }
 
 
@@ -205,6 +243,34 @@ void CUIModule_Graphic::addItem(PUIModuleGraphicItem pItem)
 	for (auto sUUID : referenceList)
 		m_ItemMap.insert(std::make_pair(sUUID, pItem));
 
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+
+bool CUIModule_Graphic::isVersion2FrontendModule()
+{
+	return true;
+}
+
+void CUIModule_Graphic::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	CUIModule::frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
+
+	CJSONWriterArray submodulesArray(writer);
+
+	for (auto& pItem : m_Items) {
+		std::string sItemType = pItem->getItemType();
+		if (!sItemType.empty()) {
+			CJSONWriterObject subModuleObject(writer);
+			pItem->frontendWriteItemToJSON(writer, subModuleObject, pFrontendState, pStateMachineData);
+			submodulesArray.addObject(subModuleObject);
+		}
+	}
+
+	moduleObject.addArray("submodules", submodulesArray);
 }
 
 

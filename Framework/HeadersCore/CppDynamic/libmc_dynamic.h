@@ -243,6 +243,16 @@ typedef LibMCResult (*PLibMCMCContext_SetTempBasePathPtr) (LibMC_MCContext pMCCo
 typedef LibMCResult (*PLibMCMCContext_ParseConfigurationPtr) (LibMC_MCContext pMCContext, const char * pXMLString);
 
 /**
+* overrides a parameter with a certain value. Fails if parameter group or parameter does not exist. Fails if Value is not fitting the parameter type.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pParameterPath - Path of the parameter. Example: main.configgroup.currentjob
+* @param[in] pParameterValue - New Value of the parameter
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_SetParameterOverridePtr) (LibMC_MCContext pMCContext, const char * pParameterPath, const char * pParameterValue);
+
+/**
 * starts the threads for all the state machines.
 *
 * @param[in] pMCContext - MCContext instance.
@@ -430,6 +440,7 @@ typedef struct {
 	PLibMCMCContext_RegisterLibraryPathPtr m_MCContext_RegisterLibraryPath;
 	PLibMCMCContext_SetTempBasePathPtr m_MCContext_SetTempBasePath;
 	PLibMCMCContext_ParseConfigurationPtr m_MCContext_ParseConfiguration;
+	PLibMCMCContext_SetParameterOverridePtr m_MCContext_SetParameterOverride;
 	PLibMCMCContext_StartAllThreadsPtr m_MCContext_StartAllThreads;
 	PLibMCMCContext_TerminateAllThreadsPtr m_MCContext_TerminateAllThreads;
 	PLibMCMCContext_StartInstanceThreadPtr m_MCContext_StartInstanceThread;

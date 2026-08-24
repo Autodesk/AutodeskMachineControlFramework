@@ -123,6 +123,30 @@ namespace AMC {
 		m_Scenes.erase(sNormalizedSceneUUID);
 	}
 
+	uint64_t CMeshHandler::getMeshEntityMemoryUsageInBytes()
+	{
+		uint64_t nUsage = 0;
+		for (auto& entityPair : m_Entities) {
+			auto pEntity = entityPair.second;
+			if (pEntity.get() != nullptr)
+				nUsage += pEntity->getMemoryUsageInBytes();
+		}
+
+		return nUsage;
+	}
+
+	uint64_t CMeshHandler::getSceneMemoryUsageInBytes()
+	{
+		uint64_t nUsage = 0;
+		for (auto& scenePair : m_Scenes) {
+			auto pScene = scenePair.second;
+			if (pScene.get() != nullptr)
+				nUsage += pScene->getMemoryUsageInBytes();
+		}
+
+		return nUsage;
+	}
+
 
 
 	/*PMeshEntity CMeshHandler::register3MFResource(Lib3MF::CLib3MFWrapper* pWrapper, AMC::CResourcePackage* pResourcePackage, const std::string& sResourceName)
@@ -164,5 +188,4 @@ namespace AMC {
 	} */
 
 }
-
 

@@ -187,6 +187,11 @@ namespace AMCCommon {
 		return convertToISO8601TimeUTC(getUTCTimeStampInMicrosecondsSince1970());
 	}
 
+	uint64_t CChrono::getElapsedMicroseconds()
+	{
+		return m_pChronoImpl->getElapsedMicroseconds();
+	}
+
 	void CChrono::sleepSeconds(const uint64_t seconds)
 	{
 		sleepMicroseconds(seconds * 1000000ULL);
@@ -423,10 +428,13 @@ namespace AMCCommon {
 		tm.tm_hour = 0;            // Hour (midnight)
 		tm.tm_min = 0;             // Minute
 		tm.tm_sec = 0;             // Second
-		tm.tm_isdst = -1;          // No daylight saving time flag
 
-		// Convert tm to time_t
-		auto time_c = std::mktime(&tm);
+		// Convert tm to time_t (treating as UTC, not local time)
+#ifdef _WIN32
+		auto time_c = _mkgmtime(&tm);  // Windows: Treat as UTC
+#else
+		auto time_c = timegm(&tm);     // POSIX: Treat as UTC
+#endif
 		if (time_c == -1) {
 			throw std::runtime_error("Failed to convert time: " + std::to_string (nYear) + "/" + std::to_string (nMonth) + "/" + std::to_string (nDay));
 		}

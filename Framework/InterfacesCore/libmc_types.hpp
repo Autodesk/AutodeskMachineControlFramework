@@ -696,6 +696,35 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDROWRANGE 680 /** Invalid row range. */
 #define LIBMC_ERROR_CONFIGURATIONLISTNAMEMISSING 681 /** Configuration list name missing */
 #define LIBMC_ERROR_CONFIGURATIONLISTBUTTONNAMEMISSING 682 /** Configuration list button name missing */
+#define LIBMC_ERROR_NONLINEAROVERRIDEPARAMETERNOTINCREASING 683 /** Nonlinear override parameter not increasing */
+#define LIBMC_ERROR_NONLINEAROVERRIDEPARAMETEROUTOFRANGE 684 /** Nonlinear override parameter out of range */
+#define LIBMC_ERROR_NONLINEAROVERRIDEFACTOROUTOFRANGE 685 /** Nonlinear override factor out of range */
+#define LIBMC_ERROR_EMPTYSIGNALINSTANCENAME 686 /** Empty signal instance name */
+#define LIBMC_ERROR_INVALIDSIGNALINSTANCENAME 687 /** Invalid signal instance name */
+#define LIBMC_ERROR_COULDNOTFINDSIGNAL 688 /** Could not find signal */
+#define LIBMC_ERROR_DUPLICATESIGNALINSTANCENAME 689 /** Duplicate signal instance name */
+#define LIBMC_ERROR_SIGNALINSTANCENOTFOUND 690 /** Signal instance not found */
+#define LIBMC_ERROR_INVALIDSIGNALARCHIVETIMEOUT 691 /** Invalid signal archive timeout */
+#define LIBMC_ERROR_UNKNOWNTELEMETRYCHANNELTYPE 692 /** Unknown telemetry channel type. */
+#define LIBMC_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER 693 /** Invalid telemetry channel identifier. */
+#define LIBMC_ERROR_TELEMETRYCHANNELALREADYEXISTS 694 /** Telemetry channel already exists. */
+#define LIBMC_ERROR_TELEMETRYCHANNELNOTFOUND 695 /** Telemetry channel not found. */
+#define LIBMC_ERROR_TELEMETRYMARKERHASALREADYBEENFINISHED 696 /** Telemetry marker has already been finished. */
+#define LIBMC_ERROR_INVALIDTELEMETRYMARKERFINISHTIMESTAMP 697 /** Invalid telemetry marker finish timestamp. */
+#define LIBMC_ERROR_UNFINISHEDTELEMETRYMARKERSHAVENODURATION 698 /** Unfinished telemetry marker have no duration. */
+#define LIBMC_ERROR_TELEMETRYMARKERALREADYREGISTERED 699 /** Telemetry Marker has been already registered. */
+#define LIBMC_ERROR_TELEMETRYCHUNKSTARTTIMESTAMPAFTEREND 700 /** Telemetry Chunk Start timestamp is after end timestamp. */
+#define LIBMC_ERROR_TELEMETRYCHUNKINDEXOUTOFRANGE 701 /** Telemetry Chunk index out of range. */
+#define LIBMC_ERROR_TELEMETRYCHUNKIDMISMATCH 702 /** Telemetry Chunk ID mismatch. */
+#define LIBMC_ERROR_TELEMETRYCHUNKISREADONLY 703 /** Telemetry Chunk is readonly. */
+#define LIBMC_ERROR_TELEMETRYCHUNKSCANONLYBEARCHIVEDIFREADONLY 704 /** Telemetry Chunks can only be archived if readonly. */
+#define LIBMC_ERROR_INVALIDTELEMETRYCHANNELTYPE 705 /** Invalid telemetry channel type. */
+#define LIBMC_ERROR_MISSINGTELEMETRYCHANNELIDENTIFIER 706 /** Missing telemetry channel identifier. */
+#define LIBMC_ERROR_MISSINGTELEMETRYCHANNELDESCRIPTION 707 /** Missing telemetry channel description. */
+#define LIBMC_ERROR_XMLNODEHASNULLNAMESPACE 708 /** XML node has a null namespace. Ensure the XML document declares a namespace on the root element. */
+#define LIBMC_ERROR_RESOURCEENTRYSIZISMISMATCH 709 /** Resource entry size mismatch between index and ZIP content. */
+#define LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH 710 /** Resource entry SHA256 checksum mismatch. */
+#define LIBMC_ERROR_INVALIDRESOURCEENTRYSHA256 711 /** Invalid resource entry SHA256 value. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1304,6 +1333,35 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDROWRANGE: return "Invalid row range.";
     case LIBMC_ERROR_CONFIGURATIONLISTNAMEMISSING: return "Configuration list name missing";
     case LIBMC_ERROR_CONFIGURATIONLISTBUTTONNAMEMISSING: return "Configuration list button name missing";
+    case LIBMC_ERROR_NONLINEAROVERRIDEPARAMETERNOTINCREASING: return "Nonlinear override parameter not increasing";
+    case LIBMC_ERROR_NONLINEAROVERRIDEPARAMETEROUTOFRANGE: return "Nonlinear override parameter out of range";
+    case LIBMC_ERROR_NONLINEAROVERRIDEFACTOROUTOFRANGE: return "Nonlinear override factor out of range";
+    case LIBMC_ERROR_EMPTYSIGNALINSTANCENAME: return "Empty signal instance name";
+    case LIBMC_ERROR_INVALIDSIGNALINSTANCENAME: return "Invalid signal instance name";
+    case LIBMC_ERROR_COULDNOTFINDSIGNAL: return "Could not find signal";
+    case LIBMC_ERROR_DUPLICATESIGNALINSTANCENAME: return "Duplicate signal instance name";
+    case LIBMC_ERROR_SIGNALINSTANCENOTFOUND: return "Signal instance not found";
+    case LIBMC_ERROR_INVALIDSIGNALARCHIVETIMEOUT: return "Invalid signal archive timeout";
+    case LIBMC_ERROR_UNKNOWNTELEMETRYCHANNELTYPE: return "Unknown telemetry channel type.";
+    case LIBMC_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER: return "Invalid telemetry channel identifier.";
+    case LIBMC_ERROR_TELEMETRYCHANNELALREADYEXISTS: return "Telemetry channel already exists.";
+    case LIBMC_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
+    case LIBMC_ERROR_TELEMETRYMARKERHASALREADYBEENFINISHED: return "Telemetry marker has already been finished.";
+    case LIBMC_ERROR_INVALIDTELEMETRYMARKERFINISHTIMESTAMP: return "Invalid telemetry marker finish timestamp.";
+    case LIBMC_ERROR_UNFINISHEDTELEMETRYMARKERSHAVENODURATION: return "Unfinished telemetry marker have no duration.";
+    case LIBMC_ERROR_TELEMETRYMARKERALREADYREGISTERED: return "Telemetry Marker has been already registered.";
+    case LIBMC_ERROR_TELEMETRYCHUNKSTARTTIMESTAMPAFTEREND: return "Telemetry Chunk Start timestamp is after end timestamp.";
+    case LIBMC_ERROR_TELEMETRYCHUNKINDEXOUTOFRANGE: return "Telemetry Chunk index out of range.";
+    case LIBMC_ERROR_TELEMETRYCHUNKIDMISMATCH: return "Telemetry Chunk ID mismatch.";
+    case LIBMC_ERROR_TELEMETRYCHUNKISREADONLY: return "Telemetry Chunk is readonly.";
+    case LIBMC_ERROR_TELEMETRYCHUNKSCANONLYBEARCHIVEDIFREADONLY: return "Telemetry Chunks can only be archived if readonly.";
+    case LIBMC_ERROR_INVALIDTELEMETRYCHANNELTYPE: return "Invalid telemetry channel type.";
+    case LIBMC_ERROR_MISSINGTELEMETRYCHANNELIDENTIFIER: return "Missing telemetry channel identifier.";
+    case LIBMC_ERROR_MISSINGTELEMETRYCHANNELDESCRIPTION: return "Missing telemetry channel description.";
+    case LIBMC_ERROR_XMLNODEHASNULLNAMESPACE: return "XML node has a null namespace. Ensure the XML document declares a namespace on the root element.";
+    case LIBMC_ERROR_RESOURCEENTRYSIZISMISMATCH: return "Resource entry size mismatch between index and ZIP content.";
+    case LIBMC_ERROR_RESOURCEENTRYCHECKSUMMISMATCH: return "Resource entry SHA256 checksum mismatch.";
+    case LIBMC_ERROR_INVALIDRESOURCEENTRYSHA256: return "Invalid resource entry SHA256 value.";
     default: return "unknown error";
   }
 }
@@ -1342,6 +1400,7 @@ namespace LibMC {
   };
   
   enum class eStreamConnectionType : LibMC_int32 {
+    Unknown = 0,
     JSONEventStream = 1,
     JPEGImageStream = 2
   };

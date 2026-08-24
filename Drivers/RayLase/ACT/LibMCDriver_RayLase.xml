@@ -95,8 +95,10 @@
 		<error name="COULDNOTRECEIVESPIPACKET" code="1044" description="Could not receive SPI Packet" />		
 		<error name="INVALIDLASERMODE" code="1045" description="Invalid laser mode" />
 		<error name="NLIGHTLASERMODEHASNOPOWEROVERRIDE" code="1046" description="nLight laser mode has no power override" />
-		
-		
+		<error name="INVALIDIOCYCLEID" code="1047" description="Invalid IO Cycle ID" />
+		<error name="IOCYCLEALREADYEXISTS" code="1048" description="IO Cycle already exists" />
+		<error name="IOCYCLENOTFOUND" code="1049" description="IO Cycle not found" />
+		<error name="INVALIDIOPORT" code="1050" description="Invalid IO Port" />
 		
 		
 		
@@ -182,6 +184,14 @@ Custom implementation
 		<param name="Abort" type="bool" pass="return" description="Returns whether the exposure should be aborted"/>
 	</functiontype>
 
+	<enum name="IOPort">
+	   <option name="Unknown" value="0" />
+	   <option name="PortA" value="1" />
+	   <option name="PortB" value="2" />
+	   <option name="PortC" value="3" />
+	   <option name="PortD" value="4" />
+	   <option name="PortE" value="5" />
+	</enum>
 
 
 	<class name="RaylaseCommandLog" parent="Driver" description="A class that implements a raylase command log.">
@@ -278,6 +288,32 @@ Custom implementation
 	</class>
 
 
+	<class name="RaylaseIOCycle" parent="Base" description="Object to control a raylase list cycle.">
+
+		<method name="GetCycleID" description="Returns the cycle ID as Integer.">
+			<param name="CycleID" type="uint32" pass="return" description="Cycle ID. Will not be 0." />
+		</method>
+
+		<method name="AddSignalOut" description="Sets or clears a GPIO Output signal during the list cycle.">
+			<param name="IOPort" type="enum" class="IOPort" pass="in" description="IO Port to write out to. MUST be configured as output pin." />
+			<param name="IOPin" type="uint32" pass="in" description="IO Pin to write out to. MUST be configured as output pin." />
+			<param name="HighNotLow" type="bool" pass="in" description="If true, sets the pin high. If false, sets the pin low." />
+		</method>
+		
+		<method name="AddWaitForSignal" description="Waits for an Input signal to be high or low during the list cycle.">
+			<param name="IOPort" type="enum" class="IOPort" pass="in" description="IO Port to read from. MUST be configured as input pin." />
+			<param name="IOPin" type="uint32" pass="in" description="IO Pin to read from. MUST be configured as input pin." />
+			<param name="HighNotLow" type="bool" pass="in" description="If true, waits for the pin to be high. If false, waits for the pin to be low." />
+			<param name="TimeoutInMicroseconds" type="uint32" pass="in" description="Timeout in Microseconds." />
+		</method>
+
+		<method name="AddDelay" description="Adds a delay to the list cycle.">
+			<param name="DelayInMicroseconds" type="uint32" pass="in" description="Delay in Microseconds." />
+		</method>
+		
+	</class>
+
+
 	<class name="RaylaseCard" parent="Base" description="Object to control a raylase-card.">
 	
 		<method name="IsConnected" description="Checks if the card is connected.">
@@ -302,6 +338,25 @@ Custom implementation
 
 		<method name="GetNLightDriverBoard" description="Returns the NLight Driver Board Handler class.">
 			<param name="DriverBoard" type="class" class="NLightDriverBoard" pass="return" description="NLight Driver Board Instance" />
+		</method>
+
+		<method name="CreateIOCycle" description="Creates a new IO cycle with a certain ID. Fails if cycle ID is already existing..">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID to use. MUST NOT be 0." />
+			<param name="IOCycle" type="class" class="RaylaseIOCycle" pass="return" description="IO Cycle Instance" />
+		</method>
+
+		<method name="IOCycleExists" description="Returns if a IO cycle exists.">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID to return." />
+			<param name="IOCycleDoesExist" type="bool" pass="return" description="Returns true, if IO Cycle exists." />
+		</method>
+
+		<method name="GetIOCycle" description="Returns a new cycle. Fails if cycle ID does not exist..">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID to return." />
+			<param name="IOCycle" type="class" class="RaylaseIOCycle" pass="return" description="IO Cycle Instance" />
+		</method>
+
+		<method name="RemoveIOCycle" description="Removes an IO Cycle of a certain ID. Does nothing if IO cycle does not exist..">
+			<param name="CycleID" type="uint32" pass="in" description="Cycle ID to remove." />
 		</method>
 
 		<method name="LaserOff" description="Turns the laser off.">
@@ -390,6 +445,7 @@ Custom implementation
 			<param name="OffsetX" type="double" pass="out" description="Translation in X in mm." />
 			<param name="OffsetY" type="double" pass="out" description="Translation in Y in mm." />
 		</method>
+
 
 	</class>
 

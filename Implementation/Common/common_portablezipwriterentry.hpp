@@ -43,17 +43,19 @@ namespace AMCCommon {
 		uint64_t m_nUncompressedSize;
 		uint16_t m_nLastModTime;
 		uint16_t m_nLastModDate;
+		uint32_t m_nExternalFileAttributes;
 		uint64_t m_nFilePosition;
 		uint64_t m_nExtInfoPosition;
 		uint64_t m_nDataPosition;
 	public:
-		CPortableZIPWriterEntry(const std::string sUTF8Name, uint16_t nLastModTime, uint16_t nLastModDate, uint64_t nFilePosition, uint64_t nExtInfoPosition, uint64_t nDataPosition);
+		CPortableZIPWriterEntry(const std::string sUTF8Name, uint16_t nLastModTime, uint16_t nLastModDate, uint32_t nExternalFileAttributes, uint64_t nFilePosition, uint64_t nExtInfoPosition, uint64_t nDataPosition);
 		std::string getUTF8Name();
 		uint32_t getCRC32();
 		uint64_t getCompressedSize();
 		uint64_t getUncompressedSize();
 		uint16_t getLastModTime();
 		uint16_t getLastModDate();
+		uint32_t getExternalFileAttributes();
 		uint64_t getFilePosition();
 		uint64_t getExtInfoPosition();
 		uint64_t getDataPosition();

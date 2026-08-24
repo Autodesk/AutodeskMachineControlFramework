@@ -83,6 +83,7 @@ namespace AMC {
 		void increaseVersion();
 
 		uint32_t getVersion();
+		uint64_t getMemoryUsageInBytes();
 
 	};
 
@@ -91,4 +92,3 @@ namespace AMC {
 
 
 #endif //__AMC_DATASERIES
-

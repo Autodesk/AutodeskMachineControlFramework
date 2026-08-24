@@ -64,6 +64,8 @@ namespace AMC {
 		
 		void unloadDataSeries (const std::string& sDataSeriesUUID);
 		void unloadAllEntities();
+
+		uint64_t getMemoryUsageInBytes();
 		
 	};
 
@@ -72,4 +74,3 @@ namespace AMC {
 
 
 #endif //__AMC_DATASERIESHANDLER
-

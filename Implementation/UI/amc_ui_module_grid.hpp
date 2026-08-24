@@ -126,6 +126,9 @@ namespace AMC {
 		std::vector<PUIModule_GridRow> m_Rows;
 		std::vector<PUIModule_GridColumn> m_Columns;
 
+		// Inner padding applied to each grid cell, in pixels (0 = none).
+		uint32_t m_nPadding;
+
 		void addSection(PUIModule pModule, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition, bool bScrollbars);
 
 	public:

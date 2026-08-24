@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_api_handler_status.hpp"
 #include "libmc_exceptiontypes.hpp"
+#include "common_utils.hpp"
 
 #include <vector>
 #include <memory>
@@ -53,68 +54,119 @@ CAPIHandler_Status::~CAPIHandler_Status()
 				
 std::string CAPIHandler_Status::getBaseURI () 
 {
-	return "api/status";
+	return "api/statemachines";
 }
-		
+
+PStateMachineInstance CAPIHandler_Status::findInstanceByName(const std::string& sInstanceName, bool bFailIfNotExisting)
+{
+	for (auto pInstance : m_Instances) {
+		if (pInstance->getName() == sInstanceName)
+			return pInstance;
+	}
+
+	if (bFailIfNotExisting)
+		throw ELibMCCustomException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
+
+	return nullptr;
+}
+
+void CAPIHandler_Status::writeStateMachineSummaryToJSON(CJSONWriter& writer, CJSONWriterObject& instanceJSONObject, PStateMachineInstance pInstance)
+{
+	LibMCAssertNotNull(pInstance.get());
+
+	auto sInstanceName = pInstance->getName();
+	instanceJSONObject.addString(AMC_API_KEY_STATUSINSTANCE_NAME, sInstanceName);
+	instanceJSONObject.addString(AMC_API_KEY_STATUSINSTANCE_STATE, m_pStateMachineData->getInstanceStateName(sInstanceName));
+}
+
+void CAPIHandler_Status::writeStateMachineDetailsToJSON(CJSONWriter& writer, CJSONWriterObject& instanceJSONObject, PStateMachineInstance pInstance)
+{
+	LibMCAssertNotNull(pInstance.get());
+
+	writeStateMachineSummaryToJSON(writer, instanceJSONObject, pInstance);
+
+	CJSONWriterArray parameterGroupsJSONArray(writer);
+	auto pParameterHandler = pInstance->getParameterHandler();
+	uint32_t nParameterGroupCount = pParameterHandler->getGroupCount();
+
+	for (uint32_t nGroupIndex = 0; nGroupIndex < nParameterGroupCount; nGroupIndex++) {
+		auto pGroup = pParameterHandler->getGroup(nGroupIndex);
+
+		CJSONWriterObject groupJSONObject(writer);
+		groupJSONObject.addString(AMC_API_KEY_STATUSPARAMETERGROUP_NAME, pGroup->getName());
+
+		CJSONWriterArray parametersJSONArray(writer);
+		uint32_t nParameterCount = pGroup->getParameterCount();
+		for (uint32_t nParamIndex = 0; nParamIndex < nParameterCount; nParamIndex++) {
+			CJSONWriterObject parameterJSONObject(writer);
+			std::string sParamName, sParamDescription, sParamDefaultValue;
+			pGroup->getParameterInfo(nParamIndex, sParamName, sParamDescription, sParamDefaultValue);
+			parameterJSONObject.addString(AMC_API_KEY_STATUSPARAMETER_NAME, sParamName);
+			parameterJSONObject.addString(AMC_API_KEY_STATUSPARAMETER_VALUE, pGroup->getParameterValueByIndex(nParamIndex));
+			parametersJSONArray.addObject(parameterJSONObject);
+		}
+
+		groupJSONObject.addArray(AMC_API_KEY_STATUSPARAMETERGROUP_PARAMETERS, parametersJSONArray);
+		parameterGroupsJSONArray.addObject(groupJSONObject);
+	}
+
+	instanceJSONObject.addArray(AMC_API_KEY_STATUSPARAMETERGROUPS, parameterGroupsJSONArray);
+}
+			
 PAPIResponse CAPIHandler_Status::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
+	pFormFields;
+	pBodyData;
+	nBodyDataSize;
+	pAuth;
 
-	if (requestType == eAPIRequestType::rtGet) {
+	if (requestType != eAPIRequestType::rtGet)
+		return nullptr;
+
+	auto sParameterString = sURI.substr(getBaseURI().length());
+
+	// GET /api/statemachines
+	if (sParameterString.empty() || (sParameterString == "/")) {
+		CJSONWriter writer;
+		writeJSONHeader(writer, AMC_API_PROTOCOL_STATUS);
+
+		CJSONWriterArray instanceJSONArray(writer);
+		for (auto pInstance : m_Instances) {
+			CJSONWriterObject instanceJSONObject(writer);
+			writeStateMachineSummaryToJSON(writer, instanceJSONObject, pInstance);
+			instanceJSONArray.addObject(instanceJSONObject);
+		}
+
+		writer.addArray(AMC_API_KEY_STATUSINSTANCES, instanceJSONArray);
+		return std::make_shared<CAPIStringResponse>(AMC_API_HTTP_SUCCESS, AMC_API_CONTENTTYPE, writer.saveToString());
+	}
+
+	// GET /api/statemachines/{instancename}
+	if ((sParameterString.length() >= 2) && (sParameterString[0] == '/')) {
+		auto sInstanceName = sParameterString.substr(1);
+		if (!sInstanceName.empty() && (sInstanceName.back() == '/'))
+			sInstanceName = sInstanceName.substr(0, sInstanceName.length() - 1);
+
+		if ((sInstanceName.empty()) || (sInstanceName.find("/") != std::string::npos))
+			return nullptr;
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sInstanceName))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSTATEMACHINENAME, sInstanceName);
+
+		auto pInstance = findInstanceByName(sInstanceName, true);
 
 		CJSONWriter writer;
 		writeJSONHeader(writer, AMC_API_PROTOCOL_STATUS);
 
-		if (!m_Instances.empty()) {
-			CJSONWriterArray instanceJSONArray(writer);
-
-			for (auto pInstance : m_Instances) {
-
-				std::string sInstanceName = pInstance->getName();
-
-				CJSONWriterObject instanceJSONObject(writer);
-				instanceJSONObject.addString(AMC_API_KEY_STATUSINSTANCE_NAME, sInstanceName);
-				instanceJSONObject.addString(AMC_API_KEY_STATUSINSTANCE_STATE, m_pStateMachineData->getInstanceStateName(sInstanceName));
-
-				CJSONWriterArray parameterGroupsJSONArray(writer);
-				auto pParameterHandler = pInstance->getParameterHandler();
-				uint32_t nParameterGroupCount = pParameterHandler->getGroupCount();
-
-				for (uint32_t nGroupIndex = 0; nGroupIndex < nParameterGroupCount; nGroupIndex++) {
-					auto pGroup = pParameterHandler->getGroup(nGroupIndex);
-
-					CJSONWriterObject groupJSONObject(writer);
-					groupJSONObject.addString(AMC_API_KEY_STATUSPARAMETERGROUP_NAME, pGroup->getName());
-
-					CJSONWriterArray parametersJSONArray(writer);
-					uint32_t nParameterCount = pGroup->getParameterCount();
-					for (uint32_t nParamIndex = 0; nParamIndex < nParameterCount; nParamIndex++) {
-						CJSONWriterObject parameterJSONObject(writer);
-						std::string sParamName, sParamDescription, sParamDefaultValue;
-						pGroup->getParameterInfo(nParamIndex, sParamName, sParamDescription, sParamDefaultValue);
-						parameterJSONObject.addString(AMC_API_KEY_STATUSPARAMETER_NAME, sParamName);
-						parameterJSONObject.addString(AMC_API_KEY_STATUSPARAMETER_VALUE, pGroup->getParameterValueByIndex(nParamIndex));
-						parametersJSONArray.addObject(parameterJSONObject);
-
-					}
-					groupJSONObject.addArray(AMC_API_KEY_STATUSPARAMETERGROUP_PARAMETERS, parametersJSONArray);
-
-					parameterGroupsJSONArray.addObject(groupJSONObject);
-				}
-
-				instanceJSONObject.addArray(AMC_API_KEY_STATUSPARAMETERGROUPS, parameterGroupsJSONArray);
-
-				instanceJSONArray.addObject(instanceJSONObject);
-			}
-
-			writer.addArray(AMC_API_KEY_STATUSINSTANCES, instanceJSONArray);
-		}
+		CJSONWriterObject instanceJSONObject(writer);
+		writeStateMachineDetailsToJSON(writer, instanceJSONObject, pInstance);
+		writer.addObject("instance", instanceJSONObject);
 
 		return std::make_shared<CAPIStringResponse>(AMC_API_HTTP_SUCCESS, AMC_API_CONTENTTYPE, writer.saveToString());
 	}
 
 	return nullptr;
 }
-
 
 
 

@@ -246,21 +246,25 @@ CDriver_CifXParameter_Integer::~CDriver_CifXParameter_Integer()
 
 int64_t CDriver_CifXParameter_Integer::GetActualIntegerValue()
 {
+	std::lock_guard<std::mutex> lockGuard(m_ValueMutex);
 	return m_nActualValue;
 }
 
 void CDriver_CifXParameter_Integer::SetActualIntegerValue(int64_t nValue)
 {
+	std::lock_guard<std::mutex> lockGuard(m_ValueMutex);
 	m_nActualValue = nValue;
 }
 
 int64_t CDriver_CifXParameter_Integer::GetTargetIntegerValue()
 {
+	std::lock_guard<std::mutex> lockGuard(m_ValueMutex);
 	return m_nTargetValue;
 }
 
 void CDriver_CifXParameter_Integer::SetTargetIntegerValue(int64_t nValue)
 {
+	std::lock_guard<std::mutex> lockGuard(m_ValueMutex);
 	m_nTargetValue = nValue;
 }
 
@@ -277,21 +281,25 @@ CDriver_CifXParameter_Double::~CDriver_CifXParameter_Double()
 
 double CDriver_CifXParameter_Double::GetActualDoubleValue()
 {
+	std::lock_guard<std::mutex> lockGuard(m_ValueMutex);
 	return m_dActualValue;
 }
 
 void CDriver_CifXParameter_Double::SetActualDoubleValue(double dValue)
 {
+	std::lock_guard<std::mutex> lockGuard(m_ValueMutex);
 	m_dActualValue = dValue;
 }
 
 double CDriver_CifXParameter_Double::GetTargetDoubleValue()
 {
+	std::lock_guard<std::mutex> lockGuard(m_ValueMutex);
 	return m_dTargetValue;
 }
 
 void CDriver_CifXParameter_Double::SetTargetDoubleValue(double dValue)
 {
+	std::lock_guard<std::mutex> lockGuard(m_ValueMutex);
 	m_dTargetValue = dValue;
 }
 
@@ -311,4 +319,3 @@ uint32_t CDriver_CifXParameter_Bool::getBit()
 {
 	return m_nBit;
 }
-

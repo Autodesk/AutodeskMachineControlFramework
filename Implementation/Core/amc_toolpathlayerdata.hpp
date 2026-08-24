@@ -66,7 +66,8 @@ namespace AMC {
 
 	typedef struct _sToolpathLayerOverride {
 		uint32_t m_nSubInterpolationCount;
-		Lib3MF::sHatchModificationInterpolationData * m_pSubInterpolationData;
+		uint32_t m_nSubInterpolationOffset;
+		//Lib3MF::sHatchModificationInterpolationData * m_pSubInterpolationData;
 		double m_dFactors[3]; // F, G and H
 	} sToolpathLayerOverride;
 

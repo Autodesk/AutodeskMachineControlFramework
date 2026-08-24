@@ -347,10 +347,13 @@ IJSONObject * CJSONObject::AddObjectValue(const std::string & sName)
 	jsonName.SetString(sName.c_str(), m_pDocument->GetAllocator());
 	jsonValue.SetObject ();
 
-	auto pMember = &m_pInstance->AddMember(jsonName, jsonValue, m_pDocument->GetAllocator());
+	m_pInstance->AddMember(jsonName, jsonValue, m_pDocument->GetAllocator());
+
+	// Get pointer to the newly added member value (not the parent object)
+	auto pMember = &(*m_pInstance)[sName.c_str()];
 
 	return new CJSONObject (m_pDocument, pMember);
-	
+
 }
 
 IJSONArray * CJSONObject::AddArrayValue(const std::string & sName)
@@ -361,7 +364,10 @@ IJSONArray * CJSONObject::AddArrayValue(const std::string & sName)
 	jsonName.SetString(sName.c_str(), m_pDocument->GetAllocator());
 	jsonValue.SetArray();
 
-	auto pMember = &m_pInstance->AddMember(jsonName, jsonValue, m_pDocument->GetAllocator());
+	m_pInstance->AddMember(jsonName, jsonValue, m_pDocument->GetAllocator());
+
+	// Get pointer to the newly added member value (not the parent object)
+	auto pMember = &(*m_pInstance)[sName.c_str()];
 
 	return new CJSONArray(m_pDocument, pMember);
 }

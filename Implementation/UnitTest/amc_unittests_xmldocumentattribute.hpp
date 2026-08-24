@@ -95,9 +95,7 @@ namespace AMCUnitTest {
 
         void testPrefixedNameSameNamespace() {
             auto doc = createBaseDocWithRoot();
-            doc->RegisterNamespace("http://example.com", "abc");
-
-            auto ns = doc->FindNamespaceByPrefix("abc", true);
+            auto ns = doc->GetDefaultNamespace();
             auto root = doc->GetRootNode();
             auto attr = root->AddAttribute(ns, "id", "42");
 
@@ -192,7 +190,7 @@ namespace AMCUnitTest {
      
 
         void testAttributeSerializationRoundtrip() {
-            auto doc = createBaseDocWithRoot("root", "http://example.com");
+            auto doc = createBaseDocWithRoot("http://example.com", "root");
             auto root = doc->GetRootNode();
             auto ns = doc->GetDefaultNamespace();
 

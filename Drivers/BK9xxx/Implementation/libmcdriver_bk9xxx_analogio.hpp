@@ -85,6 +85,8 @@ namespace Impl {
 
 			std::string m_sUnits;
 
+			bool m_bActualValueIsOutOfBounds;
+
 
 		public:
 
@@ -109,6 +111,8 @@ namespace Impl {
 			// Clips value to boundary range
 			// Returns value that has been set as target.
 			uint32_t setTargetRawValue(int64_t nRawValue);
+
+			bool getActualValueIsOutOfBounds() const;
 
 			double rawValueToScaledValue(int64_t nRawValue) const;
 

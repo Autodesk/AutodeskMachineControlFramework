@@ -479,6 +479,30 @@ LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_executelist(LibMCDriver_BuR
 	}
 }
 
+LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_executeanddeletelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommandList;
+
+	try {
+		IPLCCommandList* pIPLCCommandList = dynamic_cast<IPLCCommandList*>(pIBaseClass);
+		if (!pIPLCCommandList)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommandList->ExecuteAndDeleteList();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_waitforlist(LibMCDriver_BuR_PLCCommandList pPLCCommandList, LibMCDriver_BuR_uint32 nReactionTimeInMS, LibMCDriver_BuR_uint32 nWaitForTimeInMS, bool * pCommandSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pPLCCommandList;
@@ -876,6 +900,8 @@ LibMCDriver_BuRResult LibMCDriver_BuR::Impl::LibMCDriver_BuR_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_finishlist;
 	if (sProcName == "libmcdriver_bur_plccommandlist_executelist") 
 		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_executelist;
+	if (sProcName == "libmcdriver_bur_plccommandlist_executeanddeletelist") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_executeanddeletelist;
 	if (sProcName == "libmcdriver_bur_plccommandlist_waitforlist") 
 		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_waitforlist;
 	if (sProcName == "libmcdriver_bur_plccommandlist_pauselist") 

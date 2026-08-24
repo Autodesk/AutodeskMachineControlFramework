@@ -65,6 +65,7 @@ private:
 	bool m_bSendToHardware;
 	double m_dMaxPowerInWatts;
 
+	LibMCEnv::PWorkingFile m_tmpSimulationFile;
 
 	void drawPolylineEx(slscHandle contextHandle, const uint64_t nPointsBufferSize, const LibMCDriver_ScanLabSMC::sPoint2D* pPointsBuffer, bool bIsClosed, double dPowerInWatts);
 	void drawHatchesEx(const LibMCDriver_ScanLabSMC_uint64 nHatchesBufferSize, const LibMCDriver_ScanLabSMC::sHatch2D* pHatchesBuffer, const LibMCDriver_ScanLabSMC_double dMarkSpeed, const LibMCDriver_ScanLabSMC_double dJumpSpeed, const LibMCDriver_ScanLabSMC_double dPowerInWatts, const LibMCDriver_ScanLabSMC_double dZValue);
@@ -111,6 +112,8 @@ public:
 	void ExecuteLaserInitSequence();
 	
 	void ExecuteLaserShutdownSequence();
+
+	void LoadRawSimulationData(LibMCDriver_ScanLabSMC_uint64 nDataBufferSize, LibMCDriver_ScanLabSMC_uint64* pDataNeededCount, LibMCDriver_ScanLabSMC_uint8* pDataBuffer);
 
 private:
 

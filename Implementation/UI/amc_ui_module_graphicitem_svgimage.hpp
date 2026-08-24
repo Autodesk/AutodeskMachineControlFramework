@@ -98,6 +98,9 @@ namespace AMC {
 
 		void addTransform(PUIModule_GraphicSVGImageTransform pTransform);
 
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 
 	};
 

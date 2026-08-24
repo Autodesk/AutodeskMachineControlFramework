@@ -1,8 +1,6 @@
 echo off
 
 
-set GO111MODULE=off
-
 set STARTTIME=%TIME%
 echo Compilation start time: %STARTTIME%
 
@@ -16,6 +14,7 @@ if not exist "%outputdir%" (mkdir "%outputdir%")
 if not exist "%outputdir%\data" (mkdir "%outputdir%\data")
 if not exist "%outputdir%\temp" (mkdir "%outputdir%\temp")
 if not exist "%builddir%\Artifacts" (mkdir "%builddir%\Artifacts")
+if not exist "%builddir%\Deployment" (mkdir "%builddir%\Deployment")
 if not exist "%builddir%\DevPackage" (mkdir "%builddir%\DevPackage")
 if not exist "%builddir%\DevPackage\Framework" (mkdir "%builddir%\DevPackage\Framework")
 if not exist "%builddir%\DevPackage\Framework\HeadersDev" (mkdir "%builddir%\DevPackage\Framework\HeadersDev")
@@ -55,8 +54,7 @@ echo long git hash: %LONGGITHASH%
 
 git log -n 1 --format="%%H" -- "%basepath%\Client" >"%builddir%\clientdirhash.txt"
 SET /p CLIENTDIRHASH=<"%builddir%\clientdirhash.txt"
-SET /p CLIENTDISTHASH=<"%basepath%\Artifacts\clientdist\_githash_client.txt"
-
+SET /p CLIENTDISTHASH=<"%basepath%\Artifacts\clientdist\_githash_client_vue2.txt"
 REM Trim Strings
 for /f "tokens=* delims= " %%a in ("%CLIENTDIRHASH%") do set CLIENTDIRHASH=%%a
 for /l %%a in (1,1,100) do if "!CLIENTDIRHASH:~-1!"==" " set CLIENTDIRHASH=!CLIENTDIRHASH:~0,-1! 
@@ -66,32 +64,20 @@ for /l %%a in (1,1,100) do if "!CLIENTDIRHASH:~-1!"==" " set CLIENTDIRHASH=!CLIE
 echo client hash: %CLIENTDIRHASH%
 echo client dist hash: %CLIENTDISTHASH%
 
-if "%CLIENTDIRHASH%" neq "%CLIENTDISTHASH%" (
-	echo "Please rebuild client!"
-	goto ERROR
-)
+REM if "%CLIENTDIRHASH%" neq "%CLIENTDISTHASH%" (
+REM 	echo "Please rebuild client!"
+REM 	goto ERROR
+REM )
 
 cd /d "%basepath%"
 
-echo "Building Resource builder (Win64)..."
-set GOARCH=amd64
-set GOOS=windows
-go build -o "%builddir%/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "%basepath%/BuildScripts/buildresources.go"
-
-REM echo "Building Resource builder (Linux64)..."
-REM set GOARCH=amd64
-REM set GOOS=linux
-REM go build -o "%builddir%/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "%basepath%/BuildScripts/buildresources.go"
-
-REM echo "Building Resource builder (LinuxARM)..."
-REM set GOARCH=arm
-REM set GOOS=linux
-REM set GOARM=5
-REM go build -o "%builddir%/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "%basepath%/BuildScripts/buildresources.go"
-
-copy /y "%basepath%Artifacts\clientdist\clientpackage.zip" "%builddir%\Output\%GITHASH%_core.client"
+copy /y "%basepath%Artifacts\clientdist\clientpackage_vue2.zip" "%builddir%\Output\%GITHASH%_core_vue2.client"
 if "%ERRORLEVEL%" neq "0" (
 	goto ERROR
+)
+
+if exist "%basepath%Artifacts\clientdist\clientpackage_svelte.zip" (
+	copy /y "%basepath%Artifacts\clientdist\clientpackage_svelte.zip" "%builddir%\Output\%GITHASH%_core_svelte.client"
 )
 
 copy /y "%basepath%Artifacts\apidocsdist\apidocspackage.zip" "%builddir%\Output\%GITHASH%_core.apidocs"
@@ -114,10 +100,13 @@ echo "Building Package XML"
 
 "%builddir%\DevPackage\Framework\create_package_xml.exe" --config "%builddir%\Output\%GITHASH%_config.xml" --devpackage %GITHASH% --output "%builddir%\Output\%GITHASH%_package.xml" --serveroutput "%builddir%\Output\amc_server.xml"
 
+echo "Building Deployment ZIP"
+"%builddir%\DevPackage\Framework\create_deployment_zip.exe" --package "%builddir%\Output\%GITHASH%_package.xml" --output "%builddir%\Deployment\AMCF_Deploy_%GITHASH%.zip"
+
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
 
-copy "%basepath%\Artifacts\clientdist\clientsourcepackage.zip" Framework\ClientSource\%GITHASH%_client_source.zip
+copy "%basepath%\Artifacts\clientdist\clientsourcepackage_vue2.zip" Framework\ClientSource\%GITHASH%_client_source.zip
 if "%ERRORLEVEL%" neq "0" (
 	goto ERROR
 )
@@ -128,7 +117,10 @@ copy ..\Output\amc_server.exe Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmc.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_lib3mf.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmcdata.dll Framework\Dist\
-copy ..\Output\%GITHASH%_core.client Framework\Dist\
+copy ..\Output\%GITHASH%_core_vue2.client Framework\Dist\
+if exist ..\Output\%GITHASH%_core_svelte.client (
+	copy ..\Output\%GITHASH%_core_svelte.client Framework\Dist\
+)
 copy ..\Output\%GITHASH%_core.apidocs Framework\Dist\
 copy ..\Output\%GITHASH%_*.data Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
@@ -138,7 +130,7 @@ copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp
 del Framework\Dist\%GITHASH%_core.data
 
 cd %builddir%
-go run "%basepath%/BuildScripts/createDevPackage.go" .\DevPackage\Framework .\DevPackage\ %LONGGITHASH% win64
+"%builddir%\DevPackage\Framework\create_dev_package.exe" .\DevPackage\Framework .\DevPackage\ %LONGGITHASH% win64
 
 copy "%builddir%\DevPackage\amcf_win64_%LONGGITHASH%.zip" "%builddir%\Artifacts\devpackage_win64.zip" /Y
 

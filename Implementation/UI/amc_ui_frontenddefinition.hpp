@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <map>
+#include <vector>
 
 namespace AMC {
 
@@ -90,16 +91,21 @@ namespace AMC {
 	};
 
 
+	class CUIFrontendDefinitionModuleStore;
+	typedef std::shared_ptr<CUIFrontendDefinitionModuleStore> PUIFrontendDefinitionModuleStore;
+
 	class CUIFrontendDefinitionModuleStore {
 	private:
 
 		std::string m_sPath;
 		std::string m_sUUID;
+		std::string m_sModuleType;
 
 		std::map<std::string, PUIFrontendDefinitionAttribute> m_Attributes;
+		std::vector<PUIFrontendDefinitionModuleStore> m_ChildStores;
 
 	public:
-		CUIFrontendDefinitionModuleStore(const std::string& sModuleUUID, const std::string & sModulePath);
+		CUIFrontendDefinitionModuleStore(const std::string& sModuleUUID, const std::string & sModulePath, const std::string& sModuleType = "");
 
 		virtual ~CUIFrontendDefinitionModuleStore();
 
@@ -107,9 +113,18 @@ namespace AMC {
 
 		std::vector<PUIFrontendDefinitionAttribute> getAttributes();
 
-	};
+		// Tree structure: the definition layer owns the hierarchy
+		PUIFrontendDefinitionModuleStore addChildStore(const std::string& sChildUUID, const std::string& sChildPath, const std::string& sChildModuleType);
 
-	typedef std::shared_ptr<CUIFrontendDefinitionModuleStore> PUIFrontendDefinitionModuleStore;
+		std::vector<PUIFrontendDefinitionModuleStore> getChildStores();
+
+		bool hasChildren();
+
+		std::string getModuleType();
+
+		std::string getUUID();
+
+	};
 
 	class CUIFrontendDefinition {
 	private:
@@ -123,7 +138,7 @@ namespace AMC {
 
 		virtual ~CUIFrontendDefinition ();
 
-		PUIFrontendDefinitionModuleStore registerModuleStore (const std::string& sModuleUUID, const std::string& sPath);
+		PUIFrontendDefinitionModuleStore registerModuleStore (const std::string& sModuleUUID, const std::string& sPath, const std::string& sModuleType = "");
 
 		AMCCommon::PChrono getGlobalChrono();	
 

@@ -85,11 +85,21 @@ public:
 
 	ISignalHandler* GetUnhandledSignal(const std::string& sSignalTypeName) override;
 
+	ISignalHandler* ClaimSignalFromQueue(const std::string& sSignalTypeName) override;
+
+	bool SignalQueueIsEmpty(const std::string& sSignalTypeName) override;
+
+	bool QueueHasSignal(const std::string& sSignalTypeName) override;
+
 	ISignalHandler* GetUnhandledSignalByUUID(const std::string& sUUID, const bool bMustExist) override;
 
 	void ClearUnhandledSignalsOfType(const std::string& sSignalTypeName) override;
 
 	void ClearAllUnhandledSignals() override;
+
+	ITelemetryChannel* RegisterTelemetryChannel(const std::string& sChannelIdentifier, const std::string& sChannelDescription, const LibMCEnv::eTelemetryChannelType eChannelType) override;
+
+	ITelemetryChannel* FindTelemetryChannel(const std::string& sChannelIdentifier, const bool bFailIfNotExisting) override;	
 
 	bool HasBuildJob(const std::string& sBuildUUID) override;
 
@@ -145,6 +155,18 @@ public:
 
 	bool GetBoolParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
+	bool HasParameterGroup(const std::string& sParameterGroup) override;
+
+	bool HasParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
+
+	LibMCEnv_uint32 GetParameterGroupParameterCount(const std::string& sParameterGroup) override;
+
+	std::string GetParameterGroupParameterName(const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex) override;
+
+	std::string GetParameterGroupParameterDescription(const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex) override;
+
+	LibMCEnv::eParameterDataType GetParameterGroupParameterType(const std::string& sParameterGroup, const std::string& sParameterName) override;
+
 	bool HasResourceData(const std::string& sIdentifier) override;
 
 	void LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer) override;
@@ -154,6 +176,10 @@ public:
 	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
 	IImageLoader* CreateImageLoader() override;
+
+	IVideoStream* CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds) override;
+
+	IVideoStream* FindVideoStream(const std::string& sStreamUUID) override;
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 

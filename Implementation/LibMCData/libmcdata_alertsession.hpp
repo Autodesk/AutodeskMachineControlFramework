@@ -76,6 +76,8 @@ public:
 
     IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
 
+    LibMCData_uint64 GetAlertHeadID() override;
+
 };
 
 } // namespace Impl

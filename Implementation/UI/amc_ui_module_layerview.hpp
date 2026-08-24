@@ -102,6 +102,8 @@ namespace AMC {
 
 		PUIModule_LayerViewPlatformItem m_PlatformItem;
 
+		PUIModuleEnvironment m_pUIModuleEnvironment;
+
 	public:
 
 		/////////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +142,7 @@ namespace AMC {
 
 		bool isVersion2FrontendModule() override;
 
+		void frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
 
 	};
 

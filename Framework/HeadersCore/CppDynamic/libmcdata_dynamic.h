@@ -434,6 +434,270 @@ typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAlertsPtr) (LibMCData_A
 */
 typedef LibMCDataResult (*PLibMCDataAlertSession_RetrieveAlertsByTypePtr) (LibMCData_AlertSession pAlertSession, const char * pIdentifier, bool bOnlyActive, LibMCData_AlertIterator * pIteratorInstance);
 
+/**
+* Returns the current maximum incremental ID across all alerts. Used by the frontend to detect when the alert list has changed.
+*
+* @param[in] pAlertSession - AlertSession instance.
+* @param[out] pHeadID - Maximum incremental ID, or 0 if no alerts exist.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataAlertSession_GetAlertHeadIDPtr) (LibMCData_AlertSession pAlertSession, LibMCData_uint64 * pHeadID);
+
+/*************************************************************************************************************************
+ Class definition for TelemetrySession
+**************************************************************************************************************************/
+
+/**
+* retrieves the session UUID.
+*
+* @param[in] pTelemetrySession - TelemetrySession instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetrySession_GetSessionUUIDPtr) (LibMCData_TelemetrySession pTelemetrySession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
+
+/**
+* creates channel in journal DB.
+*
+* @param[in] pTelemetrySession - TelemetrySession instance.
+* @param[in] pUUID - Channel UUID
+* @param[in] eChannelType - Telemetry Channel Type
+* @param[in] nChannelIndex - Channel Index
+* @param[in] pChannelIdentifier - Channel Identifier
+* @param[in] pChannelDescription - Channel Identifier
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetrySession_CreateChannelInDBPtr) (LibMCData_TelemetrySession pTelemetrySession, const char * pUUID, LibMCData::eTelemetryChannelType eChannelType, LibMCData_uint32 nChannelIndex, const char * pChannelIdentifier, const char * pChannelDescription);
+
+/**
+* Writes a telemetry chunk to the current telemetry file.
+*
+* @param[in] pTelemetrySession - TelemetrySession instance.
+* @param[in] nChunkID - ID of chunk in session (1-based).
+* @param[in] nStartTimeStamp - Start time stamp of chunk.
+* @param[in] nEndTimeStamp - End time stamp of chunk.
+* @param[in] nTelemetryEntriesBufferSize - Number of elements in buffer
+* @param[in] pTelemetryEntriesBuffer - TelemetryChunkEntry buffer of Telemetry entries to write.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetrySession_WriteTelemetryChunkPtr) (LibMCData_TelemetrySession pTelemetrySession, LibMCData_uint64 nChunkID, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nTelemetryEntriesBufferSize, const LibMCData::sTelemetryChunkEntry * pTelemetryEntriesBuffer);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryChunkData
+**************************************************************************************************************************/
+
+/**
+* Returns index of chunk.
+*
+* @param[in] pTelemetryChunkData - TelemetryChunkData instance.
+* @param[out] pChunkIndex - Index of the chunk
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryChunkData_GetChunkIndexPtr) (LibMCData_TelemetryChunkData pTelemetryChunkData, LibMCData_uint64 * pChunkIndex);
+
+/**
+* Returns start time stamp of chunk.
+*
+* @param[in] pTelemetryChunkData - TelemetryChunkData instance.
+* @param[out] pStartTimeStamp - Start Timestamp of the chunk (in microseconds)
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryChunkData_GetStartTimeStampPtr) (LibMCData_TelemetryChunkData pTelemetryChunkData, LibMCData_uint64 * pStartTimeStamp);
+
+/**
+* Returns end time stamp of chunk.
+*
+* @param[in] pTelemetryChunkData - TelemetryChunkData instance.
+* @param[out] pEndTimeStamp - End Timestamp of the chunk (in microseconds)
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryChunkData_GetEndTimeStampPtr) (LibMCData_TelemetryChunkData pTelemetryChunkData, LibMCData_uint64 * pEndTimeStamp);
+
+/**
+* Returns the number of entries in this chunk.
+*
+* @param[in] pTelemetryChunkData - TelemetryChunkData instance.
+* @param[out] pEntryCount - Number of entries.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryChunkData_GetEntryCountPtr) (LibMCData_TelemetryChunkData pTelemetryChunkData, LibMCData_uint64 * pEntryCount);
+
+/**
+* Returns the raw telemetry entries.
+*
+* @param[in] pTelemetryChunkData - TelemetryChunkData instance.
+* @param[in] nTelemetryEntriesBufferSize - Number of elements in buffer
+* @param[out] pTelemetryEntriesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pTelemetryEntriesBuffer - TelemetryChunkEntry  buffer of Telemetry entries array.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryChunkData_GetEntriesPtr) (LibMCData_TelemetryChunkData pTelemetryChunkData, const LibMCData_uint64 nTelemetryEntriesBufferSize, LibMCData_uint64* pTelemetryEntriesNeededCount, LibMCData::sTelemetryChunkEntry * pTelemetryEntriesBuffer);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryReader
+**************************************************************************************************************************/
+
+/**
+* Retrieves the session UUID.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_GetSessionUUIDPtr) (LibMCData_TelemetryReader pTelemetryReader, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
+
+/**
+* Returns the start timestamp of the telemetry session.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_GetStartTimePtr) (LibMCData_TelemetryReader pTelemetryReader, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* Get telemetry session life time in microseconds.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[out] pLifeTime - Telemetry life time in microseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_GetLifeTimeInMicrosecondsPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint64 * pLifeTime);
+
+/**
+* Returns number of telemetry channels.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[out] pCount - Number of channels in session.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_GetChannelCountPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 * pCount);
+
+/**
+* Returns the information for a channel.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nChannelIndex - Index of the channel (0-based).
+* @param[in] nChannelUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pChannelUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pChannelUUIDBuffer -  buffer of UUID of the channel., may be NULL
+* @param[out] pChannelType - Type of the channel.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Identifier of the channel., may be NULL
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the channel., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_GetChannelInformationPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 nChannelIndex, const LibMCData_uint32 nChannelUUIDBufferSize, LibMCData_uint32* pChannelUUIDNeededChars, char * pChannelUUIDBuffer, LibMCData::eTelemetryChannelType * pChannelType, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Finds a channel by its identifier.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] pIdentifier - Channel identifier to search for.
+* @param[out] pChannelIndex - Index of the channel if found.
+* @param[out] pFound - True if channel was found.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_FindChannelByIdentifierPtr) (LibMCData_TelemetryReader pTelemetryReader, const char * pIdentifier, LibMCData_uint32 * pChannelIndex, bool * pFound);
+
+/**
+* Returns number of telemetry chunks.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[out] pCount - Number of chunks in session.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_GetChunkCountPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 * pCount);
+
+/**
+* Returns the information for a chunk.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nChunkIndex - Index of the chunk.
+* @param[out] pStartTimeStamp - Start timestamp of the chunk in microseconds.
+* @param[out] pEndTimeStamp - End timestamp of the chunk in microseconds.
+* @param[out] pEntryCount - Number of entries in the chunk.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_GetChunkInformationPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 nChunkIndex, LibMCData_uint64 * pStartTimeStamp, LibMCData_uint64 * pEndTimeStamp, LibMCData_uint64 * pEntryCount);
+
+/**
+* Reads telemetry chunk data from disk.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
+* @param[out] pChunkData - Telemetry Chunk Data Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_ReadChunkDataPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 nChunkIndex, LibMCData_TelemetryChunkData * pChunkData);
+
+/**
+* Finds all chunks that overlap with a time range.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+* @param[in] nChunkIndicesBufferSize - Number of elements in buffer
+* @param[out] pChunkIndicesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pChunkIndicesBuffer - uint32  buffer of Array of chunk indices.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_FindChunksInTimeRangePtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint64 nStartTimeStampInMicroseconds, LibMCData_uint64 nEndTimeStampInMicroseconds, const LibMCData_uint64 nChunkIndicesBufferSize, LibMCData_uint64* pChunkIndicesNeededCount, LibMCData_uint32 * pChunkIndicesBuffer);
+
+/**
+* Queries completed intervals (start+end marker pairs) within a time range.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+* @param[in] nChannelIndex - Channel index to filter by. Use 0xFFFFFFFF for all channels.
+* @param[in] nIntervalsBufferSize - Number of elements in buffer
+* @param[out] pIntervalsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pIntervalsBuffer - TelemetryIntervalData  buffer of Array of interval data.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_QueryIntervalsPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint64 nStartTimeStampInMicroseconds, LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint32 nChannelIndex, const LibMCData_uint64 nIntervalsBufferSize, LibMCData_uint64* pIntervalsNeededCount, LibMCData::sTelemetryIntervalData * pIntervalsBuffer);
+
+/**
+* Queries instant markers within a time range.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+* @param[in] nChannelIndex - Channel index to filter by. Use 0xFFFFFFFF for all channels.
+* @param[in] nEntriesBufferSize - Number of elements in buffer
+* @param[out] pEntriesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pEntriesBuffer - TelemetryChunkEntry  buffer of Array of instant marker entries.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_QueryInstantMarkersPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint64 nStartTimeStampInMicroseconds, LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint32 nChannelIndex, const LibMCData_uint64 nEntriesBufferSize, LibMCData_uint64* pEntriesNeededCount, LibMCData::sTelemetryChunkEntry * pEntriesBuffer);
+
+/**
+* Gets aggregated statistics for a channel within a time range.
+*
+* @param[in] pTelemetryReader - TelemetryReader instance.
+* @param[in] nChannelIndex - Channel index.
+* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+* @param[out] pIntervalCount - Number of completed intervals.
+* @param[out] pInstantMarkerCount - Number of instant markers.
+* @param[out] pTotalDurationInMicroseconds - Sum of all interval durations.
+* @param[out] pMinDurationInMicroseconds - Minimum interval duration.
+* @param[out] pMaxDurationInMicroseconds - Maximum interval duration.
+* @param[out] pAvgDurationInMicroseconds - Average interval duration.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataTelemetryReader_GetChannelStatisticsPtr) (LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 nChannelIndex, LibMCData_uint64 nStartTimeStampInMicroseconds, LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint64 * pIntervalCount, LibMCData_uint64 * pInstantMarkerCount, LibMCData_uint64 * pTotalDurationInMicroseconds, LibMCData_uint64 * pMinDurationInMicroseconds, LibMCData_uint64 * pMaxDurationInMicroseconds, LibMCData_uint64 * pAvgDurationInMicroseconds);
+
 /*************************************************************************************************************************
  Class definition for JournalChunkIntegerData
 **************************************************************************************************************************/
@@ -1941,6 +2205,15 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_RetrieveBuildJobExecutionsPtr) (Lib
 */
 typedef LibMCDataResult (*PLibMCDataBuildJob_RetrieveBuildJobExecutionsByStatusPtr) (LibMCData_BuildJob pBuildJob, LibMCData::eBuildJobExecutionStatus eStatusFilter, const char * pJournalUUIDFilter, LibMCData_BuildJobExecutionIterator * pIteratorInstance);
 
+/**
+* Returns the monotonically increasing incremental ID of the build job. Used for frontend change detection.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[out] pIncrementalID - Incremental ID of the build job. Increases with every status change.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJob_GetIncrementalIDPtr) (LibMCData_BuildJob pBuildJob, LibMCData_uint64 * pIncrementalID);
+
 /*************************************************************************************************************************
  Class definition for BuildJobIterator
 **************************************************************************************************************************/
@@ -2055,6 +2328,24 @@ typedef LibMCDataResult (*PLibMCDataBuildJobHandler_RetrieveJobExecutionPtr) (Li
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataBuildJobHandler_ListJobExecutionsPtr) (LibMCData_BuildJobHandler pBuildJobHandler, const char * pMinTimestamp, const char * pMaxTimestamp, const char * pJournalUUIDFilter, LibMCData_BuildJobExecutionIterator * pIteratorInstance);
+
+/**
+* Returns the current maximum incremental ID across all build jobs. Used by the frontend to detect when the build list has changed.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[out] pHeadID - Maximum incremental ID, or 0 if no jobs exist.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobHandler_GetBuildListHeadIDPtr) (LibMCData_BuildJobHandler pBuildJobHandler, LibMCData_uint64 * pHeadID);
+
+/**
+* Returns the current maximum incremental ID across all build job executions. Used by the frontend to detect when the execution list has changed.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[out] pHeadID - Maximum incremental ID, or 0 if no executions exist.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobHandler_GetExecutionListHeadIDPtr) (LibMCData_BuildJobHandler pBuildJobHandler, LibMCData_uint64 * pHeadID);
 
 /*************************************************************************************************************************
  Class definition for UserList
@@ -2376,6 +2667,47 @@ typedef LibMCDataResult (*PLibMCDataLoginHandler_SetUserPasswordByUUIDPtr) (LibM
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataLoginHandler_GetActiveUsersPtr) (LibMCData_LoginHandler pLoginHandler, LibMCData_UserList * pActiveUsers);
+
+/**
+* Creates a new login session record in the database.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] nCreateTimeInMicroseconds - Creation timestamp in microseconds since epoch.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_CreateLoginSessionPtr) (LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, LibMCData_uint64 nCreateTimeInMicroseconds);
+
+/**
+* Updates a login session after successful authentication.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] pUserUUID - UUID of the authenticated user.
+* @param[in] pUsername - Login name of the authenticated user.
+* @param[in] pUserRole - Role of the authenticated user.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_UpdateLoginSessionAuthenticationPtr) (LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, const char * pUserUUID, const char * pUsername, const char * pUserRole);
+
+/**
+* Updates the last activity timestamp of a login session.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @param[in] nTimestampInMicroseconds - New activity timestamp in microseconds since epoch.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_UpdateLoginSessionActivityPtr) (LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, LibMCData_uint64 nTimestampInMicroseconds);
+
+/**
+* Marks a login session as inactive.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pSessionUUID - UUID of the session.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLoginHandler_DeactivateLoginSessionPtr) (LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID);
 
 /*************************************************************************************************************************
  Class definition for PersistencyHandler
@@ -3062,6 +3394,25 @@ typedef LibMCDataResult (*PLibMCDataDataModel_CreateAlertSessionPtr) (LibMCData_
 typedef LibMCDataResult (*PLibMCDataDataModel_CreateLoginHandlerPtr) (LibMCData_DataModel pDataModel, LibMCData_LoginHandler * pLoginHandler);
 
 /**
+* creates a global telemetry session access class.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pTelemetrySessionInstance - Telemetry class instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_CreateTelemetrySessionPtr) (LibMCData_DataModel pDataModel, LibMCData_TelemetrySession * pTelemetrySessionInstance);
+
+/**
+* Creates an access instance to telemetry from a past journal session. Fails if telemetry cannot be accessed.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pJournalUUID - UUID of journal to load. UUID MUST NOT reference the current journaling session.
+* @param[out] pTelemetryReader - TelemetryReader class instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_CreateTelemetryReaderPtr) (LibMCData_DataModel pDataModel, const char * pJournalUUID, LibMCData_TelemetryReader * pTelemetryReader);
+
+/**
 * creates a persistency handler instance.
 *
 * @param[in] pDataModel - DataModel instance.
@@ -3266,6 +3617,28 @@ typedef struct {
 	PLibMCDataAlertSession_GetAlertByUUIDPtr m_AlertSession_GetAlertByUUID;
 	PLibMCDataAlertSession_RetrieveAlertsPtr m_AlertSession_RetrieveAlerts;
 	PLibMCDataAlertSession_RetrieveAlertsByTypePtr m_AlertSession_RetrieveAlertsByType;
+	PLibMCDataAlertSession_GetAlertHeadIDPtr m_AlertSession_GetAlertHeadID;
+	PLibMCDataTelemetrySession_GetSessionUUIDPtr m_TelemetrySession_GetSessionUUID;
+	PLibMCDataTelemetrySession_CreateChannelInDBPtr m_TelemetrySession_CreateChannelInDB;
+	PLibMCDataTelemetrySession_WriteTelemetryChunkPtr m_TelemetrySession_WriteTelemetryChunk;
+	PLibMCDataTelemetryChunkData_GetChunkIndexPtr m_TelemetryChunkData_GetChunkIndex;
+	PLibMCDataTelemetryChunkData_GetStartTimeStampPtr m_TelemetryChunkData_GetStartTimeStamp;
+	PLibMCDataTelemetryChunkData_GetEndTimeStampPtr m_TelemetryChunkData_GetEndTimeStamp;
+	PLibMCDataTelemetryChunkData_GetEntryCountPtr m_TelemetryChunkData_GetEntryCount;
+	PLibMCDataTelemetryChunkData_GetEntriesPtr m_TelemetryChunkData_GetEntries;
+	PLibMCDataTelemetryReader_GetSessionUUIDPtr m_TelemetryReader_GetSessionUUID;
+	PLibMCDataTelemetryReader_GetStartTimePtr m_TelemetryReader_GetStartTime;
+	PLibMCDataTelemetryReader_GetLifeTimeInMicrosecondsPtr m_TelemetryReader_GetLifeTimeInMicroseconds;
+	PLibMCDataTelemetryReader_GetChannelCountPtr m_TelemetryReader_GetChannelCount;
+	PLibMCDataTelemetryReader_GetChannelInformationPtr m_TelemetryReader_GetChannelInformation;
+	PLibMCDataTelemetryReader_FindChannelByIdentifierPtr m_TelemetryReader_FindChannelByIdentifier;
+	PLibMCDataTelemetryReader_GetChunkCountPtr m_TelemetryReader_GetChunkCount;
+	PLibMCDataTelemetryReader_GetChunkInformationPtr m_TelemetryReader_GetChunkInformation;
+	PLibMCDataTelemetryReader_ReadChunkDataPtr m_TelemetryReader_ReadChunkData;
+	PLibMCDataTelemetryReader_FindChunksInTimeRangePtr m_TelemetryReader_FindChunksInTimeRange;
+	PLibMCDataTelemetryReader_QueryIntervalsPtr m_TelemetryReader_QueryIntervals;
+	PLibMCDataTelemetryReader_QueryInstantMarkersPtr m_TelemetryReader_QueryInstantMarkers;
+	PLibMCDataTelemetryReader_GetChannelStatisticsPtr m_TelemetryReader_GetChannelStatistics;
 	PLibMCDataJournalChunkIntegerData_GetChunkIndexPtr m_JournalChunkIntegerData_GetChunkIndex;
 	PLibMCDataJournalChunkIntegerData_GetStartTimeStampPtr m_JournalChunkIntegerData_GetStartTimeStamp;
 	PLibMCDataJournalChunkIntegerData_GetEndTimeStampPtr m_JournalChunkIntegerData_GetEndTimeStamp;
@@ -3404,6 +3777,7 @@ typedef struct {
 	PLibMCDataBuildJob_RetrieveBuildJobExecutionPtr m_BuildJob_RetrieveBuildJobExecution;
 	PLibMCDataBuildJob_RetrieveBuildJobExecutionsPtr m_BuildJob_RetrieveBuildJobExecutions;
 	PLibMCDataBuildJob_RetrieveBuildJobExecutionsByStatusPtr m_BuildJob_RetrieveBuildJobExecutionsByStatus;
+	PLibMCDataBuildJob_GetIncrementalIDPtr m_BuildJob_GetIncrementalID;
 	PLibMCDataBuildJobIterator_GetCurrentJobPtr m_BuildJobIterator_GetCurrentJob;
 	PLibMCDataBuildJobHandler_CreateJobPtr m_BuildJobHandler_CreateJob;
 	PLibMCDataBuildJobHandler_JobExistsPtr m_BuildJobHandler_JobExists;
@@ -3414,6 +3788,8 @@ typedef struct {
 	PLibMCDataBuildJobHandler_ConvertStringToBuildStatusPtr m_BuildJobHandler_ConvertStringToBuildStatus;
 	PLibMCDataBuildJobHandler_RetrieveJobExecutionPtr m_BuildJobHandler_RetrieveJobExecution;
 	PLibMCDataBuildJobHandler_ListJobExecutionsPtr m_BuildJobHandler_ListJobExecutions;
+	PLibMCDataBuildJobHandler_GetBuildListHeadIDPtr m_BuildJobHandler_GetBuildListHeadID;
+	PLibMCDataBuildJobHandler_GetExecutionListHeadIDPtr m_BuildJobHandler_GetExecutionListHeadID;
 	PLibMCDataUserList_CountPtr m_UserList_Count;
 	PLibMCDataUserList_GetUserPropertiesPtr m_UserList_GetUserProperties;
 	PLibMCDataLoginHandler_UserExistsPtr m_LoginHandler_UserExists;
@@ -3439,6 +3815,10 @@ typedef struct {
 	PLibMCDataLoginHandler_SetUserDescriptionByUUIDPtr m_LoginHandler_SetUserDescriptionByUUID;
 	PLibMCDataLoginHandler_SetUserPasswordByUUIDPtr m_LoginHandler_SetUserPasswordByUUID;
 	PLibMCDataLoginHandler_GetActiveUsersPtr m_LoginHandler_GetActiveUsers;
+	PLibMCDataLoginHandler_CreateLoginSessionPtr m_LoginHandler_CreateLoginSession;
+	PLibMCDataLoginHandler_UpdateLoginSessionAuthenticationPtr m_LoginHandler_UpdateLoginSessionAuthentication;
+	PLibMCDataLoginHandler_UpdateLoginSessionActivityPtr m_LoginHandler_UpdateLoginSessionActivity;
+	PLibMCDataLoginHandler_DeactivateLoginSessionPtr m_LoginHandler_DeactivateLoginSession;
 	PLibMCDataPersistencyHandler_HasPersistentParameterPtr m_PersistencyHandler_HasPersistentParameter;
 	PLibMCDataPersistencyHandler_GetPersistentParameterDetailsPtr m_PersistencyHandler_GetPersistentParameterDetails;
 	PLibMCDataPersistencyHandler_DeletePersistentParameterPtr m_PersistencyHandler_DeletePersistentParameter;
@@ -3501,6 +3881,8 @@ typedef struct {
 	PLibMCDataDataModel_CreateJournalReaderPtr m_DataModel_CreateJournalReader;
 	PLibMCDataDataModel_CreateAlertSessionPtr m_DataModel_CreateAlertSession;
 	PLibMCDataDataModel_CreateLoginHandlerPtr m_DataModel_CreateLoginHandler;
+	PLibMCDataDataModel_CreateTelemetrySessionPtr m_DataModel_CreateTelemetrySession;
+	PLibMCDataDataModel_CreateTelemetryReaderPtr m_DataModel_CreateTelemetryReader;
 	PLibMCDataDataModel_CreatePersistencyHandlerPtr m_DataModel_CreatePersistencyHandler;
 	PLibMCDataDataModel_SetBaseTempDirectoryPtr m_DataModel_SetBaseTempDirectory;
 	PLibMCDataDataModel_GetBaseTempDirectoryPtr m_DataModel_GetBaseTempDirectory;

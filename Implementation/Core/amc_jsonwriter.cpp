@@ -152,6 +152,11 @@ void CJSONWriterArray::addArray(CJSONWriterArray& array)
 	m_Value.PushBack(array.m_Value, m_allocator);
 }
 
+void CJSONWriterArray::copyFromArray(const rapidjson::Value& arrayValue)
+{
+	m_Value.CopyFrom(arrayValue, m_allocator);
+}
+
 
 
 CJSONWriter::CJSONWriter()

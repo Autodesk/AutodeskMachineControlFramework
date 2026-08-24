@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/common_utils.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_expression.hpp"
+#include "amc_resourcepackage.hpp"
 
 using namespace AMC;
 
@@ -51,6 +52,9 @@ CUIModule_ContentButton::CUIModule_ContentButton (const std::string & sGroupPath
 	m_IconExpression(IconName),
 	m_DisabledExpression (DisabledExpression),
 	m_sEventFormValueSetting(sEventFormValueSetting), 
+	m_sKind("button"),
+	m_sVariant("default"),
+	m_sWidth("auto"),
 	m_sButtonName(sButtonName),
 	m_pStateMachineData (pStateMachineData)
 	
@@ -92,6 +96,41 @@ std::string CUIModule_ContentButton::getButtonName()
 	return m_sButtonName;
 }
 
+void CUIModule_ContentButton::setKind(const std::string& sKind)
+{
+	m_sKind = sKind;
+}
+
+std::string CUIModule_ContentButton::getKind()
+{
+	return m_sKind;
+}
+
+void CUIModule_ContentButton::setVariant(const std::string& sVariant)
+{
+	m_sVariant = sVariant;
+}
+
+void CUIModule_ContentButton::setWidth(const std::string& sWidth)
+{
+	m_sWidth = sWidth;
+}
+
+void CUIModule_ContentButton::setIconResource(const std::string& sIconResource)
+{
+	m_sIconResource = sIconResource;
+}
+
+void CUIModule_ContentButton::setTags(const std::string& sTags)
+{
+	m_sTags = sTags;
+}
+
+std::string CUIModule_ContentButton::getTags()
+{
+	return m_sTags;
+}
+
 
 
 void CUIModule_ContentButton::addFormFieldValue(PUIModule_ContentFormEntity pEntity)
@@ -117,6 +156,9 @@ PParameterGroup CUIModule_ContentButton::registerClientVariableGroup(CParameterH
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONTARGETPAGE, "button target page", m_TargetPageExpression.evaluateStringValue(m_pStateMachineData));
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONEVENT, "button event", m_EventExpression.evaluateStringValue(m_pStateMachineData));
 	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONICON, "button icon", m_IconExpression.evaluateStringValue(m_pStateMachineData));
+	// Readable by event handlers via GetUIProperty(sender, "tags"). Always registered
+	// (empty when unset) so the lookup never throws for untagged buttons.
+	pGroup->addNewStringParameter("tags", "button tags", m_sTags);
 
 	return pGroup;
 }
@@ -139,6 +181,12 @@ void CUIModule_ContentButton::writeVariablesToJSON(CJSONWriter& writer, CJSONWri
 	object.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONTARGETPAGE));
 	object.addString(AMC_API_KEY_UI_BUTTONEVENT, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONEVENT));
 	object.addString(AMC_API_KEY_UI_BUTTONICON, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONICON));
+
+	// Static toolbar layout metadata.
+	object.addString("kind", m_sKind);
+	object.addString("variant", m_sVariant);
+	object.addString("width", m_sWidth);
+	object.addString("iconresource", m_sIconResource);
 
 }
 
@@ -164,6 +212,49 @@ void CUIModule_ContentButton::syncClientVariables(CParameterHandler* pClientVari
 }
 
 
+void CUIModule_ContentButton::registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore)
+{
+	LibMCAssertNotNull(pStore.get());
+	m_pFrontendStore = pStore;
+
+	pStore->registerValue("caption", eUIFrontendDefinitionAttributeType::atString, m_CaptionExpression);
+	pStore->registerValue("disabled", eUIFrontendDefinitionAttributeType::atBoolean, m_DisabledExpression);
+	pStore->registerValue("event", eUIFrontendDefinitionAttributeType::atString, m_EventExpression);
+	pStore->registerValue("targetpage", eUIFrontendDefinitionAttributeType::atString, m_TargetPageExpression);
+	pStore->registerValue("icon", eUIFrontendDefinitionAttributeType::atString, m_IconExpression);
+
+	// Static toolbar layout metadata registered as fixed-value attributes.
+	CUIExpression kindExpr; kindExpr.setFixedValue(m_sKind);
+	pStore->registerValue("kind", eUIFrontendDefinitionAttributeType::atString, kindExpr);
+	CUIExpression variantExpr; variantExpr.setFixedValue(m_sVariant);
+	pStore->registerValue("variant", eUIFrontendDefinitionAttributeType::atString, variantExpr);
+	CUIExpression widthExpr; widthExpr.setFixedValue(m_sWidth);
+	pStore->registerValue("width", eUIFrontendDefinitionAttributeType::atString, widthExpr);
+	CUIExpression iconResourceExpr; iconResourceExpr.setFixedValue(m_sIconResource);
+	pStore->registerValue("iconresource", eUIFrontendDefinitionAttributeType::atString, iconResourceExpr);
+	CUIExpression tagsExpr; tagsExpr.setFixedValue(m_sTags);
+	pStore->registerValue("tags", eUIFrontendDefinitionAttributeType::atString, tagsExpr);
+}
+
+
+void CUIModule_ContentButton::registerFrontendEventFormValues()
+{
+	if (m_pFrontendStore == nullptr)
+		return;
+
+	std::string sFormValueUUIDs;
+	for (auto& pFormValue : m_pFormValues) {
+		if (!sFormValueUUIDs.empty())
+			sFormValueUUIDs += " ";
+		sFormValueUUIDs += pFormValue->getUUID();
+	}
+
+	CUIExpression formValuesExpr;
+	formValuesExpr.setFixedValue(sFormValueUUIDs);
+	m_pFrontendStore->registerValue("eventformvalues", eUIFrontendDefinitionAttributeType::atString, formValuesExpr);
+}
+
+
 PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
 {
 	LibMCAssertNotNull(pUIModuleEnvironment);
@@ -179,18 +270,31 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 	uint32_t nButtonIndex = 0;
 	std::set<std::string> buttonNameMap;
 
-	auto buttonsNodes = xmlNode.children("button");
-	for (auto buttonNode : buttonsNodes) {
+	// Iterate over the direct children in document order so that <button>, <spacer/> and
+	// <spring/> layout elements keep their relative ordering inside a toolbar.
+	for (auto childNode : xmlNode.children()) {
 
-		auto formvaluesAttrib = buttonNode.attribute("formvalues");
-		auto buttonNameAttrib = buttonNode.attribute("name");
+		std::string sNodeName = childNode.name();
+
+		std::string sKind;
+		if (sNodeName == "button")
+			sKind = "button";
+		else if (sNodeName == "spacer")
+			sKind = "spacer";
+		else if (sNodeName == "spring")
+			sKind = "spring";
+		else
+			continue;
+
+		auto formvaluesAttrib = childNode.attribute("formvalues");
+		auto buttonNameAttrib = childNode.attribute("name");
 
 		std::string sButtonName = buttonNameAttrib.as_string ();
 		if (sButtonName.empty ())
 		{
 			while (true) {
 				nButtonIndex++;
-				sButtonName = "button" + std::to_string(nButtonIndex);
+				sButtonName = sKind + std::to_string(nButtonIndex);
 
 				auto iIter = buttonNameMap.find(sButtonName);
 				if (iIter == buttonNameMap.end())
@@ -204,14 +308,44 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 
 		buttonNameMap.insert(sButtonName);
 
-		CUIExpression captionExpression(buttonNode, "caption");
-		CUIExpression targetPageExpression(buttonNode, "targetpage");
-		CUIExpression eventExpression(buttonNode, "event");
-		CUIExpression iconExpression(buttonNode, "icon");
-		CUIExpression disabledExpression(buttonNode, "disabled");
+		CUIExpression captionExpression(childNode, "caption");
+		CUIExpression targetPageExpression(childNode, "targetpage");
+		CUIExpression eventExpression(childNode, "event");
+		CUIExpression iconExpression(childNode, "icon");
+		CUIExpression disabledExpression(childNode, "disabled");
 
 		auto pButton = pButtonGroup->addButton(captionExpression, targetPageExpression, eventExpression, sButtonName, iconExpression, disabledExpression, formvaluesAttrib.as_string());
 
+		pButton->setKind(sKind);
+
+		auto variantAttrib = childNode.attribute("variant");
+		if (!variantAttrib.empty())
+			pButton->setVariant(variantAttrib.as_string());
+
+		auto widthAttrib = childNode.attribute("width");
+		if (!widthAttrib.empty())
+			pButton->setWidth(widthAttrib.as_string());
+
+		auto iconResourceAttrib = childNode.attribute("iconresource");
+		if (!iconResourceAttrib.empty()) {
+			// Resolve the packaged resource NAME to its resource UUID. The client
+			// addresses images by UUID via getImageURL()/the "/image/<uuid>" API
+			// endpoint, so passing the raw name results in an "invalid parameter"
+			// error. This mirrors how the <image> content item resolves resources.
+			std::string sIconResourceName = iconResourceAttrib.as_string();
+			std::string sIconResourceUUID;
+			auto pResourcePackage = pUIModuleEnvironment->resourcePackage();
+			if (pResourcePackage.get() != nullptr) {
+				auto pEntry = pResourcePackage->findEntryByName(sIconResourceName, false);
+				if (pEntry.get() != nullptr)
+					sIconResourceUUID = pEntry->getUUID();
+			}
+			pButton->setIconResource(sIconResourceUUID);
+		}
+
+		auto tagsAttrib = childNode.attribute("tags");
+		if (!tagsAttrib.empty())
+			pButton->setTags(tagsAttrib.as_string());
 	}
 
 	return pButtonGroup;
@@ -325,6 +459,11 @@ void CUIModule_ContentButtonGroup::configurePostLoading()
 		 
 	}
 
+	// Register eventformvalues on each button's frontend store now that form values are resolved
+	for (auto& pButton : m_Buttons) {
+		pButton->registerFrontendEventFormValues();
+	}
+
 }
 
 
@@ -361,6 +500,8 @@ eUIModule_ContentButtonDistribution CUIModule_ContentButtonGroup::stringToButton
 		return eUIModule_ContentButtonDistribution::cbdCentered;
 	if (sValue == "equal")
 		return eUIModule_ContentButtonDistribution::cbdEquallyDistributed;
+	if (sValue == "toolbar")
+		return eUIModule_ContentButtonDistribution::cbdToolbar;
 
 	throw ELibMCCustomException(LIBMC_ERROR_INVALIDBUTTONDISTRIBUTION, "invalid button distribution: " + sValue);
 }
@@ -379,6 +520,8 @@ std::string CUIModule_ContentButtonGroup::buttonDistributionToString(const eUIMo
 			return "centered";
 		case eUIModule_ContentButtonDistribution::cbdEquallyDistributed:
 			return "equal";
+		case eUIModule_ContentButtonDistribution::cbdToolbar:
+			return "toolbar";
 
 		default:
 			return "";
@@ -404,5 +547,22 @@ void CUIModule_ContentButtonGroup::populateClientVariables(CParameterHandler* pC
 	LibMCAssertNotNull(pClientVariableHandler);
 	for (auto pButton : m_Buttons) {
 		pButton->registerClientVariableGroup(pClientVariableHandler);
+	}
+}
+
+std::string CUIModule_ContentButtonGroup::getItemType()
+{
+	return "buttongroup";
+}
+
+void CUIModule_ContentButtonGroup::registerFrontendAttributes()
+{
+	CUIExpression distExpr;
+	distExpr.setFixedValue(buttonDistributionToString(m_ButtonDistribution));
+	registerItemStringAttribute("buttondistribution", distExpr);
+
+	for (auto& pButton : m_Buttons) {
+		auto pChildStore = m_pItemModuleStore->addChildStore(pButton->getUUID(), pButton->getElementPath(), "button");
+		pButton->registerFrontendAttributes(pChildStore);
 	}
 }

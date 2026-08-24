@@ -70,6 +70,7 @@ CRaylaseCardImpl::CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardNam
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
 
     m_pNLightDriverImpl = std::make_shared<CNLightDriverImpl>(m_pSDK, m_pDriverEnvironment);
+    m_pIOCycleMapping = std::make_shared<CRaylaseCardIOCycleMapping>();
 
     if ((dMaxLaserPowerInWatts < RAYLASE_MINLASERPOWER) || (dMaxLaserPowerInWatts > RAYLASE_MAXLASERPOWER))
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER, "invalid laser power: " + std::to_string (dMaxLaserPowerInWatts));
@@ -348,7 +349,7 @@ LibMCEnv::PDriverEnvironment CRaylaseCardImpl::getDriverEnvironment()
 
 PRaylaseCardList CRaylaseCardImpl::createNewList()
 {
-    return std::make_shared<CRaylaseCardList>(m_pSDK, m_Handle, m_dMaxLaserPowerInWatts, m_pCoordinateTransform, m_PartSuppressions, m_pNLightDriverImpl);
+    return std::make_shared<CRaylaseCardList>(m_pSDK, m_Handle, m_dMaxLaserPowerInWatts, m_pCoordinateTransform, m_PartSuppressions, m_pNLightDriverImpl, m_pIOCycleMapping);
 }
 
 void CRaylaseCardImpl::abortListExecution()
@@ -381,4 +382,29 @@ PNLightDriverImpl CRaylaseCardImpl::getNlightImplementation()
 double CRaylaseCardImpl::getMaxLaserPowerInWatts()
 {
     return m_dMaxLaserPowerInWatts;
+}
+
+PRaylaseIOCycleImpl CRaylaseCardImpl::createIOCycle(uint32_t nCycleID)
+{
+    return m_pIOCycleMapping->createIOCycle(nCycleID);
+}
+
+bool CRaylaseCardImpl::ioCycleExists(uint32_t nCycleID) const
+{
+    return m_pIOCycleMapping->ioCycleExists(nCycleID);
+}
+
+PRaylaseIOCycleImpl CRaylaseCardImpl::getIOCycle(uint32_t nCycleID) const
+{
+    return m_pIOCycleMapping->getIOCycle(nCycleID);
+}
+
+void CRaylaseCardImpl::removeIOCycle(uint32_t nCycleID)
+{
+    m_pIOCycleMapping->removeIOCycle(nCycleID);
+}
+
+PRaylaseCardIOCycleMapping CRaylaseCardImpl::getIOCycleMapping()
+{
+    return m_pIOCycleMapping;
 }

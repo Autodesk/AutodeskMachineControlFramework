@@ -131,6 +131,8 @@ void CSMCConfiguration::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nC
 
     }
 
+    m_pDriverEnvironment->LogMessage("Correction file data loaded from memory, size: " + std::to_string(m_CorrectionFileData.size()));
+
 }
 
 void CSMCConfiguration::SetCorrectionFileResource(const std::string& sResourceName)
@@ -151,8 +153,10 @@ void CSMCConfiguration::SetCorrectionFileResource(const std::string& sResourceNa
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND, "RTC correction resource not found: " + sResourceName);
     }
 
+    m_pDriverEnvironment->LogMessage ("Correction file data loaded from resource " + sResourceName + ", size: " + std::to_string (m_CorrectionFileData.size()));
 
 }
+
 
 
 void CSMCConfiguration::SetConfigurationTemplateResource(const std::string& sResourceName)
@@ -299,14 +303,17 @@ void CSMCConfiguration::SetFirmwareResources(const std::string& sFirmwareDataRes
 
 }
 
-std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCEnv::PWorkingFile& newCorrectionFile, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion, const std::string& sRTCIPAddress)
+std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion, const std::string& sRTCIPAddress, LibMCEnv::PWorkingFile pCorrectionFileToUse)
 {
 
     if (pWorkingDirectory == nullptr)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
     if ((m_nSerialNumber < SMCCONFIGURATION_MINSERIALNUMBER) || (m_nSerialNumber > SMCCONFIGURATION_MAXSERIALNUMBER))
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER);
-    if (m_CorrectionFileData.size () == 0)
+    if (pCorrectionFileToUse.get() == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+    if (pCorrectionFileToUse->GetSize () == 0)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE);
 
     if (!sRTCIPAddress.empty()) {
@@ -314,8 +321,6 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
             if (!(((ch >= '0') && (ch <= '9')) || (ch == '.')))
                 throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDIPADDRESS, "invalid RTC IP Address: " + sRTCIPAddress);
     }
-
-    newCorrectionFile = pWorkingDirectory->StoreCustomDataInTempFile("ct5", m_CorrectionFileData);
 
     pWorkingDirectory->StoreCustomData("RTC6RBF.rbf", m_FPGAData);
     if (sRTCIPAddress.empty()) {
@@ -328,7 +333,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     pWorkingDirectory->StoreCustomData("RTC6DAT.dat", m_AuxiliaryData);
 
     std::string sBaseDirectoryPath = pWorkingDirectory->GetAbsoluteFilePath();
-    std::string sCorrectionFilePath = newCorrectionFile->GetAbsoluteFileName();
+    std::string sCorrectionFilePath = pCorrectionFileToUse->GetAbsoluteFileName();
     std::string sLogFilePath = pWorkingDirectory->GetAbsoluteFilePath() + "/log.txt";
 
     std::string sSimulationDirectory = sBaseDirectoryPath + "/";
@@ -574,3 +579,8 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
 
     return sXMLString;
 };
+
+std::vector<uint8_t> & CSMCConfiguration::getCorrectionFileData()
+{
+    return m_CorrectionFileData;
+}

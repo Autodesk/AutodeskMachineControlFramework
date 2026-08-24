@@ -76,6 +76,11 @@ namespace AMCData {
 
 				break;
 			}
+			case 18: {
+				std::string sSchemaTelemetryAddQuery = "ALTER TABLE `journals` ADD `telemetryfilename` varchar ( 64 ) DEFAULT NULL";
+				pTransaction->executeStatement(sSchemaTelemetryAddQuery);
+				
+			}
 		}
 
 	}

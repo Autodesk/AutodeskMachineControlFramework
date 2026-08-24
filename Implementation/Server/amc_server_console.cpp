@@ -34,18 +34,87 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 
 #include "amc_server.hpp"
+#include "common_utils.hpp"
 
 using namespace AMC;
 
-int main () 
+#ifdef _MSC_VER
+int wmain(int argc, wchar_t* argv[])
+#else
+int main(int argc, char* argv[])
+#endif
 {
 
 	try
 	{
 
+		// Parse arguments
+		std::vector<std::string> argumentList;
+#ifdef _MSC_VER
+		// Convert wide strings to UTF8 on Windows
+		for (int argIdx = 1; argIdx < argc; argIdx++) {
+			std::wstring wArg(argv[argIdx]);
+			argumentList.push_back(AMCCommon::CUtils::UTF16toUTF8(wArg));
+		}
+#else
+		for (int argIdx = 1; argIdx < argc; argIdx++)
+			argumentList.push_back(std::string(argv[argIdx]));
+#endif
+
 		std::string sConfigurationFileName = "amc_server.xml";
+		std::vector<std::pair<std::string, std::string>> parameterOverrides;
+
+		// helper to parse "name=value"
+		auto parseNameValue = [](const std::string& token) -> std::pair<std::string, std::string> {
+			const auto pos = token.find('=');
+			if (pos == std::string::npos)
+				throw std::runtime_error("invalid --set argument, expected name=value: \"" + token + "\"");
+
+			std::string name = token.substr(0, pos);
+			std::string value = token.substr(pos + 1);
+
+			if (name.empty())
+				throw std::runtime_error("invalid --set argument, empty name before '='");
+
+			return { name, value };
+		};
+
+		for (size_t argIdx = 0; argIdx < argumentList.size(); argIdx++) {
+
+			bool bHandled = false;
+
+			std::string sArgument = argumentList[argIdx];
+			if (sArgument == "--config") {
+				argIdx++;
+				if (argIdx >= argumentList.size())
+					throw std::runtime_error("missing config file name in argument");
+
+				sConfigurationFileName = argumentList[argIdx];
+				bHandled = true;
+			}
+
+			if (sArgument == "--set") {
+				argIdx++;
+				if (argIdx >= argumentList.size())
+					throw std::runtime_error("missing parameter argument");
+
+				auto nv = parseNameValue(argumentList[argIdx]);
+				parameterOverrides.emplace_back(std::move(nv));
+				bHandled = true;
+			}
+
+			if (!bHandled) {
+				std::cout << "Warning! Unknown argument passed: " << sArgument << std::endl;
+			}
+
+		}
+
 
 		auto pServer = std::make_shared <CServer> (std::make_shared <CServerStdIO>());
+
+		for (auto iParameterOverride : parameterOverrides) {
+			pServer->addConfigurationParameterOverride(iParameterOverride.first, iParameterOverride.second);
+		}
 
 		pServer->executeBlocking(sConfigurationFileName);
 

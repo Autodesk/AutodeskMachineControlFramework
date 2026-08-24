@@ -57,6 +57,7 @@ private:
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	LibMCEnv::PWorkingFile m_pCorrectionFileInUse;
 	std::string m_sSimulationSubDirectory;
 
 	std::string m_sIPAddress;

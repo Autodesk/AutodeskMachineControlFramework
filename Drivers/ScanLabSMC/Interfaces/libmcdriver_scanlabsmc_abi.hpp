@@ -266,6 +266,17 @@ LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadsimulationdata(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_DataTable pSimulationDataTable);
 
 /**
+* Returns raw simulation data.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Raw binary simulation data.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABSMC_DECLSPEC LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadrawsimulationdata(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, const LibMCDriver_ScanLabSMC_uint64 nDataBufferSize, LibMCDriver_ScanLabSMC_uint64* pDataNeededCount, LibMCDriver_ScanLabSMC_uint8 * pDataBuffer);
+
+/**
 * Returns a characteristic value of a job.
 *
 * @param[in] pSMCJob - SMCJob instance.

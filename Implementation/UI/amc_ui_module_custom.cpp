@@ -60,6 +60,8 @@ CUIModule_Custom::CUIModule_Custom(pugi::xml_node& xmlNode, const std::string& s
 
 	m_sParentPath = sPath;
 
+	auto pFrontendDefinition = pUIModuleEnvironment->getFrontendDefinition();
+
 	m_pCustomItem = std::make_shared<CUIModuleCustomItem_Properties>(m_sUUID, m_sParentPath, pUIModuleEnvironment);
 
 	pugi::xml_node propertiesNode = xmlNode.child("properties");
@@ -79,6 +81,11 @@ CUIModule_Custom::CUIModule_Custom(pugi::xml_node& xmlNode, const std::string& s
 			CUIExpression valueExpression (propertyNode, "value");
 			m_pCustomItem->registerProperty (sName, sType, valueExpression);
 		}
+	}
+
+	// Register custom properties as v2 frontend attributes
+	for (auto& propPair : m_pCustomItem->getProperties()) {
+		registerStringAttribute(propPair.first, propPair.second);
 	}
 
 	pugi::xml_node eventsNode = xmlNode.child("events");
@@ -218,5 +225,39 @@ void CUIModule_Custom::populateLegacyClientVariables(CParameterHandler* pParamet
 		iEventIter.second->populateClientVariables(pParameterHandler);
 	}
 
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+
+bool CUIModule_Custom::isVersion2FrontendModule()
+{
+	return true;
+}
+
+void CUIModule_Custom::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	// Base class writes moduletype, uuid, name, and all registered attributes (including custom properties)
+	CUIModule::frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
+
+	// Write events as submodules
+	CJSONWriterArray submodulesArray(writer);
+
+	for (auto& eventItemPair : m_EventItemNameMap) {
+		auto pEventItem = eventItemPair.second;
+
+		CJSONWriterObject eventObject(writer);
+		eventObject.addString("moduletype", "event");
+		eventObject.addString("uuid", pEventItem->getUUID());
+
+		CJSONWriterObject attributesObject(writer);
+		attributesObject.addString("eventname", pEventItem->getEventName());
+		eventObject.addObject("attributes", attributesObject);
+
+		submodulesArray.addObject(eventObject);
+	}
+
+	moduleObject.addArray("submodules", submodulesArray);
 }
 

@@ -77,6 +77,7 @@ private:
     std::string m_sThumbnailStreamUUID;
     uint32_t m_nLayerCount;
     uint32_t m_nExecutionCount;
+    uint64_t m_nIncrementalID;
     AMCData::PStorageState m_pStorageState;
     AMCData::PSQLHandler m_pSQLHandler;
 
@@ -87,19 +88,22 @@ private:
 
 protected:
 
-    CBuildJob(const std::string& sUUID, const std::string & sName, LibMCData::eBuildJobStatus eJobStatus, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string & sUserUUID, const std::string & sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string & sThumbnailStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    CBuildJob(const std::string& sUUID, const std::string & sName, LibMCData::eBuildJobStatus eJobStatus, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string & sUserUUID, const std::string & sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string & sThumbnailStreamUUID, uint64_t nIncrementalID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
 
 public:
 
-    static CBuildJob* make(const std::string& sUUID, const std::string & sName, LibMCData::eBuildJobStatus eJobStatus, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string & sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static CBuildJob* make(const std::string& sUUID, const std::string & sName, LibMCData::eBuildJobStatus eJobStatus, const std::string & sTimeStamp, const std::string & sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string & sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, uint64_t nIncrementalID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static void bumpIncrementalID(AMCData::CSQLTransaction* pTransaction, const std::string& sUUID);
     static CBuildJob* makeFromDatabase(const std::string& sJobUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static CBuildJob* makeFrom(CBuildJob* pBuildJob);
 
-    static PBuildJob makeShared(const std::string& sUUID, const std::string& sName, LibMCData::eBuildJobStatus eJobStatus, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string& sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
+    static PBuildJob makeShared(const std::string& sUUID, const std::string& sName, LibMCData::eBuildJobStatus eJobStatus, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string& sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, uint64_t nIncrementalID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static PBuildJob makeSharedFromDatabase(const std::string& sJobUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState);
     static PBuildJob makeSharedFrom(CBuildJob* pBuildJob);
 
     std::string GetUUID() override;
+
+    LibMCData_uint64 GetIncrementalID() override;
 
 	std::string GetName() override;
 

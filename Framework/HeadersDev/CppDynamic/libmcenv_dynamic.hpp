@@ -97,6 +97,7 @@ class CToolpathLayer;
 class CToolpathAccessor;
 class CBuildExecution;
 class CBuildExecutionIterator;
+class CBuildIterator;
 class CBuild;
 class CWorkingFileProcess;
 class CWorkingFile;
@@ -128,15 +129,22 @@ class CAlert;
 class CAlertIterator;
 class CLogEntryList;
 class CJournalHandler;
+class CTelemetryInterval;
+class CTelemetryIntervalIterator;
+class CTelemetryChannelStatistics;
+class CTelemetryHandler;
 class CUserDetailList;
 class CUserManagementHandler;
 class CMachineConfigurationXSD;
 class CMachineConfigurationXSDIterator;
 class CMachineConfigurationVersion;
 class CMachineConfigurationVersionIterator;
+class CMachineConfiguration;
 class CMachineConfigurationType;
 class CMachineConfigurationTypeIterator;
 class CMachineConfigurationHandler;
+class CTelemetryMarkerScope;
+class CTelemetryChannel;
 class CStateEnvironment;
 class CUIItem;
 class CUIEnvironment;
@@ -183,6 +191,7 @@ typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
 typedef CBuildExecution CLibMCEnvBuildExecution;
 typedef CBuildExecutionIterator CLibMCEnvBuildExecutionIterator;
+typedef CBuildIterator CLibMCEnvBuildIterator;
 typedef CBuild CLibMCEnvBuild;
 typedef CWorkingFileProcess CLibMCEnvWorkingFileProcess;
 typedef CWorkingFile CLibMCEnvWorkingFile;
@@ -214,15 +223,22 @@ typedef CAlert CLibMCEnvAlert;
 typedef CAlertIterator CLibMCEnvAlertIterator;
 typedef CLogEntryList CLibMCEnvLogEntryList;
 typedef CJournalHandler CLibMCEnvJournalHandler;
+typedef CTelemetryInterval CLibMCEnvTelemetryInterval;
+typedef CTelemetryIntervalIterator CLibMCEnvTelemetryIntervalIterator;
+typedef CTelemetryChannelStatistics CLibMCEnvTelemetryChannelStatistics;
+typedef CTelemetryHandler CLibMCEnvTelemetryHandler;
 typedef CUserDetailList CLibMCEnvUserDetailList;
 typedef CUserManagementHandler CLibMCEnvUserManagementHandler;
 typedef CMachineConfigurationXSD CLibMCEnvMachineConfigurationXSD;
 typedef CMachineConfigurationXSDIterator CLibMCEnvMachineConfigurationXSDIterator;
 typedef CMachineConfigurationVersion CLibMCEnvMachineConfigurationVersion;
 typedef CMachineConfigurationVersionIterator CLibMCEnvMachineConfigurationVersionIterator;
+typedef CMachineConfiguration CLibMCEnvMachineConfiguration;
 typedef CMachineConfigurationType CLibMCEnvMachineConfigurationType;
 typedef CMachineConfigurationTypeIterator CLibMCEnvMachineConfigurationTypeIterator;
 typedef CMachineConfigurationHandler CLibMCEnvMachineConfigurationHandler;
+typedef CTelemetryMarkerScope CLibMCEnvTelemetryMarkerScope;
+typedef CTelemetryChannel CLibMCEnvTelemetryChannel;
 typedef CStateEnvironment CLibMCEnvStateEnvironment;
 typedef CUIItem CLibMCEnvUIItem;
 typedef CUIEnvironment CLibMCEnvUIEnvironment;
@@ -269,6 +285,7 @@ typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
 typedef std::shared_ptr<CBuildExecution> PBuildExecution;
 typedef std::shared_ptr<CBuildExecutionIterator> PBuildExecutionIterator;
+typedef std::shared_ptr<CBuildIterator> PBuildIterator;
 typedef std::shared_ptr<CBuild> PBuild;
 typedef std::shared_ptr<CWorkingFileProcess> PWorkingFileProcess;
 typedef std::shared_ptr<CWorkingFile> PWorkingFile;
@@ -300,15 +317,22 @@ typedef std::shared_ptr<CAlert> PAlert;
 typedef std::shared_ptr<CAlertIterator> PAlertIterator;
 typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CJournalHandler> PJournalHandler;
+typedef std::shared_ptr<CTelemetryInterval> PTelemetryInterval;
+typedef std::shared_ptr<CTelemetryIntervalIterator> PTelemetryIntervalIterator;
+typedef std::shared_ptr<CTelemetryChannelStatistics> PTelemetryChannelStatistics;
+typedef std::shared_ptr<CTelemetryHandler> PTelemetryHandler;
 typedef std::shared_ptr<CUserDetailList> PUserDetailList;
 typedef std::shared_ptr<CUserManagementHandler> PUserManagementHandler;
 typedef std::shared_ptr<CMachineConfigurationXSD> PMachineConfigurationXSD;
 typedef std::shared_ptr<CMachineConfigurationXSDIterator> PMachineConfigurationXSDIterator;
 typedef std::shared_ptr<CMachineConfigurationVersion> PMachineConfigurationVersion;
 typedef std::shared_ptr<CMachineConfigurationVersionIterator> PMachineConfigurationVersionIterator;
+typedef std::shared_ptr<CMachineConfiguration> PMachineConfiguration;
 typedef std::shared_ptr<CMachineConfigurationType> PMachineConfigurationType;
 typedef std::shared_ptr<CMachineConfigurationTypeIterator> PMachineConfigurationTypeIterator;
 typedef std::shared_ptr<CMachineConfigurationHandler> PMachineConfigurationHandler;
+typedef std::shared_ptr<CTelemetryMarkerScope> PTelemetryMarkerScope;
+typedef std::shared_ptr<CTelemetryChannel> PTelemetryChannel;
 typedef std::shared_ptr<CStateEnvironment> PStateEnvironment;
 typedef std::shared_ptr<CUIItem> PUIItem;
 typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
@@ -355,6 +379,7 @@ typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
 typedef PBuildExecution PLibMCEnvBuildExecution;
 typedef PBuildExecutionIterator PLibMCEnvBuildExecutionIterator;
+typedef PBuildIterator PLibMCEnvBuildIterator;
 typedef PBuild PLibMCEnvBuild;
 typedef PWorkingFileProcess PLibMCEnvWorkingFileProcess;
 typedef PWorkingFile PLibMCEnvWorkingFile;
@@ -386,15 +411,22 @@ typedef PAlert PLibMCEnvAlert;
 typedef PAlertIterator PLibMCEnvAlertIterator;
 typedef PLogEntryList PLibMCEnvLogEntryList;
 typedef PJournalHandler PLibMCEnvJournalHandler;
+typedef PTelemetryInterval PLibMCEnvTelemetryInterval;
+typedef PTelemetryIntervalIterator PLibMCEnvTelemetryIntervalIterator;
+typedef PTelemetryChannelStatistics PLibMCEnvTelemetryChannelStatistics;
+typedef PTelemetryHandler PLibMCEnvTelemetryHandler;
 typedef PUserDetailList PLibMCEnvUserDetailList;
 typedef PUserManagementHandler PLibMCEnvUserManagementHandler;
 typedef PMachineConfigurationXSD PLibMCEnvMachineConfigurationXSD;
 typedef PMachineConfigurationXSDIterator PLibMCEnvMachineConfigurationXSDIterator;
 typedef PMachineConfigurationVersion PLibMCEnvMachineConfigurationVersion;
 typedef PMachineConfigurationVersionIterator PLibMCEnvMachineConfigurationVersionIterator;
+typedef PMachineConfiguration PLibMCEnvMachineConfiguration;
 typedef PMachineConfigurationType PLibMCEnvMachineConfigurationType;
 typedef PMachineConfigurationTypeIterator PLibMCEnvMachineConfigurationTypeIterator;
 typedef PMachineConfigurationHandler PLibMCEnvMachineConfigurationHandler;
+typedef PTelemetryMarkerScope PLibMCEnvTelemetryMarkerScope;
+typedef PTelemetryChannel PLibMCEnvTelemetryChannel;
 typedef PStateEnvironment PLibMCEnvStateEnvironment;
 typedef PUIItem PLibMCEnvUIItem;
 typedef PUIEnvironment PLibMCEnvUIEnvironment;
@@ -728,6 +760,16 @@ public:
 			case LIBMCENV_ERROR_INVALIDREACTIONTIMEOUT: return "INVALIDREACTIONTIMEOUT";
 			case LIBMCENV_ERROR_COULDNOTSETREACTIONTIMEOUT: return "COULDNOTSETREACTIONTIMEOUT";
 			case LIBMCENV_ERROR_MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED: return "MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED";
+			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "NOCONFIGURATIONVERSIONFOUND";
+			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "NOCONFIGURATIONVERSIONACTIVE";
+			case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "TELEMETRYCHANNELNOTFOUND";
+			case LIBMCENV_ERROR_VIDEOSTREAMNOTFOUND: return "VIDEOSTREAMNOTFOUND";
+			case LIBMCENV_ERROR_INVALIDVIDEOSTREAMWIDTH: return "INVALIDVIDEOSTREAMWIDTH";
+			case LIBMCENV_ERROR_INVALIDVIDEOSTREAMHEIGHT: return "INVALIDVIDEOSTREAMHEIGHT";
+			case LIBMCENV_ERROR_INVALIDFRAMEDURATION: return "INVALIDFRAMEDURATION";
+			case LIBMCENV_ERROR_INVALIDPAUSETOLERANCE: return "INVALIDPAUSETOLERANCE";
+			case LIBMCENV_ERROR_INVALIDFRAMECACHEDURATION: return "INVALIDFRAMECACHEDURATION";
+			case LIBMCENV_ERROR_VIDEOSTREAMFRAMEENCODINGERROR: return "VIDEOSTREAMFRAMEENCODINGERROR";
 		}
 		return "UNKNOWN";
 	}
@@ -987,6 +1029,16 @@ public:
 			case LIBMCENV_ERROR_INVALIDREACTIONTIMEOUT: return "Invalid reaction timeout.";
 			case LIBMCENV_ERROR_COULDNOTSETREACTIONTIMEOUT: return "Could not set reaction timeout.";
 			case LIBMCENV_ERROR_MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED: return "Schema type already registered, but with a different name.";
+			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "No configuration version found.";
+			case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "No configuration version active.";
+			case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
+			case LIBMCENV_ERROR_VIDEOSTREAMNOTFOUND: return "Video stream not found.";
+			case LIBMCENV_ERROR_INVALIDVIDEOSTREAMWIDTH: return "Invalid video stream width.";
+			case LIBMCENV_ERROR_INVALIDVIDEOSTREAMHEIGHT: return "Invalid video stream height.";
+			case LIBMCENV_ERROR_INVALIDFRAMEDURATION: return "Invalid frame duration.";
+			case LIBMCENV_ERROR_INVALIDPAUSETOLERANCE: return "Invalid pause tolerance.";
+			case LIBMCENV_ERROR_INVALIDFRAMECACHEDURATION: return "Invalid frame cache duration.";
+			case LIBMCENV_ERROR_VIDEOSTREAMFRAMEENCODINGERROR: return "Video stream frame encoding error.";
 		}
 		return "unknown error";
 	}
@@ -1141,6 +1193,7 @@ private:
 	friend class CToolpathAccessor;
 	friend class CBuildExecution;
 	friend class CBuildExecutionIterator;
+	friend class CBuildIterator;
 	friend class CBuild;
 	friend class CWorkingFileProcess;
 	friend class CWorkingFile;
@@ -1172,15 +1225,22 @@ private:
 	friend class CAlertIterator;
 	friend class CLogEntryList;
 	friend class CJournalHandler;
+	friend class CTelemetryInterval;
+	friend class CTelemetryIntervalIterator;
+	friend class CTelemetryChannelStatistics;
+	friend class CTelemetryHandler;
 	friend class CUserDetailList;
 	friend class CUserManagementHandler;
 	friend class CMachineConfigurationXSD;
 	friend class CMachineConfigurationXSDIterator;
 	friend class CMachineConfigurationVersion;
 	friend class CMachineConfigurationVersionIterator;
+	friend class CMachineConfiguration;
 	friend class CMachineConfigurationType;
 	friend class CMachineConfigurationTypeIterator;
 	friend class CMachineConfigurationHandler;
+	friend class CTelemetryMarkerScope;
+	friend class CTelemetryChannel;
 	friend class CStateEnvironment;
 	friend class CUIItem;
 	friend class CUIEnvironment;
@@ -1431,6 +1491,8 @@ public:
 	
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadJPEGImage(const CInputVector<LibMCEnv_uint8> & JPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImageFromResource(const std::string & sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadJPEGImageFromResource(const std::string & sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData CreateImageFromRawRGB24Data(const CInputVector<LibMCEnv_uint8> & RGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData CreateImageFromRawRGBA32Data(const CInputVector<LibMCEnv_uint8> & RGBA32DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData CreateImageFromRawYUY2Data(const CInputVector<LibMCEnv_uint8> & YUY2DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
@@ -2227,6 +2289,23 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CBuildIterator 
+**************************************************************************************************************************/
+class CBuildIterator : public CIterator {
+public:
+	
+	/**
+	* CBuildIterator::CBuildIterator - Constructor for BuildIterator class.
+	*/
+	CBuildIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PBuild GetCurrentBuild();
+};
+	
+/*************************************************************************************************************************
  Class CBuild 
 **************************************************************************************************************************/
 class CBuild : public CBase {
@@ -2242,6 +2321,8 @@ public:
 	
 	inline std::string GetName();
 	inline std::string GetBuildUUID();
+	inline std::string GetCreatedTimestamp();
+	inline std::string GetLastExecutionTimestamp();
 	inline std::string GetStorageUUID();
 	inline std::string GetStorageSHA256();
 	inline void EnsureStorageSHA256IsValid();
@@ -2756,6 +2837,7 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterName);
+	inline PTelemetryChannel FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting);
 };
 	
 /*************************************************************************************************************************
@@ -2807,8 +2889,12 @@ public:
 	inline void LogMessage(const std::string & sLogString);
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
+	inline PTelemetryChannel RegisterTelemetryChannel(const std::string & sChannelIdentifier, const std::string & sChannelDescription, const eTelemetryChannelType eChannelType);
+	inline PTelemetryChannel FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageLoader CreateImageLoader();
+	inline PVideoStream CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds);
+	inline PVideoStream FindVideoStream(const std::string & sStreamUUID);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool HasBuildJob(const std::string & sBuildUUID);
@@ -3001,6 +3087,7 @@ public:
 	inline LibMCEnv_uint64 GetEndTimeStamp();
 	inline void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue);
 	inline void GetAllSamples(std::vector<sTimeStreamEntry> & SamplesBuffer);
+	inline void GetAllSamplesWithBounds(std::vector<sTimeStreamEnvelopeEntry> & SamplesBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -3020,6 +3107,7 @@ public:
 	inline std::string GetVariableName();
 	inline LibMCEnv_double ComputeDoubleSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
 	inline LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds);
+	inline PUniformJournalSampling SampleUniform(const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples);
 };
 	
 /*************************************************************************************************************************
@@ -3101,6 +3189,8 @@ public:
 	}
 	
 	inline PJournalVariable RetrieveJournalVariable(const std::string & sVariableName);
+	inline LibMCEnv_uint32 GetVariableCount();
+	inline void GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string & sName, eParameterDataType & eDataType, LibMCEnv_double & dUnits);
 	inline PDateTime GetStartTime();
 	inline PDateTime GetEndTime();
 	inline LibMCEnv_uint64 GetJournalLifeTimeInMicroseconds();
@@ -3108,6 +3198,96 @@ public:
 	inline PLogEntryList RetrieveLogEntriesFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds, eLogLevel & eMinLogLevel);
 	inline PAlertIterator RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
 	inline PAlertIterator RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
+	inline PTelemetryHandler LoadTelemetryHandler();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryInterval 
+**************************************************************************************************************************/
+class CTelemetryInterval : public CBase {
+public:
+	
+	/**
+	* CTelemetryInterval::CTelemetryInterval - Constructor for TelemetryInterval class.
+	*/
+	CTelemetryInterval(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 GetMarkerID();
+	inline std::string GetChannelIdentifier();
+	inline LibMCEnv_uint64 GetStartTimestamp();
+	inline LibMCEnv_uint64 GetEndTimestamp();
+	inline LibMCEnv_uint64 GetDuration();
+	inline LibMCEnv_uint64 GetContextData();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryIntervalIterator 
+**************************************************************************************************************************/
+class CTelemetryIntervalIterator : public CIterator {
+public:
+	
+	/**
+	* CTelemetryIntervalIterator::CTelemetryIntervalIterator - Constructor for TelemetryIntervalIterator class.
+	*/
+	CTelemetryIntervalIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PTelemetryInterval GetCurrentInterval();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryChannelStatistics 
+**************************************************************************************************************************/
+class CTelemetryChannelStatistics : public CBase {
+public:
+	
+	/**
+	* CTelemetryChannelStatistics::CTelemetryChannelStatistics - Constructor for TelemetryChannelStatistics class.
+	*/
+	CTelemetryChannelStatistics(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetChannelIdentifier();
+	inline LibMCEnv_uint64 GetIntervalCount();
+	inline LibMCEnv_uint64 GetInstantMarkerCount();
+	inline LibMCEnv_uint64 GetTotalDuration();
+	inline LibMCEnv_uint64 GetMinDuration();
+	inline LibMCEnv_uint64 GetMaxDuration();
+	inline LibMCEnv_uint64 GetAverageDuration();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryHandler 
+**************************************************************************************************************************/
+class CTelemetryHandler : public CBase {
+public:
+	
+	/**
+	* CTelemetryHandler::CTelemetryHandler - Constructor for TelemetryHandler class.
+	*/
+	CTelemetryHandler(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetSessionUUID();
+	inline PDateTime GetStartTime();
+	inline PDateTime GetEndTime();
+	inline LibMCEnv_uint64 GetLifeTimeInMicroseconds();
+	inline LibMCEnv_uint32 GetChannelCount();
+	inline std::string GetChannelIdentifier(const LibMCEnv_uint32 nChannelIndex);
+	inline bool HasChannel(const std::string & sIdentifier);
+	inline std::string GetChannelDescription(const std::string & sIdentifier);
+	inline PTelemetryIntervalIterator QueryIntervalsFromTimeDelta(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nTimeDeltaInMicroseconds);
+	inline PTelemetryIntervalIterator QueryIntervalsFromTimeRange(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
+	inline PTelemetryChannelStatistics GetChannelStatistics(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds);
 };
 	
 /*************************************************************************************************************************
@@ -3228,6 +3408,7 @@ public:
 	inline LibMCEnv_uint32 GetNumericVersion();
 	inline std::string GetParentUUID();
 	inline std::string GetConfigurationXMLString();
+	inline PXMLDocument GetConfigurationXML();
 	inline std::string GetUserUUID();
 	inline std::string GetTimestamp();
 	inline PMachineConfigurationVersion CreateNewVersion(const std::string & sXMLString, const std::string & sUserUUID);
@@ -3252,6 +3433,42 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CMachineConfiguration 
+**************************************************************************************************************************/
+class CMachineConfiguration : public CBase {
+public:
+	
+	/**
+	* CMachineConfiguration::CMachineConfiguration - Constructor for MachineConfiguration class.
+	*/
+	CMachineConfiguration(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetVersionUUID();
+	inline LibMCEnv_uint32 GetNumericVersion();
+	inline std::string GetXSDUUID();
+	inline PXMLDocument GetXMLDocument();
+	inline bool HasParameter(const std::string & sPath);
+	inline std::string GetStringParameter(const std::string & sPath);
+	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue);
+	inline LibMCEnv_double GetDoubleParameter(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue);
+	inline bool GetBoolParameter(const std::string & sPath);
+	inline std::string GetStringParameterDef(const std::string & sPath, const std::string & sDefaultValue);
+	inline LibMCEnv_int64 GetIntegerParameterDef(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue);
+	inline LibMCEnv_double GetDoubleParameterDef(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue);
+	inline bool GetBoolParameterDef(const std::string & sPath, const bool bDefaultValue);
+	inline void SetStringParameter(const std::string & sPath, const std::string & sValue);
+	inline void SetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nValue);
+	inline void SetDoubleParameter(const std::string & sPath, const LibMCEnv_double dValue);
+	inline void SetBoolParameter(const std::string & sPath, const bool bValue);
+	inline bool HasChanges();
+	inline PMachineConfigurationVersion Commit(const std::string & sUserUUID);
+	inline PMachineConfigurationVersion CommitAndActivate(const std::string & sUserUUID);
+};
+	
+/*************************************************************************************************************************
  Class CMachineConfigurationType 
 **************************************************************************************************************************/
 class CMachineConfigurationType : public CBase {
@@ -3273,6 +3490,7 @@ public:
 	inline PMachineConfigurationXSDIterator ListXSDVersions();
 	inline LibMCEnv_uint32 GetLatestXSDNumericVersion();
 	inline PMachineConfigurationXSD RegisterNewXSD(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion);
+	inline PMachineConfigurationXSD RegisterXSDFromResource(const std::string & sXSDResourceName, const std::string & sDefaultXMLResourceName, const LibMCEnv_uint32 nXSDVersion, const bool bFailIfExisting);
 	inline PMachineConfigurationXSD FindXSDByNumericVersion(const LibMCEnv_uint32 nXSDNumericVersion);
 	inline PMachineConfigurationXSD FindXSDByUUID(const std::string & sXSDUUID);
 	inline PMachineConfigurationVersion CreateDefaultConfiguration(const std::string & sXSDUUID, const std::string & sDefaultXML, const std::string & sTimeStampUTC);
@@ -3281,7 +3499,12 @@ public:
 	inline PMachineConfigurationVersion FindConfigurationVersionByUUID(const std::string & sVersionUUID);
 	inline PMachineConfigurationVersion GetActiveConfigurationVersion();
 	inline PMachineConfigurationVersion GetLatestConfigurationVersion();
+	inline PXMLDocument GetActiveConfigurationXML();
+	inline PXMLDocument GetLatestConfigurationXML();
 	inline void SetActiveConfigurationVersion(const std::string & sVersionUUID);
+	inline PMachineConfiguration GetActiveConfiguration();
+	inline PMachineConfiguration EnsureActiveConfiguration();
+	inline PMachineConfigurationXSD EnsureXSDVersion(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string & sDefaultXML);
 };
 	
 /*************************************************************************************************************************
@@ -3323,6 +3546,48 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CTelemetryMarkerScope 
+**************************************************************************************************************************/
+class CTelemetryMarkerScope : public CBase {
+public:
+	
+	/**
+	* CTelemetryMarkerScope::CTelemetryMarkerScope - Constructor for TelemetryMarkerScope class.
+	*/
+	CTelemetryMarkerScope(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint64 GetMarkerID();
+	inline std::string GetParent();
+	inline std::string GetIdentifier();
+	inline std::string GetGlobalIdentifier();
+	inline LibMCEnv_uint64 GetStartTimestamp();
+};
+	
+/*************************************************************************************************************************
+ Class CTelemetryChannel 
+**************************************************************************************************************************/
+class CTelemetryChannel : public CBase {
+public:
+	
+	/**
+	* CTelemetryChannel::CTelemetryChannel - Constructor for TelemetryChannel class.
+	*/
+	CTelemetryChannel(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetParent();
+	inline std::string GetIdentifier();
+	inline std::string GetGlobalIdentifier();
+	inline PTelemetryMarkerScope StartMarkerScope(const LibMCEnv_uint64 nUserContextData);
+	inline LibMCEnv_uint64 CreateInstantMarker(const LibMCEnv_uint64 nUserContextData);
+};
+	
+/*************************************************************************************************************************
  Class CStateEnvironment 
 **************************************************************************************************************************/
 class CStateEnvironment : public CBase {
@@ -3339,10 +3604,13 @@ public:
 	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline std::string GetPreviousState();
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
-	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
-	inline PSignalHandler GetUnhandledSignal(const std::string & sSignalTypeName);
+	inline PSignalHandler ClaimSignalFromQueue(const std::string & sSignalTypeName);
+	inline bool SignalQueueIsEmpty(const std::string & sSignalTypeName);
+	inline bool QueueHasSignal(const std::string & sSignalTypeName);
 	inline void ClearUnhandledSignalsOfType(const std::string & sSignalTypeName);
 	inline void ClearAllUnhandledSignals();
+	inline PTelemetryChannel RegisterTelemetryChannel(const std::string & sChannelIdentifier, const std::string & sChannelDescription, const eTelemetryChannelType eChannelType);
+	inline PTelemetryChannel FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting);
 	inline PSignalHandler GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
@@ -3351,15 +3619,17 @@ public:
 	inline bool HasBuildExecution(const std::string & sExecutionUUID);
 	inline PBuildExecution GetBuildExecution(const std::string & sExecutionUUID);
 	inline void UnloadAllToolpathes();
+	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
+	inline PSignalHandler GetUnhandledSignal(const std::string & sSignalTypeName);
+	inline void StoreSignal(const std::string & sName, classParam<CSignalHandler> pHandler);
+	inline PSignalHandler RetrieveSignal(const std::string & sName);
+	inline void ClearStoredValue(const std::string & sName);
 	inline void SetNextState(const std::string & sStateName);
 	inline void LogMessage(const std::string & sLogString);
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
 	inline bool CheckForTermination();
-	inline void StoreSignal(const std::string & sName, classParam<CSignalHandler> pHandler);
-	inline PSignalHandler RetrieveSignal(const std::string & sName);
-	inline void ClearStoredValue(const std::string & sName);
 	inline void SetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue);
 	inline void SetUUIDParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue);
 	inline void SetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_double dValue);
@@ -3370,11 +3640,19 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline bool HasParameterGroup(const std::string & sParameterGroup);
+	inline bool HasParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline LibMCEnv_uint32 GetParameterGroupParameterCount(const std::string & sParameterGroup);
+	inline std::string GetParameterGroupParameterName(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex);
+	inline std::string GetParameterGroupParameterDescription(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex);
+	inline eParameterDataType GetParameterGroupParameterType(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool HasResourceData(const std::string & sIdentifier);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageLoader CreateImageLoader();
+	inline PVideoStream CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds);
+	inline PVideoStream FindVideoStream(const std::string & sStreamUUID);
 	inline PMachineConfigurationHandler CreateMachineConfigurationHandler();
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
@@ -3465,6 +3743,7 @@ public:
 	inline std::string RetrieveEventSender();
 	inline std::string RetrieveEventSenderPage();
 	inline std::string RetrieveEventSenderUUID();
+	inline bool SenderHasTag(const std::string & sTag);
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline void LogMessage(const std::string & sLogString);
@@ -3475,6 +3754,10 @@ public:
 	inline LibMCEnv_double GetMachineParameterAsDouble(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetMachineParameterAsInteger(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetMachineParameterAsBool(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline LibMCEnv_uint32 GetMachineParameterGroupParameterCount(const std::string & sMachineInstance, const std::string & sParameterGroup);
+	inline std::string GetMachineParameterGroupParameterName(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex);
+	inline std::string GetMachineParameterGroupParameterDescription(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex);
+	inline eParameterDataType GetMachineParameterGroupParameterType(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
 	inline std::string GetUIProperty(const std::string & sElementPath, const std::string & sPropertyName);
 	inline std::string GetUIPropertyAsUUID(const std::string & sElementPath, const std::string & sPropertyName);
 	inline LibMCEnv_double GetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName);
@@ -3487,6 +3770,8 @@ public:
 	inline void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageLoader CreateImageLoader();
+	inline PVideoStream CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds);
+	inline PVideoStream FindVideoStream(const std::string & sStreamUUID);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 	inline LibMCEnv_uint64 GetGlobalTimerInMicroseconds();
 	inline PTestEnvironment GetTestEnvironment();
@@ -3501,6 +3786,7 @@ public:
 	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline bool HasBuildExecution(const std::string & sExecutionUUID);
 	inline PBuildExecution GetBuildExecution(const std::string & sExecutionUUID);
+	inline PBuildIterator GetRecentBuildJobs(const LibMCEnv_uint32 nMaxCount);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool CheckPermission(const std::string & sPermissionIdentifier);
@@ -3533,6 +3819,10 @@ public:
 	inline bool HasExternalEventParameter(const std::string & sParameterName);
 	inline std::string GetExternalEventParameter(const std::string & sParameterName);
 	inline void AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue);
+	inline void SetStringResult(const std::string & sReturnValueName, const std::string & sReturnValue);
+	inline void SetIntegerResult(const std::string & sReturnValueName, const LibMCEnv_int64 nReturnValue);
+	inline void SetBoolResult(const std::string & sReturnValueName, const bool bReturnValue);
+	inline void SetDoubleResult(const std::string & sReturnValueName, const LibMCEnv_double dReturnValue);
 	inline PJSONObject GetExternalEventParameters();
 	inline PJSONObject GetExternalEventResults();
 	inline PMachineConfigurationHandler CreateMachineConfigurationHandler();
@@ -3664,6 +3954,8 @@ public:
 		pWrapperTable->m_ImageData_ReadFromRawMemory = nullptr;
 		pWrapperTable->m_ImageLoader_LoadPNGImage = nullptr;
 		pWrapperTable->m_ImageLoader_LoadJPEGImage = nullptr;
+		pWrapperTable->m_ImageLoader_LoadPNGImageFromResource = nullptr;
+		pWrapperTable->m_ImageLoader_LoadJPEGImageFromResource = nullptr;
 		pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data = nullptr;
 		pWrapperTable->m_ImageLoader_CreateImageFromRawRGBA32Data = nullptr;
 		pWrapperTable->m_ImageLoader_CreateImageFromRawYUY2Data = nullptr;
@@ -4009,8 +4301,11 @@ public:
 		pWrapperTable->m_BuildExecution_GetMetaDataString = nullptr;
 		pWrapperTable->m_BuildExecution_LoadAttachedJournal = nullptr;
 		pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution = nullptr;
+		pWrapperTable->m_BuildIterator_GetCurrentBuild = nullptr;
 		pWrapperTable->m_Build_GetName = nullptr;
 		pWrapperTable->m_Build_GetBuildUUID = nullptr;
+		pWrapperTable->m_Build_GetCreatedTimestamp = nullptr;
+		pWrapperTable->m_Build_GetLastExecutionTimestamp = nullptr;
 		pWrapperTable->m_Build_GetStorageUUID = nullptr;
 		pWrapperTable->m_Build_GetStorageSHA256 = nullptr;
 		pWrapperTable->m_Build_EnsureStorageSHA256IsValid = nullptr;
@@ -4253,6 +4548,7 @@ public:
 		pWrapperTable->m_DriverStatusUpdateSession_GetDoubleParameter = nullptr;
 		pWrapperTable->m_DriverStatusUpdateSession_GetIntegerParameter = nullptr;
 		pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_FindTelemetryChannel = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection = nullptr;
@@ -4288,8 +4584,12 @@ public:
 		pWrapperTable->m_DriverEnvironment_LogMessage = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogWarning = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterTelemetryChannel = nullptr;
+		pWrapperTable->m_DriverEnvironment_FindTelemetryChannel = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateImageLoader = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateVideoStream = nullptr;
+		pWrapperTable->m_DriverEnvironment_FindVideoStream = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_DriverEnvironment_HasBuildJob = nullptr;
@@ -4370,9 +4670,11 @@ public:
 		pWrapperTable->m_UniformJournalSampling_GetEndTimeStamp = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetSample = nullptr;
 		pWrapperTable->m_UniformJournalSampling_GetAllSamples = nullptr;
+		pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds = nullptr;
 		pWrapperTable->m_JournalVariable_GetVariableName = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeDoubleSample = nullptr;
 		pWrapperTable->m_JournalVariable_ComputeIntegerSample = nullptr;
+		pWrapperTable->m_JournalVariable_SampleUniform = nullptr;
 		pWrapperTable->m_Alert_GetUUID = nullptr;
 		pWrapperTable->m_Alert_IsActive = nullptr;
 		pWrapperTable->m_Alert_GetAlertLevel = nullptr;
@@ -4390,6 +4692,8 @@ public:
 		pWrapperTable->m_LogEntryList_GetEntry = nullptr;
 		pWrapperTable->m_LogEntryList_GetEntryTime = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveJournalVariable = nullptr;
+		pWrapperTable->m_JournalHandler_GetVariableCount = nullptr;
+		pWrapperTable->m_JournalHandler_GetVariableInformation = nullptr;
 		pWrapperTable->m_JournalHandler_GetStartTime = nullptr;
 		pWrapperTable->m_JournalHandler_GetEndTime = nullptr;
 		pWrapperTable->m_JournalHandler_GetJournalLifeTimeInMicroseconds = nullptr;
@@ -4397,6 +4701,32 @@ public:
 		pWrapperTable->m_JournalHandler_RetrieveLogEntriesFromTimeInterval = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveAlerts = nullptr;
 		pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval = nullptr;
+		pWrapperTable->m_JournalHandler_LoadTelemetryHandler = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetMarkerID = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetChannelIdentifier = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetStartTimestamp = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetEndTimestamp = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetDuration = nullptr;
+		pWrapperTable->m_TelemetryInterval_GetContextData = nullptr;
+		pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration = nullptr;
+		pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetSessionUUID = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetStartTime = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetEndTime = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetChannelCount = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetChannelIdentifier = nullptr;
+		pWrapperTable->m_TelemetryHandler_HasChannel = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetChannelDescription = nullptr;
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta = nullptr;
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange = nullptr;
+		pWrapperTable->m_TelemetryHandler_GetChannelStatistics = nullptr;
 		pWrapperTable->m_UserDetailList_Count = nullptr;
 		pWrapperTable->m_UserDetailList_GetUserProperties = nullptr;
 		pWrapperTable->m_UserDetailList_GetUsername = nullptr;
@@ -4437,11 +4767,32 @@ public:
 		pWrapperTable->m_MachineConfigurationVersion_GetNumericVersion = nullptr;
 		pWrapperTable->m_MachineConfigurationVersion_GetParentUUID = nullptr;
 		pWrapperTable->m_MachineConfigurationVersion_GetConfigurationXMLString = nullptr;
+		pWrapperTable->m_MachineConfigurationVersion_GetConfigurationXML = nullptr;
 		pWrapperTable->m_MachineConfigurationVersion_GetUserUUID = nullptr;
 		pWrapperTable->m_MachineConfigurationVersion_GetTimestamp = nullptr;
 		pWrapperTable->m_MachineConfigurationVersion_CreateNewVersion = nullptr;
 		pWrapperTable->m_MachineConfigurationVersion_MigrateToNewXSD = nullptr;
 		pWrapperTable->m_MachineConfigurationVersionIterator_GetCurrent = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetVersionUUID = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetNumericVersion = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetXSDUUID = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetXMLDocument = nullptr;
+		pWrapperTable->m_MachineConfiguration_HasParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetStringParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetBoolParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetStringParameterDef = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef = nullptr;
+		pWrapperTable->m_MachineConfiguration_GetBoolParameterDef = nullptr;
+		pWrapperTable->m_MachineConfiguration_SetStringParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_SetIntegerParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_SetDoubleParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_SetBoolParameter = nullptr;
+		pWrapperTable->m_MachineConfiguration_HasChanges = nullptr;
+		pWrapperTable->m_MachineConfiguration_Commit = nullptr;
+		pWrapperTable->m_MachineConfiguration_CommitAndActivate = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetUUID = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetName = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetSchemaType = nullptr;
@@ -4450,6 +4801,7 @@ public:
 		pWrapperTable->m_MachineConfigurationType_ListXSDVersions = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetLatestXSDNumericVersion = nullptr;
 		pWrapperTable->m_MachineConfigurationType_RegisterNewXSD = nullptr;
+		pWrapperTable->m_MachineConfigurationType_RegisterXSDFromResource = nullptr;
 		pWrapperTable->m_MachineConfigurationType_FindXSDByNumericVersion = nullptr;
 		pWrapperTable->m_MachineConfigurationType_FindXSDByUUID = nullptr;
 		pWrapperTable->m_MachineConfigurationType_CreateDefaultConfiguration = nullptr;
@@ -4458,20 +4810,38 @@ public:
 		pWrapperTable->m_MachineConfigurationType_FindConfigurationVersionByUUID = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetActiveConfigurationVersion = nullptr;
 		pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationVersion = nullptr;
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfigurationXML = nullptr;
+		pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationXML = nullptr;
 		pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion = nullptr;
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration = nullptr;
+		pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration = nullptr;
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion = nullptr;
 		pWrapperTable->m_MachineConfigurationTypeIterator_GetCurrent = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_RegisterMachineConfigurationType = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_HasMachineConfigurationType = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_ListRegisteredTypes = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_FindConfigurationTypeByUUID = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_FindConfigurationTypeBySchema = nullptr;
+		pWrapperTable->m_TelemetryMarkerScope_GetMarkerID = nullptr;
+		pWrapperTable->m_TelemetryMarkerScope_GetParent = nullptr;
+		pWrapperTable->m_TelemetryMarkerScope_GetIdentifier = nullptr;
+		pWrapperTable->m_TelemetryMarkerScope_GetGlobalIdentifier = nullptr;
+		pWrapperTable->m_TelemetryMarkerScope_GetStartTimestamp = nullptr;
+		pWrapperTable->m_TelemetryChannel_GetParent = nullptr;
+		pWrapperTable->m_TelemetryChannel_GetIdentifier = nullptr;
+		pWrapperTable->m_TelemetryChannel_GetGlobalIdentifier = nullptr;
+		pWrapperTable->m_TelemetryChannel_StartMarkerScope = nullptr;
+		pWrapperTable->m_TelemetryChannel_CreateInstantMarker = nullptr;
 		pWrapperTable->m_StateEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_StateEnvironment_GetPreviousState = nullptr;
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
-		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
-		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_ClaimSignalFromQueue = nullptr;
+		pWrapperTable->m_StateEnvironment_SignalQueueIsEmpty = nullptr;
+		pWrapperTable->m_StateEnvironment_QueueHasSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_ClearUnhandledSignalsOfType = nullptr;
 		pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals = nullptr;
+		pWrapperTable->m_StateEnvironment_RegisterTelemetryChannel = nullptr;
+		pWrapperTable->m_StateEnvironment_FindTelemetryChannel = nullptr;
 		pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
@@ -4480,15 +4850,17 @@ public:
 		pWrapperTable->m_StateEnvironment_HasBuildExecution = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBuildExecution = nullptr;
 		pWrapperTable->m_StateEnvironment_UnloadAllToolpathes = nullptr;
+		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_StoreSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_RetrieveSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_ClearStoredValue = nullptr;
 		pWrapperTable->m_StateEnvironment_SetNextState = nullptr;
 		pWrapperTable->m_StateEnvironment_LogMessage = nullptr;
 		pWrapperTable->m_StateEnvironment_LogWarning = nullptr;
 		pWrapperTable->m_StateEnvironment_LogInfo = nullptr;
 		pWrapperTable->m_StateEnvironment_Sleep = nullptr;
 		pWrapperTable->m_StateEnvironment_CheckForTermination = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreSignal = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveSignal = nullptr;
-		pWrapperTable->m_StateEnvironment_ClearStoredValue = nullptr;
 		pWrapperTable->m_StateEnvironment_SetStringParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_SetUUIDParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_SetDoubleParameter = nullptr;
@@ -4499,11 +4871,19 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_HasParameterGroup = nullptr;
+		pWrapperTable->m_StateEnvironment_HasParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterCount = nullptr;
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterName = nullptr;
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterDescription = nullptr;
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType = nullptr;
 		pWrapperTable->m_StateEnvironment_HasResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateImageLoader = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateVideoStream = nullptr;
+		pWrapperTable->m_StateEnvironment_FindVideoStream = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateMachineConfigurationHandler = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDiscreteField2DFromImage = nullptr;
@@ -4562,6 +4942,7 @@ public:
 		pWrapperTable->m_UIEnvironment_RetrieveEventSender = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderPage = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = nullptr;
+		pWrapperTable->m_UIEnvironment_SenderHasTag = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
@@ -4572,6 +4953,10 @@ public:
 		pWrapperTable->m_UIEnvironment_GetMachineParameterAsDouble = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineParameterAsInteger = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterCount = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterName = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType = nullptr;
 		pWrapperTable->m_UIEnvironment_GetUIProperty = nullptr;
 		pWrapperTable->m_UIEnvironment_GetUIPropertyAsUUID = nullptr;
 		pWrapperTable->m_UIEnvironment_GetUIPropertyAsDouble = nullptr;
@@ -4584,6 +4969,8 @@ public:
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateImageLoader = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateVideoStream = nullptr;
+		pWrapperTable->m_UIEnvironment_FindVideoStream = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMicroseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_GetTestEnvironment = nullptr;
@@ -4598,6 +4985,7 @@ public:
 		pWrapperTable->m_UIEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_UIEnvironment_HasBuildExecution = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildExecution = nullptr;
+		pWrapperTable->m_UIEnvironment_GetRecentBuildJobs = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_UIEnvironment_CheckPermission = nullptr;
@@ -4630,6 +5018,10 @@ public:
 		pWrapperTable->m_UIEnvironment_HasExternalEventParameter = nullptr;
 		pWrapperTable->m_UIEnvironment_GetExternalEventParameter = nullptr;
 		pWrapperTable->m_UIEnvironment_AddExternalEventResultValue = nullptr;
+		pWrapperTable->m_UIEnvironment_SetStringResult = nullptr;
+		pWrapperTable->m_UIEnvironment_SetIntegerResult = nullptr;
+		pWrapperTable->m_UIEnvironment_SetBoolResult = nullptr;
+		pWrapperTable->m_UIEnvironment_SetDoubleResult = nullptr;
 		pWrapperTable->m_UIEnvironment_GetExternalEventParameters = nullptr;
 		pWrapperTable->m_UIEnvironment_GetExternalEventResults = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateMachineConfigurationHandler = nullptr;
@@ -5091,6 +5483,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ImageLoader_LoadJPEGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_LoadPNGImageFromResource = (PLibMCEnvImageLoader_LoadPNGImageFromResourcePtr) GetProcAddress(hLibrary, "libmcenv_imageloader_loadpngimagefromresource");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_LoadPNGImageFromResource = (PLibMCEnvImageLoader_LoadPNGImageFromResourcePtr) dlsym(hLibrary, "libmcenv_imageloader_loadpngimagefromresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_LoadPNGImageFromResource == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageLoader_LoadJPEGImageFromResource = (PLibMCEnvImageLoader_LoadJPEGImageFromResourcePtr) GetProcAddress(hLibrary, "libmcenv_imageloader_loadjpegimagefromresource");
+		#else // _WIN32
+		pWrapperTable->m_ImageLoader_LoadJPEGImageFromResource = (PLibMCEnvImageLoader_LoadJPEGImageFromResourcePtr) dlsym(hLibrary, "libmcenv_imageloader_loadjpegimagefromresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageLoader_LoadJPEGImageFromResource == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -8199,6 +8609,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildIterator_GetCurrentBuild = (PLibMCEnvBuildIterator_GetCurrentBuildPtr) GetProcAddress(hLibrary, "libmcenv_builditerator_getcurrentbuild");
+		#else // _WIN32
+		pWrapperTable->m_BuildIterator_GetCurrentBuild = (PLibMCEnvBuildIterator_GetCurrentBuildPtr) dlsym(hLibrary, "libmcenv_builditerator_getcurrentbuild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildIterator_GetCurrentBuild == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_build_getname");
 		#else // _WIN32
 		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) dlsym(hLibrary, "libmcenv_build_getname");
@@ -8214,6 +8633,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_GetBuildUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetCreatedTimestamp = (PLibMCEnvBuild_GetCreatedTimestampPtr) GetProcAddress(hLibrary, "libmcenv_build_getcreatedtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetCreatedTimestamp = (PLibMCEnvBuild_GetCreatedTimestampPtr) dlsym(hLibrary, "libmcenv_build_getcreatedtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetCreatedTimestamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetLastExecutionTimestamp = (PLibMCEnvBuild_GetLastExecutionTimestampPtr) GetProcAddress(hLibrary, "libmcenv_build_getlastexecutiontimestamp");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetLastExecutionTimestamp = (PLibMCEnvBuild_GetLastExecutionTimestampPtr) dlsym(hLibrary, "libmcenv_build_getlastexecutiontimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetLastExecutionTimestamp == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -10395,6 +10832,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_FindTelemetryChannel = (PLibMCEnvDriverStatusUpdateSession_FindTelemetryChannelPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_findtelemetrychannel");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_FindTelemetryChannel = (PLibMCEnvDriverStatusUpdateSession_FindTelemetryChannelPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_findtelemetrychannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_FindTelemetryChannel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = (PLibMCEnvDriverEnvironment_CreateStatusUpdateSessionPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createstatusupdatesession");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = (PLibMCEnvDriverEnvironment_CreateStatusUpdateSessionPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createstatusupdatesession");
@@ -10710,6 +11156,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterTelemetryChannel = (PLibMCEnvDriverEnvironment_RegisterTelemetryChannelPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registertelemetrychannel");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterTelemetryChannel = (PLibMCEnvDriverEnvironment_RegisterTelemetryChannelPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registertelemetrychannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterTelemetryChannel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_FindTelemetryChannel = (PLibMCEnvDriverEnvironment_FindTelemetryChannelPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_findtelemetrychannel");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_FindTelemetryChannel = (PLibMCEnvDriverEnvironment_FindTelemetryChannelPtr) dlsym(hLibrary, "libmcenv_driverenvironment_findtelemetrychannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_FindTelemetryChannel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = (PLibMCEnvDriverEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createemptyimage");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = (PLibMCEnvDriverEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_createemptyimage");
@@ -10725,6 +11189,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_CreateImageLoader == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateVideoStream = (PLibMCEnvDriverEnvironment_CreateVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createvideostream");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateVideoStream = (PLibMCEnvDriverEnvironment_CreateVideoStreamPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateVideoStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_FindVideoStream = (PLibMCEnvDriverEnvironment_FindVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_findvideostream");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_FindVideoStream = (PLibMCEnvDriverEnvironment_FindVideoStreamPtr) dlsym(hLibrary, "libmcenv_driverenvironment_findvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_FindVideoStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11448,6 +11930,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds = (PLibMCEnvUniformJournalSampling_GetAllSamplesWithBoundsPtr) GetProcAddress(hLibrary, "libmcenv_uniformjournalsampling_getallsampleswithbounds");
+		#else // _WIN32
+		pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds = (PLibMCEnvUniformJournalSampling_GetAllSamplesWithBoundsPtr) dlsym(hLibrary, "libmcenv_uniformjournalsampling_getallsampleswithbounds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalVariable_GetVariableName = (PLibMCEnvJournalVariable_GetVariableNamePtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_getvariablename");
 		#else // _WIN32
 		pWrapperTable->m_JournalVariable_GetVariableName = (PLibMCEnvJournalVariable_GetVariableNamePtr) dlsym(hLibrary, "libmcenv_journalvariable_getvariablename");
@@ -11472,6 +11963,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalVariable_ComputeIntegerSample == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalVariable_SampleUniform = (PLibMCEnvJournalVariable_SampleUniformPtr) GetProcAddress(hLibrary, "libmcenv_journalvariable_sampleuniform");
+		#else // _WIN32
+		pWrapperTable->m_JournalVariable_SampleUniform = (PLibMCEnvJournalVariable_SampleUniformPtr) dlsym(hLibrary, "libmcenv_journalvariable_sampleuniform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalVariable_SampleUniform == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -11628,6 +12128,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_GetVariableCount = (PLibMCEnvJournalHandler_GetVariableCountPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getvariablecount");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_GetVariableCount = (PLibMCEnvJournalHandler_GetVariableCountPtr) dlsym(hLibrary, "libmcenv_journalhandler_getvariablecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_GetVariableCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_GetVariableInformation = (PLibMCEnvJournalHandler_GetVariableInformationPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getvariableinformation");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_GetVariableInformation = (PLibMCEnvJournalHandler_GetVariableInformationPtr) dlsym(hLibrary, "libmcenv_journalhandler_getvariableinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_GetVariableInformation == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_JournalHandler_GetStartTime = (PLibMCEnvJournalHandler_GetStartTimePtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_getstarttime");
 		#else // _WIN32
 		pWrapperTable->m_JournalHandler_GetStartTime = (PLibMCEnvJournalHandler_GetStartTimePtr) dlsym(hLibrary, "libmcenv_journalhandler_getstarttime");
@@ -11688,6 +12206,240 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_JournalHandler_LoadTelemetryHandler = (PLibMCEnvJournalHandler_LoadTelemetryHandlerPtr) GetProcAddress(hLibrary, "libmcenv_journalhandler_loadtelemetryhandler");
+		#else // _WIN32
+		pWrapperTable->m_JournalHandler_LoadTelemetryHandler = (PLibMCEnvJournalHandler_LoadTelemetryHandlerPtr) dlsym(hLibrary, "libmcenv_journalhandler_loadtelemetryhandler");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_JournalHandler_LoadTelemetryHandler == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetMarkerID = (PLibMCEnvTelemetryInterval_GetMarkerIDPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getmarkerid");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetMarkerID = (PLibMCEnvTelemetryInterval_GetMarkerIDPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getmarkerid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetMarkerID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetChannelIdentifier = (PLibMCEnvTelemetryInterval_GetChannelIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getchannelidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetChannelIdentifier = (PLibMCEnvTelemetryInterval_GetChannelIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getchannelidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetChannelIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetStartTimestamp = (PLibMCEnvTelemetryInterval_GetStartTimestampPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetStartTimestamp = (PLibMCEnvTelemetryInterval_GetStartTimestampPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetStartTimestamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetEndTimestamp = (PLibMCEnvTelemetryInterval_GetEndTimestampPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getendtimestamp");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetEndTimestamp = (PLibMCEnvTelemetryInterval_GetEndTimestampPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getendtimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetEndTimestamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetDuration = (PLibMCEnvTelemetryInterval_GetDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetDuration = (PLibMCEnvTelemetryInterval_GetDurationPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryInterval_GetContextData = (PLibMCEnvTelemetryInterval_GetContextDataPtr) GetProcAddress(hLibrary, "libmcenv_telemetryinterval_getcontextdata");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryInterval_GetContextData = (PLibMCEnvTelemetryInterval_GetContextDataPtr) dlsym(hLibrary, "libmcenv_telemetryinterval_getcontextdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryInterval_GetContextData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval = (PLibMCEnvTelemetryIntervalIterator_GetCurrentIntervalPtr) GetProcAddress(hLibrary, "libmcenv_telemetryintervaliterator_getcurrentinterval");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval = (PLibMCEnvTelemetryIntervalIterator_GetCurrentIntervalPtr) dlsym(hLibrary, "libmcenv_telemetryintervaliterator_getcurrentinterval");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier = (PLibMCEnvTelemetryChannelStatistics_GetChannelIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getchannelidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier = (PLibMCEnvTelemetryChannelStatistics_GetChannelIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getchannelidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount = (PLibMCEnvTelemetryChannelStatistics_GetIntervalCountPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getintervalcount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount = (PLibMCEnvTelemetryChannelStatistics_GetIntervalCountPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getintervalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount = (PLibMCEnvTelemetryChannelStatistics_GetInstantMarkerCountPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getinstantmarkercount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount = (PLibMCEnvTelemetryChannelStatistics_GetInstantMarkerCountPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getinstantmarkercount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration = (PLibMCEnvTelemetryChannelStatistics_GetTotalDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_gettotalduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration = (PLibMCEnvTelemetryChannelStatistics_GetTotalDurationPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_gettotalduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration = (PLibMCEnvTelemetryChannelStatistics_GetMinDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getminduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration = (PLibMCEnvTelemetryChannelStatistics_GetMinDurationPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getminduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration = (PLibMCEnvTelemetryChannelStatistics_GetMaxDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getmaxduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration = (PLibMCEnvTelemetryChannelStatistics_GetMaxDurationPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getmaxduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration = (PLibMCEnvTelemetryChannelStatistics_GetAverageDurationPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannelstatistics_getaverageduration");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration = (PLibMCEnvTelemetryChannelStatistics_GetAverageDurationPtr) dlsym(hLibrary, "libmcenv_telemetrychannelstatistics_getaverageduration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetSessionUUID = (PLibMCEnvTelemetryHandler_GetSessionUUIDPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getsessionuuid");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetSessionUUID = (PLibMCEnvTelemetryHandler_GetSessionUUIDPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getsessionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetSessionUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetStartTime = (PLibMCEnvTelemetryHandler_GetStartTimePtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getstarttime");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetStartTime = (PLibMCEnvTelemetryHandler_GetStartTimePtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getstarttime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetStartTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetEndTime = (PLibMCEnvTelemetryHandler_GetEndTimePtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getendtime");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetEndTime = (PLibMCEnvTelemetryHandler_GetEndTimePtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getendtime");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetEndTime == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds = (PLibMCEnvTelemetryHandler_GetLifeTimeInMicrosecondsPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getlifetimeinmicroseconds");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds = (PLibMCEnvTelemetryHandler_GetLifeTimeInMicrosecondsPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getlifetimeinmicroseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelCount = (PLibMCEnvTelemetryHandler_GetChannelCountPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getchannelcount");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelCount = (PLibMCEnvTelemetryHandler_GetChannelCountPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getchannelcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetChannelCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelIdentifier = (PLibMCEnvTelemetryHandler_GetChannelIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getchannelidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelIdentifier = (PLibMCEnvTelemetryHandler_GetChannelIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getchannelidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetChannelIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_HasChannel = (PLibMCEnvTelemetryHandler_HasChannelPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_haschannel");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_HasChannel = (PLibMCEnvTelemetryHandler_HasChannelPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_haschannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_HasChannel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelDescription = (PLibMCEnvTelemetryHandler_GetChannelDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getchanneldescription");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelDescription = (PLibMCEnvTelemetryHandler_GetChannelDescriptionPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getchanneldescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetChannelDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta = (PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeDeltaPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_queryintervalsfromtimedelta");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta = (PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeDeltaPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_queryintervalsfromtimedelta");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange = (PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeRangePtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_queryintervalsfromtimerange");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange = (PLibMCEnvTelemetryHandler_QueryIntervalsFromTimeRangePtr) dlsym(hLibrary, "libmcenv_telemetryhandler_queryintervalsfromtimerange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelStatistics = (PLibMCEnvTelemetryHandler_GetChannelStatisticsPtr) GetProcAddress(hLibrary, "libmcenv_telemetryhandler_getchannelstatistics");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryHandler_GetChannelStatistics = (PLibMCEnvTelemetryHandler_GetChannelStatisticsPtr) dlsym(hLibrary, "libmcenv_telemetryhandler_getchannelstatistics");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryHandler_GetChannelStatistics == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12051,6 +12803,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationVersion_GetConfigurationXML = (PLibMCEnvMachineConfigurationVersion_GetConfigurationXMLPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationversion_getconfigurationxml");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationVersion_GetConfigurationXML = (PLibMCEnvMachineConfigurationVersion_GetConfigurationXMLPtr) dlsym(hLibrary, "libmcenv_machineconfigurationversion_getconfigurationxml");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationVersion_GetConfigurationXML == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_MachineConfigurationVersion_GetUserUUID = (PLibMCEnvMachineConfigurationVersion_GetUserUUIDPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationversion_getuseruuid");
 		#else // _WIN32
 		pWrapperTable->m_MachineConfigurationVersion_GetUserUUID = (PLibMCEnvMachineConfigurationVersion_GetUserUUIDPtr) dlsym(hLibrary, "libmcenv_machineconfigurationversion_getuseruuid");
@@ -12093,6 +12854,186 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MachineConfigurationVersionIterator_GetCurrent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetVersionUUID = (PLibMCEnvMachineConfiguration_GetVersionUUIDPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getversionuuid");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetVersionUUID = (PLibMCEnvMachineConfiguration_GetVersionUUIDPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getversionuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetVersionUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetNumericVersion = (PLibMCEnvMachineConfiguration_GetNumericVersionPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getnumericversion");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetNumericVersion = (PLibMCEnvMachineConfiguration_GetNumericVersionPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getnumericversion");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetNumericVersion == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetXSDUUID = (PLibMCEnvMachineConfiguration_GetXSDUUIDPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getxsduuid");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetXSDUUID = (PLibMCEnvMachineConfiguration_GetXSDUUIDPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getxsduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetXSDUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetXMLDocument = (PLibMCEnvMachineConfiguration_GetXMLDocumentPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getxmldocument");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetXMLDocument = (PLibMCEnvMachineConfiguration_GetXMLDocumentPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getxmldocument");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetXMLDocument == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_HasParameter = (PLibMCEnvMachineConfiguration_HasParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_hasparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_HasParameter = (PLibMCEnvMachineConfiguration_HasParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_hasparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_HasParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetStringParameter = (PLibMCEnvMachineConfiguration_GetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetStringParameter = (PLibMCEnvMachineConfiguration_GetStringParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameter = (PLibMCEnvMachineConfiguration_GetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameter = (PLibMCEnvMachineConfiguration_GetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameter = (PLibMCEnvMachineConfiguration_GetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameter = (PLibMCEnvMachineConfiguration_GetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetBoolParameter = (PLibMCEnvMachineConfiguration_GetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetBoolParameter = (PLibMCEnvMachineConfiguration_GetBoolParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetStringParameterDef = (PLibMCEnvMachineConfiguration_GetStringParameterDefPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getstringparameterdef");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetStringParameterDef = (PLibMCEnvMachineConfiguration_GetStringParameterDefPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getstringparameterdef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetStringParameterDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef = (PLibMCEnvMachineConfiguration_GetIntegerParameterDefPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getintegerparameterdef");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef = (PLibMCEnvMachineConfiguration_GetIntegerParameterDefPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getintegerparameterdef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef = (PLibMCEnvMachineConfiguration_GetDoubleParameterDefPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getdoubleparameterdef");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef = (PLibMCEnvMachineConfiguration_GetDoubleParameterDefPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getdoubleparameterdef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_GetBoolParameterDef = (PLibMCEnvMachineConfiguration_GetBoolParameterDefPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_getboolparameterdef");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_GetBoolParameterDef = (PLibMCEnvMachineConfiguration_GetBoolParameterDefPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_getboolparameterdef");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_GetBoolParameterDef == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_SetStringParameter = (PLibMCEnvMachineConfiguration_SetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_setstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_SetStringParameter = (PLibMCEnvMachineConfiguration_SetStringParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_setstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_SetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_SetIntegerParameter = (PLibMCEnvMachineConfiguration_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_SetIntegerParameter = (PLibMCEnvMachineConfiguration_SetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_SetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_SetDoubleParameter = (PLibMCEnvMachineConfiguration_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_SetDoubleParameter = (PLibMCEnvMachineConfiguration_SetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_SetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_SetBoolParameter = (PLibMCEnvMachineConfiguration_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_SetBoolParameter = (PLibMCEnvMachineConfiguration_SetBoolParameterPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_SetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_HasChanges = (PLibMCEnvMachineConfiguration_HasChangesPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_haschanges");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_HasChanges = (PLibMCEnvMachineConfiguration_HasChangesPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_haschanges");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_HasChanges == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_Commit = (PLibMCEnvMachineConfiguration_CommitPtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_commit");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_Commit = (PLibMCEnvMachineConfiguration_CommitPtr) dlsym(hLibrary, "libmcenv_machineconfiguration_commit");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_Commit == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfiguration_CommitAndActivate = (PLibMCEnvMachineConfiguration_CommitAndActivatePtr) GetProcAddress(hLibrary, "libmcenv_machineconfiguration_commitandactivate");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfiguration_CommitAndActivate = (PLibMCEnvMachineConfiguration_CommitAndActivatePtr) dlsym(hLibrary, "libmcenv_machineconfiguration_commitandactivate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfiguration_CommitAndActivate == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12168,6 +13109,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_RegisterXSDFromResource = (PLibMCEnvMachineConfigurationType_RegisterXSDFromResourcePtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_registerxsdfromresource");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_RegisterXSDFromResource = (PLibMCEnvMachineConfigurationType_RegisterXSDFromResourcePtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_registerxsdfromresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_RegisterXSDFromResource == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_MachineConfigurationType_FindXSDByNumericVersion = (PLibMCEnvMachineConfigurationType_FindXSDByNumericVersionPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_findxsdbynumericversion");
 		#else // _WIN32
 		pWrapperTable->m_MachineConfigurationType_FindXSDByNumericVersion = (PLibMCEnvMachineConfigurationType_FindXSDByNumericVersionPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_findxsdbynumericversion");
@@ -12240,12 +13190,57 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfigurationXML = (PLibMCEnvMachineConfigurationType_GetActiveConfigurationXMLPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_getactiveconfigurationxml");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfigurationXML = (PLibMCEnvMachineConfigurationType_GetActiveConfigurationXMLPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_getactiveconfigurationxml");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_GetActiveConfigurationXML == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationXML = (PLibMCEnvMachineConfigurationType_GetLatestConfigurationXMLPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_getlatestconfigurationxml");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationXML = (PLibMCEnvMachineConfigurationType_GetLatestConfigurationXMLPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_getlatestconfigurationxml");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationXML == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion = (PLibMCEnvMachineConfigurationType_SetActiveConfigurationVersionPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_setactiveconfigurationversion");
 		#else // _WIN32
 		pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion = (PLibMCEnvMachineConfigurationType_SetActiveConfigurationVersionPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_setactiveconfigurationversion");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration = (PLibMCEnvMachineConfigurationType_GetActiveConfigurationPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_getactiveconfiguration");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration = (PLibMCEnvMachineConfigurationType_GetActiveConfigurationPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_getactiveconfiguration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration = (PLibMCEnvMachineConfigurationType_EnsureActiveConfigurationPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_ensureactiveconfiguration");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration = (PLibMCEnvMachineConfigurationType_EnsureActiveConfigurationPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_ensureactiveconfiguration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion = (PLibMCEnvMachineConfigurationType_EnsureXSDVersionPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_ensurexsdversion");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion = (PLibMCEnvMachineConfigurationType_EnsureXSDVersionPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_ensurexsdversion");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12303,6 +13298,96 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetMarkerID = (PLibMCEnvTelemetryMarkerScope_GetMarkerIDPtr) GetProcAddress(hLibrary, "libmcenv_telemetrymarkerscope_getmarkerid");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetMarkerID = (PLibMCEnvTelemetryMarkerScope_GetMarkerIDPtr) dlsym(hLibrary, "libmcenv_telemetrymarkerscope_getmarkerid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryMarkerScope_GetMarkerID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetParent = (PLibMCEnvTelemetryMarkerScope_GetParentPtr) GetProcAddress(hLibrary, "libmcenv_telemetrymarkerscope_getparent");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetParent = (PLibMCEnvTelemetryMarkerScope_GetParentPtr) dlsym(hLibrary, "libmcenv_telemetrymarkerscope_getparent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryMarkerScope_GetParent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetIdentifier = (PLibMCEnvTelemetryMarkerScope_GetIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetrymarkerscope_getidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetIdentifier = (PLibMCEnvTelemetryMarkerScope_GetIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetrymarkerscope_getidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryMarkerScope_GetIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetGlobalIdentifier = (PLibMCEnvTelemetryMarkerScope_GetGlobalIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetrymarkerscope_getglobalidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetGlobalIdentifier = (PLibMCEnvTelemetryMarkerScope_GetGlobalIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetrymarkerscope_getglobalidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryMarkerScope_GetGlobalIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetStartTimestamp = (PLibMCEnvTelemetryMarkerScope_GetStartTimestampPtr) GetProcAddress(hLibrary, "libmcenv_telemetrymarkerscope_getstarttimestamp");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryMarkerScope_GetStartTimestamp = (PLibMCEnvTelemetryMarkerScope_GetStartTimestampPtr) dlsym(hLibrary, "libmcenv_telemetrymarkerscope_getstarttimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryMarkerScope_GetStartTimestamp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannel_GetParent = (PLibMCEnvTelemetryChannel_GetParentPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannel_getparent");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannel_GetParent = (PLibMCEnvTelemetryChannel_GetParentPtr) dlsym(hLibrary, "libmcenv_telemetrychannel_getparent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannel_GetParent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannel_GetIdentifier = (PLibMCEnvTelemetryChannel_GetIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannel_getidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannel_GetIdentifier = (PLibMCEnvTelemetryChannel_GetIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetrychannel_getidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannel_GetIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannel_GetGlobalIdentifier = (PLibMCEnvTelemetryChannel_GetGlobalIdentifierPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannel_getglobalidentifier");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannel_GetGlobalIdentifier = (PLibMCEnvTelemetryChannel_GetGlobalIdentifierPtr) dlsym(hLibrary, "libmcenv_telemetrychannel_getglobalidentifier");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannel_GetGlobalIdentifier == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannel_StartMarkerScope = (PLibMCEnvTelemetryChannel_StartMarkerScopePtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannel_startmarkerscope");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannel_StartMarkerScope = (PLibMCEnvTelemetryChannel_StartMarkerScopePtr) dlsym(hLibrary, "libmcenv_telemetrychannel_startmarkerscope");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannel_StartMarkerScope == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TelemetryChannel_CreateInstantMarker = (PLibMCEnvTelemetryChannel_CreateInstantMarkerPtr) GetProcAddress(hLibrary, "libmcenv_telemetrychannel_createinstantmarker");
+		#else // _WIN32
+		pWrapperTable->m_TelemetryChannel_CreateInstantMarker = (PLibMCEnvTelemetryChannel_CreateInstantMarkerPtr) dlsym(hLibrary, "libmcenv_telemetrychannel_createinstantmarker");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TelemetryChannel_CreateInstantMarker == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_GetMachineState = (PLibMCEnvStateEnvironment_GetMachineStatePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getmachinestate");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_GetMachineState = (PLibMCEnvStateEnvironment_GetMachineStatePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getmachinestate");
@@ -12330,21 +13415,30 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_WaitForSignal = (PLibMCEnvStateEnvironment_WaitForSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_waitforsignal");
+		pWrapperTable->m_StateEnvironment_ClaimSignalFromQueue = (PLibMCEnvStateEnvironment_ClaimSignalFromQueuePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_claimsignalfromqueue");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_WaitForSignal = (PLibMCEnvStateEnvironment_WaitForSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_waitforsignal");
+		pWrapperTable->m_StateEnvironment_ClaimSignalFromQueue = (PLibMCEnvStateEnvironment_ClaimSignalFromQueuePtr) dlsym(hLibrary, "libmcenv_stateenvironment_claimsignalfromqueue");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_WaitForSignal == nullptr)
+		if (pWrapperTable->m_StateEnvironment_ClaimSignalFromQueue == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = (PLibMCEnvStateEnvironment_GetUnhandledSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getunhandledsignal");
+		pWrapperTable->m_StateEnvironment_SignalQueueIsEmpty = (PLibMCEnvStateEnvironment_SignalQueueIsEmptyPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_signalqueueisempty");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = (PLibMCEnvStateEnvironment_GetUnhandledSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getunhandledsignal");
+		pWrapperTable->m_StateEnvironment_SignalQueueIsEmpty = (PLibMCEnvStateEnvironment_SignalQueueIsEmptyPtr) dlsym(hLibrary, "libmcenv_stateenvironment_signalqueueisempty");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_GetUnhandledSignal == nullptr)
+		if (pWrapperTable->m_StateEnvironment_SignalQueueIsEmpty == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_QueueHasSignal = (PLibMCEnvStateEnvironment_QueueHasSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_queuehassignal");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_QueueHasSignal = (PLibMCEnvStateEnvironment_QueueHasSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_queuehassignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_QueueHasSignal == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12363,6 +13457,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_RegisterTelemetryChannel = (PLibMCEnvStateEnvironment_RegisterTelemetryChannelPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_registertelemetrychannel");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_RegisterTelemetryChannel = (PLibMCEnvStateEnvironment_RegisterTelemetryChannelPtr) dlsym(hLibrary, "libmcenv_stateenvironment_registertelemetrychannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_RegisterTelemetryChannel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_FindTelemetryChannel = (PLibMCEnvStateEnvironment_FindTelemetryChannelPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findtelemetrychannel");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_FindTelemetryChannel = (PLibMCEnvStateEnvironment_FindTelemetryChannelPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findtelemetrychannel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_FindTelemetryChannel == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12438,6 +13550,51 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_WaitForSignal = (PLibMCEnvStateEnvironment_WaitForSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_waitforsignal");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_WaitForSignal = (PLibMCEnvStateEnvironment_WaitForSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_waitforsignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_WaitForSignal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = (PLibMCEnvStateEnvironment_GetUnhandledSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getunhandledsignal");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetUnhandledSignal = (PLibMCEnvStateEnvironment_GetUnhandledSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getunhandledsignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetUnhandledSignal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_StoreSignal = (PLibMCEnvStateEnvironment_StoreSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storesignal");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_StoreSignal = (PLibMCEnvStateEnvironment_StoreSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storesignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_StoreSignal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_RetrieveSignal = (PLibMCEnvStateEnvironment_RetrieveSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievesignal");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_RetrieveSignal = (PLibMCEnvStateEnvironment_RetrieveSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievesignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_RetrieveSignal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_ClearStoredValue = (PLibMCEnvStateEnvironment_ClearStoredValuePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_clearstoredvalue");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_ClearStoredValue = (PLibMCEnvStateEnvironment_ClearStoredValuePtr) dlsym(hLibrary, "libmcenv_stateenvironment_clearstoredvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_ClearStoredValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_SetNextState = (PLibMCEnvStateEnvironment_SetNextStatePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_setnextstate");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_SetNextState = (PLibMCEnvStateEnvironment_SetNextStatePtr) dlsym(hLibrary, "libmcenv_stateenvironment_setnextstate");
@@ -12489,33 +13646,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_CheckForTermination == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreSignal = (PLibMCEnvStateEnvironment_StoreSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storesignal");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreSignal = (PLibMCEnvStateEnvironment_StoreSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storesignal");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreSignal == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveSignal = (PLibMCEnvStateEnvironment_RetrieveSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievesignal");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveSignal = (PLibMCEnvStateEnvironment_RetrieveSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievesignal");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveSignal == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_ClearStoredValue = (PLibMCEnvStateEnvironment_ClearStoredValuePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_clearstoredvalue");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_ClearStoredValue = (PLibMCEnvStateEnvironment_ClearStoredValuePtr) dlsym(hLibrary, "libmcenv_stateenvironment_clearstoredvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_ClearStoredValue == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -12609,6 +13739,60 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasParameterGroup = (PLibMCEnvStateEnvironment_HasParameterGroupPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasparametergroup");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasParameterGroup = (PLibMCEnvStateEnvironment_HasParameterGroupPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasparametergroup");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasParameterGroup == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_HasParameter = (PLibMCEnvStateEnvironment_HasParameterPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasparameter");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_HasParameter = (PLibMCEnvStateEnvironment_HasParameterPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_HasParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterCount = (PLibMCEnvStateEnvironment_GetParameterGroupParameterCountPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getparametergroupparametercount");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterCount = (PLibMCEnvStateEnvironment_GetParameterGroupParameterCountPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getparametergroupparametercount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterName = (PLibMCEnvStateEnvironment_GetParameterGroupParameterNamePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getparametergroupparametername");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterName = (PLibMCEnvStateEnvironment_GetParameterGroupParameterNamePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getparametergroupparametername");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterDescription = (PLibMCEnvStateEnvironment_GetParameterGroupParameterDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getparametergroupparameterdescription");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterDescription = (PLibMCEnvStateEnvironment_GetParameterGroupParameterDescriptionPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getparametergroupparameterdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType = (PLibMCEnvStateEnvironment_GetParameterGroupParameterTypePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getparametergroupparametertype");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType = (PLibMCEnvStateEnvironment_GetParameterGroupParameterTypePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getparametergroupparametertype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_HasResourceData = (PLibMCEnvStateEnvironment_HasResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_hasresourcedata");
@@ -12651,6 +13835,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_CreateImageLoader == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateVideoStream = (PLibMCEnvStateEnvironment_CreateVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createvideostream");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateVideoStream = (PLibMCEnvStateEnvironment_CreateVideoStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateVideoStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_FindVideoStream = (PLibMCEnvStateEnvironment_FindVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_findvideostream");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_FindVideoStream = (PLibMCEnvStateEnvironment_FindVideoStreamPtr) dlsym(hLibrary, "libmcenv_stateenvironment_findvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_FindVideoStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -13176,6 +14378,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SenderHasTag = (PLibMCEnvUIEnvironment_SenderHasTagPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_senderhastag");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SenderHasTag = (PLibMCEnvUIEnvironment_SenderHasTagPtr) dlsym(hLibrary, "libmcenv_uienvironment_senderhastag");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SenderHasTag == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
@@ -13263,6 +14474,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterCount = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterCountPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparametercount");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterCount = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterCountPtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparametercount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterName = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterNamePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparametername");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterName = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterNamePtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparametername");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterDescriptionPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparameterdescription");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterDescriptionPtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparameterdescription");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterTypePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparametertype");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType = (PLibMCEnvUIEnvironment_GetMachineParameterGroupParameterTypePtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparametergroupparametertype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -13371,6 +14618,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_CreateImageLoader == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateVideoStream = (PLibMCEnvUIEnvironment_CreateVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createvideostream");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateVideoStream = (PLibMCEnvUIEnvironment_CreateVideoStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_createvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateVideoStream == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_FindVideoStream = (PLibMCEnvUIEnvironment_FindVideoStreamPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_findvideostream");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_FindVideoStream = (PLibMCEnvUIEnvironment_FindVideoStreamPtr) dlsym(hLibrary, "libmcenv_uienvironment_findvideostream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_FindVideoStream == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -13497,6 +14762,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_GetBuildExecution == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetRecentBuildJobs = (PLibMCEnvUIEnvironment_GetRecentBuildJobsPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getrecentbuildjobs");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetRecentBuildJobs = (PLibMCEnvUIEnvironment_GetRecentBuildJobsPtr) dlsym(hLibrary, "libmcenv_uienvironment_getrecentbuildjobs");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetRecentBuildJobs == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -13788,6 +15062,42 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetStringResult = (PLibMCEnvUIEnvironment_SetStringResultPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setstringresult");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetStringResult = (PLibMCEnvUIEnvironment_SetStringResultPtr) dlsym(hLibrary, "libmcenv_uienvironment_setstringresult");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetStringResult == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetIntegerResult = (PLibMCEnvUIEnvironment_SetIntegerResultPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setintegerresult");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetIntegerResult = (PLibMCEnvUIEnvironment_SetIntegerResultPtr) dlsym(hLibrary, "libmcenv_uienvironment_setintegerresult");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetIntegerResult == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetBoolResult = (PLibMCEnvUIEnvironment_SetBoolResultPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setboolresult");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetBoolResult = (PLibMCEnvUIEnvironment_SetBoolResultPtr) dlsym(hLibrary, "libmcenv_uienvironment_setboolresult");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetBoolResult == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetDoubleResult = (PLibMCEnvUIEnvironment_SetDoubleResultPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setdoubleresult");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetDoubleResult = (PLibMCEnvUIEnvironment_SetDoubleResultPtr) dlsym(hLibrary, "libmcenv_uienvironment_setdoubleresult");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetDoubleResult == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_GetExternalEventParameters = (PLibMCEnvUIEnvironment_GetExternalEventParametersPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getexternaleventparameters");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_GetExternalEventParameters = (PLibMCEnvUIEnvironment_GetExternalEventParametersPtr) dlsym(hLibrary, "libmcenv_uienvironment_getexternaleventparameters");
@@ -14053,6 +15363,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_imageloader_loadjpegimage", (void**)&(pWrapperTable->m_ImageLoader_LoadJPEGImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_LoadJPEGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_loadpngimagefromresource", (void**)&(pWrapperTable->m_ImageLoader_LoadPNGImageFromResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_LoadPNGImageFromResource == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imageloader_loadjpegimagefromresource", (void**)&(pWrapperTable->m_ImageLoader_LoadJPEGImageFromResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageLoader_LoadJPEGImageFromResource == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imageloader_createimagefromrawrgb24data", (void**)&(pWrapperTable->m_ImageLoader_CreateImageFromRawRGB24Data));
@@ -15435,12 +16753,24 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildExecutionIterator_GetCurrentExecution == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_builditerator_getcurrentbuild", (void**)&(pWrapperTable->m_BuildIterator_GetCurrentBuild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildIterator_GetCurrentBuild == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_build_getname", (void**)&(pWrapperTable->m_Build_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_getbuilduuid", (void**)&(pWrapperTable->m_Build_GetBuildUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetBuildUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getcreatedtimestamp", (void**)&(pWrapperTable->m_Build_GetCreatedTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetCreatedTimestamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getlastexecutiontimestamp", (void**)&(pWrapperTable->m_Build_GetLastExecutionTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetLastExecutionTimestamp == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_getstorageuuid", (void**)&(pWrapperTable->m_Build_GetStorageUUID));
@@ -16411,6 +17741,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_GetBoolParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_findtelemetrychannel", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_FindTelemetryChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_FindTelemetryChannel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createstatusupdatesession", (void**)&(pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -16551,12 +17885,28 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogInfo == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_registertelemetrychannel", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterTelemetryChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterTelemetryChannel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_findtelemetrychannel", (void**)&(pWrapperTable->m_DriverEnvironment_FindTelemetryChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_FindTelemetryChannel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createemptyimage", (void**)&(pWrapperTable->m_DriverEnvironment_CreateEmptyImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateEmptyImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createimageloader", (void**)&(pWrapperTable->m_DriverEnvironment_CreateImageLoader));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateImageLoader == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createvideostream", (void**)&(pWrapperTable->m_DriverEnvironment_CreateVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateVideoStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_findvideostream", (void**)&(pWrapperTable->m_DriverEnvironment_FindVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_FindVideoStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_DriverEnvironment_CreateDiscreteField2D));
@@ -16879,6 +18229,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetAllSamples == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uniformjournalsampling_getallsampleswithbounds", (void**)&(pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UniformJournalSampling_GetAllSamplesWithBounds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_getvariablename", (void**)&(pWrapperTable->m_JournalVariable_GetVariableName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_GetVariableName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -16889,6 +18243,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_journalvariable_computeintegersample", (void**)&(pWrapperTable->m_JournalVariable_ComputeIntegerSample));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_ComputeIntegerSample == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalvariable_sampleuniform", (void**)&(pWrapperTable->m_JournalVariable_SampleUniform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalVariable_SampleUniform == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_alert_getuuid", (void**)&(pWrapperTable->m_Alert_GetUUID));
@@ -16959,6 +18317,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveJournalVariable == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_getvariablecount", (void**)&(pWrapperTable->m_JournalHandler_GetVariableCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetVariableCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_getvariableinformation", (void**)&(pWrapperTable->m_JournalHandler_GetVariableInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetVariableInformation == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_getstarttime", (void**)&(pWrapperTable->m_JournalHandler_GetStartTime));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_GetStartTime == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -16985,6 +18351,110 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_journalhandler_retrievealertsfromtimeinterval", (void**)&(pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval));
 		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_RetrieveAlertsFromTimeInterval == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_journalhandler_loadtelemetryhandler", (void**)&(pWrapperTable->m_JournalHandler_LoadTelemetryHandler));
+		if ( (eLookupError != 0) || (pWrapperTable->m_JournalHandler_LoadTelemetryHandler == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getmarkerid", (void**)&(pWrapperTable->m_TelemetryInterval_GetMarkerID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetMarkerID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getchannelidentifier", (void**)&(pWrapperTable->m_TelemetryInterval_GetChannelIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetChannelIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getstarttimestamp", (void**)&(pWrapperTable->m_TelemetryInterval_GetStartTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetStartTimestamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getendtimestamp", (void**)&(pWrapperTable->m_TelemetryInterval_GetEndTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetEndTimestamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getduration", (void**)&(pWrapperTable->m_TelemetryInterval_GetDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryinterval_getcontextdata", (void**)&(pWrapperTable->m_TelemetryInterval_GetContextData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryInterval_GetContextData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryintervaliterator_getcurrentinterval", (void**)&(pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryIntervalIterator_GetCurrentInterval == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getchannelidentifier", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetChannelIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getintervalcount", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetIntervalCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getinstantmarkercount", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetInstantMarkerCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_gettotalduration", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetTotalDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getminduration", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetMinDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getmaxduration", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetMaxDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannelstatistics_getaverageduration", (void**)&(pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannelStatistics_GetAverageDuration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getsessionuuid", (void**)&(pWrapperTable->m_TelemetryHandler_GetSessionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetSessionUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getstarttime", (void**)&(pWrapperTable->m_TelemetryHandler_GetStartTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetStartTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getendtime", (void**)&(pWrapperTable->m_TelemetryHandler_GetEndTime));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetEndTime == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getlifetimeinmicroseconds", (void**)&(pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetLifeTimeInMicroseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getchannelcount", (void**)&(pWrapperTable->m_TelemetryHandler_GetChannelCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetChannelCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getchannelidentifier", (void**)&(pWrapperTable->m_TelemetryHandler_GetChannelIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetChannelIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_haschannel", (void**)&(pWrapperTable->m_TelemetryHandler_HasChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_HasChannel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getchanneldescription", (void**)&(pWrapperTable->m_TelemetryHandler_GetChannelDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetChannelDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_queryintervalsfromtimedelta", (void**)&(pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeDelta == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_queryintervalsfromtimerange", (void**)&(pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_QueryIntervalsFromTimeRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetryhandler_getchannelstatistics", (void**)&(pWrapperTable->m_TelemetryHandler_GetChannelStatistics));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryHandler_GetChannelStatistics == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_userdetaillist_count", (void**)&(pWrapperTable->m_UserDetailList_Count));
@@ -17147,6 +18617,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationVersion_GetConfigurationXMLString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationversion_getconfigurationxml", (void**)&(pWrapperTable->m_MachineConfigurationVersion_GetConfigurationXML));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationVersion_GetConfigurationXML == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationversion_getuseruuid", (void**)&(pWrapperTable->m_MachineConfigurationVersion_GetUserUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationVersion_GetUserUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17165,6 +18639,86 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationversioniterator_getcurrent", (void**)&(pWrapperTable->m_MachineConfigurationVersionIterator_GetCurrent));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationVersionIterator_GetCurrent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getversionuuid", (void**)&(pWrapperTable->m_MachineConfiguration_GetVersionUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetVersionUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getnumericversion", (void**)&(pWrapperTable->m_MachineConfiguration_GetNumericVersion));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetNumericVersion == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getxsduuid", (void**)&(pWrapperTable->m_MachineConfiguration_GetXSDUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetXSDUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getxmldocument", (void**)&(pWrapperTable->m_MachineConfiguration_GetXMLDocument));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetXMLDocument == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_hasparameter", (void**)&(pWrapperTable->m_MachineConfiguration_HasParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_HasParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getstringparameter", (void**)&(pWrapperTable->m_MachineConfiguration_GetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getintegerparameter", (void**)&(pWrapperTable->m_MachineConfiguration_GetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getdoubleparameter", (void**)&(pWrapperTable->m_MachineConfiguration_GetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getboolparameter", (void**)&(pWrapperTable->m_MachineConfiguration_GetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getstringparameterdef", (void**)&(pWrapperTable->m_MachineConfiguration_GetStringParameterDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetStringParameterDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getintegerparameterdef", (void**)&(pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetIntegerParameterDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getdoubleparameterdef", (void**)&(pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetDoubleParameterDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_getboolparameterdef", (void**)&(pWrapperTable->m_MachineConfiguration_GetBoolParameterDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_GetBoolParameterDef == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_setstringparameter", (void**)&(pWrapperTable->m_MachineConfiguration_SetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_SetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_setintegerparameter", (void**)&(pWrapperTable->m_MachineConfiguration_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_SetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_setdoubleparameter", (void**)&(pWrapperTable->m_MachineConfiguration_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_SetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_setboolparameter", (void**)&(pWrapperTable->m_MachineConfiguration_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_haschanges", (void**)&(pWrapperTable->m_MachineConfiguration_HasChanges));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_HasChanges == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_commit", (void**)&(pWrapperTable->m_MachineConfiguration_Commit));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_Commit == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfiguration_commitandactivate", (void**)&(pWrapperTable->m_MachineConfiguration_CommitAndActivate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfiguration_CommitAndActivate == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_getuuid", (void**)&(pWrapperTable->m_MachineConfigurationType_GetUUID));
@@ -17199,6 +18753,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_RegisterNewXSD == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_registerxsdfromresource", (void**)&(pWrapperTable->m_MachineConfigurationType_RegisterXSDFromResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_RegisterXSDFromResource == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_findxsdbynumericversion", (void**)&(pWrapperTable->m_MachineConfigurationType_FindXSDByNumericVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_FindXSDByNumericVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17231,8 +18789,28 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_getactiveconfigurationxml", (void**)&(pWrapperTable->m_MachineConfigurationType_GetActiveConfigurationXML));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_GetActiveConfigurationXML == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_getlatestconfigurationxml", (void**)&(pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationXML));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_GetLatestConfigurationXML == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_setactiveconfigurationversion", (void**)&(pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_SetActiveConfigurationVersion == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_getactiveconfiguration", (void**)&(pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_ensureactiveconfiguration", (void**)&(pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_ensurexsdversion", (void**)&(pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtypeiterator_getcurrent", (void**)&(pWrapperTable->m_MachineConfigurationTypeIterator_GetCurrent));
@@ -17259,6 +18837,46 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationHandler_FindConfigurationTypeBySchema == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_telemetrymarkerscope_getmarkerid", (void**)&(pWrapperTable->m_TelemetryMarkerScope_GetMarkerID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryMarkerScope_GetMarkerID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrymarkerscope_getparent", (void**)&(pWrapperTable->m_TelemetryMarkerScope_GetParent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryMarkerScope_GetParent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrymarkerscope_getidentifier", (void**)&(pWrapperTable->m_TelemetryMarkerScope_GetIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryMarkerScope_GetIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrymarkerscope_getglobalidentifier", (void**)&(pWrapperTable->m_TelemetryMarkerScope_GetGlobalIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryMarkerScope_GetGlobalIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrymarkerscope_getstarttimestamp", (void**)&(pWrapperTable->m_TelemetryMarkerScope_GetStartTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryMarkerScope_GetStartTimestamp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannel_getparent", (void**)&(pWrapperTable->m_TelemetryChannel_GetParent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannel_GetParent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannel_getidentifier", (void**)&(pWrapperTable->m_TelemetryChannel_GetIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannel_GetIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannel_getglobalidentifier", (void**)&(pWrapperTable->m_TelemetryChannel_GetGlobalIdentifier));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannel_GetGlobalIdentifier == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannel_startmarkerscope", (void**)&(pWrapperTable->m_TelemetryChannel_StartMarkerScope));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannel_StartMarkerScope == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_telemetrychannel_createinstantmarker", (void**)&(pWrapperTable->m_TelemetryChannel_CreateInstantMarker));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TelemetryChannel_CreateInstantMarker == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getmachinestate", (void**)&(pWrapperTable->m_StateEnvironment_GetMachineState));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetMachineState == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17271,12 +18889,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_PrepareSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_waitforsignal", (void**)&(pWrapperTable->m_StateEnvironment_WaitForSignal));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_WaitForSignal == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_claimsignalfromqueue", (void**)&(pWrapperTable->m_StateEnvironment_ClaimSignalFromQueue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ClaimSignalFromQueue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_getunhandledsignal", (void**)&(pWrapperTable->m_StateEnvironment_GetUnhandledSignal));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUnhandledSignal == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_signalqueueisempty", (void**)&(pWrapperTable->m_StateEnvironment_SignalQueueIsEmpty));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_SignalQueueIsEmpty == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_queuehassignal", (void**)&(pWrapperTable->m_StateEnvironment_QueueHasSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_QueueHasSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_clearunhandledsignalsoftype", (void**)&(pWrapperTable->m_StateEnvironment_ClearUnhandledSignalsOfType));
@@ -17285,6 +18907,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_clearallunhandledsignals", (void**)&(pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ClearAllUnhandledSignals == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_registertelemetrychannel", (void**)&(pWrapperTable->m_StateEnvironment_RegisterTelemetryChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RegisterTelemetryChannel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_findtelemetrychannel", (void**)&(pWrapperTable->m_StateEnvironment_FindTelemetryChannel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindTelemetryChannel == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getunhandledsignalbyuuid", (void**)&(pWrapperTable->m_StateEnvironment_GetUnhandledSignalByUUID));
@@ -17319,6 +18949,26 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_UnloadAllToolpathes == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_waitforsignal", (void**)&(pWrapperTable->m_StateEnvironment_WaitForSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_WaitForSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getunhandledsignal", (void**)&(pWrapperTable->m_StateEnvironment_GetUnhandledSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetUnhandledSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_storesignal", (void**)&(pWrapperTable->m_StateEnvironment_StoreSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievesignal", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_clearstoredvalue", (void**)&(pWrapperTable->m_StateEnvironment_ClearStoredValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ClearStoredValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_setnextstate", (void**)&(pWrapperTable->m_StateEnvironment_SetNextState));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_SetNextState == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17341,18 +18991,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_checkfortermination", (void**)&(pWrapperTable->m_StateEnvironment_CheckForTermination));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CheckForTermination == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storesignal", (void**)&(pWrapperTable->m_StateEnvironment_StoreSignal));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreSignal == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievesignal", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveSignal));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveSignal == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_clearstoredvalue", (void**)&(pWrapperTable->m_StateEnvironment_ClearStoredValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ClearStoredValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_setstringparameter", (void**)&(pWrapperTable->m_StateEnvironment_SetStringParameter));
@@ -17395,6 +19033,30 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasparametergroup", (void**)&(pWrapperTable->m_StateEnvironment_HasParameterGroup));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasParameterGroup == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasparameter", (void**)&(pWrapperTable->m_StateEnvironment_HasParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getparametergroupparametercount", (void**)&(pWrapperTable->m_StateEnvironment_GetParameterGroupParameterCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getparametergroupparametername", (void**)&(pWrapperTable->m_StateEnvironment_GetParameterGroupParameterName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getparametergroupparameterdescription", (void**)&(pWrapperTable->m_StateEnvironment_GetParameterGroupParameterDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getparametergroupparametertype", (void**)&(pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetParameterGroupParameterType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_hasresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_HasResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_HasResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17413,6 +19075,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createimageloader", (void**)&(pWrapperTable->m_StateEnvironment_CreateImageLoader));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateImageLoader == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createvideostream", (void**)&(pWrapperTable->m_StateEnvironment_CreateVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateVideoStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_findvideostream", (void**)&(pWrapperTable->m_StateEnvironment_FindVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_FindVideoStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createmachineconfigurationhandler", (void**)&(pWrapperTable->m_StateEnvironment_CreateMachineConfigurationHandler));
@@ -17647,6 +19317,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_senderhastag", (void**)&(pWrapperTable->m_UIEnvironment_SenderHasTag));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SenderHasTag == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_PrepareSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -17685,6 +19359,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparameterasbool", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparametergroupparametercount", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparametergroupparametername", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparametergroupparameterdescription", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterDescription == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparametergroupparametertype", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterGroupParameterType == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getuiproperty", (void**)&(pWrapperTable->m_UIEnvironment_GetUIProperty));
@@ -17733,6 +19423,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_createimageloader", (void**)&(pWrapperTable->m_UIEnvironment_CreateImageLoader));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateImageLoader == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createvideostream", (void**)&(pWrapperTable->m_UIEnvironment_CreateVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateVideoStream == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_findvideostream", (void**)&(pWrapperTable->m_UIEnvironment_FindVideoStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_FindVideoStream == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds));
@@ -17789,6 +19487,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getbuildexecution", (void**)&(pWrapperTable->m_UIEnvironment_GetBuildExecution));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBuildExecution == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getrecentbuildjobs", (void**)&(pWrapperTable->m_UIEnvironment_GetRecentBuildJobs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetRecentBuildJobs == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_UIEnvironment_CreateDiscreteField2D));
@@ -17917,6 +19619,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_addexternaleventresultvalue", (void**)&(pWrapperTable->m_UIEnvironment_AddExternalEventResultValue));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_AddExternalEventResultValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setstringresult", (void**)&(pWrapperTable->m_UIEnvironment_SetStringResult));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetStringResult == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setintegerresult", (void**)&(pWrapperTable->m_UIEnvironment_SetIntegerResult));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetIntegerResult == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setboolresult", (void**)&(pWrapperTable->m_UIEnvironment_SetBoolResult));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetBoolResult == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setdoubleresult", (void**)&(pWrapperTable->m_UIEnvironment_SetDoubleResult));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetDoubleResult == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getexternaleventparameters", (void**)&(pWrapperTable->m_UIEnvironment_GetExternalEventParameters));
@@ -18564,12 +20282,50 @@ public:
 	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-	* @return Image instance containing the PNG image.
+	* @return Image instance containing the JPEG image.
 	*/
 	PImageData CImageLoader::LoadJPEGImage(const CInputVector<LibMCEnv_uint8> & JPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
 	{
 		LibMCEnvHandle hImageDataInstance = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_LoadJPEGImage(m_pHandle, (LibMCEnv_uint64)JPEGDataBuffer.size(), JPEGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::LoadPNGImageFromResource - creates an image object from a machine PNG resource data.
+	* @param[in] sResourceName - PNG Data Resource Name. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CImageLoader::LoadPNGImageFromResource(const std::string & sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_LoadPNGImageFromResource(m_pHandle, sResourceName.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CImageLoader::LoadJPEGImageFromResource - creates an image object from a machine JPEG resource data.
+	* @param[in] sResourceName - JPEG Data Resource Name. Fails if image cannot be loaded.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the JPEG image.
+	*/
+	PImageData CImageLoader::LoadJPEGImageFromResource(const std::string & sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageLoader_LoadJPEGImageFromResource(m_pHandle, sResourceName.c_str(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
 		
 		if (!hImageDataInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -23182,6 +24938,25 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CBuildIterator
+	 */
+	
+	/**
+	* CBuildIterator::GetCurrentBuild - Returns the build the iterator points at.
+	* @return returns the Build instance.
+	*/
+	PBuild CBuildIterator::GetCurrentBuild()
+	{
+		LibMCEnvHandle hBuildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildIterator_GetCurrentBuild(m_pHandle, &hBuildInstance));
+		
+		if (!hBuildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
+	}
+	
+	/**
 	 * Method definitions for class CBuild
 	 */
 	
@@ -23213,6 +24988,36 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetBuildUUID(m_pHandle, bytesNeededBuildUUID, &bytesWrittenBuildUUID, &bufferBuildUUID[0]));
 		
 		return std::string(&bufferBuildUUID[0]);
+	}
+	
+	/**
+	* CBuild::GetCreatedTimestamp - Returns creation timestamp of the build in ISO-8601 format.
+	* @return Creation timestamp in ISO-8601 format (e.g., 2025-10-23T14:30:00.000Z).
+	*/
+	std::string CBuild::GetCreatedTimestamp()
+	{
+		LibMCEnv_uint32 bytesNeededTimestamp = 0;
+		LibMCEnv_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetCreatedTimestamp(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetCreatedTimestamp(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		
+		return std::string(&bufferTimestamp[0]);
+	}
+	
+	/**
+	* CBuild::GetLastExecutionTimestamp - Returns the most recent execution timestamp in ISO-8601 format. Returns empty string if build has never been executed.
+	* @return Most recent execution timestamp in ISO-8601 format. Empty string if never executed.
+	*/
+	std::string CBuild::GetLastExecutionTimestamp()
+	{
+		LibMCEnv_uint32 bytesNeededTimestamp = 0;
+		LibMCEnv_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetLastExecutionTimestamp(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetLastExecutionTimestamp(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		
+		return std::string(&bufferTimestamp[0]);
 	}
 	
 	/**
@@ -26528,6 +28333,24 @@ public:
 	}
 	
 	/**
+	* CDriverStatusUpdateSession::FindTelemetryChannel - Returns a telemetry channel from the current state machine.
+	* @param[in] sChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+	* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+	* @return Channel instance. NULL if Channel does not exist.
+	*/
+	PTelemetryChannel CDriverStatusUpdateSession::FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting)
+	{
+		LibMCEnvHandle hChannelInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_FindTelemetryChannel(m_pHandle, sChannelIdentifier.c_str(), bFailIfNotExisting, &hChannelInstance));
+		
+		if (hChannelInstance) {
+			return std::make_shared<CTelemetryChannel>(m_pWrapper, hChannelInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
 	 * Method definitions for class CDriverEnvironment
 	 */
 	
@@ -26983,6 +28806,42 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::RegisterTelemetryChannel - Registers a telemetry channel for the current state machine. Fails if identifier already exists.
+	* @param[in] sChannelIdentifier - Channel Identifier. Must be a alphanumerical path string.
+	* @param[in] sChannelDescription - Description of Channel. MUST NOT be empty.
+	* @param[in] eChannelType - Type of Channel.
+	* @return Channel instance.
+	*/
+	PTelemetryChannel CDriverEnvironment::RegisterTelemetryChannel(const std::string & sChannelIdentifier, const std::string & sChannelDescription, const eTelemetryChannelType eChannelType)
+	{
+		LibMCEnvHandle hChannelInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterTelemetryChannel(m_pHandle, sChannelIdentifier.c_str(), sChannelDescription.c_str(), eChannelType, &hChannelInstance));
+		
+		if (!hChannelInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryChannel>(m_pWrapper, hChannelInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::FindTelemetryChannel - Returns a telemetry channel from the current state machine.
+	* @param[in] sChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+	* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+	* @return Channel instance. NULL if Channel does not exist.
+	*/
+	PTelemetryChannel CDriverEnvironment::FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting)
+	{
+		LibMCEnvHandle hChannelInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_FindTelemetryChannel(m_pHandle, sChannelIdentifier.c_str(), bFailIfNotExisting, &hChannelInstance));
+		
+		if (hChannelInstance) {
+			return std::make_shared<CTelemetryChannel>(m_pWrapper, hChannelInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
 	* CDriverEnvironment::CreateEmptyImage - creates an empty image object.
 	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
 	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
@@ -27015,6 +28874,43 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	PVideoStream CDriverEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateVideoStream(m_pHandle, nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds, &hVideoStreamInstance));
+		
+		if (!hVideoStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	PVideoStream CDriverEnvironment::FindVideoStream(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_FindVideoStream(m_pHandle, sStreamUUID.c_str(), &hVideoStreamInstance));
+		
+		if (hVideoStreamInstance) {
+			return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**
@@ -28067,6 +29963,19 @@ public:
 	}
 	
 	/**
+	* CUniformJournalSampling::GetAllSamplesWithBounds - Returns all timestamps together with the min/max/average/last value of each bucket of the sampling. Enables faithful multi-scale visualisation of large journals.
+	* @param[out] SamplesBuffer - Array of Timestream envelope entries, in increasing order.
+	*/
+	void CUniformJournalSampling::GetAllSamplesWithBounds(std::vector<sTimeStreamEnvelopeEntry> & SamplesBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededSamples = 0;
+		LibMCEnv_uint64 elementsWrittenSamples = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamplesWithBounds(m_pHandle, 0, &elementsNeededSamples, nullptr));
+		SamplesBuffer.resize((size_t) elementsNeededSamples);
+		CheckError(m_pWrapper->m_WrapperTable.m_UniformJournalSampling_GetAllSamplesWithBounds(m_pHandle, elementsNeededSamples, &elementsWrittenSamples, SamplesBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CJournalVariable
 	 */
 	
@@ -28109,6 +30018,24 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_ComputeIntegerSample(m_pHandle, nTimeInMicroSeconds, &resultSampleValue));
 		
 		return resultSampleValue;
+	}
+	
+	/**
+	* CJournalVariable::SampleUniform - Downsamples the variable's history over a time range into a fixed number of min/max/average/last buckets. Used for multi-scale visualisation of large journals.
+	* @param[in] nStartTimeStamp - Start time stamp to sample in microseconds. MUST be smaller than end time stamp.
+	* @param[in] nEndTimeStamp - End time stamp to sample in microseconds. MUST be larger than start time stamp.
+	* @param[in] nNumberOfSamples - Number of buckets to generate. MUST be greater than 0.
+	* @return Resulting uniform sampling instance.
+	*/
+	PUniformJournalSampling CJournalVariable::SampleUniform(const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples)
+	{
+		LibMCEnvHandle hSampling = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalVariable_SampleUniform(m_pHandle, nStartTimeStamp, nEndTimeStamp, nNumberOfSamples, &hSampling));
+		
+		if (!hSampling) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CUniformJournalSampling>(m_pWrapper, hSampling);
 	}
 	
 	/**
@@ -28368,6 +30295,35 @@ public:
 	}
 	
 	/**
+	* CJournalHandler::GetVariableCount - Returns the number of recorded variables in the journal.
+	* @return Number of recorded variables.
+	*/
+	LibMCEnv_uint32 CJournalHandler::GetVariableCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetVariableCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CJournalHandler::GetVariableInformation - Returns metadata of a recorded variable by index.
+	* @param[in] nIndex - Index of the variable. 0-based. MUST be smaller than the variable count.
+	* @param[out] sName - Name (parameter path) of the variable.
+	* @param[out] eDataType - Data type of the variable.
+	* @param[out] dUnits - Quantization units of the variable (0 for non-double variables).
+	*/
+	void CJournalHandler::GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string & sName, eParameterDataType & eDataType, LibMCEnv_double & dUnits)
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetVariableInformation(m_pHandle, nIndex, 0, &bytesNeededName, nullptr, &eDataType, &dUnits));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_GetVariableInformation(m_pHandle, nIndex, bytesNeededName, &bytesWrittenName, &bufferName[0], &eDataType, &dUnits));
+		sName = std::string(&bufferName[0]);
+	}
+	
+	/**
 	* CJournalHandler::GetStartTime - Retrieves the reference start time of the journal.
 	* @return DateTime Instance
 	*/
@@ -28475,6 +30431,381 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CAlertIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CJournalHandler::LoadTelemetryHandler - Loads the telemetry handler for this journal.
+	* @return Telemetry handler instance.
+	*/
+	PTelemetryHandler CJournalHandler::LoadTelemetryHandler()
+	{
+		LibMCEnvHandle hTelemetryHandlerInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_JournalHandler_LoadTelemetryHandler(m_pHandle, &hTelemetryHandlerInstance));
+		
+		if (!hTelemetryHandlerInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryHandler>(m_pWrapper, hTelemetryHandlerInstance);
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryInterval
+	 */
+	
+	/**
+	* CTelemetryInterval::GetMarkerID - Returns the marker ID.
+	* @return Marker ID
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetMarkerID()
+	{
+		LibMCEnv_uint64 resultMarkerID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetMarkerID(m_pHandle, &resultMarkerID));
+		
+		return resultMarkerID;
+	}
+	
+	/**
+	* CTelemetryInterval::GetChannelIdentifier - Returns the channel identifier.
+	* @return Channel identifier
+	*/
+	std::string CTelemetryInterval::GetChannelIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetChannelIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetChannelIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryInterval::GetStartTimestamp - Returns the start timestamp in microseconds.
+	* @return Start timestamp
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetStartTimestamp()
+	{
+		LibMCEnv_uint64 resultTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetStartTimestamp(m_pHandle, &resultTimestamp));
+		
+		return resultTimestamp;
+	}
+	
+	/**
+	* CTelemetryInterval::GetEndTimestamp - Returns the end timestamp in microseconds.
+	* @return End timestamp
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetEndTimestamp()
+	{
+		LibMCEnv_uint64 resultTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetEndTimestamp(m_pHandle, &resultTimestamp));
+		
+		return resultTimestamp;
+	}
+	
+	/**
+	* CTelemetryInterval::GetDuration - Returns the duration in microseconds.
+	* @return Duration
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	* CTelemetryInterval::GetContextData - Returns the context data.
+	* @return Context data
+	*/
+	LibMCEnv_uint64 CTelemetryInterval::GetContextData()
+	{
+		LibMCEnv_uint64 resultContextData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryInterval_GetContextData(m_pHandle, &resultContextData));
+		
+		return resultContextData;
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryIntervalIterator
+	 */
+	
+	/**
+	* CTelemetryIntervalIterator::GetCurrentInterval - Returns the current interval.
+	* @return Current interval
+	*/
+	PTelemetryInterval CTelemetryIntervalIterator::GetCurrentInterval()
+	{
+		LibMCEnvHandle hInterval = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryIntervalIterator_GetCurrentInterval(m_pHandle, &hInterval));
+		
+		if (!hInterval) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryInterval>(m_pWrapper, hInterval);
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryChannelStatistics
+	 */
+	
+	/**
+	* CTelemetryChannelStatistics::GetChannelIdentifier - Returns the channel identifier.
+	* @return Channel identifier
+	*/
+	std::string CTelemetryChannelStatistics::GetChannelIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetChannelIdentifier(m_pHandle, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetChannelIdentifier(m_pHandle, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetIntervalCount - Returns the number of completed intervals.
+	* @return Number of intervals
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetIntervalCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetIntervalCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetInstantMarkerCount - Returns the number of instant markers.
+	* @return Number of instant markers
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetInstantMarkerCount()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetInstantMarkerCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetTotalDuration - Returns the total duration of all intervals.
+	* @return Total duration in microseconds
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetTotalDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetTotalDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetMinDuration - Returns the minimum interval duration.
+	* @return Min duration in microseconds
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetMinDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetMinDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetMaxDuration - Returns the maximum interval duration.
+	* @return Max duration in microseconds
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetMaxDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetMaxDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	* CTelemetryChannelStatistics::GetAverageDuration - Returns the average interval duration.
+	* @return Average duration in microseconds
+	*/
+	LibMCEnv_uint64 CTelemetryChannelStatistics::GetAverageDuration()
+	{
+		LibMCEnv_uint64 resultDuration = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannelStatistics_GetAverageDuration(m_pHandle, &resultDuration));
+		
+		return resultDuration;
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryHandler
+	 */
+	
+	/**
+	* CTelemetryHandler::GetSessionUUID - Returns the session UUID.
+	* @return Session UUID
+	*/
+	std::string CTelemetryHandler::GetSessionUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetSessionUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetSessionUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CTelemetryHandler::GetStartTime - Returns the session start time.
+	* @return DateTime Instance
+	*/
+	PDateTime CTelemetryHandler::GetStartTime()
+	{
+		LibMCEnvHandle hDateTimeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetStartTime(m_pHandle, &hDateTimeInstance));
+		
+		if (!hDateTimeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
+	}
+	
+	/**
+	* CTelemetryHandler::GetEndTime - Returns the session end time.
+	* @return DateTime Instance
+	*/
+	PDateTime CTelemetryHandler::GetEndTime()
+	{
+		LibMCEnvHandle hDateTimeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetEndTime(m_pHandle, &hDateTimeInstance));
+		
+		if (!hDateTimeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDateTime>(m_pWrapper, hDateTimeInstance);
+	}
+	
+	/**
+	* CTelemetryHandler::GetLifeTimeInMicroseconds - Returns the session lifetime in microseconds.
+	* @return Lifetime
+	*/
+	LibMCEnv_uint64 CTelemetryHandler::GetLifeTimeInMicroseconds()
+	{
+		LibMCEnv_uint64 resultLifeTime = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetLifeTimeInMicroseconds(m_pHandle, &resultLifeTime));
+		
+		return resultLifeTime;
+	}
+	
+	/**
+	* CTelemetryHandler::GetChannelCount - Returns the number of telemetry channels.
+	* @return Number of channels
+	*/
+	LibMCEnv_uint32 CTelemetryHandler::GetChannelCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CTelemetryHandler::GetChannelIdentifier - Returns the identifier for a channel by index.
+	* @param[in] nChannelIndex - Channel index (0-based)
+	* @return Channel identifier
+	*/
+	std::string CTelemetryHandler::GetChannelIdentifier(const LibMCEnv_uint32 nChannelIndex)
+	{
+		LibMCEnv_uint32 bytesNeededIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelIdentifier(m_pHandle, nChannelIndex, 0, &bytesNeededIdentifier, nullptr));
+		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelIdentifier(m_pHandle, nChannelIndex, bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		
+		return std::string(&bufferIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryHandler::HasChannel - Checks if a channel exists.
+	* @param[in] sIdentifier - Channel identifier
+	* @return True if channel exists
+	*/
+	bool CTelemetryHandler::HasChannel(const std::string & sIdentifier)
+	{
+		bool resultExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_HasChannel(m_pHandle, sIdentifier.c_str(), &resultExists));
+		
+		return resultExists;
+	}
+	
+	/**
+	* CTelemetryHandler::GetChannelDescription - Returns the description of a channel.
+	* @param[in] sIdentifier - Channel identifier
+	* @return Channel description
+	*/
+	std::string CTelemetryHandler::GetChannelDescription(const std::string & sIdentifier)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelDescription(m_pHandle, sIdentifier.c_str(), 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelDescription(m_pHandle, sIdentifier.c_str(), bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CTelemetryHandler::QueryIntervalsFromTimeDelta - Queries intervals from the last N microseconds.
+	* @param[in] sChannelIdentifier - Channel identifier. Empty string for all channels.
+	* @param[in] nTimeDeltaInMicroseconds - Time delta from the end of the session.
+	* @return Iterator over intervals
+	*/
+	PTelemetryIntervalIterator CTelemetryHandler::QueryIntervalsFromTimeDelta(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nTimeDeltaInMicroseconds)
+	{
+		LibMCEnvHandle hIterator = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_QueryIntervalsFromTimeDelta(m_pHandle, sChannelIdentifier.c_str(), nTimeDeltaInMicroseconds, &hIterator));
+		
+		if (!hIterator) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryIntervalIterator>(m_pWrapper, hIterator);
+	}
+	
+	/**
+	* CTelemetryHandler::QueryIntervalsFromTimeRange - Queries intervals within a time range.
+	* @param[in] sChannelIdentifier - Channel identifier. Empty string for all channels.
+	* @param[in] nStartTimeInMicroseconds - Start time.
+	* @param[in] nEndTimeInMicroseconds - End time.
+	* @return Iterator over intervals
+	*/
+	PTelemetryIntervalIterator CTelemetryHandler::QueryIntervalsFromTimeRange(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+	{
+		LibMCEnvHandle hIterator = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_QueryIntervalsFromTimeRange(m_pHandle, sChannelIdentifier.c_str(), nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hIterator));
+		
+		if (!hIterator) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryIntervalIterator>(m_pWrapper, hIterator);
+	}
+	
+	/**
+	* CTelemetryHandler::GetChannelStatistics - Gets aggregated statistics for a channel.
+	* @param[in] sChannelIdentifier - Channel identifier.
+	* @param[in] nStartTimeInMicroseconds - Start time (0 for beginning of session).
+	* @param[in] nEndTimeInMicroseconds - End time (0 for end of session).
+	* @return Statistics instance
+	*/
+	PTelemetryChannelStatistics CTelemetryHandler::GetChannelStatistics(const std::string & sChannelIdentifier, const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
+	{
+		LibMCEnvHandle hStatistics = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryHandler_GetChannelStatistics(m_pHandle, sChannelIdentifier.c_str(), nStartTimeInMicroseconds, nEndTimeInMicroseconds, &hStatistics));
+		
+		if (!hStatistics) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryChannelStatistics>(m_pWrapper, hStatistics);
 	}
 	
 	/**
@@ -29115,6 +31446,21 @@ public:
 	}
 	
 	/**
+	* CMachineConfigurationVersion::GetConfigurationXML - Returns the configuration XML instance.
+	* @return XML Document.
+	*/
+	PXMLDocument CMachineConfigurationVersion::GetConfigurationXML()
+	{
+		LibMCEnvHandle hXMLInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationVersion_GetConfigurationXML(m_pHandle, &hXMLInstance));
+		
+		if (!hXMLInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLInstance);
+	}
+	
+	/**
 	* CMachineConfigurationVersion::GetUserUUID - Returns the User UUID.
 	* @return UUID of the User.
 	*/
@@ -29197,6 +31543,286 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CMachineConfigurationVersion>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	 * Method definitions for class CMachineConfiguration
+	 */
+	
+	/**
+	* CMachineConfiguration::GetVersionUUID - Returns the UUID of the underlying configuration version this working copy was created from.
+	* @return UUID of the configuration version.
+	*/
+	std::string CMachineConfiguration::GetVersionUUID()
+	{
+		LibMCEnv_uint32 bytesNeededVersionUUID = 0;
+		LibMCEnv_uint32 bytesWrittenVersionUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetVersionUUID(m_pHandle, 0, &bytesNeededVersionUUID, nullptr));
+		std::vector<char> bufferVersionUUID(bytesNeededVersionUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetVersionUUID(m_pHandle, bytesNeededVersionUUID, &bytesWrittenVersionUUID, &bufferVersionUUID[0]));
+		
+		return std::string(&bufferVersionUUID[0]);
+	}
+	
+	/**
+	* CMachineConfiguration::GetNumericVersion - Returns the numeric version of the underlying configuration version.
+	* @return Returns the configuration numeric version.
+	*/
+	LibMCEnv_uint32 CMachineConfiguration::GetNumericVersion()
+	{
+		LibMCEnv_uint32 resultConfigurationNumericVersion = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetNumericVersion(m_pHandle, &resultConfigurationNumericVersion));
+		
+		return resultConfigurationNumericVersion;
+	}
+	
+	/**
+	* CMachineConfiguration::GetXSDUUID - Returns the UUID of the XSD used by this configuration.
+	* @return UUID of the configuration XSD.
+	*/
+	std::string CMachineConfiguration::GetXSDUUID()
+	{
+		LibMCEnv_uint32 bytesNeededXSDUUID = 0;
+		LibMCEnv_uint32 bytesWrittenXSDUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetXSDUUID(m_pHandle, 0, &bytesNeededXSDUUID, nullptr));
+		std::vector<char> bufferXSDUUID(bytesNeededXSDUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetXSDUUID(m_pHandle, bytesNeededXSDUUID, &bytesWrittenXSDUUID, &bufferXSDUUID[0]));
+		
+		return std::string(&bufferXSDUUID[0]);
+	}
+	
+	/**
+	* CMachineConfiguration::GetXMLDocument - Returns the current in-memory configuration as an XML document instance for advanced access. The returned document reflects any uncommitted changes.
+	* @return XML Document.
+	*/
+	PXMLDocument CMachineConfiguration::GetXMLDocument()
+	{
+		LibMCEnvHandle hXMLInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetXMLDocument(m_pHandle, &hXMLInstance));
+		
+		if (!hXMLInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLInstance);
+	}
+	
+	/**
+	* CMachineConfiguration::HasParameter - Returns whether a parameter exists at the given path.
+	* @param[in] sPath - Slash-separated element path beneath the root, e.g. 'PLCConfig/IPAddress'.
+	* @return True if the parameter node and its value attribute exist.
+	*/
+	bool CMachineConfiguration::HasParameter(const std::string & sPath)
+	{
+		bool resultParameterExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_HasParameter(m_pHandle, sPath.c_str(), &resultParameterExists));
+		
+		return resultParameterExists;
+	}
+	
+	/**
+	* CMachineConfiguration::GetStringParameter - Returns the string value of a parameter. Fails if the parameter does not exist.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @return Parameter value.
+	*/
+	std::string CMachineConfiguration::GetStringParameter(const std::string & sPath)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetStringParameter(m_pHandle, sPath.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetStringParameter(m_pHandle, sPath.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CMachineConfiguration::GetIntegerParameter - Returns the integer value of a parameter. Fails if the parameter does not exist or is not an integer in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @return Parameter value.
+	*/
+	LibMCEnv_int64 CMachineConfiguration::GetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetIntegerParameter(m_pHandle, sPath.c_str(), nMinValue, nMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetDoubleParameter - Returns the double value of a parameter. Fails if the parameter does not exist or is not a double in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dMinValue - Minimum allowed value.
+	* @param[in] dMaxValue - Maximum allowed value.
+	* @return Parameter value.
+	*/
+	LibMCEnv_double CMachineConfiguration::GetDoubleParameter(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetDoubleParameter(m_pHandle, sPath.c_str(), dMinValue, dMaxValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetBoolParameter - Returns the boolean value of a parameter. Fails if the parameter does not exist or is not a boolean.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @return Parameter value.
+	*/
+	bool CMachineConfiguration::GetBoolParameter(const std::string & sPath)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetBoolParameter(m_pHandle, sPath.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetStringParameterDef - Returns the string value of a parameter. Returns the default value if the parameter does not exist.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] sDefaultValue - Default value.
+	* @return Parameter value.
+	*/
+	std::string CMachineConfiguration::GetStringParameterDef(const std::string & sPath, const std::string & sDefaultValue)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetStringParameterDef(m_pHandle, sPath.c_str(), sDefaultValue.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetStringParameterDef(m_pHandle, sPath.c_str(), sDefaultValue.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CMachineConfiguration::GetIntegerParameterDef - Returns the integer value of a parameter. Returns the default value if the parameter does not exist or is not a valid integer in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nMinValue - Minimum allowed value.
+	* @param[in] nMaxValue - Maximum allowed value.
+	* @param[in] nDefaultValue - Default value. MUST be in valid range.
+	* @return Parameter value.
+	*/
+	LibMCEnv_int64 CMachineConfiguration::GetIntegerParameterDef(const std::string & sPath, const LibMCEnv_int64 nMinValue, const LibMCEnv_int64 nMaxValue, const LibMCEnv_int64 nDefaultValue)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetIntegerParameterDef(m_pHandle, sPath.c_str(), nMinValue, nMaxValue, nDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetDoubleParameterDef - Returns the double value of a parameter. Returns the default value if the parameter does not exist or is not a valid double in range.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dMinValue - Minimum allowed value.
+	* @param[in] dMaxValue - Maximum allowed value.
+	* @param[in] dDefaultValue - Default value. MUST be in valid range.
+	* @return Parameter value.
+	*/
+	LibMCEnv_double CMachineConfiguration::GetDoubleParameterDef(const std::string & sPath, const LibMCEnv_double dMinValue, const LibMCEnv_double dMaxValue, const LibMCEnv_double dDefaultValue)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetDoubleParameterDef(m_pHandle, sPath.c_str(), dMinValue, dMaxValue, dDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::GetBoolParameterDef - Returns the boolean value of a parameter. Returns the default value if the parameter does not exist or is not a valid boolean.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] bDefaultValue - Default value.
+	* @return Parameter value.
+	*/
+	bool CMachineConfiguration::GetBoolParameterDef(const std::string & sPath, const bool bDefaultValue)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_GetBoolParameterDef(m_pHandle, sPath.c_str(), bDefaultValue, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CMachineConfiguration::SetStringParameter - Sets the string value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] sValue - Value to set.
+	*/
+	void CMachineConfiguration::SetStringParameter(const std::string & sPath, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_SetStringParameter(m_pHandle, sPath.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CMachineConfiguration::SetIntegerParameter - Sets the integer value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] nValue - Value to set.
+	*/
+	void CMachineConfiguration::SetIntegerParameter(const std::string & sPath, const LibMCEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_SetIntegerParameter(m_pHandle, sPath.c_str(), nValue));
+	}
+	
+	/**
+	* CMachineConfiguration::SetDoubleParameter - Sets the double value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] dValue - Value to set.
+	*/
+	void CMachineConfiguration::SetDoubleParameter(const std::string & sPath, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_SetDoubleParameter(m_pHandle, sPath.c_str(), dValue));
+	}
+	
+	/**
+	* CMachineConfiguration::SetBoolParameter - Sets the boolean value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+	* @param[in] sPath - Slash-separated element path beneath the root.
+	* @param[in] bValue - Value to set.
+	*/
+	void CMachineConfiguration::SetBoolParameter(const std::string & sPath, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_SetBoolParameter(m_pHandle, sPath.c_str(), bValue));
+	}
+	
+	/**
+	* CMachineConfiguration::HasChanges - Returns whether the in-memory working copy has uncommitted changes.
+	* @return True if there are uncommitted changes.
+	*/
+	bool CMachineConfiguration::HasChanges()
+	{
+		bool resultHasUncommittedChanges = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_HasChanges(m_pHandle, &resultHasUncommittedChanges));
+		
+		return resultHasUncommittedChanges;
+	}
+	
+	/**
+	* CMachineConfiguration::Commit - Commits the current in-memory state as a new configuration version (child of the version this working copy is based on). Does not change the active version. After committing, the working copy is rebased on the new version.
+	* @param[in] sUserUUID - User UUID for logging who initiated the change.
+	* @return Returns the newly created configuration version.
+	*/
+	PMachineConfigurationVersion CMachineConfiguration::Commit(const std::string & sUserUUID)
+	{
+		LibMCEnvHandle hVersionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_Commit(m_pHandle, sUserUUID.c_str(), &hVersionInstance));
+		
+		if (!hVersionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfigurationVersion>(m_pWrapper, hVersionInstance);
+	}
+	
+	/**
+	* CMachineConfiguration::CommitAndActivate - Commits the current in-memory state as a new configuration version and sets it as the active version for the type. After committing, the working copy is rebased on the new version.
+	* @param[in] sUserUUID - User UUID for logging who initiated the change.
+	* @return Returns the newly created and now active configuration version.
+	*/
+	PMachineConfigurationVersion CMachineConfiguration::CommitAndActivate(const std::string & sUserUUID)
+	{
+		LibMCEnvHandle hVersionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfiguration_CommitAndActivate(m_pHandle, sUserUUID.c_str(), &hVersionInstance));
+		
+		if (!hVersionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfigurationVersion>(m_pWrapper, hVersionInstance);
 	}
 	
 	/**
@@ -29320,6 +31946,26 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CMachineConfigurationXSD>(m_pWrapper, hXSDInstance);
+	}
+	
+	/**
+	* CMachineConfigurationType::RegisterXSDFromResource - Registers a XSD from a resource file including its default configuration.
+	* @param[in] sXSDResourceName - XSD Resource Name. Resource MUST exist.
+	* @param[in] sDefaultXMLResourceName - Default XML Resource Name. Resource MUST exist.
+	* @param[in] nXSDVersion - New Version to add. MUST be larger than GetLatestXSDVersion if FailIfExisting is true.
+	* @param[in] bFailIfExisting - If true, the call will fail if XSDVersion is not larger than GetLatestXSDVersion. If false, the call will return the new XSDInstance, if XSDVersion is larger than GetLatestXSDVersion, null otherwise. 
+	* @return Returns the new XSD of the configuration type, if it has been newly registered.
+	*/
+	PMachineConfigurationXSD CMachineConfigurationType::RegisterXSDFromResource(const std::string & sXSDResourceName, const std::string & sDefaultXMLResourceName, const LibMCEnv_uint32 nXSDVersion, const bool bFailIfExisting)
+	{
+		LibMCEnvHandle hXSDInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_RegisterXSDFromResource(m_pHandle, sXSDResourceName.c_str(), sDefaultXMLResourceName.c_str(), nXSDVersion, bFailIfExisting, &hXSDInstance));
+		
+		if (hXSDInstance) {
+			return std::make_shared<CMachineConfigurationXSD>(m_pWrapper, hXSDInstance);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**
@@ -29453,12 +32099,91 @@ public:
 	}
 	
 	/**
+	* CMachineConfigurationType::GetActiveConfigurationXML - Returns the currently active configuration XML for this type.
+	* @return XML Document.
+	*/
+	PXMLDocument CMachineConfigurationType::GetActiveConfigurationXML()
+	{
+		LibMCEnvHandle hXMLInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_GetActiveConfigurationXML(m_pHandle, &hXMLInstance));
+		
+		if (!hXMLInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLInstance);
+	}
+	
+	/**
+	* CMachineConfigurationType::GetLatestConfigurationXML - Returns the most recently created configuration XML for this type.
+	* @return XML Document.
+	*/
+	PXMLDocument CMachineConfigurationType::GetLatestConfigurationXML()
+	{
+		LibMCEnvHandle hXMLInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_GetLatestConfigurationXML(m_pHandle, &hXMLInstance));
+		
+		if (!hXMLInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CXMLDocument>(m_pWrapper, hXMLInstance);
+	}
+	
+	/**
 	* CMachineConfigurationType::SetActiveConfigurationVersion - Sets the active configuration version for this type.
 	* @param[in] sVersionUUID - UUID of the version to set as active.
 	*/
 	void CMachineConfigurationType::SetActiveConfigurationVersion(const std::string & sVersionUUID)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_SetActiveConfigurationVersion(m_pHandle, sVersionUUID.c_str()));
+	}
+	
+	/**
+	* CMachineConfigurationType::GetActiveConfiguration - Returns an ergonomic, typed working copy of the currently active configuration version. Fails if no version is active.
+	* @return Working copy of the active configuration.
+	*/
+	PMachineConfiguration CMachineConfigurationType::GetActiveConfiguration()
+	{
+		LibMCEnvHandle hConfigurationInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_GetActiveConfiguration(m_pHandle, &hConfigurationInstance));
+		
+		if (!hConfigurationInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfiguration>(m_pWrapper, hConfigurationInstance);
+	}
+	
+	/**
+	* CMachineConfigurationType::EnsureActiveConfiguration - Returns an ergonomic, typed working copy of the active configuration, activating the latest version first if none is currently active. Fails if no configuration version exists at all.
+	* @return Working copy of the active configuration.
+	*/
+	PMachineConfiguration CMachineConfigurationType::EnsureActiveConfiguration()
+	{
+		LibMCEnvHandle hConfigurationInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_EnsureActiveConfiguration(m_pHandle, &hConfigurationInstance));
+		
+		if (!hConfigurationInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfiguration>(m_pWrapper, hConfigurationInstance);
+	}
+	
+	/**
+	* CMachineConfigurationType::EnsureXSDVersion - Registers a new XSD version together with its default configuration, but only if the given version is newer than the latest registered XSD. Returns null if the given version is not newer (no-op). Collapses the common bootstrap pattern of RegisterNewXSD + CreateDefaultConfiguration.
+	* @param[in] sXSDString - XSD String of the version. MUST be a valid schema of this type.
+	* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+	* @param[in] sDefaultXML - Default configuration XML string conforming to the given XSD.
+	* @return The newly registered XSD, or null if the version was not newer than the latest.
+	*/
+	PMachineConfigurationXSD CMachineConfigurationType::EnsureXSDVersion(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string & sDefaultXML)
+	{
+		LibMCEnvHandle hXSDInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_EnsureXSDVersion(m_pHandle, sXSDString.c_str(), nXSDVersion, sDefaultXML.c_str(), &hXSDInstance));
+		
+		if (hXSDInstance) {
+			return std::make_shared<CMachineConfigurationXSD>(m_pWrapper, hXSDInstance);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**
@@ -29564,6 +32289,157 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CTelemetryMarkerScope
+	 */
+	
+	/**
+	* CTelemetryMarkerScope::GetMarkerID - Returns the global marker ID
+	* @return Global marker id.
+	*/
+	LibMCEnv_uint64 CTelemetryMarkerScope::GetMarkerID()
+	{
+		LibMCEnv_uint64 resultMarkerID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryMarkerScope_GetMarkerID(m_pHandle, &resultMarkerID));
+		
+		return resultMarkerID;
+	}
+	
+	/**
+	* CTelemetryMarkerScope::GetParent - Returns the Identifier of the Parent (State machine or Driver) of the channel.
+	* @return Parent Identifier
+	*/
+	std::string CTelemetryMarkerScope::GetParent()
+	{
+		LibMCEnv_uint32 bytesNeededParentIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenParentIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryMarkerScope_GetParent(m_pHandle, 0, &bytesNeededParentIdentifier, nullptr));
+		std::vector<char> bufferParentIdentifier(bytesNeededParentIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryMarkerScope_GetParent(m_pHandle, bytesNeededParentIdentifier, &bytesWrittenParentIdentifier, &bufferParentIdentifier[0]));
+		
+		return std::string(&bufferParentIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryMarkerScope::GetIdentifier - Returns the Identifier of the Channel.
+	* @return Channel Identifier. Will be a alphanumerical path string.
+	*/
+	std::string CTelemetryMarkerScope::GetIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededChannelIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenChannelIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryMarkerScope_GetIdentifier(m_pHandle, 0, &bytesNeededChannelIdentifier, nullptr));
+		std::vector<char> bufferChannelIdentifier(bytesNeededChannelIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryMarkerScope_GetIdentifier(m_pHandle, bytesNeededChannelIdentifier, &bytesWrittenChannelIdentifier, &bufferChannelIdentifier[0]));
+		
+		return std::string(&bufferChannelIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryMarkerScope::GetGlobalIdentifier - Returns the global Identifier of the Channel, which is ParentIdentifier.ChannelIdentifier
+	* @return Global Identifier. Will be a alphanumerical path string.
+	*/
+	std::string CTelemetryMarkerScope::GetGlobalIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededGlobalIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenGlobalIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryMarkerScope_GetGlobalIdentifier(m_pHandle, 0, &bytesNeededGlobalIdentifier, nullptr));
+		std::vector<char> bufferGlobalIdentifier(bytesNeededGlobalIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryMarkerScope_GetGlobalIdentifier(m_pHandle, bytesNeededGlobalIdentifier, &bytesWrittenGlobalIdentifier, &bufferGlobalIdentifier[0]));
+		
+		return std::string(&bufferGlobalIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryMarkerScope::GetStartTimestamp - Returns start timestamp of the marker
+	* @return Start timestamp.
+	*/
+	LibMCEnv_uint64 CTelemetryMarkerScope::GetStartTimestamp()
+	{
+		LibMCEnv_uint64 resultStartTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryMarkerScope_GetStartTimestamp(m_pHandle, &resultStartTimestamp));
+		
+		return resultStartTimestamp;
+	}
+	
+	/**
+	 * Method definitions for class CTelemetryChannel
+	 */
+	
+	/**
+	* CTelemetryChannel::GetParent - Returns the Identifier of the Parent (State machine or Driver) of the channel.
+	* @return Parent Identifier
+	*/
+	std::string CTelemetryChannel::GetParent()
+	{
+		LibMCEnv_uint32 bytesNeededParentIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenParentIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannel_GetParent(m_pHandle, 0, &bytesNeededParentIdentifier, nullptr));
+		std::vector<char> bufferParentIdentifier(bytesNeededParentIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannel_GetParent(m_pHandle, bytesNeededParentIdentifier, &bytesWrittenParentIdentifier, &bufferParentIdentifier[0]));
+		
+		return std::string(&bufferParentIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryChannel::GetIdentifier - Returns the Identifier of the Channel.
+	* @return Channel Identifier. Will be a alphanumerical path string.
+	*/
+	std::string CTelemetryChannel::GetIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededChannelIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenChannelIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannel_GetIdentifier(m_pHandle, 0, &bytesNeededChannelIdentifier, nullptr));
+		std::vector<char> bufferChannelIdentifier(bytesNeededChannelIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannel_GetIdentifier(m_pHandle, bytesNeededChannelIdentifier, &bytesWrittenChannelIdentifier, &bufferChannelIdentifier[0]));
+		
+		return std::string(&bufferChannelIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryChannel::GetGlobalIdentifier - Returns the global Identifier of the Channel, which is ParentIdentifier.ChannelIdentifier
+	* @return Global Identifier. Will be a alphanumerical path string.
+	*/
+	std::string CTelemetryChannel::GetGlobalIdentifier()
+	{
+		LibMCEnv_uint32 bytesNeededGlobalIdentifier = 0;
+		LibMCEnv_uint32 bytesWrittenGlobalIdentifier = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannel_GetGlobalIdentifier(m_pHandle, 0, &bytesNeededGlobalIdentifier, nullptr));
+		std::vector<char> bufferGlobalIdentifier(bytesNeededGlobalIdentifier);
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannel_GetGlobalIdentifier(m_pHandle, bytesNeededGlobalIdentifier, &bytesWrittenGlobalIdentifier, &bufferGlobalIdentifier[0]));
+		
+		return std::string(&bufferGlobalIdentifier[0]);
+	}
+	
+	/**
+	* CTelemetryChannel::StartMarkerScope - Starts a marker scope object.
+	* @param[in] nUserContextData - User data to be stored with the marker.
+	* @return Marker scope instance. Will finish when freed.
+	*/
+	PTelemetryMarkerScope CTelemetryChannel::StartMarkerScope(const LibMCEnv_uint64 nUserContextData)
+	{
+		LibMCEnvHandle hTelemetryMarkerScopeInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannel_StartMarkerScope(m_pHandle, nUserContextData, &hTelemetryMarkerScopeInstance));
+		
+		if (!hTelemetryMarkerScopeInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryMarkerScope>(m_pWrapper, hTelemetryMarkerScopeInstance);
+	}
+	
+	/**
+	* CTelemetryChannel::CreateInstantMarker - Creates a marker of length 0.
+	* @param[in] nUserContextData - User data to be stored with the marker.
+	* @return Global marker ID.
+	*/
+	LibMCEnv_uint64 CTelemetryChannel::CreateInstantMarker(const LibMCEnv_uint64 nUserContextData)
+	{
+		LibMCEnv_uint64 resultMarkerID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TelemetryChannel_CreateInstantMarker(m_pHandle, nUserContextData, &resultMarkerID));
+		
+		return resultMarkerID;
+	}
+	
+	/**
 	 * Method definitions for class CStateEnvironment
 	 */
 	
@@ -29616,35 +32492,14 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::WaitForSignal - Waits for a signal for a certain amount of time.
-	* @param[in] sSignalName - Name Of Signal
-	* @param[in] nTimeOut - Timeout in Milliseconds. 0 for Immediate return.
-	* @param[out] pHandlerInstance - Signal object. If Success is false, the Signal Handler Object will be null.
-	* @return Signal has been triggered
-	*/
-	bool CStateEnvironment::WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance)
-	{
-		LibMCEnvHandle hHandlerInstance = nullptr;
-		bool resultSuccess = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_WaitForSignal(m_pHandle, sSignalName.c_str(), nTimeOut, &hHandlerInstance, &resultSuccess));
-		if (hHandlerInstance) {
-			pHandlerInstance = std::make_shared<CSignalHandler>(m_pWrapper, hHandlerInstance);
-		} else {
-			pHandlerInstance = nullptr;
-		}
-		
-		return resultSuccess;
-	}
-	
-	/**
-	* CStateEnvironment::GetUnhandledSignal - Retrieves an unhandled signal By signal type name. Only affects signals with Phase InQueue.
+	* CStateEnvironment::ClaimSignalFromQueue - Retrieves an InQueue signal by type and changes its phase to InProcess. Recommended to use as it is robust against signal timeouts...
 	* @param[in] sSignalTypeName - Name Of Signal to be returned
-	* @return Signal object. If no signal has been found the signal handler object will be null.
+	* @return Signal object. If no signal is InQueue the signal handler object will be null.
 	*/
-	PSignalHandler CStateEnvironment::GetUnhandledSignal(const std::string & sSignalTypeName)
+	PSignalHandler CStateEnvironment::ClaimSignalFromQueue(const std::string & sSignalTypeName)
 	{
 		LibMCEnvHandle hHandlerInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUnhandledSignal(m_pHandle, sSignalTypeName.c_str(), &hHandlerInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ClaimSignalFromQueue(m_pHandle, sSignalTypeName.c_str(), &hHandlerInstance));
 		
 		if (hHandlerInstance) {
 			return std::make_shared<CSignalHandler>(m_pWrapper, hHandlerInstance);
@@ -29654,7 +32509,33 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::ClearUnhandledSignalsOfType - Clears all unhandled signals of a certain type and marks them as Cleared. Only affects signals with Phase InQueue.
+	* CStateEnvironment::SignalQueueIsEmpty - Returns if a signal queue is empty for a specific type... Equivalent to NOT QueueHasSignal.
+	* @param[in] sSignalTypeName - Name Of Signal to be returned
+	* @return Returns if the signal queue is empty. Please be aware that even a false return value does not guarantee that ClaimSignalFromQueue returns a non-null value.
+	*/
+	bool CStateEnvironment::SignalQueueIsEmpty(const std::string & sSignalTypeName)
+	{
+		bool resultIsEmpty = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_SignalQueueIsEmpty(m_pHandle, sSignalTypeName.c_str(), &resultIsEmpty));
+		
+		return resultIsEmpty;
+	}
+	
+	/**
+	* CStateEnvironment::QueueHasSignal - Returns if a signal queue has a signal of a specific type. Equivalent to NOT SignalQueueIsEmpty ().
+	* @param[in] sSignalTypeName - Name Of Signal to be returned
+	* @return Returns if there is a signal in a signal queue. Please be aware that even a true return value does not guarantee that ClaimSignalFromQueue returns a non-null value.
+	*/
+	bool CStateEnvironment::QueueHasSignal(const std::string & sSignalTypeName)
+	{
+		bool resultHasSignal = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_QueueHasSignal(m_pHandle, sSignalTypeName.c_str(), &resultHasSignal));
+		
+		return resultHasSignal;
+	}
+	
+	/**
+	* CStateEnvironment::ClearUnhandledSignalsOfType - Clears all InQueue or InProcess signals of a certain type and marks them as Cleared. Handled, failed or timedout signals are unaffected
 	* @param[in] sSignalTypeName - Name Of Signal to be cleared.
 	*/
 	void CStateEnvironment::ClearUnhandledSignalsOfType(const std::string & sSignalTypeName)
@@ -29663,7 +32544,7 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::ClearAllUnhandledSignals - Clears all unhandled signals and marks them Cleared. Only affects signals in the specific queue (as well as with Phase InQueue.
+	* CStateEnvironment::ClearAllUnhandledSignals - Clears all InQueue or InProcess signals of this state machine and marks them Cleared. Handled, failed or timedout signals are unaffected
 	*/
 	void CStateEnvironment::ClearAllUnhandledSignals()
 	{
@@ -29671,9 +32552,45 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::GetUnhandledSignalByUUID - retrieves an unhandled signal from the current state machine by UUID.
+	* CStateEnvironment::RegisterTelemetryChannel - Registers a telemetry channel for the current state machine. Fails if identifier already exists.
+	* @param[in] sChannelIdentifier - Channel Identifier. Must be a alphanumerical path string.
+	* @param[in] sChannelDescription - Description of Channel. MUST NOT be empty.
+	* @param[in] eChannelType - Type of Channel.
+	* @return Channel instance.
+	*/
+	PTelemetryChannel CStateEnvironment::RegisterTelemetryChannel(const std::string & sChannelIdentifier, const std::string & sChannelDescription, const eTelemetryChannelType eChannelType)
+	{
+		LibMCEnvHandle hChannelInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RegisterTelemetryChannel(m_pHandle, sChannelIdentifier.c_str(), sChannelDescription.c_str(), eChannelType, &hChannelInstance));
+		
+		if (!hChannelInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTelemetryChannel>(m_pWrapper, hChannelInstance);
+	}
+	
+	/**
+	* CStateEnvironment::FindTelemetryChannel - Returns a telemetry channel from the current state machine.
+	* @param[in] sChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+	* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+	* @return Channel instance. NULL if Channel does not exist.
+	*/
+	PTelemetryChannel CStateEnvironment::FindTelemetryChannel(const std::string & sChannelIdentifier, const bool bFailIfNotExisting)
+	{
+		LibMCEnvHandle hChannelInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindTelemetryChannel(m_pHandle, sChannelIdentifier.c_str(), bFailIfNotExisting, &hChannelInstance));
+		
+		if (hChannelInstance) {
+			return std::make_shared<CTelemetryChannel>(m_pWrapper, hChannelInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CStateEnvironment::GetUnhandledSignalByUUID - Retrieves an InQueue or InProcess signal from the current state machine by UUID.
 	* @param[in] sUUID - Name
-	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.
+	* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled, failed, cleared or timedout already.
 	* @return Signal handler instance. Returns null, if signal does not exist.
 	*/
 	PSignalHandler CStateEnvironment::GetUnhandledSignalByUUID(const std::string & sUUID, const bool bMustExist)
@@ -29781,6 +32698,80 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::WaitForSignal - DEPRECIATED: Waits for an InQueue signal to exist for a certain amount of time. DOES NOT change signal phase to InProcess, and is not atomic. And so NOT robust against signal timeouts. USE claim signal instead.
+	* @param[in] sSignalName - Name Of Signal
+	* @param[in] nTimeOut - Timeout in Milliseconds. 0 for Immediate return.
+	* @param[out] pHandlerInstance - Signal object. If Success is false, the Signal Handler Object will be null.
+	* @return Signal has been triggered
+	*/
+	bool CStateEnvironment::WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance)
+	{
+		LibMCEnvHandle hHandlerInstance = nullptr;
+		bool resultSuccess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_WaitForSignal(m_pHandle, sSignalName.c_str(), nTimeOut, &hHandlerInstance, &resultSuccess));
+		if (hHandlerInstance) {
+			pHandlerInstance = std::make_shared<CSignalHandler>(m_pWrapper, hHandlerInstance);
+		} else {
+			pHandlerInstance = nullptr;
+		}
+		
+		return resultSuccess;
+	}
+	
+	/**
+	* CStateEnvironment::GetUnhandledSignal - DEPRECIATED: Retrieves am InQueue signal by type. DOES NOT change signal phase to InProcess, and is not atomic. And so NOT robust against signal timeouts. USE ClaimSignalFromQueue instead.
+	* @param[in] sSignalTypeName - Name Of Signal to be returned
+	* @return Signal object. If no signal has been found the signal handler object will be null.
+	*/
+	PSignalHandler CStateEnvironment::GetUnhandledSignal(const std::string & sSignalTypeName)
+	{
+		LibMCEnvHandle hHandlerInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetUnhandledSignal(m_pHandle, sSignalTypeName.c_str(), &hHandlerInstance));
+		
+		if (hHandlerInstance) {
+			return std::make_shared<CSignalHandler>(m_pWrapper, hHandlerInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CStateEnvironment::StoreSignal - DEPRECIATED: stores a signal handler in the current state machine
+	* @param[in] sName - Name
+	* @param[in] pHandler - Signal handler to store.
+	*/
+	void CStateEnvironment::StoreSignal(const std::string & sName, classParam<CSignalHandler> pHandler)
+	{
+		LibMCEnvHandle hHandler = pHandler.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreSignal(m_pHandle, sName.c_str(), hHandler));
+	}
+	
+	/**
+	* CStateEnvironment::RetrieveSignal - DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
+	* @param[in] sName - Name
+	* @return Signal handler instance.
+	*/
+	PSignalHandler CStateEnvironment::RetrieveSignal(const std::string & sName)
+	{
+		LibMCEnvHandle hHandler = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveSignal(m_pHandle, sName.c_str(), &hHandler));
+		
+		if (!hHandler) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CSignalHandler>(m_pWrapper, hHandler);
+	}
+	
+	/**
+	* CStateEnvironment::ClearStoredValue - DEPRECIATED: deletes a value from the data store.
+	* @param[in] sName - Name
+	*/
+	void CStateEnvironment::ClearStoredValue(const std::string & sName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ClearStoredValue(m_pHandle, sName.c_str()));
+	}
+	
+	/**
 	* CStateEnvironment::SetNextState - sets the next state
 	* @param[in] sStateName - Name of next state
 	*/
@@ -29835,42 +32826,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CheckForTermination(m_pHandle, &resultShallTerminate));
 		
 		return resultShallTerminate;
-	}
-	
-	/**
-	* CStateEnvironment::StoreSignal - DEPRECIATED: stores a signal handler in the current state machine
-	* @param[in] sName - Name
-	* @param[in] pHandler - Signal handler to store.
-	*/
-	void CStateEnvironment::StoreSignal(const std::string & sName, classParam<CSignalHandler> pHandler)
-	{
-		LibMCEnvHandle hHandler = pHandler.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreSignal(m_pHandle, sName.c_str(), hHandler));
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveSignal - DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
-	* @param[in] sName - Name
-	* @return Signal handler instance.
-	*/
-	PSignalHandler CStateEnvironment::RetrieveSignal(const std::string & sName)
-	{
-		LibMCEnvHandle hHandler = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveSignal(m_pHandle, sName.c_str(), &hHandler));
-		
-		if (!hHandler) {
-			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CSignalHandler>(m_pWrapper, hHandler);
-	}
-	
-	/**
-	* CStateEnvironment::ClearStoredValue - DEPRECIATED: deletes a value from the data store.
-	* @param[in] sName - Name
-	*/
-	void CStateEnvironment::ClearStoredValue(const std::string & sName)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ClearStoredValue(m_pHandle, sName.c_str()));
 	}
 	
 	/**
@@ -30005,6 +32960,94 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::HasParameterGroup - checks if a parameter group exists.
+	* @param[in] sParameterGroup - Parameter Group
+	* @return returns true if the parameter group exists.
+	*/
+	bool CStateEnvironment::HasParameterGroup(const std::string & sParameterGroup)
+	{
+		bool resultGroupExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasParameterGroup(m_pHandle, sParameterGroup.c_str(), &resultGroupExists));
+		
+		return resultGroupExists;
+	}
+	
+	/**
+	* CStateEnvironment::HasParameter - checks if a parameter exists within a given group.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return returns true if the parameter exists in the given group.
+	*/
+	bool CStateEnvironment::HasParameter(const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		bool resultParameterExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_HasParameter(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultParameterExists));
+		
+		return resultParameterExists;
+	}
+	
+	/**
+	* CStateEnvironment::GetParameterGroupParameterCount - returns the number of parameters contained in a given parameter group.
+	* @param[in] sParameterGroup - Parameter Group
+	* @return Number of parameters in the group.
+	*/
+	LibMCEnv_uint32 CStateEnvironment::GetParameterGroupParameterCount(const std::string & sParameterGroup)
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetParameterGroupParameterCount(m_pHandle, sParameterGroup.c_str(), &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CStateEnvironment::GetParameterGroupParameterName - returns the name of a parameter in a given parameter group by index.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Name of the parameter.
+	*/
+	std::string CStateEnvironment::GetParameterGroupParameterName(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetParameterGroupParameterName(m_pHandle, sParameterGroup.c_str(), nIndex, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetParameterGroupParameterName(m_pHandle, sParameterGroup.c_str(), nIndex, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CStateEnvironment::GetParameterGroupParameterDescription - returns the description of a parameter in a given parameter group by index.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Description of the parameter.
+	*/
+	std::string CStateEnvironment::GetParameterGroupParameterDescription(const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetParameterGroupParameterDescription(m_pHandle, sParameterGroup.c_str(), nIndex, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetParameterGroupParameterDescription(m_pHandle, sParameterGroup.c_str(), nIndex, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CStateEnvironment::GetParameterGroupParameterType - returns the data type of a parameter in a given parameter group by name.
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Data type of the parameter.
+	*/
+	eParameterDataType CStateEnvironment::GetParameterGroupParameterType(const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		eParameterDataType resultParameterType = (eParameterDataType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetParameterGroupParameterType(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultParameterType));
+		
+		return resultParameterType;
+	}
+	
+	/**
 	* CStateEnvironment::HasResourceData - retrieves if the machine resources has data with the given identifier.
 	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
 	* @return returns true if the resource exists in the machine resource package.
@@ -30080,6 +33123,43 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
+	}
+	
+	/**
+	* CStateEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	PVideoStream CStateEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateVideoStream(m_pHandle, nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds, &hVideoStreamInstance));
+		
+		if (!hVideoStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+	}
+	
+	/**
+	* CStateEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	PVideoStream CStateEnvironment::FindVideoStream(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_FindVideoStream(m_pHandle, sStreamUUID.c_str(), &hVideoStreamInstance));
+		
+		if (hVideoStreamInstance) {
+			return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**
@@ -30924,6 +34004,19 @@ public:
 	}
 	
 	/**
+	* CUIEnvironment::SenderHasTag - checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.
+	* @param[in] sTag - Tag to check for.
+	* @return True if the sender declares the given tag.
+	*/
+	bool CUIEnvironment::SenderHasTag(const std::string & sTag)
+	{
+		bool resultTagExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SenderHasTag(m_pHandle, sTag.c_str(), &resultTagExists));
+		
+		return resultTagExists;
+	}
+	
+	/**
 	* CUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
@@ -31062,6 +34155,71 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterAsBool(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetMachineParameterGroupParameterCount - returns the number of parameters contained in a given parameter group of a state machine.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @return Number of parameters in the group.
+	*/
+	LibMCEnv_uint32 CUIEnvironment::GetMachineParameterGroupParameterCount(const std::string & sMachineInstance, const std::string & sParameterGroup)
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterGroupParameterCount(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CUIEnvironment::GetMachineParameterGroupParameterName - returns the name of a parameter in a given parameter group of a state machine by index.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Name of the parameter.
+	*/
+	std::string CUIEnvironment::GetMachineParameterGroupParameterName(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterGroupParameterName(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), nIndex, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterGroupParameterName(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), nIndex, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetMachineParameterGroupParameterDescription - returns the description of a parameter in a given parameter group of a state machine by index.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+	* @return Description of the parameter.
+	*/
+	std::string CUIEnvironment::GetMachineParameterGroupParameterDescription(const std::string & sMachineInstance, const std::string & sParameterGroup, const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 bytesNeededDescription = 0;
+		LibMCEnv_uint32 bytesWrittenDescription = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterGroupParameterDescription(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), nIndex, 0, &bytesNeededDescription, nullptr));
+		std::vector<char> bufferDescription(bytesNeededDescription);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterGroupParameterDescription(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), nIndex, bytesNeededDescription, &bytesWrittenDescription, &bufferDescription[0]));
+		
+		return std::string(&bufferDescription[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetMachineParameterGroupParameterType - returns the data type of a parameter in a given parameter group of a state machine by name.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Data type of the parameter.
+	*/
+	eParameterDataType CUIEnvironment::GetMachineParameterGroupParameterType(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		eParameterDataType resultParameterType = (eParameterDataType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterGroupParameterType(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultParameterType));
+		
+		return resultParameterType;
 	}
 	
 	/**
@@ -31228,6 +34386,43 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CImageLoader>(m_pWrapper, hImageLoaderInstance);
+	}
+	
+	/**
+	* CUIEnvironment::CreateVideoStream - creates a video stream object for MJPEG streaming.
+	* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+	* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+	* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+	* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+	* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+	* @return Video stream instance.
+	*/
+	PVideoStream CUIEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateVideoStream(m_pHandle, nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds, &hVideoStreamInstance));
+		
+		if (!hVideoStreamInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+	}
+	
+	/**
+	* CUIEnvironment::FindVideoStream - Finds a video stream by UUID. Returns null if the stream does not exist.
+	* @param[in] sStreamUUID - UUID of the video stream to find.
+	* @return Video stream instance, or null if not found.
+	*/
+	PVideoStream CUIEnvironment::FindVideoStream(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hVideoStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_FindVideoStream(m_pHandle, sStreamUUID.c_str(), &hVideoStreamInstance));
+		
+		if (hVideoStreamInstance) {
+			return std::make_shared<CVideoStream>(m_pWrapper, hVideoStreamInstance);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**
@@ -31436,6 +34631,22 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CBuildExecution>(m_pWrapper, hExecutionInstance);
+	}
+	
+	/**
+	* CUIEnvironment::GetRecentBuildJobs - Returns an iterator for recent build jobs, ordered by timestamp (newest first).
+	* @param[in] nMaxCount - Maximum number of jobs to return. Must be greater than 0.
+	* @return Iterator for build jobs, ordered newest first.
+	*/
+	PBuildIterator CUIEnvironment::GetRecentBuildJobs(const LibMCEnv_uint32 nMaxCount)
+	{
+		LibMCEnvHandle hBuildIterator = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetRecentBuildJobs(m_pHandle, nMaxCount, &hBuildIterator));
+		
+		if (!hBuildIterator) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildIterator>(m_pWrapper, hBuildIterator);
 	}
 	
 	/**
@@ -31927,6 +35138,46 @@ public:
 	void CUIEnvironment::AddExternalEventResultValue(const std::string & sReturnValueName, const std::string & sReturnValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_AddExternalEventResultValue(m_pHandle, sReturnValueName.c_str(), sReturnValue.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::SetStringResult - Sets a string result value for external event return (typed convenience wrapper).
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] sReturnValue - Return value.
+	*/
+	void CUIEnvironment::SetStringResult(const std::string & sReturnValueName, const std::string & sReturnValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetStringResult(m_pHandle, sReturnValueName.c_str(), sReturnValue.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::SetIntegerResult - Sets an integer result value for external event return.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] nReturnValue - Return value.
+	*/
+	void CUIEnvironment::SetIntegerResult(const std::string & sReturnValueName, const LibMCEnv_int64 nReturnValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetIntegerResult(m_pHandle, sReturnValueName.c_str(), nReturnValue));
+	}
+	
+	/**
+	* CUIEnvironment::SetBoolResult - Sets a boolean result value for external event return.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] bReturnValue - Return value.
+	*/
+	void CUIEnvironment::SetBoolResult(const std::string & sReturnValueName, const bool bReturnValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetBoolResult(m_pHandle, sReturnValueName.c_str(), bReturnValue));
+	}
+	
+	/**
+	* CUIEnvironment::SetDoubleResult - Sets a double result value for external event return.
+	* @param[in] sReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+	* @param[in] dReturnValue - Return value.
+	*/
+	void CUIEnvironment::SetDoubleResult(const std::string & sReturnValueName, const LibMCEnv_double dReturnValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetDoubleResult(m_pHandle, sReturnValueName.c_str(), dReturnValue));
 	}
 	
 	/**

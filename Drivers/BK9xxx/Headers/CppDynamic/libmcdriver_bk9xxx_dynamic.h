@@ -298,6 +298,16 @@ typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_AnalogInputE
 typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_AnalogOutputExistsPtr) (LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pName, bool * pNameExists);
 
 /**
+* Returns if an analog input is out of bounds. The raw values itself will be clipped to the configured range.
+*
+* @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
+* @param[in] pName - Name of variable. Fails if Variable does not exist or is not an analog variable.
+* @param[out] pInputIsOutOfBounds - Flag if the raw value is out of bounds and has been clipped to the input window.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_AnalogInputIsOutOfBoundsPtr) (LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pName, bool * pInputIsOutOfBounds);
+
+/**
 * Reads a value from an digital input variable. Fails if variable does not exist.
 *
 * @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
@@ -491,6 +501,7 @@ typedef struct {
 	PLibMCDriver_BK9xxxDriver_BK9xxx_DigitalOutputExistsPtr m_Driver_BK9xxx_DigitalOutputExists;
 	PLibMCDriver_BK9xxxDriver_BK9xxx_AnalogInputExistsPtr m_Driver_BK9xxx_AnalogInputExists;
 	PLibMCDriver_BK9xxxDriver_BK9xxx_AnalogOutputExistsPtr m_Driver_BK9xxx_AnalogOutputExists;
+	PLibMCDriver_BK9xxxDriver_BK9xxx_AnalogInputIsOutOfBoundsPtr m_Driver_BK9xxx_AnalogInputIsOutOfBounds;
 	PLibMCDriver_BK9xxxDriver_BK9xxx_GetDigitalInputPtr m_Driver_BK9xxx_GetDigitalInput;
 	PLibMCDriver_BK9xxxDriver_BK9xxx_GetDigitalOutputPtr m_Driver_BK9xxx_GetDigitalOutput;
 	PLibMCDriver_BK9xxxDriver_BK9xxx_GetAnalogInputRawPtr m_Driver_BK9xxx_GetAnalogInputRaw;

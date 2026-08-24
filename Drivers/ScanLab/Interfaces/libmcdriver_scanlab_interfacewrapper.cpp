@@ -4351,6 +4351,58 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addwritemaskeddigitalio
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readdigitalinputs(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pDigitalInput)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pDigitalInput == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pDigitalInput = pIRTCContext->ReadDigitalInputs();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readdigitalinputbit(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nBitIndex, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pValue = pIRTCContext->ReadDigitalInputBit(nBitIndex);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_enableoie(LibMCDriver_ScanLab_RTCContext pRTCContext)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -5548,6 +5600,134 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_mappowerwattstopercent(
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		*pLaserPowerInPercent = pIRTCContext->MapPowerWattsToPercent(dLaserPowerInWatts);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setpiecewiselineardefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const sLibMCDriver_ScanLabDefocusCorrectionPoint * pCalibrationPointsBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if ( (!pCalibrationPointsBuffer) && (nCalibrationPointsBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->SetPiecewiseLinearDefocusCorrectionByPower(nCalibrationPointsBufferSize, pCalibrationPointsBuffer);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disabledefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->DisableDefocusCorrectionByPower();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_defocuscorrectionbypowerisenabled(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pIsEnabled)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pIsEnabled == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pIsEnabled = pIRTCContext->DefocusCorrectionByPowerIsEnabled();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getdefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext, const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, sLibMCDriver_ScanLabDefocusCorrectionPoint * pCalibrationPointsBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if ((!pCalibrationPointsBuffer) && !(pCalibrationPointsNeededCount))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->GetDefocusCorrectionByPower(nCalibrationPointsBufferSize, pCalibrationPointsNeededCount, pCalibrationPointsBuffer);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_mapdefocuscorrectionfrompower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserPowerInWatts, LibMCDriver_ScanLab_double * pDefocusOffsetInMM)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (pDefocusOffsetInMM == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		*pDefocusOffsetInMM = pIRTCContext->MapDefocusCorrectionFromPower(dLaserPowerInWatts);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -8279,6 +8459,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addwritedigitaliolist;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_readdigitalinputs") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_readdigitalinputs;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_readdigitalinputbit") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_readdigitalinputbit;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_enableoie") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enableoie;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disableoie") 
@@ -8373,6 +8557,16 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_mappowerpercentagetowatts;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_mappowerwattstopercent") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_mappowerwattstopercent;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_setpiecewiselineardefocuscorrectionbypower") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setpiecewiselineardefocuscorrectionbypower;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_disabledefocuscorrectionbypower") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disabledefocuscorrectionbypower;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_defocuscorrectionbypowerisenabled") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_defocuscorrectionbypowerisenabled;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getdefocuscorrectionbypower") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getdefocuscorrectionbypower;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_mapdefocuscorrectionfrompower") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_mapdefocuscorrectionfrompower;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_enablespatiallaserpowermodulation;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_disablepowermodulation") 

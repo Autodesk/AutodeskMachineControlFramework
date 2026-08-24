@@ -57,14 +57,16 @@ template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_p
 	return pExternalInstance;
 }
 
-CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PMeshHandler pMeshHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono,  PStateJournal pStateJournal)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PMeshHandler pMeshHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono,  PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler, AMC::PStreamRegistry pStreamRegistry)
 	: m_pEnvironmentWrapper (pEnvironmentWrapper), 
 	m_pToolpathHandler (pToolpathHandler), 
 	m_pMeshHandler (pMeshHandler),
 	m_pLogger (pLogger),
 	m_pDataModel (pDataModel),
 	m_pGlobalChrono (pGlobalChrono),
-	m_pStateJournal(pStateJournal)
+	m_pStateJournal(pStateJournal),
+	m_pTelemetryHandler (pTelemetryHandler),
+	m_pStreamRegistry (pStreamRegistry)
 {
 	LibMCAssertNotNull(pEnvironmentWrapper.get());
 	LibMCAssertNotNull(pToolpathHandler.get());
@@ -73,6 +75,8 @@ CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpath
 	LibMCAssertNotNull(pDataModel.get());
 	LibMCAssertNotNull(pGlobalChrono.get());
 	LibMCAssertNotNull(pStateJournal.get());
+	LibMCAssertNotNull(pTelemetryHandler.get());
+	LibMCAssertNotNull(pStreamRegistry.get());
 
 }
 
@@ -108,7 +112,7 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	auto pParameterGroup = std::make_shared<CParameterGroup>(m_pGlobalChrono);
 	pParameterGroup->setJournal(m_pStateJournal, sName);
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_pMeshHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, sName, m_pStateJournal);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_pMeshHandler, m_sTempBasePath, m_pLogger, m_pDataModel, m_pGlobalChrono, sName, m_pStateJournal, m_pTelemetryHandler, m_pStreamRegistry);
 
 	pInternalEnvironment->setIsInitializing(true);
 
@@ -183,6 +187,14 @@ void CDriverHandler::GetDriverInformation(const std::string& sName, std::string&
 
 	sType = pDriver->getType();
 	pSymbolLookup = pDriver->getSymbolLookup();
+}
+
+void CDriverHandler::GetDriverVersionInfo(const std::string& sName, uint32_t& nMajor, uint32_t& nMinor, uint32_t& nMicro, std::string& sBuild)
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+	auto pDriver = findDriver(sName, true);
+
+	pDriver->getVersionInfo(nMajor, nMinor, nMicro, sBuild);
 }
 
 

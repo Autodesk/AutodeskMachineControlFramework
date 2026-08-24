@@ -70,18 +70,18 @@ namespace AMCUnitTest {
 
         void testAddPermission() {
             AMC::CAccessControl control;
-            auto perm = control.addPermission("perm.read", makeString("Read"), makeString("Can read"));
-            auto found = control.findPermission("perm.read", true);
-            assertTrue(found->getIdentifier() == "perm.read");
+            auto perm = control.addPermission("perm_read", makeString("Read"), makeString("Can read"));
+            auto found = control.findPermission("perm_read", true);
+            assertTrue(found->getIdentifier() == "perm_read");
         }
 
         void testAddDuplicatePermissionFails() {
             AMC::CAccessControl control;
-            control.addPermission("perm.read", makeString("Read"), makeString("Can read"));
+            control.addPermission("perm_read", makeString("Read"), makeString("Can read"));
 
             bool thrown = false;
             try {
-                control.addPermission("perm.read", makeString("Read Again"), makeString("Should fail"));
+                control.addPermission("perm_read", makeString("Read Again"), makeString("Should fail"));
             } catch (...) {
                 thrown = true;
             }
@@ -125,11 +125,11 @@ namespace AMCUnitTest {
 
         void testCheckPermissionInRole() {
             AMC::CAccessControl control;
-            auto perm = control.addPermission("perm.test", makeString("Test"), makeString(""));
+            auto perm = control.addPermission("perm_test", makeString("Test"), makeString(""));
             auto role = control.addRole("tester", makeString("Tester"), makeString(""));
 
             role->addPermission(perm);
-            bool hasPerm = control.checkPermissionInRole("tester", "perm.test");
+            bool hasPerm = control.checkPermissionInRole("tester", "perm_test");
             assertTrue(hasPerm);
         }
 
@@ -158,10 +158,10 @@ namespace AMCUnitTest {
         void testEmptyIdentifierThrows() {
             AMC::CAccessControl control;
             control.addRole("viewer", makeString("Viewer"), makeString(""));
-            control.addPermission("perm.view", makeString("View"), makeString(""));
+            control.addPermission("perm_view", makeString("View"), makeString(""));
             bool thrown = false;
             try {
-                control.checkPermissionInRole("", "perm.view");
+                control.checkPermissionInRole("", "perm_view");
             } catch (...) {
                 thrown = true;
             }

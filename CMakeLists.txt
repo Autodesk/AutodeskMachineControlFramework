@@ -35,8 +35,9 @@ project(LibMC)
 
 option(INCLUDE_DRIVERS "Include the drivers in the build" ON)
 option(INCLUDE_TESTS "Include the test system in the build" OFF)
+option(ENABLE_COVERAGE "Enable coverage instrumentation (GCC/Clang)" OFF)
 
-set(CMAKE_AMCF_PLUGINNAME Examples/LPBFSystem)
+set(CMAKE_AMCF_PLUGINNAME Examples/WidgetTest)
 
 set(CMAKE_AMCF_PROJECTDIR ${PROJECT_BINARY_DIR})
 
@@ -46,6 +47,26 @@ set(CMAKE_CURRENT_PLUGINS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_AMCF_PLUGINNAM
 if(INCLUDE_TESTS)
 message(STATUS "Including Tests in build")
 add_subdirectory(Tests)
+endif()
+
+if(ENABLE_COVERAGE)
+	if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+		message(STATUS "Coverage enabled")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g --coverage")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g --coverage")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+		if(UNIX AND NOT APPLE)
+			add_custom_target(coverage
+				COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/DevTools/coverage_linux.sh --unittest
+				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+				COMMENT "Running unit test coverage (Linux)"
+				VERBATIM
+			)
+		endif()
+	else()
+		message(WARNING "Coverage enabled but compiler is not supported for --coverage")
+	endif()
 endif()
 
 set (CMAKE_CXX_STANDARD 17)
@@ -78,14 +99,17 @@ endif()
 # Setting platform dependent executables
 if (${TARGETPLATFORM} MATCHES "win64")
 	set(BUILDRESOURCES_EXECUTABLE ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.exe)
+	set(BUILDRESOURCES_OUTPUT_NAME "buildresources")
 	set(DLLEXTENSION "dll")
 	set(LIB3MF_ARTIFACT "lib3mf_win64.dll")
 elseif (${TARGETPLATFORM} MATCHES "linux64")
 	set(BUILDRESOURCES_EXECUTABLE ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.linux64)
+	set(BUILDRESOURCES_OUTPUT_NAME "buildresources.linux64")
 	set(DLLEXTENSION "so")
 	set(LIB3MF_ARTIFACT "lib3mf_linux64.so")
 elseif (${TARGETPLATFORM} MATCHES "rpi")
 	set(BUILDRESOURCES_EXECUTABLE ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.rpi)
+	set(BUILDRESOURCES_OUTPUT_NAME "buildresources.rpi")
 	set(DLLEXTENSION "so")
 	set(LIB3MF_ARTIFACT "lib3mf_rpi.so")
 else ()
@@ -111,8 +135,11 @@ message(STATUS "Client hash: \"${CLIENTDIRHASH}\"")
 add_custom_target(finished_drivers ALL)
 add_dependencies(finished_drivers amc_server)
 add_dependencies(finished_drivers copy_distribution_libraries)
+add_dependencies(finished_drivers build_resources)
 add_dependencies(finished_drivers create_core_resources)
 add_dependencies(finished_drivers create_package_xml)
+add_dependencies(finished_drivers create_deployment_zip)
+add_dependencies(finished_drivers create_dev_package)
 add_dependencies(finished_drivers build_configuration_xml)
 add_dependencies(finished_drivers libmc)
 
@@ -532,6 +559,8 @@ add_custom_command(
 			${CMAKE_CURRENT_PLUGINS_DIR}/Resources/
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core.data)
 
+add_dependencies(create_core_resources build_resources)
+
 #[[++
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -716,6 +745,7 @@ file(GLOB UNITTEST_SRC
   ${LIBMC_SRC_DEP_PUGIXML}
   ${LIBMC_SRC_DEP_CROSSGUID}
   ${LIBMC_SRC_DEP_LODEPNG}
+  ${LIBMCDATA_SRC}
 )
 
 add_executable(amc_unittest ${UNITTEST_SRC})
@@ -737,12 +767,16 @@ target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Impl
 target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/UI)
 target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/LibMC)
 target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/LibMCEnv)
+target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/LibMCData)
+target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/DataModel)
 target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
 target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PicoSHA2)
 target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libzip)
+target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
 target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
 target_include_directories(amc_unittest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
 target_compile_options(amc_unittest PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
+target_compile_options(amc_unittest PRIVATE "-D__LIBMCDATA_EXPORTS")
 
 if(WIN32)
 	
@@ -750,10 +784,12 @@ if(WIN32)
 		target_link_libraries(amc_unittest Winmm.lib)
 		target_link_libraries(amc_unittest Shlwapi.lib)
 		target_link_libraries(amc_unittest ws2_32.lib)
+		target_link_libraries(amc_unittest ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/sqlite3.lib)
 	else()
 		target_link_libraries(amc_unittest winmm.lib)
 		target_link_libraries(amc_unittest shlwapi.lib)
 		target_link_libraries(amc_unittest ws2_32.lib)
+		target_link_libraries(amc_unittest SQLite3)
 		target_link_options(amc_unittest PRIVATE -static-libgcc -static-libstdc++ --static )
 	endif (MSVC)
 else()
@@ -772,6 +808,9 @@ endif(WIN32)
 
 if(UNIX)
 	target_link_libraries(amc_unittest ${LIBUUID_PATH})
+	if (NOT APPLE)
+		target_link_libraries(amc_unittest SQLite3)
+	endif()
 endif()
 
 
@@ -901,3 +940,352 @@ if(UNIX)
 endif()
 
 
+
+
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ create_deployment_zip Target
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+file(GLOB CREATE_DEPLOYMENT_ZIP_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/BuildScripts/createDeploymentZIP.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_zip.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriter.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriterentry.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/crossguid/guid.cpp
+	${LIBMC_SRC_DEP_ZLIB}
+)
+
+add_executable(create_deployment_zip ${CREATE_DEPLOYMENT_ZIP_SRC} ${LIBMC_SRC_DEP_PUGIXML})
+
+target_include_directories(create_deployment_zip PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(create_deployment_zip PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
+target_include_directories(create_deployment_zip PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+set_target_properties(create_deployment_zip
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	
+	OUTPUT_NAME "create_deployment_zip"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	    
+)
+
+
+if(WIN32)
+	target_link_libraries(create_deployment_zip shlwapi.lib)
+	target_link_libraries(create_deployment_zip ws2_32.lib)
+endif(WIN32)
+
+if(UNIX)
+	if(NOT LIBUUID_PATH)
+		message(FATAL_ERROR "libuuid not found")
+	endif()
+	target_link_libraries(create_deployment_zip ${LIBUUID_PATH})
+endif()
+
+
+
+#[[++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ create_dev_package Target
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+file(GLOB CREATE_DEV_PACKAGE_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/BuildScripts/createDevPackage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_zip.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriter.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriterentry.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/crossguid/guid.cpp
+	${LIBMC_SRC_DEP_ZLIB}
+)
+
+add_executable(create_dev_package ${CREATE_DEV_PACKAGE_SRC})
+
+target_include_directories(create_dev_package PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(create_dev_package PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
+target_include_directories(create_dev_package PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+set_target_properties(create_dev_package
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	
+	OUTPUT_NAME "create_dev_package"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	    
+)
+
+
+if(WIN32)
+	target_link_libraries(create_dev_package shlwapi.lib)
+	target_link_libraries(create_dev_package ws2_32.lib)
+endif(WIN32)
+
+if(UNIX)
+	if(NOT LIBUUID_PATH)
+		message(FATAL_ERROR "libuuid not found")
+	endif()
+	target_link_libraries(create_dev_package ${LIBUUID_PATH})
+endif()
+
+
+
+#[[++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ build_resources Target
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+file(GLOB BUILD_RESOURCES_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/BuildScripts/buildResources.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_zip.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriter.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriterentry.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/crossguid/guid.cpp
+	${LIBMC_SRC_DEP_PUGIXML}
+	${LIBMC_SRC_DEP_ZLIB}
+)
+
+add_executable(build_resources ${BUILD_RESOURCES_SRC})
+
+target_include_directories(build_resources PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(build_resources PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
+target_include_directories(build_resources PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
+target_include_directories(build_resources PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+set_target_properties(build_resources
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	
+	OUTPUT_NAME "${BUILDRESOURCES_OUTPUT_NAME}"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	    
+)
+
+
+if(WIN32)
+	target_link_libraries(build_resources shlwapi.lib)
+	target_link_libraries(build_resources ws2_32.lib)
+endif(WIN32)
+
+if(UNIX)
+	if(NOT LIBUUID_PATH)
+		message(FATAL_ERROR "libuuid not found")
+	endif()
+	target_link_libraries(build_resources ${LIBUUID_PATH})
+endif()
+
+
+
+#[[++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++ create_client_dist Target
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+file(GLOB CREATE_CLIENT_DIST_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/BuildScripts/createClientDist.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_zip.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriter.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriterentry.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/crossguid/guid.cpp
+	${LIBMC_SRC_DEP_PUGIXML}
+	${LIBMC_SRC_DEP_ZLIB}
+)
+
+add_executable(create_client_dist ${CREATE_CLIENT_DIST_SRC})
+target_sources(create_client_dist PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp)
+
+target_include_directories(create_client_dist PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(create_client_dist PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
+target_include_directories(create_client_dist PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
+target_include_directories(create_client_dist PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+set_target_properties(create_client_dist
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	
+	OUTPUT_NAME "create_client_dist"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	    
+)
+
+
+if(WIN32)
+	target_link_libraries(create_client_dist shlwapi.lib)
+	target_link_libraries(create_client_dist ws2_32.lib)
+endif(WIN32)
+
+if(UNIX)
+	if(NOT LIBUUID_PATH)
+		message(FATAL_ERROR "libuuid not found")
+	endif()
+	target_link_libraries(create_client_dist ${LIBUUID_PATH})
+endif()
+
+
+
+#[[++ 
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++ create_client_source Target
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+file(GLOB CREATE_CLIENT_SOURCE_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/BuildScripts/createClientSource.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_zip.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriter.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_portablezipwriterentry.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/crossguid/guid.cpp
+	${LIBMC_SRC_DEP_ZLIB}
+)
+
+add_executable(create_client_source ${CREATE_CLIENT_SOURCE_SRC})
+target_sources(create_client_source PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp)
+
+target_include_directories(create_client_source PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(create_client_source PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
+target_include_directories(create_client_source PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+set_target_properties(create_client_source
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	
+	OUTPUT_NAME "create_client_source"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	    
+)
+
+
+if(WIN32)
+	target_link_libraries(create_client_source shlwapi.lib)
+	target_link_libraries(create_client_source ws2_32.lib)
+endif(WIN32)
+
+if(UNIX)
+	if(NOT LIBUUID_PATH)
+		message(FATAL_ERROR "libuuid not found")
+	endif()
+	target_link_libraries(create_client_source ${LIBUUID_PATH})
+endif()
+
+
+
+#[[++ 
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ packageManager Target
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+if(UNIX AND NOT APPLE)
+  # If you ever want to force static later, set this to TRUE before find_package.
+  # set(OPENSSL_USE_STATIC_LIBS TRUE)
+  find_package(OpenSSL REQUIRED)     # provides OpenSSL::SSL and OpenSSL::Crypto
+endif()
+
+file(GLOB PACKAGE_MANAGER_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/BuildScripts/packageManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/crossguid/guid.cpp
+)
+
+add_executable(package_manager ${PACKAGE_MANAGER_SRC} ${LIBMC_SRC_DEP_PUGIXML})
+
+target_include_directories(package_manager PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(package_manager PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
+target_include_directories(package_manager PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
+target_include_directories(package_manager PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PicoSHA2)
+if(MSVC)
+target_include_directories(package_manager PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl)
+endif()
+target_include_directories(package_manager PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+set_target_properties(package_manager
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/DevPackage/Framework"
+	
+	OUTPUT_NAME "package_manager"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	    
+)
+
+
+target_compile_options(package_manager PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
+target_compile_options(package_manager PRIVATE "-DUNICODE")
+target_compile_options(package_manager PRIVATE "-D_UNICODE")
+
+
+if(MSVC)
+	target_link_libraries(package_manager shlwapi.lib)
+	target_link_libraries(package_manager ws2_32.lib)
+	target_link_libraries(package_manager bcrypt.lib)	
+
+	target_link_libraries(package_manager ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl/win64/tls-24.lib)
+	target_link_libraries(package_manager ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl/win64/crypto-49.lib)
+	target_link_libraries(package_manager ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl/win64/ssl-52.lib)
+endif()
+
+if(UNIX AND NOT APPLE)
+
+	find_package(Threads REQUIRED)
+
+	if(NOT LIBUUID_PATH)
+		message(FATAL_ERROR "libuuid not found")
+	endif()
+	target_link_libraries(package_manager ${LIBUUID_PATH} OpenSSL::SSL OpenSSL::Crypto Threads::Threads)
+endif()

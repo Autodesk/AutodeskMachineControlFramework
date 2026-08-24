@@ -81,6 +81,8 @@ namespace AMC {
 
 		void registerProperty(const std::string & sName, const std::string & sTypeString, CUIExpression valueExpression);
 
+		const std::map<std::string, CUIExpression>& getProperties() const;
+
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
 	};

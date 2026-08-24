@@ -211,6 +211,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->ptr_n_set_mark_speed = (PScanLabPtr_n_set_mark_speed)_loadScanLabAddress(hLibrary, "n_set_mark_speed");
 	this->ptr_n_set_jump_speed = (PScanLabPtr_n_set_jump_speed)_loadScanLabAddress(hLibrary, "n_set_jump_speed");
 	this->ptr_n_write_io_port = (PScanLabPtr_n_write_io_port)_loadScanLabAddress(hLibrary, "n_write_io_port");
+	this->ptr_n_read_io_port = (PScanLabPtr_n_read_io_port)_loadScanLabAddress(hLibrary, "n_read_io_port");
 	this->ptr_n_write_8bit_port = (PScanLabPtr_n_write_8bit_port)_loadScanLabAddress(hLibrary, "n_write_8bit_port");
 	this->ptr_n_write_da_1 = (PScanLabPtr_n_write_da_1)_loadScanLabAddress(hLibrary, "n_write_da_1");
 	this->ptr_n_write_da_2 = (PScanLabPtr_n_write_da_2)_loadScanLabAddress(hLibrary, "n_write_da_2");
@@ -432,6 +433,7 @@ void CScanLabSDK::resetFunctionPtrs()
 	ptr_n_set_mark_speed = nullptr;
 	ptr_n_set_jump_speed = nullptr;
 	ptr_n_write_io_port = nullptr;
+	ptr_n_read_io_port = nullptr;
 	ptr_n_write_8bit_port = nullptr;
 	ptr_n_write_da_1 = nullptr;
 	ptr_n_write_da_2 = nullptr;
@@ -845,6 +847,16 @@ void CScanLabSDK::n_write_io_port(uint32_t nCardNo, uint32_t nValue)
 		m_pLogJournal->logCall("n_write_io_port", std::to_string(nCardNo) + ", " + std::to_string(nValue));
 
 	ptr_n_write_io_port(nCardNo, nValue);
+}
+
+uint32_t CScanLabSDK::n_read_io_port(uint32_t nCardNo)
+{
+	if (m_pLogJournal.get() != nullptr)
+		m_pLogJournal->logCall("n_read_io_port", std::to_string(nCardNo));
+
+	uint32_t nValue = ptr_n_read_io_port(nCardNo);
+
+	return nValue;
 }
 
 void CScanLabSDK::n_write_8bit_port(uint32_t nCardNo, uint32_t nValue)

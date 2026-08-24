@@ -79,6 +79,8 @@ private:
 
 public:
 
+	static void bumpIncrementalID(AMCData::PSQLHandler pSQLHandler, const std::string& sExecutionUUID);
+
 	static CBuildJobExecution* makeFrom(CBuildJobExecution * pBuildJobExecution);
 
 	static std::shared_ptr<CBuildJobExecution> makeSharedFrom(CBuildJobExecution* pBuildJobExecution);

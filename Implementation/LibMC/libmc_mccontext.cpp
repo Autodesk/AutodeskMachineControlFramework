@@ -33,11 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 #include "libmc_apirequesthandler.hpp"
 #include "libmc_streamconnection.hpp"
+#include "amc_streamregistry.hpp"
+
 #include "pugixml.hpp"
 
 #include "amc_statemachineinstance.hpp"
 #include "amc_logger.hpp"
 #include "amc_alerthandler.hpp"
+#include "amc_telemetry.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_logger_multi.hpp"
@@ -61,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MACHINEDEFINITION_XMLSCHEMA "http://schemas.autodesk.com/amc/machinedefinitions/2020/02"
 #define MACHINEDEFINITIONTEST_XMLSCHEMA "http://schemas.autodesk.com/amc/testdefinitions/2020/02"
 
+#define LIBMC_SYSTEMTHREAD_INTERVAL_MILLISECONDS 10
 
 using namespace LibMC::Impl;
 using namespace AMC;
@@ -94,7 +98,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, m_pStateJournal, "./testoutput", pGlobalChrono);
 
     // Create API Handlers for data model requests
-    m_pAPI = std::make_shared<AMC::CAPI>();
+    m_pAPI = std::make_shared<AMC::CAPI>(pGlobalChrono, pDataModel);
     CAPIFactory factory (m_pAPI, m_pSystemState, m_InstanceList);
 
     // Create API Documentation handler
@@ -295,6 +299,22 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
 }
 
 
+void CMCContext::SetParameterOverride(const std::string& sParameterPath, const std::string& sParameterValue)
+{
+    auto pStateMachineData = m_pSystemState->stateMachineData();
+
+    std::string sParameterInstance;
+    std::string sParameterGroup;
+    std::string sParameterName;
+
+    pStateMachineData->extractParameterDetailsFromDotString(sParameterPath, sParameterInstance, sParameterGroup, sParameterName, false, false);
+
+    auto pParameterInstanceHandler = pStateMachineData->getParameterHandler(sParameterInstance);
+    auto pParamaterGroup = pParameterInstanceHandler->findGroup(sParameterGroup, true);
+	pParamaterGroup->setParameterValueByName(sParameterName, sParameterValue);
+}
+
+
 void CMCContext::RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResource)
 {
     m_pSystemState->logger()->logMessage("mapping " + sLibraryName + " to " + sLibraryPath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -388,6 +408,7 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
 
     try {
         m_pSystemState->driverHandler()->registerDriver(sName, sType, sLibraryName, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName), sConfigurationData, m_pCoreResourcePackage);
+        m_pSystemState->addDriverVersionInfo(sName);
     } 
     catch (std::exception & E) {
         m_pSystemState->logger()->logMessage(std::string ("Driver error: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);
@@ -442,23 +463,33 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
     m_pSystemState->logger()->logMessage("Creating state machine \"" + sName + "\"", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
     pInstance = std::make_shared<CStateMachineInstance> (sName, sDescription, m_pEnvironmentWrapper, m_pSystemState, m_pStateJournal);
 
+    auto pSystemParameterHandler = m_pSystemState->stateMachineData()->getParameterHandler("system");
+    auto pSignalInformationGroup = pSystemParameterHandler->addGroup("signals_" + sName, sName + " Signals");
+
+    auto pStateSignalHandler = m_pSystemState->stateSignalHandler();
+	auto pStateSignalInstance = pStateSignalHandler->registerInstance(sName);
+
     auto signalNodes = xmlNode.children("signaldefinition");
     for (pugi::xml_node signalNode : signalNodes) {
         auto signalNameAttrib = signalNode.attribute("name");
         if (signalNameAttrib.empty())
             throw ELibMCCustomException(LIBMC_ERROR_MISSINGSIGNALNAME, "statemachine " + sName);
 
-        std::list<CStateSignalParameter> SignalParameters;
-        std::list<CStateSignalParameter> SignalResults;
+        std::vector<CStateSignalParameter> SignalParameters;
+        std::vector<CStateSignalParameter> SignalResults;
         uint32_t nSignalReactionTimeOut = 0;
+		uint32_t nAutomaticArchiveTimeInMS = 0;
         uint32_t nSignalQueueSize = 0;
 
-        readSignalParameters(signalNameAttrib.as_string(), signalNode, SignalParameters, SignalResults, nSignalReactionTimeOut, nSignalQueueSize);
+        std::string sSignalName = signalNameAttrib.as_string();
+        readSignalParameters(sSignalName, signalNode, SignalParameters, SignalResults, nSignalReactionTimeOut, nAutomaticArchiveTimeInMS, nSignalQueueSize);
 
-        auto pStateSignalHandler = m_pSystemState->stateSignalHandler();
-        pStateSignalHandler->addSignalDefinition(sName, signalNameAttrib.as_string(), SignalParameters, SignalResults, nSignalReactionTimeOut, nSignalQueueSize);
+        pStateSignalInstance->addSignalDefinition(sSignalName, SignalParameters, SignalResults, nSignalReactionTimeOut, nAutomaticArchiveTimeInMS, nSignalQueueSize, pSignalInformationGroup);
 
     }
+
+
+
 
 
     auto pParameterHandler = pInstance->getParameterHandler();
@@ -561,6 +592,39 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
 
     }
 
+    // Load all telemetry channels for the state machine
+    auto pTelemetryHandler = m_pSystemState->getTelemetryHandlerInstance();
+
+	auto telemetryNode = xmlNode.child("telemetry");
+    if (!telemetryNode.empty()) {
+        auto telemetryNodes = telemetryNode.children("channel");
+        for (pugi::xml_node telemetryChannelNode : telemetryNodes) {
+            auto channelIdentifierAttrib = telemetryChannelNode.attribute("identifier");
+            auto channelDescriptionAttrib = telemetryChannelNode.attribute("description");
+            auto channelTypeAttrib = telemetryChannelNode.attribute("type");
+
+            std::string sChannelIdentifier = channelIdentifierAttrib.as_string();
+            std::string sChannelDescription = channelDescriptionAttrib.as_string();
+            std::string sChannelType = channelTypeAttrib.as_string();
+
+            if (sChannelIdentifier.empty())
+                throw ELibMCCustomException(LIBMC_ERROR_MISSINGTELEMETRYCHANNELIDENTIFIER, "state machine " + sName);
+            if (sChannelDescription.empty())
+                throw ELibMCCustomException(LIBMC_ERROR_MISSINGTELEMETRYCHANNELDESCRIPTION, "state machine " + sName);
+            if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sChannelIdentifier))
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER, sChannelIdentifier + " (state machine " + sName + ")");
+
+            LibMCData::eTelemetryChannelType eChannelType = LibMCData::eTelemetryChannelType::CustomMarker;
+            if (!sChannelType.empty())
+                eChannelType = CTelemetryChannel::mapChannelTypeStringToDataChannelType(sChannelType);
+
+            std::string sGlobalChannelIdentifier = sName + "." + sChannelIdentifier;
+            pTelemetryHandler->registerChannel(sGlobalChannelIdentifier, sChannelDescription, eChannelType);
+
+        }
+    }
+
+
 
     pInstance->setInitState(sInitState);
     pInstance->setFailedState(sFailedState);
@@ -590,7 +654,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
 }
 
 
-void CMCContext::readSignalParameters(const std::string& sSignalName, const pugi::xml_node& xmlNode, std::list<AMC::CStateSignalParameter>& Parameters, std::list<AMC::CStateSignalParameter>& Results, uint32_t & nSignalReactionTimeOut, uint32_t& nSignalQueueSize)
+void CMCContext::readSignalParameters(const std::string& sSignalName, const pugi::xml_node& xmlNode, std::vector<AMC::CStateSignalParameter>& Parameters, std::vector<AMC::CStateSignalParameter>& Results, uint32_t & nSignalReactionTimeOut, uint32_t& nAutomaticArchiveTimeInMS, uint32_t& nSignalQueueSize)
 {
 
     auto reactionTimeOutAttrib = xmlNode.attribute("reactiontimeout");
@@ -605,6 +669,19 @@ void CMCContext::readSignalParameters(const std::string& sSignalName, const pugi
 		nSignalReactionTimeOut = 3600000; // Default value is 1 hour
     }
 		
+
+    auto archiveTimeAttrib = xmlNode.attribute("archivetime");
+    if (!archiveTimeAttrib.empty()) {
+        nAutomaticArchiveTimeInMS = archiveTimeAttrib.as_uint();
+        if (nAutomaticArchiveTimeInMS < AMC_SIGNAL_MINARCHIVETIMEINMS)
+            throw ELibMCCustomException(LIBMC_ERROR_INVALIDSIGNALARCHIVETIMEOUT, sSignalName);
+        if (nAutomaticArchiveTimeInMS > AMC_SIGNAL_MAXARCHIVETIMEINMS)
+            throw ELibMCCustomException(LIBMC_ERROR_INVALIDSIGNALARCHIVETIMEOUT, sSignalName);
+    }
+    else {
+        nAutomaticArchiveTimeInMS = 3600000; // Default value is 1 hour
+    }
+    
 
     auto queueSizeAttrib = xmlNode.attribute("queuesize");
     if (!queueSizeAttrib.empty()) {
@@ -902,8 +979,105 @@ LibMCPlugin::PWrapper CMCContext::loadPlugin(std::string sPluginName)
 }
 
 
+void CMCContext::executeSystemThread()
+{
+    auto pLogger = m_pSystemState->getLoggerInstance();
+
+    try {
+
+        while (!systemThreadShallTerminate()) {
+
+
+            auto pSignalHandler = m_pSystemState->getStateSignalHandlerInstance();
+            pSignalHandler->checkForReactionTimeouts(m_pSystemState->globalChrono()->getElapsedMicroseconds());
+            pSignalHandler->autoArchiveMessages(m_pSystemState->globalChrono()->getElapsedMicroseconds());            
+            pSignalHandler->writeMessagesToArchive(nullptr);
+            
+			auto pTelemetryHandler = m_pSystemState->getTelemetryHandlerInstance();
+            pTelemetryHandler->archiveOldChunksToDB();
+
+            m_pSystemState->updateMemoryUsageParameters();            
+
+
+
+        }
+    }
+    catch (std::exception & E)
+    {
+        try {
+            std::string sErrorMessage(E.what());
+            pLogger->logMessage("Fatal system thread error: " + sErrorMessage, "system", AMC::eLogLevel::FatalError);
+        } 
+        catch (...) {
+        }
+    }
+    catch (...)
+    {
+        try {
+            pLogger->logMessage("Untyped fatal system thread error", "system", AMC::eLogLevel::FatalError);
+        }
+        catch (...) {
+        }
+    }
+
+
+}
+
+
+void CMCContext::startSystemThread()
+{
+
+    if (systemThreadIsRunning())
+        throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, "system");
+
+    // Initialise signals
+    m_SystemTerminateSignal = std::promise<void>();
+    m_SystemTerminateFuture = m_SystemTerminateSignal.get_future();
+
+    // Start Thread
+    m_SystemThread = std::thread(&CMCContext::executeSystemThread, this);
+
+}
+
+bool CMCContext::systemThreadIsRunning()
+{
+    return m_SystemTerminateFuture.valid();
+}
+
+bool CMCContext::systemThreadShallTerminate()
+{
+    if (m_SystemTerminateFuture.wait_for(std::chrono::milliseconds(LIBMC_SYSTEMTHREAD_INTERVAL_MILLISECONDS)) == std::future_status::timeout)
+        return false;
+
+    return true;
+}
+
+void CMCContext::terminateSystemThread()
+{
+    m_pSystemState->logger()->logMessage("terminating system thread...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+
+    if (!systemThreadIsRunning())
+        throw ELibMCCustomException(LIBMC_ERROR_THREADISNOTRUNNING, "system");
+
+    // Set termination flag
+    m_SystemTerminateSignal.set_value();
+
+    // Wait for thread to finish
+    m_SystemThread.join();
+
+    m_pSystemState->logger()->logMessage("system thread terminated", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+
+    // Clean up signals
+    m_SystemTerminateFuture = std::future<void>();
+    m_SystemTerminateSignal = std::promise<void>();
+}
+
 void CMCContext::StartAllThreads()
 {
+
+    m_pSystemState->logger()->logMessage("starting system thread...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+    startSystemThread();
+
     m_pSystemState->logger()->logMessage("starting threads...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
     for (auto instance : m_InstanceList)
         instance->startThread();
@@ -911,9 +1085,32 @@ void CMCContext::StartAllThreads()
 
 void CMCContext::TerminateAllThreads()
 {
-    m_pSystemState->logger()->logMessage("terminating threads...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    for (auto instance : m_InstanceList)
-        instance->terminateThread();
+	auto pLogger = m_pSystemState->getLoggerInstance();
+    pLogger->logMessage("terminating threads...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+
+    for (auto instance : m_InstanceList) {
+		std::string sInstanceName = instance->getName();
+        try {
+            instance->terminateThread();
+        } catch (std::exception & E) {
+            pLogger->logMessage(std::string("could not terminate thread of instance '") + sInstanceName + "': " + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Warning);
+		}
+        catch (...) {
+            pLogger->logMessage(std::string("could not terminate thread of instance '") + sInstanceName + "': unknown error", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Warning);
+		}
+    }
+        
+
+    try {
+        terminateSystemThread();
+    }
+    catch (std::exception & E) {
+		pLogger->logMessage(std::string("could not terminate system thread: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Warning);
+    }
+    catch (...) {
+		pLogger->logMessage("could not terminate system thread: unknown error", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Warning);
+    }
+
 
 }
 
@@ -1028,8 +1225,12 @@ IStreamConnection* CMCContext::CreateStreamConnection(const std::string& sStream
 {
     std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
 
-    return new CStreamConnection(sNormalizedStreamUUID);
+    // Look up the stream in the registry
+    AMC::PStreamInstance pStream;
+    auto pRegistry = m_pSystemState->getStreamRegistryInstance();
+    if (pRegistry.get() != nullptr) {
+        pStream = pRegistry->findStream(sNormalizedStreamUUID);
+    }
 
-
+    return new CStreamConnection(sNormalizedStreamUUID, pStream);
 }
-

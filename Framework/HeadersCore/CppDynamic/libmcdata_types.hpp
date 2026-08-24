@@ -471,6 +471,12 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_COULDNOTFINDMACHINECONFIGURATIONXSDBYUUID 444 /** Could not find latest machine configuration XSD by UUID. */
 #define LIBMCDATA_ERROR_COULDNOTFINDMACHINECONFIGURATIONVERSIONBYUUID 445 /** Could not find latest machine configuration version by UUID. */
 #define LIBMCDATA_ERROR_MACHINECONFIGURATIONTYPEMISMATCH 446 /** Machine configuration mismatch. */
+#define LIBMCDATA_ERROR_UNKNOWNTELEMETRYCHANNELTYPE 447 /** Unknown telemetry channel type. */
+#define LIBMCDATA_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER 448 /** Invalid telemetry channel identifier. */
+#define LIBMCDATA_ERROR_TELEMETRYCHANNELALREADYEXISTS 449 /** Telemetry channel already exists. */
+#define LIBMCDATA_ERROR_TELEMETRYCHANNELNOTFOUND 450 /** Telemetry channel not found. */
+#define LIBMCDATA_ERROR_JOBNAMETOOLONG 451 /** Job name exceeds maximum allowed length */
+#define LIBMCDATA_ERROR_STRINGPARAMETERTOOLONG 452 /** String parameter exceeds maximum allowed length */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -854,6 +860,12 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_COULDNOTFINDMACHINECONFIGURATIONXSDBYUUID: return "Could not find latest machine configuration XSD by UUID.";
     case LIBMCDATA_ERROR_COULDNOTFINDMACHINECONFIGURATIONVERSIONBYUUID: return "Could not find latest machine configuration version by UUID.";
     case LIBMCDATA_ERROR_MACHINECONFIGURATIONTYPEMISMATCH: return "Machine configuration mismatch.";
+    case LIBMCDATA_ERROR_UNKNOWNTELEMETRYCHANNELTYPE: return "Unknown telemetry channel type.";
+    case LIBMCDATA_ERROR_INVALIDTELEMETRYCHANNELIDENTIFIER: return "Invalid telemetry channel identifier.";
+    case LIBMCDATA_ERROR_TELEMETRYCHANNELALREADYEXISTS: return "Telemetry channel already exists.";
+    case LIBMCDATA_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
+    case LIBMCDATA_ERROR_JOBNAMETOOLONG: return "Job name exceeds maximum allowed length";
+    case LIBMCDATA_ERROR_STRINGPARAMETERTOOLONG: return "String parameter exceeds maximum allowed length";
     default: return "unknown error";
   }
 }
@@ -869,6 +881,9 @@ typedef LibMCDataHandle LibMCData_LogSession;
 typedef LibMCDataHandle LibMCData_Alert;
 typedef LibMCDataHandle LibMCData_AlertIterator;
 typedef LibMCDataHandle LibMCData_AlertSession;
+typedef LibMCDataHandle LibMCData_TelemetrySession;
+typedef LibMCDataHandle LibMCData_TelemetryChunkData;
+typedef LibMCDataHandle LibMCData_TelemetryReader;
 typedef LibMCDataHandle LibMCData_JournalChunkIntegerData;
 typedef LibMCDataHandle LibMCData_JournalSession;
 typedef LibMCDataHandle LibMCData_JournalReader;
@@ -954,6 +969,23 @@ namespace LibMCData {
     CustomBinaryData = 100
   };
   
+  enum class eTelemetryChannelType : LibMCData_int32 {
+    Unknown = 0,
+    CustomMarker = 1,
+    RemoteQuery = 2,
+    StateExecution = 3,
+    StateRepeatDelay = 4,
+    SignalQueue = 5,
+    SignalProcessing = 6,
+    SignalAcknowledgement = 7
+  };
+  
+  enum class eTelemetryChunkEntryType : LibMCData_int32 {
+    InstantMarker = 1,
+    IntervalStartMarker = 2,
+    IntervalEndMarker = 3
+  };
+  
   enum class eBuildJobExecutionStatus : LibMCData_int32 {
     Unknown = 0,
     InProcess = 1,
@@ -973,6 +1005,23 @@ namespace LibMCData {
       LibMCData_uint32 m_EntryStartIndex;
       LibMCData_uint32 m_EntryCount;
   } sJournalChunkVariableInfo;
+  
+  typedef struct sTelemetryChunkEntry {
+      eTelemetryChunkEntryType m_EntryType;
+      LibMCData_uint32 m_ChannelIndex;
+      LibMCData_uint64 m_MarkerID;
+      LibMCData_uint64 m_TimeStamp;
+      LibMCData_uint64 m_ContextData;
+  } sTelemetryChunkEntry;
+  
+  typedef struct sTelemetryIntervalData {
+      LibMCData_uint64 m_MarkerID;
+      LibMCData_uint32 m_ChannelIndex;
+      LibMCData_uint64 m_StartTimeStamp;
+      LibMCData_uint64 m_EndTimeStamp;
+      LibMCData_uint64 m_DurationInMicroseconds;
+      LibMCData_uint64 m_ContextData;
+  } sTelemetryIntervalData;
   
   #pragma pack ()
   
@@ -1019,8 +1068,12 @@ typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
 typedef LibMCData::eCustomDataType eLibMCDataCustomDataType;
+typedef LibMCData::eTelemetryChannelType eLibMCDataTelemetryChannelType;
+typedef LibMCData::eTelemetryChunkEntryType eLibMCDataTelemetryChunkEntryType;
 typedef LibMCData::eBuildJobExecutionStatus eLibMCDataBuildJobExecutionStatus;
 typedef LibMCData::sJournalChunkVariableInfo sLibMCDataJournalChunkVariableInfo;
+typedef LibMCData::sTelemetryChunkEntry sLibMCDataTelemetryChunkEntry;
+typedef LibMCData::sTelemetryIntervalData sLibMCDataTelemetryIntervalData;
 typedef LibMCData::LogCallback LibMCDataLogCallback;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statemachinedata.hpp"
 
 #include "amc_ui_module_content.hpp"
+#include "amc_ui_module_contentleaf.hpp"
 #include "amc_ui_module_tabs.hpp"
 #include "amc_ui_module_grid.hpp"
 #include "amc_ui_module_glscene.hpp"
@@ -72,6 +73,9 @@ PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, const std::str
 	if (sType == CUIModule_LayerView::getStaticType())
 		return std::make_shared<CUIModule_LayerView>(xmlNode, sPath, pUIModuleEnvironment);
 
+	if (CUIModule_ContentLeaf::isSupportedModuleType(sType))
+		return std::make_shared<CUIModule_ContentLeaf>(xmlNode, sPath, pUIModuleEnvironment);
+
 	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 
 }
@@ -83,6 +87,9 @@ bool CUIModuleFactory::moduleTypeIsRegistered(const std::string& sType)
 		return true;
 
 	if (sType == CUIModule_Tabs::getStaticType())
+		return true;
+
+	if (sType == CUIModule_Logs::getStaticType())
 		return true;
 
 	if (sType == CUIModule_Grid::getStaticType())
@@ -97,6 +104,8 @@ bool CUIModuleFactory::moduleTypeIsRegistered(const std::string& sType)
 	if (sType == CUIModule_LayerView::getStaticType())
 		return true;
 
+	if (CUIModule_ContentLeaf::isSupportedModuleType(sType))
+		return true;
+
 	return false;
 }
-

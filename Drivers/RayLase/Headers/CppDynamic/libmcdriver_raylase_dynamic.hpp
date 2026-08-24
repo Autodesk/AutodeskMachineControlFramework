@@ -64,6 +64,7 @@ class CBase;
 class CDriver;
 class CRaylaseCommandLog;
 class CNLightDriverBoard;
+class CRaylaseIOCycle;
 class CRaylaseCard;
 class CDriver_Raylase;
 
@@ -75,6 +76,7 @@ typedef CBase CLibMCDriver_RaylaseBase;
 typedef CDriver CLibMCDriver_RaylaseDriver;
 typedef CRaylaseCommandLog CLibMCDriver_RaylaseRaylaseCommandLog;
 typedef CNLightDriverBoard CLibMCDriver_RaylaseNLightDriverBoard;
+typedef CRaylaseIOCycle CLibMCDriver_RaylaseRaylaseIOCycle;
 typedef CRaylaseCard CLibMCDriver_RaylaseRaylaseCard;
 typedef CDriver_Raylase CLibMCDriver_RaylaseDriver_Raylase;
 
@@ -86,6 +88,7 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<CRaylaseCommandLog> PRaylaseCommandLog;
 typedef std::shared_ptr<CNLightDriverBoard> PNLightDriverBoard;
+typedef std::shared_ptr<CRaylaseIOCycle> PRaylaseIOCycle;
 typedef std::shared_ptr<CRaylaseCard> PRaylaseCard;
 typedef std::shared_ptr<CDriver_Raylase> PDriver_Raylase;
 
@@ -97,6 +100,7 @@ typedef PBase PLibMCDriver_RaylaseBase;
 typedef PDriver PLibMCDriver_RaylaseDriver;
 typedef PRaylaseCommandLog PLibMCDriver_RaylaseRaylaseCommandLog;
 typedef PNLightDriverBoard PLibMCDriver_RaylaseNLightDriverBoard;
+typedef PRaylaseIOCycle PLibMCDriver_RaylaseRaylaseIOCycle;
 typedef PRaylaseCard PLibMCDriver_RaylaseRaylaseCard;
 typedef PDriver_Raylase PLibMCDriver_RaylaseDriver_Raylase;
 
@@ -232,6 +236,10 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_COULDNOTRECEIVESPIPACKET: return "COULDNOTRECEIVESPIPACKET";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERMODE: return "INVALIDLASERMODE";
 			case LIBMCDRIVER_RAYLASE_ERROR_NLIGHTLASERMODEHASNOPOWEROVERRIDE: return "NLIGHTLASERMODEHASNOPOWEROVERRIDE";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOCYCLEID: return "INVALIDIOCYCLEID";
+			case LIBMCDRIVER_RAYLASE_ERROR_IOCYCLEALREADYEXISTS: return "IOCYCLEALREADYEXISTS";
+			case LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND: return "IOCYCLENOTFOUND";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT: return "INVALIDIOPORT";
 		}
 		return "UNKNOWN";
 	}
@@ -294,6 +302,10 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_COULDNOTRECEIVESPIPACKET: return "Could not receive SPI Packet";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERMODE: return "Invalid laser mode";
 			case LIBMCDRIVER_RAYLASE_ERROR_NLIGHTLASERMODEHASNOPOWEROVERRIDE: return "nLight laser mode has no power override";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOCYCLEID: return "Invalid IO Cycle ID";
+			case LIBMCDRIVER_RAYLASE_ERROR_IOCYCLEALREADYEXISTS: return "IO Cycle already exists";
+			case LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND: return "IO Cycle not found";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT: return "Invalid IO Port";
 		}
 		return "unknown error";
 	}
@@ -419,6 +431,7 @@ private:
 	friend class CDriver;
 	friend class CRaylaseCommandLog;
 	friend class CNLightDriverBoard;
+	friend class CRaylaseIOCycle;
 	friend class CRaylaseCard;
 	friend class CDriver_Raylase;
 
@@ -557,6 +570,26 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CRaylaseIOCycle 
+**************************************************************************************************************************/
+class CRaylaseIOCycle : public CBase {
+public:
+	
+	/**
+	* CRaylaseIOCycle::CRaylaseIOCycle - Constructor for RaylaseIOCycle class.
+	*/
+	CRaylaseIOCycle(CWrapper* pWrapper, LibMCDriver_RaylaseHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCDriver_Raylase_uint32 GetCycleID();
+	inline void AddSignalOut(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow);
+	inline void AddWaitForSignal(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds);
+	inline void AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds);
+};
+	
+/*************************************************************************************************************************
  Class CRaylaseCard 
 **************************************************************************************************************************/
 class CRaylaseCard : public CBase {
@@ -577,6 +610,10 @@ public:
 	inline PRaylaseCommandLog RetrieveLatestLog();
 	inline void LaserOn();
 	inline PNLightDriverBoard GetNLightDriverBoard();
+	inline PRaylaseIOCycle CreateIOCycle(const LibMCDriver_Raylase_uint32 nCycleID);
+	inline bool IOCycleExists(const LibMCDriver_Raylase_uint32 nCycleID);
+	inline PRaylaseIOCycle GetIOCycle(const LibMCDriver_Raylase_uint32 nCycleID);
+	inline void RemoveIOCycle(const LibMCDriver_Raylase_uint32 nCycleID);
 	inline void LaserOff();
 	inline void ArmLaser(const bool bShallBeArmed);
 	inline bool IsLaserArmed();
@@ -772,6 +809,10 @@ public:
 		pWrapperTable->m_NLightDriverBoard_IsWaterFlow = nullptr;
 		pWrapperTable->m_NLightDriverBoard_SetModeChangeDelays = nullptr;
 		pWrapperTable->m_NLightDriverBoard_GetModeChangeDelays = nullptr;
+		pWrapperTable->m_RaylaseIOCycle_GetCycleID = nullptr;
+		pWrapperTable->m_RaylaseIOCycle_AddSignalOut = nullptr;
+		pWrapperTable->m_RaylaseIOCycle_AddWaitForSignal = nullptr;
+		pWrapperTable->m_RaylaseIOCycle_AddDelay = nullptr;
 		pWrapperTable->m_RaylaseCard_IsConnected = nullptr;
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = nullptr;
 		pWrapperTable->m_RaylaseCard_EnableCommandLogging = nullptr;
@@ -779,6 +820,10 @@ public:
 		pWrapperTable->m_RaylaseCard_RetrieveLatestLog = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOn = nullptr;
 		pWrapperTable->m_RaylaseCard_GetNLightDriverBoard = nullptr;
+		pWrapperTable->m_RaylaseCard_CreateIOCycle = nullptr;
+		pWrapperTable->m_RaylaseCard_IOCycleExists = nullptr;
+		pWrapperTable->m_RaylaseCard_GetIOCycle = nullptr;
+		pWrapperTable->m_RaylaseCard_RemoveIOCycle = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOff = nullptr;
 		pWrapperTable->m_RaylaseCard_ArmLaser = nullptr;
 		pWrapperTable->m_RaylaseCard_IsLaserArmed = nullptr;
@@ -1108,6 +1153,42 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RaylaseIOCycle_GetCycleID = (PLibMCDriver_RaylaseRaylaseIOCycle_GetCycleIDPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylaseiocycle_getcycleid");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseIOCycle_GetCycleID = (PLibMCDriver_RaylaseRaylaseIOCycle_GetCycleIDPtr) dlsym(hLibrary, "libmcdriver_raylase_raylaseiocycle_getcycleid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseIOCycle_GetCycleID == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseIOCycle_AddSignalOut = (PLibMCDriver_RaylaseRaylaseIOCycle_AddSignalOutPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylaseiocycle_addsignalout");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseIOCycle_AddSignalOut = (PLibMCDriver_RaylaseRaylaseIOCycle_AddSignalOutPtr) dlsym(hLibrary, "libmcdriver_raylase_raylaseiocycle_addsignalout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseIOCycle_AddSignalOut == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseIOCycle_AddWaitForSignal = (PLibMCDriver_RaylaseRaylaseIOCycle_AddWaitForSignalPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylaseiocycle_addwaitforsignal");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseIOCycle_AddWaitForSignal = (PLibMCDriver_RaylaseRaylaseIOCycle_AddWaitForSignalPtr) dlsym(hLibrary, "libmcdriver_raylase_raylaseiocycle_addwaitforsignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseIOCycle_AddWaitForSignal == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseIOCycle_AddDelay = (PLibMCDriver_RaylaseRaylaseIOCycle_AddDelayPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylaseiocycle_adddelay");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseIOCycle_AddDelay = (PLibMCDriver_RaylaseRaylaseIOCycle_AddDelayPtr) dlsym(hLibrary, "libmcdriver_raylase_raylaseiocycle_adddelay");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseIOCycle_AddDelay == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RaylaseCard_IsConnected = (PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_isconnected");
 		#else // _WIN32
 		pWrapperTable->m_RaylaseCard_IsConnected = (PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_isconnected");
@@ -1168,6 +1249,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RaylaseCard_GetNLightDriverBoard == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_CreateIOCycle = (PLibMCDriver_RaylaseRaylaseCard_CreateIOCyclePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_createiocycle");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_CreateIOCycle = (PLibMCDriver_RaylaseRaylaseCard_CreateIOCyclePtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_createiocycle");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_CreateIOCycle == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_IOCycleExists = (PLibMCDriver_RaylaseRaylaseCard_IOCycleExistsPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_iocycleexists");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_IOCycleExists = (PLibMCDriver_RaylaseRaylaseCard_IOCycleExistsPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_iocycleexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_IOCycleExists == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_GetIOCycle = (PLibMCDriver_RaylaseRaylaseCard_GetIOCyclePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_getiocycle");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_GetIOCycle = (PLibMCDriver_RaylaseRaylaseCard_GetIOCyclePtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_getiocycle");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_GetIOCycle == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_RemoveIOCycle = (PLibMCDriver_RaylaseRaylaseCard_RemoveIOCyclePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_removeiocycle");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_RemoveIOCycle = (PLibMCDriver_RaylaseRaylaseCard_RemoveIOCyclePtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_removeiocycle");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_RemoveIOCycle == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1609,6 +1726,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_NLightDriverBoard_GetModeChangeDelays == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylaseiocycle_getcycleid", (void**)&(pWrapperTable->m_RaylaseIOCycle_GetCycleID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseIOCycle_GetCycleID == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylaseiocycle_addsignalout", (void**)&(pWrapperTable->m_RaylaseIOCycle_AddSignalOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseIOCycle_AddSignalOut == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylaseiocycle_addwaitforsignal", (void**)&(pWrapperTable->m_RaylaseIOCycle_AddWaitForSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseIOCycle_AddWaitForSignal == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylaseiocycle_adddelay", (void**)&(pWrapperTable->m_RaylaseIOCycle_AddDelay));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseIOCycle_AddDelay == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_isconnected", (void**)&(pWrapperTable->m_RaylaseCard_IsConnected));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_IsConnected == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1635,6 +1768,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_getnlightdriverboard", (void**)&(pWrapperTable->m_RaylaseCard_GetNLightDriverBoard));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_GetNLightDriverBoard == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_createiocycle", (void**)&(pWrapperTable->m_RaylaseCard_CreateIOCycle));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_CreateIOCycle == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_iocycleexists", (void**)&(pWrapperTable->m_RaylaseCard_IOCycleExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_IOCycleExists == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_getiocycle", (void**)&(pWrapperTable->m_RaylaseCard_GetIOCycle));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_GetIOCycle == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_removeiocycle", (void**)&(pWrapperTable->m_RaylaseCard_RemoveIOCycle));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_RemoveIOCycle == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_laseroff", (void**)&(pWrapperTable->m_RaylaseCard_LaserOff));
@@ -2094,6 +2243,54 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CRaylaseIOCycle
+	 */
+	
+	/**
+	* CRaylaseIOCycle::GetCycleID - Returns the cycle ID as Integer.
+	* @return Cycle ID. Will not be 0.
+	*/
+	LibMCDriver_Raylase_uint32 CRaylaseIOCycle::GetCycleID()
+	{
+		LibMCDriver_Raylase_uint32 resultCycleID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseIOCycle_GetCycleID(m_pHandle, &resultCycleID));
+		
+		return resultCycleID;
+	}
+	
+	/**
+	* CRaylaseIOCycle::AddSignalOut - Sets or clears a GPIO Output signal during the list cycle.
+	* @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
+	* @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+	* @param[in] bHighNotLow - If true, sets the pin high. If false, sets the pin low.
+	*/
+	void CRaylaseIOCycle::AddSignalOut(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseIOCycle_AddSignalOut(m_pHandle, eIOPort, nIOPin, bHighNotLow));
+	}
+	
+	/**
+	* CRaylaseIOCycle::AddWaitForSignal - Waits for an Input signal to be high or low during the list cycle.
+	* @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
+	* @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+	* @param[in] bHighNotLow - If true, waits for the pin to be high. If false, waits for the pin to be low.
+	* @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
+	*/
+	void CRaylaseIOCycle::AddWaitForSignal(const eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseIOCycle_AddWaitForSignal(m_pHandle, eIOPort, nIOPin, bHighNotLow, nTimeoutInMicroseconds));
+	}
+	
+	/**
+	* CRaylaseIOCycle::AddDelay - Adds a delay to the list cycle.
+	* @param[in] nDelayInMicroseconds - Delay in Microseconds.
+	*/
+	void CRaylaseIOCycle::AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseIOCycle_AddDelay(m_pHandle, nDelayInMicroseconds));
+	}
+	
+	/**
 	 * Method definitions for class CRaylaseCard
 	 */
 	
@@ -2169,6 +2366,60 @@ public:
 			CheckError(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CNLightDriverBoard>(m_pWrapper, hDriverBoard);
+	}
+	
+	/**
+	* CRaylaseCard::CreateIOCycle - Creates a new IO cycle with a certain ID. Fails if cycle ID is already existing..
+	* @param[in] nCycleID - Cycle ID to use. MUST NOT be 0.
+	* @return IO Cycle Instance
+	*/
+	PRaylaseIOCycle CRaylaseCard::CreateIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+	{
+		LibMCDriver_RaylaseHandle hIOCycle = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_CreateIOCycle(m_pHandle, nCycleID, &hIOCycle));
+		
+		if (!hIOCycle) {
+			CheckError(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CRaylaseIOCycle>(m_pWrapper, hIOCycle);
+	}
+	
+	/**
+	* CRaylaseCard::IOCycleExists - Returns if a IO cycle exists.
+	* @param[in] nCycleID - Cycle ID to return.
+	* @return Returns true, if IO Cycle exists.
+	*/
+	bool CRaylaseCard::IOCycleExists(const LibMCDriver_Raylase_uint32 nCycleID)
+	{
+		bool resultIOCycleDoesExist = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_IOCycleExists(m_pHandle, nCycleID, &resultIOCycleDoesExist));
+		
+		return resultIOCycleDoesExist;
+	}
+	
+	/**
+	* CRaylaseCard::GetIOCycle - Returns a new cycle. Fails if cycle ID does not exist..
+	* @param[in] nCycleID - Cycle ID to return.
+	* @return IO Cycle Instance
+	*/
+	PRaylaseIOCycle CRaylaseCard::GetIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+	{
+		LibMCDriver_RaylaseHandle hIOCycle = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_GetIOCycle(m_pHandle, nCycleID, &hIOCycle));
+		
+		if (!hIOCycle) {
+			CheckError(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CRaylaseIOCycle>(m_pWrapper, hIOCycle);
+	}
+	
+	/**
+	* CRaylaseCard::RemoveIOCycle - Removes an IO Cycle of a certain ID. Does nothing if IO cycle does not exist..
+	* @param[in] nCycleID - Cycle ID to remove.
+	*/
+	void CRaylaseCard::RemoveIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_RemoveIOCycle(m_pHandle, nCycleID));
 	}
 	
 	/**

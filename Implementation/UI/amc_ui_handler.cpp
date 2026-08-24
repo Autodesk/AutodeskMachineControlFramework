@@ -306,10 +306,12 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMAINPAGE);
     std::string sMainPage(mainpageAttrib.as_string());
 
-    auto colorsNode = xmlNode.child("colors");
-    if (!colorsNode.empty()) {
+    auto defaultThemeAttrib = xmlNode.attribute("defaulttheme");
+    m_sDefaultTheme = defaultThemeAttrib.empty() ? "light" : defaultThemeAttrib.as_string();
 
-        auto colorNodes = colorsNode.children("color");
+    auto parseColorBlock = [](pugi::xml_node& parentNode, std::map<std::string, uint32_t>& targetMap)
+    {
+        auto colorNodes = parentNode.children("color");
         for (pugi::xml_node colorNode : colorNodes) {
             auto nameColorAttrib = colorNode.attribute("name");
             auto redColorAttrib = colorNode.attribute("red");
@@ -325,7 +327,6 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
                 throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORGREENCHANNEL);
             if (blueColorAttrib.empty())
                 throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORBLUECHANNEL);
-
 
             double dRed = redColorAttrib.as_double(-1.0);
             double dGreen = greenColorAttrib.as_double(-1.0);
@@ -348,16 +349,30 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
             if (nBlue > 255) nBlue = 255;
 
             uint32_t nColor = (nRed + nGreen * 256 + nBlue * 65536);
-            m_Colors.insert(std::make_pair (sColorName, nColor));
-
+            targetMap.insert(std::make_pair (sColorName, nColor));
         }
+    };
 
-    }
+    auto colorsNode = xmlNode.child("colors");
+    if (!colorsNode.empty())
+        parseColorBlock(colorsNode, m_Colors);
+
+    auto darkColorsNode = xmlNode.child("darkcolors");
+    if (!darkColorsNode.empty())
+        parseColorBlock(darkColorsNode, m_DarkColors);
 
     auto loginNode = xmlNode.child("login");
     if (!loginNode.empty()) {
         m_LoginBackgroundUUID = CUIExpression(loginNode, "backgroundresource", "");
         m_LoginWelcomeMessage = CUIExpression(loginNode, "welcomemessage", "");
+
+        auto loginStyleAttrib = loginNode.attribute("loginstyle");
+        m_sLoginStyle = loginStyleAttrib.empty() ? "classic" : loginStyleAttrib.as_string();
+
+        m_LoginSubtitle = CUIExpression(loginNode, "loginsubtitle", "");
+
+        auto panelResourceAttrib = loginNode.attribute("panelresource");
+        m_sPanelResourceName = panelResourceAttrib.empty() ? "" : panelResourceAttrib.as_string();
     }
 
 
@@ -665,6 +680,8 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
                         throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
 
                     sSenderPath = pModuleItem->findElementPathByUUID(sSenderUUID);
+                    if (sSenderPath.empty())
+                        sSenderPath = pModuleItem->getItemPath();
                 }
 
             }
@@ -880,10 +897,11 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
         pDialog.second->populateClientVariables(pClientVariableHandler);
     }
 }
+/////////////////////////////////////////////////////////////////////////////////////
+// Shared UI bootstrap configuration
+/////////////////////////////////////////////////////////////////////////////////////
 
-
-
-void CUIHandler::writeLegacyConfigurationToJSON(CJSONWriter& writer)
+void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer)
 {
     auto pStateMachineData = m_pUISystemState->getStateMachineData();
 
@@ -905,22 +923,42 @@ void CUIHandler::writeLegacyConfigurationToJSON(CJSONWriter& writer)
     }
     writer.addString(AMC_API_KEY_UI_LOGINWELCOMEMESSAGE, m_LoginWelcomeMessage.evaluateStringValue(pStateMachineData));
 
-    CJSONWriterObject colorsObject(writer);
-    for (auto color : m_Colors) {
+    writer.addString(AMC_API_KEY_UI_LOGINSTYLE, m_sLoginStyle);
+    writer.addString(AMC_API_KEY_UI_LOGINSUBTITLE, m_LoginSubtitle.evaluateStringValue(pStateMachineData));
 
-        std::stringstream sColorStream;
-        uint32_t nRed = color.second & 0xff;
-        uint32_t nGreen = (color.second >> 8) & 0xff;
-        uint32_t nBlue = (color.second >> 16) & 0xff;
-
-        sColorStream << "#" << std::setfill('0') << std::setw(2) << std::hex << nRed << std::setfill('0') << std::setw(2) << std::hex << nGreen << std::setfill('0') << std::setw(2) << std::hex << nBlue;
-
-        colorsObject.addString(color.first, sColorStream.str());
+    if (!m_sPanelResourceName.empty()) {
+        auto pPanelResource = m_pCoreResourcePackage->findEntryByName(m_sPanelResourceName, true);
+        writer.addString(AMC_API_KEY_UI_LOGINPANELUUID, pPanelResource->getUUID());
     }
 
-    writer.addObject(AMC_API_KEY_UI_COLORS, colorsObject);
+    writer.addString(AMC_API_KEY_UI_DEFAULTTHEME, m_sDefaultTheme);
+
+    auto writeColorMap = [&writer](const std::map<std::string, uint32_t>& colorMap, const std::string& sKey)
+    {
+        CJSONWriterObject colorsObject(writer);
+        for (auto color : colorMap) {
+            std::stringstream sColorStream;
+            uint32_t nRed = color.second & 0xff;
+            uint32_t nGreen = (color.second >> 8) & 0xff;
+            uint32_t nBlue = (color.second >> 16) & 0xff;
+
+            sColorStream << "#" << std::setfill('0') << std::setw(2) << std::hex << nRed << std::setfill('0') << std::setw(2) << std::hex << nGreen << std::setfill('0') << std::setw(2) << std::hex << nBlue;
+
+            colorsObject.addString(color.first, sColorStream.str());
+        }
+        writer.addObject(sKey, colorsObject);
+    };
+
+    writeColorMap(m_Colors, AMC_API_KEY_UI_COLORS);
+
+    if (!m_DarkColors.empty())
+        writeColorMap(m_DarkColors, AMC_API_KEY_UI_DARKCOLORS);
 
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+// Legacy UI System
+/////////////////////////////////////////////////////////////////////////////////////
 
 void CUIHandler::writeLegacyStateToJSON(CJSONWriter& writer, CParameterHandler* pLegacyClientVariableHandler)
 {
@@ -1012,6 +1050,34 @@ void CUIHandler::frontendWriteStatusToJSON(CJSONWriter& writer, CUIFrontendState
 {
 
     auto pStateMachineData = m_pUISystemState->getStateMachineData().get ();
+
+    CJSONWriterArray menuItems(writer);
+    for (auto iter : m_MenuItems) {
+        CJSONWriterObject menuItem(writer);
+        menuItem.addString(AMC_API_KEY_UI_ID, iter->getID());
+        menuItem.addString(AMC_API_KEY_UI_UUID, iter->getUUID());
+        menuItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon());
+        menuItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption());
+        menuItem.addString(AMC_API_KEY_UI_DESCRIPTION, iter->getDescription());
+        menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPageName());
+        menuItem.addString(AMC_API_KEY_UI_EVENTNAME, iter->getEventName());
+        menuItems.addObject(menuItem);
+    }
+    writer.addArray(AMC_API_KEY_UI_MENUITEMS, menuItems);
+
+    CJSONWriterArray toolbarItems(writer);
+    for (auto iter : m_ToolbarItems) {
+        CJSONWriterObject toolbarItem(writer);
+        toolbarItem.addString(AMC_API_KEY_UI_ID, iter->getID());
+        toolbarItem.addString(AMC_API_KEY_UI_UUID, iter->getUUID());
+        toolbarItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon());
+        toolbarItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption());
+        toolbarItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPageName());
+        toolbarItem.addString(AMC_API_KEY_UI_EVENTNAME, iter->getEventName());
+        toolbarItems.addObject(toolbarItem);
+    }
+    writer.addArray(AMC_API_KEY_UI_TOOLBARITEMS, toolbarItems);
+
     CJSONWriterArray pages(writer);
     for (auto iter : m_Pages) {
         CJSONWriterObject pageObject(writer);
@@ -1022,10 +1088,27 @@ void CUIHandler::frontendWriteStatusToJSON(CJSONWriter& writer, CUIFrontendState
     }
     writer.addArray(AMC_API_KEY_UI_PAGES, pages);
 
+    CJSONWriterArray custompages(writer);
+    for (auto iter : m_CustomPages) {
+        CJSONWriterObject custompage(writer);
+        custompage.addString(AMC_API_KEY_UI_COMPONENTNAME, iter.second->getComponentName());
+        iter.second->frontendWritePageStatusToJSON(writer, custompage, pFrontendState, pStateMachineData);
+        custompages.addObject(custompage);
+    }
+    writer.addArray(AMC_API_KEY_UI_CUSTOMPAGES, custompages);
+
+    CJSONWriterArray dialogs(writer);
+    for (auto iter : m_Dialogs) {
+        CJSONWriterObject dialog(writer);
+        dialog.addString(AMC_API_KEY_UI_DIALOGTITLE, iter.second->getTitle());
+        iter.second->frontendWritePageStatusToJSON(writer, dialog, pFrontendState, pStateMachineData);
+        dialogs.addObject(dialog);
+    }
+    writer.addArray(AMC_API_KEY_UI_DIALOGS, dialogs);
+
 }
 
 PUIFrontendDefinition CUIHandler::getFrontendDefinition()
 {
     return m_pFrontendDefinition;
 }
-

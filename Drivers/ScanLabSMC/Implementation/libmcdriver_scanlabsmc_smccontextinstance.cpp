@@ -115,9 +115,7 @@ CSMCContextInstance::CSMCContextInstance(const std::string& sContextName, ISMCCo
 
 	m_sIPAddress = pSMCConfiguration->GetIPAddress();
 
-	m_bSendToHardware = pSMCConfiguration->GetSendToHardware();
-
-	auto pCorrectionFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ct5", "");
+	m_bSendToHardware = pSMCConfiguration->GetSendToHardware();	
 
 	eSMCConfigVersion configVersion = eSMCConfigVersion::Unknown;
 	auto versionInfo = m_pSDK->slsc_cfg_get_scanmotioncontrol_version();
@@ -143,8 +141,18 @@ CSMCContextInstance::CSMCContextInstance(const std::string& sContextName, ISMCCo
 		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_UNKNOWNSMCMAJORVERSION, "unknown smc major version: " + sVersionString);
 	}
 
+	std::vector<uint8_t> & correctionFileBuffer = pCastedConfiguration->getCorrectionFileData();
+	
+	m_pDriverEnvironment->LogMessage("RTC Correction file data loaded, size: " + std::to_string(correctionFileBuffer.size()));
 
-	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get (), pCorrectionFile, configVersion, m_sIPAddress);
+	if (correctionFileBuffer.empty ())
+		throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE);
+
+	m_pCorrectionFileInUse = m_pWorkingDirectory->StoreCustomDataInTempFile("ct5", correctionFileBuffer);
+
+	m_pDriverEnvironment->LogMessage("RTC Correction file name " + m_pCorrectionFileInUse->GetAbsoluteFileName ());
+
+	std::string sConfigurationXML = pCastedConfiguration->buildConfigurationXML(m_pWorkingDirectory.get (), configVersion, m_sIPAddress, m_pCorrectionFileInUse);
 
 	std::vector<uint8_t> Buffer (sConfigurationXML.begin (), sConfigurationXML.end ());
 
@@ -180,6 +188,7 @@ CSMCContextInstance::~CSMCContextInstance()
 {
 	m_pContextHandle = nullptr;
 	m_pSDK = nullptr;
+	m_pCorrectionFileInUse = nullptr;
 
 	m_pWorkingDirectory = nullptr;
 

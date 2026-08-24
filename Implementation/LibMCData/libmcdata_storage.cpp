@@ -409,7 +409,8 @@ void CStorage::CreateDownloadTicket(const std::string& sTicketUUID, const std::s
     if (sClientFileName.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_EMPTYCLIENTFILENAME);
 
-    // TODO: Check invalid file name?
+    if (!AMCCommon::CUtils::stringIsValidFileName(sClientFileName))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCLIENTFILENAME, "invalid client file name: " + sClientFileName);
 
     auto pTransaction = m_pSQLHandler->beginTransaction();
     
@@ -527,4 +528,3 @@ void CStorage::AttachStreamToJournal(const std::string& sStreamUUID, const std::
 
     pTransaction->commit();
 }
-

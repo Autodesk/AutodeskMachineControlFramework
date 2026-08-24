@@ -67,6 +67,8 @@ namespace AMC {
 			uint32_t m_nPort;
 			bool m_bUseHTTPS;
 			bool m_bServiceHasBeenStarted;
+
+			std::vector<std::pair<std::string, std::string>> m_ParameterOverrides;
 		
 		public:
 		
@@ -77,6 +79,8 @@ namespace AMC {
 			void executeBlocking (const std::string& sConfigurationFileName);
 			
 			void log (const std::string & sMessage);
+
+			void addConfigurationParameterOverride(const std::string& sParameterName, const std::string& sParameterValue);
 
 			PServerIO getServerIO ();
 

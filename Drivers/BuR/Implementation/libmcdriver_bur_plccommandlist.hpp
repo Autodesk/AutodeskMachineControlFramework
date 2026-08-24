@@ -77,6 +77,10 @@ private:
 
     bool m_bIsSimulationMode;
 
+    // Shared implementation for ExecuteList / ExecuteAndDeleteList. If bDeleteAfterExecution is true,
+    // the list is executed with BUR_COMMAND_DIRECT_EXECUTEANDDELETELIST so the PLC removes it afterwards.
+    void executeListInternal(bool bDeleteAfterExecution);
+
 protected:
 
 public:
@@ -90,6 +94,8 @@ public:
     void FinishList() override;
 
 	void ExecuteList() override;
+
+	void ExecuteAndDeleteList() override;
 
 	bool WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS) override;
 

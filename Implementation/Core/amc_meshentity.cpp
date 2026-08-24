@@ -619,6 +619,14 @@ namespace AMC {
 
 	}
 
-}
+	uint64_t CMeshEntity::getMemoryUsageInBytes()
+	{
+		uint64_t nUsage = 0;
+		nUsage += (uint64_t)m_Nodes.capacity() * (uint64_t)sizeof(sMeshEntityNode);
+		nUsage += (uint64_t)m_Edges.capacity() * (uint64_t)sizeof(sMeshEntityEdge);
+		nUsage += (uint64_t)m_Faces.capacity() * (uint64_t)sizeof(sMeshEntityFace);
+		return nUsage;
+	}
 
+}
 

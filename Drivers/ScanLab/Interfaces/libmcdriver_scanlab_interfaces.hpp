@@ -1610,6 +1610,19 @@ public:
 	virtual void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) = 0;
 
 	/**
+	* IRTCContext::ReadDigitalInputs - Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.
+	* @return Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 ReadDigitalInputs() = 0;
+
+	/**
+	* IRTCContext::ReadDigitalInputBit - Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.
+	* @param[in] nBitIndex - Index of the digital input bit to read. MUST be between 0 and 15.
+	* @return Current state of the requested digital input bit.
+	*/
+	virtual bool ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex) = 0;
+
+	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
 	*/
 	virtual void EnableOIE() = 0;
@@ -1922,6 +1935,39 @@ public:
 	* @return Laser Power in Percent
 	*/
 	virtual LibMCDriver_ScanLab_double MapPowerWattsToPercent(const LibMCDriver_ScanLab_double dLaserPowerInWatts) = 0;
+
+	/**
+	* IRTCContext::SetPiecewiseLinearDefocusCorrectionByPower - Sets a piecewise linear defocus correction table that maps laser power (in watts) to a defocus offset (in mm). This compensates for focus shift caused by thermal lensing at different power levels. The correction is automatically added to the Z defocus value during marking operations.
+	* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+	* @param[in] pCalibrationPointsBuffer - Defocus correction points that map laser power to defocus offset. Power values MUST be non-negative and strictly increasing in the array. Array MUST NOT be empty.
+	*/
+	virtual void SetPiecewiseLinearDefocusCorrectionByPower(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer) = 0;
+
+	/**
+	* IRTCContext::DisableDefocusCorrectionByPower - Disables the defocus correction by laser power. After calling this, no power-dependent defocus adjustment will be applied.
+	*/
+	virtual void DisableDefocusCorrectionByPower() = 0;
+
+	/**
+	* IRTCContext::DefocusCorrectionByPowerIsEnabled - Returns whether defocus correction by laser power is currently enabled.
+	* @return True if defocus correction by power is enabled.
+	*/
+	virtual bool DefocusCorrectionByPowerIsEnabled() = 0;
+
+	/**
+	* IRTCContext::GetDefocusCorrectionByPower - Returns the current defocus correction table. Fails if defocus correction is not enabled.
+	* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+	* @param[out] pCalibrationPointsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pCalibrationPointsBuffer - DefocusCorrectionPoint buffer of Defocus Correction Points
+	*/
+	virtual void GetDefocusCorrectionByPower(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer) = 0;
+
+	/**
+	* IRTCContext::MapDefocusCorrectionFromPower - Looks up the defocus correction offset for a given laser power. Fails if defocus correction is not enabled.
+	* @param[in] dLaserPowerInWatts - Laser Power in Watts
+	* @return Defocus offset in millimeters
+	*/
+	virtual LibMCDriver_ScanLab_double MapDefocusCorrectionFromPower(const LibMCDriver_ScanLab_double dLaserPowerInWatts) = 0;
 
 	/**
 	* IRTCContext::EnableSpatialLaserPowerModulation - Enables a spatial laser power modulation via callback.

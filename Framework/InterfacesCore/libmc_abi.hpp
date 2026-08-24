@@ -256,6 +256,16 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_settempbasepath(LibMC_MCContext pMCCo
 LIBMC_DECLSPEC LibMCResult libmc_mccontext_parseconfiguration(LibMC_MCContext pMCContext, const char * pXMLString);
 
 /**
+* overrides a parameter with a certain value. Fails if parameter group or parameter does not exist. Fails if Value is not fitting the parameter type.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pParameterPath - Path of the parameter. Example: main.configgroup.currentjob
+* @param[in] pParameterValue - New Value of the parameter
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_setparameteroverride(LibMC_MCContext pMCContext, const char * pParameterPath, const char * pParameterValue);
+
+/**
 * starts the threads for all the state machines.
 *
 * @param[in] pMCContext - MCContext instance.

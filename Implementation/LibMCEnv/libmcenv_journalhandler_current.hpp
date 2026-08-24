@@ -68,6 +68,10 @@ public:
 
     IJournalVariable* RetrieveJournalVariable(const std::string& sVariableName) override;
 
+    LibMCEnv_uint32 GetVariableCount() override;
+
+    void GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string& sName, LibMCEnv::eParameterDataType& eDataType, LibMCEnv_double& dUnits) override;
+
     IDateTime* GetStartTime() override;
 
     IDateTime* GetEndTime() override;
@@ -81,6 +85,8 @@ public:
 	IAlertIterator* RetrieveAlerts(const LibMCEnv_uint64 nTimeDeltaInMicroseconds) override;
 
 	IAlertIterator* RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds) override;
+
+	ITelemetryHandler* LoadTelemetryHandler() override;
 };
 
 } // namespace Impl

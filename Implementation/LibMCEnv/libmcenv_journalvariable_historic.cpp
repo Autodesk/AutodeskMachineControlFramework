@@ -33,10 +33,12 @@ Abstract: This is a stub class definition of CJournalVariable
 
 #include "libmcenv_journalvariable_historic.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_uniformjournalsampling.hpp"
 
 
 // Include custom headers here.
 #include <cmath>
+#include <vector>
 
 using namespace LibMCEnv::Impl;
 
@@ -72,6 +74,13 @@ LibMCEnv_double CJournalVariable_Historic::ComputeDoubleSample(const LibMCEnv_ui
 LibMCEnv_int64 CJournalVariable_Historic::ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds)
 {
     return m_pJournalReader->computeIntegerSample(m_sVariableName, nTimeInMicroSeconds);
+}
+
+IUniformJournalSampling* CJournalVariable_Historic::SampleUniform(const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples)
+{
+    std::vector<AMC::sJournalEnvelopeSample> envelope;
+    m_pJournalReader->sampleVariableEnvelope(m_sVariableName, nStartTimeStamp, nEndTimeStamp, nNumberOfSamples, envelope);
+    return new CUniformJournalSampling(m_sVariableName, nStartTimeStamp, nEndTimeStamp, envelope);
 }
 
 

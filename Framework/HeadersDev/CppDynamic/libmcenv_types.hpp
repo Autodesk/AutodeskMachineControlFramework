@@ -347,6 +347,16 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDREACTIONTIMEOUT 10250 /** Invalid reaction timeout. */
 #define LIBMCENV_ERROR_COULDNOTSETREACTIONTIMEOUT 10251 /** Could not set reaction timeout. */
 #define LIBMCENV_ERROR_MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED 10252 /** Schema type already registered, but with a different name. */
+#define LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND 10253 /** No configuration version found. */
+#define LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE 10254 /** No configuration version active. */
+#define LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND 10255 /** Telemetry channel not found. */
+#define LIBMCENV_ERROR_VIDEOSTREAMNOTFOUND 10256 /** Video stream not found. */
+#define LIBMCENV_ERROR_INVALIDVIDEOSTREAMWIDTH 10257 /** Invalid video stream width. */
+#define LIBMCENV_ERROR_INVALIDVIDEOSTREAMHEIGHT 10258 /** Invalid video stream height. */
+#define LIBMCENV_ERROR_INVALIDFRAMEDURATION 10259 /** Invalid frame duration. */
+#define LIBMCENV_ERROR_INVALIDPAUSETOLERANCE 10260 /** Invalid pause tolerance. */
+#define LIBMCENV_ERROR_INVALIDFRAMECACHEDURATION 10261 /** Invalid frame cache duration. */
+#define LIBMCENV_ERROR_VIDEOSTREAMFRAMEENCODINGERROR 10262 /** Video stream frame encoding error. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -606,6 +616,16 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDREACTIONTIMEOUT: return "Invalid reaction timeout.";
     case LIBMCENV_ERROR_COULDNOTSETREACTIONTIMEOUT: return "Could not set reaction timeout.";
     case LIBMCENV_ERROR_MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED: return "Schema type already registered, but with a different name.";
+    case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONFOUND: return "No configuration version found.";
+    case LIBMCENV_ERROR_NOCONFIGURATIONVERSIONACTIVE: return "No configuration version active.";
+    case LIBMCENV_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
+    case LIBMCENV_ERROR_VIDEOSTREAMNOTFOUND: return "Video stream not found.";
+    case LIBMCENV_ERROR_INVALIDVIDEOSTREAMWIDTH: return "Invalid video stream width.";
+    case LIBMCENV_ERROR_INVALIDVIDEOSTREAMHEIGHT: return "Invalid video stream height.";
+    case LIBMCENV_ERROR_INVALIDFRAMEDURATION: return "Invalid frame duration.";
+    case LIBMCENV_ERROR_INVALIDPAUSETOLERANCE: return "Invalid pause tolerance.";
+    case LIBMCENV_ERROR_INVALIDFRAMECACHEDURATION: return "Invalid frame cache duration.";
+    case LIBMCENV_ERROR_VIDEOSTREAMFRAMEENCODINGERROR: return "Video stream frame encoding error.";
     default: return "unknown error";
   }
 }
@@ -652,6 +672,7 @@ typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
 typedef LibMCEnvHandle LibMCEnv_BuildExecution;
 typedef LibMCEnvHandle LibMCEnv_BuildExecutionIterator;
+typedef LibMCEnvHandle LibMCEnv_BuildIterator;
 typedef LibMCEnvHandle LibMCEnv_Build;
 typedef LibMCEnvHandle LibMCEnv_WorkingFileProcess;
 typedef LibMCEnvHandle LibMCEnv_WorkingFile;
@@ -683,15 +704,22 @@ typedef LibMCEnvHandle LibMCEnv_Alert;
 typedef LibMCEnvHandle LibMCEnv_AlertIterator;
 typedef LibMCEnvHandle LibMCEnv_LogEntryList;
 typedef LibMCEnvHandle LibMCEnv_JournalHandler;
+typedef LibMCEnvHandle LibMCEnv_TelemetryInterval;
+typedef LibMCEnvHandle LibMCEnv_TelemetryIntervalIterator;
+typedef LibMCEnvHandle LibMCEnv_TelemetryChannelStatistics;
+typedef LibMCEnvHandle LibMCEnv_TelemetryHandler;
 typedef LibMCEnvHandle LibMCEnv_UserDetailList;
 typedef LibMCEnvHandle LibMCEnv_UserManagementHandler;
 typedef LibMCEnvHandle LibMCEnv_MachineConfigurationXSD;
 typedef LibMCEnvHandle LibMCEnv_MachineConfigurationXSDIterator;
 typedef LibMCEnvHandle LibMCEnv_MachineConfigurationVersion;
 typedef LibMCEnvHandle LibMCEnv_MachineConfigurationVersionIterator;
+typedef LibMCEnvHandle LibMCEnv_MachineConfiguration;
 typedef LibMCEnvHandle LibMCEnv_MachineConfigurationType;
 typedef LibMCEnvHandle LibMCEnv_MachineConfigurationTypeIterator;
 typedef LibMCEnvHandle LibMCEnv_MachineConfigurationHandler;
+typedef LibMCEnvHandle LibMCEnv_TelemetryMarkerScope;
+typedef LibMCEnvHandle LibMCEnv_TelemetryChannel;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
 typedef LibMCEnvHandle LibMCEnv_UIItem;
 typedef LibMCEnvHandle LibMCEnv_UIEnvironment;
@@ -728,6 +756,15 @@ namespace LibMCEnv {
     ObjectType = 4,
     ArrayType = 5,
     BoolType = 6
+  };
+  
+  enum class eParameterDataType : LibMCEnv_int32 {
+    Unknown = 0,
+    String = 1,
+    UUID = 2,
+    Integer = 3,
+    Double = 4,
+    Bool = 5
   };
   
   enum class eImagePixelFormat : LibMCEnv_int32 {
@@ -835,6 +872,17 @@ namespace LibMCEnv {
     Uint64Column = 5
   };
   
+  enum class eTelemetryChannelType : LibMCEnv_int32 {
+    Unknown = 0,
+    CustomMarker = 1,
+    RemoteQuery = 2,
+    StateExecution = 3,
+    StateRepeatDelay = 4,
+    SignalQueue = 5,
+    SignalProcessing = 6,
+    SignalAcknowledgement = 7
+  };
+  
   enum class eSignalPhase : LibMCEnv_int32 {
     Invalid = 0, /** Invalid phase. Should not happen. */
     InPreparation = 10, /** Signal has not been triggered yet. Parameters can change. */
@@ -844,7 +892,7 @@ namespace LibMCEnv {
     Failed = 50, /** Signal is has not been handled to its specification. An error message is available. */
     TimedOut = 60, /** The signal timed out before being processed. */
     Cleared = 70, /** The signal queue has been cleared and the signal will not be processed anymore. */
-    Retracted = 80, /** The sender has retracted the signal before it was processed. */
+    Retracted = 80, /** NOT IMPLEMENTED: The sender has retracted the signal before it was processed. */
     Archived = 90 /** The signal has been archived. */
   };
   
@@ -921,6 +969,14 @@ namespace LibMCEnv {
       LibMCEnv_double m_Value;
   } sTimeStreamEntry;
   
+  typedef struct sTimeStreamEnvelopeEntry {
+      LibMCEnv_uint64 m_TimestampInMicroSeconds;
+      LibMCEnv_double m_MinValue;
+      LibMCEnv_double m_MaxValue;
+      LibMCEnv_double m_AverageValue;
+      LibMCEnv_double m_LastValue;
+  } sTimeStreamEnvelopeEntry;
+  
   #pragma pack ()
   
 } // namespace LibMCEnv;
@@ -929,6 +985,7 @@ namespace LibMCEnv {
 typedef LibMCEnv::eAlertLevel eLibMCEnvAlertLevel;
 typedef LibMCEnv::eLogLevel eLibMCEnvLogLevel;
 typedef LibMCEnv::eJSONObjectType eLibMCEnvJSONObjectType;
+typedef LibMCEnv::eParameterDataType eLibMCEnvParameterDataType;
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::ePNGStorageFormat eLibMCEnvPNGStorageFormat;
 typedef LibMCEnv::eFieldSamplingMode eLibMCEnvFieldSamplingMode;
@@ -941,6 +998,7 @@ typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::eWorkingFileProcessStatus eLibMCEnvWorkingFileProcessStatus;
 typedef LibMCEnv::eBuildExecutionStatus eLibMCEnvBuildExecutionStatus;
 typedef LibMCEnv::eDataTableColumnType eLibMCEnvDataTableColumnType;
+typedef LibMCEnv::eTelemetryChannelType eLibMCEnvTelemetryChannelType;
 typedef LibMCEnv::eSignalPhase eLibMCEnvSignalPhase;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
@@ -955,5 +1013,6 @@ typedef LibMCEnv::sHatch2DSubInterpolationData sLibMCEnvHatch2DSubInterpolationD
 typedef LibMCEnv::sModelDataTransform sLibMCEnvModelDataTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
 typedef LibMCEnv::sTimeStreamEntry sLibMCEnvTimeStreamEntry;
+typedef LibMCEnv::sTimeStreamEnvelopeEntry sLibMCEnvTimeStreamEnvelopeEntry;
 
 #endif // __LIBMCENV_TYPES_HEADER_CPP

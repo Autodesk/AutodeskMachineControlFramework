@@ -248,6 +248,8 @@ void CDriver_Raylase::DrawLayerMultiLaserWithCallback(const std::string& sStream
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_NOLASERINDICESASSIGNED);
 
     auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+    pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.raylase.com/iocontrol/2026/01", "precycleid", LibMCEnv::eToolpathAttributeType::Integer);
+    pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.raylase.com/iocontrol/2026/01", "postcycleid", LibMCEnv::eToolpathAttributeType::Integer);
     auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
     std::vector<PRaylaseCardList> executionLists;

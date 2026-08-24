@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 #include <cctype>
 #include <cmath>
+#include <fstream>
 
 #include "crossguid/guid.hpp"
 #include "PicoSHA2/picosha2.h"
@@ -46,12 +47,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cppcodec/base64_url.hpp"
 
 #ifdef _WIN32
+#include <windows.h>
+#include <winternl.h>
 #include <objbase.h>
 #include <shlwapi.h>
 #include <iomanip>
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #include <ctime>
 #include <unistd.h>
 #include <dirent.h> 
@@ -607,6 +611,35 @@ namespace AMCCommon {
 
 		// Last characters is also not allowed to be a dot
 		if (previousCharWasDot)
+			return false;
+
+		return true;
+	}
+
+	bool CUtils::stringIsValidFileName(const std::string& sFileName)
+	{
+		if (sFileName.empty())
+			return false;
+
+		if (sFileName.find(":") != std::string::npos)
+			return false;
+		if (sFileName.find(">") != std::string::npos)
+			return false;
+		if (sFileName.find("<") != std::string::npos)
+			return false;
+		if (sFileName.find("\"") != std::string::npos)
+			return false;
+		if (sFileName.find("/") != std::string::npos)
+			return false;
+		if (sFileName.find("\\") != std::string::npos)
+			return false;
+		if (sFileName.find("|") != std::string::npos)
+			return false;
+		if (sFileName.find("?") != std::string::npos)
+			return false;
+		if (sFileName.find("*") != std::string::npos)
+			return false;
+		if (sFileName.find("..") != std::string::npos)
 			return false;
 
 		return true;
@@ -1170,7 +1203,8 @@ namespace AMCCommon {
 		TempPathBuffer[MAX_PATH] = 0;
 		std::string tmpfolder = CUtils::UTF16toUTF8(TempPathBuffer.data());
 #else
-		std::string tmpfolder = getenv("TMPDIR");
+		const char* tmpEnv = getenv("TMPDIR");
+		std::string tmpfolder = (tmpEnv != nullptr) ? tmpEnv : "";
 #endif
 		if (tmpfolder.empty())
 			return "";
@@ -1190,6 +1224,130 @@ namespace AMCCommon {
 			}
 			return finaltmpfolder;
 		}
+	}
+
+	std::string CUtils::getOperatingSystemIdentifier()
+	{
+#ifdef _WIN32
+		typedef LONG(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+		HMODULE hNtDll = GetModuleHandleW(L"ntdll.dll");
+		if (hNtDll != nullptr) {
+			auto pRtlGetVersion = reinterpret_cast<RtlGetVersionPtr>(GetProcAddress(hNtDll, "RtlGetVersion"));
+			if (pRtlGetVersion != nullptr) {
+				RTL_OSVERSIONINFOW osVersionInfo;
+				ZeroMemory(&osVersionInfo, sizeof(osVersionInfo));
+				osVersionInfo.dwOSVersionInfoSize = sizeof(osVersionInfo);
+				if (pRtlGetVersion(&osVersionInfo) == 0) {
+					std::stringstream osStream;
+					osStream << "windows " << osVersionInfo.dwMajorVersion << "." << osVersionInfo.dwMinorVersion << "." << osVersionInfo.dwBuildNumber;
+					return osStream.str();
+				}
+			}
+		}
+
+		return "windows";
+#else
+		std::ifstream osReleaseFile("/etc/os-release");
+		if (osReleaseFile.good()) {
+			std::string line;
+			std::string prettyName;
+			std::string name;
+			std::string versionId;
+			while (std::getline(osReleaseFile, line)) {
+				line = trimString(line);
+				if (line.rfind("PRETTY_NAME=", 0) == 0)
+					prettyName = trimString(line.substr(12));
+				else if (line.rfind("NAME=", 0) == 0)
+					name = trimString(line.substr(5));
+				else if (line.rfind("VERSION_ID=", 0) == 0)
+					versionId = trimString(line.substr(11));
+			}
+
+			auto cleanValue = [](const std::string& value) {
+				if (value.size() >= 2) {
+					if ((value.front() == '"') && (value.back() == '"'))
+						return value.substr(1, value.size() - 2);
+				}
+				return value;
+			};
+
+			prettyName = cleanValue(prettyName);
+			name = cleanValue(name);
+			versionId = cleanValue(versionId);
+
+			if (!prettyName.empty())
+				return std::string("linux ") + prettyName;
+			if (!name.empty() && !versionId.empty())
+				return std::string("linux ") + name + " " + versionId;
+			if (!name.empty())
+				return std::string("linux ") + name;
+		}
+
+		struct utsname unameData;
+		if (uname(&unameData) == 0) {
+			std::string release = trimString(std::string(unameData.release));
+			if (!release.empty())
+				return std::string("linux ") + release;
+		}
+
+		return "linux";
+#endif
+	}
+
+	std::string CUtils::getMachineIdentifier()
+	{
+#ifdef _WIN32
+		std::string machineIdentifier;
+		HKEY hKey = nullptr;
+		if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Cryptography", 0, KEY_READ | KEY_WOW64_64KEY, &hKey) == ERROR_SUCCESS) {
+			wchar_t valueBuffer[256];
+			DWORD valueSize = sizeof(valueBuffer);
+			DWORD valueType = 0;
+			if (RegQueryValueExW(hKey, L"MachineGuid", nullptr, &valueType, reinterpret_cast<LPBYTE>(valueBuffer), &valueSize) == ERROR_SUCCESS) {
+				if ((valueType == REG_SZ) || (valueType == REG_EXPAND_SZ)) {
+					if (valueSize >= sizeof(wchar_t)) {
+						valueBuffer[(valueSize / sizeof(wchar_t)) - 1] = 0;
+					}
+					machineIdentifier = trimString(UTF16toUTF8(valueBuffer));
+				}
+			}
+			RegCloseKey(hKey);
+		}
+
+		if (machineIdentifier.empty()) {
+			char hostNameBuffer[MAX_COMPUTERNAME_LENGTH + 1];
+			DWORD hostNameSize = MAX_COMPUTERNAME_LENGTH + 1;
+			if (GetComputerNameA(hostNameBuffer, &hostNameSize) != 0) {
+				machineIdentifier = trimString(std::string(hostNameBuffer, hostNameSize));
+			}
+		}
+
+		if (machineIdentifier.empty())
+			throw std::runtime_error("could not read machine identifier");
+
+		return machineIdentifier;
+#else
+		const char* machineIdPaths[] = { "/etc/machine-id", "/var/lib/dbus/machine-id" };
+		for (const char* machineIdPath : machineIdPaths) {
+			if (CUtils::fileOrPathExistsOnDisk(machineIdPath)) {
+				std::ifstream fileStream(machineIdPath);
+				if (fileStream.good()) {
+					std::stringstream buffer;
+					buffer << fileStream.rdbuf();
+					std::string machineIdentifier = trimString(buffer.str());
+					if (!machineIdentifier.empty())
+						return machineIdentifier;
+				}
+			}
+		}
+
+		char hostNameBuffer[256];
+		hostNameBuffer[sizeof(hostNameBuffer) - 1] = 0;
+		if (gethostname(hostNameBuffer, sizeof(hostNameBuffer) - 1) == 0)
+			return trimString(std::string(hostNameBuffer));
+
+		throw std::runtime_error("could not read machine identifier");
+#endif
 	}
 
 }

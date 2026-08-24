@@ -59,6 +59,7 @@ class IBase;
 class IDriver;
 class IRaylaseCommandLog;
 class INLightDriverBoard;
+class IRaylaseIOCycle;
 class IRaylaseCard;
 class IDriver_Raylase;
 
@@ -459,6 +460,46 @@ typedef IBaseSharedPtr<INLightDriverBoard> PINLightDriverBoard;
 
 
 /*************************************************************************************************************************
+ Class interface for RaylaseIOCycle 
+**************************************************************************************************************************/
+
+class IRaylaseIOCycle : public virtual IBase {
+public:
+	/**
+	* IRaylaseIOCycle::GetCycleID - Returns the cycle ID as Integer.
+	* @return Cycle ID. Will not be 0.
+	*/
+	virtual LibMCDriver_Raylase_uint32 GetCycleID() = 0;
+
+	/**
+	* IRaylaseIOCycle::AddSignalOut - Sets or clears a GPIO Output signal during the list cycle.
+	* @param[in] eIOPort - IO Port to write out to. MUST be configured as output pin.
+	* @param[in] nIOPin - IO Pin to write out to. MUST be configured as output pin.
+	* @param[in] bHighNotLow - If true, sets the pin high. If false, sets the pin low.
+	*/
+	virtual void AddSignalOut(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow) = 0;
+
+	/**
+	* IRaylaseIOCycle::AddWaitForSignal - Waits for an Input signal to be high or low during the list cycle.
+	* @param[in] eIOPort - IO Port to read from. MUST be configured as input pin.
+	* @param[in] nIOPin - IO Pin to read from. MUST be configured as input pin.
+	* @param[in] bHighNotLow - If true, waits for the pin to be high. If false, waits for the pin to be low.
+	* @param[in] nTimeoutInMicroseconds - Timeout in Microseconds.
+	*/
+	virtual void AddWaitForSignal(const LibMCDriver_Raylase::eIOPort eIOPort, const LibMCDriver_Raylase_uint32 nIOPin, const bool bHighNotLow, const LibMCDriver_Raylase_uint32 nTimeoutInMicroseconds) = 0;
+
+	/**
+	* IRaylaseIOCycle::AddDelay - Adds a delay to the list cycle.
+	* @param[in] nDelayInMicroseconds - Delay in Microseconds.
+	*/
+	virtual void AddDelay(const LibMCDriver_Raylase_uint32 nDelayInMicroseconds) = 0;
+
+};
+
+typedef IBaseSharedPtr<IRaylaseIOCycle> PIRaylaseIOCycle;
+
+
+/*************************************************************************************************************************
  Class interface for RaylaseCard 
 **************************************************************************************************************************/
 
@@ -501,6 +542,33 @@ public:
 	* @return NLight Driver Board Instance
 	*/
 	virtual INLightDriverBoard * GetNLightDriverBoard() = 0;
+
+	/**
+	* IRaylaseCard::CreateIOCycle - Creates a new IO cycle with a certain ID. Fails if cycle ID is already existing..
+	* @param[in] nCycleID - Cycle ID to use. MUST NOT be 0.
+	* @return IO Cycle Instance
+	*/
+	virtual IRaylaseIOCycle * CreateIOCycle(const LibMCDriver_Raylase_uint32 nCycleID) = 0;
+
+	/**
+	* IRaylaseCard::IOCycleExists - Returns if a IO cycle exists.
+	* @param[in] nCycleID - Cycle ID to return.
+	* @return Returns true, if IO Cycle exists.
+	*/
+	virtual bool IOCycleExists(const LibMCDriver_Raylase_uint32 nCycleID) = 0;
+
+	/**
+	* IRaylaseCard::GetIOCycle - Returns a new cycle. Fails if cycle ID does not exist..
+	* @param[in] nCycleID - Cycle ID to return.
+	* @return IO Cycle Instance
+	*/
+	virtual IRaylaseIOCycle * GetIOCycle(const LibMCDriver_Raylase_uint32 nCycleID) = 0;
+
+	/**
+	* IRaylaseCard::RemoveIOCycle - Removes an IO Cycle of a certain ID. Does nothing if IO cycle does not exist..
+	* @param[in] nCycleID - Cycle ID to remove.
+	*/
+	virtual void RemoveIOCycle(const LibMCDriver_Raylase_uint32 nCycleID) = 0;
 
 	/**
 	* IRaylaseCard::LaserOff - Turns the laser off.

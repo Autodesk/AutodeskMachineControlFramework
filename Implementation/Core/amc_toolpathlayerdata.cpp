@@ -429,9 +429,11 @@ namespace AMC {
 
 						}
 
-				
+#if USEALLMODIFICATIONFACTORS 				
 						for (uint32_t nFactorIndex = 0; nFactorIndex < 3; nFactorIndex++) {
-
+#else // USE ONLY FACTOR_F MODIFICATOR
+						for (uint32_t nFactorIndex = 0; nFactorIndex < 1; nFactorIndex++) {
+#endif
 							Lib3MF::eToolpathProfileModificationFactor factorType = Lib3MF::eToolpathProfileModificationFactor::Unknown;
 							uint32_t factorFlag = 0;
 							switch (nFactorIndex) {
@@ -462,8 +464,22 @@ namespace AMC {
 
 								size_t nInterpolationDataStartIndex = m_InterpolationData.size();
 								if (nonLinearValues.size() > 0) {
-									for (auto & interpolationData : nonLinearValues)
+									double dPreviousParameter = 0.0;
+									double dMinParameterIncrease = 1e-5;
+									double dMaxParameter = 1.0 - dMinParameterIncrease;
+
+									for (auto& interpolationData : nonLinearValues) {
+										if (interpolationData.m_Parameter < dPreviousParameter + dMinParameterIncrease) 
+											throw ELibMCCustomException(LIBMC_ERROR_NONLINEAROVERRIDEPARAMETERNOTINCREASING, std::to_string (interpolationData.m_Parameter) + " in " + m_sDebugName);
+
+										if (interpolationData.m_Parameter > dMaxParameter)
+											throw ELibMCCustomException(LIBMC_ERROR_NONLINEAROVERRIDEPARAMETEROUTOFRANGE, std::to_string(interpolationData.m_Parameter) + " in " + m_sDebugName);
+
+										if (interpolationData.m_Factor < 0.0 || interpolationData.m_Factor > 1.0)
+											throw ELibMCCustomException(LIBMC_ERROR_NONLINEAROVERRIDEFACTOROUTOFRANGE, std::to_string(interpolationData.m_Factor) + " in " + m_sDebugName);
+
 										m_InterpolationData.push_back(interpolationData);
+									}
 								}
 
 								if (hatchFactors.size() > 0) {
@@ -475,19 +491,21 @@ namespace AMC {
 
 									for (uint32_t nHatchIndex = 0; nHatchIndex < hatchFactors.size(); nHatchIndex++) {
 										uint32_t nSubInterpolationCount = 0;
-										Lib3MF::sHatchModificationInterpolationData* pSubInterpolationData = nullptr;
+										uint32_t nSubInterpolationOffset = 0;
+										//Lib3MF::sHatchModificationInterpolationData* pSubInterpolationData = nullptr;
 										if (nonLinearCounts.size() > 0) {
 											nSubInterpolationCount = nonLinearCounts.at(nHatchIndex);
-											pSubInterpolationData = &m_InterpolationData.at(nInterpolationDataStartIndex + nTotalSubInterpolationCount);
+											if (nSubInterpolationCount > 0)
+												nSubInterpolationOffset = (uint32_t)(nInterpolationDataStartIndex + nTotalSubInterpolationCount);
 										}
 
 										pDstOverride->m_dFactors[nFactorIndex] = pSrcOverride->m_Point1Factor;
 										pDstOverride->m_nSubInterpolationCount = nSubInterpolationCount;
-										pDstOverride->m_pSubInterpolationData = pSubInterpolationData;
+										pDstOverride->m_nSubInterpolationOffset = nSubInterpolationOffset;
 										pDstOverride++;
 										pDstOverride->m_dFactors[nFactorIndex] = pSrcOverride->m_Point2Factor;
 										pDstOverride->m_nSubInterpolationCount = nSubInterpolationCount;
-										pDstOverride->m_pSubInterpolationData = pSubInterpolationData;
+										pDstOverride->m_nSubInterpolationOffset = nSubInterpolationOffset;
 										pDstOverride++;
 										pSrcOverride++;
 
@@ -1067,7 +1085,8 @@ namespace AMC {
 		uint32_t nStartIndex = pSegment->m_PointStartIndex;
 		if (pSegment->m_PointCount > 0) {
 			uint32_t nPointIndex = nStartIndex + nHatchIndex * 2;
-			pSubInterpolationData = m_OverrideFactors.at(nPointIndex).m_pSubInterpolationData;
+			uint32_t nSubInterpolationOffset = m_OverrideFactors.at(nPointIndex).m_nSubInterpolationOffset;
+			pSubInterpolationData = &m_InterpolationData.at (nSubInterpolationOffset);
 			nSubInterpolationCount = m_OverrideFactors.at(nPointIndex).m_nSubInterpolationCount;
 		}
 		else {

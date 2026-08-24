@@ -93,6 +93,17 @@ namespace AMC {
 
 	}
 
-}
+	uint64_t CDataSeriesHandler::getMemoryUsageInBytes()
+	{
+		uint64_t nUsage = 0;
+		for (auto& entityPair : m_Entities) {
+			auto pSeries = entityPair.second;
+			if (pSeries.get() != nullptr)
+				nUsage += pSeries->getMemoryUsageInBytes();
+		}
 
+		return nUsage;
+	}
+
+}
 

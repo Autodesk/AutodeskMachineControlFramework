@@ -60,13 +60,14 @@ namespace AMC {
 		CUIExpression m_UploadCaption;
 		std::string m_sSuccessEvent;
 		std::string m_sFailureEvent;
+		std::string m_sAcceptedTypes;
 		CUIModule_ContentRegistry* m_pOwner;
 
 	public:
 
 		static PUIModule_ContentUpload makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentUpload(CUIModule_ContentRegistry* pOwner, CUIExpression uploadClass, CUIExpression uploadCaption, const std::string & sSuccessEvent, const std::string& sFailureEvent, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData);
+		CUIModule_ContentUpload(CUIModule_ContentRegistry* pOwner, CUIExpression uploadClass, CUIExpression uploadCaption, const std::string & sSuccessEvent, const std::string& sFailureEvent, const std::string& sAcceptedTypes, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentUpload();
 
@@ -80,7 +81,9 @@ namespace AMC {
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
-
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 
 	};
 

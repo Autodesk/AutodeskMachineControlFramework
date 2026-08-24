@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMCCommon {
 
-	CPortableZIPWriterEntry::CPortableZIPWriterEntry(const std::string sUTF8Name, uint16_t nLastModTime, uint16_t nLastModDate, uint64_t nFilePosition, uint64_t nExtInfoPosition, uint64_t nDataPosition)
+	CPortableZIPWriterEntry::CPortableZIPWriterEntry(const std::string sUTF8Name, uint16_t nLastModTime, uint16_t nLastModDate, uint32_t nExternalFileAttributes, uint64_t nFilePosition, uint64_t nExtInfoPosition, uint64_t nDataPosition)
 	{
 		m_sUTF8Name = sUTF8Name;
 		m_nCRC32 = 0;
@@ -40,6 +40,7 @@ namespace AMCCommon {
 		m_nUncompressedSize = 0;
 		m_nLastModTime = nLastModTime;
 		m_nLastModDate = nLastModDate;
+		m_nExternalFileAttributes = nExternalFileAttributes;
 		m_nFilePosition = nFilePosition;
 		m_nExtInfoPosition = nExtInfoPosition;
 		m_nDataPosition = nDataPosition;
@@ -73,6 +74,11 @@ namespace AMCCommon {
 	uint16_t CPortableZIPWriterEntry::getLastModDate()
 	{
 		return m_nLastModDate;
+	}
+
+	uint32_t CPortableZIPWriterEntry::getExternalFileAttributes()
+	{
+		return m_nExternalFileAttributes;
 	}
 
 	uint64_t CPortableZIPWriterEntry::getFilePosition()

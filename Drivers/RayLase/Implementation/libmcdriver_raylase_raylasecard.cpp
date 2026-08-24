@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CRaylaseCard
 #include "libmcdriver_raylase_raylasecard.hpp"
 #include "libmcdriver_raylase_interfaceexception.hpp"
 #include "libmcdriver_raylase_nlightdriverboard.hpp"
+#include "libmcdriver_raylase_raylaseiocycle.hpp"
 
 using namespace LibMCDriver_Raylase::Impl;
 //#include <iostream>
@@ -197,6 +198,9 @@ void CRaylaseCard::DrawLayerWithCallback(const std::string& sStreamUUID, const L
 	if (bVerbose)
     	pDriverEnvironment->LogMessage("Loading layer");
 
+    pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.raylase.com/iocontrol/2026/01", "precycleid", LibMCEnv::eToolpathAttributeType::Integer);
+    pToolpathAccessor->RegisterCustomSegmentAttribute("http://schemas.raylase.com/iocontrol/2026/01", "postcycleid", LibMCEnv::eToolpathAttributeType::Integer);
+
     auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
     auto pList = m_pRaylaseCardImpl->createNewList();
@@ -245,8 +249,22 @@ void CRaylaseCard::DrawLayerWithCallback(const std::string& sStreamUUID, const L
             pDriverEnvironment->LogMessage("Deleting list from card");
 
     }
+    catch (std::exception & E)
+    {
+        pDriverEnvironment->LogWarning("Fatal Error occured: " + std::string (E.what ()));
+
+        // Abort execution, if it is still running
+        m_pRaylaseCardImpl->abortListExecution();
+
+        // Always delete list on card
+        pList->deleteListListOnCard();
+
+        throw;
+    }
     catch (...)
     {
+        pDriverEnvironment->LogWarning("Unknown fatal error occured");
+
         // Abort execution, if it is still running
         m_pRaylaseCardImpl->abortListExecution();
 
@@ -296,4 +314,26 @@ bool CRaylaseCard::IsConnected()
 INLightDriverBoard* CRaylaseCard::GetNLightDriverBoard() 
 {
     return new CNLightDriverBoard(m_pRaylaseCardImpl);
+}
+
+IRaylaseIOCycle* CRaylaseCard::CreateIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+{
+    auto pIOCycleImpl = m_pRaylaseCardImpl->createIOCycle(nCycleID);
+    return new CRaylaseIOCycle(pIOCycleImpl);
+}
+
+bool CRaylaseCard::IOCycleExists(const LibMCDriver_Raylase_uint32 nCycleID)
+{
+    return m_pRaylaseCardImpl->ioCycleExists(nCycleID);
+}
+
+IRaylaseIOCycle* CRaylaseCard::GetIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+{
+    auto pIOCycleImpl = m_pRaylaseCardImpl->getIOCycle(nCycleID);
+    return new CRaylaseIOCycle(pIOCycleImpl);
+}
+
+void CRaylaseCard::RemoveIOCycle(const LibMCDriver_Raylase_uint32 nCycleID)
+{
+    m_pRaylaseCardImpl->removeIOCycle(nCycleID);
 }

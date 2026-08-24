@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
@@ -280,7 +281,16 @@ void CUIModule_ContentExecutionList::addLegacyContentToJSON(CJSONWriter& writer,
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONSTARTTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC (nStartTimeStamp));
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONENDTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC(nEndTimeStamp));
 		entryObject.addInteger(AMC_API_KEY_UI_ITEMEXECUTIONDURATION, nDurationInSeconds);
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
+
+		// Retrieve the parent build job and check for thumbnail
+		std::string sJobUUID = pExecution->GetJobUUID();
+		auto pBuildJob = pBuildJobHandler->RetrieveJob(sJobUUID);
+
+		if (pBuildJob->HasThumbnailStream())
+			entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTHUMBNAIL, pBuildJob->GetThumbnailStreamUUID());
+		else
+			entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
+
 		entryObject.addInteger(AMC_API_KEY_UI_ITEMEXECUTIONLAYERCOUNT, pExecution->GetJobLayerCount());
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONSTATUS, sStatusString);
 		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONBUILDSTATUS, pExecution->GetJobStatusString());
@@ -375,4 +385,63 @@ void CUIModule_ContentExecutionList::addButton(const std::string& sButtonName, C
 	m_ButtonUUIDMap.insert(std::make_pair(pButton->getUUID(), pButton));
 
 
+}
+
+std::string CUIModule_ContentExecutionList::getItemType()
+{
+	return "executionlist";
+}
+
+void CUIModule_ContentExecutionList::registerFrontendAttributes()
+{
+	registerItemStringAttribute("loadingtext", m_LoadingText);
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectEvent);
+		registerItemStringAttribute("selectevent", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(std::to_string(m_nEntriesPerPage));
+		registerItemIntegerAttribute("entriesperpage", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectedExecutionFieldUUID);
+		registerItemStringAttribute("selectionvalueuuid", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectedButtonFieldUUID);
+		registerItemStringAttribute("buttonvalueuuid", expr);
+	}
+}
+
+void CUIModule_ContentExecutionList::frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	if (pFrontendState == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (m_pItemModuleStore == nullptr)
+		return;
+
+	std::string sItemType = m_pItemModuleStore->getModuleType();
+	if (sItemType.empty())
+		return;
+
+	itemObject.addString("moduletype", sItemType);
+	itemObject.addString("uuid", m_pItemModuleStore->getUUID());
+
+	CJSONWriterObject attributesObject(writer);
+	pFrontendState->writeModuleAttributesToJSON(writer, attributesObject, m_pItemModuleStore.get(), pStateMachineData);
+
+	if (m_pDataModel) {
+		auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+		attributesObject.addInteger(AMC_API_KEY_EXECUTIONS_HEADID, (int64_t) pBuildJobHandler->GetExecutionListHeadID());
+	}
+
+	itemObject.addObject("attributes", attributesObject);
+
+	itemObject.addString(AMC_API_KEY_UI_ITEMSELECTIONVALUEUUID, m_sSelectedExecutionFieldUUID);
+	itemObject.addString(AMC_API_KEY_UI_ITEMBUTTONVALUEUUID, m_sSelectedButtonFieldUUID);
+	writeButtonsToJSON(writer, itemObject);
 }

@@ -79,6 +79,9 @@ namespace AMC {
 		//PMeshEntity register3MFMesh(const std::string& sEntityUUID, Lib3MF::CLib3MFMeshObject* pMeshObject);
 
 		//PMeshEntity register3MFResource(Lib3MF::CLib3MFWrapper * pWrapper, AMC::CResourcePackage * pResourcePackage, const std::string & sResourceName);
+
+		uint64_t getMeshEntityMemoryUsageInBytes();
+		uint64_t getSceneMemoryUsageInBytes();
 		
 	};
 
@@ -87,4 +90,3 @@ namespace AMC {
 
 
 #endif //__AMC_MESHHANDLER
-

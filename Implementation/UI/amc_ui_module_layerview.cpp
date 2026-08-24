@@ -230,7 +230,7 @@ void CUIModule_LayerViewPlatformItem::populateClientVariables(CParameterHandler*
 
 
 CUIModule_LayerView::CUIModule_LayerView(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
-: CUIModule (getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition ())
+: CUIModule (getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition ()), m_pUIModuleEnvironment(pUIModuleEnvironment)
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
@@ -251,6 +251,7 @@ CUIModule_LayerView::CUIModule_LayerView(pugi::xml_node& xmlNode, const std::str
 	CUIExpression originX(platformNode, "originx");
 	CUIExpression originY(platformNode, "originy");
 	CUIExpression baseImage(platformNode, "baseimage");
+	CUIExpression darkBaseImage(platformNode, "dark_baseimage", false);
 	CUIExpression layerIndex(platformNode, "layerindex", false);
 
 	CUIExpression buildUUID;
@@ -300,6 +301,63 @@ CUIModule_LayerView::CUIModule_LayerView(pugi::xml_node& xmlNode, const std::str
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
+	// Color configuration: <colors> child element with light/dark mode attributes.
+	// Fallback to sensible defaults when not specified.
+	/////////////////////////////////////////////////////////////////////////////////////
+	auto colorsNode = xmlNode.child("colors");
+
+	auto readColorAttr = [&](pugi::xml_node& node, const char* attrName, const char* fallback) -> CUIExpression {
+		CUIExpression expr;
+		auto attr = node.attribute(attrName);
+		if (!attr.empty())
+			expr.setFixedValue(attr.as_string());
+		else
+			expr.setFixedValue(fallback);
+		return expr;
+	};
+
+	CUIExpression colorBackground, colorGrid, colorContour, colorHatch, colorTravel;
+	CUIExpression darkColorBackground, darkColorGrid, darkColorContour, darkColorHatch, darkColorTravel;
+
+	if (!colorsNode.empty()) {
+		colorBackground = readColorAttr(colorsNode, "background", "#ffffff");
+		colorGrid = readColorAttr(colorsNode, "grid", "#e0e0e0");
+		colorContour = readColorAttr(colorsNode, "contour", "#00aa88");
+		colorHatch = readColorAttr(colorsNode, "hatch", "#cc88cc");
+		colorTravel = readColorAttr(colorsNode, "travel", "#aaaaaa");
+
+		darkColorBackground = readColorAttr(colorsNode, "dark_background", "#1a1a2e");
+		darkColorGrid = readColorAttr(colorsNode, "dark_grid", "#333344");
+		darkColorContour = readColorAttr(colorsNode, "dark_contour", "#33ddaa");
+		darkColorHatch = readColorAttr(colorsNode, "dark_hatch", "#dd99dd");
+		darkColorTravel = readColorAttr(colorsNode, "dark_travel", "#555566");
+	}
+	else {
+		colorBackground.setFixedValue("#ffffff");
+		colorGrid.setFixedValue("#e0e0e0");
+		colorContour.setFixedValue("#00aa88");
+		colorHatch.setFixedValue("#cc88cc");
+		colorTravel.setFixedValue("#aaaaaa");
+
+		darkColorBackground.setFixedValue("#1a1a2e");
+		darkColorGrid.setFixedValue("#333344");
+		darkColorContour.setFixedValue("#33ddaa");
+		darkColorHatch.setFixedValue("#dd99dd");
+		darkColorTravel.setFixedValue("#555566");
+	}
+
+	registerStringAttribute("color_background", colorBackground);
+	registerStringAttribute("color_grid", colorGrid);
+	registerStringAttribute("color_contour", colorContour);
+	registerStringAttribute("color_hatch", colorHatch);
+	registerStringAttribute("color_travel", colorTravel);
+	registerStringAttribute("darkcolor_background", darkColorBackground);
+	registerStringAttribute("darkcolor_grid", darkColorGrid);
+	registerStringAttribute("darkcolor_contour", darkColorContour);
+	registerStringAttribute("darkcolor_hatch", darkColorHatch);
+	registerStringAttribute("darkcolor_travel", darkColorTravel);
+
+	/////////////////////////////////////////////////////////////////////////////////////
 	// New UI Frontend System
 	/////////////////////////////////////////////////////////////////////////////////////
 	registerUUIDAttribute(AMC_API_KEY_UI_BUILDUUID, buildUUID);
@@ -310,12 +368,52 @@ CUIModule_LayerView::CUIModule_LayerView(pugi::xml_node& xmlNode, const std::str
 	registerNumberAttribute(AMC_API_KEY_UI_SIZEY, sizeY);
 	registerNumberAttribute(AMC_API_KEY_UI_ORIGINX, originX);
 	registerNumberAttribute(AMC_API_KEY_UI_ORIGINY, originY);
-	registerStringAttribute(AMC_API_KEY_UI_BASEIMAGERESOURCE, baseImage);
+	// baseimageresource must be the UUID so the frontend's /image/{uuid} endpoint works.
+	// Resolve the resource name -> UUID once at startup and register as a fixed value.
+	{
+		auto pStateMachineData = pUIModuleEnvironment->stateMachineData();
+		std::string sBaseImageName = baseImage.evaluateStringValue(pStateMachineData.get());
+		CUIExpression baseImageUUIDExpr;
+		if (!sBaseImageName.empty()) {
+			auto pResourceEntry = pUIModuleEnvironment->resourcePackage()->findEntryByName(sBaseImageName, true);
+			baseImageUUIDExpr.setFixedValue(pResourceEntry->getUUID());
+		} else {
+			baseImageUUIDExpr.setFixedValue(AMCCommon::CUtils::createEmptyUUID());
+		}
+		registerStringAttribute(AMC_API_KEY_UI_BASEIMAGERESOURCE, baseImageUUIDExpr);
+	}
+	{
+		auto pStateMachineData = pUIModuleEnvironment->stateMachineData();
+		std::string sDarkBaseImageName = darkBaseImage.evaluateStringValue(pStateMachineData.get());
+		CUIExpression darkBaseImageUUIDExpr;
+		if (!sDarkBaseImageName.empty()) {
+			auto pResourceEntry = pUIModuleEnvironment->resourcePackage()->findEntryByName(sDarkBaseImageName, true);
+			darkBaseImageUUIDExpr.setFixedValue(pResourceEntry->getUUID());
+		} else {
+			darkBaseImageUUIDExpr.setFixedValue("");
+		}
+		registerStringAttribute("dark_baseimageresource", darkBaseImageUUIDExpr);
+	}
 	registerBoolAttribute(AMC_API_KEY_UI_LABELVISIBLE, labelVisible);
 	registerStringAttribute(AMC_API_KEY_UI_LABELCAPTION, labelCaption);
 	registerStringAttribute(AMC_API_KEY_UI_LABELICON, labelIcon);
 	registerStringAttribute(AMC_API_KEY_UI_SLIDERCHANGEEVENT, sliderChangeEvent);
 	registerBoolAttribute(AMC_API_KEY_UI_SLIDERFIXED, sliderFixed);
+
+	CUIExpression platformUUIDExpr;
+	platformUUIDExpr.setFixedValue(m_PlatformItem->getUUID());
+	registerStringAttribute(AMC_API_KEY_UI_PLATFORMUUID, platformUUIDExpr);
+
+	auto captionAttrib = xmlNode.attribute("caption");
+	m_sCaption = captionAttrib.as_string();
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(m_sCaption);
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr;
+	visibleExpr.setFixedValue("1");
+	registerBoolAttribute("visible", visibleExpr);
 }
 
 
@@ -394,4 +492,38 @@ void CUIModule_LayerView::populateLegacyClientVariables(CParameterHandler* pPara
 bool CUIModule_LayerView::isVersion2FrontendModule()
 {
 	return true;
+}
+
+void CUIModule_LayerView::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	CUIModule::frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
+
+	auto pParamHandler = pFrontendState->getLegacyParameterHandler();
+	auto pGroup = pParamHandler->findGroup(m_PlatformItem->getItemPath(), false);
+	if (pGroup == nullptr)
+		return;
+
+	if (m_PlatformItem != nullptr) {
+		CJSONWriterObject cvObject(writer);
+
+		std::string sBuildUUID = pGroup->getUUIDParameterValueByName(AMC_API_KEY_UI_BUILDUUID);
+		cvObject.addString(AMC_API_KEY_UI_BUILDUUID, sBuildUUID);
+		cvObject.addInteger(AMC_API_KEY_UI_CURRENTLAYER, pGroup->getIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER));
+
+		uint32_t nLayerCount = 0;
+		if (AMCCommon::CUtils::stringIsNonEmptyUUIDString(sBuildUUID)) {
+			auto pToolpathHandler = m_pUIModuleEnvironment->toolpathHandler();
+			auto pDataModel = m_pUIModuleEnvironment->dataModel();
+			auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+			if (pBuildJobHandler->JobExists(sBuildUUID)) {
+				auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+				auto pToolpathEntity = pToolpathHandler->findToolpathEntity(pBuildJob->GetStorageStreamUUID(), false);
+				if (pToolpathEntity != nullptr)
+					nLayerCount = pToolpathEntity->getLayerCount();
+			}
+		}
+		cvObject.addInteger(AMC_API_KEY_UI_LAYERCOUNT, nLayerCount);
+
+		moduleObject.addObject("clientvariables", cvObject);
+	}
 }

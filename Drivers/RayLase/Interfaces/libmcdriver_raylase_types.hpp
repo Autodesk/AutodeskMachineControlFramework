@@ -150,6 +150,10 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_COULDNOTRECEIVESPIPACKET 1044 /** Could not receive SPI Packet */
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERMODE 1045 /** Invalid laser mode */
 #define LIBMCDRIVER_RAYLASE_ERROR_NLIGHTLASERMODEHASNOPOWEROVERRIDE 1046 /** nLight laser mode has no power override */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOCYCLEID 1047 /** Invalid IO Cycle ID */
+#define LIBMCDRIVER_RAYLASE_ERROR_IOCYCLEALREADYEXISTS 1048 /** IO Cycle already exists */
+#define LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND 1049 /** IO Cycle not found */
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT 1050 /** Invalid IO Port */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -212,6 +216,10 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_COULDNOTRECEIVESPIPACKET: return "Could not receive SPI Packet";
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERMODE: return "Invalid laser mode";
     case LIBMCDRIVER_RAYLASE_ERROR_NLIGHTLASERMODEHASNOPOWEROVERRIDE: return "nLight laser mode has no power override";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOCYCLEID: return "Invalid IO Cycle ID";
+    case LIBMCDRIVER_RAYLASE_ERROR_IOCYCLEALREADYEXISTS: return "IO Cycle already exists";
+    case LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND: return "IO Cycle not found";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT: return "Invalid IO Port";
     default: return "unknown error";
   }
 }
@@ -224,6 +232,7 @@ typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Base;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCommandLog;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_NLightDriverBoard;
+typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseIOCycle;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_RaylaseCard;
 typedef LibMCDriver_RaylaseHandle LibMCDriver_Raylase_Driver_Raylase;
 
@@ -237,6 +246,15 @@ namespace LibMCDriver_Raylase {
     DontSuppress = 0, /** Part is exposed with full power. */
     SkipPart = 1, /** Part is skipped and not exposed at all. */
     NoPower = 2 /** Part is exposed with a power of 0 Watts. */
+  };
+  
+  enum class eIOPort : LibMCDriver_Raylase_int32 {
+    Unknown = 0,
+    PortA = 1,
+    PortB = 2,
+    PortC = 3,
+    PortD = 4,
+    PortE = 5
   };
   
   /*************************************************************************************************************************
@@ -276,6 +294,7 @@ namespace LibMCDriver_Raylase {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCDriver_Raylase::ePartSuppressionMode eLibMCDriver_RaylasePartSuppressionMode;
+typedef LibMCDriver_Raylase::eIOPort eLibMCDriver_RaylaseIOPort;
 typedef LibMCDriver_Raylase::sPoint2D sLibMCDriver_RaylasePoint2D;
 typedef LibMCDriver_Raylase::sHatch2D sLibMCDriver_RaylaseHatch2D;
 typedef LibMCDriver_Raylase::ExposureCancellationCallback LibMCDriver_RaylaseExposureCancellationCallback;

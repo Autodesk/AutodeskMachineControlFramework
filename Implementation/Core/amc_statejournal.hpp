@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "amc_statejournalstream.hpp"
 #include "libmcdata_types.hpp"
@@ -58,6 +59,23 @@ namespace AMC {
 		double m_dVariance;
 
 	} sStateJournalStatistics;
+
+	// Metadata of a single recorded journal variable
+	typedef struct _sJournalVariableInfo {
+		std::string m_sName;
+		LibMCData::eParameterDataType m_eDataType;
+		double m_dUnits;
+	} sJournalVariableInfo;
+
+	// A single downsampled bucket of a variable's history over a time range.
+	// Timestamps are relative to the journal start, in microseconds.
+	typedef struct _sJournalEnvelopeSample {
+		uint64_t m_nTimeStampInMicroSeconds;
+		double m_dMinValue;
+		double m_dMaxValue;
+		double m_dAverageValue;
+		double m_dLastValue;
+	} sJournalEnvelopeSample;
 
 
 	class CStateJournal;
@@ -94,14 +112,21 @@ namespace AMC {
 		//sStateJournalStatistics computeStatistics (const std::string& sName, const sStateJournalInterval& interval);
 
 		double computeSample(const std::string& sName, const uint64_t nTimeStamp);
-		
-		void retrieveRecentInterval (uint64_t nLastMicroSeconds, sStateJournalInterval& interval);
+
+		// Enumeration of recorded variables (for building a history browser UI)
+		uint32_t getVariableCount();
+		void getVariableInformation(const uint32_t nIndex, std::string& sName, LibMCData::eParameterDataType& eDataType, double& dUnits);
+
+		// Downsamples a numeric/boolean variable's history over a time range into nBucketCount
+		// min/max/avg/last buckets. Used for multi-scale visualisation of large journals.
+		void sampleVariableEnvelope(const std::string& sName, const uint64_t nStartTimeInMicroSeconds, const uint64_t nEndTimeInMicroSeconds, const uint32_t nBucketCount, std::vector<sJournalEnvelopeSample>& envelope);
 
 		void registerAlias (const std::string& sName, const std::string& sSourceName);
 
 		std::string getStartTimeAsUTC();
 
 		uint64_t getLifeTimeInMicroseconds();
+		uint64_t getMemoryUsageInBytes();
 
 	};
 
@@ -110,4 +135,3 @@ namespace AMC {
 
 
 #endif //__AMC_STATEJOURNAL
-

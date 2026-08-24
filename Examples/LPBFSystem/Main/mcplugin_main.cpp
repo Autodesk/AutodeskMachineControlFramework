@@ -81,6 +81,7 @@ __DECLARESTATE(init)
 	}
 
 	pVideoDevice->SetToSupportedResolution(0) ;
+	
 
 	auto pImage = pStateEnvironment->CreateEmptyImage (pVideoDevice->GetCurrentResolutionX(), pVideoDevice->GetCurrentResolutionY(), 100.0, 100.0, LibMCEnv::eImagePixelFormat::RGB24bit);
 	if (pVideoDevice->CaptureRawImage(pImage)) {
@@ -106,6 +107,13 @@ __DECLARESTATE(init)
 	pJPEGStream->Finish();
 		
 
+	auto pVideoStream = pStateEnvironment->CreateVideoStream (
+		pVideoDevice->GetCurrentResolutionX (), pVideoDevice->GetCurrentResolutionY (), 33333, 100000, 66666);
+
+	pVideoDevice->StartStreamCapture(pVideoStream);
+
+	pStateEnvironment->LogMessage("video stream uuid: " + pVideoStream->GetUUID());
+
 
 	pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", 0);
 	pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
@@ -127,6 +135,19 @@ __DECLARESTATE(idle)
 
 	auto dCounterTest = pStateEnvironment->GetDoubleParameter("jobinfo", "countertest");
 	auto nTimer = pStateEnvironment->GetGlobalTimerInMilliseconds();
+
+	auto pDummyTrigger = pStateEnvironment->PrepareSignal("plc", "signal_dummy");
+	pDummyTrigger->SetInteger("timer", (int32_t)nTimer);
+	pDummyTrigger->Trigger();
+
+	pStateEnvironment->LogMessage("Timer: " + std::to_string(nTimer));
+
+	auto pTelemetryChannel = pStateEnvironment->FindTelemetryChannel("gasinitializationtime", true);
+	auto pMarker = pTelemetryChannel->StartMarkerScope(12345);
+
+	// DOSOMETHING
+
+	pMarker = nullptr;
 
 	pStateEnvironment->SetDoubleParameter ("jobinfo", "countertest", dCounterTest + abs (sin (nTimer * 0.001)));
 

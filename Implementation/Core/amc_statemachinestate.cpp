@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_driverhandler.hpp"
 
 #include "common_utils.hpp"
+#include "amc_telemetry.hpp"
 
 #include "libmc_exceptiontypes.hpp"
 
@@ -41,16 +42,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CStateMachineState::CStateMachineState(const std::string& sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMCCommon::PChrono pGlobalChrono)
+	CStateMachineState::CStateMachineState(const std::string& sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMCCommon::PChrono pGlobalChrono, PTelemetryHandler pTelemetryHandler)
 		: m_sInstanceName(sInstanceName), m_sName (sName), m_pEnvironmentWrapper (pEnvironmentWrapper), m_nRepeatDelay (nRepeatDelay), m_pGlobalChrono (pGlobalChrono), m_LastExecutionTimeStampInMicroseconds(0)
 	{
 		LibMCAssertNotNull(pEnvironmentWrapper.get());
 		LibMCAssertNotNull(pGlobalChrono.get());
+		LibMCAssertNotNull(pTelemetryHandler.get());
 
 		if ((nRepeatDelay < AMC_MINREPEATDELAY_MS) || (nRepeatDelay > AMC_MAXREPEATDELAY_MS))
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDREPEATDELAY, m_sInstanceName);
 
 		updateExecutionTime();
+
+		m_pTelemetryExecutionChannel = pTelemetryHandler->registerChannel(getTelemetryExecutionName(), "Execution of State " + m_sInstanceName + "." + m_sName, LibMCData::eTelemetryChannelType::StateExecution);
+		m_pTelemetryRepeatDelayChannel = pTelemetryHandler->registerChannel(getTelemetryRepeatDelayName(), "Repeat Delay of State " + m_sInstanceName + "." + m_sName, LibMCData::eTelemetryChannelType::StateRepeatDelay);
 
 	}
 
@@ -67,6 +72,17 @@ namespace AMC {
 	{
 		return std::string (m_sName.c_str());
 	}
+
+	std::string CStateMachineState::getTelemetryExecutionName() const
+	{
+		return m_sInstanceName + "." + m_sName + ".execution";
+	}
+
+	std::string CStateMachineState::getTelemetryRepeatDelayName() const
+	{
+		return m_sInstanceName + "." + m_sName + ".repeatdelay";
+	}
+	
 
 	uint32_t CStateMachineState::getOutstateCount() const
 	{
@@ -85,7 +101,8 @@ namespace AMC {
 
 	void CStateMachineState::updateExecutionTime()
 	{
-		m_LastExecutionTimeStampInMicroseconds = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ();
+		// Use monotonic elapsed time to avoid issues with NTP clock adjustments
+		m_LastExecutionTimeStampInMicroseconds = m_pGlobalChrono->getElapsedMicroseconds();
 	}
 
 
@@ -136,9 +153,16 @@ namespace AMC {
 
 		try {
 
-			ensureExecutionDelay(AMC_REPEATDELAYCHUNK_MS);
+			{
+				auto repeatDelayInterval = m_pTelemetryRepeatDelayChannel->startIntervalScope(0);
+				ensureExecutionDelay(AMC_REPEATDELAYCHUNK_MS);
+			}
 
-			m_pPluginState->Execute(pExternalEnvironment.get());
+			{
+				auto telemetryInterval = m_pTelemetryExecutionChannel->startIntervalScope(0);
+				m_pPluginState->Execute(pExternalEnvironment.get());
+
+			}
 
 			sNextState = pInternalEnvironment->getNextState();
 
@@ -161,8 +185,9 @@ namespace AMC {
 
 		if (chunkInMilliseconds < AMC_MINREPEATDELAY_MS)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDREPEATDELAY, m_sInstanceName);
-		
-		uint64_t executionTimeInMicroSeconds = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+
+		// Use monotonic elapsed time - not affected by NTP or system clock adjustments
+		uint64_t executionTimeInMicroSeconds = m_pGlobalChrono->getElapsedMicroseconds();
 		if (m_LastExecutionTimeStampInMicroseconds > executionTimeInMicroSeconds)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDEXECUTIONDELAY, std::to_string (m_LastExecutionTimeStampInMicroseconds));
 
@@ -171,7 +196,7 @@ namespace AMC {
 		while (deltaExecutionTimeInMicroSeconds < (m_nRepeatDelay * 1000ULL)) {
 			m_pGlobalChrono->sleepMilliseconds(chunkInMilliseconds);
 
-			uint64_t newExecutionTimeInMicroSeconds = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
+			uint64_t newExecutionTimeInMicroSeconds = m_pGlobalChrono->getElapsedMicroseconds();
 			if (m_LastExecutionTimeStampInMicroseconds > newExecutionTimeInMicroSeconds)
 				throw ELibMCCustomException(LIBMC_ERROR_INVALIDEXECUTIONDELAY, std::to_string(m_LastExecutionTimeStampInMicroseconds));
 

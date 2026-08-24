@@ -657,6 +657,36 @@ LibMCResult libmc_mccontext_parseconfiguration(LibMC_MCContext pMCContext, const
 	}
 }
 
+LibMCResult libmc_mccontext_setparameteroverride(LibMC_MCContext pMCContext, const char * pParameterPath, const char * pParameterValue)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pParameterPath == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pParameterValue == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sParameterPath(pParameterPath);
+		std::string sParameterValue(pParameterValue);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIMCContext->SetParameterOverride(sParameterPath, sParameterValue);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCResult libmc_mccontext_startallthreads(LibMC_MCContext pMCContext)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
@@ -1015,6 +1045,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_mccontext_settempbasepath;
 	if (sProcName == "libmc_mccontext_parseconfiguration") 
 		*ppProcAddress = (void*) &libmc_mccontext_parseconfiguration;
+	if (sProcName == "libmc_mccontext_setparameteroverride") 
+		*ppProcAddress = (void*) &libmc_mccontext_setparameteroverride;
 	if (sProcName == "libmc_mccontext_startallthreads") 
 		*ppProcAddress = (void*) &libmc_mccontext_startallthreads;
 	if (sProcName == "libmc_mccontext_terminateallthreads") 

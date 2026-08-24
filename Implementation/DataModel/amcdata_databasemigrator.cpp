@@ -51,7 +51,7 @@ namespace AMCData {
 
 	uint32_t CDatabaseMigrator::getCurrentSchemaVersion()
 	{
-		return 18;
+		return 21;
 	}
 
 	void CDatabaseMigrator::migrateDatabaseSchemas(PSQLHandler pSQLHandler, std::string& sInstallationUUID, std::string& sInstallationSecret)

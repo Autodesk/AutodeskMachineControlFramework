@@ -170,12 +170,20 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_AddCommandPtr) (L
 typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_FinishListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
 
 /**
-* Execute command list.
+* Execute command list. The list is kept on the PLC and must be removed manually via DeleteList once it has finished executing.
 *
 * @param[in] pPLCCommandList - PLCCommandList instance.
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_ExecuteListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/**
+* Executes the command list and instructs the PLC to delete it automatically once execution has finished. No manual DeleteList call is required afterwards.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_ExecuteAndDeleteListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
 
 /**
 * Wait for command list to finish executing
@@ -391,6 +399,7 @@ typedef struct {
 	PLibMCDriver_BuRPLCCommandList_AddCommandPtr m_PLCCommandList_AddCommand;
 	PLibMCDriver_BuRPLCCommandList_FinishListPtr m_PLCCommandList_FinishList;
 	PLibMCDriver_BuRPLCCommandList_ExecuteListPtr m_PLCCommandList_ExecuteList;
+	PLibMCDriver_BuRPLCCommandList_ExecuteAndDeleteListPtr m_PLCCommandList_ExecuteAndDeleteList;
 	PLibMCDriver_BuRPLCCommandList_WaitForListPtr m_PLCCommandList_WaitForList;
 	PLibMCDriver_BuRPLCCommandList_PauseListPtr m_PLCCommandList_PauseList;
 	PLibMCDriver_BuRPLCCommandList_ResumeListPtr m_PLCCommandList_ResumeList;

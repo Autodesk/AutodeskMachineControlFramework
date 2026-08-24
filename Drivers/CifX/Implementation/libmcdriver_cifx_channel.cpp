@@ -42,6 +42,8 @@ Abstract: This is a stub class definition of CChannelInformation
 #define CIFX_DEFAULT_HOSTSTATETIMEOUT 5000
 #define CIFX_DEFAULT_BUSSTATETIMEOUT 2000
 #define CIFX_DEFAULT_SYNCDELAY 10
+#define CIFX_DEFAULT_READTIMEOUT 1000
+#define CIFX_DEFAULT_WRITETIMEOUT 1000
 
 using namespace LibMCDriver_CifX::Impl;
 
@@ -325,7 +327,7 @@ std::vector<uint8_t>& CDriver_CifXChannelBuffer::getBuffer()
 
 
 CDriver_CifXChannelThreadState::CDriver_CifXChannelThreadState(PCifXSDK pCifXSDK, uint32_t nInputSize, uint32_t nOutputSize, cifxHandle hChannel)
-	: m_pCifXSDK(pCifXSDK), m_hChannel(hChannel), m_bDebugMode(true), m_InputBuffer(nInputSize), m_OutputBuffer(nOutputSize), m_bThreadIsRunning (false)
+	: m_pCifXSDK(pCifXSDK), m_hChannel(hChannel), m_bCancelFlag(false), m_bThreadIsRunning(false), m_bDebugMode(true), m_InputBuffer(nInputSize), m_OutputBuffer(nOutputSize), m_nThreadExecutionCounter (0)
 {
 	if (pCifXSDK.get() == nullptr)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
@@ -345,16 +347,33 @@ CDriver_CifXChannelThreadState::~CDriver_CifXChannelThreadState()
 
 }
 
-void CDriver_CifXChannelThreadState::executeThread(uint32_t nReadTimeOut, uint32_t nWriteTimeOut)
+void CDriver_CifXChannelThreadState::executeThread(uint32_t nReadTimeOut, uint32_t nWriteTimeOut, LibMCEnv::PTelemetryChannel readTelemetryChannel, LibMCEnv::PTelemetryChannel writeTelemetryChannel)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	m_nThreadExecutionCounter++;
+
+	LibMCEnv::PTelemetryMarkerScope readMarkerScope = nullptr;
+	if (readTelemetryChannel.get() != nullptr) 
+		readMarkerScope = readTelemetryChannel->StartMarkerScope (m_nThreadExecutionCounter);
+
 	auto& inputBuffer = m_InputBuffer.getBuffer();
 	if (inputBuffer.size() > 0)
 		m_pCifXSDK->checkError(m_pCifXSDK->xChannelIORead(m_hChannel, 0, 0, (uint32_t)inputBuffer.size(), inputBuffer.data(), nReadTimeOut));
+
+	readMarkerScope = nullptr;
+
+	LibMCEnv::PTelemetryMarkerScope writeMarkerScope = nullptr;
+	if (writeTelemetryChannel.get() != nullptr)
+		writeMarkerScope = writeTelemetryChannel->StartMarkerScope(m_nThreadExecutionCounter);
+
 	auto& outputBuffer = m_OutputBuffer.getBuffer();
 	if (outputBuffer.size() > 0)
 		m_pCifXSDK->checkError(m_pCifXSDK->xChannelIOWrite(m_hChannel, 0, 0, (uint32_t)outputBuffer.size(), outputBuffer.data(), nWriteTimeOut));
 
+	writeMarkerScope = nullptr;
+
+	m_nThreadExecutionCounter++;
 }
 
 void CDriver_CifXChannelThreadState::handleException(uint32_t nErrorCode, const std::string& sMessage)
@@ -576,7 +595,8 @@ void CDriver_CifXChannelThreadState::writeOutputParameter(CDriver_CifXParameter*
 
 
 CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
-	: m_nChannelIndex(0), m_nInputSize(0), m_nOutputSize(0), m_nHostStateTimeOut(CIFX_DEFAULT_HOSTSTATETIMEOUT), m_nBusStateTimeOut(CIFX_DEFAULT_BUSSTATETIMEOUT), m_SyncDelay (CIFX_DEFAULT_SYNCDELAY)
+	: m_nChannelIndex(0), m_nInputSize(0), m_nOutputSize(0), m_nHostStateTimeOut(CIFX_DEFAULT_HOSTSTATETIMEOUT), m_nBusStateTimeOut(CIFX_DEFAULT_BUSSTATETIMEOUT), m_SyncDelay(CIFX_DEFAULT_SYNCDELAY),
+	m_nReadTimeout(CIFX_DEFAULT_READTIMEOUT), m_nWriteTimeout(CIFX_DEFAULT_WRITETIMEOUT)
 
 {
 	auto boardAttrib = channelNode.attribute("board");
@@ -624,6 +644,30 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 		if (nBusStateTimeout <= 0)
 			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDBUSSTATETIMEOUT);
 		m_nBusStateTimeOut = nBusStateTimeout;
+	}
+
+	auto syncDelayAttrib = channelNode.attribute("syncdelay");
+	if (!syncDelayAttrib.empty()) {
+		int nSyncDelay = syncDelayAttrib.as_int(0);
+		if (nSyncDelay <= 0)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM, "invalid syncdelay attribute");
+		m_SyncDelay = nSyncDelay;
+	}
+
+	auto readTimeoutAttrib = channelNode.attribute("readtimeout");
+	if (!readTimeoutAttrib.empty()) {
+		int nReadTimeout = readTimeoutAttrib.as_int(0);
+		if (nReadTimeout <= 0)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM, "invalid readtimeout attribute");
+		m_nReadTimeout = nReadTimeout;
+	}
+
+	auto writeTimeoutAttrib = channelNode.attribute("writetimeout");
+	if (!writeTimeoutAttrib.empty()) {
+		int nWriteTimeout = writeTimeoutAttrib.as_int(0);
+		if (nWriteTimeout <= 0)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM, "invalid writetimeout attribute");
+		m_nWriteTimeout = nWriteTimeout;
 	}
 
 	auto inputIONode = channelNode.child("input_io");
@@ -676,10 +720,26 @@ CDriver_CifXChannel::~CDriver_CifXChannel()
 
 }
 
-std::string CDriver_CifXChannel::getBoardName()
+std::string CDriver_CifXChannel::getBoardName() const
 {
 	return m_sBoardName;
 }
+
+std::string CDriver_CifXChannel::getTelemetryUpdateName() const
+{
+	return m_sBoardName + "." + "update";
+}
+
+std::string CDriver_CifXChannel::getTelemetryIOReadName() const
+{
+	return m_sBoardName + "." + "ioread";
+}
+
+std::string CDriver_CifXChannel::getTelemetryIOWriteName() const
+{
+	return m_sBoardName + "." + "iowrite";
+}
+
 
 uint32_t CDriver_CifXChannel::getChannelIndex()
 {
@@ -781,10 +841,13 @@ PDriver_CifXParameter CDriver_CifXChannel::findOutputValue(const std::string& sN
 }
 
 
-void CDriver_CifXChannel::startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverHandle)
+void CDriver_CifXChannel::startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverHandle, LibMCEnv::PDriverStatusUpdateSession pDriverUpdateSession)
 {
 	if (pCifXSDK.get() == nullptr)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+	if (pDriverUpdateSession.get () == nullptr)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+
 
 	stopSyncThread();
 
@@ -804,17 +867,23 @@ void CDriver_CifXChannel::startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverH
 	uint32_t nBusState = 0;
 	pCifXSDK->checkError(pCifXSDK->xChannelBusState(hChannel, CIFX_BUS_STATE_ON, &nBusState, m_nBusStateTimeOut));
 
-	uint32_t nReadTimeout = 1000;
-	uint32_t nWriteTimeout = 1000;
+	uint32_t nReadTimeout = m_nReadTimeout;
+	uint32_t nWriteTimeout = m_nWriteTimeout;
 	uint32_t nSyncDelay = m_SyncDelay;
 
 	auto pInputs = m_Inputs;
 	auto pOutputs = m_Outputs;
 
-	// First call should be in connection thread
-	pThreadState->executeThread(nReadTimeout, nWriteTimeout);
+	std::string sIOReadName = getTelemetryIOReadName();
+	std::string sIOWriteName = getTelemetryIOWriteName();
 
-	m_SyncThread = std::thread([pThreadState, pInputs, pOutputs, nReadTimeout, nWriteTimeout, nSyncDelay]() {
+	// First call should be in connection thread
+	auto pReadTelemetryChannel = pDriverUpdateSession->FindTelemetryChannel(sIOReadName, true);
+	auto pWriteTelemetryChannel = pDriverUpdateSession->FindTelemetryChannel(sIOWriteName, true);
+
+	pThreadState->executeThread(nReadTimeout, nWriteTimeout, pReadTelemetryChannel, pWriteTelemetryChannel);
+
+	m_SyncThread = std::thread([pThreadState, pInputs, pOutputs, nReadTimeout, nWriteTimeout, nSyncDelay, pDriverUpdateSession, sIOWriteName, sIOReadName]() {
 
 		pThreadState->setThreadIsRunning(true);
 
@@ -825,7 +894,10 @@ void CDriver_CifXChannel::startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverH
 				for (auto pOutput : pOutputs)
 					pThreadState->writeOutputParameter(pOutput.get());
 
-				pThreadState->executeThread(nReadTimeout, nWriteTimeout);
+				auto pReadTelemetryChannel = pDriverUpdateSession->FindTelemetryChannel(sIOReadName, true);
+				auto pWriteTelemetryChannel = pDriverUpdateSession->FindTelemetryChannel(sIOWriteName, true);
+
+				pThreadState->executeThread(nReadTimeout, nWriteTimeout, pReadTelemetryChannel, pWriteTelemetryChannel);
 
 				for (auto pInput : pInputs)
 					pThreadState->readInputParameter(pInput.get());

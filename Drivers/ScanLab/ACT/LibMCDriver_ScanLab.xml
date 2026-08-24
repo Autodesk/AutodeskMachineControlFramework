@@ -209,7 +209,9 @@
 		<error name="PULSELENGTHCONTROLNOTSUPPORTEDBYOIE" code="1157" description="Pulse Length control not supported by OIE yet." />
 		<error name="INVALIDLASERPOWERMAPPING" code="1158" description="Invalid laser power mapping." />
 		<error name="COULDNOTCONVERTLASERPOWERTOWATTS" code="1159" description="Could not convert laser power to watts." />
-		<error name="COULDNOTCONVERTLASERPOWERTOPERCENT" code="1160" description="Could not convert laser power to percent." />			
+		<error name="COULDNOTCONVERTLASERPOWERTOPERCENT" code="1160" description="Could not convert laser power to percent." />
+		<error name="INVALIDDEFOCUSCORRECTIONTABLE" code="1161" description="Invalid defocus correction table." />
+		<error name="DEFOCUSCORRECTIONNOTENABLED" code="1162" description="Defocus correction by power is not enabled." />			
 							
 	</errors>
 
@@ -328,6 +330,11 @@
 	<struct name="LaserCalibrationPoint" description="The laser output calibration at a percentage point.">
 		<member name="PowerSetPointInPercent" type="double" description="Set point of the power in Percent." />
 		<member name="PowerOutputInWatts" type="double" description="Output power in Watts." />
+	</struct>
+
+	<struct name="DefocusCorrectionPoint" description="A defocus correction point mapping laser power to defocus offset.">
+		<member name="PowerInWatts" type="double" description="Laser power in Watts." />
+		<member name="DefocusOffsetInMM" type="double" description="Defocus offset in millimeters." />
 	</struct>
 		
 	<struct name="MicroVector">
@@ -1187,6 +1194,15 @@ Custom implementation
 			<param name="OutputMask" type="uint32" pass="in" description="Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535." />
 		</method>
 
+		<method name="ReadDigitalInputs" description="Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.">
+			<param name="DigitalInput" type="uint32" pass="return" description="Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15." />
+		</method>
+
+		<method name="ReadDigitalInputBit" description="Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.">
+			<param name="BitIndex" type="uint32" pass="in" description="Index of the digital input bit to read. MUST be between 0 and 15." />
+			<param name="Value" type="bool" pass="return" description="Current state of the requested digital input bit." />
+		</method>
+
 		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">
 		</method>
 
@@ -1402,6 +1418,26 @@ Custom implementation
 		<method name="MapPowerWattsToPercent" description="Maps a laser power value to the laser power in percent.">
 			<param name="LaserPowerInWatts" type="double" pass="in" description="Laser Power in Watts" />
 			<param name="LaserPowerInPercent" type="double" pass="return" description="Laser Power in Percent" />
+		</method>
+
+		<method name="SetPiecewiseLinearDefocusCorrectionByPower" description="Sets a piecewise linear defocus correction table that maps laser power (in watts) to a defocus offset (in mm). This compensates for focus shift caused by thermal lensing at different power levels. The correction is automatically added to the Z defocus value during marking operations.">
+			<param name="CalibrationPoints" type="structarray" class="DefocusCorrectionPoint" pass="in" description="Defocus correction points that map laser power to defocus offset. Power values MUST be non-negative and strictly increasing in the array. Array MUST NOT be empty." />
+		</method>
+
+		<method name="DisableDefocusCorrectionByPower" description="Disables the defocus correction by laser power. After calling this, no power-dependent defocus adjustment will be applied.">
+		</method>
+
+		<method name="DefocusCorrectionByPowerIsEnabled" description="Returns whether defocus correction by laser power is currently enabled.">
+			<param name="IsEnabled" type="bool" pass="return" description="True if defocus correction by power is enabled." />
+		</method>
+
+		<method name="GetDefocusCorrectionByPower" description="Returns the current defocus correction table. Fails if defocus correction is not enabled.">
+			<param name="CalibrationPoints" type="structarray" class="DefocusCorrectionPoint" pass="out" description="Defocus Correction Points" />
+		</method>
+
+		<method name="MapDefocusCorrectionFromPower" description="Looks up the defocus correction offset for a given laser power. Fails if defocus correction is not enabled.">
+			<param name="LaserPowerInWatts" type="double" pass="in" description="Laser Power in Watts" />
+			<param name="DefocusOffsetInMM" type="double" pass="return" description="Defocus offset in millimeters" />
 		</method>
 
 		<method name="EnableSpatialLaserPowerModulation" description="Enables a spatial laser power modulation via callback.">

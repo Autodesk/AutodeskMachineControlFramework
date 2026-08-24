@@ -59,6 +59,16 @@ CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, const std::string& sPath
 		addTab (pTab);			
 	}
 
+	auto captionAttrib = xmlNode.attribute("caption");
+	m_sCaption = captionAttrib.as_string();
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(m_sCaption);
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr(xmlNode, "visible", "1");
+	registerBoolAttribute("visible", visibleExpr);
+
 }
 
 

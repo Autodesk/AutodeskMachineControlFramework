@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_expression.hpp"
 
 #include "pugixml.hpp"
+#include <functional>
 
 namespace AMC {
 
@@ -51,6 +52,13 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_ContentFormMemo, PUIModule_ContentFormMemo);
 	amcDeclareDependingClass(CUIModule_ContentFormCheckbox, PUIModule_ContentFormCheckbox);
 	amcDeclareDependingClass(CUIModule_ContentFormCombobox, PUIModule_ContentFormCombobox);
+	amcDeclareDependingClass(CUIModule_ContentFormNumber, PUIModule_ContentFormNumber);
+	amcDeclareDependingClass(CUIModule_ContentFormSlider, PUIModule_ContentFormSlider);
+	amcDeclareDependingClass(CUIModule_ContentFormDatetime, PUIModule_ContentFormDatetime);
+	amcDeclareDependingClass(CUIModule_ContentFormMultiselect, PUIModule_ContentFormMultiselect);
+	amcDeclareDependingClass(CUIModule_ContentFormCalculated, PUIModule_ContentFormCalculated);
+	amcDeclareDependingClass(CUIModule_ContentFormSection, PUIModule_ContentFormSection);
+	amcDeclareDependingClass(CUIModule_ContentFormActionBar, PUIModule_ContentFormActionBar);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CParameterGroup, PParameterGroup);
@@ -69,6 +77,8 @@ namespace AMC {
 		CUIExpression m_ReadOnlyExpression;
 
 		PStateMachineData m_pStateMachineData;
+
+		PUIFrontendDefinitionModuleStore m_pFrontendStore;
 
 		PParameterGroup registerClientVariableGroup(CParameterHandler* pClientVariableHandler);
 
@@ -101,6 +111,9 @@ namespace AMC {
 
 		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) = 0;
 
+		// v2 frontend: register entity attributes on the given child store
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore);
+
 	};
 
 		
@@ -115,11 +128,12 @@ namespace AMC {
 		CUIExpression m_MinValueExpression;
 		CUIExpression m_MaxValueExpression;
 
+		std::string m_sOnChangeEvent;
 	public:
 
 		static PUIModule_ContentFormEdit makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
 
-		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, CUIExpression Prefix, CUIExpression Suffix, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, CUIExpression Prefix, CUIExpression Suffix, std::string sOnChangeEvent, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormEdit();
 
@@ -132,6 +146,8 @@ namespace AMC {
 		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 		virtual void setValidationExpressions(CUIExpression validationExpression, CUIExpression validationMessageExpression, CUIExpression minValueExpression, CUIExpression m_maxValueExpression);
+
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
 
 	};
 
@@ -157,6 +173,8 @@ namespace AMC {
 
 		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+
 	};
 	
 	class CUIModule_ContentFormMemo : public CUIModule_ContentFormEntity {
@@ -178,18 +196,24 @@ namespace AMC {
 
 		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+
 	};
 	
 	class CUIModule_ContentFormCombobox : public CUIModule_ContentFormEntity {
 	protected:
 		CUIExpression m_ValueExpression;
 		std::string m_sOnChangeEvent;
-		std::vector<std::pair<std::string, int>> m_Items;
+		// Item list: pair of (display text, value as string). For legacy integer comboboxes
+		// the value string holds the integer literal; for string comboboxes it holds the value directly.
+		std::vector<std::pair<std::string, std::string>> m_Items;
+		// If true, the selected value is treated as a string; otherwise it is treated as a (legacy) integer.
+		bool m_bStringValue;
 	public:
 
 		static PUIModule_ContentFormCombobox makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
 
-		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData, const std::vector<std::pair<std::string, int>>& items);
+		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData, const std::vector<std::pair<std::string, std::string>>& items, bool bStringValue);
 
 		virtual ~CUIModule_ContentFormCombobox();
 
@@ -201,8 +225,146 @@ namespace AMC {
 
 		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+
 	};	
 	
+	// ── Phase 2: number ──────────────────────────────────────────────────────
+	class CUIModule_ContentFormNumber : public CUIModule_ContentFormEntity {
+	protected:
+		CUIExpression m_ValueExpression;
+		CUIExpression m_MinValueExpression;
+		CUIExpression m_MaxValueExpression;
+		CUIExpression m_StepExpression;
+		CUIExpression m_UnitExpression;
+		std::string m_sOnChangeEvent;
+	public:
+		static PUIModule_ContentFormNumber makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormNumber(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, CUIExpression Min, CUIExpression Max, CUIExpression Step, CUIExpression Unit, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData);
+		virtual ~CUIModule_ContentFormNumber();
+		virtual std::string getTypeString() override;
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+	};
+
+	// ── Phase 2: slider ──────────────────────────────────────────────────────
+	class CUIModule_ContentFormSlider : public CUIModule_ContentFormEntity {
+	protected:
+		CUIExpression m_ValueExpression;
+		CUIExpression m_MinValueExpression;
+		CUIExpression m_MaxValueExpression;
+		CUIExpression m_StepExpression;
+		CUIExpression m_UnitExpression;
+		std::string m_sOnChangeEvent;
+	public:
+		static PUIModule_ContentFormSlider makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormSlider(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, CUIExpression Min, CUIExpression Max, CUIExpression Step, CUIExpression Unit, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData);
+		virtual ~CUIModule_ContentFormSlider();
+		virtual std::string getTypeString() override;
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+	};
+
+	// ── Phase 2: datetime ────────────────────────────────────────────────────
+	class CUIModule_ContentFormDatetime : public CUIModule_ContentFormEntity {
+	protected:
+		CUIExpression m_ValueExpression;
+		std::string m_sMode;
+		std::string m_sOnChangeEvent;
+	public:
+		static PUIModule_ContentFormDatetime makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormDatetime(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sMode, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData);
+		virtual ~CUIModule_ContentFormDatetime();
+		virtual std::string getTypeString() override;
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+	};
+
+	// ── Phase 2: multiselect ─────────────────────────────────────────────────
+	class CUIModule_ContentFormMultiselect : public CUIModule_ContentFormEntity {
+	protected:
+		CUIExpression m_ValueExpression;
+		std::string m_sOnChangeEvent;
+		std::vector<std::pair<std::string, int>> m_Items;
+	public:
+		static PUIModule_ContentFormMultiselect makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormMultiselect(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData, const std::vector<std::pair<std::string, int>>& items);
+		virtual ~CUIModule_ContentFormMultiselect();
+		virtual std::string getTypeString() override;
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+	};
+
+	// ── Phase 2: calculated ──────────────────────────────────────────────────
+	class CUIModule_ContentFormCalculated : public CUIModule_ContentFormEntity {
+	protected:
+		CUIExpression m_ValueExpression;
+		CUIExpression m_UnitExpression;
+		CUIExpression m_FormatExpression;
+	public:
+		static PUIModule_ContentFormCalculated makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormCalculated(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, CUIExpression Unit, CUIExpression Format, PStateMachineData pStateMachineData);
+		virtual ~CUIModule_ContentFormCalculated();
+		virtual std::string getTypeString() override;
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+	};
+
+	// ── Phase 2: section ─────────────────────────────────────────────────────
+	class CUIModule_ContentFormSection : public CUIModule_ContentFormEntity {
+	protected:
+		CUIExpression m_DescriptionExpression;
+		CUIExpression m_IconExpression;
+		bool m_bCollapsible;
+		bool m_bDefaultOpen;
+		std::list<PUIModule_ContentFormEntity> m_Entities;
+		std::map<std::string, PUIModule_ContentFormEntity> m_EntityNameMap;
+		std::map<std::string, PUIModule_ContentFormEntity> m_EntityUUIDMap;
+	public:
+		static PUIModule_ContentFormSection makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormSection(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Description, CUIExpression Icon, bool bCollapsible, bool bDefaultOpen, PStateMachineData pStateMachineData);
+		virtual ~CUIModule_ContentFormSection();
+		virtual std::string getTypeString() override;
+		void addEntity(PUIModule_ContentFormEntity pEntity);
+		bool hasEntityWithName(const std::string& sName);
+		PUIModule_ContentFormEntity findEntityByUUID(const std::string& sUUID);
+		std::list<PUIModule_ContentFormEntity>& getEntities();
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+	};
+
+	// ── Phase 2: actionbar ───────────────────────────────────────────────────
+	class CUIModule_ContentFormActionBar : public CUIModule_ContentFormEntity {
+	protected:
+		std::string m_sSubmitEvent;
+		std::string m_sCancelEvent;
+		std::string m_sValidateEvent;
+		std::string m_sSubmitCaption;
+		std::string m_sCancelCaption;
+		bool m_bOptimistic;
+	public:
+		static PUIModule_ContentFormActionBar makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormActionBar(const std::string& sName, const std::string& sFormPath, const std::string& sSubmitEvent, const std::string& sCancelEvent, const std::string& sValidateEvent, const std::string& sSubmitCaption, const std::string& sCancelCaption, bool bOptimistic, PStateMachineData pStateMachineData);
+		virtual ~CUIModule_ContentFormActionBar();
+		virtual std::string getTypeString() override;
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void syncClientVariables(CParameterHandler* pClientVariableHandler) override;
+		virtual void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		virtual void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore) override;
+	};
+
 	class CUIModule_ContentForm : public CUIModule_ContentItem {
 	protected:		
 		std::list<PUIModule_ContentFormEntity> m_Entities;
@@ -233,6 +395,8 @@ namespace AMC {
 		PUIModule_ContentFormEntity findEntityByName(const std::string& sName);
 		PUIModule_ContentFormEntity findEntityByUUID(const std::string& sUUID);
 
+		static void parseXmlFormNode(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData, std::function<void(PUIModule_ContentFormEntity)> addEntityFn);
+
 		std::list<PUIModule_ContentFormEntity> getEntities ();
 
 		// Returns all UUIDs that could be contained in this Item
@@ -244,6 +408,9 @@ namespace AMC {
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 
 	};
 

@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# disable go modules
-export GO111MODULE="off" 
-
 scriptpath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 echo "script path: $scriptpath"
 cd "$scriptpath"
@@ -40,4 +37,3 @@ cmake  ..
 cmake --build . --config Release
 
 cd Output
-

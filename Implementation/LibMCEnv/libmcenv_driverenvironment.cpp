@@ -48,6 +48,8 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_datatable.hpp"
 #include "libmcenv_imageloader.hpp"
 #include "libmcenv_jsonobject.hpp"
+#include "libmcenv_telemetrychannel.hpp"
+#include "libmcenv_videostream.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -55,6 +57,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "amc_xmldocument.hpp"
 #include "amc_xmldocumentnode.hpp"
 #include "amc_constants.hpp"
+#include "amc_telemetry.hpp"
 
 // Include custom headers here.
 
@@ -65,7 +68,7 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName, AMC::PStateJournal pStateJournal)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, AMC::PMeshHandler pMeshHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, const std::string& sDriverName, AMC::PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler, AMC::PStreamRegistry pStreamRegistry)
     : m_bIsInitializing(false), 
     m_pParameterGroup(pParameterGroup), 
     m_pDriverResourcePackage (pDriverResourcePackage), 
@@ -77,7 +80,9 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
     m_sDriverName (sDriverName), 
     m_pDataModel (pDataModel), 
     m_pGlobalChrono (pGlobalChrono),
-    m_pStateJournal (pStateJournal)
+    m_pStateJournal (pStateJournal),
+	m_pTelemetryHandler(pTelemetryHandler),
+	m_pStreamRegistry(pStreamRegistry)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -103,6 +108,8 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pStateJournal.get () == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pTelemetryHandler.get () == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
 
@@ -114,7 +121,7 @@ CDriverEnvironment::~CDriverEnvironment()
 
 IDriverStatusUpdateSession* CDriverEnvironment::CreateStatusUpdateSession()
 {
-    return new CDriverStatusUpdateSession(m_pParameterGroup, m_pLogger, m_sDriverName, m_pGlobalChrono);
+    return new CDriverStatusUpdateSession(m_pParameterGroup, m_pLogger, m_sDriverName, m_pGlobalChrono, m_pTelemetryHandler);
 
 }
 
@@ -200,6 +207,32 @@ void CDriverEnvironment::RetrieveMachineResourceData(const std::string& sIdentif
 {
     retrieveDriverDataFromPackage(m_pMachineResourcePackage, sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
 }
+
+ITelemetryChannel* CDriverEnvironment::RegisterTelemetryChannel(const std::string& sChannelIdentifier, const std::string& sChannelDescription, const LibMCEnv::eTelemetryChannelType eChannelType)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sChannelIdentifier))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "invalid driver telemetry channel identifier: " + sChannelIdentifier + " (driver " + m_sDriverName + ")");
+
+    std::string sIdentifier = m_sDriverName + "." + sChannelIdentifier;
+
+    m_pTelemetryHandler->registerChannel(sIdentifier, sChannelDescription, CTelemetryChannel::mapEnvChannelTypeToDataChannelType(eChannelType));
+
+    return new CTelemetryChannel(m_pTelemetryHandler, m_sDriverName, sChannelIdentifier);
+}
+
+ITelemetryChannel* CDriverEnvironment::FindTelemetryChannel(const std::string& sChannelIdentifier, const bool bFailIfNotExisting)
+{
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sChannelIdentifier))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "invalid driver telemetry channel identifier: " + sChannelIdentifier + " (driver " + m_sDriverName + ")");
+
+    std::string sIdentifier = m_sDriverName + "." + sChannelIdentifier;
+
+    m_pTelemetryHandler->findChannelByIdentifier(sIdentifier, true);
+
+    return new CTelemetryChannel(m_pTelemetryHandler, m_sDriverName, sChannelIdentifier);
+
+}
+
 
 
 IToolpathAccessor* CDriverEnvironment::CreateToolpathAccessor(const std::string& sStreamUUID)
@@ -338,7 +371,29 @@ IImageData* CDriverEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSiz
 
 IImageLoader* CDriverEnvironment::CreateImageLoader()
 {
-    return new CImageLoader();
+    return new CImageLoader(m_pMachineResourcePackage);
+}
+
+IVideoStream* CDriverEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+{
+    if (m_pStreamRegistry.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pInstance = m_pStreamRegistry->createVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+    return new CVideoStream(pInstance);
+}
+
+IVideoStream* CDriverEnvironment::FindVideoStream(const std::string& sStreamUUID)
+{
+    if (m_pStreamRegistry.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pInstance = m_pStreamRegistry->findVideoStream(sStreamUUID);
+    if (pInstance.get() == nullptr)
+        return nullptr;
+
+    return new CVideoStream(pInstance);
 }
 
 

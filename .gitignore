@@ -13,6 +13,8 @@ build_win64
 build_linux64
 build_rpi
 build_client
+build_coverage
+build_clientdist_tools
 ACT/LibMC_component
 ACT/LibMCDriverEnv_component
 ACT/LibMCDriver_component
@@ -25,6 +27,14 @@ Client/.DS_Store
 Client/node_modules
 Client/dist
 Client/dist.xml
+Client/vue2/.DS_Store
+Client/vue2/node_modules
+Client/vue2/dist
+Client/vue2/dist.xml
+Client/vue3/.DS_Store
+Client/vue3/node_modules
+Client/vue3/dist
+Client/vue3/dist.xml
 
 # local env files
 Client/.env.local
@@ -43,6 +53,29 @@ Client/*.ntvs*
 Client/*.njsproj
 Client/*.sln
 Client/*.sw?
+
+ClientV3/.DS_Store
+ClientV3/node_modules
+ClientV3/dist
+ClientV3/dist.xml
+
+# local env files
+ClientV3/.env.local
+ClientV3/.env.*.local
+
+# Log files
+ClientV3/npm-debug.log*
+ClientV3/yarn-debug.log*
+ClientV3/yarn-error.log*
+
+# Editor directories and files
+ClientV3/.idea
+ClientV3/.vscode
+ClientV3/*.suo
+ClientV3/*.ntvs*
+ClientV3/*.njsproj
+ClientV3/*.sln
+ClientV3/*.sw?
 
 Framework/HeadersCore/Go
 Drivers/ScanLab/Dependencies

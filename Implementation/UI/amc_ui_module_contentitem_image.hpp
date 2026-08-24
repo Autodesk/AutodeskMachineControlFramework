@@ -74,6 +74,15 @@ namespace AMC {
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
+
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
+		virtual void frontendWriteItemToJSON(CJSONWriter& writer, CJSONWriterObject& itemObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
+
+	private:
+		// Resolves a resource name or UUID string to a UUID.
+		std::string resolveResourceToUUID(const std::string& sResourceValue);
 	};
 
 

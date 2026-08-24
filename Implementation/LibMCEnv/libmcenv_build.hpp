@@ -73,9 +73,17 @@ public:
 
 	virtual ~CBuild();
 
+	static CBuild* makeFrom (CBuild * pBuild);
+
+	static std::shared_ptr<CBuild> makeSharedFrom(CBuild* pBuild);
+
 	std::string GetName() override;
 
 	std::string GetBuildUUID() override;
+
+	std::string GetCreatedTimestamp() override;
+
+	std::string GetLastExecutionTimestamp() override;
 
 	std::string GetStorageUUID() override;
 

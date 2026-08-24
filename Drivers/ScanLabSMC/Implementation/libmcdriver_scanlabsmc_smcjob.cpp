@@ -132,6 +132,11 @@ void CSMCJob::LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable)
     m_pJobInstance->ReadSimulationFile(pSimulationDataTable);
 }
 
+void CSMCJob::LoadRawSimulationData(LibMCDriver_ScanLabSMC_uint64 nDataBufferSize, LibMCDriver_ScanLabSMC_uint64* pDataNeededCount, LibMCDriver_ScanLabSMC_uint8* pDataBuffer)
+{
+	m_pJobInstance->LoadRawSimulationData(nDataBufferSize, pDataNeededCount, pDataBuffer);
+}
+
 LibMCDriver_ScanLabSMC_double CSMCJob::GetJobCharacteristic(const LibMCDriver_ScanLabSMC::eJobCharacteristic eValueType)
 {
     return m_pJobInstance->GetJobCharacteristic (eValueType);

@@ -95,6 +95,8 @@ public:
 
 	virtual std::string GetConfigurationXMLString() override;
 
+	virtual IXMLDocument* GetConfigurationXML() override;
+
 	virtual std::string GetUserUUID() override;
 
 	virtual std::string GetTimestamp() override;

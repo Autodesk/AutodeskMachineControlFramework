@@ -112,6 +112,12 @@ __DECLARESTATE(idle)
 	pDriver->QueryParameters();
 
 
+	auto pDummySignal = pStateEnvironment->ClaimSignalFromQueue("signal_dummy");
+	if (pDummySignal.get() != nullptr) {
+		pDummySignal->SignalHandled();
+	}
+
+	pStateEnvironment->ClearUnhandledSignalsOfType("signal_dummy");
 
 	LibMCEnv::PSignalHandler pHandlerInstance;
 	if (pStateEnvironment->WaitForSignal("signal_recoatlayer", 0, pHandlerInstance)) {			

@@ -103,6 +103,10 @@ namespace AMC {
 		return m_nVersion;
 	}
 
-}
+	uint64_t CDataSeries::getMemoryUsageInBytes()
+	{
+		return (uint64_t)m_Entries.capacity() * (uint64_t)sizeof(sDataSeriesEntry);
+	}
 
+}
 

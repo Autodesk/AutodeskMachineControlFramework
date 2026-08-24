@@ -253,6 +253,17 @@ typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_StopExecuti
 typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_LoadSimulationDataPtr) (LibMCDriver_ScanLabSMC_SMCJob pSMCJob, LibMCEnv_DataTable pSimulationDataTable);
 
 /**
+* Returns raw simulation data.
+*
+* @param[in] pSMCJob - SMCJob instance.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBuffer - uint8  buffer of Raw binary simulation data.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabSMCResult (*PLibMCDriver_ScanLabSMCSMCJob_LoadRawSimulationDataPtr) (LibMCDriver_ScanLabSMC_SMCJob pSMCJob, const LibMCDriver_ScanLabSMC_uint64 nDataBufferSize, LibMCDriver_ScanLabSMC_uint64* pDataNeededCount, LibMCDriver_ScanLabSMC_uint8 * pDataBuffer);
+
+/**
 * Returns a characteristic value of a job.
 *
 * @param[in] pSMCJob - SMCJob instance.
@@ -874,6 +885,7 @@ typedef struct {
 	PLibMCDriver_ScanLabSMCSMCJob_WaitForExecutionPtr m_SMCJob_WaitForExecution;
 	PLibMCDriver_ScanLabSMCSMCJob_StopExecutionPtr m_SMCJob_StopExecution;
 	PLibMCDriver_ScanLabSMCSMCJob_LoadSimulationDataPtr m_SMCJob_LoadSimulationData;
+	PLibMCDriver_ScanLabSMCSMCJob_LoadRawSimulationDataPtr m_SMCJob_LoadRawSimulationData;
 	PLibMCDriver_ScanLabSMCSMCJob_GetJobCharacteristicPtr m_SMCJob_GetJobCharacteristic;
 	PLibMCDriver_ScanLabSMCSMCJob_GetJobDurationPtr m_SMCJob_GetJobDuration;
 	PLibMCDriver_ScanLabSMCSMCJob_ExecuteLaserInitSequencePtr m_SMCJob_ExecuteLaserInitSequence;

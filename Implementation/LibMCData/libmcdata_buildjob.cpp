@@ -51,7 +51,7 @@ using namespace LibMCData::Impl;
 /*************************************************************************************************************************
  Class definition of CBuildJob 
 **************************************************************************************************************************/
-CBuildJob::CBuildJob(const std::string& sUUID, const std::string& sName, LibMCData::eBuildJobStatus eJobStatus, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string& sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+CBuildJob::CBuildJob(const std::string& sUUID, const std::string& sName, LibMCData::eBuildJobStatus eJobStatus, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string& sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, uint64_t nIncrementalID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
   : m_sUUID (AMCCommon::CUtils::normalizeUUIDString(sUUID)),
     m_sName (sName), 
     m_eJobStatus (eJobStatus), 
@@ -64,6 +64,7 @@ CBuildJob::CBuildJob(const std::string& sUUID, const std::string& sName, LibMCDa
     m_nLayerCount(nLayerCount),
     m_nExecutionCount (nExecutionCount),
     m_sThumbnailStreamUUID(AMCCommon::CUtils::normalizeUUIDString(sThumbnailStreamUUID)),
+    m_nIncrementalID(nIncrementalID),
     m_pStorageState (pStorageState)
 {
     if (pSQLHandler.get() == nullptr)
@@ -76,9 +77,20 @@ CBuildJob::CBuildJob(const std::string& sUUID, const std::string& sName, LibMCDa
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBTIMESTAMP);
 }
 
-CBuildJob* CBuildJob::make(const std::string& sUUID, const std::string& sName, LibMCData::eBuildJobStatus eJobStatus, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string& sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+CBuildJob* CBuildJob::make(const std::string& sUUID, const std::string& sName, LibMCData::eBuildJobStatus eJobStatus, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string& sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, uint64_t nIncrementalID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
 {
-    return new CBuildJob(sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, nStorageStreamSize, sUserUUID, sUserName, nLayerCount, nExecutionCount, sThumbnailStreamUUID, pSQLHandler, pStorageState);
+    return new CBuildJob(sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, nStorageStreamSize, sUserUUID, sUserName, nLayerCount, nExecutionCount, sThumbnailStreamUUID, nIncrementalID, pSQLHandler, pStorageState);
+}
+
+void CBuildJob::bumpIncrementalID(AMCData::CSQLTransaction* pTransaction, const std::string& sUUID)
+{
+    if (pTransaction == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    std::string sUpdateQuery = "UPDATE buildjobs SET incremental_id = (SELECT COALESCE(MAX(incremental_id), 0) + 1 FROM buildjobs) WHERE uuid=?";
+    auto pStatement = pTransaction->prepareStatement(sUpdateQuery);
+    pStatement->setString(1, sUUID);
+    pStatement->execute();
 }
 
 CBuildJob* CBuildJob::makeFromDatabase(const std::string& sJobUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
@@ -90,7 +102,7 @@ CBuildJob* CBuildJob::makeFromDatabase(const std::string& sJobUUID, AMCData::PSQ
 
     auto sParsedJobUUID = AMCCommon::CUtils::normalizeUUIDString(sJobUUID);
 
-    std::string sQuery = "SELECT buildjobs.uuid, buildjobs.name, buildjobs.status, buildjobs.timestamp, buildjobs.storagestreamuuid, buildjobs.layercount, buildjobs.useruuid, users.login, (SELECT count(buildjobexecutions.uuid) FROM buildjobexecutions WHERE buildjobexecutions.jobuuid=buildjobs.uuid), buildjobs.thumbnailuuid, storage_streams.size FROM buildjobs LEFT JOIN users ON users.uuid=buildjobs.useruuid LEFT JOIN storage_streams ON storage_streams.uuid=buildjobs.storagestreamuuid WHERE buildjobs.uuid=?";
+    std::string sQuery = "SELECT buildjobs.uuid, buildjobs.name, buildjobs.status, buildjobs.timestamp, buildjobs.storagestreamuuid, buildjobs.layercount, buildjobs.useruuid, users.login, (SELECT count(buildjobexecutions.uuid) FROM buildjobexecutions WHERE buildjobexecutions.jobuuid=buildjobs.uuid), buildjobs.thumbnailuuid, storage_streams.size, buildjobs.incremental_id FROM buildjobs LEFT JOIN users ON users.uuid=buildjobs.useruuid LEFT JOIN storage_streams ON storage_streams.uuid=buildjobs.storagestreamuuid WHERE buildjobs.uuid=?";
     auto pStatement = pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, sParsedJobUUID);
     if (!pStatement->nextRow())
@@ -112,9 +124,10 @@ CBuildJob* CBuildJob::makeFromDatabase(const std::string& sJobUUID, AMCData::PSQ
 
     std::string sThumbnailStreamUUID = AMCCommon::CUtils::normalizeUUIDString(pStatement->getColumnString(10));
     uint64_t nStorageStreamSize = pStatement->getColumnInt64(11);
+    uint64_t nIncrementalID = (uint64_t) pStatement->getColumnInt64(12);
     pStatement = nullptr;
 
-    return make (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, nStorageStreamSize, sUserUUID, sUserName, nLayerCount, (uint32_t) nExecutionCount, sThumbnailStreamUUID, pSQLHandler, pStorageState);
+    return make (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, nStorageStreamSize, sUserUUID, sUserName, nLayerCount, (uint32_t) nExecutionCount, sThumbnailStreamUUID, nIncrementalID, pSQLHandler, pStorageState);
 }
 
 CBuildJob* CBuildJob::makeFrom(CBuildJob* pBuildJob)
@@ -123,12 +136,12 @@ CBuildJob* CBuildJob::makeFrom(CBuildJob* pBuildJob)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
     return make(pBuildJob->m_sUUID, pBuildJob->m_sName, pBuildJob->m_eJobStatus, pBuildJob->m_sTimeStamp, pBuildJob->m_sStorageStreamUUID, pBuildJob->m_nStorageStreamSize, pBuildJob->m_sUserUUID, pBuildJob->m_sUserName,
-            pBuildJob->m_nLayerCount, pBuildJob->m_nExecutionCount, pBuildJob->m_sThumbnailStreamUUID, pBuildJob->m_pSQLHandler, pBuildJob->m_pStorageState);
+            pBuildJob->m_nLayerCount, pBuildJob->m_nExecutionCount, pBuildJob->m_sThumbnailStreamUUID, pBuildJob->m_nIncrementalID, pBuildJob->m_pSQLHandler, pBuildJob->m_pStorageState);
 }
 
-PBuildJob CBuildJob::makeShared(const std::string& sUUID, const std::string& sName, LibMCData::eBuildJobStatus eJobStatus, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string& sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
+PBuildJob CBuildJob::makeShared(const std::string& sUUID, const std::string& sName, LibMCData::eBuildJobStatus eJobStatus, const std::string& sTimeStamp, const std::string& sStorageStreamUUID, uint64_t nStorageStreamSize, const std::string& sUserUUID, const std::string& sUserName, uint32_t nLayerCount, uint32_t nExecutionCount, const std::string& sThumbnailStreamUUID, uint64_t nIncrementalID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
 {
-    return std::shared_ptr<CBuildJob>(make(sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, nStorageStreamSize, sUserUUID, sUserName, nLayerCount, nExecutionCount, sThumbnailStreamUUID, pSQLHandler, pStorageState));
+    return std::shared_ptr<CBuildJob>(make(sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, nStorageStreamSize, sUserUUID, sUserName, nLayerCount, nExecutionCount, sThumbnailStreamUUID, nIncrementalID, pSQLHandler, pStorageState));
 }
 
 PBuildJob CBuildJob::makeSharedFromDatabase(const std::string& sJobUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStorageState pStorageState)
@@ -148,6 +161,11 @@ PBuildJob CBuildJob::makeSharedFrom(CBuildJob* pBuildJob)
 std::string CBuildJob::GetUUID()
 {
     return m_sUUID;
+}
+
+LibMCData_uint64 CBuildJob::GetIncrementalID()
+{
+    return m_nIncrementalID;
 }
 
 std::string CBuildJob::GetName()
@@ -234,6 +252,7 @@ void CBuildJob::SetThumbnailStreamUUID(const std::string& sStreamUUID)
     pStatement->execute();
     pStatement = nullptr;
 
+    bumpIncrementalID(pTransaction.get(), m_sUUID);
     pTransaction->commit();
     pTransaction = nullptr;
 
@@ -268,10 +287,11 @@ void CBuildJob::ensureUpdate(const std::string sUpdateUUID, uint32_t nErrorCode)
 
 void CBuildJob::StartValidating()
 {
+    auto pTransaction = m_pSQLHandler->beginTransaction();
 
     auto updateUUID = AMCCommon::CUtils::createUUID();
     std::string sQuery = "UPDATE buildjobs SET status=?, updateuuid=? WHERE status=? AND uuid=?";
-    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    auto pStatement = pTransaction->prepareStatement(sQuery);
     pStatement->setString(1, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Validating));
     pStatement->setString(2, updateUUID);
     pStatement->setString(3, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Created));
@@ -279,15 +299,20 @@ void CBuildJob::StartValidating()
     pStatement->execute();
     pStatement = nullptr;
 
+    bumpIncrementalID(pTransaction.get(), m_sUUID);
+    pTransaction->commit();
+    pTransaction = nullptr;
+
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 }
 
 void CBuildJob::FinishValidating(const LibMCData_uint32 nLayerCount)
 {
+    auto pTransaction = m_pSQLHandler->beginTransaction();
 
     auto updateUUID = AMCCommon::CUtils::createUUID();
     std::string sQuery = "UPDATE buildjobs SET status=?, layercount=?, updateuuid=? WHERE status=? AND uuid=?";
-    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    auto pStatement = pTransaction->prepareStatement(sQuery);
     pStatement->setString(1, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Validated));
     pStatement->setInt64(2, nLayerCount);
     pStatement->setString(3, updateUUID);
@@ -296,21 +321,31 @@ void CBuildJob::FinishValidating(const LibMCData_uint32 nLayerCount)
     pStatement->execute();
     pStatement = nullptr;
 
+    bumpIncrementalID(pTransaction.get(), m_sUUID);
+    pTransaction->commit();
+    pTransaction = nullptr;
+
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 }
 
 
 void CBuildJob::ArchiveJob()
 {
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
     auto updateUUID = AMCCommon::CUtils::createUUID();
     std::string sQuery = "UPDATE buildjobs SET status=?, updateuuid=? WHERE status=? AND uuid=?";
-    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    auto pStatement = pTransaction->prepareStatement(sQuery);
     pStatement->setString(1, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Archived));
     pStatement->setString(2, updateUUID);
     pStatement->setString(3, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Validated));
     pStatement->setString(4, m_sUUID);
     pStatement->execute();
     pStatement = nullptr;
+
+    bumpIncrementalID(pTransaction.get(), m_sUUID);
+    pTransaction->commit();
+    pTransaction = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 
@@ -320,34 +355,46 @@ void CBuildJob::ArchiveJob()
 
 void CBuildJob::UnArchiveJob()
 {
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
     auto updateUUID = AMCCommon::CUtils::createUUID();
     std::string sQuery = "UPDATE buildjobs SET status=?, updateuuid=? WHERE status=? AND uuid=?";
-    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    auto pStatement = pTransaction->prepareStatement(sQuery);
     pStatement->setString(1, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Validated));
     pStatement->setString(2, updateUUID);
     pStatement->setString(3, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Archived));
     pStatement->setString(4, m_sUUID);
     pStatement->execute();
+    pStatement = nullptr;
+
+    bumpIncrementalID(pTransaction.get(), m_sUUID);
+    pTransaction->commit();
+    pTransaction = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 
     m_eJobStatus = LibMCData::eBuildJobStatus::Validated;
-
 }
 
 void CBuildJob::DeleteJob()
 {
     // TODO: Physically delete job from disk!
 
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
     auto updateUUID = AMCCommon::CUtils::createUUID();
     std::string sQuery = "UPDATE buildjobs SET status=?, updateuuid=? WHERE status=? AND uuid=?";
-    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    auto pStatement = pTransaction->prepareStatement(sQuery);
     pStatement->setString(1, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Deleted));
     pStatement->setString(2, updateUUID);
     pStatement->setString(3, convertBuildJobStatusToString(LibMCData::eBuildJobStatus::Archived));
     pStatement->setString(4, m_sUUID);
     pStatement->execute();
     pStatement = nullptr;
+
+    bumpIncrementalID(pTransaction.get(), m_sUUID);
+    pTransaction->commit();
+    pTransaction = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS);
 
@@ -371,17 +418,23 @@ void CBuildJob::ChangeName(const std::string& sName)
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBNAME);
 
     if (sName.length () > AMC_BUILDJOBDATA_MAXNAMELENGTH)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOBNAME, "invalid job name: " + sName);
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_JOBNAMETOOLONG, "job name exceeds maximum allowed length");
+
+    auto pTransaction = m_pSQLHandler->beginTransaction();
 
 	auto updateUUID = AMCCommon::CUtils::createUUID();
 
     std::string sQuery = "UPDATE buildjobs SET name=?, updateuuid=? WHERE uuid=?";
-    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    auto pStatement = pTransaction->prepareStatement(sQuery);
     pStatement->setString(1, sName);
     pStatement->setString(2, updateUUID);
     pStatement->setString(3, m_sUUID);
     pStatement->execute();
     pStatement = nullptr;
+
+    bumpIncrementalID(pTransaction.get(), m_sUUID);
+    pTransaction->commit();
+    pTransaction = nullptr;
 
     ensureUpdate(updateUUID, LIBMCDATA_ERROR_COULDNOTUPDATEBUILDNAME);
 
@@ -637,6 +690,9 @@ IBuildJobExecution* CBuildJob::CreateBuildJobExecution(const std::string& sDescr
     pInsertStatement->setInt(9, 1);
     pInsertStatement->setString(10, sAbsoluteCreationTimeStamp);
     pInsertStatement->execute();
+    pInsertStatement = nullptr;
+
+    CBuildJobExecution::bumpIncrementalID(m_pSQLHandler, sExecutionUUID);
 
     return new CBuildJobExecution(m_pSQLHandler, sExecutionUUID, m_sUUID, sJournalUUID, sUserUUID, nAbsoluteStartTimeStampInMicrosecondsSince1970, m_sName, m_eJobStatus, m_nLayerCount, m_pStorageState);
 

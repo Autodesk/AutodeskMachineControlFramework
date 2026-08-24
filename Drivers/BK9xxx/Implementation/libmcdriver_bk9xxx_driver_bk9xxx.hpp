@@ -185,6 +185,8 @@ namespace LibMCDriver_BK9xxx {
 
 			bool AnalogOutputExists(const std::string& sName) override;
 
+			bool AnalogInputIsOutOfBounds(const std::string& sName) override;
+
 			bool GetDigitalInput(const std::string& sVariableName) override;
 
 			bool GetDigitalOutput(const std::string& sVariableName) override;

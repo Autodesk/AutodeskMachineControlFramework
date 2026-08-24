@@ -165,6 +165,7 @@ void CUIModule::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriter
 
 	moduleObject.addString("moduletype", getType ());
 	moduleObject.addString("uuid", m_sUUID);
+	moduleObject.addString("name", getName ());
 	if ((m_nGridColumn > 1) || (m_nGridRow > 1)) {
 		moduleObject.addInteger("gridcolumn", m_nGridColumn);
 		moduleObject.addInteger("gridrow", m_nGridRow);

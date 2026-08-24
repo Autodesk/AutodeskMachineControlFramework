@@ -81,6 +81,19 @@ CBuild::~CBuild()
 {
 }
 
+CBuild* CBuild::makeFrom(CBuild* pBuild)
+{
+	if (pBuild == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	return new CBuild(pBuild->m_pDataModel, pBuild->m_sBuildJobUUID, pBuild->m_pToolpathHandler, pBuild->m_pMeshHandler, pBuild->m_pGlobalChrono, pBuild->m_pStateJournal);
+}
+
+std::shared_ptr<CBuild> CBuild::makeSharedFrom(CBuild* pBuild)
+{
+	return std::shared_ptr<CBuild>(makeFrom(pBuild));
+}
+
 std::string CBuild::GetName()
 {
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
@@ -93,6 +106,39 @@ std::string CBuild::GetBuildUUID()
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 	return pBuildJob->GetUUID();
+}
+
+std::string CBuild::GetCreatedTimestamp()
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->GetTimeStamp();
+}
+
+std::string CBuild::GetLastExecutionTimestamp()
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	// Find the latest execution timestamp
+	std::string sLatestExecutionTime = "";
+	uint64_t nLatestExecutionMicroseconds = 0;
+
+	auto pJobExecutionIterator = pBuildJob->RetrieveBuildJobExecutions("");
+	while (pJobExecutionIterator->MoveNext()) {
+		auto pJobExecution = pJobExecutionIterator->GetCurrentJobExecution();
+		uint64_t nExecutionTime = pJobExecution->GetStartTimeStampInMicroseconds();
+		if (nExecutionTime > nLatestExecutionMicroseconds) {
+			nLatestExecutionMicroseconds = nExecutionTime;
+		}
+	}
+
+	// Convert to ISO 8601 format if we found any executions
+	if (nLatestExecutionMicroseconds > 0) {
+		sLatestExecutionTime = AMCCommon::CChrono::convertToISO8601TimeUTC(nLatestExecutionMicroseconds);
+	}
+
+	return sLatestExecutionTime;
 }
 
 std::string CBuild::GetStorageUUID()

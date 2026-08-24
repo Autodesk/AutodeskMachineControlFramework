@@ -117,3 +117,8 @@ HSymbolLookupHandle CDriver::getSymbolLookup()
 {
 	return m_pDriverWrapper->GetSymbolLookupMethod();
 }
+
+void CDriver::getVersionInfo(uint32_t& nMajor, uint32_t& nMinor, uint32_t& nMicro, std::string& sBuild)
+{
+	m_pDriverInstance->GetVersion(nMajor, nMinor, nMicro, sBuild);
+}

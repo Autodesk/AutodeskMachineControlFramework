@@ -98,13 +98,15 @@ APIHandler_AuthType CAPIHandler_Auth::parseRequest(const std::string& sURI, cons
 			}
 		}
 
+		// Match /api/auth/<uuid>/logout  (1 + 36 + 7 = 44 chars: "/<uuid>/logout")
+		if (sParameterString.length() == 44) {
+			if (sParameterString.substr(0, 1) == "/" && sParameterString.substr(37) == "/logout") {
+				sSessionUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(1, 36));
+				return APIHandler_AuthType::atLogout;
+			}
+		}
+
 	}
-
-	if (requestType == eAPIRequestType::rtPost) {
-
-
-	} 
-
 
 	return APIHandler_AuthType::atUnknown;
 }
@@ -123,6 +125,11 @@ void CAPIHandler_Auth::checkAuthorizationMode(const std::string& sURI, const eAP
 
 		case APIHandler_AuthType::atAuthorize:
 			bNeedsToBeAuthorized = false;
+			bCreateNewSession = false;
+			break;
+
+		case APIHandler_AuthType::atLogout:
+			bNeedsToBeAuthorized = true;
 			bCreateNewSession = false;
 			break;
 
@@ -237,6 +244,17 @@ void CAPIHandler_Auth::handleAuthorizeRequest(const uint8_t* pBodyData, const si
 }
 
 
+void CAPIHandler_Auth::handleLogoutRequest(CJSONWriter& writer, std::string& sSessionUUID, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	m_pSessionHandler->deactivateSession(sSessionUUID);
+
+	writer.addBoolean("success", true);
+}
+
+
 PAPIResponse CAPIHandler_Auth::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	std::string sSessionUUID;
@@ -253,6 +271,10 @@ PAPIResponse CAPIHandler_Auth::handleRequest(const std::string& sURI, const eAPI
 
 	case APIHandler_AuthType::atAuthorize:
 		handleAuthorizeRequest(pBodyData, nBodyDataSize, writer, sSessionUUID, pAuth);
+		break;
+
+	case APIHandler_AuthType::atLogout:
+		handleLogoutRequest(writer, sSessionUUID, pAuth);
 		break;
 
 	default:

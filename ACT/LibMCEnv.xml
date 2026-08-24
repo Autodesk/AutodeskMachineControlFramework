@@ -290,11 +290,18 @@
 		<error name="INVALIDREACTIONTIMEOUT" code="10250" description="Invalid reaction timeout." />	
 		<error name="COULDNOTSETREACTIONTIMEOUT" code="10251" description="Could not set reaction timeout." />	
 		<error name="MACHINECONFIGURATIONSCHEMATYPEALREADYREGISTERED" code="10252" description="Schema type already registered, but with a different name." />	
+		<error name="NOCONFIGURATIONVERSIONFOUND" code="10253" description="No configuration version found." />	
+		<error name="NOCONFIGURATIONVERSIONACTIVE" code="10254" description="No configuration version active." />	
+		<error name="TELEMETRYCHANNELNOTFOUND" code="10255" description="Telemetry channel not found." />	
+		<error name="VIDEOSTREAMNOTFOUND" code="10256" description="Video stream not found." />	
+		<error name="INVALIDVIDEOSTREAMWIDTH" code="10257" description="Invalid video stream width." />	
+		<error name="INVALIDVIDEOSTREAMHEIGHT" code="10258" description="Invalid video stream height." />	
+		<error name="INVALIDFRAMEDURATION" code="10259" description="Invalid frame duration." />	
+		<error name="INVALIDPAUSETOLERANCE" code="10260" description="Invalid pause tolerance." />	
+		<error name="INVALIDFRAMECACHEDURATION" code="10261" description="Invalid frame cache duration." />	
+		<error name="VIDEOSTREAMFRAMEENCODINGERROR" code="10262" description="Video stream frame encoding error." />	
 		
 		
-		
-		
-					
 	</errors>
 
 	<enum name="AlertLevel">
@@ -324,6 +331,15 @@
 		<option name="ObjectType" value="4"/>
 		<option name="ArrayType" value="5"/>
 		<option name="BoolType" value="6"/>
+	</enum>	
+
+	<enum name="ParameterDataType">
+		<option name="Unknown" value="0"/>
+		<option name="String" value="1"/>
+		<option name="UUID" value="2"/>
+		<option name="Integer" value="3"/>
+		<option name="Double" value="4"/>
+		<option name="Bool" value="5"/>
 	</enum>	
 	
 		
@@ -436,8 +452,17 @@
 		<option name="Uint64Column" value="5" />
 	</enum>
 	
-		
-	
+	<enum name="TelemetryChannelType">
+		<option name="Unknown" value="0"/>
+		<option name="CustomMarker" value="1"/>
+		<option name="RemoteQuery" value="2"/>
+		<option name="StateExecution" value="3"/>
+		<option name="StateRepeatDelay" value="4"/>		
+		<option name="SignalQueue" value="5"/>
+		<option name="SignalProcessing" value="6"/>
+		<option name="SignalAcknowledgement" value="7"/>
+	</enum>		
+
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
 	</struct>
@@ -506,6 +531,14 @@
 		<member name="Value" type="double" />
 	</struct>
 
+	<struct name="TimeStreamEnvelopeEntry" description="A downsampled bucket of a variable history, carrying min/max/average/last over the bucket time span.">
+		<member name="TimestampInMicroSeconds" type="uint64" />
+		<member name="MinValue" type="double" />
+		<member name="MaxValue" type="double" />
+		<member name="AverageValue" type="double" />
+		<member name="LastValue" type="double" />
+	</struct>
+
 	<enum name="SignalPhase">
 		<option name="Invalid" value="0" description="Invalid phase. Should not happen." />
 		<option name="InPreparation" value="10" description="Signal has not been triggered yet. Parameters can change." />
@@ -515,7 +548,7 @@
 		<option name="Failed" value="50" description="Signal is has not been handled to its specification. An error message is available." />
 		<option name="TimedOut" value="60" description="The signal timed out before being processed." />
 		<option name="Cleared" value="70" description="The signal queue has been cleared and the signal will not be processed anymore." />
-		<option name="Retracted" value="80" description="The sender has retracted the signal before it was processed." />
+		<option name="Retracted" value="80" description="NOT IMPLEMENTED: The sender has retracted the signal before it was processed." />
 		<option name="Archived" value="90" description="The signal has been archived." />
 	</enum>	
 
@@ -793,7 +826,23 @@
 			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
 			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the JPEG image." />
+		</method>
+
+		<method name="LoadPNGImageFromResource" description="creates an image object from a machine PNG resource data.">
+			<param name="ResourceName" type="string" pass="in" description="PNG Data Resource Name. Fails if image cannot be loaded." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
+
+		<method name="LoadJPEGImageFromResource" description="creates an image object from a machine JPEG resource data.">
+			<param name="ResourceName" type="string" pass="in" description="JPEG Data Resource Name. Fails if image cannot be loaded." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the JPEG image." />
 		</method>
 
 		<method name="CreateImageFromRawRGB24Data" description="creates an image object from raw RGB24 Data. (3 bytes per pixel)">
@@ -2576,6 +2625,12 @@
 		</method>
 	</class>
 
+	<class name="BuildIterator" parent="Iterator">
+		<method name="GetCurrentBuild" description="Returns the build the iterator points at.">
+			<param name="BuildInstance" type="handle" class="Build" pass="return" description="returns the Build instance."/>
+		</method>
+	</class>
+
 
 	<class name="Build" parent="Base" description="Build instance to access build files">
 
@@ -2585,6 +2640,14 @@
 
 		<method name="GetBuildUUID" description="Returns uuid of the build.">
 			<param name="BuildUUID" type="string" pass="return" description="UUID of the build." />
+		</method>
+
+		<method name="GetCreatedTimestamp" description="Returns creation timestamp of the build in ISO-8601 format.">
+			<param name="Timestamp" type="string" pass="return" description="Creation timestamp in ISO-8601 format (e.g., 2025-10-23T14:30:00.000Z)." />
+		</method>
+
+		<method name="GetLastExecutionTimestamp" description="Returns the most recent execution timestamp in ISO-8601 format. Returns empty string if build has never been executed.">
+			<param name="Timestamp" type="string" pass="return" description="Most recent execution timestamp in ISO-8601 format. Empty string if never executed." />
 		</method>
 
 		<method name="GetStorageUUID" description="Returns storage uuid of the build stream.">
@@ -3860,6 +3923,13 @@
 			<param name="Value" type="bool" pass="return" description="Value of parameter" />
 		</method>
 
+		<method name="FindTelemetryChannel" description="Returns a telemetry channel from the current state machine.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel Identifier to return. Must be a alphanumerical path string." />
+			<param name="FailIfNotExisting" type="bool" pass="in" description="If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist.." />
+			<param name="ChannelInstance" type="optionalclass" class="TelemetryChannel" pass="return" description="Channel instance. NULL if Channel does not exist." />
+		</method>		
+
+
 	</class>
 
 
@@ -4042,6 +4112,20 @@
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
 		
+		<method name="RegisterTelemetryChannel" description="Registers a telemetry channel for the current state machine. Fails if identifier already exists.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel Identifier. Must be a alphanumerical path string." />
+			<param name="ChannelDescription" type="string" pass="in" description="Description of Channel. MUST NOT be empty." />
+			<param name="ChannelType" type="enum" class="TelemetryChannelType" pass="in" description="Type of Channel." />			
+			<param name="ChannelInstance" type="class" class="TelemetryChannel" pass="return" description="Channel instance." />
+		</method>
+
+		<method name="FindTelemetryChannel" description="Returns a telemetry channel from the current state machine.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel Identifier to return. Must be a alphanumerical path string." />
+			<param name="FailIfNotExisting" type="bool" pass="in" description="If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist.." />
+			<param name="ChannelInstance" type="optionalclass" class="TelemetryChannel" pass="return" description="Channel instance. NULL if Channel does not exist." />
+		</method>		
+		
+		
 		<method name="CreateEmptyImage" description="creates an empty image object.">
 			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
 			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
@@ -4054,7 +4138,21 @@
 		<method name="CreateImageLoader" description="creates an image loader object.">			
 			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
 		</method>		
-		
+
+		<method name="CreateVideoStream" description="creates a video stream object for MJPEG streaming.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Width of the video stream in pixels. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Height of the video stream in pixels. MUST be positive." />
+			<param name="DesiredFrameDurationInMicroseconds" type="uint32" pass="in" description="Duration of a frame in microseconds. MUST be between 10000 and 60000000." />
+			<param name="PauseToleranceInMicroseconds" type="uint32" pass="in" description="How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration." />
+			<param name="FrameCacheDurationInMicroseconds" type="uint32" pass="in" description="How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration." />
+			<param name="VideoStreamInstance" type="class" class="VideoStream" pass="return" description="Video stream instance." />
+		</method>		
+
+		<method name="FindVideoStream" description="Finds a video stream by UUID. Returns null if the stream does not exist.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the video stream to find." />
+			<param name="VideoStreamInstance" type="optionalclass" class="VideoStream" pass="return" description="Video stream instance, or null if not found." />
+		</method>		
+
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
 			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />
@@ -4456,6 +4554,10 @@
 			<param name="Samples" type="structarray" class="TimeStreamEntry" pass="out" description="Array of Timestream entries, in increasing order." />
 		</method>
 
+		<method name="GetAllSamplesWithBounds" description="Returns all timestamps together with the min/max/average/last value of each bucket of the sampling. Enables faithful multi-scale visualisation of large journals.">
+			<param name="Samples" type="structarray" class="TimeStreamEnvelopeEntry" pass="out" description="Array of Timestream envelope entries, in increasing order." />
+		</method>
+
 	</class>
 
 
@@ -4473,6 +4575,13 @@
 		<method name="ComputeIntegerSample" description="Computes a single sample at a time. Fails if no data is available at this time value.">
 			<param name="TimeInMicroSeconds" type="uint64" pass="in" description="Timestamp to check." />
 			<param name="SampleValue" type="int64" pass="return" description="Value of the variable at the time step in integer." />
+		</method>
+
+		<method name="SampleUniform" description="Downsamples the variable's history over a time range into a fixed number of min/max/average/last buckets. Used for multi-scale visualisation of large journals.">
+			<param name="StartTimeStamp" type="uint64" pass="in" description="Start time stamp to sample in microseconds. MUST be smaller than end time stamp." />
+			<param name="EndTimeStamp" type="uint64" pass="in" description="End time stamp to sample in microseconds. MUST be larger than start time stamp." />
+			<param name="NumberOfSamples" type="uint32" pass="in" description="Number of buckets to generate. MUST be greater than 0." />
+			<param name="Sampling" type="class" class="UniformJournalSampling" pass="return" description="Resulting uniform sampling instance." />
 		</method>
 
 	</class>
@@ -4565,7 +4674,18 @@
 			<param name="VariableName" type="string" pass="in" description="Variable name to analyse. Fails if Variable does not exist." />
 			<param name="JournalVariable" type="class" class="JournalVariable" pass="return" description="Journal Instance." />
 		</method>
-						
+
+		<method name="GetVariableCount" description="Returns the number of recorded variables in the journal.">
+			<param name="Count" type="uint32" pass="return" description="Number of recorded variables." />
+		</method>
+
+		<method name="GetVariableInformation" description="Returns metadata of a recorded variable by index.">
+			<param name="Index" type="uint32" pass="in" description="Index of the variable. 0-based. MUST be smaller than the variable count." />
+			<param name="Name" type="string" pass="out" description="Name (parameter path) of the variable." />
+			<param name="DataType" type="enum" class="ParameterDataType" pass="out" description="Data type of the variable." />
+			<param name="Units" type="double" pass="out" description="Quantization units of the variable (0 for non-double variables)." />
+		</method>
+
 		<method name="GetStartTime" description="Retrieves the reference start time of the journal.">
 			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
 		</method>
@@ -4601,8 +4721,144 @@
 			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time stamp in microseconds. MUST be larger than StartTimeInMicroseconds. Fails if larger than recorded time interval." />
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="Alert Iterator Instance." />
 		</method>
+
+		<method name="LoadTelemetryHandler" description="Loads the telemetry handler for this journal.">
+			<param name="TelemetryHandlerInstance" type="class" class="TelemetryHandler" pass="return" description="Telemetry handler instance." />
+		</method>
 		
 	</class>
+
+
+	<class name="TelemetryInterval" parent="Base" description="Represents a completed telemetry interval.">
+
+		<method name="GetMarkerID" description="Returns the marker ID.">
+			<param name="MarkerID" type="uint64" pass="return" description="Marker ID" />	
+		</method>
+
+		<method name="GetChannelIdentifier" description="Returns the channel identifier.">
+			<param name="Identifier" type="string" pass="return" description="Channel identifier" />	
+		</method>
+
+		<method name="GetStartTimestamp" description="Returns the start timestamp in microseconds.">
+			<param name="Timestamp" type="uint64" pass="return" description="Start timestamp" />	
+		</method>
+
+		<method name="GetEndTimestamp" description="Returns the end timestamp in microseconds.">
+			<param name="Timestamp" type="uint64" pass="return" description="End timestamp" />	
+		</method>
+
+		<method name="GetDuration" description="Returns the duration in microseconds.">
+			<param name="Duration" type="uint64" pass="return" description="Duration" />	
+		</method>
+
+		<method name="GetContextData" description="Returns the context data.">
+			<param name="ContextData" type="uint64" pass="return" description="Context data" />	
+		</method>
+
+	</class>
+
+
+	<class name="TelemetryIntervalIterator" parent="Iterator" description="Iterator for telemetry intervals.">
+		
+		<method name="GetCurrentInterval" description="Returns the current interval.">
+			<param name="Interval" type="class" class="TelemetryInterval" pass="return" description="Current interval" />	
+		</method>
+
+	</class>
+
+
+	<class name="TelemetryChannelStatistics" parent="Base" description="Aggregated telemetry statistics for a channel.">
+
+		<method name="GetChannelIdentifier" description="Returns the channel identifier.">
+			<param name="Identifier" type="string" pass="return" description="Channel identifier" />	
+		</method>
+
+		<method name="GetIntervalCount" description="Returns the number of completed intervals.">
+			<param name="Count" type="uint64" pass="return" description="Number of intervals" />	
+		</method>
+
+		<method name="GetInstantMarkerCount" description="Returns the number of instant markers.">
+			<param name="Count" type="uint64" pass="return" description="Number of instant markers" />	
+		</method>
+
+		<method name="GetTotalDuration" description="Returns the total duration of all intervals.">
+			<param name="Duration" type="uint64" pass="return" description="Total duration in microseconds" />	
+		</method>
+
+		<method name="GetMinDuration" description="Returns the minimum interval duration.">
+			<param name="Duration" type="uint64" pass="return" description="Min duration in microseconds" />	
+		</method>
+
+		<method name="GetMaxDuration" description="Returns the maximum interval duration.">
+			<param name="Duration" type="uint64" pass="return" description="Max duration in microseconds" />	
+		</method>
+
+		<method name="GetAverageDuration" description="Returns the average interval duration.">
+			<param name="Duration" type="uint64" pass="return" description="Average duration in microseconds" />	
+		</method>
+
+	</class>
+
+
+	<class name="TelemetryHandler" parent="Base" description="Handler for accessing past telemetry data.">
+
+		<method name="GetSessionUUID" description="Returns the session UUID.">
+			<param name="UUID" type="string" pass="return" description="Session UUID" />	
+		</method>
+
+		<method name="GetStartTime" description="Returns the session start time.">
+			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
+		</method>
+
+		<method name="GetEndTime" description="Returns the session end time.">
+			<param name="DateTimeInstance" type="class" class="DateTime" pass="return" description="DateTime Instance" />
+		</method>
+
+		<method name="GetLifeTimeInMicroseconds" description="Returns the session lifetime in microseconds.">
+			<param name="LifeTime" type="uint64" pass="return" description="Lifetime" />	
+		</method>
+
+		<method name="GetChannelCount" description="Returns the number of telemetry channels.">
+			<param name="Count" type="uint32" pass="return" description="Number of channels" />	
+		</method>
+
+		<method name="GetChannelIdentifier" description="Returns the identifier for a channel by index.">
+			<param name="ChannelIndex" type="uint32" pass="in" description="Channel index (0-based)" />	
+			<param name="Identifier" type="string" pass="return" description="Channel identifier" />	
+		</method>
+
+		<method name="HasChannel" description="Checks if a channel exists.">
+			<param name="Identifier" type="string" pass="in" description="Channel identifier" />	
+			<param name="Exists" type="bool" pass="return" description="True if channel exists" />	
+		</method>
+
+		<method name="GetChannelDescription" description="Returns the description of a channel.">
+			<param name="Identifier" type="string" pass="in" description="Channel identifier" />	
+			<param name="Description" type="string" pass="return" description="Channel description" />	
+		</method>
+
+		<method name="QueryIntervalsFromTimeDelta" description="Queries intervals from the last N microseconds.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel identifier. Empty string for all channels." />	
+			<param name="TimeDeltaInMicroseconds" type="uint64" pass="in" description="Time delta from the end of the session." />	
+			<param name="Iterator" type="class" class="TelemetryIntervalIterator" pass="return" description="Iterator over intervals" />	
+		</method>
+
+		<method name="QueryIntervalsFromTimeRange" description="Queries intervals within a time range.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel identifier. Empty string for all channels." />	
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time." />	
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time." />	
+			<param name="Iterator" type="class" class="TelemetryIntervalIterator" pass="return" description="Iterator over intervals" />	
+		</method>
+
+		<method name="GetChannelStatistics" description="Gets aggregated statistics for a channel.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel identifier." />	
+			<param name="StartTimeInMicroseconds" type="uint64" pass="in" description="Start time (0 for beginning of session)." />	
+			<param name="EndTimeInMicroseconds" type="uint64" pass="in" description="End time (0 for end of session)." />	
+			<param name="Statistics" type="class" class="TelemetryChannelStatistics" pass="return" description="Statistics instance" />	
+		</method>
+
+	</class>
+
 
 	<class name="UserDetailList" parent="Base" description="List of user details at a certain snapshot time.">
 
@@ -4819,10 +5075,6 @@
 			<param name="XSDUUID" type="string" pass="return" description="UUID of the configuration XSD." />
 		</method>
 
-		<!--method name="GetTypeUUID" description="Returns the UUID of the associated configuration type.">
-			<param name="TypeUUID" type="string" pass="return" description="UUID of the configuration type." />
-		</method-->
-
 		<method name="GetNumericVersion" description="Returns the numeric version of the configuration version.">
 			<param name="ConfigurationNumericVersion" type="uint32" pass="return" description="Returns the configuration numeric version." />
 		</method>
@@ -4831,20 +5083,12 @@
 			<param name="ParentUUID" type="string" pass="return" description="UUID of the configuration version that is the parent of this version. Returns 00000000-0000-0000-0000-000000000000 if this is the default version." />
 		</method>
 
-		<!--method name="GetSchemaType" description="Returns the schema type string of the configuration.">
-			<param name="SchemaType" type="string" pass="return" description="Schema type of the configuration type." />
-		</method>
-
-		<method name="GetXSDVersion" description="Returns the version number of the associated XSD.">
-			<param name="XSDVersion" type="uint32" pass="return" description="Returns the XSD version." />
-		</method>
-
-		<method name="GetXSDString" description="Returns the XSD used for validation as a string.">
-			<param name="XSDString" type="string" pass="return" description="XSD String." />
-		</method-->
-
 		<method name="GetConfigurationXMLString" description="Returns the configuration XML content as string.">
 			<param name="XMLString" type="string" pass="return" description="XML String." />
+		</method>
+
+		<method name="GetConfigurationXML" description="Returns the configuration XML instance.">
+			<param name="XMLInstance" type="class" class="XMLDocument" pass="return" description="XML Document." />
 		</method>
 
 		<method name="GetUserUUID" description="Returns the User UUID.">
@@ -4858,7 +5102,6 @@
 		<method name="CreateNewVersion" description="Creates a new configuration version from this one with the same XSD.">
 			<param name="XMLString" type="string" pass="in" description="New XML Configuration String. MUST conform to current XSD." />
 			<param name="UserUUID" type="string" pass="in" description="User UUID for logging the user who initiated the change." />
-			<!--param name="TimeStampUTC" type="string" pass="in" description="Current time in UTC." /-->
 			<param name="CurrentInstance" type="class" class="MachineConfigurationVersion" pass="return" description="Returns the newly created MachineConfigurationVersion instance." />
 		</method>
 
@@ -4866,7 +5109,6 @@
 			<param name="NewXSD" type="class" class="MachineConfigurationXSD" pass="in" description="New XSD to use. MUST be of the same type as the current. MUST have an increased version number." />
 			<param name="XMLString" type="string" pass="in" description="New XML Configuration String. MUST conform to new XSD." />
 			<param name="UserUUID" type="string" pass="in" description="User UUID for logging the user who initiated the change." />
-			<!--param name="TimeStampUTC" type="string" pass="in" description="Current time in UTC." /-->
 			<param name="CurrentInstance" type="class" class="MachineConfigurationVersion" pass="return" description="Returns the newly created MachineConfigurationVersion instance." />
 		</method>
 
@@ -4876,6 +5118,127 @@
 
 		<method name="GetCurrent" description="Returns the current MachineConfigurationVersion instance.">
 			<param name="Instance" type="class" class="MachineConfigurationVersion" pass="return" description="Currently selected configuration version instance." />
+		</method>
+
+	</class>
+
+	<class name="MachineConfiguration" parent="Base" description="Ergonomic, typed, namespace-free working copy of a machine configuration version. Reads and writes individual parameters by a slash-separated path (relative to the root element, resolved in the document default namespace); leaf values are stored in the 'value' attribute. Changes are held in memory until committed as a new configuration version.">
+
+		<!-- VERSION METADATA -->
+
+		<method name="GetVersionUUID" description="Returns the UUID of the underlying configuration version this working copy was created from.">
+			<param name="VersionUUID" type="string" pass="return" description="UUID of the configuration version." />
+		</method>
+
+		<method name="GetNumericVersion" description="Returns the numeric version of the underlying configuration version.">
+			<param name="ConfigurationNumericVersion" type="uint32" pass="return" description="Returns the configuration numeric version." />
+		</method>
+
+		<method name="GetXSDUUID" description="Returns the UUID of the XSD used by this configuration.">
+			<param name="XSDUUID" type="string" pass="return" description="UUID of the configuration XSD." />
+		</method>
+
+		<method name="GetXMLDocument" description="Returns the current in-memory configuration as an XML document instance for advanced access. The returned document reflects any uncommitted changes.">
+			<param name="XMLInstance" type="class" class="XMLDocument" pass="return" description="XML Document." />
+		</method>
+
+		<!-- TYPED READ ACCESS -->
+
+		<method name="HasParameter" description="Returns whether a parameter exists at the given path.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root, e.g. 'PLCConfig/IPAddress'." />
+			<param name="ParameterExists" type="bool" pass="return" description="True if the parameter node and its value attribute exist." />
+		</method>
+
+		<method name="GetStringParameter" description="Returns the string value of a parameter. Fails if the parameter does not exist.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="string" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetIntegerParameter" description="Returns the integer value of a parameter. Fails if the parameter does not exist or is not an integer in range.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="Value" type="int64" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetDoubleParameter" description="Returns the double value of a parameter. Fails if the parameter does not exist or is not a double in range.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value." />
+			<param name="Value" type="double" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetBoolParameter" description="Returns the boolean value of a parameter. Fails if the parameter does not exist or is not a boolean.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="bool" pass="return" description="Parameter value." />
+		</method>
+
+		<!-- TYPED READ ACCESS WITH DEFAULTS -->
+
+		<method name="GetStringParameterDef" description="Returns the string value of a parameter. Returns the default value if the parameter does not exist.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="DefaultValue" type="string" pass="in" description="Default value." />
+			<param name="Value" type="string" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetIntegerParameterDef" description="Returns the integer value of a parameter. Returns the default value if the parameter does not exist or is not a valid integer in range.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="MinValue" type="int64" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="int64" pass="in" description="Maximum allowed value." />
+			<param name="DefaultValue" type="int64" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="int64" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetDoubleParameterDef" description="Returns the double value of a parameter. Returns the default value if the parameter does not exist or is not a valid double in range.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="MinValue" type="double" pass="in" description="Minimum allowed value." />
+			<param name="MaxValue" type="double" pass="in" description="Maximum allowed value." />
+			<param name="DefaultValue" type="double" pass="in" description="Default value. MUST be in valid range." />
+			<param name="Value" type="double" pass="return" description="Parameter value." />
+		</method>
+
+		<method name="GetBoolParameterDef" description="Returns the boolean value of a parameter. Returns the default value if the parameter does not exist or is not a valid boolean.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="DefaultValue" type="bool" pass="in" description="Default value." />
+			<param name="Value" type="bool" pass="return" description="Parameter value." />
+		</method>
+
+		<!-- TYPED WRITE ACCESS (in memory until committed) -->
+
+		<method name="SetStringParameter" description="Sets the string value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="string" pass="in" description="Value to set." />
+		</method>
+
+		<method name="SetIntegerParameter" description="Sets the integer value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="int64" pass="in" description="Value to set." />
+		</method>
+
+		<method name="SetDoubleParameter" description="Sets the double value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="double" pass="in" description="Value to set." />
+		</method>
+
+		<method name="SetBoolParameter" description="Sets the boolean value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.">
+			<param name="Path" type="string" pass="in" description="Slash-separated element path beneath the root." />
+			<param name="Value" type="bool" pass="in" description="Value to set." />
+		</method>
+
+		<!-- PERSISTENCE -->
+
+		<method name="HasChanges" description="Returns whether the in-memory working copy has uncommitted changes.">
+			<param name="HasUncommittedChanges" type="bool" pass="return" description="True if there are uncommitted changes." />
+		</method>
+
+		<method name="Commit" description="Commits the current in-memory state as a new configuration version (child of the version this working copy is based on). Does not change the active version. After committing, the working copy is rebased on the new version.">
+			<param name="UserUUID" type="string" pass="in" description="User UUID for logging who initiated the change." />
+			<param name="VersionInstance" type="class" class="MachineConfigurationVersion" pass="return" description="Returns the newly created configuration version." />
+		</method>
+
+		<method name="CommitAndActivate" description="Commits the current in-memory state as a new configuration version and sets it as the active version for the type. After committing, the working copy is rebased on the new version.">
+			<param name="UserUUID" type="string" pass="in" description="User UUID for logging who initiated the change." />
+			<param name="VersionInstance" type="class" class="MachineConfigurationVersion" pass="return" description="Returns the newly created and now active configuration version." />
 		</method>
 
 	</class>
@@ -4913,13 +5276,21 @@
 		<method name="GetLatestXSDNumericVersion" description="Returns the version number of the latest XSD for this type.">
 			<param name="XSDNumericVersion" type="uint32" pass="return" description="Latest XSD version number, or 0 if none exist." />
 		</method>
-
+		
 		<method name="RegisterNewXSD" description="Registers a new XSD Version. Fails if version already exists or is not incrementing.">
 			<param name="XSDString" type="string" pass="in" description="XSD String of the version. MUST be a valid schema of this type." />
 			<param name="XSDVersion" type="uint32" pass="in" description="New Version to add. MUST be larger than GetLatestXSDVersion." />
 			<param name="XSDInstance" type="class" class="MachineConfigurationXSD" pass="return" description="Returns the new XSD of the configuration type." />
 		</method>
-
+		
+		<method name="RegisterXSDFromResource" description="Registers a XSD from a resource file including its default configuration.">
+			<param name="XSDResourceName" type="string" pass="in" description="XSD Resource Name. Resource MUST exist." />
+			<param name="DefaultXMLResourceName" type="string" pass="in" description="Default XML Resource Name. Resource MUST exist." />
+			<param name="XSDVersion" type="uint32" pass="in" description="New Version to add. MUST be larger than GetLatestXSDVersion if FailIfExisting is true." />
+			<param name="FailIfExisting" type="bool" pass="in" description="If true, the call will fail if XSDVersion is not larger than GetLatestXSDVersion. If false, the call will return the new XSDInstance, if XSDVersion is larger than GetLatestXSDVersion, null otherwise. " />
+			<param name="XSDInstance" type="optionalclass" class="MachineConfigurationXSD" pass="return" description="Returns the new XSD of the configuration type, if it has been newly registered." />
+		</method>
+		
 		<method name="FindXSDByNumericVersion" description="Finds a specific XSD of this type by its Numeric Version Number.">
 			<param name="XSDNumericVersion" type="uint32" pass="in" description="Requested version number." />
 			<param name="XSDInstance" type="class" class="MachineConfigurationXSD" pass="return" description="XSD instance if exists." />
@@ -4962,8 +5333,33 @@
 			<param name="Version" type="optionalclass" class="MachineConfigurationVersion" pass="return" description="Latest configuration version or null." />
 		</method>
 
+		<method name="GetActiveConfigurationXML" description="Returns the currently active configuration XML for this type.">
+			<param name="XMLInstance" type="class" class="XMLDocument" pass="return" description="XML Document." />
+		</method>
+
+		<method name="GetLatestConfigurationXML" description="Returns the most recently created configuration XML for this type.">
+			<param name="XMLInstance" type="class" class="XMLDocument" pass="return" description="XML Document." />
+		</method>
+
 		<method name="SetActiveConfigurationVersion" description="Sets the active configuration version for this type.">
 			<param name="VersionUUID" type="string" pass="in" description="UUID of the version to set as active." />
+		</method>
+
+		<!-- ERGONOMIC HELPERS -->
+
+		<method name="GetActiveConfiguration" description="Returns an ergonomic, typed working copy of the currently active configuration version. Fails if no version is active.">
+			<param name="ConfigurationInstance" type="class" class="MachineConfiguration" pass="return" description="Working copy of the active configuration." />
+		</method>
+
+		<method name="EnsureActiveConfiguration" description="Returns an ergonomic, typed working copy of the active configuration, activating the latest version first if none is currently active. Fails if no configuration version exists at all.">
+			<param name="ConfigurationInstance" type="class" class="MachineConfiguration" pass="return" description="Working copy of the active configuration." />
+		</method>
+
+		<method name="EnsureXSDVersion" description="Registers a new XSD version together with its default configuration, but only if the given version is newer than the latest registered XSD. Returns null if the given version is not newer (no-op). Collapses the common bootstrap pattern of RegisterNewXSD + CreateDefaultConfiguration.">
+			<param name="XSDString" type="string" pass="in" description="XSD String of the version. MUST be a valid schema of this type." />
+			<param name="XSDVersion" type="uint32" pass="in" description="Version to add. Registered only if larger than GetLatestXSDNumericVersion." />
+			<param name="DefaultXML" type="string" pass="in" description="Default configuration XML string conforming to the given XSD." />
+			<param name="XSDInstance" type="optionalclass" class="MachineConfigurationXSD" pass="return" description="The newly registered XSD, or null if the version was not newer than the latest." />
 		</method>
 
 	</class>
@@ -5006,6 +5402,56 @@
 	</class>
 
 
+	<class name="TelemetryMarkerScope" parent="Base" description="Telemetry Marker Scope">
+
+		<method name="GetMarkerID" description="Returns the global marker ID">
+			<param name="MarkerID" type="uint64" pass="return" description="Global marker id." />
+		</method>
+
+		<method name="GetParent" description="Returns the Identifier of the Parent (State machine or Driver) of the channel.">
+			<param name="ParentIdentifier" type="string" pass="return" description="Parent Identifier" />
+		</method>
+
+		<method name="GetIdentifier" description="Returns the Identifier of the Channel.">
+			<param name="ChannelIdentifier" type="string" pass="return" description="Channel Identifier. Will be a alphanumerical path string." />
+		</method>
+
+		<method name="GetGlobalIdentifier" description="Returns the global Identifier of the Channel, which is ParentIdentifier.ChannelIdentifier">
+			<param name="GlobalIdentifier" type="string" pass="return" description="Global Identifier. Will be a alphanumerical path string." />
+		</method>
+
+		<method name="GetStartTimestamp" description="Returns start timestamp of the marker">
+			<param name="StartTimestamp" type="uint64" pass="return" description="Start timestamp." />
+		</method>
+		
+	</class>
+
+	<class name="TelemetryChannel" parent="Base" description="Telemetry Channel accessor">
+
+		<method name="GetParent" description="Returns the Identifier of the Parent (State machine or Driver) of the channel.">
+			<param name="ParentIdentifier" type="string" pass="return" description="Parent Identifier" />
+		</method>
+
+		<method name="GetIdentifier" description="Returns the Identifier of the Channel.">
+			<param name="ChannelIdentifier" type="string" pass="return" description="Channel Identifier. Will be a alphanumerical path string." />
+		</method>
+
+		<method name="GetGlobalIdentifier" description="Returns the global Identifier of the Channel, which is ParentIdentifier.ChannelIdentifier">
+			<param name="GlobalIdentifier" type="string" pass="return" description="Global Identifier. Will be a alphanumerical path string." />
+		</method>
+
+		<method name="StartMarkerScope" description="Starts a marker scope object.">
+			<param name="UserContextData" type="uint64" pass="in" description="User data to be stored with the marker." />
+			<param name="TelemetryMarkerScopeInstance" type="class" class="TelemetryMarkerScope" pass="return" description="Marker scope instance. Will finish when freed." />		
+		</method>
+
+		<method name="CreateInstantMarker" description="Creates a marker of length 0.">
+			<param name="UserContextData" type="uint64" pass="in" description="User data to be stored with the marker." />
+			<param name="MarkerID" type="uint64" pass="return" description="Global marker ID." />
+		</method>
+
+	</class>
+
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
 
 		<method name="GetMachineState" description="Retrieves the machine state">
@@ -5023,28 +5469,44 @@
 			<param name="SignalInstance" type="class" class="SignalTrigger" pass="return" description="Signal trigger object." />
 		</method>
 	  
-		<method name="WaitForSignal" description="Waits for a signal for a certain amount of time.">
-			<param name="SignalName" type="string" pass="in" description="Name Of Signal" />
-			<param name="TimeOut" type="uint32" pass="in" description="Timeout in Milliseconds. 0 for Immediate return." />			
-			<param name="HandlerInstance" type="optionalclass" class="SignalHandler" pass="out" description="Signal object. If Success is false, the Signal Handler Object will be null." />
-			<param name="Success" type="bool" pass="return" description="Signal has been triggered" />
-		</method>		
-
-		<method name="GetUnhandledSignal" description="Retrieves an unhandled signal By signal type name. Only affects signals with Phase InQueue.">
+		<method name="ClaimSignalFromQueue" description="Retrieves an InQueue signal by type and changes its phase to InProcess. Recommended to use as it is robust against signal timeouts...">
 			<param name="SignalTypeName" type="string" pass="in" description="Name Of Signal to be returned" />
-			<param name="HandlerInstance" type="optionalclass" class="SignalHandler" pass="return" description="Signal object. If no signal has been found the signal handler object will be null." />
-		</method>		
-		
-		<method name="ClearUnhandledSignalsOfType" description="Clears all unhandled signals of a certain type and marks them as Cleared. Only affects signals with Phase InQueue.">
+			<param name="HandlerInstance" type="optionalclass" class="SignalHandler" pass="return" description="Signal object. If no signal is InQueue the signal handler object will be null." />
+		</method>
+
+		<method name="SignalQueueIsEmpty" description="Returns if a signal queue is empty for a specific type... Equivalent to NOT QueueHasSignal.">
+			<param name="SignalTypeName" type="string" pass="in" description="Name Of Signal to be returned" />
+			<param name="IsEmpty" type="bool" pass="return" description="Returns if the signal queue is empty. Please be aware that even a false return value does not guarantee that ClaimSignalFromQueue returns a non-null value." />
+		</method>
+
+		<method name="QueueHasSignal" description="Returns if a signal queue has a signal of a specific type. Equivalent to NOT SignalQueueIsEmpty ().">
+			<param name="SignalTypeName" type="string" pass="in" description="Name Of Signal to be returned" />
+			<param name="HasSignal" type="bool" pass="return" description="Returns if there is a signal in a signal queue. Please be aware that even a true return value does not guarantee that ClaimSignalFromQueue returns a non-null value." />
+		</method>
+
+		<method name="ClearUnhandledSignalsOfType" description="Clears all InQueue or InProcess signals of a certain type and marks them as Cleared. Handled, failed or timedout signals are unaffected">
 			<param name="SignalTypeName" type="string" pass="in" description="Name Of Signal to be cleared." />
 		</method>		
 
-		<method name="ClearAllUnhandledSignals" description="Clears all unhandled signals and marks them Cleared. Only affects signals in the specific queue (as well as with Phase InQueue.">
+		<method name="ClearAllUnhandledSignals" description="Clears all InQueue or InProcess signals of this state machine and marks them Cleared. Handled, failed or timedout signals are unaffected">
 		</method>		
+		
+		<method name="RegisterTelemetryChannel" description="Registers a telemetry channel for the current state machine. Fails if identifier already exists.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel Identifier. Must be a alphanumerical path string." />
+			<param name="ChannelDescription" type="string" pass="in" description="Description of Channel. MUST NOT be empty." />
+			<param name="ChannelType" type="enum" class="TelemetryChannelType" pass="in" description="Type of Channel." />			
+			<param name="ChannelInstance" type="class" class="TelemetryChannel" pass="return" description="Channel instance." />
+		</method>
 
-		<method name="GetUnhandledSignalByUUID" description="retrieves an unhandled signal from the current state machine by UUID.">
+		<method name="FindTelemetryChannel" description="Returns a telemetry channel from the current state machine.">
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel Identifier to return. Must be a alphanumerical path string." />
+			<param name="FailIfNotExisting" type="bool" pass="in" description="If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist.." />
+			<param name="ChannelInstance" type="optionalclass" class="TelemetryChannel" pass="return" description="Channel instance. NULL if Channel does not exist." />
+		</method>		
+		
+		<method name="GetUnhandledSignalByUUID" description="Retrieves an InQueue or InProcess signal from the current state machine by UUID.">
 			<param name="UUID" type="string" pass="in" description="Name" />
-			<param name="MustExist" type="bool" pass="in" description="The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already." />
+			<param name="MustExist" type="bool" pass="in" description="The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled, failed, cleared or timedout already." />
 			<param name="Handler" type="optionalclass" class="SignalHandler" pass="return" description="Signal handler instance. Returns null, if signal does not exist." />
 		</method>
 		
@@ -5081,7 +5543,37 @@
 
 		<method name="UnloadAllToolpathes" description="unloads all toolpath in memory to clean up">
 		</method>
+		
+		
+		<!-- DEPRECIATED METHODS - MIGHT BE REMOVED IN FUTURE VERSIONS -->
+		
+		<method name="WaitForSignal" description="DEPRECIATED: Waits for an InQueue signal to exist for a certain amount of time. DOES NOT change signal phase to InProcess, and is not atomic. And so NOT robust against signal timeouts. USE claim signal instead.">
+			<param name="SignalName" type="string" pass="in" description="Name Of Signal" />
+			<param name="TimeOut" type="uint32" pass="in" description="Timeout in Milliseconds. 0 for Immediate return." />			
+			<param name="HandlerInstance" type="optionalclass" class="SignalHandler" pass="out" description="Signal object. If Success is false, the Signal Handler Object will be null." />
+			<param name="Success" type="bool" pass="return" description="Signal has been triggered" />
+		</method>		
 
+		<method name="GetUnhandledSignal" description="DEPRECIATED: Retrieves am InQueue signal by type. DOES NOT change signal phase to InProcess, and is not atomic. And so NOT robust against signal timeouts. USE ClaimSignalFromQueue instead.">
+			<param name="SignalTypeName" type="string" pass="in" description="Name Of Signal to be returned" />
+			<param name="HandlerInstance" type="optionalclass" class="SignalHandler" pass="return" description="Signal object. If no signal has been found the signal handler object will be null." />
+		</method>		
+
+		<method name="StoreSignal" description="DEPRECIATED: stores a signal handler in the current state machine">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Handler" type="class" class="SignalHandler" pass="in" description="Signal handler to store." />
+		</method>
+
+		<method name="RetrieveSignal" description="DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Handler" type="class" class="SignalHandler" pass="return" description="Signal handler instance." />
+		</method>
+
+		<method name="ClearStoredValue" description="DEPRECIATED: deletes a value from the data store.">
+			<param name="Name" type="string" pass="in" description="Name" />
+		</method>
+		
+		<!-- /DEPRECIATED -->
 
 		<method name="SetNextState" description="sets the next state">
 			<param name="StateName" type="string" pass="in" description="Name of next state" />
@@ -5107,21 +5599,6 @@
 			<param name="ShallTerminate" type="bool" pass="return" description="Returns if termination shall appear" />
 		</method>
 
-
-
-		<method name="StoreSignal" description="DEPRECIATED: stores a signal handler in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Handler" type="class" class="SignalHandler" pass="in" description="Signal handler to store." />
-		</method>
-
-		<method name="RetrieveSignal" description="DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Handler" type="class" class="SignalHandler" pass="return" description="Signal handler instance." />
-		</method>
-
-		<method name="ClearStoredValue" description="DEPRECIATED: deletes a value from the data store.">
-			<param name="Name" type="string" pass="in" description="Name" />
-		</method>
 		
 		
 		<method name="SetStringParameter" description="sets a string parameter">
@@ -5183,7 +5660,41 @@
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="bool" pass="return" description="Value to set" />
 		</method>
-		
+
+		<method name="HasParameterGroup" description="checks if a parameter group exists.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="GroupExists" type="bool" pass="return" description="returns true if the parameter group exists." />
+		</method>
+
+		<method name="HasParameter" description="checks if a parameter exists within a given group.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="ParameterExists" type="bool" pass="return" description="returns true if the parameter exists in the given group." />
+		</method>
+
+		<method name="GetParameterGroupParameterCount" description="returns the number of parameters contained in a given parameter group.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Count" type="uint32" pass="return" description="Number of parameters in the group." />
+		</method>
+
+		<method name="GetParameterGroupParameterName" description="returns the name of a parameter in a given parameter group by index.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
+			<param name="Name" type="string" pass="return" description="Name of the parameter." />
+		</method>
+
+		<method name="GetParameterGroupParameterDescription" description="returns the description of a parameter in a given parameter group by index.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
+			<param name="Description" type="string" pass="return" description="Description of the parameter." />
+		</method>
+
+		<method name="GetParameterGroupParameterType" description="returns the data type of a parameter in a given parameter group by name.">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="ParameterType" type="enum" class="ParameterDataType" pass="return" description="Data type of the parameter." />
+		</method>
+
 		<method name="HasResourceData" description = "retrieves if the machine resources has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />
 			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
@@ -5210,6 +5721,20 @@
 		
 		<method name="CreateImageLoader" description="creates an image loader object.">			
 			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
+		</method>		
+
+		<method name="CreateVideoStream" description="creates a video stream object for MJPEG streaming.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Width of the video stream in pixels. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Height of the video stream in pixels. MUST be positive." />
+			<param name="DesiredFrameDurationInMicroseconds" type="uint32" pass="in" description="Duration of a frame in microseconds. MUST be between 10000 and 60000000." />
+			<param name="PauseToleranceInMicroseconds" type="uint32" pass="in" description="How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration." />
+			<param name="FrameCacheDurationInMicroseconds" type="uint32" pass="in" description="How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration." />
+			<param name="VideoStreamInstance" type="class" class="VideoStream" pass="return" description="Video stream instance." />
+		</method>		
+
+		<method name="FindVideoStream" description="Finds a video stream by UUID. Returns null if the stream does not exist.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the video stream to find." />
+			<param name="VideoStreamInstance" type="optionalclass" class="VideoStream" pass="return" description="Video stream instance, or null if not found." />
 		</method>		
 
 		<method name="CreateMachineConfigurationHandler" description="creates a machine configuration handler, dealing with all persistent machine settings that the user will store in the local database.">			
@@ -5510,6 +6035,11 @@
 		<method name="RetrieveEventSenderUUID" description="returns uuid of the UI control that triggered the event.">
 			<param name="SenderUUID" type="string" pass="return" description="Name of the sender uuid." />
 		</method>
+
+		<method name="SenderHasTag" description="checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.">
+			<param name="Tag" type="string" pass="in" description="Tag to check for." />
+			<param name="TagExists" type="bool" pass="return" description="True if the sender declares the given tag." />
+		</method>
 				
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
@@ -5569,6 +6099,33 @@
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="bool" pass="return" description="Current Parameter Value" />
+		</method>
+
+		<method name="GetMachineParameterGroupParameterCount" description="returns the number of parameters contained in a given parameter group of a state machine.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Count" type="uint32" pass="return" description="Number of parameters in the group." />
+		</method>
+
+		<method name="GetMachineParameterGroupParameterName" description="returns the name of a parameter in a given parameter group of a state machine by index.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
+			<param name="Name" type="string" pass="return" description="Name of the parameter." />
+		</method>
+
+		<method name="GetMachineParameterGroupParameterDescription" description="returns the description of a parameter in a given parameter group of a state machine by index.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="Index" type="uint32" pass="in" description="Index of the parameter (0-based). Fails if out of range." />
+			<param name="Description" type="string" pass="return" description="Description of the parameter." />
+		</method>
+
+		<method name="GetMachineParameterGroupParameterType" description="returns the data type of a parameter in a given parameter group of a state machine by name.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="ParameterType" type="enum" class="ParameterDataType" pass="return" description="Data type of the parameter." />
 		</method>
 
 
@@ -5647,6 +6204,20 @@
 			<param name="ImageLoaderInstance" type="class" class="ImageLoader" pass="return" description="Image loader instance." />
 		</method>		
 
+		<method name="CreateVideoStream" description="creates a video stream object for MJPEG streaming.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Width of the video stream in pixels. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Height of the video stream in pixels. MUST be positive." />
+			<param name="DesiredFrameDurationInMicroseconds" type="uint32" pass="in" description="Duration of a frame in microseconds. MUST be between 10000 and 60000000." />
+			<param name="PauseToleranceInMicroseconds" type="uint32" pass="in" description="How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration." />
+			<param name="FrameCacheDurationInMicroseconds" type="uint32" pass="in" description="How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration." />
+			<param name="VideoStreamInstance" type="class" class="VideoStream" pass="return" description="Video stream instance." />
+		</method>		
+
+		<method name="FindVideoStream" description="Finds a video stream by UUID. Returns null if the stream does not exist.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the video stream to find." />
+			<param name="VideoStreamInstance" type="optionalclass" class="VideoStream" pass="return" description="Video stream instance, or null if not found." />
+		</method>		
+
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
@@ -5712,6 +6283,10 @@
 			<param name="ExecutionUUID" type="string" pass="in" description="UUID of the execution entity." />
 			<param name="ExecutionInstance" type="class" class="BuildExecution" pass="return" description="Build execution instance" />
 		</method>
+	<method name="GetRecentBuildJobs" description="Returns an iterator for recent build jobs, ordered by timestamp (newest first).">
+		<param name="MaxCount" type="uint32" pass="in" description="Maximum number of jobs to return. Must be greater than 0." />
+		<param name="BuildIterator" type="class" class="BuildIterator" pass="return" description="Iterator for build jobs, ordered newest first." />
+	</method>
 
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
@@ -5883,6 +6458,26 @@
 			<param name="ReturnValueName" type="string" pass="in" description="The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
 			<param name="ReturnValue" type="string" pass="in" description="Return value." />
 		</method>
+
+	<method name="SetStringResult" description="Sets a string result value for external event return (typed convenience wrapper).">
+		<param name="ReturnValueName" type="string" pass="in" description="The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+		<param name="ReturnValue" type="string" pass="in" description="Return value." />
+	</method>
+
+	<method name="SetIntegerResult" description="Sets an integer result value for external event return.">
+		<param name="ReturnValueName" type="string" pass="in" description="The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+		<param name="ReturnValue" type="int64" pass="in" description="Return value." />
+	</method>
+
+	<method name="SetBoolResult" description="Sets a boolean result value for external event return.">
+		<param name="ReturnValueName" type="string" pass="in" description="The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+		<param name="ReturnValue" type="bool" pass="in" description="Return value." />
+	</method>
+
+	<method name="SetDoubleResult" description="Sets a double result value for external event return.">
+		<param name="ReturnValueName" type="string" pass="in" description="The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)" />
+		<param name="ReturnValue" type="double" pass="in" description="Return value." />
+	</method>
 		
 		<method name="GetExternalEventParameters" description="Returns the external event parameters. This JSON Object was passed on from the external API.">
 			<param name="ParameterValue" type="class" class="JSONObject" pass="return" description="Parameter value." />

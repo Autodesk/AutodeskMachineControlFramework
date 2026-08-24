@@ -98,6 +98,8 @@ namespace AMC {
 
 		void addArray(CJSONWriterArray& array);
 
+		void copyFromArray(const rapidjson::Value& arrayValue);
+
 		bool isEmpty();
 
 	};
