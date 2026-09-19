@@ -36,7 +36,7 @@ project(LibMC)
 option(INCLUDE_DRIVERS "Include the drivers in the build" ON)
 option(INCLUDE_TESTS "Include the test system in the build" OFF)
 
-set(CMAKE_AMCF_PLUGINNAME Examples/LPBFSystem)
+set(CMAKE_AMCF_PLUGINNAME Examples/MySLM)
 
 set(CMAKE_AMCF_PROJECTDIR ${PROJECT_BINARY_DIR})
 
