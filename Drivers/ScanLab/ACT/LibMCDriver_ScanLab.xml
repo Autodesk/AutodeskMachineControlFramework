@@ -211,8 +211,11 @@
 		<error name="COULDNOTCONVERTLASERPOWERTOWATTS" code="1159" description="Could not convert laser power to watts." />
 		<error name="COULDNOTCONVERTLASERPOWERTOPERCENT" code="1160" description="Could not convert laser power to percent." />
 		<error name="INVALIDDEFOCUSCORRECTIONTABLE" code="1161" description="Invalid defocus correction table." />
-		<error name="DEFOCUSCORRECTIONNOTENABLED" code="1162" description="Defocus correction by power is not enabled." />			
-							
+		<error name="DEFOCUSCORRECTIONNOTENABLED" code="1162" description="Defocus correction by power is not enabled." />
+		<error name="INVALIDMINIMUMJUMPDISTANCE" code="1163" description="Invalid minimum jump distance." />
+		<error name="INVALIDMINIMUMJUMPDISTANCEINPROFILE" code="1164" description="Invalid minimum jump distance in profile." />
+		<error name="MINIMUMJUMPDISTANCEPROVIDEDTWICEINPROFILE" code="1165" description="Minimum jump distance provided twice in profile." />
+
 	</errors>
 
 
@@ -1459,6 +1462,14 @@ Custom implementation
 		</method>
 		
 		<method name="DisableLineSubdivision" description="Disables the subdivision of mark lines.">
+		</method>
+
+		<method name="SetMinimumJumpDistance" description="Sets the minimum jump distance. Jumps shorter than this distance, measured from the current scan position, are not written to the list, so the following mark starts at the current scan position and no skywriting is added for the jump. Jumps to the current scan position are never written. Default is 0. A segment profile can override it for the jumps of that segment with the value minimumdistance (in mm) or minimumdistance_bits (in RTC bits) in the namespace http://schemas.scanlab.com/jump/2026/10.">
+			<param name="MinimumJumpDistanceInMM" type="double" pass="in" description="Minimum jump distance in mm. 0 disables the check. MUST be between 0 and 1 mm." />
+		</method>
+
+		<method name="GetMinimumJumpDistance" description="Returns the minimum jump distance.">
+			<param name="MinimumJumpDistanceInMM" type="double" pass="return" description="Minimum jump distance in mm. 0 if disabled." />
 		</method>
 		
 		<method name="ReadMultiMCBSP" description="Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.">

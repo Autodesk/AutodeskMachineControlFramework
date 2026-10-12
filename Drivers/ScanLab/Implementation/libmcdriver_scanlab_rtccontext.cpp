@@ -579,6 +579,7 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
 	m_pPowerMapping = std::make_shared<CRTCPowerMapping>();
+	m_pJumpFilter = std::make_shared<CRTCJumpFilter>();
 
 	if (pDriverEnvironment.get () == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -1211,11 +1212,10 @@ void CRTCContext::jumpAbsoluteEx(double dTargetXInMM, double dTargetYInMM)
 	double dTargetXInUnits = round((dTargetXInMM - m_dLaserOriginX) * m_dCorrectionFactor);
 	double dTargetYInUnits = round((dTargetYInMM - m_dLaserOriginY) * m_dCorrectionFactor);
 
-	int nTargetX = (int32_t)dTargetXInUnits;
-	int nTargetY = (int32_t)dTargetYInUnits;
+	int32_t nTargetX = (int32_t)dTargetXInUnits;
+	int32_t nTargetY = (int32_t)dTargetYInUnits;
 
-	// Avoid Null Jumps!
-	if ((nTargetX != m_nCurrentScanPositionX) || (nTargetY != m_nCurrentScanPositionY)) {
+	if (m_pJumpFilter->jumpIsNeeded(m_nCurrentScanPositionX, m_nCurrentScanPositionY, nTargetX, nTargetY, m_dCorrectionFactor)) {
 		m_pScanLabSDK->n_jump_abs(m_CardNo, nTargetX, nTargetY);
 		m_nCurrentScanPositionX = nTargetX;
 		m_nCurrentScanPositionY = nTargetY;
@@ -1856,6 +1856,17 @@ void CRTCContext::DisableLineSubdivision()
 	m_dLineSubdivisionThreshold = RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD;
 	m_bEnableLineSubdivision = false;
 
+}
+
+void CRTCContext::SetMinimumJumpDistance(const LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM)
+{
+	if (!m_pJumpFilter->setMinimumJumpDistance(dMinimumJumpDistanceInMM))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCE, "Invalid minimum jump distance: " + std::to_string(dMinimumJumpDistanceInMM));
+}
+
+LibMCDriver_ScanLab_double CRTCContext::GetMinimumJumpDistance()
+{
+	return m_pJumpFilter->getMinimumJumpDistance();
 }
 
 
@@ -3257,6 +3268,34 @@ int64_t readSkywritingLaserOnShiftIn64thus(LibMCEnv::CToolpathLayer* pLayer, uin
 }
 
 
+void updateMinimumJumpDistanceOverride(LibMCEnv::CToolpathLayer* pLayer, uint32_t nSegmentIndex, double dBitsPerMM, CRTCJumpFilter* pJumpFilter)
+{
+	bool bHasValueInMM = pLayer->SegmentProfileHasValue(nSegmentIndex, RTCJUMPFILTER_PROFILENAMESPACE, RTCJUMPFILTER_PROFILEVALUE_MM);
+	bool bHasValueInBits = pLayer->SegmentProfileHasValue(nSegmentIndex, RTCJUMPFILTER_PROFILENAMESPACE, RTCJUMPFILTER_PROFILEVALUE_BITS);
+
+	double dValueInMM = 0.0;
+	if (bHasValueInMM)
+		dValueInMM = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, RTCJUMPFILTER_PROFILENAMESPACE, RTCJUMPFILTER_PROFILEVALUE_MM);
+
+	double dValueInBits = 0.0;
+	if (bHasValueInBits)
+		dValueInBits = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, RTCJUMPFILTER_PROFILENAMESPACE, RTCJUMPFILTER_PROFILEVALUE_BITS);
+
+	double dMinimumJumpDistanceInMM = 0.0;
+	switch (CRTCJumpFilter::resolveSegmentOverride(bHasValueInMM, dValueInMM, bHasValueInBits, dValueInBits, dBitsPerMM, dMinimumJumpDistanceInMM)) {
+	case eRTCJumpFilterOverride::Valid:
+		pJumpFilter->setSegmentOverride(dMinimumJumpDistanceInMM);
+		break;
+	case eRTCJumpFilterOverride::NoOverride:
+		pJumpFilter->clearSegmentOverride();
+		break;
+	case eRTCJumpFilterOverride::ProvidedTwice:
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MINIMUMJUMPDISTANCEPROVIDEDTWICEINPROFILE);
+	default:
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCEINPROFILE, "Invalid minimum jump distance in profile of segment " + std::to_string(nSegmentIndex));
+	}
+}
+
 int64_t readSkywritingRunInPhaseInBits(LibMCEnv::CToolpathLayer* pLayer, uint32_t nSegmentIndex)
 {
 	// We think 1 Million should be enough, even if RTC Documentation says it can go up to 2^32
@@ -3355,6 +3394,8 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 		nCustomPostDelaySegmentAttributeID = (int32_t)pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/delay/2023/01", "postdelay");
 	}
 
+	CRTCJumpFilterSegmentScope jumpFilterSegmentScope(m_pJumpFilter.get());
+
 	uint32_t nSegmentCount = pLayer->GetSegmentCount();
 	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 
@@ -3428,6 +3469,8 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 			}
 
 			if (nLaserIndexOfSegment == nCurrentLaserIndex) {
+
+				updateMinimumJumpDistanceOverride(pLayer.get(), nSegmentIndex, m_dCorrectionFactor, m_pJumpFilter.get());
 
 				int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
 

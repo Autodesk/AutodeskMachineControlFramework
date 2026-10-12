@@ -36,6 +36,8 @@ Abstract: This is the class declaration of CRTCContext
 #endif
 
 // Include custom headers here.
+#include "libmcdriver_scanlab_rtcjumpfilter.hpp"
+
 #include <set>
 #include <atomic>
 
@@ -266,6 +268,8 @@ protected:
 	// Optional defocus correction based on laser power (for thermal lensing compensation).
 	// nullptr when disabled.
 	PRTCDefocusCorrectionByPower m_pDefocusCorrectionByPower;
+
+	PRTCJumpFilter m_pJumpFilter;
 	
 	void writeJumpSpeed (float jumpSpeed);
 
@@ -603,6 +607,10 @@ public:
 	void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold) override;
 
 	void DisableLineSubdivision() override;
+
+	void SetMinimumJumpDistance(const LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM) override;
+
+	LibMCDriver_ScanLab_double GetMinimumJumpDistance() override;
 
 	LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) override;
 

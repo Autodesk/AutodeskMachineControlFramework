@@ -2265,6 +2265,24 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablelinesubdivision(LibMCDriver_ScanLab_RTCContext pRTCContext);
 
 /**
+* Sets the minimum jump distance. Jumps shorter than this distance, measured from the current scan position, are not written to the list, so the following mark starts at the current scan position and no skywriting is added for the jump. Jumps to the current scan position are never written. Default is 0. A segment profile can override it for the jumps of that segment with the value minimumdistance (in mm) or minimumdistance_bits (in RTC bits) in the namespace http://schemas.scanlab.com/jump/2026/10.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dMinimumJumpDistanceInMM - Minimum jump distance in mm. 0 disables the check. MUST be between 0 and 1 mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setminimumjumpdistance(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM);
+
+/**
+* Returns the minimum jump distance.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pMinimumJumpDistanceInMM - Minimum jump distance in mm. 0 if disabled.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getminimumjumpdistance(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pMinimumJumpDistanceInMM);
+
+/**
 * Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.
 *
 * @param[in] pRTCContext - RTCContext instance.

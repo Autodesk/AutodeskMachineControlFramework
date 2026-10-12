@@ -2001,6 +2001,18 @@ public:
 	virtual void DisableLineSubdivision() = 0;
 
 	/**
+	* IRTCContext::SetMinimumJumpDistance - Sets the minimum jump distance. Jumps shorter than this distance, measured from the current scan position, are not written to the list, so the following mark starts at the current scan position and no skywriting is added for the jump. Jumps to the current scan position are never written. Default is 0. A segment profile can override it for the jumps of that segment with the value minimumdistance (in mm) or minimumdistance_bits (in RTC bits) in the namespace http://schemas.scanlab.com/jump/2026/10.
+	* @param[in] dMinimumJumpDistanceInMM - Minimum jump distance in mm. 0 disables the check. MUST be between 0 and 1 mm.
+	*/
+	virtual void SetMinimumJumpDistance(const LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM) = 0;
+
+	/**
+	* IRTCContext::GetMinimumJumpDistance - Returns the minimum jump distance.
+	* @return Minimum jump distance in mm. 0 if disabled.
+	*/
+	virtual LibMCDriver_ScanLab_double GetMinimumJumpDistance() = 0;
+
+	/**
 	* IRTCContext::ReadMultiMCBSP - Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.
 	* @param[in] nRegisterNo - Number of the register to read.
 	* @return Value of the register.

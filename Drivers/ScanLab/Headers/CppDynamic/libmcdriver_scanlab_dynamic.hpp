@@ -375,6 +375,9 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOPERCENT: return "COULDNOTCONVERTLASERPOWERTOPERCENT";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE: return "INVALIDDEFOCUSCORRECTIONTABLE";
 			case LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED: return "DEFOCUSCORRECTIONNOTENABLED";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCE: return "INVALIDMINIMUMJUMPDISTANCE";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCEINPROFILE: return "INVALIDMINIMUMJUMPDISTANCEINPROFILE";
+			case LIBMCDRIVER_SCANLAB_ERROR_MINIMUMJUMPDISTANCEPROVIDEDTWICEINPROFILE: return "MINIMUMJUMPDISTANCEPROVIDEDTWICEINPROFILE";
 		}
 		return "UNKNOWN";
 	}
@@ -552,6 +555,9 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOPERCENT: return "Could not convert laser power to percent.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE: return "Invalid defocus correction table.";
 			case LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED: return "Defocus correction by power is not enabled.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCE: return "Invalid minimum jump distance.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCEINPROFILE: return "Invalid minimum jump distance in profile.";
+			case LIBMCDRIVER_SCANLAB_ERROR_MINIMUMJUMPDISTANCEPROVIDEDTWICEINPROFILE: return "Minimum jump distance provided twice in profile.";
 		}
 		return "unknown error";
 	}
@@ -1086,6 +1092,8 @@ public:
 	inline void DisablePowerModulation();
 	inline void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold);
 	inline void DisableLineSubdivision();
+	inline void SetMinimumJumpDistance(const LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM);
+	inline LibMCDriver_ScanLab_double GetMinimumJumpDistance();
 	inline LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo);
 	inline PUARTConnection CreateUARTConnection(const LibMCDriver_ScanLab_uint32 nDesiredBaudRate);
 	inline void EnableScanAhead(const LibMCDriver_ScanLab_uint32 nHeadNo, const LibMCDriver_ScanLab_uint32 nTableNo);
@@ -1570,6 +1578,8 @@ public:
 		pWrapperTable->m_RTCContext_DisablePowerModulation = nullptr;
 		pWrapperTable->m_RTCContext_EnableLineSubdivision = nullptr;
 		pWrapperTable->m_RTCContext_DisableLineSubdivision = nullptr;
+		pWrapperTable->m_RTCContext_SetMinimumJumpDistance = nullptr;
+		pWrapperTable->m_RTCContext_GetMinimumJumpDistance = nullptr;
 		pWrapperTable->m_RTCContext_ReadMultiMCBSP = nullptr;
 		pWrapperTable->m_RTCContext_CreateUARTConnection = nullptr;
 		pWrapperTable->m_RTCContext_EnableScanAhead = nullptr;
@@ -3636,6 +3646,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetMinimumJumpDistance = (PLibMCDriver_ScanLabRTCContext_SetMinimumJumpDistancePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setminimumjumpdistance");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetMinimumJumpDistance = (PLibMCDriver_ScanLabRTCContext_SetMinimumJumpDistancePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setminimumjumpdistance");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetMinimumJumpDistance == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetMinimumJumpDistance = (PLibMCDriver_ScanLabRTCContext_GetMinimumJumpDistancePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getminimumjumpdistance");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetMinimumJumpDistance = (PLibMCDriver_ScanLabRTCContext_GetMinimumJumpDistancePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getminimumjumpdistance");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetMinimumJumpDistance == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_ReadMultiMCBSP = (PLibMCDriver_ScanLabRTCContext_ReadMultiMCBSPPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_readmultimcbsp");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_ReadMultiMCBSP = (PLibMCDriver_ScanLabRTCContext_ReadMultiMCBSPPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_readmultimcbsp");
@@ -5306,6 +5334,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disablelinesubdivision", (void**)&(pWrapperTable->m_RTCContext_DisableLineSubdivision));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableLineSubdivision == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setminimumjumpdistance", (void**)&(pWrapperTable->m_RTCContext_SetMinimumJumpDistance));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetMinimumJumpDistance == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getminimumjumpdistance", (void**)&(pWrapperTable->m_RTCContext_GetMinimumJumpDistance));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetMinimumJumpDistance == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_readmultimcbsp", (void**)&(pWrapperTable->m_RTCContext_ReadMultiMCBSP));
@@ -8053,6 +8089,27 @@ public:
 	void CRTCContext::DisableLineSubdivision()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableLineSubdivision(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::SetMinimumJumpDistance - Sets the minimum jump distance. Jumps shorter than this distance, measured from the current scan position, are not written to the list, so the following mark starts at the current scan position and no skywriting is added for the jump. Jumps to the current scan position are never written. Default is 0. A segment profile can override it for the jumps of that segment with the value minimumdistance (in mm) or minimumdistance_bits (in RTC bits) in the namespace http://schemas.scanlab.com/jump/2026/10.
+	* @param[in] dMinimumJumpDistanceInMM - Minimum jump distance in mm. 0 disables the check. MUST be between 0 and 1 mm.
+	*/
+	void CRTCContext::SetMinimumJumpDistance(const LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetMinimumJumpDistance(m_pHandle, dMinimumJumpDistanceInMM));
+	}
+	
+	/**
+	* CRTCContext::GetMinimumJumpDistance - Returns the minimum jump distance.
+	* @return Minimum jump distance in mm. 0 if disabled.
+	*/
+	LibMCDriver_ScanLab_double CRTCContext::GetMinimumJumpDistance()
+	{
+		LibMCDriver_ScanLab_double resultMinimumJumpDistanceInMM = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetMinimumJumpDistance(m_pHandle, &resultMinimumJumpDistanceInMM));
+		
+		return resultMinimumJumpDistanceInMM;
 	}
 	
 	/**

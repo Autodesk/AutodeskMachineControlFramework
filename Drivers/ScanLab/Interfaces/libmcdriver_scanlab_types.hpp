@@ -265,6 +265,9 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOPERCENT 1160 /** Could not convert laser power to percent. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE 1161 /** Invalid defocus correction table. */
 #define LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED 1162 /** Defocus correction by power is not enabled. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCE 1163 /** Invalid minimum jump distance. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCEINPROFILE 1164 /** Invalid minimum jump distance in profile. */
+#define LIBMCDRIVER_SCANLAB_ERROR_MINIMUMJUMPDISTANCEPROVIDEDTWICEINPROFILE 1165 /** Minimum jump distance provided twice in profile. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -442,6 +445,9 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTCONVERTLASERPOWERTOPERCENT: return "Could not convert laser power to percent.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE: return "Invalid defocus correction table.";
     case LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED: return "Defocus correction by power is not enabled.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCE: return "Invalid minimum jump distance.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCEINPROFILE: return "Invalid minimum jump distance in profile.";
+    case LIBMCDRIVER_SCANLAB_ERROR_MINIMUMJUMPDISTANCEPROVIDEDTWICEINPROFILE: return "Minimum jump distance provided twice in profile.";
     default: return "unknown error";
   }
 }
