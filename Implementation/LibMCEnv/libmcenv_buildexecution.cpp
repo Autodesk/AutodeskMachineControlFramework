@@ -416,7 +416,7 @@ std::string CBuildExecution::StoreDataTable(const std::string& sIdentifier, cons
 
 	std::string sNormalizedUserUUID;
 	if (!sUserUUID.empty())
-		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sNormalizedUserUUID);
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 	else
 		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 

@@ -420,7 +420,7 @@ std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::st
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLENAME);
 	if (sIdentifier.empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER);
-	if (AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER, "invalid datatable identifier: " + sIdentifier);
 
 	if (pFieldDataInstance == nullptr)
@@ -428,7 +428,7 @@ std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::st
 
 	std::string sNormalizedUserUUID;
 	if (!sUserUUID.empty())
-		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sNormalizedUserUUID);
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 	else
 		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 
