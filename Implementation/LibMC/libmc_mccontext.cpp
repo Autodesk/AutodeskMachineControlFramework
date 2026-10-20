@@ -310,8 +310,27 @@ void CMCContext::SetParameterOverride(const std::string& sParameterPath, const s
     pStateMachineData->extractParameterDetailsFromDotString(sParameterPath, sParameterInstance, sParameterGroup, sParameterName, false, false);
 
     auto pParameterInstanceHandler = pStateMachineData->getParameterHandler(sParameterInstance);
-    auto pParamaterGroup = pParameterInstanceHandler->findGroup(sParameterGroup, true);
-	pParamaterGroup->setParameterValueByName(sParameterName, sParameterValue);
+    auto pParameterGroup = pParameterInstanceHandler->findGroup(sParameterGroup, true);
+
+    auto eDataType = pParameterGroup->getParameterDataTypeByName(sParameterName);
+
+    switch (eDataType) {
+    case AMC::eParameterDataType::String:
+    case AMC::eParameterDataType::UUID:
+        pParameterGroup->setParameterValueByName(sParameterName, sParameterValue);
+        break;
+    case AMC::eParameterDataType::Integer:
+        pParameterGroup->setIntParameterValueByName(sParameterName, AMCCommon::CUtils::stringToInteger(sParameterValue));
+        break;
+    case AMC::eParameterDataType::Double:
+        pParameterGroup->setDoubleParameterValueByName(sParameterName, AMCCommon::CUtils::stringToDouble(sParameterValue));
+        break;
+    case AMC::eParameterDataType::Bool:
+        pParameterGroup->setBoolParameterValueByName(sParameterName, AMCCommon::CUtils::stringToBool(sParameterValue));
+        break;
+    default:
+        throw ELibMCCustomException(LIBMC_ERROR_INVALIDVARIABLETYPE, sParameterPath);
+    }
 }
 
 
