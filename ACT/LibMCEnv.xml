@@ -6419,6 +6419,12 @@
 		<param name="BuildIterator" type="class" class="BuildIterator" pass="return" description="Iterator for build jobs, ordered newest first." />
 	</method>
 
+	<method name="CreateBuildJobFromStorage" description="Creates a new build job from an existing storage stream. The storage stream must contain a valid 3MF file.">
+		<param name="StorageStreamUUID" type="string" pass="in" description="UUID of the storage stream containing the 3MF file." />
+		<param name="BuildName" type="string" pass="in" description="Display name for the build job. Must not be empty." />
+		<param name="BuildUUID" type="string" pass="return" description="UUID of the newly created build job." />
+	</method>
+
 		<method name="CreateDiscreteField2D" description="Creates an empty discrete field.">
 			<param name="PixelCountX" type="uint32" pass="in" description="Pixel count in X. MUST be positive." />
 			<param name="PixelCountY" type="uint32" pass="in" description="Pixel count in Y. MUST be positive." />

@@ -9063,6 +9063,14 @@ public:
 	virtual IBuildIterator * GetRecentBuildJobs(const LibMCEnv_uint32 nMaxCount) = 0;
 
 	/**
+	* IUIEnvironment::CreateBuildJobFromStorage - Creates a new build job from an existing storage stream. The storage stream must contain a valid 3MF file.
+	* @param[in] sStorageStreamUUID - UUID of the storage stream containing the 3MF file.
+	* @param[in] sBuildName - Display name for the build job. Must not be empty.
+	* @return UUID of the newly created build job.
+	*/
+	virtual std::string CreateBuildJobFromStorage(const std::string & sStorageStreamUUID, const std::string & sBuildName) = 0;
+
+	/**
 	* IUIEnvironment::CreateDiscreteField2D - Creates an empty discrete field.
 	* @param[in] nPixelCountX - Pixel count in X. MUST be positive.
 	* @param[in] nPixelCountY - Pixel count in Y. MUST be positive.

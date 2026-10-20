@@ -11869,6 +11869,19 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBuildExecutionPtr) (LibMCEnv_
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetRecentBuildJobsPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nMaxCount, LibMCEnv_BuildIterator * pBuildIterator);
 
 /**
+* Creates a new build job from an existing storage stream. The storage stream must contain a valid 3MF file.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pStorageStreamUUID - UUID of the storage stream containing the 3MF file.
+* @param[in] pBuildName - Display name for the build job. Must not be empty.
+* @param[in] nBuildUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBuildUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBuildUUIDBuffer -  buffer of UUID of the newly created build job., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateBuildJobFromStoragePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pStorageStreamUUID, const char * pBuildName, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
+
+/**
 * Creates an empty discrete field.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -13436,6 +13449,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_HasBuildExecutionPtr m_UIEnvironment_HasBuildExecution;
 	PLibMCEnvUIEnvironment_GetBuildExecutionPtr m_UIEnvironment_GetBuildExecution;
 	PLibMCEnvUIEnvironment_GetRecentBuildJobsPtr m_UIEnvironment_GetRecentBuildJobs;
+	PLibMCEnvUIEnvironment_CreateBuildJobFromStoragePtr m_UIEnvironment_CreateBuildJobFromStorage;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr m_UIEnvironment_CreateDiscreteField2D;
 	PLibMCEnvUIEnvironment_CreateDiscreteField2DFromImagePtr m_UIEnvironment_CreateDiscreteField2DFromImage;
 	PLibMCEnvUIEnvironment_CheckPermissionPtr m_UIEnvironment_CheckPermission;

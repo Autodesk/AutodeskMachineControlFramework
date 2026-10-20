@@ -3819,6 +3819,7 @@ public:
 	inline bool HasBuildExecution(const std::string & sExecutionUUID);
 	inline PBuildExecution GetBuildExecution(const std::string & sExecutionUUID);
 	inline PBuildIterator GetRecentBuildJobs(const LibMCEnv_uint32 nMaxCount);
+	inline std::string CreateBuildJobFromStorage(const std::string & sStorageStreamUUID, const std::string & sBuildName);
 	inline PDiscreteFieldData2D CreateDiscreteField2D(const LibMCEnv_uint32 nPixelCountX, const LibMCEnv_uint32 nPixelCountY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue);
 	inline PDiscreteFieldData2D CreateDiscreteField2DFromImage(classParam<CImageData> pImageDataInstance, const LibMCEnv_double dBlackValue, const LibMCEnv_double dWhiteValue, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY);
 	inline bool CheckPermission(const std::string & sPermissionIdentifier);
@@ -5044,6 +5045,7 @@ public:
 		pWrapperTable->m_UIEnvironment_HasBuildExecution = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBuildExecution = nullptr;
 		pWrapperTable->m_UIEnvironment_GetRecentBuildJobs = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateBuildJobFromStorage = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2DFromImage = nullptr;
 		pWrapperTable->m_UIEnvironment_CheckPermission = nullptr;
@@ -15066,6 +15068,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateBuildJobFromStorage = (PLibMCEnvUIEnvironment_CreateBuildJobFromStoragePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createbuildjobfromstorage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateBuildJobFromStorage = (PLibMCEnvUIEnvironment_CreateBuildJobFromStoragePtr) dlsym(hLibrary, "libmcenv_uienvironment_createbuildjobfromstorage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateBuildJobFromStorage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = (PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_creatediscretefield2d");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_CreateDiscreteField2D = (PLibMCEnvUIEnvironment_CreateDiscreteField2DPtr) dlsym(hLibrary, "libmcenv_uienvironment_creatediscretefield2d");
@@ -19887,6 +19898,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getrecentbuildjobs", (void**)&(pWrapperTable->m_UIEnvironment_GetRecentBuildJobs));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetRecentBuildJobs == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createbuildjobfromstorage", (void**)&(pWrapperTable->m_UIEnvironment_CreateBuildJobFromStorage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateBuildJobFromStorage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_creatediscretefield2d", (void**)&(pWrapperTable->m_UIEnvironment_CreateDiscreteField2D));
@@ -35361,6 +35376,23 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CBuildIterator>(m_pWrapper, hBuildIterator);
+	}
+	
+	/**
+	* CUIEnvironment::CreateBuildJobFromStorage - Creates a new build job from an existing storage stream. The storage stream must contain a valid 3MF file.
+	* @param[in] sStorageStreamUUID - UUID of the storage stream containing the 3MF file.
+	* @param[in] sBuildName - Display name for the build job. Must not be empty.
+	* @return UUID of the newly created build job.
+	*/
+	std::string CUIEnvironment::CreateBuildJobFromStorage(const std::string & sStorageStreamUUID, const std::string & sBuildName)
+	{
+		LibMCEnv_uint32 bytesNeededBuildUUID = 0;
+		LibMCEnv_uint32 bytesWrittenBuildUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateBuildJobFromStorage(m_pHandle, sStorageStreamUUID.c_str(), sBuildName.c_str(), 0, &bytesNeededBuildUUID, nullptr));
+		std::vector<char> bufferBuildUUID(bytesNeededBuildUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateBuildJobFromStorage(m_pHandle, sStorageStreamUUID.c_str(), sBuildName.c_str(), bytesNeededBuildUUID, &bytesWrittenBuildUUID, &bufferBuildUUID[0]));
+		
+		return std::string(&bufferBuildUUID[0]);
 	}
 	
 	/**

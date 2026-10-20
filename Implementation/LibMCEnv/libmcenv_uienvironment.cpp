@@ -849,6 +849,96 @@ IBuildIterator* CUIEnvironment::GetRecentBuildJobs(const LibMCEnv_uint32 nMaxCou
     return pResultIterator.release();
 }
 
+std::string CUIEnvironment::CreateBuildJobFromStorage(const std::string& sStorageStreamUUID, const std::string& sBuildName)
+{
+    // Validate inputs
+    std::string sNormalizedStorageUUID = AMCCommon::CUtils::normalizeUUIDString(sStorageStreamUUID);
+
+    if (sBuildName.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "build name must not be empty");
+
+    // Get services
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pStorage = pDataModel->CreateStorage();
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+
+    // Verify stream exists and is 3MF
+    if (!pStorage->StreamIsReady(sNormalizedStorageUUID))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "storage stream does not exist: " + sNormalizedStorageUUID);
+
+    auto pStream = pStorage->RetrieveStream(sNormalizedStorageUUID);
+    if (pStream->GetMIMEType() != "application/3mf")
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "storage stream is not a 3MF file (MIME type: " + pStream->GetMIMEType() + ")");
+
+    // Create build job
+    std::string sBuildUUID = AMCCommon::CUtils::createUUID();
+    auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+    pBuildJobHandler->CreateJob(
+        sBuildUUID,
+        sBuildName,
+        m_pAPIAuth->getUserUUID(),
+        sNormalizedStorageUUID,
+        pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970()
+    );
+
+    // Validate and extract metadata
+    auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+    auto pToolpathHandler = m_pUISystemState->getToolpathHandler();
+
+    pBuildJob->StartValidating();
+
+    std::set<std::string> attachmentRelationsToRead;
+    AMC::CToolpathEntity toolpathEntity(
+        pDataModel,
+        sNormalizedStorageUUID,
+        pToolpathHandler->getLib3MFWrapper(),
+        sBuildName,
+        true,
+        attachmentRelationsToRead
+    );
+
+    pBuildJob->FinishValidating(toolpathEntity.getLayerCount());
+
+    // Add toolpath data
+    pBuildJob->AddJobData(
+        pStream->GetContextIdentifier(),
+        pStream->GetName(),
+        pStream,
+        LibMCData::eCustomDataType::Toolpath,
+        m_pAPIAuth->getUserUUID(),
+        pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970()
+    );
+
+    // Extract and add thumbnail if present
+    std::vector<uint8_t> thumbNailBuffer;
+    std::string thumbNailMimeType;
+    if (toolpathEntity.readThumbnail(thumbNailBuffer, thumbNailMimeType)) {
+        std::string sThumbnailUUID = AMCCommon::CUtils::createUUID();
+        pStorage->StoreNewStream(
+            sThumbnailUUID,
+            "thumbnail",
+            thumbNailMimeType,
+            thumbNailBuffer,
+            m_pAPIAuth->getUserUUID(),
+            pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970()
+        );
+        auto pThumbnailStream = pStorage->RetrieveStream(sThumbnailUUID);
+
+        pBuildJob->AddJobData(
+            "thumbnail",
+            "thumbnail",
+            pThumbnailStream,
+            LibMCData::eCustomDataType::Thumbnail,
+            m_pAPIAuth->getUserUUID(),
+            pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970()
+        );
+
+        pBuildJob->SetThumbnailStreamUUID(sThumbnailUUID);
+    }
+
+    return sBuildUUID;
+}
+
 
 IDiscreteFieldData2D* CUIEnvironment::CreateDiscreteField2D(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv_double dOriginX, const LibMCEnv_double dOriginY, const LibMCEnv_double dDefaultValue)
 {

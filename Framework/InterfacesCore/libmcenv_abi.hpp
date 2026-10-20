@@ -11882,6 +11882,19 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getbuildexecution(LibMCE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getrecentbuildjobs(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nMaxCount, LibMCEnv_BuildIterator * pBuildIterator);
 
 /**
+* Creates a new build job from an existing storage stream. The storage stream must contain a valid 3MF file.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pStorageStreamUUID - UUID of the storage stream containing the 3MF file.
+* @param[in] pBuildName - Display name for the build job. Must not be empty.
+* @param[in] nBuildUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBuildUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBuildUUIDBuffer -  buffer of UUID of the newly created build job., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createbuildjobfromstorage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pStorageStreamUUID, const char * pBuildName, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
+
+/**
 * Creates an empty discrete field.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
