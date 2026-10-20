@@ -7,6 +7,8 @@
 	import Image from '@lucide/svelte/icons/image';
 
 	import { useModuleTick } from '$lib/amcf/poll.svelte';
+	import { paginate } from '$lib/amcf/paging';
+	import ListPager from '$lib/amcf/ListPager.svelte';
 
 	let { module, app }: { module: any; app: any } = $props();
 	const poll = useModuleTick(() => module);
@@ -15,6 +17,9 @@
 	let entries = $derived.by(() => { poll.v; return [...(module.entries || [])]; });
 	let entrybuttons = $derived.by(() => { poll.v; return [...(module.entrybuttons || [])]; });
 	let loaded = $derived.by(() => { poll.v; return module.loaded === true; });
+	let entriesPerPage = $derived.by(() => { poll.v; return module.entriesperpage; });
+	let pageNumber = $state(1);
+	let listPage = $derived(paginate(entries, pageNumber, entriesPerPage));
 	let detailItem: any = $state(null);
 
 	const nullUUID = '00000000-0000-0000-0000-000000000000';
@@ -70,7 +75,7 @@
 
 {#if visible}
 	<div class="w-full border rounded-md overflow-hidden">
-		<ScrollArea class="max-h-[500px]">
+		<ScrollArea class="*:data-[slot=scroll-area-viewport]:max-h-[500px]">
 			<Table.Root>
 				<Table.Header class="sticky top-0 bg-muted z-10">
 					<Table.Row>
@@ -91,7 +96,7 @@
 							</Table.Cell>
 						</Table.Row>
 					{:else}
-						{#each entries as exec, idx (exec.executionUUID || idx)}
+						{#each listPage.rows as exec, idx (exec.executionUUID || idx)}
 							<Table.Row
 								class="hover:bg-muted/50 transition-colors cursor-pointer"
 								onclick={() => { detailItem = exec; }}
@@ -137,6 +142,7 @@
 				</Table.Body>
 			</Table.Root>
 		</ScrollArea>
+		<ListPager {listPage} onPageChange={(page) => { pageNumber = page; }} />
 	</div>
 
 	<!-- Detail dialog -->
