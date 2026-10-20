@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_STATEMACHINEINSTANCE
 #define __AMC_STATEMACHINEINSTANCE
 
+#include <cstdint>
 #include "amc_statemachinestate.hpp"
 #include "libmcplugin_dynamic.hpp"
 #include "libmcenv_stateenvironment.hpp"

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_STRINGRESOURCE
 #define __AMC_STRINGRESOURCE
 
+#include <cstdint>
 #include <memory>
 #include <string>
 

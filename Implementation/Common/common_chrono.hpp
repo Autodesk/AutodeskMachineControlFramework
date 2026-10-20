@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_CHRONO
 #define __AMC_CHRONO
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>

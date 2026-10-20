@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_DRIVER
 #define __AMC_DRIVER
 
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_API_RESPONSE
 #define __AMC_API_RESPONSE
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #include "amc_api_types.hpp"

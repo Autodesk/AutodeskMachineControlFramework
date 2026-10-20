@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_SYSTEMSTATE
 #define __AMC_UI_SYSTEMSTATE
 
+#include <cstdint>
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
 #include "common_chrono.hpp"

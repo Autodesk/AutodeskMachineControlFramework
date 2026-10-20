@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMCCOMMON_IMPORTSTREAM
 #define __AMCCOMMON_IMPORTSTREAM
 
+#include <cstdint>
 #include <vector>
 #include <string>
 #include <memory>

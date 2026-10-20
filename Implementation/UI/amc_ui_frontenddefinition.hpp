@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_FRONTENDDEFINITION
 #define __AMC_UI_FRONTENDDEFINITION
 
+#include <cstdint>
 #include "common_chrono.hpp"
 
 #include "amc_ui_expression.hpp"

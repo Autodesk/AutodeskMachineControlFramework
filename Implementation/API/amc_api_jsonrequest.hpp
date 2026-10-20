@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_API_JSONREQUEST
 #define __AMC_API_JSONREQUEST
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <map>

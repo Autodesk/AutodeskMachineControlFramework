@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMC_API_TYPES
 
 
+
+#include <cstdint>
 namespace AMC {
 
 	enum class eAPIRequestType : uint32_t {

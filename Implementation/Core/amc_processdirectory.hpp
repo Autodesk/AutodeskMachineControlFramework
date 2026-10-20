@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CProcessController
 #define __AMC_PROCESSDIRECTORY
 
 
+#include <cstdint>
 #include "Common/common_chrono.hpp"
 #include "Common/common_exportstream_native.hpp"
 

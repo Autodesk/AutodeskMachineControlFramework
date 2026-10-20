@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __COMMON_PORTABLEZIPWRITER
 #define __COMMON_PORTABLEZIPWRITER
 
+#include <cstdint>
 #include <string>
 #include <list>
 

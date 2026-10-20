@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UTILS
 #define __AMC_UTILS
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>

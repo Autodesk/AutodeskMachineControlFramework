@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_GLSCENE
 #define __AMC_UI_MODULE_GLSCENE
 
+#include <cstdint>
 #include "header_protection.hpp"
 #include "amc_ui_module_item.hpp"
 

@@ -39,6 +39,7 @@ Abstract: This is the class declaration of CPLCCommand
 
 
 #include <memory>
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <map>

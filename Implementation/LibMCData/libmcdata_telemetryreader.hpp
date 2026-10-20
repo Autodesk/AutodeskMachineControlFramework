@@ -35,6 +35,7 @@ Abstract: This is the class declaration of CTelemetryReader
 #ifndef __LIBMCDATA_TELEMETRYREADER
 #define __LIBMCDATA_TELEMETRYREADER
 
+#include <cstdint>
 #include "libmcdata_interfaces.hpp"
 #include "libmcdata_telemetrychunkdata.hpp"
 

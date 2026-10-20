@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_STATEMACHINESTATE
 #define __AMC_STATEMACHINESTATE
 
+#include <cstdint>
 #include <vector>
 #include <string>
 #include <memory>

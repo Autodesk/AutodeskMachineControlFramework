@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_DRIVERHANDLER
 #define __AMC_DRIVERHANDLER
 
+#include <cstdint>
 #include <map>
 #include <list>
 #include <string>

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_JPEG
 #define __AMC_JPEG
 
+#include <cstdint>
 #include <memory>
 #include <vector>
 

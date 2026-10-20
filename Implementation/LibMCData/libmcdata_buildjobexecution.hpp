@@ -35,6 +35,7 @@ Abstract: This is the class declaration of CBuildJobExecution
 #ifndef __LIBMCDATA_BUILDJOBEXECUTION
 #define __LIBMCDATA_BUILDJOBEXECUTION
 
+#include <cstdint>
 #include "libmcdata_interfaces.hpp"
 #include "libmcdata_buildjobexecutiondata.hpp"
 

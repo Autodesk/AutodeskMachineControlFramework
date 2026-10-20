@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMCCOMMON_IMPORTSTREAM_NATIVE
 #define __AMCCOMMON_IMPORTSTREAM_NATIVE
 
+#include <cstdint>
 #include "common_importstream.hpp"
 #include <string>
 #include <iostream>

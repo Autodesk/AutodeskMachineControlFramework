@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_INTERFACES
 #define __AMC_UI_INTERFACES
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 namespace AMC {

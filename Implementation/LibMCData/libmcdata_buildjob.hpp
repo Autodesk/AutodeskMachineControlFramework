@@ -35,6 +35,7 @@ Abstract: This is the class declaration of CBuildJob
 #ifndef __LIBMCDATA_BUILDJOB
 #define __LIBMCDATA_BUILDJOB
 
+#include <cstdint>
 #include "libmcdata_interfaces.hpp"
 
 // Parent classes

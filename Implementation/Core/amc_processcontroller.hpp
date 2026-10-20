@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CProcessController
 #define __AMC_PROCESSCONTROLLER
 
 
+#include <cstdint>
 #include "Common/common_chrono.hpp"
 #include "amc_logger.hpp"
 #include "amc_processdirectory.hpp"

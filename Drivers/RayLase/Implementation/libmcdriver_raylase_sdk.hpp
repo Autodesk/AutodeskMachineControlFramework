@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __LIBMCDRIVER_RAYLASE_SDK
 
 #include <memory>
+#include <cstdint>
 #include <string>
 
 #ifdef _WIN32

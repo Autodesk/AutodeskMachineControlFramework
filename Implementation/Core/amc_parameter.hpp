@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error Never include amc_parameter.hpp from outside of amc_parameter.cpp and amc_parametergroup.cpp
 #endif
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
