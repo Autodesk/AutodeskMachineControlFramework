@@ -3,13 +3,14 @@
 
 	let { module, app }: { module: any; app: any } = $props();
 	const poll = useModuleTick(() => module);
+	const nullUUID = '00000000-0000-0000-0000-000000000000';
 
 	let visible = $derived.by(() => { poll.v; return module.visible !== false; });
 	let imageURL = $derived.by(() => {
 		poll.v;
-		return module.imageresourceuuid && app
-			? app.getImageURL(module.imageresourceuuid)
-			: '';
+		const uuid = module.imageresource;
+		if (!uuid || uuid === nullUUID || !app) return '';
+		return app.getImageURL(uuid);
 	});
 	let maxheight = $derived.by(() => { poll.v; return module.maxheight || 400; });
 	let aspectratio = $derived.by(() => { poll.v; return module.aspectratio || 'auto'; });
