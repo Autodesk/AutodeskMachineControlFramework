@@ -87,7 +87,8 @@ void CAPIHandler_Executions::handleListExecutionsRequest(CJSONWriter& writer, CA
 
 		uint64_t nStartTimeStamp = pExecution->GetStartTimeStampInMicroseconds();
 		uint64_t nEndTimeStamp = 0;
-		if (status == LibMCData::eBuildJobExecutionStatus::Finished) {
+		// Failed (e.g. aborted) executions also have an end time stamp.
+		if ((status == LibMCData::eBuildJobExecutionStatus::Finished) || (status == LibMCData::eBuildJobExecutionStatus::Failed)) {
 			nEndTimeStamp = pExecution->GetEndTimeStampInMicroseconds();
 		}
 
