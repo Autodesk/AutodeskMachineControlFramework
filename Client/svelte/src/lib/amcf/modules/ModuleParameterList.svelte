@@ -422,9 +422,11 @@
 										</button>
 									</Table.Cell>
 								{/if}
+								<!-- Auto-sized columns wrap: unwrapped long descriptions widen the table past the
+								     vertical-only ScrollArea and hide the other columns. Pinned widths keep the ellipsis. -->
 								{#each headers as h (h.value)}
 									<Table.Cell
-										class="text-sm py-1.5 overflow-hidden text-ellipsis"
+										class="text-sm py-1.5 overflow-hidden text-ellipsis {colWidth(h) ? '' : 'whitespace-normal wrap-anywhere'}"
 										style={colWidth(h) ? `width: ${colWidth(h)};` : ''}
 									>
 										{#if h.value === 'paramValue' && isEditable(row)}
