@@ -8,6 +8,7 @@
 	import { useModuleTick } from '$lib/amcf/poll.svelte';
 	import { paginate } from '$lib/amcf/paging';
 	import ListPager from '$lib/amcf/ListPager.svelte';
+	import { triggerSelectEvent, triggerButtonEvent } from '@core/modules/AMCModule_TableUtils.js';
 
 	let { module, app }: { module: any; app: any } = $props();
 	const poll = useModuleTick(() => module);
@@ -37,23 +38,11 @@
 	}
 
 	function selectBuild (build: any) {
-		if (module.selectevent && app) {
-			const formvalues: Record<string, string> = {};
-			if (module.selectionvalueuuid)
-				formvalues[module.selectionvalueuuid] = build.buildUUID;
-			app.triggerUIEvent(module.selectevent, module.uuid, formvalues);
-		}
+		triggerSelectEvent(app, module, build.buildUUID);
 	}
 
 	function triggerButton (btn: any, build: any) {
-		if (btn.selectevent && app) {
-			const formvalues: Record<string, string> = {};
-			if (module.selectionvalueuuid)
-				formvalues[module.selectionvalueuuid] = build.buildUUID;
-			if (module.buttonvalueuuid)
-				formvalues[module.buttonvalueuuid] = build.buildUUID;
-			app.triggerUIEvent(btn.selectevent, module.uuid, formvalues);
-		}
+		triggerButtonEvent(app, module, btn, build.buildUUID);
 	}
 </script>
 
