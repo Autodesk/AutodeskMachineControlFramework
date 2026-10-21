@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '@mdi/font/css/materialdesignicons.min.css';
 	import Home from '@lucide/svelte/icons/house';
 	import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 	import Settings from '@lucide/svelte/icons/settings';
@@ -178,11 +179,18 @@
 	};
 
 	let Icon = $derived(mdiMap[icon] || null);
+	// Names without a lucide equivalent render from the MDI webfont, as in the vue2 client.
+	let isMdiName = $derived(/^mdi-[a-z0-9-]+$/.test(icon));
 </script>
 
 {#if Icon}
 	{@const ResolvedIcon = Icon}
 	<ResolvedIcon class={className} />
+{:else if isMdiName}
+	<!-- The glyph is sized from the box (100cqh), so callers size it with h-*/w-* like a lucide icon. -->
+	<span class="inline-block shrink-0 {className}" style="container-type: size" aria-hidden="true">
+		<i class="mdi {icon} block leading-none" style="font-size: 100cqh"></i>
+	</span>
 {:else if icon}
 	<CircleIcon class={className} />
 {/if}
