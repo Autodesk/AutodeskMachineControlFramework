@@ -105,8 +105,8 @@ namespace AMCUnitTest {
 			assertFalse(filter.jumpIsNeeded(0, 0, 3, 0, BITSPERMM * 2.0), "3 bits with 4 bit minimum");
 			assertTrue(filter.jumpIsNeeded(0, 0, 4, 0, BITSPERMM * 2.0), "4 bits with 4 bit minimum");
 
-			int32_t nMin = std::numeric_limits<int32_t>::min();
-			int32_t nMax = std::numeric_limits<int32_t>::max();
+			int32_t nMin = (std::numeric_limits<int32_t>::min)();
+			int32_t nMax = (std::numeric_limits<int32_t>::max)();
 			assertTrue(filter.jumpIsNeeded(nMin, nMin, nMax, nMax, BITSPERMM), "full range jump does not overflow");
 
 			assertTrue(filter.setMinimumJumpDistance(0.0));
