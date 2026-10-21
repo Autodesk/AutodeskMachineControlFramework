@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Move axis: play / run glyph. White fill for use on the primary (filled) button. -->
+  <path fill="#ffffff" d="M8,5.14V19.14L19,12.14L8,5.14Z" />
+</svg>

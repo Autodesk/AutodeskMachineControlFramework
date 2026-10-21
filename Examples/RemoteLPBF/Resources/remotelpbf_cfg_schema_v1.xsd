@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:cfg="com.autodesk.remotelpbf"
+           targetNamespace="com.autodesk.remotelpbf"
+           elementFormDefault="qualified">
+
+  <!-- Root element -->
+  <xs:element name="Configuration" type="cfg:ConfigurationType"/>
+
+  <!-- Configuration root type. Machine settings for the Autodesk Remote LPBF laser controller. -->
+  <xs:complexType name="ConfigurationType">
+    <xs:sequence>
+      <xs:element name="Simulation" type="cfg:SimulationType"/>
+      <xs:element name="Process" type="cfg:ProcessType"/>
+      <xs:element name="ScannerCard" type="cfg:ScannerCardType"/>
+    </xs:sequence>
+    <xs:attribute name="Version" type="xs:string" use="required"/>
+    <xs:attribute name="TypeName" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- Simulation settings -->
+  <xs:complexType name="SimulationType">
+    <xs:sequence>
+      <xs:element name="SimulateLaser" type="cfg:ValueType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Process settings -->
+  <xs:complexType name="ProcessType">
+    <xs:sequence>
+      <xs:element name="ExposureTimeout" type="cfg:ValueType"/>
+      <xs:element name="WatchdogTimeout" type="cfg:ValueType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Scanlab RTC6 scanner card settings -->
+  <xs:complexType name="ScannerCardType">
+    <xs:sequence>
+      <xs:element name="Serial" type="cfg:ValueType"/>
+      <xs:element name="IPAddress" type="cfg:ValueType"/>
+      <xs:element name="Netmask" type="cfg:ValueType"/>
+      <xs:element name="Port" type="cfg:ValueType"/>
+      <xs:element name="Timeout" type="cfg:ValueType"/>
+      <xs:element name="LaserOnDelay" type="cfg:ValueType"/>
+      <xs:element name="LaserOffDelay" type="cfg:ValueType"/>
+      <xs:element name="MarkDelay" type="cfg:ValueType"/>
+      <xs:element name="JumpDelay" type="cfg:ValueType"/>
+      <xs:element name="PolygonDelay" type="cfg:ValueType"/>
+      <xs:element name="LaserOriginX" type="cfg:ValueType"/>
+      <xs:element name="LaserOriginY" type="cfg:ValueType"/>
+      <xs:element name="LaserFieldMinX" type="cfg:ValueType"/>
+      <xs:element name="LaserFieldMinY" type="cfg:ValueType"/>
+      <xs:element name="LaserFieldMaxX" type="cfg:ValueType"/>
+      <xs:element name="LaserFieldMaxY" type="cfg:ValueType"/>
+      <xs:element name="TransformationAngle" type="cfg:ValueType"/>
+      <xs:element name="TransformationOffsetX" type="cfg:ValueType"/>
+      <xs:element name="TransformationOffsetY" type="cfg:ValueType"/>
+      <xs:element name="TransformationScaleX" type="cfg:ValueType"/>
+      <xs:element name="TransformationScaleY" type="cfg:ValueType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Generic leaf: value carried in the "value" attribute, optional description. -->
+  <xs:complexType name="ValueType">
+    <xs:attribute name="value" type="xs:string" use="required"/>
+    <xs:attribute name="description" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+</xs:schema>

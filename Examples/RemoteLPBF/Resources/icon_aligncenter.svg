@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Middle preset: horizontal-align-center glyph. -->
+  <path fill="#1e293b" d="M11,2V4H2V7H11V9H13V7H22V4H13V2H11M11,15V13H13V15H22V18H13V20H11V18H2V15H11Z" />
+</svg>
