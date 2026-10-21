@@ -8,6 +8,9 @@
 	import Axis3d from '@lucide/svelte/icons/axis-3d';
 	import Tags from '@lucide/svelte/icons/tags';
 	import Info from '@lucide/svelte/icons/info';
+	import Palette from '@lucide/svelte/icons/palette';
+	import ZapOff from '@lucide/svelte/icons/zap-off';
+	import Route from '@lucide/svelte/icons/route';
 	// @ts-ignore — core JS has no type declarations yet
 	import WebGLImpl from '@core/common/AMCImplementation_WebGL.js';
 	// @ts-ignore
@@ -18,6 +21,17 @@
 	const MIN_ZOOM_SELECTION_PX = 5;
 	const PART_MARKER_PX = 5;
 	const NULL_UUID = '00000000-0000-0000-0000-000000000000';
+	const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+	// Scatter plot channel and the columns of it that LayerViewImpl can colour by.
+	const POINT_CHANNEL = 'laser';
+	const POINT_CHANNEL_COLUMNS = ['laseron', 'power'];
+	const POINT_COLOR_MODES = [
+		{ mode: 'unicolor', caption: 'Uniform', column: '' },
+		{ mode: 'time', caption: 'Timing', column: '' },
+		{ mode: 'velocity', caption: 'Velocity', column: '' },
+		{ mode: 'laseron', caption: 'Laser On', column: 'laseron' },
+		{ mode: 'powerramp', caption: 'Power', column: 'power' }
+	];
 
 	let { module, app }: { module: any; app: any } = $props();
 	const poll = useModuleTick(() => module);
@@ -53,6 +67,25 @@
 		translationX,
 		translationY
 	] as CoordinateTransform);
+	let labelCaption = $derived.by(() => {
+		poll.v;
+		return platform?.labelvisible ? String(platform.labelcaption || '') : '';
+	});
+
+	// Scatter plot (platform.scatterplotuuid) drawn as points on top of the toolpath.
+	let pointsLoaded = $state(false);
+	let pointColumns = $state.raw<string[]>([]);
+	let pointColorMode = $state('unicolor');
+	let showLaserOffPoints = $state(false);
+	let toolpathVisible = $state(true);
+	let pointLoadCounter = 0;
+	let availableColorModes = $derived(
+		POINT_COLOR_MODES.filter((entry) => entry.column === '' || pointColumns.includes(entry.column))
+	);
+	let pointColorCaption = $derived(
+		POINT_COLOR_MODES.find((entry) => entry.mode === pointColorMode)?.caption ?? 'Uniform'
+	);
+
 	let sliderValue = $state(0);
 	let appliedColorTheme = $state('');
 	let coordinateSystemOverride: boolean | null = $state(null);
@@ -144,6 +177,8 @@
 			layerViewer = new LayerViewImpl(glInstance);
 			// Write-only, so effects that pan or zoom do not subscribe to viewVersion.
 			layerViewer.onTransformChanged = () => { viewVersion = ++transformChangeCount; };
+			layerViewer.toolpathVisible = toolpathVisible;
+			layerViewer.showLaserOffPoints = showLaserOffPoints;
 
 			glInstance.setupDOMElement(containerEl);
 			layerViewer.updateSize(w, h);
@@ -160,6 +195,7 @@
 
 				platform.displayed_layer = 0;
 				platform.displayed_build = 0;
+				platform.displayed_scatterplot = '';
 			}
 
 			const cs = getCurrentColorSet();
@@ -205,6 +241,98 @@
 				if (layerViewer) layerViewer.RenderScene(true);
 			});
 		}
+
+		const scatterPlotUUID = typeof platform.scatterplotuuid === 'string' ? platform.scatterplotuuid.toLowerCase() : NULL_UUID;
+		if (platform.displayed_scatterplot !== scatterPlotUUID) {
+			platform.displayed_scatterplot = scatterPlotUUID;
+			loadScatterPlot(scatterPlotUUID);
+		}
+	}
+
+	function clearScatterPlot() {
+		pointsLoaded = false;
+		pointColumns = [];
+		if (!layerViewer) return;
+		layerViewer.clearPointsChannelData(POINT_CHANNEL);
+		layerViewer.clearPoints();
+		layerViewer.RenderScene(true);
+	}
+
+	// Returns the colourable columns of a /pointchanneldata response; header fields are skipped.
+	function parsePointChannelData(response: any): [string, Float32Array][] {
+		const contentType = String(response?.headers?.['content-type'] || '');
+		if (!contentType.includes('application/json')) return [];
+
+		const parsed = JSON.parse(new TextDecoder().decode(response.data));
+		if (!parsed || typeof parsed !== 'object') return [];
+
+		const columns: [string, Float32Array][] = [];
+		for (const column of POINT_CHANNEL_COLUMNS) {
+			const values = parsed[column];
+			if (Array.isArray(values) && values.every((value) => typeof value === 'number')) {
+				columns.push([column, new Float32Array(values)]);
+			}
+		}
+		return columns;
+	}
+
+	async function loadScatterPlot(scatterPlotUUID: string) {
+		const loadIndex = ++pointLoadCounter;
+		clearScatterPlot();
+		if (!layerViewer || scatterPlotUUID === NULL_UUID || !UUID_PATTERN.test(scatterPlotUUID)) return;
+
+		try {
+			const pointsResponse = await app.axiosGetArrayBufferRequest('/pointcloud/' + scatterPlotUUID);
+			let channelColumns: [string, Float32Array][] = [];
+			try {
+				const channelResponse = await app.axiosGetArrayBufferRequest('/pointchanneldata/' + scatterPlotUUID + '/' + POINT_CHANNEL);
+				channelColumns = parsePointChannelData(channelResponse);
+			} catch (err: any) {
+				console.warn('[LayerView] point channel data error:', err?.response || err);
+			}
+
+			if (loadIndex !== pointLoadCounter || !layerViewer) return;
+
+			layerViewer.loadPoints(new Float32Array(pointsResponse.data));
+			for (const [column, values] of channelColumns) {
+				layerViewer.loadPointsChannelData(POINT_CHANNEL, column, values);
+			}
+			pointColumns = channelColumns.map(([column]) => column);
+			pointsLoaded = true;
+
+			if (!availableColorModes.some((entry) => entry.mode === pointColorMode)) {
+				pointColorMode = 'unicolor';
+			}
+			layerViewer.showLaserOffPoints = showLaserOffPoints;
+			layerViewer.setColorMode(pointColorMode);
+		} catch (err: any) {
+			console.warn('[LayerView] point cloud error:', err?.response || err);
+			if (layerViewer) layerViewer.RenderScene(true);
+		}
+	}
+
+	function cyclePointColorMode() {
+		if (!layerViewer) return;
+		const index = availableColorModes.findIndex((entry) => entry.mode === pointColorMode);
+		pointColorMode = availableColorModes[(index + 1) % availableColorModes.length].mode;
+		layerViewer.setColorMode(pointColorMode);
+	}
+
+	function toggleLaserOffPoints() {
+		showLaserOffPoints = !showLaserOffPoints;
+		if (!layerViewer) return;
+		layerViewer.showLaserOffPoints = showLaserOffPoints;
+		layerViewer.updateLayerPoints();
+		layerViewer.RenderScene(true);
+	}
+
+	function toggleToolpath() {
+		toolpathVisible = !toolpathVisible;
+		if (!layerViewer) return;
+		layerViewer.toolpathVisible = toolpathVisible;
+		layerViewer.updateLoadedLayer();
+		layerViewer.updateTransform();
+		layerViewer.RenderScene(true);
 	}
 
 	function changeLayer(layer: number) {
@@ -573,6 +701,7 @@
 		if (platform) {
 			platform.displayed_layer = 0;
 			platform.displayed_build = 0;
+			platform.displayed_scatterplot = '';
 		}
 
 		requestAnimationFrame(() => {
@@ -599,9 +728,11 @@
 	onDestroy(() => {
 		module.onDataHasChanged = null;
 		clearHover();
+		pointLoadCounter++;
 		if (platform) {
 			platform.displayed_layer = 0;
 			platform.displayed_build = 0;
+			platform.displayed_scatterplot = '';
 		}
 	});
 </script>
@@ -706,7 +837,44 @@
 				<Info size={16} />
 				<span>Properties</span>
 			</button>
+			{#if pointsLoaded}
+				<button
+					class="layerview-btn"
+					onclick={cyclePointColorMode}
+					title="Change how the recorded points are coloured"
+					aria-label={`Point colours: ${pointColorCaption}. Click to change`}
+				>
+					<Palette size={16} />
+					<span>{pointColorCaption}</span>
+				</button>
+				{#if pointColumns.includes('laseron')}
+					<button
+						class="layerview-btn"
+						onclick={toggleLaserOffPoints}
+						title="Also show points recorded while the laser was off"
+						aria-label="Toggle points with laser off"
+						aria-pressed={showLaserOffPoints}
+					>
+						<ZapOff size={16} />
+						<span>Laser Off</span>
+					</button>
+				{/if}
+				<button
+					class="layerview-btn"
+					onclick={toggleToolpath}
+					title="Show or hide the toolpath below the recorded points"
+					aria-label="Toggle toolpath"
+					aria-pressed={toolpathVisible}
+				>
+					<Route size={16} />
+					<span>Toolpath</span>
+				</button>
+			{/if}
 		</div>
+
+		{#if labelCaption}
+			<div class="layerview-label">{labelCaption}</div>
+		{/if}
 
 		<!-- Layer info overlay -->
 		{#if layerCount > 0}
@@ -960,6 +1128,24 @@
 	.layerview-btn[aria-pressed='true'] {
 		background-color: var(--primary, #2563eb);
 		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65);
+	}
+	.layerview-label {
+		position: absolute;
+		/* Below the toolbar (top 8px + 56px buttons). */
+		top: 72px;
+		left: 8px;
+		max-width: calc(100% - 56px);
+		padding: 4px 10px;
+		border-radius: 4px;
+		background: rgba(0, 0, 0, 0.65);
+		color: white;
+		font-size: 11px;
+		font-variant-numeric: tabular-nums;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		pointer-events: none;
+		z-index: 10;
 	}
 	.layerview-layer-info {
 		position: absolute;
