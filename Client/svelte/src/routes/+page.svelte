@@ -411,9 +411,15 @@
 		<main class="flex-1 min-w-0 min-h-0 relative">
 			{#each pages as page (page.name)}
 				{#if poll.v >= 0 && app.pageIsActive(page)}
-					<div class="absolute inset-2">
-						{#each page.modules || [] as mod (mod.uuid)}
-							<ModuleFactory module={mod} {app} />
+					<!-- A lone top-level module (typically a grid) fills the page; several are
+					     stacked at their natural height and the page scrolls (issue #28). -->
+					{@const modules = page.modules || []}
+					{@const fillsPage = modules.length === 1}
+					<div class="absolute inset-2 overflow-auto flex flex-col gap-2">
+						{#each modules as mod (mod.uuid)}
+							<div class={fillsPage ? 'flex-1 min-h-0' : 'shrink-0'}>
+								<ModuleFactory module={mod} {app} />
+							</div>
 						{/each}
 					</div>
 				{/if}
