@@ -29,14 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 import axios from "axios";
-
-async function sha256hex(message) {
-	const data = new TextEncoder().encode(message);
-	const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-	return Array.from(new Uint8Array(hashBuffer))
-		.map(b => b.toString(16).padStart(2, '0'))
-		.join('');
-}
+import { sha256Hex } from "./AMCCrypto.js";
 
 import * as Assert from "./AMCAsserts.js";
 import * as Common from "./AMCCommon.js"
@@ -432,9 +425,9 @@ export default class AMCApplication extends Common.AMCObject {
             let loginsalt = resultCreateSession.data.loginsalt;
             let clientkey = sessionkey;
 
-            let saltedpassword = await sha256hex(loginsalt + userPassword);
-            let clientkeyhash = await sha256hex(clientkey + saltedpassword);
-            let sessionkeyhash = await sha256hex(sessionkey + clientkeyhash);
+            let saltedpassword = await sha256Hex(loginsalt + userPassword);
+            let clientkeyhash = await sha256Hex(clientkey + saltedpassword);
+            let sessionkeyhash = await sha256Hex(sessionkey + clientkeyhash);
 
             let resultAuthenticate = await this.axiosPostRequest("/auth/" + sessionuuid, {
                 "clientkey": clientkey,
@@ -2397,8 +2390,8 @@ export default class AMCApplication extends Common.AMCObject {
 		for (let value of randomArray)
 			randomString = randomString + value.toString ();
 
-		let passwordSalt = await sha256hex(randomString);
-		let passwordHash = await sha256hex(passwordSalt + trimmedPassword);
+		let passwordSalt = await sha256Hex(randomString);
+		let passwordHash = await sha256Hex(passwordSalt + trimmedPassword);
 		
 		return {
 			"salt": passwordSalt,

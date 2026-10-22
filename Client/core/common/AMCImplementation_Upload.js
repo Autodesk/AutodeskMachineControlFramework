@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import * as Assert from "./AMCAsserts.js";
 import * as Common from "./AMCCommon.js"
+import { sha256Hex } from "./AMCCrypto.js";
 
 
 export default class AMCUpload extends Common.AMCObject {
@@ -195,10 +196,7 @@ export default class AMCUpload extends Common.AMCObject {
 			offset += buf.byteLength;
 		}
 
-		const hashBuffer = await crypto.subtle.digest('SHA-256', combined);
-		this.sha256sum = Array.from(new Uint8Array(hashBuffer))
-			.map(b => b.toString(16).padStart(2, '0'))
-			.join('');
+		this.sha256sum = await sha256Hex(combined);
 
 		return this.sha256sum;
 	}
