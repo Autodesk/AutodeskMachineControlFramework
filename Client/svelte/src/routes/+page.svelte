@@ -300,7 +300,7 @@
 					<Sheet.Header class="p-4 border-b">
 						<Sheet.Title>{appName}</Sheet.Title>
 					</Sheet.Header>
-					<ScrollArea class="flex-1">
+					<ScrollArea class="flex-1 min-h-0">
 						<nav class="flex flex-col">
 							{#each menuItems as item (item.uuid)}
 								{@const active = isMenuActive(item)}
@@ -384,7 +384,7 @@
 		{#if isLargeScreen && sidebarVisible}
 			<aside class="w-72 border-r border-border bg-card shrink-0 flex flex-col">
 				<div class="p-4 border-b font-semibold text-sm">{appName}</div>
-				<ScrollArea class="flex-1">
+				<ScrollArea class="flex-1 min-h-0">
 					<nav class="flex flex-col">
 						{#each menuItems as item (item.uuid)}
 							{@const active = isMenuActive(item)}
@@ -412,12 +412,14 @@
 			{#each pages as page (page.name)}
 				{#if poll.v >= 0 && app.pageIsActive(page)}
 					<!-- A lone top-level module (typically a grid) fills the page; several are
-					     stacked at their natural height and the page scrolls (issue #28). -->
+					     stacked at their natural height and the page scrolls (issue #28).
+					     The lone module's wrapper is a flex column, so a module sized with
+					     flex-1 (logs) is confined to the page and scrolls itself. -->
 					{@const modules = page.modules || []}
 					{@const fillsPage = modules.length === 1}
 					<div class="absolute inset-2 overflow-auto flex flex-col gap-2">
 						{#each modules as mod (mod.uuid)}
-							<div class={fillsPage ? 'flex-1 min-h-0' : 'shrink-0'}>
+							<div class={fillsPage ? 'flex-1 min-h-0 flex flex-col' : 'shrink-0'}>
 								<ModuleFactory module={mod} {app} />
 							</div>
 						{/each}
