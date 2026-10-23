@@ -517,9 +517,20 @@ public:
 
 // Element path (dialog.content.form) of the machine settings modal dialog form.
 #define REMOTELPBF_MACHINESETTINGS_DIALOGFORM "machinesettingsdialog.msdlgcontent.msdlgform."
+#define REMOTELPBF_FACTORYRESET_DIALOGFORM "factoryresetdialog.frdlgcontent.frdlgform."
 
 // Maximum length of a configuration version name, as accepted by MachineConfiguration.Commit.
 #define REMOTELPBF_CONFIGVERSION_MAXNAMELENGTH 256
+
+static bool checkMachineConfigurationPermission(LibMCEnv::PUIEnvironment pUIEnvironment)
+{
+	if (pUIEnvironment->CheckPermission("permission_modify_machine_configuration"))
+		return true;
+
+	pUIEnvironment->LogWarning("Machine configuration change denied: missing permission_modify_machine_configuration.");
+	pUIEnvironment->ShowHint("You are not allowed to modify the machine configuration.", 3000);
+	return false;
+}
 
 // Reads the configuration version name typed into the "versionname" field of the given dialog
 // form. The typed text is stored back into the session variable, so resetting it to "" on the
@@ -548,6 +559,9 @@ static bool readConfigurationVersionName(LibMCEnv::PUIEnvironment pUIEnvironment
 // schema and asks the main state machine to re-apply the configuration to live parameters.
 static void activateSelectedConfiguration(LibMCEnv::PUIEnvironment pUIEnvironment, const std::string& sSchema, const std::string& sLabel)
 {
+	if (!checkMachineConfigurationPermission(pUIEnvironment))
+		return;
+
 	auto sSender = pUIEnvironment->RetrieveEventSender();
 	auto sVersionUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
 
@@ -591,6 +605,9 @@ public:
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
+		if (!checkMachineConfigurationPermission(pUIEnvironment))
+			return;
+
 		pUIEnvironment->SetSessionVariable("configversion_name", "");
 		pUIEnvironment->ActivateModalDialog("machinesettingsdialog");
 	}
@@ -606,6 +623,9 @@ public:
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
+		if (!checkMachineConfigurationPermission(pUIEnvironment))
+			return;
+
 		const std::string sForm = REMOTELPBF_MACHINESETTINGS_DIALOGFORM;
 
 		std::string sVersionName;
@@ -689,6 +709,74 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 		pUIEnvironment->ActivateModalDialog("machinehistorydialog");
+	}
+};
+
+class CEvent_OnOpenFactoryReset : public virtual CEvent {
+public:
+	static std::string getEventName() { return "onopenfactoryreset"; }
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (!checkMachineConfigurationPermission(pUIEnvironment))
+			return;
+		if (pUIEnvironment->GetMachineParameterAsBool("main", "execution", "executionactive")) {
+			pUIEnvironment->ShowHint("Factory settings cannot be restored while an execution is active.", 4000);
+			return;
+		}
+
+		pUIEnvironment->SetSessionVariable("configreset_confirmation", "");
+		pUIEnvironment->ActivateModalDialog("factoryresetdialog");
+	}
+};
+
+class CEvent_OnConfirmFactoryReset : public virtual CEvent {
+public:
+	static std::string getEventName() { return "onconfirmfactoryreset"; }
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (!checkMachineConfigurationPermission(pUIEnvironment))
+			return;
+		if (pUIEnvironment->GetMachineParameterAsBool("main", "execution", "executionactive")) {
+			pUIEnvironment->CloseModalDialog();
+			pUIEnvironment->ShowHint("Factory settings cannot be restored while an execution is active.", 4000);
+			return;
+		}
+
+		auto sConfirmation = trimWhitespace(pUIEnvironment->GetUIProperty(REMOTELPBF_FACTORYRESET_DIALOGFORM "confirmation", "value"));
+		pUIEnvironment->SetSessionVariable("configreset_confirmation", sConfirmation);
+		if (sConfirmation != "RESET") {
+			pUIEnvironment->ShowHint("Type RESET exactly to confirm the factory reset.", 3000);
+			return;
+		}
+
+		auto pType = pUIEnvironment->CreateMachineConfigurationHandler()->FindConfigurationTypeBySchema(REMOTELPBF_CONFIG_SCHEMA);
+		if (pType.get() == nullptr) {
+			pUIEnvironment->CloseModalDialog();
+			pUIEnvironment->ShowHint("The machine configuration type has not been registered.", 4000);
+			return;
+		}
+
+		auto pVersion = pType->ResetToParameterDefaults(pUIEnvironment->GetCurrentUserUUID(), "Factory reset");
+		pUIEnvironment->LogMessage("Created and activated factory-reset machine settings configuration v" + std::to_string(pVersion->GetNumericVersion()));
+
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_reloadconfiguration");
+		pSignal->Trigger();
+
+		pUIEnvironment->CloseModalDialog();
+		pUIEnvironment->ShowHint("Factory settings restored as a new configuration version.", 4000);
+	}
+};
+
+class CEvent_OnCancelFactoryReset : public virtual CEvent {
+public:
+	static std::string getEventName() { return "oncancelfactoryreset"; }
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		pUIEnvironment->SetSessionVariable("configreset_confirmation", pUIEnvironment->GetUIProperty(REMOTELPBF_FACTORYRESET_DIALOGFORM "confirmation", "value"));
+		pUIEnvironment->CloseModalDialog();
 	}
 };
 
@@ -966,6 +1054,12 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 	if (createEventInstanceByName<CEvent_OnMachineSettingsCancel>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnOpenMachineHistory>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnOpenFactoryReset>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnConfirmFactoryReset>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnCancelFactoryReset>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnCloseDialog>(sEventName, pEventInstance))
 		return pEventInstance;

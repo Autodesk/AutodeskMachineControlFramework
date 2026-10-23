@@ -100,62 +100,17 @@ typedef CState<CMainData> CMainState;
 // Schema identifier of the persistent Remote LPBF machine settings configuration.
 #define REMOTELPBF_CONFIG_SCHEMA "com.autodesk.remotelpbf"
 
-// Registers the machine-settings configuration type (idempotent), bootstraps schema v1 with
-// its default configuration on first run, ensures an active version exists and mirrors its
-// values into the live state-machine parameters. Publishes a status summary into the
-// "configstatus" group for display on the machine configuration page.
+// Registers the machine-settings configuration type (idempotent), bootstraps schema v1 from
+// the factory defaults declared in config.xml and synchronizes the active version to the mapped
+// live state-machine parameters. Publishes a status summary for the configuration page.
 static void applyMachineSettingsToRuntime(LibMCEnv::PStateEnvironment pStateEnvironment) {
 	auto pHandler = pStateEnvironment->CreateMachineConfigurationHandler();
 	auto pType = pHandler->RegisterMachineConfigurationType(REMOTELPBF_CONFIG_SCHEMA, "Autodesk Remote LPBF Machine Settings");
 
 	std::string sXSD = pStateEnvironment->LoadResourceString("remotelpbf_cfg_schema_v1");
-	std::string sDefaultXML = pStateEnvironment->LoadResourceString("remotelpbf_cfg_default_v1");
-	pType->EnsureXSDVersion(sXSD, 1, sDefaultXML);
-
+	pType->EnsureXSDVersionFromParameterDefaults(sXSD, 1);
+	auto nAppliedParameterCount = pType->SynchronizeParameters();
 	auto pConfig = pType->EnsureActiveConfiguration();
-
-	auto setBoolIfPresent = [&pStateEnvironment](const std::string& sGroup, const std::string& sName, bool bValue) {
-		if (pStateEnvironment->HasParameter(sGroup, sName))
-			pStateEnvironment->SetBoolParameter(sGroup, sName, bValue);
-	};
-	auto setIntegerIfPresent = [&pStateEnvironment](const std::string& sGroup, const std::string& sName, int64_t nValue) {
-		if (pStateEnvironment->HasParameter(sGroup, sName))
-			pStateEnvironment->SetIntegerParameter(sGroup, sName, nValue);
-	};
-	auto setDoubleIfPresent = [&pStateEnvironment](const std::string& sGroup, const std::string& sName, double dValue) {
-		if (pStateEnvironment->HasParameter(sGroup, sName))
-			pStateEnvironment->SetDoubleParameter(sGroup, sName, dValue);
-	};
-	auto setStringIfPresent = [&pStateEnvironment](const std::string& sGroup, const std::string& sName, const std::string& sValue) {
-		if (pStateEnvironment->HasParameter(sGroup, sName))
-			pStateEnvironment->SetStringParameter(sGroup, sName, sValue);
-	};
-
-	setBoolIfPresent("configuration", "simulatelaser", pConfig->GetBoolParameterDef("Simulation/SimulateLaser", true));
-	setIntegerIfPresent("jobinfo", "exposuretimeout", pConfig->GetIntegerParameterDef("Process/ExposureTimeout", 0, 3600000, 300000));
-	setIntegerIfPresent("execution", "watchdogtimeout", pConfig->GetIntegerParameterDef("Process/WatchdogTimeout", 0, 86400000, 300000));
-
-	setIntegerIfPresent("cardconfig", "serial", pConfig->GetIntegerParameterDef("ScannerCard/Serial", 0, 0xFFFFFFFFLL, 20065509));
-	setStringIfPresent("cardconfig", "ipaddress", pConfig->GetStringParameterDef("ScannerCard/IPAddress", "141.60.143.95"));
-	setStringIfPresent("cardconfig", "netmask", pConfig->GetStringParameterDef("ScannerCard/Netmask", "255.255.255.0"));
-	setIntegerIfPresent("cardconfig", "port", pConfig->GetIntegerParameterDef("ScannerCard/Port", 0, 65535, 49374));
-	setIntegerIfPresent("cardconfig", "timeout", pConfig->GetIntegerParameterDef("ScannerCard/Timeout", 0, 3600000, 1000));
-	setDoubleIfPresent("cardconfig", "laserondelay", pConfig->GetDoubleParameterDef("ScannerCard/LaserOnDelay", -1.0E6, 1.0E6, 100.0));
-	setDoubleIfPresent("cardconfig", "laseroffdelay", pConfig->GetDoubleParameterDef("ScannerCard/LaserOffDelay", -1.0E6, 1.0E6, 100.0));
-	setDoubleIfPresent("cardconfig", "markdelay", pConfig->GetDoubleParameterDef("ScannerCard/MarkDelay", -1.0E6, 1.0E6, 570.0));
-	setDoubleIfPresent("cardconfig", "jumpdelay", pConfig->GetDoubleParameterDef("ScannerCard/JumpDelay", -1.0E6, 1.0E6, 1400.0));
-	setDoubleIfPresent("cardconfig", "polygondelay", pConfig->GetDoubleParameterDef("ScannerCard/PolygonDelay", -1.0E6, 1.0E6, 280.0));
-	setDoubleIfPresent("cardconfig", "laseroriginx", pConfig->GetDoubleParameterDef("ScannerCard/LaserOriginX", -1.0E4, 1.0E4, 100.0));
-	setDoubleIfPresent("cardconfig", "laseroriginy", pConfig->GetDoubleParameterDef("ScannerCard/LaserOriginY", -1.0E4, 1.0E4, 125.0));
-	setDoubleIfPresent("cardconfig", "laserfield_minx", pConfig->GetDoubleParameterDef("ScannerCard/LaserFieldMinX", -1.0E4, 1.0E4, 0.0));
-	setDoubleIfPresent("cardconfig", "laserfield_miny", pConfig->GetDoubleParameterDef("ScannerCard/LaserFieldMinY", -1.0E4, 1.0E4, 0.0));
-	setDoubleIfPresent("cardconfig", "laserfield_maxx", pConfig->GetDoubleParameterDef("ScannerCard/LaserFieldMaxX", -1.0E4, 1.0E4, 200.0));
-	setDoubleIfPresent("cardconfig", "laserfield_maxy", pConfig->GetDoubleParameterDef("ScannerCard/LaserFieldMaxY", -1.0E4, 1.0E4, 250.0));
-	setDoubleIfPresent("cardconfig", "transformation_angle", pConfig->GetDoubleParameterDef("ScannerCard/TransformationAngle", -360.0, 360.0, 90.0));
-	setDoubleIfPresent("cardconfig", "transformation_offsetx", pConfig->GetDoubleParameterDef("ScannerCard/TransformationOffsetX", -1.0E4, 1.0E4, 0.0));
-	setDoubleIfPresent("cardconfig", "transformation_offsety", pConfig->GetDoubleParameterDef("ScannerCard/TransformationOffsetY", -1.0E4, 1.0E4, 0.002));
-	setDoubleIfPresent("cardconfig", "transformation_scalex", pConfig->GetDoubleParameterDef("ScannerCard/TransformationScaleX", -100.0, 100.0, 1.0));
-	setDoubleIfPresent("cardconfig", "transformation_scaley", pConfig->GetDoubleParameterDef("ScannerCard/TransformationScaleY", -100.0, 100.0, 1.0));
 
 	pStateEnvironment->SetStringParameter("configstatus", "activeversiondisplay", "Version " + std::to_string(pConfig->GetNumericVersion()));
 
@@ -165,7 +120,7 @@ static void applyMachineSettingsToRuntime(LibMCEnv::PStateEnvironment pStateEnvi
 		pStateEnvironment->SetStringParameter("configstatus", "activeuser", pActiveVersion->GetUserUUID());
 	}
 
-	pStateEnvironment->LogMessage("Machine settings configuration v" + std::to_string(pConfig->GetNumericVersion()) + " applied.");
+	pStateEnvironment->LogMessage("Machine settings configuration v" + std::to_string(pConfig->GetNumericVersion()) + " applied to " + std::to_string(nAppliedParameterCount) + " parameters.");
 }
 
 static void applyMachineConfigurationToRuntime(LibMCEnv::PStateEnvironment pStateEnvironment) {
@@ -199,7 +154,7 @@ static void updateSubsystemErrorFlags(LibMCEnv::PStateEnvironment pStateEnvironm
 
 // Switches the laser enable pin via the "laser" state machine. Best-effort: returns whether the
 // signal was handled successfully within the timeout. Used to assert laser-off on finish/cancel/
-// error and laser-on at execution start.
+// error and at execution start (the laser state machine enables it per exposure).
 static bool setLaserPin(LibMCEnv::PStateEnvironment pStateEnvironment, bool bOn, uint32_t nTimeoutMS) {
 	auto pSignal = pStateEnvironment->PrepareSignal("laser", "signal_changelaseronoff");
 	pSignal->SetBool("laseron", bOn);
@@ -529,10 +484,11 @@ public:
 		// Discard any stale exposure/cancel signals before starting the loop.
 		pStateEnvironment->ClearAllUnhandledSignals();
 
-		// Turn the laser enable pin on for the whole execution.
-		pStateEnvironment->LogMessage("Turning laser on...");
-		if (!setLaserPin(pStateEnvironment, true, 30000)) {
-			pStateEnvironment->LogWarning("Could not turn laser on - aborting execution.");
+		// The laser state machine switches the enable pin on only while a layer is drawn;
+		// make sure it is not left on (e.g. from the manual UI toggle) while waiting.
+		pStateEnvironment->LogMessage("Turning laser off until the first exposure...");
+		if (!setLaserPin(pStateEnvironment, false, 30000)) {
+			pStateEnvironment->LogWarning("Could not turn laser off - aborting execution.");
 			pStateEnvironment->SetNextState("cancelexecution");
 			return;
 		}

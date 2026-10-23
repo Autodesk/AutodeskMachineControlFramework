@@ -384,9 +384,31 @@ public:
 			if (pDriver->IsSimulationMode()) {
 				pStateEnvironment->LogMessage("Simulation mode delay of 2 seconds..");
 				pStateEnvironment->Sleep(2000);
+				pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
 			}
+			else {
+				// The laser enable pin is only high while the layer is drawn: with the pin
+				// high the idle standby (tickle) pulses already make the laser emit.
+				// DrawLayer blocks until the card has finished the list.
+				auto pContext = pDriver->GetContext();
+				auto nLeadTime = pStateEnvironment->GetIntegerParameter("lasersignaltiming", "enableleadtime");
 
-			pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+				pContext->SetLaserPinOut(true, false);
+				pStateEnvironment->SetBoolParameter("lasersignaltiming", "laseronsignal", true);
+				try {
+					if (nLeadTime > 0)
+						pStateEnvironment->Sleep((uint32_t)nLeadTime);
+
+					pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+				}
+				catch (...) {
+					pContext->SetLaserPinOut(false, false);
+					pStateEnvironment->SetBoolParameter("lasersignaltiming", "laseronsignal", false);
+					throw;
+				}
+				pContext->SetLaserPinOut(false, false);
+				pStateEnvironment->SetBoolParameter("lasersignaltiming", "laseronsignal", false);
+			}
 		}
 		pSignalHandler->SetBoolResult("success", true);
 		pSignalHandler->SignalHandled();

@@ -19,6 +19,7 @@
       <permission identifier="permission_user_management" displayname="User Management" description="Can create/edit local users." />
       <permission identifier="permission_remote_execution" displayname="Remote Execution" description="Can drive layer execution over the REST interface." />
       <permission identifier="permission_acknowledgealerts" displayname="Acknowledge Alerts" description="Can acknowledge alerts." />
+      <permission identifier="permission_modify_machine_configuration" displayname="Modify Machine Configuration" description="Can create, activate and reset machine configuration versions." />
     </permissions>
 
 
@@ -44,6 +45,7 @@
         <permission identifier="permission_start_build" />
         <permission identifier="permission_remote_execution" />
         <permission identifier="permission_user_management" />
+        <permission identifier="permission_modify_machine_configuration" />
       </role>
 
     </roles>
@@ -71,7 +73,7 @@
 			<parameter name="totalheight" description="Total Height" default="0" type="double" />
 			<parameter name="currentheight" description="Current Height" default="0" type="double"/>
 			<parameter name="printinprogress" description="Execution is in progress" default="0" type="bool"/>
-			<parameter name="exposuretimeout" description="Exposure Timeout (ms)" default="300000" type="int"/>
+			<parameter name="exposuretimeout" description="Exposure Timeout (ms)" default="300000" type="int" configschema="com.autodesk.remotelpbf" configpath="Process/ExposureTimeout"/>
 		</parametergroup>
 
 		<parametergroup name="ui" description="User interface">
@@ -89,33 +91,33 @@
 		</parametergroup>
 
 		<parametergroup name="configuration" description="Machine Configuration">
-			<parameter name="simulatelaser" description="Simulate laser control" default="1" type="bool" />
+			<parameter name="simulatelaser" description="Simulate laser control" default="1" type="bool" configschema="com.autodesk.remotelpbf" configpath="Simulation/SimulateLaser" />
 		</parametergroup>
 
 		<!-- Scanlab scanner card settings, mirrored from the machine configuration (ScannerCard/*).
 		     The laser state machine reads them through derived parameters at initialisation. -->
 		<parametergroup name="cardconfig" description="Scanner Card Config">
-			<parameter name="serial" description="Serial" default="20065509" type="int"/>
-			<parameter name="ipaddress" description="Scanner Ethernet Address" default="141.60.143.95" type="string"/>
-			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string"/>
-			<parameter name="port" description="Port" default="49374" type="int"/>
-			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
-			<parameter name="laserondelay" description="Laser On Delay in microseconds" default="100" type="double"/>
-			<parameter name="laseroffdelay" description="Laser Off Delay in microseconds" default="100" type="double"/>
-			<parameter name="markdelay" description="Mark Delay in microseconds" default="570" type="double"/>
-			<parameter name="jumpdelay" description="Jump Delay in microseconds" default="1400" type="double"/>
-			<parameter name="polygondelay" description="Polygon Delay in microseconds" default="280" type="double"/>
-			<parameter name="laseroriginx" description="Laser Origin X" default="100" type="double"/>
-			<parameter name="laseroriginy" description="Laser Origin Y" default="125" type="double"/>
-			<parameter name="laserfield_minx" description="Laser Field Min X" default="0" type="double"/>
-			<parameter name="laserfield_miny" description="Laser Field Min Y" default="0" type="double"/>
-			<parameter name="laserfield_maxx" description="Laser Field Max X" default="200" type="double"/>
-			<parameter name="laserfield_maxy" description="Laser Field Max Y" default="250" type="double"/>
-			<parameter name="transformation_angle" description="Transformation Angle (in degree)" default="90.0" type="double"/>
-			<parameter name="transformation_offsetx" description="Transformation Offset X (in mm)" default="0.000" type="double"/>
-			<parameter name="transformation_offsety" description="Transformation Offset Y (in mm)" default="0.002" type="double"/>
-			<parameter name="transformation_scalex" description="Transformation Scale X" default="1.0" type="double"/>
-			<parameter name="transformation_scaley" description="Transformation Scale Y" default="1.0" type="double"/>
+			<parameter name="serial" description="Serial" default="20065509" type="int" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/Serial"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="141.60.143.95" type="string" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/IPAddress"/>
+			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/Netmask"/>
+			<parameter name="port" description="Port" default="49374" type="int" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/Port"/>
+			<parameter name="timeout" description="Connection timeout" default="1000" type="int" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/Timeout"/>
+			<parameter name="laserondelay" description="Laser On Delay in microseconds" default="100" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserOnDelay"/>
+			<parameter name="laseroffdelay" description="Laser Off Delay in microseconds" default="100" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserOffDelay"/>
+			<parameter name="markdelay" description="Mark Delay in microseconds" default="570" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/MarkDelay"/>
+			<parameter name="jumpdelay" description="Jump Delay in microseconds" default="1400" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/JumpDelay"/>
+			<parameter name="polygondelay" description="Polygon Delay in microseconds" default="280" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/PolygonDelay"/>
+			<parameter name="laseroriginx" description="Laser Origin X" default="100" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserOriginX"/>
+			<parameter name="laseroriginy" description="Laser Origin Y" default="125" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserOriginY"/>
+			<parameter name="laserfield_minx" description="Laser Field Min X" default="0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserFieldMinX"/>
+			<parameter name="laserfield_miny" description="Laser Field Min Y" default="0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserFieldMinY"/>
+			<parameter name="laserfield_maxx" description="Laser Field Max X" default="200" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserFieldMaxX"/>
+			<parameter name="laserfield_maxy" description="Laser Field Max Y" default="250" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserFieldMaxY"/>
+			<parameter name="transformation_angle" description="Transformation Angle (in degree)" default="90.0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationAngle"/>
+			<parameter name="transformation_offsetx" description="Transformation Offset X (in mm)" default="0.000" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationOffsetX"/>
+			<parameter name="transformation_offsety" description="Transformation Offset Y (in mm)" default="0.002" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationOffsetY"/>
+			<parameter name="transformation_scalex" description="Transformation Scale X" default="1.0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationScaleX"/>
+			<parameter name="transformation_scaley" description="Transformation Scale Y" default="1.0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationScaleY"/>
 		</parametergroup>
 
 		<!-- Read-only summary of the persistent machine configuration, populated at init and
@@ -137,7 +139,7 @@
 			<parameter name="lastexposedlayer" description="Index of the last successfully exposed layer" default="-1" type="int"/>
 			<parameter name="exposurecount" description="Number of layer exposures completed in this execution" default="0" type="int"/>
 			<parameter name="lasterror" description="Laser subsystem is in error" default="0" type="bool"/>
-			<parameter name="watchdogtimeout" description="Max ms between layer commands before auto-cancel (0 disables)" default="300000" type="int"/>
+			<parameter name="watchdogtimeout" description="Max ms between layer commands before auto-cancel (0 disables)" default="300000" type="int" configschema="com.autodesk.remotelpbf" configpath="Process/WatchdogTimeout"/>
 			<parameter name="waitingsince" description="Global timer stamp (ms) when the current wait started" default="0" type="int"/>
 			<parameter name="watchdogremainingms" description="Remaining watchdog time in ms" default="0" type="int"/>
 		</parametergroup>
@@ -298,6 +300,7 @@
 
 		<parametergroup name="lasersignaltiming" description="CO2 Laser Signal Timing">
 			<parameter name="laseronsignal" description="Laser On GPIO State" default="0" type="bool"/>
+			<parameter name="enableleadtime" description="Wait after switching the laser enable pin on before a layer is drawn (in Milliseconds)" default="0" type="int"/>
 			<parameter name="pulsehalfperiod" description="Laser Pulse Half Period (in Microseconds)" default="25" type="double"/>
 			<parameter name="pulselength" description="Default Laser Pulse Length (in Microseconds)" default="5" type="double"/>
 			<parameter name="standbyhalfperiod" description="Standby Tickle Signal Half Period (in Microseconds)" default="100" type="double"/>
@@ -405,6 +408,7 @@
 			<!-- Name of a new machine configuration version, typed into the machine settings dialog.
 			     Reset to "" whenever the dialog is opened. -->
 			<parameter name="configversion_name" type="string" default="" description="Name typed for a new configuration version"/>
+			<parameter name="configreset_confirmation" type="string" default="" description="Confirmation text typed for a factory reset"/>
 		</sessionvariables>
 
 		<!-- Read-only details of the part selected in the execution page "Parts" tab. All values come
@@ -511,6 +515,21 @@
 					<button name="back" caption="Back" event="onclosedialog"/>
 				</buttongroup>
 
+			</content>
+		</dialog>
+
+		<!-- Factory reset is deliberately separate from history activation. It creates and activates
+		     a new, user-attributed version from the defaults declared by this installation. -->
+		<dialog name="factoryresetdialog">
+			<content name="frdlgcontent" title="Reset to Factory Settings">
+				<statusbanner name="frwarning" severity="warning" title="Reset machine configuration?" description="A new configuration version will be created from the defaults in config.xml. Existing history is preserved."/>
+				<form name="frdlgform">
+					<edit name="confirmation" caption="Type RESET to confirm" sync:value="session.configreset_confirmation"/>
+				</form>
+				<buttongroup name="frdlgactions" distribution="equal">
+					<button name="confirm" caption="Create and Activate Factory Version" event="onconfirmfactoryreset" variant="primary" formvalues="frdlgform"/>
+					<button name="cancel" caption="Cancel" event="oncancelfactoryreset" formvalues="frdlgform"/>
+				</buttongroup>
 			</content>
 		</dialog>
 
@@ -727,6 +746,7 @@
 					<buttongroup name="cfgsettingsactions" distribution="equal">
 						<button name="changecfg" caption="Change configuration" event="onopenmachinesettings" variant="primary"/>
 						<button name="historycfg" caption="View Configuration History" event="onopenmachinehistory"/>
+						<button name="resetcfg" caption="Reset to Factory Settings" event="onopenfactoryreset"/>
 					</buttongroup>
 				</content>
 
