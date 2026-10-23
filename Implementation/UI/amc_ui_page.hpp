@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_PAGE
 #define __AMC_UI_PAGE
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_PAGE
@@ -80,6 +81,7 @@ namespace AMC {
 		CUIExpression m_Icon;
 		CUIExpression m_Caption;
 		CUIExpression m_Description;
+		CUIExpression m_Visible;
 		uint32_t m_nGridColumns;
 		uint32_t m_nGridRows;
 
@@ -107,7 +109,6 @@ namespace AMC {
 		/////////////////////////////////////////////////////////////////////////////////////
 		// Legacy UI System
 		/////////////////////////////////////////////////////////////////////////////////////
-		virtual void writeLegacyModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray, CParameterHandler* pLegacyClientVariableHandler);
 		virtual PUIModule findModuleByUUID(const std::string& sUUID) override;
 		virtual PUIModuleItem findModuleItemByUUID(const std::string& sUUID) override;
 		virtual void registerFormName(const std::string& sFormUUID, const std::string& sFormName) override;
@@ -117,7 +118,14 @@ namespace AMC {
 		/////////////////////////////////////////////////////////////////////////////////////
 		// New UI Frontend System
 		/////////////////////////////////////////////////////////////////////////////////////
-		void frontendWritePageStatusToJSON(CJSONWriter& writer, CJSONWriterObject& pageObject, CUIFrontendState* pFrontendState, CStateMachineData * pStateMachineData);
+		void frontendWritePageStatusToJSON(CJSONWriter& writer, CJSONWriterObject& pageObject, CUIFrontendState* pFrontendState, CStateMachineData * pStateMachineData, bool bWriteModules, const sUIFrontendBuildEpoch& epoch);
+
+		void setVisibleExpression(const CUIExpression& visibleExpression);
+
+		bool isVisible(CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData);
+
+		// Collects the session references of the page level expressions (icon, caption, description, visible).
+		void collectSessionReferences(std::vector<std::string>& references);
 										
 	};
 		

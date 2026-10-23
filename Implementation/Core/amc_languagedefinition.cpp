@@ -34,8 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
 
-#define LANGUAGE_MAXSTRINGIDENTIFIERLENGTH 64
-
 namespace AMC {
 
 
@@ -45,7 +43,7 @@ namespace AMC {
 		if (sLanguageIdentifier.empty())
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYLANGUAGEIDENTIFIER);
 
-		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sLanguageIdentifier))
+		if (!AMCCommon::CUtils::stringIsValidLanguageIdentifier (sLanguageIdentifier))
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDLANGUAGEIDENTIFIER, sLanguageIdentifier);
 
 
@@ -67,24 +65,47 @@ namespace AMC {
 	}
 
 
-	std::string CLanguageDefinition::getTranslatedString(const std::string& sStringIdentifier)
+	bool CLanguageDefinition::findTranslation(const std::string& sStringIdentifier, std::string& sValue)
+	{
+		auto iIter = m_TranslationMap.find(sStringIdentifier);
+		if (iIter != m_TranslationMap.end()) {
+			sValue = iIter->second;
+			return true;
+		}
+
+		if (m_pParentLanguage.get() != nullptr)
+			return m_pParentLanguage->findTranslation(sStringIdentifier, sValue);
+
+		return false;
+	}
+
+	std::string CLanguageDefinition::getTranslatedString(const std::string& sStringIdentifier, const std::string& sFallbackValue)
 	{
 		if (sStringIdentifier.empty ())
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYLANGUAGESTRINGIDENTIFIER);
 
-		if (sStringIdentifier.size() >= LANGUAGE_MAXSTRINGIDENTIFIERLENGTH)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER);
+		if (!AMCCommon::CUtils::stringIsValidLanguageStringIdentifier(sStringIdentifier))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER, sStringIdentifier);
 
-		auto iIter = m_TranslationMap.find(sStringIdentifier);
-		if (iIter != m_TranslationMap.end())
-			return iIter->second;
+		std::string sValue;
+		if (findTranslation(sStringIdentifier, sValue))
+			return sValue;
 
-		if (m_pParentLanguage.get() != nullptr)
-			return m_pParentLanguage->getTranslatedString(sStringIdentifier);
+		{
+			std::lock_guard<std::mutex> lockGuard(m_TranslationMissesMutex);
+			m_TranslationMisses.insert(sStringIdentifier);
+		}
 
-		m_TranslationMisses.insert(sStringIdentifier);
+		if (sFallbackValue.empty())
+			return sStringIdentifier;
 
-		return "";
+		return sFallbackValue;
+	}
+
+	std::set<std::string> CLanguageDefinition::getTranslationMisses()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_TranslationMissesMutex);
+		return m_TranslationMisses;
 	}
 
 	bool CLanguageDefinition::stringExists(const std::string& sStringIdentifier)
@@ -104,10 +125,7 @@ namespace AMC {
 		if (sStringIdentifier.empty())
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYLANGUAGESTRINGIDENTIFIER);
 
-		if (sStringIdentifier.size() >= LANGUAGE_MAXSTRINGIDENTIFIERLENGTH)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER);
-
-		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sStringIdentifier))
+		if (!AMCCommon::CUtils::stringIsValidLanguageStringIdentifier(sStringIdentifier))
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER, sStringIdentifier);
 
 		m_TranslationMap.insert(std::make_pair (sStringIdentifier, sValue));

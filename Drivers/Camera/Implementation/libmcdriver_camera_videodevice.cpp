@@ -173,21 +173,21 @@ std::string CVideoDevice_Win32::GetSourceFormatDescription(const LibMCDriver_Cam
 
 void CVideoDevice_Win32::StartStreamCapture(LibMCEnv::PVideoStream pStreamInstance)
 {
-	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
+	m_pDeviceInstance->startStreamCapture(pStreamInstance);
 }
 
 void CVideoDevice_Win32::StopStreamCapture()
 {
-	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
+	m_pDeviceInstance->stopStreamCapture();
 }
 
 bool CVideoDevice_Win32::StreamCaptureIsActive()
 {
-	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
+	return m_pDeviceInstance->streamCaptureIsActive();
 }
 
 void CVideoDevice_Win32::GetStreamCaptureStatistics(LibMCDriver_Camera_double & dDesiredFramerate, LibMCDriver_Camera_double & dMinFramerate, LibMCDriver_Camera_double & dMaxFramerate, LibMCDriver_Camera_double & dMeanFramerate, LibMCDriver_Camera_double & dStdDevFramerate)
 {
-	throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
+	m_pDeviceInstance->getStreamCaptureStatistics(dDesiredFramerate, dMinFramerate, dMaxFramerate, dMeanFramerate, dStdDevFramerate);
 }
 

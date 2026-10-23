@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCTEST_UNITTEST_IO
 
 
+#include <cstdint>
 #include <string>
 #include <memory>
 

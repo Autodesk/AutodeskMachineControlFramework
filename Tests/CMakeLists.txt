@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ]]
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 project("AMC Unit Tests")
 
@@ -37,6 +37,7 @@ add_subdirectory(RayLaseTest)
 add_subdirectory(BuRTest)
 add_subdirectory(RasterizerTest)
 add_subdirectory(FieldData2DTest)
+add_subdirectory(SignalLoadTest)
 add_subdirectory(ScanlabOIETest)
 add_subdirectory(ScanlabSMCTest)
 add_subdirectory(BK9xxxTest)

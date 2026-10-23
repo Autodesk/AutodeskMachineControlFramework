@@ -36,7 +36,10 @@ Abstract: This is the class declaration of CRTCContext
 #endif
 
 // Include custom headers here.
+#include "libmcdriver_scanlab_rtcjumpfilter.hpp"
+
 #include <set>
+#include <atomic>
 
 namespace LibMCDriver_ScanLab {
 namespace Impl {
@@ -85,6 +88,44 @@ public:
 };
 
 typedef std::shared_ptr<CRTCPowerMapping> PRTCPowerMapping;
+
+
+class CRTCDefocusCorrectionByPower {
+private:
+	struct sDefocusKnot { double x; double y; }; // x = power in watts, y = defocus offset in mm
+
+	// Sorted by x = watts, maps to y = defocus offset in mm
+	std::vector<sDefocusKnot> m_DefocusTable;
+
+	double m_dEpsilon;
+
+	bool nearlyEqual(double a, double b, double eps);
+	bool interpolate(const std::vector<sDefocusKnot>& pts, double x, double& y);
+
+public:
+
+	CRTCDefocusCorrectionByPower();
+
+	virtual ~CRTCDefocusCorrectionByPower();
+
+	// Sets the correction table from a map of (powerInWatts -> defocusOffsetInMM).
+	// Power values MUST be non-negative and strictly increasing.
+	void setDefocusCorrectionTable(const std::map<double, double>& defocusByPowerMap);
+
+	// Looks up the defocus offset in mm for a given laser power in watts.
+	// Returns true if the lookup was interpolated within the table range,
+	// false if it was clamped to an endpoint.
+	bool mapPowerToDefocusOffset(double dLaserPowerInWatts, double& dDefocusOffsetInMM);
+
+	// Returns the number of calibration points in the table.
+	size_t getTableSize();
+
+	// Returns the internal table for serialization / API retrieval.
+	const std::vector<sDefocusKnot>& getTable();
+
+};
+
+typedef std::shared_ptr<CRTCDefocusCorrectionByPower> PRTCDefocusCorrectionByPower;
 
 
 class CRTCContextOwnerData {
@@ -169,6 +210,48 @@ protected:
 	double m_dStandbyPulseHalfPeriodInMS;
 	double m_dStandbyPulseLengthInMS;
 
+	// Cache used only while AddMicrovectorMovement writes one microvector block. Normal power
+	// writes never consult or update it, so their semantics remain independent of this optimization.
+	int32_t m_nMicrovectorPowerCacheDACValue;				// -1 == invalid, re-issue unconditionally
+	uint32_t m_nMicrovectorPowerCachePulseHalfPeriodInBits;	// for eLaserPort::LaserPulseModulation
+	uint32_t m_nMicrovectorPowerCachePulseLengthInBits;		// for eLaserPort::LaserPulseModulation
+
+	// Monotonic count of power commands emitted while the microvector cache is enabled.
+	uint64_t m_nMicrovectorPowerCommandsWritten;
+
+	// List sizes as passed to ConfigureLists / n_config_list. 0 == never configured, capacity
+	// checks are skipped then.
+	uint32_t m_nConfiguredListSizeA;
+	uint32_t m_nConfiguredListSizeB;
+
+	// true while list execution has already been started out of AddMicrovectorMovement in
+	// streaming mode. While set, the next ExecuteList() / executeListWithRecording() MUST NOT
+	// issue a second n_execute_list_pos: the list is already running and the RTC6 would report
+	// RTC6_BUSY. Shared with CRTCRecordingInstance (see PrepareRecording), because the recording
+	// path starts list execution itself and bypasses this context.
+	std::shared_ptr<std::atomic<bool>> m_pMicrovectorStreamExecutionStarted;
+
+	// List index / position of the last SetStartList() call, i.e. where the currently open list
+	// begins. The streaming path starts execution from here (prologue included).
+	uint32_t m_nCurrentStartListIndex;
+	uint32_t m_nCurrentStartListPosition;
+
+	// Opt-in switch set via the public SetMicrovectorStreamingEnabled(). The machine plugin
+	// forwards cardconfig/enablemicrovectorstreaming here at initialization. Default false:
+	// a plugin that never calls the setter gets the sequential download path.
+	bool m_bMicrovectorStreamingEnabled;
+
+	// Streaming threshold in microvectors, also set via SetMicrovectorStreamingEnabled().
+	// Layers below this size always download sequentially. Clamped to at least
+	// RTCCONTEXT_MICROVECTORSTREAM_MINPREBUFFER, because below that the prebuffer would cover
+	// the whole layer and the margin checks would never run.
+	uint64_t m_nMicrovectorStreamMinLayerSize;
+
+	// Fraction of the layer downloaded before execution starts, also set via
+	// SetMicrovectorStreamingEnabled(). Range (0..1]; values below the safe minimum only make
+	// sense for testing the overrun detector and are accepted with a logged warning.
+	double m_dMicrovectorStreamPrebufferFraction;
+
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 	LibMCDriver_ScanLab::eOIEOperationMode m_OIEOperationMode;
@@ -181,12 +264,26 @@ protected:
 	PNLightAFXProfileSelectorInstance m_pNLightAFXSelectorInstance;
 
 	PRTCPowerMapping m_pPowerMapping;
+
+	// Optional defocus correction based on laser power (for thermal lensing compensation).
+	// nullptr when disabled.
+	PRTCDefocusCorrectionByPower m_pDefocusCorrectionByPower;
+
+	PRTCJumpFilter m_pJumpFilter;
 	
 	void writeJumpSpeed (float jumpSpeed);
 
 	void writeMarkSpeed(float markSpeed);
 
-	void writePower(double dPowerInPercent, bool bOIEPIDControlFlag);
+	// bCheckError == false suppresses the per-call n_get_last_error query. That query is a control
+	// command, and on RTC6 Ethernet boards every control command forces the DLL to wait until the
+	// board has acknowledged all previously buffered list commands (RTC6 manual, ch. 16.9 "High
+	// Performance Mode"), i.e. one network round trip per call. Only pass false from bulk list
+	// writers that check the accumulated error (n_get_error) once after the whole block.
+	void writePower(double dPowerInPercent, bool bOIEPIDControlFlag, bool bUseMicrovectorPowerCache, bool bCheckError = true);
+
+	// Drops the microvector-local power cache, so the next cached write re-issues the command.
+	void invalidateMicrovectorPowerCache();
 
 	void writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, bool bOIEPIDControlFlag);
 
@@ -212,6 +309,20 @@ protected:
 
 	// Calls the SetTriggerX Call that is necessary for the specific OIE board
 	void callSetTriggerOIE(uint32_t nPeriod);
+
+	// Converts a delay in seconds to RTC ticks
+	int32_t ConvertDelaySecondsToTicks(double delay);
+
+	// Writes nCount microvectors into the currently open list without any per-command or
+	// per-block error checking. Shared loop body of the sequential and the streaming download
+	// paths of AddMicrovectorMovement; callers bracket it with n_reset_error / n_get_error.
+	void emitMicroVectorsToOpenList(const LibMCDriver_ScanLab::sMicroVector* pBegin, uint64_t nCount);
+
+	// Streaming download only: reads input and output pointer (two control commands, so this
+	// drains the High Performance Mode pipeline - call sparingly) and verifies that the output
+	// pointer has not caught up with the download. Throws after stopping list execution if the
+	// margin is exhausted. Returns min(nMinObservedMargin, current margin) for diagnostics.
+	uint64_t checkStreamMargin(uint64_t nMinObservedMargin);
 
 public:
 
@@ -340,6 +451,10 @@ public:
 	void AddWriteDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput) override;
 
 	void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) override;
+
+	LibMCDriver_ScanLab_uint32 ReadDigitalInputs() override;
+
+	bool ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex) override;
 
 	void EnableOIE() override;
 
@@ -475,6 +590,16 @@ public:
 
 	LibMCDriver_ScanLab_double MapPowerWattsToPercent(const LibMCDriver_ScanLab_double dLaserPowerInWatts) override;
 
+	void SetPiecewiseLinearDefocusCorrectionByPower(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint* pCalibrationPointsBuffer) override;
+
+	void DisableDefocusCorrectionByPower() override;
+
+	bool DefocusCorrectionByPowerIsEnabled() override;
+
+	void GetDefocusCorrectionByPower(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint* pCalibrationPointsBuffer) override;
+
+	LibMCDriver_ScanLab_double MapDefocusCorrectionFromPower(const LibMCDriver_ScanLab_double dLaserPowerInWatts) override;
+
 	void EnableSpatialLaserPowerModulation(const LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData) override;
 
 	void DisablePowerModulation() override;
@@ -482,6 +607,10 @@ public:
 	void EnableLineSubdivision(const LibMCDriver_ScanLab_double dLengthThreshold) override;
 
 	void DisableLineSubdivision() override;
+
+	void SetMinimumJumpDistance(const LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM) override;
+
+	LibMCDriver_ScanLab_double GetMinimumJumpDistance() override;
 
 	LibMCDriver_ScanLab_int32 ReadMultiMCBSP(const LibMCDriver_ScanLab_uint32 nRegisterNo) override;
 
@@ -508,6 +637,8 @@ public:
 	LibMCDriver_ScanLab_int32 GetRTCInternalValue(const LibMCDriver_ScanLab_uint32 nInternalSignalID) override;
 
 	void AddMicrovectorMovement(const LibMCDriver_ScanLab_uint64 nMicrovectorArrayBufferSize, const LibMCDriver_ScanLab::sMicroVector* pMicrovectorArrayBuffer) override;
+
+	void SetMicrovectorStreamingEnabled(const bool bEnabled, const LibMCDriver_ScanLab_uint32 nMinLayerSize, const LibMCDriver_ScanLab_double dPrebufferFraction) override;
 
 };
 

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_CONTENTITEM_ALERTLIST
 #define __AMC_UI_MODULE_CONTENTITEM_ALERTLIST
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -78,8 +79,6 @@ namespace AMC {
 
 		virtual ~CUIModule_ContentAlertList();
 
-		void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
 		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
@@ -88,7 +87,9 @@ namespace AMC {
 
 		virtual std::list <std::string> getReferenceUUIDs() override;
 
-
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 	};
 
 

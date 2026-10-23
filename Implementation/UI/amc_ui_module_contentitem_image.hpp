@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_CONTENTITEM_IMAGE
 #define __AMC_UI_MODULE_CONTENTITEM_IMAGE
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -67,13 +68,23 @@ namespace AMC {
 		
 		virtual ~CUIModule_ContentImage();
 
-		void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
 
 		virtual void configurePostLoading() override;
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
+
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
+
+	private:
+		// Resolves a resource name or UUID string to a UUID.
+		std::string resolveResourceToUUID(const std::string& sResourceValue);
+
+		// Registers an attribute that is only written if the expression is not empty.
+		void registerOptionalStringAttribute(const std::string& sName, const CUIExpression& expression);
 	};
 
 

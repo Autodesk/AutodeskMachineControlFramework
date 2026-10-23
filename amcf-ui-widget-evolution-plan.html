@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AMCF UI Evolution Plan - Widgets, Properties, and Form Builder Architecture</title>
+  <style>
+    :root {
+      --bg: #f4f8fc;
+      --card: #fff;
+      --text: #112640;
+      --muted: #4d627a;
+      --line: #d4e0ef;
+      --head: #eaf1fb;
+      --accent: #005ea2;
+      --phase1: #e7f3ff;
+      --phase2: #edf8f1;
+      --phase3: #fff5e8;
+      --risk: #8d2e00;
+      --ok: #1f6d3a;
+      --done-bg: #f0faf4;
+      --done-border: #b5dfc6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f9fcff 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.45;
+    }
+    .wrap { max-width: 1360px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    h2 { margin: 26px 0 10px; font-size: 22px; }
+    h3 { margin: 18px 0 8px; font-size: 18px; }
+    p, li { color: var(--muted); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 3px 12px rgba(17, 38, 64, 0.06);
+    }
+    .phase1 { background: var(--phase1); }
+    .phase2 { background: var(--phase2); }
+    .phase3 { background: var(--phase3); }
+    .done-card {
+      background: var(--done-bg);
+      border: 1px solid var(--done-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(30, 100, 60, 0.07);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 13px;
+      margin: 8px 0 12px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px;
+      vertical-align: top;
+    }
+    th { background: var(--head); text-align: left; }
+    code {
+      background: #eef4fd;
+      border: 1px solid #d4e1f3;
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #f8fbff;
+      border: 1px solid #d8e5f6;
+      border-radius: 8px;
+      padding: 10px;
+      color: #15314f;
+      font-size: 12px;
+      overflow: auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px;
+    }
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #f8fbff;
+      color: #163354;
+      padding: 2px 8px;
+      margin: 2px 6px 2px 0;
+      font-size: 12px;
+    }
+    .risk { color: var(--risk); font-weight: 600; }
+    .ok   { color: var(--ok);   font-weight: 600; }
+    .new  { color: #005ea2;     font-weight: 600; }
+
+    /* status badges */
+    .badge {
+      display: inline-block;
+      border-radius: 6px;
+      padding: 1px 7px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .badge-done   { background: #dff3ea; color: #14572e; border: 1px solid #9fd7b8; }
+    .badge-new    { background: #deeeff; color: #003a72; border: 1px solid #b0d4f7; }
+    .badge-partial{ background: #fff0d0; color: #6b3d00; border: 1px solid #f0cc80; }
+    .badge-future { background: #eee;    color: #555;    border: 1px solid #ccc;    }
+
+    /* progress bar */
+    .progress-bar {
+      height: 10px;
+      background: #e0ecf8;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 6px 0 2px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1f6d3a, #39a860);
+      border-radius: 99px;
+    }
+
+    .status-header {
+      background: linear-gradient(135deg, #005ea2 0%, #003366 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .status-header h2 { color: #fff; margin: 0 0 8px; border: none; }
+    .status-header p  { color: rgba(255,255,255,.8); margin: 0; }
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+    @media (max-width: 700px) { .status-grid { grid-template-columns: 1fr; } }
+    .status-tile {
+      background: rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+    .status-tile .phase-name { font-size: 12px; font-weight: 700; opacity: .7; text-transform: uppercase; letter-spacing: .05em; }
+    .status-tile .phase-status { font-size: 15px; font-weight: 700; margin-top: 4px; }
+    .status-tile .phase-bar { height: 6px; background: rgba(255,255,255,.25); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+    .status-tile .phase-bar-fill { height: 100%; border-radius: 99px; background: #6ee8a0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>AMCF UI Evolution Plan</h1>
+    <p>Goal: define a cohesive next-generation widget architecture for robust HMI design, with a dedicated and expandable <code>form</code> module and clear compatibility path from the current AMCF schema.</p>
+
+    <!-- ── Status dashboard ──────────────────────────────── -->
+    <div class="status-header">
+      <h2>Current Status — Feb 2026</h2>
+      <p>Phase 1 and Phase 2 are complete. The content module has been upgraded with card styles and spacing. Phase 3 (Form Builder + Advanced Modules) is the next focus.</p>
+      <div class="status-grid">
+        <div class="status-tile">
+          <div class="phase-name">Phase 1 — Foundation</div>
+          <div class="phase-status">Complete ✓</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="status-tile">
+          <div class="phase-name">Phase 2 — Form Module</div>
+          <div class="phase-status">Complete ✓</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="status-tile">
+          <div class="phase-name">Phase 3 — Builder + Advanced</div>
+          <div class="phase-status">Pending</div>
+          <div class="phase-bar"><div class="phase-bar-fill" style="width:5%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2>1. Target Architecture Principles</h2>
+    <div class="card">
+      <div class="grid">
+        <div>
+          <h3>Schema-First Widgets</h3>
+          <p>Every widget is declared by typed JSON schema with stable contracts and backward-compatible defaults.</p>
+        </div>
+        <div>
+          <h3>Composable Layout</h3>
+          <p>Widgets nest cleanly under <code>grid</code>, <code>tabs</code>, <code>content</code> (card variants), dialogs, and future split panes without custom one-off logic.</p>
+        </div>
+        <div>
+          <h3>Unified Event Model</h3>
+          <p>All widgets emit events via <code>/api/event</code> with source widget UUID and value payload. Server-side validation uses <code>/api/validate</code>.</p>
+        </div>
+        <div>
+          <h3>Responsive by Default</h3>
+          <p>Desktop/wall-panel/mobile behavior is explicit in widget properties. Form builder preview mode is a Phase 3 target.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>2. Cross-Cutting Properties</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Property Group</th>
+            <th>Properties</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Identity and semantics</td>
+            <td><code>id</code>, <code>name</code>, <code>role</code>, <code>testid</code>, <code>tags[]</code></td>
+            <td><span class="badge badge-future">Future</span></td>
+          </tr>
+          <tr>
+            <td>Visibility and state</td>
+            <td><code>visible</code>, <code>enabledWhen</code>, <code>readonlyWhen</code></td>
+            <td><span class="badge badge-done">Done</span> <code>visible</code> with <code>CUIExpression</code> dynamic expressions on all v2 modules; <code>enabledWhen</code> / <code>readonlyWhen</code> on form entities.</td>
+          </tr>
+          <tr>
+            <td>Layout and responsive</td>
+            <td><code>colSpan</code>, <code>rowSpan</code>, <code>minWidth</code>, <code>maxWidth</code>, <code>breakpoints</code></td>
+            <td><span class="badge badge-future">Future</span> Grid module handles column/row sizing; breakpoint system is Phase 3.</td>
+          </tr>
+          <tr>
+            <td>Styling and theming</td>
+            <td><code>cardstyle</code>, <code>elevation</code>, <code>spacing</code>, <code>cardcolor</code></td>
+            <td><span class="badge badge-done">Done</span> Implemented on <code>content</code> module. Design token system for other modules is Phase 3.</td>
+          </tr>
+          <tr>
+            <td>Localization</td>
+            <td><code>labelKey</code>, <code>helpKey</code>, <code>placeholderKey</code>, <code>tooltipKey</code></td>
+            <td><span class="badge badge-future">Future</span></td>
+          </tr>
+          <tr>
+            <td>Data contracts</td>
+            <td><code>dataSource</code>, <code>refreshPolicy</code>, <code>cacheTTL</code>, <code>emptyState</code>, <code>errorState</code></td>
+            <td><span class="badge badge-future">Future</span> Each module polls independently; unified contract is Phase 3.</td>
+          </tr>
+          <tr>
+            <td>Event contracts</td>
+            <td><code>events{onChange,onClick,onSubmit}</code>, <code>payloadMap</code>, <code>debounceMs</code>, <code>confirm</code></td>
+            <td><span class="badge badge-partial">Partial</span> Form entities emit <code>changeevent</code>, <code>toggleevent</code>; action bar emits <code>submitevent</code>/<code>cancelevent</code>. Namespace convention and debounce are Phase 3.</td>
+          </tr>
+          <tr>
+            <td>Audit and ops</td>
+            <td><code>auditLevel</code>, <code>requiresRole[]</code>, <code>requiresAck</code>, <code>telemetryKey</code></td>
+            <td><span class="badge badge-future">Future</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>3. New Widget Modules to Add</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>New Module</th>
+            <th>Core Use Case</th>
+            <th>Key Features</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>formbuilder</code></td><td>Visual and schema-driven form creation</td><td>Drag/drop fields, section templates, validation builder, responsive preview, schema export.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>panel</code></td><td>Reusable titled card container</td><td>Header actions, collapsible body, status stripe, slot composition.</td><td><span class="badge badge-partial">Partial</span> <code>content</code> card styles cover basic cases.</td></tr>
+          <tr><td><code>splitview</code></td><td>Resizable side-by-side areas</td><td>Horizontal/vertical split, persistent divider, optional lock ratios.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>wizard</code></td><td>Guided multi-step workflows</td><td>Step graph, per-step validation, step conditions, resume state.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>timeline</code></td><td>Process lifecycle tracking</td><td>Events, timestamps, status transitions, clickable nodes.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>statusmatrix</code></td><td>Subsystem health matrix</td><td>Color-coded grid, filtering, alarm links, drilldown actions.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>metriccards</code></td><td>KPI snapshot tiles</td><td>Trend indicator, thresholds, units, compact/expanded modes.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>timeseries</code></td><td>Modern chart module replacement</td><td>Multiple axes, zoom, brush, annotations, downsampling.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>tableplus</code></td><td>Unified data table component</td><td>Typed columns, custom cells, inline actions, bulk actions, virtual scroll.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>alarmcenter</code></td><td>Operational alert handling</td><td>Acknowledge/shelve/assign, severity policies, timeline link, SOP actions.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>assetviewer</code></td><td>Media and model presentation</td><td>Image/video/3D tabs, metadata pane, quality fallback.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>commandbar</code></td><td>Operator action strip</td><td>Role-aware actions, grouped commands, confirmation templates.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>4. Form Module — Current State</h2>
+
+    <div class="done-card">
+      <p><span class="badge badge-done">Complete</span> The <code>form</code> module is a fully first-class module in both backend (<code>CUIModule_ContentLeaf</code> / <code>amc_ui_module_contentitem_form.cpp</code>) and frontend (<code>AMCModule_Form.vue</code>, <code>AMCModule_Form.js</code>, <code>AMCFormField.vue</code>). It supports v2 frontend updates and the complete entity set listed below.</p>
+      <div>
+        <span class="pill">Entity types: edit, switch, memo, combobox, number, slider, datetime, multiselect, calculated</span>
+        <span class="pill">Sections: collapsible, icon, description</span>
+        <span class="pill">Action bar: submit, cancel, validate</span>
+        <span class="pill">Dirty-state tracking</span>
+        <span class="pill">Optimistic &amp; pessimistic submit</span>
+        <span class="pill">Server validation via /api/validate</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>4.1 Implemented Form Field Types</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Purpose</th><th>Key Properties</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><code>edit</code></td><td>Text entry</td><td><code>minlength</code>, <code>maxlength</code>, <code>placeholder</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>switch</code></td><td>Boolean toggle</td><td><code>changeevent</code>, <code>value</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>memo</code></td><td>Multi-line text</td><td><code>rows</code>, <code>minlength</code>, <code>maxlength</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>combobox</code></td><td>Dropdown selection</td><td><code>options[]</code>, <code>comboevent</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>number</code></td><td>Numerical entry</td><td><code>min</code>, <code>max</code>, <code>step</code>, <code>unit</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>slider</code></td><td>Continuous tuning</td><td><code>min</code>, <code>max</code>, <code>step</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>datetime</code></td><td>Temporal entry</td><td><code>mode</code> (date/time/datetime), <code>format</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>multiselect</code></td><td>Multiple choice chips</td><td><code>items[]</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>calculated</code></td><td>Read-only computed output</td><td><code>format</code>, expression-driven</td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>section</code></td><td>Field group container</td><td><code>collapsible</code>, <code>defaultopen</code>, <code>icon</code>, <code>description</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>actionbar</code></td><td>Submit / cancel strip</td><td><code>submitevent</code>, <code>cancelevent</code>, <code>validateevent</code>, <code>optimistic</code></td><td><span class="badge badge-done">Done</span></td></tr>
+          <tr><td><code>file</code></td><td>Document upload</td><td><code>accept</code>, <code>maxSizeMb</code>, <code>multiple</code></td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>signature</code></td><td>Operator sign-off</td><td><code>requiredRole</code>, <code>reasonCode</code></td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>password</code></td><td>Secure field</td><td><code>maskToggle</code>, <code>policy</code></td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>jsoneditor</code></td><td>Structured JSON input</td><td><code>schemaRef</code>, <code>mode</code>, <code>lint</code></td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td><code>taginput</code></td><td>Label collections</td><td><code>allowedValues</code>, <code>allowCustom</code></td><td><span class="badge badge-future">Phase 3</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>4.2 Form Validation Framework</h3>
+      <table>
+        <thead><tr><th>Layer</th><th>Validation Scope</th><th>Status</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Field-level</td><td>Single value constraints</td><td><span class="badge badge-done">Done</span></td><td>Range, string length, required enforced in <code>AMCFormField.vue</code> <code>checkRules()</code>.</td></tr>
+          <tr><td>Cross-field</td><td>Dependencies between fields</td><td><span class="badge badge-done">Done</span></td><td>Via <code>/api/validate</code>: server throws <code>VALIDATIONERROR:{...}</code> and response maps errors to field UUIDs.</td></tr>
+          <tr><td>Section-level</td><td>Composite checks</td><td><span class="badge badge-partial">Partial</span></td><td>Supported through server-side validation returning section-level error messages.</td></tr>
+          <tr><td>Form-level</td><td>Workflow invariants</td><td><span class="badge badge-done">Done</span></td><td>Action bar <code>isFormDirty</code> / <code>isSubmitting</code> state and optimistic vs pessimistic submit policy.</td></tr>
+          <tr><td>Server async</td><td>Backend constraint checks</td><td><span class="badge badge-done">Done</span></td><td><code>/api/validate</code> endpoint calls <code>pUIHandler-&gt;handleEvent</code>; <code>CAPIHandler_Validate</code> parses <code>VALIDATIONERROR:</code> exception prefix.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>4.3 Form Builder UX (Authoring Tool) — Phase 3</h3>
+      <table>
+        <thead><tr><th>Builder Area</th><th>Capabilities</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Palette</td><td>Field components, section templates, action widgets.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td>Canvas</td><td>Drag/drop layout with snap grid, alignment guides, breakpoint preview.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td>Inspector</td><td>Schema properties editor per selected field or section.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td>Rules panel</td><td>Condition and validation rule editor with expression helper.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td>Data binding panel</td><td>Map fields to entity UUIDs and event payload keys.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td>Preview/runtime parity</td><td>Live simulation with mock state and event traces.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+          <tr><td>Versioning</td><td>Save drafts, publish versions, compare schema diffs.</td><td><span class="badge badge-future">Phase 3</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>5. Content Module — Card Widget Upgrade</h2>
+    <div class="done-card">
+      <p><span class="badge badge-done">New — Feb 2026</span> The <code>content</code> module has been upgraded from a plain div wrapper into a configurable card widget. All new attributes are backward-compatible (defaults preserve previous appearance). Full documentation: <a href="amcf-content-widget-upgrade.html">amcf-content-widget-upgrade.html</a>.</p>
+      <table>
+        <thead><tr><th>New Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>cardstyle</code></td><td>string enum</td><td><code>none</code></td><td><code>none</code> (plain divs), <code>elevated</code> (drop shadow), <code>outlined</code> (border), <code>tinted</code> (coloured background).</td></tr>
+          <tr><td><code>spacing</code></td><td>integer px</td><td><code>0</code></td><td>CSS <code>gap</code> between vertically stacked child sub-modules.</td></tr>
+          <tr><td><code>elevation</code></td><td>integer 0–24</td><td><code>2</code></td><td>Vuetify shadow depth for the <code>elevated</code> style.</td></tr>
+          <tr><td><code>cardcolor</code></td><td>CSS color</td><td><em>empty</em></td><td>Background colour override for the <code>tinted</code> style.</td></tr>
+        </tbody>
+      </table>
+      <p>The component now fills <code>height: 100%</code> inside Grid cells. Card styles render <code>title</code> / <code>subtitle</code> using Vuetify <code>v-card-title</code> / <code>v-card-subtitle</code> for professional appearance.</p>
+    </div>
+
+    <h2>6. App Layout Fixes (Feb 2026)</h2>
+    <div class="done-card">
+      <p><span class="badge badge-done">Fixed</span> The root application layout was refactored from JavaScript pixel calculation to CSS flex for reliable full-height behaviour:</p>
+      <ul>
+        <li>Content card expanded from <code>width: 90%</code> (centred) to <code>width: 100%</code>.</li>
+        <li>Height is now managed via <code>.v-main__wrap { display:flex; flex-direction:column; height:100% }</code> rather than <code>window.innerHeight</code> arithmetic.</li>
+        <li>Page <code>v-container</code> replaced with a plain <code>div</code> to eliminate Vuetify's breakpoint <code>max-width</code> cap.</li>
+        <li><code>margin: auto</code> removed from card style so it no longer forces centering.</li>
+      </ul>
+    </div>
+
+    <h2>7. Bug Fixes Applied (Feb 2026)</h2>
+    <div class="done-card">
+      <h3>LayerView / GLScene</h3>
+      <ul>
+        <li><span class="badge badge-done">Fixed</span> <code>module.uuid</code> scoping error in <code>created()</code> hooks of both <code>AMCModule_LayerView.vue</code> and <code>AMCModule_GLScene.vue</code>.</li>
+        <li><span class="badge badge-done">Fixed</span> <code>LayerViewerInstance</code> is now always initialised in <code>created()</code>, preventing null-dereference during render when the WebGL instance is retrieved from cache.</li>
+        <li><span class="badge badge-done">Fixed</span> Platform item is now synthesised from v2 module attributes (<code>platformuuid</code>) in <code>_normalizeV2ToLegacy()</code>, so the build plate renders correctly in v2 mode.</li>
+        <li><span class="badge badge-done">Fixed</span> <code>baseimageresource</code> attribute registered as the resource UUID (not the filename) so <code>/image/{uuid}</code> resolves correctly.</li>
+        <li><span class="badge badge-done">Fixed</span> <code>layercount</code> uses <code>Assert.OptionalIntegerValue</code> to default to 0 when absent from v2 attributes.</li>
+      </ul>
+      <h3>BuildList Thumbnails</h3>
+      <ul>
+        <li><span class="badge badge-done">Fixed</span> <code>defaultthumbnail</code> UUID is now exposed from C++ via v2 attributes so the JS module can use it as a fallback when <code>job.thumbnail</code> is absent from <code>/api/build</code> responses, preventing thumbnails from vanishing on load.</li>
+      </ul>
+    </div>
+
+    <h2>8. Proposed Unified Widget Schema (Example)</h2>
+    <div class="card">
+      <pre>{
+  "uuid": "...",
+  "type": "form",
+  "caption": "Build Parameters",
+  "sections": [
+    {
+      "type": "section",
+      "uuid": "sect-process",
+      "title": "Process Settings",
+      "collapsible": true,
+      "defaultopen": true,
+      "entities": [
+        {
+          "uuid": "field-layer-thickness",
+          "type": "number",
+          "label": "Layer Thickness",
+          "unit": "um",
+          "min": 10,
+          "max": 120,
+          "step": 1
+        },
+        {
+          "uuid": "field-exposure",
+          "type": "slider",
+          "label": "Laser Power",
+          "min": 0,
+          "max": 1000,
+          "step": 10,
+          "unit": "W"
+        }
+      ]
+    }
+  ],
+  "actionbar": {
+    "type": "actionbar",
+    "uuid": "bar-process",
+    "submitevent": "apply_build_parameters",
+    "cancelevent": "reset_build_parameters",
+    "validateevent": "validate_build_parameters",
+    "optimistic": false
+  }
+}</pre>
+    </div>
+
+    <h2>9. Cohesive HMI Widget Family — Current Status</h2>
+    <div class="card">
+      <p>Items marked <strong class="ok">[live]</strong> exist as first-class modules. Items marked <strong class="new">[upgraded]</strong> have been recently enhanced.</p>
+      <div>
+        <span class="pill">Layout: <strong class="ok">grid</strong>, <strong class="ok">tabs</strong>, <strong class="new">content (card variants, spacing, height:100%)</strong>, splitview, accordion</span>
+        <span class="pill">Data: <strong class="ok">parameterlist</strong>, <strong class="ok">buildlist</strong>, <strong class="ok">executionlist</strong>, <strong class="ok">alertlist</strong>, <strong class="ok">configurationlist</strong>, tableplus, metriccards, timeseries, timeline, statusmatrix</span>
+        <span class="pill">Actions: <strong class="ok">buttongroup</strong>, commandbar, wizard</span>
+        <span class="pill">Input: <strong class="new">form (9 field types + sections + actionbar + /api/validate)</strong>, formbuilder, <strong class="ok">upload</strong></span>
+        <span class="pill">Media/3D: <strong class="ok">image</strong>, <strong class="ok">videostream</strong>, <strong class="ok">graphic</strong>, <strong class="new">layerview (build plate fix)</strong>, <strong class="ok">glscene</strong>, assetviewer</span>
+        <span class="pill">Operations: <strong class="ok">logs</strong>, <strong class="ok">chart</strong>, alarmcenter, notifications, audit feed</span>
+      </div>
+    </div>
+
+    <h2>10. Migration and Delivery Plan</h2>
+
+    <div class="done-card">
+      <h3>Phase 1: Stabilize Existing Widgets — Complete</h3>
+      <ul>
+        <li class="ok">Done: migrate client traffic from <code>/ui/*</code> to dedicated <code>/api/*</code> handlers and unregister <code>CAPIHandler_UI</code>.</li>
+        <li class="ok">Done: promote all 12 former content-item types to first-class modules in backend (<code>CUIModule_ContentLeaf</code>) and frontend (<code>AMCModule_Factory.vue</code> component map).</li>
+        <li class="ok">Done: implement v2 frontend state via <code>/api/frontend</code> with <code>frontendWriteItemToJSON</code>/<code>frontendWriteModuleStatusToJSON</code>; mark <code>/api/state</code> as deprecated.</li>
+        <li class="ok">Done: add v2 format normalisation (<code>_normalizeV2ToLegacy()</code>) and ContentLeaf unwrapping in client so both legacy and v2 payloads render correctly.</li>
+        <li class="ok">Done: implement <code>ModuleFactory</code> pattern in Vue 2 client, replacing ContentLeaf abstraction with direct component resolution by <code>module.type</code>.</li>
+        <li class="ok">Done: v2 widget support for chart, image, form, parameterlist, configurationlist, logs, graphic, glscene, layerview, and custom modules.</li>
+        <li class="ok">Done: standardised <code>visible</code>, <code>enabledWhen</code>, <code>readonlyWhen</code> cross-cutting properties via <code>CUIExpression</code> dynamic expressions on all v2 modules.</li>
+        <li class="ok">Done: runtime schema validation added (<code>AMCModuleSchema.js</code>, <code>validateModuleJSON</code>) to catch malformed module payloads before rendering.</li>
+        <li class="ok">Done: fix known form/list issues — string validation, alert row mapping, configuration action schema usage.</li>
+        <li>Future: shared <code>tableplus</code> base — migrate <code>parameterlist</code>, <code>alertlist</code>, <code>buildlist</code>, <code>executionlist</code>, <code>configurationlist</code>. (Phase 3)</li>
+      </ul>
+    </div>
+
+    <div class="done-card">
+      <h3>Phase 2: Form as First-Class Module — Complete</h3>
+      <ul>
+        <li class="ok">Done: form promoted from content item to module-level citizen with its own layout engine and section model.</li>
+        <li class="ok">Done: new field types — <code>number</code>, <code>slider</code>, <code>datetime</code>, <code>multiselect</code>, <code>calculated</code>.</li>
+        <li class="ok">Done: section containers — <code>collapsible</code>, <code>defaultopen</code>, <code>icon</code>, <code>description</code>.</li>
+        <li class="ok">Done: validation engine — field-level in <code>AMCFormField.vue checkRules()</code>; cross-field and form-level via <code>/api/validate</code> (<code>CAPIHandler_Validate</code>).</li>
+        <li class="ok">Done: form action bar with <code>submitevent</code>, <code>cancelevent</code>, <code>validateevent</code>, dirty-state tracking, optimistic/pessimistic submit policies.</li>
+        <li class="ok">Done: reusable <code>AMCFormField.vue</code> component encapsulates rendering, local rules, and server error display for all field types.</li>
+        <li class="ok">Done: <code>AMCApplication.js</code> <code>validateFormValues()</code> method calls <code>/api/validate</code> and resolves to <code>{ valid, errors }</code>.</li>
+        <li class="ok">Done: content module card widget upgrade — <code>cardstyle</code>, <code>spacing</code>, <code>elevation</code>, <code>cardcolor</code> attributes; full-height layout.</li>
+        <li class="ok">Done: App.vue full-width/full-height layout refactor (CSS flex replacing JS pixel calculation).</li>
+      </ul>
+    </div>
+
+    <div class="card phase3">
+      <h3>Phase 3: Form Builder + Advanced HMI Modules — Next</h3>
+      <ul>
+        <li>Ship <code>formbuilder</code> authoring UI with schema export and preview.</li>
+        <li>Add remaining field types: <code>file</code>, <code>signature</code>, <code>password</code>, <code>jsoneditor</code>, <code>taginput</code>.</li>
+        <li>Add advanced modules: <code>wizard</code>, <code>statusmatrix</code>, <code>alarmcenter</code>, <code>splitview</code>, <code>timeline</code>, <code>metriccards</code>.</li>
+        <li>Migrate shared table base (<code>tableplus</code>) and adopt in all list modules.</li>
+        <li>Introduce namespace event convention (<code>module.action.intent</code>) with payload schema docs.</li>
+        <li>Provide template packs for common AM workflows (job setup, execution monitoring, maintenance).</li>
+        <li>Introduce policy packs (role gates, confirmation patterns, audit requirements).</li>
+      </ul>
+    </div>
+
+    <h2>11. Technical Decisions Status</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>Decision</th><th>Status</th><th>Impact</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>State transport model</td>
+            <td><span class="ok">Done:</span> v2 frontend schema/event model is primary via <code>/api/frontend</code>; dedicated <code>/api/*</code> handlers replace <code>/ui/*</code>; <code>/api/state</code> deprecated. Client supports both v2 and legacy via <code>_normalizeV2ToLegacy()</code>.</td>
+            <td>Cleaner data flow, fewer race conditions, and a path to remove legacy compatibility code.</td>
+          </tr>
+          <tr>
+            <td>Module factory model</td>
+            <td><span class="ok">Done:</span> Vue 2 client uses <code>AMCModule_Factory.vue</code> component map (20+ types); C++ backend uses <code>CUIModuleFactory::createModule()</code> with <code>CUIModule_ContentLeaf</code> wrapper for leaf types.</td>
+            <td>Uniform module instantiation, simpler rendering pipeline, no container dependency for leaf types.</td>
+          </tr>
+          <tr>
+            <td>Server-side validation</td>
+            <td><span class="ok">Done:</span> <code>/api/validate</code> endpoint (<code>CAPIHandler_Validate</code>) accepts <code>eventname</code> + <code>formvalues</code> JSON and parses <code>VALIDATIONERROR:{...}</code> exceptions into per-field error maps.</td>
+            <td>Cross-field and server-constraint validation without custom API endpoints per form.</td>
+          </tr>
+          <tr>
+            <td>Schema governance</td>
+            <td>Define JSON schema versions and compatibility policy (<code>schemaVersion</code>).</td>
+            <td>Safe rollout of new widgets and properties.</td>
+          </tr>
+          <tr>
+            <td>Design tokens</td>
+            <td>Current: Vuetify light theme colors applied from <code>/api/config</code>. <code>content</code> module has <code>cardstyle</code>/<code>cardcolor</code>/<code>elevation</code>/<code>spacing</code>. Next: centralised token map (spacing, typography, colors, state tones).</td>
+            <td>Consistent HMI look and fast theme changes.</td>
+          </tr>
+          <tr>
+            <td>Event naming convention</td>
+            <td>Current: ad-hoc names (<code>changeevent</code>, <code>submitevent</code>, <code>cancelevent</code>, <code>validateevent</code>) via <code>/api/event</code>. Phase 3: namespace all events (<code>module.action.intent</code>).</td>
+            <td>Easier backend contract maintenance and tracing.</td>
+          </tr>
+          <tr>
+            <td>Builder storage</td>
+            <td>Store generated schemas as versioned server artifacts with diff/audit.</td>
+            <td>Traceable HMI evolution and rollback safety.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>12. Content Module Deprecation Plan</h2>
+    <div class="card">
+      <p><strong>Note:</strong> The <code>content</code> module has been upgraded (card styles, spacing, height:100%) and is <em>no longer a simple deprecation target</em>. It now serves as a useful layout/card container. The long-term plan shifts toward making child modules first-class citizens while <code>content</code> becomes a composable panel wrapper.</p>
+      <p><strong>Revised goal:</strong> Keep <code>content</code> as the canonical card/panel container. Deprecate only the <em>use of content as a data widget host</em> (i.e., wrapping individual data widgets that could stand alone). Pages should eventually contain <code>grid</code> + <code>content</code> + direct first-class modules, not chains of nested <code>content &gt; content &gt; item</code>.</p>
+      <p><strong>Current state (Feb 2026):</strong> Steps 1–5 are complete. All 12 leaf types have backend and frontend first-class support. Legacy <code>&lt;content&gt;</code> XML is still used in all Example configs.</p>
+    </div>
+
+    <div class="card">
+      <h3>12.1 Legacy-to-Module Mapping</h3>
+      <table>
+        <thead><tr><th>Legacy Content Item</th><th>New First-Class Module</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>paragraph</code></td><td><code>paragraph</code> module</td><td><span class="ok">Live:</span> first-class via <code>CUIModule_ContentLeaf</code> + <code>AMCModule_Paragraph.vue</code>.</td></tr>
+          <tr><td><code>image</code></td><td><code>image</code> module</td><td><span class="ok">Live:</span> v2 support, <code>/api/image/{uuid}</code> endpoint.</td></tr>
+          <tr><td><code>videostream</code></td><td><code>videostream</code> module</td><td><span class="ok">Live:</span> first-class via <code>AMCModule_VideoStream.vue</code>.</td></tr>
+          <tr><td><code>chart</code></td><td><code>chart</code> module</td><td><span class="ok">Live:</span> v2 support, <code>/api/dataseries/{uuid}</code> endpoint.</td></tr>
+          <tr><td><code>upload</code></td><td><code>upload</code> module</td><td><span class="ok">Live:</span> <code>/api/upload</code> endpoint chain.</td></tr>
+          <tr><td><code>buttongroup</code></td><td><code>buttongroup</code> module</td><td><span class="ok">Live:</span> first-class via <code>AMCModule_ButtonGroup.vue</code>.</td></tr>
+          <tr><td><code>parameterlist</code></td><td><code>parameterlist</code> module</td><td><span class="ok">Live:</span> v2 support. Future: adopt shared table base.</td></tr>
+          <tr><td><code>alertlist</code></td><td><code>alertlist</code> module</td><td><span class="ok">Live:</span> <code>/api/alerts</code> endpoint. Future: adopt shared table base.</td></tr>
+          <tr><td><code>buildlist</code></td><td><code>buildlist</code> module</td><td><span class="ok">Live:</span> <code>/api/build</code> endpoint; default thumbnail fix applied. Future: adopt shared table base.</td></tr>
+          <tr><td><code>executionlist</code></td><td><code>executionlist</code> module</td><td><span class="ok">Live:</span> <code>/api/executions</code> endpoint. Future: adopt shared table base.</td></tr>
+          <tr><td><code>configurationlist</code></td><td><code>configurationlist</code> module</td><td><span class="ok">Live:</span> <code>/api/configurations</code> endpoint, v2 support.</td></tr>
+          <tr><td><code>form</code></td><td><code>form</code> module</td><td><span class="ok">Live:</span> 9 entity types, sections, actionbar, dirty-state, <code>/api/validate</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>13. Current API Endpoint Inventory (Feb 2026)</h2>
+    <div class="card">
+      <p>All endpoints are registered under <code>/api/*</code>. The former <code>/api/ui/*</code> handler (<code>CAPIHandler_UI</code>) is unregistered.</p>
+      <table>
+        <thead><tr><th>Endpoint</th><th>Handler</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><code>/api/config</code></td><td><code>CAPIHandler_Config</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/frontend</code></td><td><code>CAPIHandler_Frontend</code></td><td class="ok">Active (v2 primary)</td></tr>
+          <tr><td><code>/api/auth</code></td><td><code>CAPIHandler_Auth</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/event</code></td><td><code>CAPIHandler_Event</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/validate</code></td><td><code>CAPIHandler_Validate</code></td><td class="ok">Active (new — Phase 2)</td></tr>
+          <tr><td><code>/api/widget/{uuid}/{type}</code></td><td><code>CAPIHandler_Widget</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/module/{uuid}</code></td><td><code>CAPIHandler_Module</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/contentitem/{uuid}</code></td><td><code>CAPIHandler_ContentItem</code></td><td>Legacy fallback</td></tr>
+          <tr><td><code>/api/build</code></td><td><code>CAPIHandler_Build</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/executions</code></td><td><code>CAPIHandler_Executions</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/alerts</code></td><td><code>CAPIHandler_Alerts</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/configurations</code></td><td><code>CAPIHandler_Configurations</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/dataseries/{uuid}</code></td><td><code>CAPIHandler_DataSeries</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/image/{uuid}</code></td><td><code>CAPIHandler_Image</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/upload</code></td><td><code>CAPIHandler_Upload</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/download/{uuid}</code></td><td><code>CAPIHandler_Download</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/logs</code></td><td><code>CAPIHandler_Logs</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/version</code></td><td><code>CAPIHandler_Version</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/setup</code></td><td><code>CAPIHandler_Setup</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/statemachines</code></td><td><code>CAPIHandler_Status</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/meshgeometry/{uuid}</code></td><td><code>CAPIHandler_MeshGeometry</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/meshedges/{uuid}</code></td><td><code>CAPIHandler_MeshEdges</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/pointcloud/{uuid}</code></td><td><code>CAPIHandler_PointCloud</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/pointchanneldata/{uuid}/{ch}</code></td><td><code>CAPIHandler_PointChannelData</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/ext</code></td><td><code>CAPIHandler_External</code></td><td class="ok">Active</td></tr>
+          <tr><td><code>/api/state</code></td><td><code>CAPIHandler_State</code></td><td class="risk">Deprecated (migrate to /api/frontend)</td></tr>
+          <tr><td><code>/api/ui/*</code></td><td><code>CAPIHandler_UI</code></td><td class="risk">Unregistered</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>14. Success Criteria</h2>
+    <div class="card">
+      <ul>
+        <li class="ok">Done: v2 frontend state model is operational via <code>/api/frontend</code>. Legacy path removed.</li>
+        <li class="ok">Done: Full-featured form screens can be built in XML/schema — 9 field types, sections, validation, action bar.</li>
+        <li class="ok">Done: Server-side cross-field validation available via <code>/api/validate</code> with per-field error maps.</li>
+        <li class="ok">Done: Content module supports card-style presentation with configurable elevation, spacing, and background.</li>
+        <li>Future: One responsive form definition supports desktop + panel + tablet layouts (Phase 3 — form builder).</li>
+        <li>Future: Widget event contracts are typed and documented; no ad-hoc payload guessing (Phase 3 — event namespace).</li>
+        <li>Future: At least 80% of current custom one-off table/list logic replaced by shared base modules (Phase 3 — tableplus).</li>
+        <li>Future: Operator-critical actions support role checks + confirmation + audit context (Phase 3 — policy packs).</li>
+      </ul>
+      <p class="ok">Result: cohesive, scalable HMI architecture with lower maintenance cost and faster screen delivery.</p>
+    </div>
+
+    <p>This plan is designed to be implemented incrementally while keeping current AMCF page/module JSON definitions functional. Last updated: Feb 2026.</p>
+  </div>
+</body>
+</html>

@@ -43,8 +43,8 @@ using namespace LibMCEnv::Impl;
  Class definition of CMachineConfigurationTypeIterator 
 **************************************************************************************************************************/
 
-CMachineConfigurationTypeIterator::CMachineConfigurationTypeIterator(LibMCData::PMachineConfigurationTypeIterator pMachineConfigurationTypeIterator)
-    : m_pMachineConfigurationTypeIterator(pMachineConfigurationTypeIterator)
+CMachineConfigurationTypeIterator::CMachineConfigurationTypeIterator(LibMCData::PMachineConfigurationTypeIterator pMachineConfigurationTypeIterator, AMC::PStateMachineData pStateMachineData)
+    : m_pMachineConfigurationTypeIterator(pMachineConfigurationTypeIterator), m_pStateMachineData(pStateMachineData)
 {
     if (pMachineConfigurationTypeIterator.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -66,7 +66,7 @@ IMachineConfigurationType* CMachineConfigurationTypeIterator::GetCurrent()
     if (pCurrentConfigurationType.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCDATA_ERROR_INVALIDITERATOR);
 
-    return new CMachineConfigurationType(pCurrentConfigurationType);
+    return new CMachineConfigurationType(pCurrentConfigurationType, m_pStateMachineData);
 }
 
 IMachineConfigurationTypeIterator* CMachineConfigurationTypeIterator::Clone()

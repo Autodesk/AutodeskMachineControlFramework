@@ -70,6 +70,8 @@ namespace AMC {
 		PMeshSceneItem addItem(const std::string& sMeshEntityUUID, LibMCEnv::sModelDataTransform transform);
 
 		void removeItem (const std::string & sUUID);
+
+		uint64_t getMemoryUsageInBytes();
  
 	};
 	
@@ -80,4 +82,3 @@ namespace AMC {
 
 
 #endif //__AMC_MESHSCENE
-

@@ -842,6 +842,35 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_analogoutputexists(Lib
 	}
 }
 
+LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_analoginputisoutofbounds(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pName, bool * pInputIsOutOfBounds)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_BK9xxx;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCDriver_BK9xxxInterfaceException (LIBMCDRIVER_BK9XXX_ERROR_INVALIDPARAM);
+		if (pInputIsOutOfBounds == nullptr)
+			throw ELibMCDriver_BK9xxxInterfaceException (LIBMCDRIVER_BK9XXX_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IDriver_BK9xxx* pIDriver_BK9xxx = dynamic_cast<IDriver_BK9xxx*>(pIBaseClass);
+		if (!pIDriver_BK9xxx)
+			throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_INVALIDCAST);
+		
+		*pInputIsOutOfBounds = pIDriver_BK9xxx->AnalogInputIsOutOfBounds(sName);
+
+		return LIBMCDRIVER_BK9XXX_SUCCESS;
+	}
+	catch (ELibMCDriver_BK9xxxInterfaceException & Exception) {
+		return handleLibMCDriver_BK9xxxException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_getdigitalinput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, bool * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_BK9xxx;
@@ -1162,6 +1191,8 @@ LibMCDriver_BK9xxxResult LibMCDriver_BK9xxx::Impl::LibMCDriver_BK9xxx_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_bk9xxx_driver_bk9xxx_analoginputexists;
 	if (sProcName == "libmcdriver_bk9xxx_driver_bk9xxx_analogoutputexists") 
 		*ppProcAddress = (void*) &libmcdriver_bk9xxx_driver_bk9xxx_analogoutputexists;
+	if (sProcName == "libmcdriver_bk9xxx_driver_bk9xxx_analoginputisoutofbounds") 
+		*ppProcAddress = (void*) &libmcdriver_bk9xxx_driver_bk9xxx_analoginputisoutofbounds;
 	if (sProcName == "libmcdriver_bk9xxx_driver_bk9xxx_getdigitalinput") 
 		*ppProcAddress = (void*) &libmcdriver_bk9xxx_driver_bk9xxx_getdigitalinput;
 	if (sProcName == "libmcdriver_bk9xxx_driver_bk9xxx_getdigitaloutput") 

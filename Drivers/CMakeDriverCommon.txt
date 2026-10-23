@@ -172,10 +172,11 @@ add_custom_command(
 			${CMAKE_CURRENT_SOURCE_DIR}/Resources
 			${PROJECT_BINARY_DIR}/../../Output/${GLOBALGITHASH}_driver_${DRIVERSUFFIX}.data)
 
+add_dependencies(${DRIVERNAME} build_resources)
+
 
 ##########################################################################################
 ### Add custom code below
 ##########################################################################################
-
 
 

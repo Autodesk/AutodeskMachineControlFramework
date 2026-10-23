@@ -41,7 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_SIGNAL_MAXQUEUESIZE 1024
 
 #define AMC_SIGNAL_MINREACTIONTIMEINMS 1
-#define AMC_SIGNAL_MAXREACTIONTIMEINMS 3600000
+#define AMC_SIGNAL_MAXREACTIONTIMEINMS 3600000 // 1 hour reaction timeout is maximum
+
+#define AMC_SIGNAL_MINARCHIVETIMEINMS 1
+#define AMC_SIGNAL_MAXARCHIVETIMEINMS (3600000 * 24 * 14) // 14 days to stay within Uint32 range
 
 namespace AMC {
 
@@ -54,7 +57,7 @@ namespace AMC {
 		Failed = 50, 
 		TimedOut = 60, 
 		Cleared = 70, 
-		Retracted = 80 
+		Archived = 80 
 	};
 
 }

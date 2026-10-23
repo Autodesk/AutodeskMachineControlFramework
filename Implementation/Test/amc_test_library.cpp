@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amc_test_library.hpp"
+#include "common_utils.hpp"
 #include <iostream>
 #include <regex>
 
@@ -40,6 +41,8 @@ CTestLibrary::CTestLibrary(const std::string& sName, const std::string& sDLLFile
 	m_sResourceExtension = ".data";
 #ifdef _WIN32
 	m_sDLLExtension = ".dll";
+#elif defined(__APPLE__)
+	m_sDLLExtension = ".dylib";
 #else
 	m_sDLLExtension = ".so";
 #endif
@@ -55,9 +58,27 @@ std::string CTestLibrary::getName()
 	return m_sName;
 }
 
+static std::string resolveLibraryPath(const std::string& sLibraryName)
+{
+	std::vector<std::string> searchPaths = {
+		"./" + sLibraryName,
+		"./Output/" + sLibraryName,
+		"../Output/" + sLibraryName,
+		"build_linux64/Output/" + sLibraryName
+	};
+
+	for (const auto& sPath : searchPaths) {
+		if (AMCCommon::CUtils::fileOrPathExistsOnDisk(sPath))
+			return sPath;
+	}
+
+	return "./" + sLibraryName;
+}
+
 std::string CTestLibrary::getDLLFileName(const std::string& sGitHash)
 {	
-	return std::regex_replace(m_sDLLFileName, std::regex("\\%githash%"), sGitHash) + m_sDLLExtension;
+	std::string sLibraryName = std::regex_replace(m_sDLLFileName, std::regex("\\%githash%"), sGitHash) + m_sDLLExtension;
+	return resolveLibraryPath(sLibraryName);
 }
 
 std::string CTestLibrary::getResourceFileName(const std::string& sGitHash)
@@ -65,5 +86,6 @@ std::string CTestLibrary::getResourceFileName(const std::string& sGitHash)
 	if (m_sResourceFileName.empty())
 		return "";
 
-	return std::regex_replace(m_sResourceFileName, std::regex("\\%githash%"), sGitHash) + m_sResourceExtension;
+	std::string sResourceName = std::regex_replace(m_sResourceFileName, std::regex("\\%githash%"), sGitHash) + m_sResourceExtension;
+	return resolveLibraryPath(sResourceName);
 }

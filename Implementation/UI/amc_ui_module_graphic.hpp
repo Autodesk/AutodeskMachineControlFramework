@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_GRAPHIC
 #define __AMC_UI_MODULE_GRAPHIC
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -93,10 +94,6 @@ namespace AMC {
 		// Legacy UI System
 		/////////////////////////////////////////////////////////////////////////////////////
 		
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
-		virtual void writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler) override;
-
 		virtual void populateModuleMap(std::map<std::string, PUIModule>& moduleMap) override;
 
 		virtual void populateLegacyItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
@@ -109,6 +106,7 @@ namespace AMC {
 		// New UI Frontend System
 		/////////////////////////////////////////////////////////////////////////////////////
 
+		bool isVersion2FrontendModule() override;
 
 	};
 

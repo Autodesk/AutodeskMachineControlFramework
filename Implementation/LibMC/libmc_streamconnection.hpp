@@ -45,6 +45,11 @@ Abstract: This is the class declaration of CStreamConnection
 #endif
 
 // Include custom headers here.
+#include "amc_streaminstance.hpp"
+#include "amc_videostreaminstance.hpp"
+#include "amc_jsoneventstreaminstance.hpp"
+
+#include <chrono>
 
 
 namespace LibMC {
@@ -59,11 +64,20 @@ class CStreamConnection : public virtual IStreamConnection, public virtual CBase
 private:
 
     std::string m_sStreamUUID;
-    uint32_t m_nDummy;
+    AMC::PStreamInstance m_pStream;
+    AMC::PVideoStreamInstance m_pVideoStream;  // Cached downcast for video streams
+    uint64_t m_nLastFrameVersion;
+
+    AMC::PJSONEventStreamInstance m_pJSONEventStream;
+    AMC::sJSONEventStreamCursor m_JSONEventCursor;
+    std::chrono::steady_clock::time_point m_LastJSONEventTime;
+
+    IStreamData* getNewJSONEventContent();
 
 public:
 
-    CStreamConnection(const std::string & sStreamUUID);
+    // sClientID identifies the client within a JSON event stream; it is empty for other streams.
+    CStreamConnection(const std::string & sStreamUUID, AMC::PStreamInstance pStream, const std::string & sClientID);
 
     virtual ~CStreamConnection();
 
@@ -72,6 +86,10 @@ public:
 	uint32_t GetIdleDelay() override;
 
     LibMC::eStreamConnectionType GetStreamType() override;
+
+    void SetResumeEventID(const LibMC_uint64 nEventID) override;
+
+    bool IsActive() override;
 
 };
 

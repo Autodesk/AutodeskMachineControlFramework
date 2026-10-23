@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "libmc_exceptiontypes.hpp"
 
 
@@ -65,22 +66,6 @@ std::string CUIModuleCustomItem_Properties::getUUID()
 }
 
 
-void CUIModuleCustomItem_Properties::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
-
-	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
-
-	for (auto iIter : m_Properties) {
-		std::string sName = iIter.first;
-		if (iIter.second.needsSync())
-			pGroup->setParameterValueByName(sName, iIter.second.evaluateStringValue(pStateMachineData));
-
-		object.addString(sName, pGroup->getParameterValueByName (sName));
-	}
-
-}
-
 std::list <std::string> CUIModuleCustomItem_Properties::getReferenceUUIDs()
 {
 	std::list <std::string> resultList;
@@ -105,6 +90,11 @@ void CUIModuleCustomItem_Properties::populateClientVariables(CParameterHandler* 
 void CUIModuleCustomItem_Properties::registerProperty(const std::string& sName, const std::string& sTypeString, CUIExpression valueExpression)
 {
 	m_Properties.insert (std::make_pair (sName, valueExpression));
+}
+
+const std::map<std::string, CUIExpression>& CUIModuleCustomItem_Properties::getProperties() const
+{
+	return m_Properties;
 }
 
 
@@ -174,31 +164,41 @@ std::string CUIModuleCustomItem_Event::getUUID()
 
 
 
-void CUIModuleCustomItem_Event::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
+void CUIModuleCustomItem_Event::writeParametersToJSON(CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CUIFrontendState* pFrontendState)
 {
-
-	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+	PParameterGroup pGroup;
+	if (pFrontendState != nullptr) {
+		auto pLegacyParameterHandler = pFrontendState->getLegacyParameterHandler();
+		if (pLegacyParameterHandler.get() != nullptr)
+			pGroup = pLegacyParameterHandler->findGroup(getItemPath(), false);
+	}
 
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
 
 	CJSONWriterArray parameterArray(writer);
 
 	for (auto iIter : m_EventParameterNameMap) {
-		std::string sName = iIter.first;
+		std::string sParameterName = iIter.first;
 		auto& expression = iIter.second->getExpression ();
-		if (expression.needsSync())
-			pGroup->setParameterValueByName(sName, expression.evaluateStringValue(pStateMachineData));
 
+		std::string sValue;
+		if (pGroup.get() != nullptr) {
+			if (expression.needsSync())
+				pGroup->setParameterValueByName(sParameterName, expression.evaluateStringValue(pStateMachineData));
+			sValue = pGroup->getParameterValueByName(sParameterName);
+		}
+		else {
+			sValue = expression.evaluateStringValue(pStateMachineData);
+		}
 
 		CJSONWriterObject parameterObject(writer);
-		parameterObject.addString("name", sName);
+		parameterObject.addString("name", sParameterName);
 		parameterObject.addString("uuid", iIter.second->getUUID ());
-		parameterObject.addString("defaultvalue", pGroup->getParameterValueByName(sName));
+		parameterObject.addString("defaultvalue", sValue);
 		parameterArray.addObject(parameterObject);
-			
 	}
 
-	object.addArray("parameters", parameterArray);
+	object.addArray(sName, parameterArray);
 
 }
 

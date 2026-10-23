@@ -91,6 +91,7 @@ namespace AMCData {
 
 		std::string m_sJournalBasePath;
 		std::string m_sChunkBaseName;
+		std::string m_sTelemetryChunkBaseName;
 		
 		std::vector<PActiveJournalFile> m_JournalFiles;
 
@@ -98,13 +99,23 @@ namespace AMCData {
 
 		PActiveJournalFile createJournalFile();
 
+		std::vector<PActiveJournalFile> m_TelemetryFiles;
+
+		PActiveJournalFile m_pCurrentTelemetryFile;
+
+		// If false, no telemetry data file is created and no telemetry entry is ever written.
+		// This is an explicit flag on purpose: an empty m_sTelemetryChunkBaseName stays an error.
+		bool m_bTelemetryEnabled;
+
+		PActiveJournalFile createTelemetryFile();
+
 	public:
 
 		static std::string convertAlertLevelToString(const LibMCData::eAlertLevel eLevel);
 		
 		static LibMCData::eAlertLevel convertStringToAlertLevel(const std::string & sValue, bool bFailIfUnknown);
 
-		CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string & sSessionUUID);
+		CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string& sTelemetryChunkBaseName, const std::string & sSessionUUID, bool bTelemetryEnabled = true);
 
 		virtual ~CJournal();
 
@@ -142,12 +153,16 @@ namespace AMCData {
 		void getAcknowledgementInformation(const std::string& sUUID, std::string& sUserUUID, std::string& sUserComment, std::string& sTimestampUTC);
 
 		void retrieveAlerts(std::vector<std::string> & alertUUIDs);
+
+		void retrieveAlertsChangedSince(std::vector<std::string>& alertUUIDs, uint64_t nIncrementalID);
 		void retrieveActiveAlerts(std::vector<std::string>& alertUUIDs);
 		void retrieveAlertsByType(std::vector<std::string>& alertUUIDs, const std::string& sTypeIdentifier);
 		void retrieveActiveAlertsByType(std::vector<std::string>& alertUUIDs, const std::string& sTypeIdentifier);
 
 		void acknowledgeAlertForUser(const std::string & sAlertUUID, const std::string & sUserUUID, const std::string & sUserComment, const std::string & sTimeStampUTC);
 		void deactivateAlert(const std::string& sAlertUUID);
+
+		uint64_t getAlertHeadID();
 
 		uint64_t getChunkIntervalInMicroseconds ();
 
@@ -159,6 +174,16 @@ namespace AMCData {
 
 		static LibMCData::eParameterDataType convertStringToDataType(const std::string & sValue);
 
+		static std::string convertTelemetryTypeToString(LibMCData::eTelemetryChannelType telemetryType);
+
+		static LibMCData::eTelemetryChannelType convertStringToTelemetryType(const std::string& sValue);
+
+		void createTelemetryChannelInDB(const std::string& sUUID, const LibMCData::eTelemetryChannelType eChannelType, const LibMCData_uint32 nChannelIndex, const std::string& sChannelIdentifier, const std::string& sChannelDescription);
+
+		void writeTelemetryChunk(uint64_t nChunkID, uint64_t nStartTimeStamp, uint64_t nEndTimeStamp, uint64_t nTelemetryEntriesBufferSize, const LibMCData::sTelemetryChunkEntry* pTelemetryEntriesBuffer);
+
+		void addSessionMetrics(const std::string& sLoginSessionUUID, const std::string& sLabel, uint64_t nIntervalStart, uint64_t nIntervalEnd, uint32_t nRequestCount, double dSumDurationMS, double dMinDurationMS, double dMaxDurationMS, double dSumSqDurationMS, uint64_t nPayloadSumBytes, uint64_t nPayloadMaxBytes, double dServerBuildSumMS, const std::string& sTimestampUTC);
+
 	};
 
 	typedef std::shared_ptr<CJournal> PJournal;
@@ -167,4 +192,3 @@ namespace AMCData {
 
 
 #endif //__AMCDATA_JOURNAL
-

@@ -445,16 +445,19 @@
 		<error name="COULDNOTFINDMACHINECONFIGURATIONXSDBYUUID" code="444" description="Could not find latest machine configuration XSD by UUID." />
 		<error name="COULDNOTFINDMACHINECONFIGURATIONVERSIONBYUUID" code="445" description="Could not find latest machine configuration version by UUID." />
 		<error name="MACHINECONFIGURATIONTYPEMISMATCH" code="446" description="Machine configuration mismatch." />
+		<error name="UNKNOWNTELEMETRYCHANNELTYPE" code="447" description="Unknown telemetry channel type." />
+		<error name="INVALIDTELEMETRYCHANNELIDENTIFIER" code="448" description="Invalid telemetry channel identifier." />
+		<error name="TELEMETRYCHANNELALREADYEXISTS" code="449" description="Telemetry channel already exists." />
+		<error name="TELEMETRYCHANNELNOTFOUND" code="450" description="Telemetry channel not found." />					
+
+		<error name="JOBNAMETOOLONG" code="451" description="Job name exceeds maximum allowed length" />
+		<error name="STRINGPARAMETERTOOLONG" code="452" description="String parameter exceeds maximum allowed length" />
+		<error name="TELEMETRYSETTINGAFTERINITIALISATION" code="453" description="Telemetry setting changed after database initialisation" />
 
 	</errors>
 	
 		
-	<struct name="JournalChunkVariableInfo">
-		<member name="VariableIndex" type="uint32" />
-		<member name="StorageType" type="uint32" />
-		<member name="EntryStartIndex" type="uint32" />
-		<member name="EntryCount" type="uint32" />
-	</struct>
+
 
 	<enum name="AlertLevel">
 		<option name="FatalError" value="1"/>
@@ -516,12 +519,53 @@
 		<option name="CustomBinaryData" value="100"/>
 	</enum>		
 	
+	<enum name="TelemetryChannelType">
+		<option name="Unknown" value="0"/>
+		<option name="CustomMarker" value="1"/>
+		<option name="RemoteQuery" value="2"/>
+		<option name="StateExecution" value="3"/>
+		<option name="StateRepeatDelay" value="4"/>		
+		<option name="SignalQueue" value="5"/>
+		<option name="SignalProcessing" value="6"/>
+		<option name="SignalAcknowledgement" value="7"/>
+	</enum>		
+	
+	<enum name="TelemetryChunkEntryType">
+		<option name="InstantMarker" value="1"/>
+		<option name="IntervalStartMarker" value="2"/>
+		<option name="IntervalEndMarker" value="3"/>
+	</enum>		
+	
 	<enum name="BuildJobExecutionStatus">
 		<option name="Unknown" value="0" />
 		<option name="InProcess" value="1" />
 		<option name="Finished" value="2" />
 		<option name="Failed" value="3" />
 	</enum>
+	
+	<struct name="JournalChunkVariableInfo">
+		<member name="VariableIndex" type="uint32" />
+		<member name="StorageType" type="uint32" />
+		<member name="EntryStartIndex" type="uint32" />
+		<member name="EntryCount" type="uint32" />
+	</struct>
+
+	<struct name="TelemetryChunkEntry">
+		<member name="EntryType" type="enum" class="TelemetryChunkEntryType" />
+		<member name="ChannelIndex" type="uint32" />
+		<member name="MarkerID" type="uint64" />
+		<member name="TimeStamp" type="uint64" />
+		<member name="ContextData" type="uint64" />
+	</struct>
+
+	<struct name="TelemetryIntervalData">
+		<member name="MarkerID" type="uint64" />
+		<member name="ChannelIndex" type="uint32" />
+		<member name="StartTimeStamp" type="uint64" />
+		<member name="EndTimeStamp" type="uint64" />
+		<member name="DurationInMicroseconds" type="uint64" />
+		<member name="ContextData" type="uint64" />
+	</struct>
 
 	<functiontype name="StreamReadCallback" description="Callback to call for reading a data chunk">
 		<param name="ByteData" type="pointer" pass="in" description="Pointer to a buffer to read data into"/>
@@ -727,8 +771,152 @@
 			<param name="Identifier" type="string" pass="in" description="Alert Identifier to look for. Fails if empty." />	
 			<param name="OnlyActive" type="bool" pass="in" description="If true, only active alerts will be returned." />	
 			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance" />	
-		</method>				
+		</method>
+
+		<method name="GetAlertHeadID" description="Returns the current maximum incremental ID across all alerts. Used by the frontend to detect when the alert list has changed.">
+			<param name="HeadID" type="uint64" pass="return" description="Maximum incremental ID, or 0 if no alerts exist." />
+		</method>
+
+		<method name="RetrieveAlertsChangedSince" description="Retrieves all alerts whose incremental ID is larger than the given one, ordered by timestamp. Used by the frontend to fetch only the changed rows of the alert list.">
+			<param name="IncrementalID" type="uint64" pass="in" description="Incremental ID to compare against, usually a head ID returned by GetAlertHeadID." />
+			<param name="IteratorInstance" type="class" class="AlertIterator" pass="return" description="AlertIterator Instance. List may be empty." />
+		</method>
 		
+	</class>
+
+
+    <!-- The TelemetrySession class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="TelemetrySession" parent="Base" description="Journaling Instance">
+
+		<method name="GetSessionUUID" description="retrieves the session UUID.">
+			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
+		</method>
+		
+		<method name="CreateChannelInDB" description="creates channel in journal DB.">
+			<param name="UUID" type="string" pass="in" description="Channel UUID" />	
+			<param name="ChannelType" type="enum" class="TelemetryChannelType" pass="in" description="Telemetry Channel Type" />	
+			<param name="ChannelIndex" type="uint32" pass="in" description="Channel Index" />	
+			<param name="ChannelIdentifier" type="string" pass="in" description="Channel Identifier" />	
+			<param name="ChannelDescription" type="string" pass="in" description="Channel Identifier" />	
+		</method>
+
+		<method name="WriteTelemetryChunk" description="Writes a telemetry chunk to the current telemetry file.">
+			<param name="ChunkID" type="uint64" pass="in" description="ID of chunk in session (1-based)." />	
+			<param name="StartTimeStamp" type="uint64" pass="in" description="Start time stamp of chunk." />	
+			<param name="EndTimeStamp" type="uint64" pass="in" description="End time stamp of chunk." />	
+			<param name="TelemetryEntries" type="structarray" class="TelemetryChunkEntry" pass="in" description="Telemetry entries to write." />	
+		</method>
+						
+	</class>
+
+
+    <!-- The TelemetryChunkData class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="TelemetryChunkData" parent="Base" description="Class containing telemetry chunk data from a past session">
+
+		<method name="GetChunkIndex" description="Returns index of chunk.">
+			<param name="ChunkIndex" type="uint64" pass="return" description="Index of the chunk" />	
+		</method>		
+
+		<method name="GetStartTimeStamp" description="Returns start time stamp of chunk.">
+			<param name="StartTimeStamp" type="uint64" pass="return" description="Start Timestamp of the chunk (in microseconds)" />	
+		</method>		
+
+		<method name="GetEndTimeStamp" description="Returns end time stamp of chunk.">
+			<param name="EndTimeStamp" type="uint64" pass="return" description="End Timestamp of the chunk (in microseconds)" />	
+		</method>		
+
+		<method name="GetEntryCount" description="Returns the number of entries in this chunk.">
+			<param name="EntryCount" type="uint64" pass="return" description="Number of entries." />	
+		</method>		
+
+		<method name="GetEntries" description="Returns the raw telemetry entries.">
+			<param name="TelemetryEntries" type="structarray" class="TelemetryChunkEntry" pass="out" description="Telemetry entries array." />	
+		</method>		
+
+	</class>
+
+
+    <!-- The TelemetryReader class is not thread safe and MUST ONLY be used in a single thread context... -->
+	<class name="TelemetryReader" parent="Base" description="Reader for past telemetry session data">
+
+		<method name="GetSessionUUID" description="Retrieves the session UUID.">
+			<param name="SessionUUID" type="string" pass="return" description="Session UUID" />	
+		</method>
+
+		<method name="GetStartTime" description="Returns the start timestamp of the telemetry session.">
+			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
+		</method>
+
+		<method name="GetLifeTimeInMicroseconds" description="Get telemetry session life time in microseconds.">
+			<param name="LifeTime" type="uint64" pass="return" description="Telemetry life time in microseconds." />	
+		</method>				
+
+		<method name="GetChannelCount" description="Returns number of telemetry channels.">
+			<param name="Count" type="uint32" pass="return" description="Number of channels in session." />	
+		</method>				
+
+		<method name="GetChannelInformation" description="Returns the information for a channel.">
+			<param name="ChannelIndex" type="uint32" pass="in" description="Index of the channel (0-based)." />	
+			<param name="ChannelUUID" type="string" pass="out" description="UUID of the channel." />	
+			<param name="ChannelType" type="enum" class="TelemetryChannelType" pass="out" description="Type of the channel." />
+			<param name="Identifier" type="string" pass="out" description="Identifier of the channel." />	
+			<param name="Description" type="string" pass="out" description="Description of the channel." />	
+		</method>				
+
+		<method name="FindChannelByIdentifier" description="Finds a channel by its identifier.">
+			<param name="Identifier" type="string" pass="in" description="Channel identifier to search for." />	
+			<param name="ChannelIndex" type="uint32" pass="out" description="Index of the channel if found." />	
+			<param name="Found" type="bool" pass="return" description="True if channel was found." />	
+		</method>				
+
+		<method name="GetChunkCount" description="Returns number of telemetry chunks.">
+			<param name="Count" type="uint32" pass="return" description="Number of chunks in session." />	
+		</method>				
+
+		<method name="GetChunkInformation" description="Returns the information for a chunk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the chunk." />	
+			<param name="StartTimeStamp" type="uint64" pass="out" description="Start timestamp of the chunk in microseconds." />	
+			<param name="EndTimeStamp" type="uint64" pass="out" description="End timestamp of the chunk in microseconds." />	
+			<param name="EntryCount" type="uint64" pass="out" description="Number of entries in the chunk." />	
+		</method>				
+
+		<method name="ReadChunkData" description="Reads telemetry chunk data from disk.">
+			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to read. Fails if chunk index is not found." />	
+			<param name="ChunkData" type="class" class="TelemetryChunkData" pass="return" description="Telemetry Chunk Data Instance" />	
+		</method>		
+
+		<method name="FindChunksInTimeRange" description="Finds all chunks that overlap with a time range.">
+			<param name="StartTimeStampInMicroseconds" type="uint64" pass="in" description="Start of the time range." />	
+			<param name="EndTimeStampInMicroseconds" type="uint64" pass="in" description="End of the time range." />	
+			<param name="ChunkIndices" type="basicarray" class="uint32" pass="out" description="Array of chunk indices." />	
+		</method>		
+
+		<method name="QueryIntervals" description="Queries completed intervals (start+end marker pairs) within a time range.">
+			<param name="StartTimeStampInMicroseconds" type="uint64" pass="in" description="Start of the time range." />	
+			<param name="EndTimeStampInMicroseconds" type="uint64" pass="in" description="End of the time range." />	
+			<param name="ChannelIndex" type="uint32" pass="in" description="Channel index to filter by. Use 0xFFFFFFFF for all channels." />	
+			<param name="Intervals" type="structarray" class="TelemetryIntervalData" pass="out" description="Array of interval data." />	
+		</method>		
+
+		<method name="QueryInstantMarkers" description="Queries instant markers within a time range.">
+			<param name="StartTimeStampInMicroseconds" type="uint64" pass="in" description="Start of the time range." />	
+			<param name="EndTimeStampInMicroseconds" type="uint64" pass="in" description="End of the time range." />	
+			<param name="ChannelIndex" type="uint32" pass="in" description="Channel index to filter by. Use 0xFFFFFFFF for all channels." />	
+			<param name="Entries" type="structarray" class="TelemetryChunkEntry" pass="out" description="Array of instant marker entries." />	
+		</method>		
+
+		<method name="GetChannelStatistics" description="Gets aggregated statistics for a channel within a time range.">
+			<param name="ChannelIndex" type="uint32" pass="in" description="Channel index." />	
+			<param name="StartTimeStampInMicroseconds" type="uint64" pass="in" description="Start of the time range." />	
+			<param name="EndTimeStampInMicroseconds" type="uint64" pass="in" description="End of the time range." />	
+			<param name="IntervalCount" type="uint64" pass="out" description="Number of completed intervals." />	
+			<param name="InstantMarkerCount" type="uint64" pass="out" description="Number of instant markers." />	
+			<param name="TotalDurationInMicroseconds" type="uint64" pass="out" description="Sum of all interval durations." />	
+			<param name="MinDurationInMicroseconds" type="uint64" pass="out" description="Minimum interval duration." />	
+			<param name="MaxDurationInMicroseconds" type="uint64" pass="out" description="Maximum interval duration." />	
+			<param name="AvgDurationInMicroseconds" type="uint64" pass="out" description="Average interval duration." />	
+		</method>		
+
 	</class>
 
 
@@ -762,6 +950,7 @@
 	</class>
 
 
+
     <!-- The JournalSession class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="JournalSession" parent="Base" description="Journaling Instance">
 
@@ -783,8 +972,7 @@
 		</method>
 
 		
-		
-
+	
 		<method name="WriteJournalChunkIntegerData" description="writes detailed journal state data to disk.">
 			<param name="ChunkIndex" type="uint32" pass="in" description="Index of the Chunk to write" />	
 			<param name="StartTimeStamp" type="uint64" pass="in" description="Start Timestamp of the chunk (in microseconds)" />	
@@ -1455,6 +1643,10 @@
 			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
 			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
 		</method>
+
+		<method name="GetIncrementalID" description="Returns the monotonically increasing incremental ID of the build job. Used for frontend change detection.">
+			<param name="IncrementalID" type="uint64" pass="return" description="Incremental ID of the build job. Increases with every status change." />
+		</method>
 		
 	</class>
 
@@ -1518,6 +1710,24 @@
 			<param name="MaxTimestamp" type="string" pass="in" description="Maximum Timestamp in ISO8601 UTC format. May be empty for no filter." />	
 			<param name="JournalUUIDFilter" type="string" pass="in" description="UUID of the journal to filter from. Ignored if empty string." />
 			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that are queried. List may be empty." />
+		</method>
+
+		<method name="GetBuildListHeadID" description="Returns the current maximum incremental ID across all build jobs. Used by the frontend to detect when the build list has changed.">
+			<param name="HeadID" type="uint64" pass="return" description="Maximum incremental ID, or 0 if no jobs exist." />
+		</method>
+
+		<method name="GetExecutionListHeadID" description="Returns the current maximum incremental ID across all build job executions. Used by the frontend to detect when the execution list has changed.">
+			<param name="HeadID" type="uint64" pass="return" description="Maximum incremental ID, or 0 if no executions exist." />
+		</method>
+
+		<method name="ListJobsChangedSince" description="Retrieves all build jobs of any status whose incremental ID is larger than the given one, ordered by timestamp descending. Used by the frontend to fetch only the changed rows of the build list.">
+			<param name="IncrementalID" type="uint64" pass="in" description="Incremental ID to compare against, usually a head ID returned by GetBuildListHeadID." />
+			<param name="IteratorInstance" type="class" class="BuildJobIterator" pass="return" description="Build Job Iterator Instance. List may be empty." />
+		</method>
+
+		<method name="ListJobExecutionsChangedSince" description="Retrieves all active build executions whose incremental ID is larger than the given one, ordered by start timestamp descending. Used by the frontend to fetch only the changed rows of the execution list.">
+			<param name="IncrementalID" type="uint64" pass="in" description="Incremental ID to compare against, usually a head ID returned by GetExecutionListHeadID." />
+			<param name="IteratorInstance" type="class" class="BuildJobExecutionIterator" pass="return" description="Returns the list of execution instances that changed. List may be empty." />
 		</method>
 			
 	</class>
@@ -1672,6 +1882,27 @@
 			<param name="ActiveUsers" type="class" class="UserList" pass="return" description="New instance of active users." />
 		</method>
 
+		<method name="CreateLoginSession" description="Creates a new login session record in the database.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the session." />
+			<param name="CreateTimeInMicroseconds" type="uint64" pass="in" description="Creation timestamp in microseconds since epoch." />
+		</method>
+
+		<method name="UpdateLoginSessionAuthentication" description="Updates a login session after successful authentication.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the session." />
+			<param name="UserUUID" type="string" pass="in" description="UUID of the authenticated user." />
+			<param name="Username" type="string" pass="in" description="Login name of the authenticated user." />
+			<param name="UserRole" type="string" pass="in" description="Role of the authenticated user." />
+		</method>
+
+		<method name="UpdateLoginSessionActivity" description="Updates the last activity timestamp of a login session.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the session." />
+			<param name="TimestampInMicroseconds" type="uint64" pass="in" description="New activity timestamp in microseconds since epoch." />
+		</method>
+
+		<method name="DeactivateLoginSession" description="Marks a login session as inactive.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the session." />
+		</method>
+
 	</class>
 
 
@@ -1766,6 +1997,59 @@
 
 	</class>
 
+	<class name="UserPreferenceHandler" parent="Base" description="Generic per-user preference store. A preference is identified by the tuple (UserUUID, Domain, Key) and holds an arbitrary UTF8 value (typically a JSON document)." multithread="true">
+
+		<method name="HasUserPreference" description="Checks if a preference has been stored for the given user, domain and key.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user the preference belongs to." />
+			<param name="Domain" type="string" pass="in" description="Domain the preference belongs to, e.g. 'parameterlist'. MUST NOT be empty." />
+			<param name="Key" type="string" pass="in" description="Key identifying the preference within the domain. MUST NOT be empty." />
+			<param name="PreferenceExists" type="bool" pass="return" description="returns if the preference exists." />
+		</method>
+
+		<method name="RetrieveUserPreference" description="Retrieves a stored preference value. Fails if the preference does not exist.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user the preference belongs to." />
+			<param name="Domain" type="string" pass="in" description="Domain the preference belongs to." />
+			<param name="Key" type="string" pass="in" description="Key identifying the preference within the domain." />
+			<param name="Value" type="string" pass="return" description="Stored value of the preference." />
+		</method>
+
+		<method name="StoreUserPreference" description="Stores a preference value. Creates a new preference or overwrites the existing one.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user the preference belongs to." />
+			<param name="Domain" type="string" pass="in" description="Domain the preference belongs to. MUST NOT be empty." />
+			<param name="Key" type="string" pass="in" description="Key identifying the preference within the domain. MUST NOT be empty." />
+			<param name="Value" type="string" pass="in" description="Value to store." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
+		</method>
+
+		<method name="DeleteUserPreference" description="Removes a preference from the database. Does nothing if the preference does not exist.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user the preference belongs to." />
+			<param name="Domain" type="string" pass="in" description="Domain the preference belongs to." />
+			<param name="Key" type="string" pass="in" description="Key identifying the preference within the domain." />
+			<param name="PreferenceExisted" type="bool" pass="return" description="returns if the preference existed." />
+		</method>
+
+	</class>
+
+	<class name="SessionMetricsHandler" parent="Base" description="Records client reactivity metrics per login session. Each record aggregates the client-side roundtrip measurements (and folded-in server build time and payload sizes) of the frontend polling requests over a short measurement window." multithread="true">
+
+		<method name="AddFrontendMetrics" description="Adds an aggregated frontend metrics record for a measurement window. The moments (count, sum, min, max, sumsq) are stored raw so mean/stddev can be derived and records re-aggregated.">
+			<param name="SessionUUID" type="string" pass="in" description="UUID of the login session the metrics belong to." />
+			<param name="Label" type="string" pass="in" description="Label identifying the measured request family, e.g. 'frontend'." />
+			<param name="IntervalStart" type="uint64" pass="in" description="Start of the measurement window in Microseconds since 1970." />
+			<param name="IntervalEnd" type="uint64" pass="in" description="End of the measurement window in Microseconds since 1970." />
+			<param name="RequestCount" type="uint32" pass="in" description="Number of requests captured in the window." />
+			<param name="SumDurationMS" type="double" pass="in" description="Sum of roundtrip durations in milliseconds." />
+			<param name="MinDurationMS" type="double" pass="in" description="Minimum roundtrip duration in milliseconds." />
+			<param name="MaxDurationMS" type="double" pass="in" description="Maximum roundtrip duration in milliseconds." />
+			<param name="SumSqDurationMS" type="double" pass="in" description="Sum of squared roundtrip durations in milliseconds (for stddev)." />
+			<param name="PayloadSumBytes" type="uint64" pass="in" description="Sum of response payload sizes in bytes." />
+			<param name="PayloadMaxBytes" type="uint64" pass="in" description="Maximum response payload size in bytes." />
+			<param name="ServerBuildSumMS" type="double" pass="in" description="Sum of the server-reported build times in milliseconds." />
+			<param name="AbsoluteTimeStamp" type="uint64" pass="in" description="Absolute Time Stamp in Microseconds since 1970." />
+		</method>
+
+	</class>
+
 	<!-- The MachineConfigurationVersion class is not thread safe and MUST ONLY be used in a single thread context... -->
 	<class name="MachineConfigurationVersion" parent="Base" description="Machine configuration XML version.">
 
@@ -1787,6 +2071,10 @@
 
 		<method name="GetParentUUID" description="Returns the UUID of the parent version.">
 			<param name="ParentUUID" type="string" pass="return" description="UUID of the configuration version that is the parent of this version. Returns 00000000-0000-0000-0000-000000000000 if this is the default version." />
+		</method>
+
+		<method name="GetName" description="Returns the name of the configuration version.">
+			<param name="Name" type="string" pass="return" description="Name of the configuration version. Default configurations are named 'Default configuration'. Versions created before names were introduced return an empty string." />
 		</method>
 
 		<!-- method name="GetSchemaType" description="Returns the schema type string of the configuration.">
@@ -1816,6 +2104,7 @@
 		<method name="CreateNewVersion" description="Creates a new configuration version from this one with the same XSD.">
 			<param name="XMLString" type="string" pass="in" description="New XML Configuration String. MUST conform to current XSD." />
 			<param name="UserUUID" type="string" pass="in" description="User UUID for logging the user who initiated the change." />
+			<param name="Name" type="string" pass="in" description="Name of the new version. MUST NOT be empty or only whitespace, and MUST NOT be longer than 256 characters. Leading and trailing whitespace is removed." />
 			<!--param name="TimeStampUTC" type="string" pass="in" description="Current time in UTC." /-->
 			<param name="CurrentInstance" type="class" class="MachineConfigurationVersion" pass="return" description="Returns the newly created MachineConfigurationVersion instance." />
 		</method>
@@ -1824,6 +2113,7 @@
 			<param name="NewXSD" type="class" class="MachineConfigurationXSD" pass="in" description="New XSD to use. MUST be of the same type as the current. MUST have an increased version number." />
 			<param name="XMLString" type="string" pass="in" description="New XML Configuration String. MUST conform to new XSD." />
 			<param name="UserUUID" type="string" pass="in" description="User UUID for logging the user who initiated the change." />
+			<param name="Name" type="string" pass="in" description="Name of the new version. MUST NOT be empty or only whitespace, and MUST NOT be longer than 256 characters." />
 			<!--param name="TimeStampUTC" type="string" pass="in" description="Current time in UTC." /-->
 			<param name="CurrentInstance" type="class" class="MachineConfigurationVersion" pass="return" description="Returns the newly created MachineConfigurationVersion instance." />
 		</method>
@@ -1929,7 +2219,7 @@
 
 		<!-- CONFIGURATION MANAGEMENT -->
 
-		<method name="CreateDefaultConfiguration" description="Creates the default configuration for a given XSD version. Fails if a configuration for this XSD already exists.">
+		<method name="CreateDefaultConfiguration" description="Creates the default configuration for a given XSD version, named 'Default configuration'. Fails if a configuration for this XSD already exists.">
 			<param name="XSDUUID" type="string" pass="in" description="UUID of the XSD to base the default configuration on." />
 			<param name="DefaultXML" type="string" pass="in" description="Configuration XML string conforming to the given XSD." />
 			<!--param name="UserUUID" type="string" pass="in" description="User UUID for logging who created the default configuration." /-->
@@ -2002,8 +2292,16 @@
 			<param name="ConnectionString" type="string" pass="in" description="Connection string." />				
 		</method>
 
+		<method name="SetTelemetryEnabled" description="enables or disables telemetry recording. Must be called before InitialiseDatabase.">
+			<param name="TelemetryEnabled" type="bool" pass="in" description="Flag if telemetry recording shall be enabled." />
+		</method>
+
+		<method name="GetTelemetryEnabled" description="returns if telemetry recording is enabled.">
+			<param name="TelemetryEnabled" type="bool" pass="return" description="Flag if telemetry recording is enabled." />
+		</method>
+
 		<method name="GetDataModelVersion" description="returns the linear data model version.">
-			<param name="Version" type="uint32" pass="return" description="Data model version." />	
+			<param name="Version" type="uint32" pass="return" description="Data model version." />
 		</method>
 
 		<method name="GetInstallationInformation" description="DEPRECIATED. Only used for backwards compatibility. NEVER USE because of thread safety issues.. Use GetInstallationInformationObject instead.">
@@ -2043,9 +2341,26 @@
 		<method name="CreateLoginHandler" description="creates a login handler instance.">
 			<param name="LoginHandler" type="class" class="LoginHandler" pass="return" description="LoginHandler instance." />	
 		</method>
-		
+
+		<method name="CreateTelemetrySession" description="creates a global telemetry session access class.">
+			<param name="TelemetrySessionInstance" type="class" class="TelemetrySession" pass="return" description="Telemetry class instance." />	
+		</method>
+
+		<method name="CreateTelemetryReader" description="Creates an access instance to telemetry from a past journal session. Fails if telemetry cannot be accessed.">
+			<param name="JournalUUID" type="string" pass="in" description="UUID of journal to load. UUID MUST NOT reference the current journaling session." />	
+			<param name="TelemetryReader" type="class" class="TelemetryReader" pass="return" description="TelemetryReader class instance." />	
+		</method>
+
 		<method name="CreatePersistencyHandler" description="creates a persistency handler instance.">
 			<param name="PersistencyHandler" type="class" class="PersistencyHandler" pass="return" description="PersistencyHandler instance." />	
+		</method>
+
+		<method name="CreateUserPreferenceHandler" description="creates a user preference handler instance.">
+			<param name="UserPreferenceHandler" type="class" class="UserPreferenceHandler" pass="return" description="UserPreferenceHandler instance." />	
+		</method>
+
+		<method name="CreateSessionMetricsHandler" description="creates a session metrics handler instance.">
+			<param name="SessionMetricsHandler" type="class" class="SessionMetricsHandler" pass="return" description="SessionMetricsHandler instance." />	
 		</method>
 		
 		<method name="SetBaseTempDirectory" description="Sets a custom base temp directory. An empty string defaults to the system temp directory.">

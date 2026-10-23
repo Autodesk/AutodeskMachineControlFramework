@@ -115,7 +115,10 @@ namespace AMC {
 		}
 	}
 
+	uint64_t CMeshScene::getMemoryUsageInBytes()
+	{
+		return (uint64_t)m_Items.capacity() * (uint64_t)sizeof(PMeshSceneItem);
+	}
 
 }
-
 

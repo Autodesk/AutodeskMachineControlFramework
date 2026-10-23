@@ -71,12 +71,15 @@ private:
 	std::string	m_sConfigurationXML;
 	std::string	m_sUserUUID;
 	std::string	m_sTimestampUTC;
-	
+	std::string	m_sName;
 
 public:
 
 
-	CMachineConfigurationVersion(AMCData::PSQLHandler pSQLHandler, const std::string& sUUID, const std::string& sXSDUUID, LibMCData_uint32 nConfigurationVersionNumber, const std::string& sParentUUID, const std::string& sConfigurationXML, const std::string& sUserUUID, const std::string& sTimestampUTC);
+	CMachineConfigurationVersion(AMCData::PSQLHandler pSQLHandler, const std::string& sUUID, const std::string& sXSDUUID, LibMCData_uint32 nConfigurationVersionNumber, const std::string& sParentUUID, const std::string& sConfigurationXML, const std::string& sUserUUID, const std::string& sTimestampUTC, const std::string& sName);
+
+	// Trims the name and checks that it is not empty and at most 256 characters long.
+	static std::string checkVersionName(const std::string& sName);
 
 	virtual ~CMachineConfigurationVersion();
 
@@ -104,15 +107,17 @@ public:
 
 	std::string GetParentUUID() override;
 
+	std::string GetName() override;
+
 	std::string GetConfigurationXMLString() override;
 
 	std::string GetUserUUID() override;
 
 	std::string GetTimestamp() override;
 
-	IMachineConfigurationVersion* CreateNewVersion(const std::string & sXMLString, const std::string & sUserUUID) override;
+	IMachineConfigurationVersion* CreateNewVersion(const std::string & sXMLString, const std::string & sUserUUID, const std::string & sName) override;
 
-	IMachineConfigurationVersion* MigrateToNewXSD(IMachineConfigurationXSD* pNewXSD, const std::string & sXMLString, const std::string & sUserUUID) override;
+	IMachineConfigurationVersion* MigrateToNewXSD(IMachineConfigurationXSD* pNewXSD, const std::string & sXMLString, const std::string & sUserUUID, const std::string & sName) override;
 
 };
 

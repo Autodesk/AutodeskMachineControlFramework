@@ -109,6 +109,7 @@ namespace Impl {
 
 	class CDriver_CifXParameter_Integer : public CDriver_CifXParameter {
 	private:
+		mutable std::mutex m_ValueMutex;
 		int64_t m_nActualValue;
 		int64_t m_nTargetValue;
 
@@ -129,6 +130,7 @@ namespace Impl {
 
 	class CDriver_CifXParameter_Double : public CDriver_CifXParameter {
 	private:
+		mutable std::mutex m_ValueMutex;
 		double m_dActualValue;
 		double m_dTargetValue;
 

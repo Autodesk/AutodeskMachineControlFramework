@@ -67,11 +67,6 @@ std::string CUIModule_ContentItem::getUUID()
 	return m_sUUID;
 }
 
-void CUIModule_ContentItem::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-
-}
-
 std::list <std::string> CUIModule_ContentItem::getReferenceUUIDs()
 {
 	std::list <std::string> resultList;
@@ -84,4 +79,72 @@ std::list <std::string> CUIModule_ContentItem::getReferenceUUIDs()
 void CUIModule_ContentItem::populateClientVariables(CParameterHandler* pParameterHandler)
 {
 
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+
+void CUIModule_ContentItem::initFrontendModuleStore(CUIFrontendDefinition* pFrontendDefinition)
+{
+	LibMCAssertNotNull(pFrontendDefinition);
+	m_pItemModuleStore = pFrontendDefinition->registerModuleStore(m_sUUID, getItemPath(), getItemType());
+	registerFrontendAttributes();
+}
+
+void CUIModule_ContentItem::registerFrontendAttributes()
+{
+	// Default: no attributes. Subclasses override to register their specific attributes.
+}
+
+std::string CUIModule_ContentItem::getItemType()
+{
+	return "";
+}
+
+PUIFrontendDefinitionModuleStore CUIModule_ContentItem::getFrontendModuleStore()
+{
+	return m_pItemModuleStore;
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemStringAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atString, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemBoolAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atBoolean, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemIntegerAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atInteger, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemNumberAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atNumber, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemUUIDAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atUUID, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule_ContentItem::registerItemProviderAttribute(const std::string& sName, eUIFrontendDefinitionAttributeType attributeType, eUIFrontendDefinitionAttributeScope scope, UIFrontendDefinitionProvider provider)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerProvider(sName, attributeType, scope, provider);
 }

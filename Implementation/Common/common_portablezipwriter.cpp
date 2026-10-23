@@ -58,6 +58,9 @@ namespace AMCCommon {
 			m_nVersionMade = ZIPFILEVERSIONNEEDED;
 			m_nVersionNeeded = ZIPFILEVERSIONNEEDED;
 		}
+#ifndef _WIN32
+		m_nVersionMade |= (3 << 8);
+#endif
 
 		if (m_pExportStream->getPosition() != 0)
 			throw std::runtime_error("export stream not empty");
@@ -71,6 +74,11 @@ namespace AMCCommon {
 	}
 
 	PExportStream CPortableZIPWriter::createEntry(const std::string sName, uint64_t nUnixTimeStamp)
+	{
+		return createEntryWithExternalAttributes(sName, nUnixTimeStamp, 0);
+	}
+
+	PExportStream CPortableZIPWriter::createEntryWithExternalAttributes(const std::string sName, uint64_t nUnixTimeStamp, uint32_t nExternalFileAttributes)
 	{
 		if (m_bIsFinished)
 			throw std::runtime_error("zip already finished");
@@ -134,8 +142,20 @@ namespace AMCCommon {
 
 		uint64_t nDataPosition = m_pExportStream->getPosition();
 
+		if (nExternalFileAttributes == 0) {
+			bool bIsDirectory = false;
+			if (!sUTF8Name.empty()) {
+				char lastChar = *sUTF8Name.rbegin();
+				bIsDirectory = (lastChar == '/') || (lastChar == '\\');
+			}
+			uint32_t nPerms = bIsDirectory ? 0755 : 0644;
+			uint32_t nTypeBits = bIsDirectory ? 0x4000 : 0x8000;
+			uint32_t nMode = nTypeBits | (nPerms & 0x0FFF);
+			nExternalFileAttributes = (nMode << 16);
+		}
+
 		// create list entry
-		m_pCurrentEntry = std::make_shared<CPortableZIPWriterEntry>(sUTF8Name, nLastModTime, nLastModDate, nFilePosition, nExtInfoPosition, nDataPosition);
+		m_pCurrentEntry = std::make_shared<CPortableZIPWriterEntry>(sUTF8Name, nLastModTime, nLastModDate, nExternalFileAttributes, nFilePosition, nExtInfoPosition, nDataPosition);
 		m_Entries.push_back(m_pCurrentEntry);
 
 		// Return new ZIP Entry stream
@@ -272,7 +292,7 @@ namespace AMCCommon {
 			DirectoryHeader.m_nFileCommentLength = 0;
 			DirectoryHeader.m_nDiskNumberStart = 0;
 			DirectoryHeader.m_nInternalFileAttributes = 0;
-			DirectoryHeader.m_nExternalFileAttributes = ZIPFILEEXTERNALFILEATTRIBUTES;
+			DirectoryHeader.m_nExternalFileAttributes = pEntry->getExternalFileAttributes();
 			DirectoryHeader.m_nRelativeOffsetOfLocalHeader = (uint32_t) pEntry->getFilePosition();
 
 			uint64_t nRelativeOffsetOfLocalHeader = pEntry->getFilePosition();

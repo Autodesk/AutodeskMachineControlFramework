@@ -59,6 +59,9 @@ Abstract: This is the class declaration of CDriver_BuR
 #define BUR_COMMAND_DIRECT_RESUMELIST 107
 #define BUR_COMMAND_DIRECT_MACHINESTATUSLEGACY 108
 #define BUR_COMMAND_DIRECT_DELETELIST 112
+// Executes a command list and lets the PLC delete it automatically once execution has finished.
+// NOTE: the numeric command id must match the value expected by the PLC firmware.
+#define BUR_COMMAND_DIRECT_EXECUTEANDDELETELIST 113
 
 #define BUR_COMMAND_DIRECT_CURRENTJOURNALSTATUS 120
 #define BUR_COMMAND_DIRECT_CURRENTJOURNALSCHEMA 121

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_LAYERVIEW
 #define __AMC_UI_MODULE_LAYERVIEW
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -50,6 +51,7 @@ namespace AMC {
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	amcDeclareDependingClass(CParameterGroup, PParameterGroup);
 	amcDeclareDependingClass(CUIModule_LayerViewPlatformItem, PUIModule_LayerViewPlatformItem);
 		
 
@@ -59,6 +61,14 @@ namespace AMC {
 		CUIExpression m_SizeY;
 		CUIExpression m_OriginX;
 		CUIExpression m_OriginY;
+		CUIExpression m_PaddingX;
+		CUIExpression m_PaddingY;
+		CUIExpression m_TransformAngle;
+		CUIExpression m_RotationCenterX;
+		CUIExpression m_RotationCenterY;
+		CUIExpression m_TranslationX;
+		CUIExpression m_TranslationY;
+		CUIExpression m_ShowCoordinateSystem;
 		CUIExpression m_BaseImage;
 		CUIExpression m_LayerIndex;
 		CUIExpression m_LabelVisible;
@@ -75,15 +85,18 @@ namespace AMC {
 
 	public:
 
-		CUIModule_LayerViewPlatformItem (const std::string& sItemPath, CUIExpression sizeX, CUIExpression sizeY, CUIExpression originX, CUIExpression originY, CUIExpression layerIndex, CUIExpression baseImage, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModule_LayerViewPlatformItem (const std::string& sItemPath, CUIExpression sizeX, CUIExpression sizeY, CUIExpression originX, CUIExpression originY, CUIExpression paddingX, CUIExpression paddingY, CUIExpression transformAngle, CUIExpression rotationCenterX, CUIExpression rotationCenterY, CUIExpression translationX, CUIExpression translationY, CUIExpression showCoordinateSystem, CUIExpression layerIndex, CUIExpression baseImage, PUIModuleEnvironment pUIModuleEnvironment);
 
 		virtual std::string getUUID() override;
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
-		virtual void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-		
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler);
+
+		// v2 frontend: applies the synced build references to the per-session client variables.
+		// The synced layer index is only applied when its value changes, so the slider can still
+		// be used to browse other layers in between.
+		void syncFrontendClientVariables(CParameterGroup* pGroup, CStateMachineData* pStateMachineData);
 
 		void handleCustomRequest(PAPIAuth pAuth, const std::string& requestType, const CAPIJSONRequest& requestData, CJSONWriter& response, CUIModule_UIEventHandler* pEventHandler) override;
 
@@ -101,6 +114,13 @@ namespace AMC {
 		std::string m_sCaption;
 
 		PUIModule_LayerViewPlatformItem m_PlatformItem;
+
+		PUIModuleEnvironment m_pUIModuleEnvironment;
+
+		// Returns the session's platform client variables after applying the synced references, or nullptr.
+		PParameterGroup findSyncedPlatformGroup(CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData);
+
+		void retrieveBuildInformation(const std::string& sBuildUUID, uint32_t& nLayerCount, uint64_t& nPartStateVersion);
 
 	public:
 
@@ -122,10 +142,6 @@ namespace AMC {
 		// Legacy UI System
 		/////////////////////////////////////////////////////////////////////////////////////
 		
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
-		virtual void writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler) override;
-		
 		virtual void populateModuleMap(std::map<std::string, PUIModule>& moduleMap) override;
 
 		virtual void populateLegacyItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
@@ -139,7 +155,6 @@ namespace AMC {
 		/////////////////////////////////////////////////////////////////////////////////////
 
 		bool isVersion2FrontendModule() override;
-
 
 	};
 

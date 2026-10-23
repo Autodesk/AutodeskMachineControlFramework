@@ -183,12 +183,20 @@ LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_ad
 LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_finishlist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
 
 /**
-* Execute command list.
+* Execute command list. The list is kept on the PLC and must be removed manually via DeleteList once it has finished executing.
 *
 * @param[in] pPLCCommandList - PLCCommandList instance.
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_executelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/**
+* Executes the command list and instructs the PLC to delete it automatically once execution has finished. No manual DeleteList call is required afterwards.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_executeanddeletelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
 
 /**
 * Wait for command list to finish executing

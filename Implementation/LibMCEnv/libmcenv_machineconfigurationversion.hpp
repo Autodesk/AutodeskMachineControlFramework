@@ -93,15 +93,22 @@ public:
 
 	virtual std::string GetParentUUID() override;
 
+	virtual std::string GetName() override;
+
 	virtual std::string GetConfigurationXMLString() override;
+
+	virtual IXMLDocument* GetConfigurationXML() override;
 
 	virtual std::string GetUserUUID() override;
 
 	virtual std::string GetTimestamp() override;
 
-	virtual IMachineConfigurationVersion* CreateNewVersion(const std::string& sXMLString, const std::string& sUserUUID) override;
+	virtual IMachineConfigurationVersion* CreateNewVersion(const std::string& sXMLString, const std::string& sUserUUID, const std::string& sName) override;
 
-	virtual IMachineConfigurationVersion* MigrateToNewXSD(IMachineConfigurationXSD* pNewXSD, const std::string& sXMLString, const std::string& sUserUUID) override;
+	virtual IMachineConfigurationVersion* MigrateToNewXSD(IMachineConfigurationXSD* pNewXSD, const std::string& sXMLString, const std::string& sUserUUID, const std::string& sName) override;
+
+	// Trims the name and throws INVALIDCONFIGURATIONVERSIONNAME if it is empty or longer than 256 characters.
+	static std::string checkVersionName(const std::string& sName);
 
 };
 

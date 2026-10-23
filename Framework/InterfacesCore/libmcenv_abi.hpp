@@ -577,10 +577,36 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_loadpngimage(LibMCEnv_Imag
 * @param[in] dDPIValueX - DPI Value in X. MUST be positive.
 * @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
 * @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
-* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @param[out] pImageDataInstance - Image instance containing the JPEG image.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_loadjpegimage(LibMCEnv_ImageLoader pImageLoader, LibMCEnv_uint64 nJPEGDataBufferSize, const LibMCEnv_uint8 * pJPEGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from a machine PNG resource data.
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] pResourceName - PNG Data Resource Name. Fails if image cannot be loaded.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+* @param[out] pImageDataInstance - Image instance containing the PNG image.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_loadpngimagefromresource(LibMCEnv_ImageLoader pImageLoader, const char * pResourceName, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
+
+/**
+* creates an image object from a machine JPEG resource data.
+*
+* @param[in] pImageLoader - ImageLoader instance.
+* @param[in] pResourceName - JPEG Data Resource Name. Fails if image cannot be loaded.
+* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+* @param[out] pImageDataInstance - Image instance containing the JPEG image.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_imageloader_loadjpegimagefromresource(LibMCEnv_ImageLoader pImageLoader, const char * pResourceName, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
 /**
 * creates an image object from raw RGB24 Data. (3 bytes per pixel)
@@ -2989,6 +3015,37 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getname(LibMCEnv_Toolpath
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
+* Returns the part number of the build item.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nPartNumberBufferSize - size of the buffer (including trailing 0)
+* @param[out] pPartNumberNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pPartNumberBuffer -  buffer of Returns the part number. Empty if not set., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getpartnumber(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nPartNumberBufferSize, LibMCEnv_uint32* pPartNumberNeededChars, char * pPartNumberBuffer);
+
+/**
+* Returns the UUID of the part's mesh object.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nMeshUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMeshUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMeshUUIDBuffer -  buffer of Returns the mesh object uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getmeshuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nMeshUUIDBufferSize, LibMCEnv_uint32* pMeshUUIDNeededChars, char * pMeshUUIDBuffer);
+
+/**
+* Returns if the part has been disabled with Build.DisablePart. Layers loaded through a toolpath accessor do not contain segments of disabled parts.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[out] pIsDisabled - Returns true if the part is disabled.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_isdisabled(LibMCEnv_ToolpathPart pToolpathPart, bool * pIsDisabled);
+
+/**
 * Returns the Root Component of the part.
 *
 * @param[in] pToolpathPart - ToolpathPart instance.
@@ -3587,6 +3644,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_registercustomsegment
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_loadlayer(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_ToolpathLayer * pLayerData);
+
+/**
+* Searches a layer range for the first layer that contains at least one segment. Segments of parts disabled with Build.DisablePart still count, so a layer that only contains disabled parts is not empty, even though LoadLayer returns it without segments. The emptiness of each layer is cached for as long as the toolpath is loaded, so repeated searches are cheap. Fails with NONONEMPTYLAYERFOUND if all layers in the range are empty.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nMinLayerIndex - Lower border of the search range (inclusive).
+* @param[in] nMaxLayerIndex - Upper border of the search range (inclusive). Clamped to LayerCount - 1. MUST NOT be smaller than MinLayerIndex.
+* @param[in] bFromMinToMax - If true, the search starts at MinLayerIndex and moves upwards, otherwise it starts at MaxLayerIndex and moves downwards.
+* @param[out] pLayerIndex - Index of the first non-empty layer in search direction.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_findnonemptylayer(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nMinLayerIndex, LibMCEnv_uint32 nMaxLayerIndex, bool bFromMinToMax, LibMCEnv_uint32 * pLayerIndex);
 
 /**
 * Retrieves the toolpath units in mm.
@@ -4222,6 +4291,19 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecution_loadattachedjournal(Lib
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_buildexecutioniterator_getcurrentexecution(LibMCEnv_BuildExecutionIterator pBuildExecutionIterator, LibMCEnv_BuildExecution * pBuildExecutionInstance);
 
 /*************************************************************************************************************************
+ Class definition for BuildIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the build the iterator points at.
+*
+* @param[in] pBuildIterator - BuildIterator instance.
+* @param[out] pBuildInstance - returns the Build instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_builditerator_getcurrentbuild(LibMCEnv_BuildIterator pBuildIterator, LibMCEnv_Build * pBuildInstance);
+
+/*************************************************************************************************************************
  Class definition for Build
 **************************************************************************************************************************/
 
@@ -4246,6 +4328,28 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getname(LibMCEnv_Build pBuild, c
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getbuilduuid(LibMCEnv_Build pBuild, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
+
+/**
+* Returns creation timestamp of the build in ISO-8601 format.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Creation timestamp in ISO-8601 format (e.g., 2025-10-23T14:30:00.000Z)., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getcreatedtimestamp(LibMCEnv_Build pBuild, const LibMCEnv_uint32 nTimestampBufferSize, LibMCEnv_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* Returns the most recent execution timestamp in ISO-8601 format. Returns empty string if build has never been executed.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Most recent execution timestamp in ISO-8601 format. Empty string if never executed., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getlastexecutiontimestamp(LibMCEnv_Build pBuild, const LibMCEnv_uint32 nTimestampBufferSize, LibMCEnv_uint32* pTimestampNeededChars, char * pTimestampBuffer);
 
 /**
 * Returns storage uuid of the build stream.
@@ -4338,6 +4442,33 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_toolpathisloaded(LibMCEnv_Build 
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_Build pBuild, LibMCEnv_ToolpathAccessor * pToolpathInstance);
+
+/**
+* Disables a part of the build. From then on, layers loaded through a toolpath accessor do not contain any segments of this part, so it is no longer exposed. Layer emptiness (ToolpathAccessor.FindNonEmptyLayer) is not affected. The state is kept in memory until EnableAllParts is called or the server restarts. Toolpath MUST have been loaded with LoadToolpath before.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pPartUUID - Build item UUID of the part. Fails with TOOLPATHPARTNOTFOUND if the part does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_disablepart(LibMCEnv_Build pBuild, const char * pPartUUID);
+
+/**
+* Returns if a part of the build has been disabled.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pPartUUID - Build item UUID of the part.
+* @param[out] pIsDisabled - Returns true if the part is disabled.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_partisdisabled(LibMCEnv_Build pBuild, const char * pPartUUID, bool * pIsDisabled);
+
+/**
+* Re-enables all disabled parts of the build.
+*
+* @param[in] pBuild - Build instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_enableallparts(LibMCEnv_Build pBuild);
 
 /**
 * Returns if the Build has an attached data with a certain UUID
@@ -6813,6 +6944,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_getintegerpa
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_getboolparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, bool * pValue);
 
+/**
+* Returns a telemetry channel from the current state machine.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+* @param[out] pChannelInstance - Channel instance. NULL if Channel does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_findtelemetrychannel(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pChannelIdentifier, bool bFailIfNotExisting, LibMCEnv_TelemetryChannel * pChannelInstance);
+
 /*************************************************************************************************************************
  Class definition for DriverEnvironment
 **************************************************************************************************************************/
@@ -7178,6 +7320,29 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_logwarning(LibMCEnv_
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loginfo(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pLogString);
 
 /**
+* Registers a telemetry channel for the current state machine. Fails if identifier already exists.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pChannelIdentifier - Channel Identifier. Must be a alphanumerical path string.
+* @param[in] pChannelDescription - Description of Channel. MUST NOT be empty.
+* @param[in] eChannelType - Type of Channel.
+* @param[out] pChannelInstance - Channel instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registertelemetrychannel(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pChannelIdentifier, const char * pChannelDescription, LibMCEnv::eTelemetryChannelType eChannelType, LibMCEnv_TelemetryChannel * pChannelInstance);
+
+/**
+* Returns a telemetry channel from the current state machine.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+* @param[out] pChannelInstance - Channel instance. NULL if Channel does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_findtelemetrychannel(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pChannelIdentifier, bool bFailIfNotExisting, LibMCEnv_TelemetryChannel * pChannelInstance);
+
+/**
 * creates an empty image object.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -7199,6 +7364,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createemptyimage(Lib
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createimageloader(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
+
+/**
+* creates a video stream object for MJPEG streaming.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+* @param[out] pVideoStreamInstance - Video stream instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createvideostream(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance);
+
+/**
+* Finds a video stream by UUID. Returns null if the stream does not exist.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pStreamUUID - UUID of the video stream to find.
+* @param[out] pVideoStreamInstance - Video stream instance, or null if not found.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_findvideostream(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance);
 
 /**
 * Creates an empty discrete field.
@@ -8035,6 +8224,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getsample(LibMC
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getallsamples(LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry * pSamplesBuffer);
 
+/**
+* Returns all timestamps together with the min/max/average/last value of each bucket of the sampling. Enables faithful multi-scale visualisation of large journals.
+*
+* @param[in] pUniformJournalSampling - UniformJournalSampling instance.
+* @param[in] nSamplesBufferSize - Number of elements in buffer
+* @param[out] pSamplesNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pSamplesBuffer - TimeStreamEnvelopeEntry  buffer of Array of Timestream envelope entries, in increasing order.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uniformjournalsampling_getallsampleswithbounds(LibMCEnv_UniformJournalSampling pUniformJournalSampling, const LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEnvelopeEntry * pSamplesBuffer);
+
 /*************************************************************************************************************************
  Class definition for JournalVariable
 **************************************************************************************************************************/
@@ -8069,6 +8269,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computedoublesample(Li
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_computeintegersample(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nTimeInMicroSeconds, LibMCEnv_int64 * pSampleValue);
+
+/**
+* Downsamples the variable's history over a time range into a fixed number of min/max/average/last buckets. Used for multi-scale visualisation of large journals.
+*
+* @param[in] pJournalVariable - JournalVariable instance.
+* @param[in] nStartTimeStamp - Start time stamp to sample in microseconds. MUST be smaller than end time stamp.
+* @param[in] nEndTimeStamp - End time stamp to sample in microseconds. MUST be larger than start time stamp.
+* @param[in] nNumberOfSamples - Number of buckets to generate. MUST be greater than 0.
+* @param[out] pSampling - Resulting uniform sampling instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalvariable_sampleuniform(LibMCEnv_JournalVariable pJournalVariable, LibMCEnv_uint64 nStartTimeStamp, LibMCEnv_uint64 nEndTimeStamp, LibMCEnv_uint32 nNumberOfSamples, LibMCEnv_UniformJournalSampling * pSampling);
 
 /*************************************************************************************************************************
  Class definition for Alert
@@ -8264,6 +8476,29 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_logentrylist_getentrytime(LibMCEnv_Log
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievejournalvariable(LibMCEnv_JournalHandler pJournalHandler, const char * pVariableName, LibMCEnv_JournalVariable * pJournalVariable);
 
 /**
+* Returns the number of recorded variables in the journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pCount - Number of recorded variables.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_getvariablecount(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns metadata of a recorded variable by index.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[in] nIndex - Index of the variable. 0-based. MUST be smaller than the variable count.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name (parameter path) of the variable., may be NULL
+* @param[out] pDataType - Data type of the variable.
+* @param[out] pUnits - Quantization units of the variable (0 for non-double variables).
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_getvariableinformation(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer, LibMCEnv::eParameterDataType * pDataType, LibMCEnv_double * pUnits);
+
+/**
 * Retrieves the reference start time of the journal.
 *
 * @param[in] pJournalHandler - JournalHandler instance.
@@ -8333,6 +8568,277 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievealerts(LibMCEnv
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_retrievealertsfromtimeinterval(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_AlertIterator * pIteratorInstance);
+
+/**
+* Loads the telemetry handler for this journal.
+*
+* @param[in] pJournalHandler - JournalHandler instance.
+* @param[out] pTelemetryHandlerInstance - Telemetry handler instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_journalhandler_loadtelemetryhandler(LibMCEnv_JournalHandler pJournalHandler, LibMCEnv_TelemetryHandler * pTelemetryHandlerInstance);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryInterval
+**************************************************************************************************************************/
+
+/**
+* Returns the marker ID.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pMarkerID - Marker ID
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryinterval_getmarkerid(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pMarkerID);
+
+/**
+* Returns the channel identifier.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Channel identifier, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryinterval_getchannelidentifier(LibMCEnv_TelemetryInterval pTelemetryInterval, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the start timestamp in microseconds.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pTimestamp - Start timestamp
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryinterval_getstarttimestamp(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pTimestamp);
+
+/**
+* Returns the end timestamp in microseconds.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pTimestamp - End timestamp
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryinterval_getendtimestamp(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pTimestamp);
+
+/**
+* Returns the duration in microseconds.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pDuration - Duration
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryinterval_getduration(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pDuration);
+
+/**
+* Returns the context data.
+*
+* @param[in] pTelemetryInterval - TelemetryInterval instance.
+* @param[out] pContextData - Context data
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryinterval_getcontextdata(LibMCEnv_TelemetryInterval pTelemetryInterval, LibMCEnv_uint64 * pContextData);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryIntervalIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the current interval.
+*
+* @param[in] pTelemetryIntervalIterator - TelemetryIntervalIterator instance.
+* @param[out] pInterval - Current interval
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryintervaliterator_getcurrentinterval(LibMCEnv_TelemetryIntervalIterator pTelemetryIntervalIterator, LibMCEnv_TelemetryInterval * pInterval);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryChannelStatistics
+**************************************************************************************************************************/
+
+/**
+* Returns the channel identifier.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Channel identifier, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannelstatistics_getchannelidentifier(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Returns the number of completed intervals.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pCount - Number of intervals
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannelstatistics_getintervalcount(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns the number of instant markers.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pCount - Number of instant markers
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannelstatistics_getinstantmarkercount(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pCount);
+
+/**
+* Returns the total duration of all intervals.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pDuration - Total duration in microseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannelstatistics_gettotalduration(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration);
+
+/**
+* Returns the minimum interval duration.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pDuration - Min duration in microseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannelstatistics_getminduration(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration);
+
+/**
+* Returns the maximum interval duration.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pDuration - Max duration in microseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannelstatistics_getmaxduration(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration);
+
+/**
+* Returns the average interval duration.
+*
+* @param[in] pTelemetryChannelStatistics - TelemetryChannelStatistics instance.
+* @param[out] pDuration - Average duration in microseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannelstatistics_getaverageduration(LibMCEnv_TelemetryChannelStatistics pTelemetryChannelStatistics, LibMCEnv_uint64 * pDuration);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryHandler
+**************************************************************************************************************************/
+
+/**
+* Returns the session UUID.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Session UUID, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_getsessionuuid(LibMCEnv_TelemetryHandler pTelemetryHandler, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns the session start time.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[out] pDateTimeInstance - DateTime Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_getstarttime(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Returns the session end time.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[out] pDateTimeInstance - DateTime Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_getendtime(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_DateTime * pDateTimeInstance);
+
+/**
+* Returns the session lifetime in microseconds.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[out] pLifeTime - Lifetime
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_getlifetimeinmicroseconds(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint64 * pLifeTime);
+
+/**
+* Returns the number of telemetry channels.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[out] pCount - Number of channels
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_getchannelcount(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns the identifier for a channel by index.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] nChannelIndex - Channel index (0-based)
+* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIdentifierBuffer -  buffer of Channel identifier, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_getchannelidentifier(LibMCEnv_TelemetryHandler pTelemetryHandler, LibMCEnv_uint32 nChannelIndex, const LibMCEnv_uint32 nIdentifierBufferSize, LibMCEnv_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+
+/**
+* Checks if a channel exists.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pIdentifier - Channel identifier
+* @param[out] pExists - True if channel exists
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_haschannel(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pIdentifier, bool * pExists);
+
+/**
+* Returns the description of a channel.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pIdentifier - Channel identifier
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Channel description, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_getchanneldescription(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pIdentifier, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* Queries intervals from the last N microseconds.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pChannelIdentifier - Channel identifier. Empty string for all channels.
+* @param[in] nTimeDeltaInMicroseconds - Time delta from the end of the session.
+* @param[out] pIterator - Iterator over intervals
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_queryintervalsfromtimedelta(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nTimeDeltaInMicroseconds, LibMCEnv_TelemetryIntervalIterator * pIterator);
+
+/**
+* Queries intervals within a time range.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pChannelIdentifier - Channel identifier. Empty string for all channels.
+* @param[in] nStartTimeInMicroseconds - Start time.
+* @param[in] nEndTimeInMicroseconds - End time.
+* @param[out] pIterator - Iterator over intervals
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_queryintervalsfromtimerange(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_TelemetryIntervalIterator * pIterator);
+
+/**
+* Gets aggregated statistics for a channel.
+*
+* @param[in] pTelemetryHandler - TelemetryHandler instance.
+* @param[in] pChannelIdentifier - Channel identifier.
+* @param[in] nStartTimeInMicroseconds - Start time (0 for beginning of session).
+* @param[in] nEndTimeInMicroseconds - End time (0 for end of session).
+* @param[out] pStatistics - Statistics instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetryhandler_getchannelstatistics(LibMCEnv_TelemetryHandler pTelemetryHandler, const char * pChannelIdentifier, LibMCEnv_uint64 nStartTimeInMicroseconds, LibMCEnv_uint64 nEndTimeInMicroseconds, LibMCEnv_TelemetryChannelStatistics * pStatistics);
 
 /*************************************************************************************************************************
  Class definition for UserDetailList
@@ -8817,6 +9323,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_getnumeric
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_getparentuuid(LibMCEnv_MachineConfigurationVersion pMachineConfigurationVersion, const LibMCEnv_uint32 nParentUUIDBufferSize, LibMCEnv_uint32* pParentUUIDNeededChars, char * pParentUUIDBuffer);
 
 /**
+* Returns the name of the configuration version.
+*
+* @param[in] pMachineConfigurationVersion - MachineConfigurationVersion instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the configuration version. Default configurations are named 'Default configuration'. Versions created before names were introduced return an empty string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_getname(LibMCEnv_MachineConfigurationVersion pMachineConfigurationVersion, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
 * Returns the configuration XML content as string.
 *
 * @param[in] pMachineConfigurationVersion - MachineConfigurationVersion instance.
@@ -8826,6 +9343,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_getparentu
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_getconfigurationxmlstring(LibMCEnv_MachineConfigurationVersion pMachineConfigurationVersion, const LibMCEnv_uint32 nXMLStringBufferSize, LibMCEnv_uint32* pXMLStringNeededChars, char * pXMLStringBuffer);
+
+/**
+* Returns the configuration XML instance.
+*
+* @param[in] pMachineConfigurationVersion - MachineConfigurationVersion instance.
+* @param[out] pXMLInstance - XML Document.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_getconfigurationxml(LibMCEnv_MachineConfigurationVersion pMachineConfigurationVersion, LibMCEnv_XMLDocument * pXMLInstance);
 
 /**
 * Returns the User UUID.
@@ -8855,10 +9381,11 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_gettimesta
 * @param[in] pMachineConfigurationVersion - MachineConfigurationVersion instance.
 * @param[in] pXMLString - New XML Configuration String. MUST conform to current XSD.
 * @param[in] pUserUUID - User UUID for logging the user who initiated the change.
+* @param[in] pName - Name of the new version, shown in the configuration history. Leading and trailing whitespace is removed. Fails with INVALIDCONFIGURATIONVERSIONNAME if the name is empty or longer than 256 characters.
 * @param[out] pCurrentInstance - Returns the newly created MachineConfigurationVersion instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_createnewversion(LibMCEnv_MachineConfigurationVersion pMachineConfigurationVersion, const char * pXMLString, const char * pUserUUID, LibMCEnv_MachineConfigurationVersion * pCurrentInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_createnewversion(LibMCEnv_MachineConfigurationVersion pMachineConfigurationVersion, const char * pXMLString, const char * pUserUUID, const char * pName, LibMCEnv_MachineConfigurationVersion * pCurrentInstance);
 
 /**
 * Creates a new configuration version from this one but with a different XSD.
@@ -8867,10 +9394,11 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_createnewv
 * @param[in] pNewXSD - New XSD to use. MUST be of the same type as the current. MUST have an increased version number.
 * @param[in] pXMLString - New XML Configuration String. MUST conform to new XSD.
 * @param[in] pUserUUID - User UUID for logging the user who initiated the change.
+* @param[in] pName - Name of the new version, shown in the configuration history. Fails with INVALIDCONFIGURATIONVERSIONNAME if the name is empty or longer than 256 characters.
 * @param[out] pCurrentInstance - Returns the newly created MachineConfigurationVersion instance.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_migratetonewxsd(LibMCEnv_MachineConfigurationVersion pMachineConfigurationVersion, LibMCEnv_MachineConfigurationXSD pNewXSD, const char * pXMLString, const char * pUserUUID, LibMCEnv_MachineConfigurationVersion * pCurrentInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_migratetonewxsd(LibMCEnv_MachineConfigurationVersion pMachineConfigurationVersion, LibMCEnv_MachineConfigurationXSD pNewXSD, const char * pXMLString, const char * pUserUUID, const char * pName, LibMCEnv_MachineConfigurationVersion * pCurrentInstance);
 
 /*************************************************************************************************************************
  Class definition for MachineConfigurationVersionIterator
@@ -8884,6 +9412,227 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversion_migrateton
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationversioniterator_getcurrent(LibMCEnv_MachineConfigurationVersionIterator pMachineConfigurationVersionIterator, LibMCEnv_MachineConfigurationVersion * pInstance);
+
+/*************************************************************************************************************************
+ Class definition for MachineConfiguration
+**************************************************************************************************************************/
+
+/**
+* Returns the UUID of the underlying configuration version this working copy was created from.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] nVersionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pVersionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pVersionUUIDBuffer -  buffer of UUID of the configuration version., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getversionuuid(LibMCEnv_MachineConfiguration pMachineConfiguration, const LibMCEnv_uint32 nVersionUUIDBufferSize, LibMCEnv_uint32* pVersionUUIDNeededChars, char * pVersionUUIDBuffer);
+
+/**
+* Returns the numeric version of the underlying configuration version.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[out] pConfigurationNumericVersion - Returns the configuration numeric version.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getnumericversion(LibMCEnv_MachineConfiguration pMachineConfiguration, LibMCEnv_uint32 * pConfigurationNumericVersion);
+
+/**
+* Returns the UUID of the XSD used by this configuration.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] nXSDUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pXSDUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pXSDUUIDBuffer -  buffer of UUID of the configuration XSD., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getxsduuid(LibMCEnv_MachineConfiguration pMachineConfiguration, const LibMCEnv_uint32 nXSDUUIDBufferSize, LibMCEnv_uint32* pXSDUUIDNeededChars, char * pXSDUUIDBuffer);
+
+/**
+* Returns the current in-memory configuration as an XML document instance for advanced access. The returned document reflects any uncommitted changes.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[out] pXMLInstance - XML Document.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getxmldocument(LibMCEnv_MachineConfiguration pMachineConfiguration, LibMCEnv_XMLDocument * pXMLInstance);
+
+/**
+* Returns whether a parameter exists at the given path.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root, e.g. 'PLCConfig/IPAddress'.
+* @param[out] pParameterExists - True if the parameter node and its value attribute exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_hasparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool * pParameterExists);
+
+/**
+* Returns the string value of a parameter. Fails if the parameter does not exist.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Parameter value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getstringparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns the integer value of a parameter. Fails if the parameter does not exist or is not an integer in range.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] nMinValue - Minimum allowed value.
+* @param[in] nMaxValue - Maximum allowed value.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getintegerparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 * pValue);
+
+/**
+* Returns the double value of a parameter. Fails if the parameter does not exist or is not a double in range.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] dMinValue - Minimum allowed value.
+* @param[in] dMaxValue - Maximum allowed value.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getdoubleparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double * pValue);
+
+/**
+* Returns the boolean value of a parameter. Fails if the parameter does not exist or is not a boolean.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getboolparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool * pValue);
+
+/**
+* Returns the string value of a parameter. Returns the default value if the parameter does not exist.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] pDefaultValue - Default value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Parameter value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getstringparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const char * pDefaultValue, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Returns the integer value of a parameter. Returns the default value if the parameter does not exist or is not a valid integer in range.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] nMinValue - Minimum allowed value.
+* @param[in] nMaxValue - Maximum allowed value.
+* @param[in] nDefaultValue - Default value. MUST be in valid range.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getintegerparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nMinValue, LibMCEnv_int64 nMaxValue, LibMCEnv_int64 nDefaultValue, LibMCEnv_int64 * pValue);
+
+/**
+* Returns the double value of a parameter. Returns the default value if the parameter does not exist or is not a valid double in range.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] dMinValue - Minimum allowed value.
+* @param[in] dMaxValue - Maximum allowed value.
+* @param[in] dDefaultValue - Default value. MUST be in valid range.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getdoubleparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dMinValue, LibMCEnv_double dMaxValue, LibMCEnv_double dDefaultValue, LibMCEnv_double * pValue);
+
+/**
+* Returns the boolean value of a parameter. Returns the default value if the parameter does not exist or is not a valid boolean.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] bDefaultValue - Default value.
+* @param[out] pValue - Parameter value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_getboolparameterdef(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool bDefaultValue, bool * pValue);
+
+/**
+* Sets the string value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] pValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_setstringparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, const char * pValue);
+
+/**
+* Sets the integer value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] nValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_setintegerparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_int64 nValue);
+
+/**
+* Sets the double value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] dValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_setdoubleparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, LibMCEnv_double dValue);
+
+/**
+* Sets the boolean value of a parameter, creating missing intermediate nodes and the value attribute as needed. Change is held in memory until committed.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pPath - Slash-separated element path beneath the root.
+* @param[in] bValue - Value to set.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_setboolparameter(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pPath, bool bValue);
+
+/**
+* Returns whether the in-memory working copy has uncommitted changes.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[out] pHasUncommittedChanges - True if there are uncommitted changes.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_haschanges(LibMCEnv_MachineConfiguration pMachineConfiguration, bool * pHasUncommittedChanges);
+
+/**
+* Commits the current in-memory state as a new configuration version (child of the version this working copy is based on). Does not change the active version. After committing, the working copy is rebased on the new version.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pUserUUID - User UUID for logging who initiated the change.
+* @param[in] pName - Name of the new version, shown in the configuration history. Leading and trailing whitespace is removed. Fails with INVALIDCONFIGURATIONVERSIONNAME if the name is empty or longer than 256 characters.
+* @param[out] pVersionInstance - Returns the newly created configuration version.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_commit(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pUserUUID, const char * pName, LibMCEnv_MachineConfigurationVersion * pVersionInstance);
+
+/**
+* Commits the current in-memory state as a new configuration version and sets it as the active version for the type. After committing, the working copy is rebased on the new version.
+*
+* @param[in] pMachineConfiguration - MachineConfiguration instance.
+* @param[in] pUserUUID - User UUID for logging who initiated the change.
+* @param[in] pName - Name of the new version, shown in the configuration history. Leading and trailing whitespace is removed. Fails with INVALIDCONFIGURATIONVERSIONNAME if the name is empty or longer than 256 characters.
+* @param[out] pVersionInstance - Returns the newly created and now active configuration version.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfiguration_commitandactivate(LibMCEnv_MachineConfiguration pMachineConfiguration, const char * pUserUUID, const char * pName, LibMCEnv_MachineConfigurationVersion * pVersionInstance);
 
 /*************************************************************************************************************************
  Class definition for MachineConfigurationType
@@ -8972,6 +9721,19 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getlatestxsdn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_registernewxsd(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDString, LibMCEnv_uint32 nXSDVersion, LibMCEnv_MachineConfigurationXSD * pXSDInstance);
 
 /**
+* Registers a XSD from a resource file including its default configuration.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[in] pXSDResourceName - XSD Resource Name. Resource MUST exist.
+* @param[in] pDefaultXMLResourceName - Default XML Resource Name. Resource MUST exist.
+* @param[in] nXSDVersion - New Version to add. MUST be larger than GetLatestXSDVersion if FailIfExisting is true.
+* @param[in] bFailIfExisting - If true, the call will fail if XSDVersion is not larger than GetLatestXSDVersion. If false, the call will return the new XSDInstance, if XSDVersion is larger than GetLatestXSDVersion, null otherwise. 
+* @param[out] pXSDInstance - Returns the new XSD of the configuration type, if it has been newly registered.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_registerxsdfromresource(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDResourceName, const char * pDefaultXMLResourceName, LibMCEnv_uint32 nXSDVersion, bool bFailIfExisting, LibMCEnv_MachineConfigurationXSD * pXSDInstance);
+
+/**
 * Finds a specific XSD of this type by its Numeric Version Number.
 *
 * @param[in] pMachineConfigurationType - MachineConfigurationType instance.
@@ -9051,6 +9813,24 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getactiveconf
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getlatestconfigurationversion(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_MachineConfigurationVersion * pVersion);
 
 /**
+* Returns the currently active configuration XML for this type.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[out] pXMLInstance - XML Document.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getactiveconfigurationxml(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_XMLDocument * pXMLInstance);
+
+/**
+* Returns the most recently created configuration XML for this type.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[out] pXMLInstance - XML Document.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getlatestconfigurationxml(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_XMLDocument * pXMLInstance);
+
+/**
 * Sets the active configuration version for this type.
 *
 * @param[in] pMachineConfigurationType - MachineConfigurationType instance.
@@ -9058,6 +9838,67 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getlatestconf
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_setactiveconfigurationversion(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pVersionUUID);
+
+/**
+* Returns an ergonomic, typed working copy of the currently active configuration version. Fails if no version is active.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[out] pConfigurationInstance - Working copy of the active configuration.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_getactiveconfiguration(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_MachineConfiguration * pConfigurationInstance);
+
+/**
+* Returns an ergonomic, typed working copy of the active configuration, activating the latest version first if none is currently active. Fails if no configuration version exists at all.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[out] pConfigurationInstance - Working copy of the active configuration.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_ensureactiveconfiguration(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_MachineConfiguration * pConfigurationInstance);
+
+/**
+* Registers a new XSD version together with its default configuration, but only if the given version is newer than the latest registered XSD. Returns null if the given version is not newer (no-op). Collapses the common bootstrap pattern of RegisterNewXSD + CreateDefaultConfiguration.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[in] pXSDString - XSD String of the version. MUST be a valid schema of this type.
+* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+* @param[in] pDefaultXML - Default configuration XML string conforming to the given XSD.
+* @param[out] pXSDInstance - The newly registered XSD, or null if the version was not newer than the latest.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_ensurexsdversion(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDString, LibMCEnv_uint32 nXSDVersion, const char * pDefaultXML, LibMCEnv_MachineConfigurationXSD * pXSDInstance);
+
+/**
+* Registers a new XSD version and generates its default configuration from state-machine parameters mapped to this configuration schema. Returns null if the given version is not newer.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[in] pXSDString - XSD String of the version. MUST be a valid schema of this type.
+* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+* @param[out] pXSDInstance - The newly registered XSD, or null if the version was not newer than the latest.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_ensurexsdversionfromparameterdefaults(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDString, LibMCEnv_uint32 nXSDVersion, LibMCEnv_MachineConfigurationXSD * pXSDInstance);
+
+/**
+* Applies every parameter of the active configuration to the state-machine parameters mapped to this configuration schema. All values are validated before any runtime parameter is changed.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[out] pAppliedParameterCount - Number of mapped runtime parameters that have been synchronized.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_synchronizeparameters(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_uint32 * pAppliedParameterCount);
+
+/**
+* Creates and activates a new auditable configuration version from the mapped state-machine parameter defaults, then synchronizes the runtime parameters. Existing configuration history is preserved.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[in] pUserUUID - UUID of the user requesting the reset.
+* @param[in] pName - Name of the new factory-reset configuration version.
+* @param[out] pVersionInstance - The newly created and active factory-reset configuration version.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_resettoparameterdefaults(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pUserUUID, const char * pName, LibMCEnv_MachineConfigurationVersion * pVersionInstance);
 
 /*************************************************************************************************************************
  Class definition for MachineConfigurationTypeIterator
@@ -9127,6 +9968,118 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationhandler_findconfig
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationhandler_findconfigurationtypebyschema(LibMCEnv_MachineConfigurationHandler pMachineConfigurationHandler, const char * pSchemaType, LibMCEnv_MachineConfigurationType * pTypeInstance);
 
 /*************************************************************************************************************************
+ Class definition for TelemetryMarkerScope
+**************************************************************************************************************************/
+
+/**
+* Returns the global marker ID
+*
+* @param[in] pTelemetryMarkerScope - TelemetryMarkerScope instance.
+* @param[out] pMarkerID - Global marker id.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrymarkerscope_getmarkerid(LibMCEnv_TelemetryMarkerScope pTelemetryMarkerScope, LibMCEnv_uint64 * pMarkerID);
+
+/**
+* Returns the Identifier of the Parent (State machine or Driver) of the channel.
+*
+* @param[in] pTelemetryMarkerScope - TelemetryMarkerScope instance.
+* @param[in] nParentIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pParentIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pParentIdentifierBuffer -  buffer of Parent Identifier, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrymarkerscope_getparent(LibMCEnv_TelemetryMarkerScope pTelemetryMarkerScope, const LibMCEnv_uint32 nParentIdentifierBufferSize, LibMCEnv_uint32* pParentIdentifierNeededChars, char * pParentIdentifierBuffer);
+
+/**
+* Returns the Identifier of the Channel.
+*
+* @param[in] pTelemetryMarkerScope - TelemetryMarkerScope instance.
+* @param[in] nChannelIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pChannelIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pChannelIdentifierBuffer -  buffer of Channel Identifier. Will be a alphanumerical path string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrymarkerscope_getidentifier(LibMCEnv_TelemetryMarkerScope pTelemetryMarkerScope, const LibMCEnv_uint32 nChannelIdentifierBufferSize, LibMCEnv_uint32* pChannelIdentifierNeededChars, char * pChannelIdentifierBuffer);
+
+/**
+* Returns the global Identifier of the Channel, which is ParentIdentifier.ChannelIdentifier
+*
+* @param[in] pTelemetryMarkerScope - TelemetryMarkerScope instance.
+* @param[in] nGlobalIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pGlobalIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pGlobalIdentifierBuffer -  buffer of Global Identifier. Will be a alphanumerical path string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrymarkerscope_getglobalidentifier(LibMCEnv_TelemetryMarkerScope pTelemetryMarkerScope, const LibMCEnv_uint32 nGlobalIdentifierBufferSize, LibMCEnv_uint32* pGlobalIdentifierNeededChars, char * pGlobalIdentifierBuffer);
+
+/**
+* Returns start timestamp of the marker
+*
+* @param[in] pTelemetryMarkerScope - TelemetryMarkerScope instance.
+* @param[out] pStartTimestamp - Start timestamp.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrymarkerscope_getstarttimestamp(LibMCEnv_TelemetryMarkerScope pTelemetryMarkerScope, LibMCEnv_uint64 * pStartTimestamp);
+
+/*************************************************************************************************************************
+ Class definition for TelemetryChannel
+**************************************************************************************************************************/
+
+/**
+* Returns the Identifier of the Parent (State machine or Driver) of the channel.
+*
+* @param[in] pTelemetryChannel - TelemetryChannel instance.
+* @param[in] nParentIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pParentIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pParentIdentifierBuffer -  buffer of Parent Identifier, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannel_getparent(LibMCEnv_TelemetryChannel pTelemetryChannel, const LibMCEnv_uint32 nParentIdentifierBufferSize, LibMCEnv_uint32* pParentIdentifierNeededChars, char * pParentIdentifierBuffer);
+
+/**
+* Returns the Identifier of the Channel.
+*
+* @param[in] pTelemetryChannel - TelemetryChannel instance.
+* @param[in] nChannelIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pChannelIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pChannelIdentifierBuffer -  buffer of Channel Identifier. Will be a alphanumerical path string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannel_getidentifier(LibMCEnv_TelemetryChannel pTelemetryChannel, const LibMCEnv_uint32 nChannelIdentifierBufferSize, LibMCEnv_uint32* pChannelIdentifierNeededChars, char * pChannelIdentifierBuffer);
+
+/**
+* Returns the global Identifier of the Channel, which is ParentIdentifier.ChannelIdentifier
+*
+* @param[in] pTelemetryChannel - TelemetryChannel instance.
+* @param[in] nGlobalIdentifierBufferSize - size of the buffer (including trailing 0)
+* @param[out] pGlobalIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pGlobalIdentifierBuffer -  buffer of Global Identifier. Will be a alphanumerical path string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannel_getglobalidentifier(LibMCEnv_TelemetryChannel pTelemetryChannel, const LibMCEnv_uint32 nGlobalIdentifierBufferSize, LibMCEnv_uint32* pGlobalIdentifierNeededChars, char * pGlobalIdentifierBuffer);
+
+/**
+* Starts a marker scope object.
+*
+* @param[in] pTelemetryChannel - TelemetryChannel instance.
+* @param[in] nUserContextData - User data to be stored with the marker.
+* @param[out] pTelemetryMarkerScopeInstance - Marker scope instance. Will finish when freed.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannel_startmarkerscope(LibMCEnv_TelemetryChannel pTelemetryChannel, LibMCEnv_uint64 nUserContextData, LibMCEnv_TelemetryMarkerScope * pTelemetryMarkerScopeInstance);
+
+/**
+* Creates a marker of length 0.
+*
+* @param[in] pTelemetryChannel - TelemetryChannel instance.
+* @param[in] nUserContextData - User data to be stored with the marker.
+* @param[out] pMarkerID - Global marker ID.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_telemetrychannel_createinstantmarker(LibMCEnv_TelemetryChannel pTelemetryChannel, LibMCEnv_uint64 nUserContextData, LibMCEnv_uint64 * pMarkerID);
+
+/*************************************************************************************************************************
  Class definition for StateEnvironment
 **************************************************************************************************************************/
 
@@ -9165,29 +10118,37 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getpreviousstate(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_preparesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance);
 
 /**
-* Waits for a signal for a certain amount of time.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pSignalName - Name Of Signal
-* @param[in] nTimeOut - Timeout in Milliseconds. 0 for Immediate return.
-* @param[out] pHandlerInstance - Signal object. If Success is false, the Signal Handler Object will be null.
-* @param[out] pSuccess - Signal has been triggered
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_waitforsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalName, LibMCEnv_uint32 nTimeOut, LibMCEnv_SignalHandler * pHandlerInstance, bool * pSuccess);
-
-/**
-* Retrieves an unhandled signal By signal type name. Only affects signals with Phase InQueue.
+* Retrieves an InQueue signal by type and changes its phase to InProcess. Recommended to use as it is robust against signal timeouts...
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pSignalTypeName - Name Of Signal to be returned
-* @param[out] pHandlerInstance - Signal object. If no signal has been found the signal handler object will be null.
+* @param[out] pHandlerInstance - Signal object. If no signal is InQueue the signal handler object will be null.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getunhandledsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, LibMCEnv_SignalHandler * pHandlerInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_claimsignalfromqueue(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, LibMCEnv_SignalHandler * pHandlerInstance);
 
 /**
-* Clears all unhandled signals of a certain type and marks them as Cleared. Only affects signals with Phase InQueue.
+* Returns if a signal queue is empty for a specific type... Equivalent to NOT QueueHasSignal.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pSignalTypeName - Name Of Signal to be returned
+* @param[out] pIsEmpty - Returns if the signal queue is empty. Please be aware that even a false return value does not guarantee that ClaimSignalFromQueue returns a non-null value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_signalqueueisempty(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, bool * pIsEmpty);
+
+/**
+* Returns if a signal queue has a signal of a specific type. Equivalent to NOT SignalQueueIsEmpty ().
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pSignalTypeName - Name Of Signal to be returned
+* @param[out] pHasSignal - Returns if there is a signal in a signal queue. Please be aware that even a true return value does not guarantee that ClaimSignalFromQueue returns a non-null value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_queuehassignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, bool * pHasSignal);
+
+/**
+* Clears all InQueue or InProcess signals of a certain type and marks them as Cleared. Handled, failed or timedout signals are unaffected
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pSignalTypeName - Name Of Signal to be cleared.
@@ -9196,7 +10157,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getunhandledsignal(Li
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_clearunhandledsignalsoftype(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName);
 
 /**
-* Clears all unhandled signals and marks them Cleared. Only affects signals in the specific queue (as well as with Phase InQueue.
+* Clears all InQueue or InProcess signals of this state machine and marks them Cleared. Handled, failed or timedout signals are unaffected
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @return error code or 0 (success)
@@ -9204,11 +10165,34 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_clearunhandledsignals
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_clearallunhandledsignals(LibMCEnv_StateEnvironment pStateEnvironment);
 
 /**
-* retrieves an unhandled signal from the current state machine by UUID.
+* Registers a telemetry channel for the current state machine. Fails if identifier already exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pChannelIdentifier - Channel Identifier. Must be a alphanumerical path string.
+* @param[in] pChannelDescription - Description of Channel. MUST NOT be empty.
+* @param[in] eChannelType - Type of Channel.
+* @param[out] pChannelInstance - Channel instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_registertelemetrychannel(LibMCEnv_StateEnvironment pStateEnvironment, const char * pChannelIdentifier, const char * pChannelDescription, LibMCEnv::eTelemetryChannelType eChannelType, LibMCEnv_TelemetryChannel * pChannelInstance);
+
+/**
+* Returns a telemetry channel from the current state machine.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pChannelIdentifier - Channel Identifier to return. Must be a alphanumerical path string.
+* @param[in] bFailIfNotExisting - If true, the call will fail if the channel identifier does not exist. If false, the call will return NULL if the channel identifier does not exist..
+* @param[out] pChannelInstance - Channel instance. NULL if Channel does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findtelemetrychannel(LibMCEnv_StateEnvironment pStateEnvironment, const char * pChannelIdentifier, bool bFailIfNotExisting, LibMCEnv_TelemetryChannel * pChannelInstance);
+
+/**
+* Retrieves an InQueue or InProcess signal from the current state machine by UUID.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pUUID - Name
-* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled already.
+* @param[in] bMustExist - The call fails if MustExist is true and not signal with UUID does exist or a signal with UUID has been handled, failed, cleared or timedout already.
 * @param[out] pHandler - Signal handler instance. Returns null, if signal does not exist.
 * @return error code or 0 (success)
 */
@@ -9286,6 +10270,57 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getbuildexecution(Lib
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_unloadalltoolpathes(LibMCEnv_StateEnvironment pStateEnvironment);
 
 /**
+* DEPRECIATED: Waits for an InQueue signal to exist for a certain amount of time. DOES NOT change signal phase to InProcess, and is not atomic. And so NOT robust against signal timeouts. USE claim signal instead.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pSignalName - Name Of Signal
+* @param[in] nTimeOut - Timeout in Milliseconds. 0 for Immediate return.
+* @param[out] pHandlerInstance - Signal object. If Success is false, the Signal Handler Object will be null.
+* @param[out] pSuccess - Signal has been triggered
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_waitforsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalName, LibMCEnv_uint32 nTimeOut, LibMCEnv_SignalHandler * pHandlerInstance, bool * pSuccess);
+
+/**
+* DEPRECIATED: Retrieves am InQueue signal by type. DOES NOT change signal phase to InProcess, and is not atomic. And so NOT robust against signal timeouts. USE ClaimSignalFromQueue instead.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pSignalTypeName - Name Of Signal to be returned
+* @param[out] pHandlerInstance - Signal object. If no signal has been found the signal handler object will be null.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getunhandledsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pSignalTypeName, LibMCEnv_SignalHandler * pHandlerInstance);
+
+/**
+* DEPRECIATED: stores a signal handler in the current state machine
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name
+* @param[in] pHandler - Signal handler to store.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler pHandler);
+
+/**
+* DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name
+* @param[out] pHandler - Signal handler instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler * pHandler);
+
+/**
+* DEPRECIATED: deletes a value from the data store.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_clearstoredvalue(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName);
+
+/**
 * sets the next state
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -9338,35 +10373,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_sleep(LibMCEnv_StateE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_checkfortermination(LibMCEnv_StateEnvironment pStateEnvironment, bool * pShallTerminate);
-
-/**
-* DEPRECIATED: stores a signal handler in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pHandler - Signal handler to store.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler pHandler);
-
-/**
-* DEPRECIATED: retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pHandler - Signal handler instance.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler * pHandler);
-
-/**
-* DEPRECIATED: deletes a value from the data store.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_clearstoredvalue(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName);
 
 /**
 * sets a string parameter
@@ -9483,6 +10489,134 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getintegerparameter(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
 /**
+* checks if a parameter group exists.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[out] pGroupExists - returns true if the parameter group exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasparametergroup(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, bool * pGroupExists);
+
+/**
+* checks if a parameter exists within a given group.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pParameterExists - returns true if the parameter exists in the given group.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hasparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pParameterExists);
+
+/**
+* returns the number of parameters contained in a given parameter group.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[out] pCount - Number of parameters in the group.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparametercount(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 * pCount);
+
+/**
+* returns the name of a parameter in a given parameter group by index.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparametername(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the description of a parameter in a given parameter group by index.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparameterdescription(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* returns the data type of a parameter in a given parameter group by name.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pParameterType - Data type of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getparametergroupparametertype(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, LibMCEnv::eParameterDataType * pParameterType);
+
+/**
+* checks if a UI session variable is declared in the user interface configuration.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pVariableName - Session variable name.
+* @param[out] pVariableExists - returns true if the session variable is declared.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_hassessionvariable(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, bool * pVariableExists);
+
+/**
+* sets a string UI session variable in all currently active client sessions. Sessions created afterwards start with the declared default value.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] pValue - New value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_setsessionvariableforallsessions(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, const char * pValue);
+
+/**
+* sets a uuid UI session variable in all currently active client sessions. Sessions created afterwards start with the declared default value.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] pValue - New value. An empty string sets the null UUID.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_setsessionvariableforallsessionsasuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, const char * pValue);
+
+/**
+* sets a double UI session variable in all currently active client sessions. Sessions created afterwards start with the declared default value.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] dValue - New value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_setsessionvariableforallsessionsasdouble(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, LibMCEnv_double dValue);
+
+/**
+* sets an integer UI session variable in all currently active client sessions. Sessions created afterwards start with the declared default value.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] nValue - New value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_setsessionvariableforallsessionsasinteger(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, LibMCEnv_int64 nValue);
+
+/**
+* sets a bool UI session variable in all currently active client sessions. Sessions created afterwards start with the declared default value.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] bValue - New value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_setsessionvariableforallsessionsasbool(LibMCEnv_StateEnvironment pStateEnvironment, const char * pVariableName, bool bValue);
+
+/**
 * retrieves if the machine resources has data with the given identifier.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -9538,6 +10672,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createemptyimage(LibM
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createimageloader(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
+
+/**
+* creates a video stream object for MJPEG streaming.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+* @param[out] pVideoStreamInstance - Video stream instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createvideostream(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance);
+
+/**
+* Finds a video stream by UUID. Returns null if the stream does not exist.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pStreamUUID - UUID of the video stream to find.
+* @param[out] pVideoStreamInstance - Video stream instance, or null if not found.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_findvideostream(LibMCEnv_StateEnvironment pStateEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance);
 
 /**
 * creates a machine configuration handler, dealing with all persistent machine settings that the user will store in the local database.
@@ -10146,6 +11304,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsenderpage(
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsenderuuid(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderUUIDBufferSize, LibMCEnv_uint32* pSenderUUIDNeededChars, char * pSenderUUIDBuffer);
 
 /**
+* checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pTag - Tag to check for.
+* @param[out] pTagExists - True if the sender declares the given tag.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_senderhastag(LibMCEnv_UIEnvironment pUIEnvironment, const char * pTag, bool * pTagExists);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -10258,6 +11426,57 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparameterasint
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparameterasbool(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue);
+
+/**
+* returns the number of parameters contained in a given parameter group of a state machine.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[out] pCount - Number of parameters in the group.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparametercount(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 * pCount);
+
+/**
+* returns the name of a parameter in a given parameter group of a state machine by index.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparametername(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the description of a parameter in a given parameter group of a state machine by index.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] nIndex - Index of the parameter (0-based). Fails if out of range.
+* @param[in] nDescriptionBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDescriptionNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDescriptionBuffer -  buffer of Description of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparameterdescription(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nDescriptionBufferSize, LibMCEnv_uint32* pDescriptionNeededChars, char * pDescriptionBuffer);
+
+/**
+* returns the data type of a parameter in a given parameter group of a state machine by name.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pParameterType - Data type of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineparametergroupparametertype(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv::eParameterDataType * pParameterType);
 
 /**
 * returns a string property of a UI element on the client
@@ -10374,6 +11593,131 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setuipropertyasinteger(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setuipropertyasbool(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, bool bValue);
 
 /**
+* returns the UUID of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nSessionUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSessionUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSessionUUIDBuffer -  buffer of Session UUID., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getsessionuuid(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSessionUUIDBufferSize, LibMCEnv_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer);
+
+/**
+* checks if a session variable is declared in the user interface configuration.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name.
+* @param[out] pVariableExists - returns true if the session variable is declared.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hassessionvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, bool * pVariableExists);
+
+/**
+* returns a session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Current value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getsessionvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a uuid session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Current value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getsessionvariableasuuid(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a double session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[out] pValue - Current value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getsessionvariableasdouble(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_double * pValue);
+
+/**
+* returns an integer session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[out] pValue - Current value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getsessionvariableasinteger(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_int64 * pValue);
+
+/**
+* returns a bool session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[out] pValue - Current value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getsessionvariableasbool(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, bool * pValue);
+
+/**
+* sets a session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] pValue - New value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setsessionvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, const char * pValue);
+
+/**
+* sets a uuid session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] pValue - New value. An empty string sets the null UUID.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setsessionvariableasuuid(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, const char * pValue);
+
+/**
+* sets a double session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] dValue - New value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setsessionvariableasdouble(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_double dValue);
+
+/**
+* sets an integer session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] nValue - New value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setsessionvariableasinteger(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, LibMCEnv_int64 nValue);
+
+/**
+* sets a bool session variable of the client session that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableName - Session variable name. Fails if variable is not declared.
+* @param[in] bValue - New value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setsessionvariableasbool(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableName, bool bValue);
+
+/**
 * creates an empty image object.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -10395,6 +11739,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createemptyimage(LibMCEn
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createimageloader(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_ImageLoader * pImageLoaderInstance);
+
+/**
+* creates a video stream object for MJPEG streaming.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nPixelSizeX - Width of the video stream in pixels. MUST be positive.
+* @param[in] nPixelSizeY - Height of the video stream in pixels. MUST be positive.
+* @param[in] nDesiredFrameDurationInMicroseconds - Duration of a frame in microseconds. MUST be between 10000 and 60000000.
+* @param[in] nPauseToleranceInMicroseconds - How many microseconds can pass without new frames until the stream becomes inactive. MUST exceed frame duration.
+* @param[in] nFrameCacheDurationInMicroseconds - How long frames will be cached. MUST not be smaller than DesiredFrameDuration or exceed 100 times DesiredFrameDuration.
+* @param[out] pVideoStreamInstance - Video stream instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createvideostream(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, LibMCEnv_uint32 nPauseToleranceInMicroseconds, LibMCEnv_uint32 nFrameCacheDurationInMicroseconds, LibMCEnv_VideoStream * pVideoStreamInstance);
+
+/**
+* Finds a video stream by UUID. Returns null if the stream does not exist.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pStreamUUID - UUID of the video stream to find.
+* @param[out] pVideoStreamInstance - Video stream instance, or null if not found.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_findvideostream(LibMCEnv_UIEnvironment pUIEnvironment, const char * pStreamUUID, LibMCEnv_VideoStream * pVideoStreamInstance);
 
 /**
 * Returns the global timer in milliseconds.
@@ -10533,6 +11901,29 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasbuildexecution(LibMCE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getbuildexecution(LibMCEnv_UIEnvironment pUIEnvironment, const char * pExecutionUUID, LibMCEnv_BuildExecution * pExecutionInstance);
+
+/**
+* Returns an iterator for recent build jobs, ordered by timestamp (newest first).
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nMaxCount - Maximum number of jobs to return. Must be greater than 0.
+* @param[out] pBuildIterator - Iterator for build jobs, ordered newest first.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getrecentbuildjobs(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nMaxCount, LibMCEnv_BuildIterator * pBuildIterator);
+
+/**
+* Creates a new build job from an existing storage stream. The storage stream must contain a valid 3MF file.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pStorageStreamUUID - UUID of the storage stream containing the 3MF file.
+* @param[in] pBuildName - Display name for the build job. Must not be empty.
+* @param[in] nBuildUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBuildUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBuildUUIDBuffer -  buffer of UUID of the newly created build job., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_createbuildjobfromstorage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pStorageStreamUUID, const char * pBuildName, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
 
 /**
 * Creates an empty discrete field.
@@ -10875,6 +12266,46 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getexternaleventparamete
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_addexternaleventresultvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, const char * pReturnValue);
+
+/**
+* Sets a string result value for external event return (typed convenience wrapper).
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[in] pReturnValue - Return value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setstringresult(LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, const char * pReturnValue);
+
+/**
+* Sets an integer result value for external event return.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[in] nReturnValue - Return value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setintegerresult(LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, LibMCEnv_int64 nReturnValue);
+
+/**
+* Sets a boolean result value for external event return.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[in] bReturnValue - Return value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setboolresult(LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, bool bReturnValue);
+
+/**
+* Sets a double result value for external event return.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pReturnValueName - The name of the return parameter. MUST be an alphanumeric ASCII string (with optional _ and -)
+* @param[in] dReturnValue - Return value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setdoubleresult(LibMCEnv_UIEnvironment pUIEnvironment, const char * pReturnValueName, LibMCEnv_double dReturnValue);
 
 /**
 * Returns the external event parameters. This JSON Object was passed on from the external API.

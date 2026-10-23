@@ -52,7 +52,7 @@ using namespace LibMCDriver_BK9xxx::Impl;
 
 
 CDriver_BK9xxx_AnalogIODefinition::CDriver_BK9xxx_AnalogIODefinition(pugi::xml_node& xmlNode)
-	: m_nOffset(0), m_nActualRawValue(0), m_nTargetRawValue (0), m_nRawMin (0), m_nRawMax (65535), m_dScaledMin (0.0), m_dScaledMax (100.0)
+	: m_nOffset(0), m_nActualRawValue(0), m_nTargetRawValue (0), m_nRawMin (0), m_nRawMax (65535), m_dScaledMin (0.0), m_dScaledMax (100.0), m_bActualValueIsOutOfBounds(false)
 {
 
 	auto offsetAttrib = xmlNode.attribute("offset");
@@ -152,15 +152,23 @@ uint32_t CDriver_BK9xxx_AnalogIODefinition::setActualRawValue(int64_t nRawValue)
 {
 	if (nRawValue < (int64_t)m_nRawMin) {
 		m_nActualRawValue = m_nRawMin;
+		m_bActualValueIsOutOfBounds = true;
 	}
 	else if (nRawValue > (int64_t)m_nRawMax) {
 		m_nActualRawValue = m_nRawMax;
+		m_bActualValueIsOutOfBounds = true;
 	}
 	else {
 		m_nActualRawValue = (uint32_t) nRawValue;
+		m_bActualValueIsOutOfBounds = false;
 	}
 
 	return m_nActualRawValue;
+}
+
+bool CDriver_BK9xxx_AnalogIODefinition::getActualValueIsOutOfBounds() const
+{
+	return m_bActualValueIsOutOfBounds;
 }
 
 uint32_t CDriver_BK9xxx_AnalogIODefinition::setTargetRawValue(int64_t nRawValue)

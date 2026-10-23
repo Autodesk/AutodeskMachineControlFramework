@@ -73,6 +73,7 @@ public:
     std::string getStreamPath(const std::string& sStreamUUID);
     std::string getJournalBasePath(const std::string& sTimeFileName);
     std::string getJournalChunkBaseName(const std::string& sTimeFileName);
+    std::string getTelemetryChunkBaseName(const std::string& sTimeFileName);
     std::string getJournalFileName(const std::string& sTimeFileName);
 
     std::string getSessionUUID();

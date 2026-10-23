@@ -91,7 +91,7 @@ void CPLCCommandList::AddCommand(IPLCCommand* pCommandInstance)
 
 
 
-void CPLCCommandList::ExecuteList()
+void CPLCCommandList::executeListInternal(bool bDeleteAfterExecution)
 {
     if (m_pConnector == nullptr)
         return;
@@ -115,13 +115,27 @@ void CPLCCommandList::ExecuteList()
         }
 
         packetList.push_back(m_pConnector->makePacket(BUR_COMMAND_DIRECT_FINISHLIST, m_ListIdentifier, nullptr));
-        packetList.push_back(m_pConnector->makePacket(BUR_COMMAND_DIRECT_EXECUTELIST, m_ListIdentifier, nullptr));
+
+        // Either execute and keep the list (caller deletes it later via DeleteList), or execute and
+        // let the PLC delete the list automatically once it has finished.
+        uint32_t nExecuteCommand = bDeleteAfterExecution ? BUR_COMMAND_DIRECT_EXECUTEANDDELETELIST : BUR_COMMAND_DIRECT_EXECUTELIST;
+        packetList.push_back(m_pConnector->makePacket(nExecuteCommand, m_ListIdentifier, nullptr));
 
         m_pConnector->sendCommandsToPLC(packetList);
 
 
     }
 
+}
+
+void CPLCCommandList::ExecuteList()
+{
+    executeListInternal(false);
+}
+
+void CPLCCommandList::ExecuteAndDeleteList()
+{
+    executeListInternal(true);
 }
 
 

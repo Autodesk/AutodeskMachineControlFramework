@@ -46,7 +46,7 @@ CXMLDocumentNodeInstance::CXMLDocumentNodeInstance(CXMLDocumentInstance* pDocume
 	if (!checkXMLNodeName (sNodeName)) 
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLNODENAME, sNodeName);
 	if (pNameSpace.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNODEHASNULLNAMESPACE, sNodeName);
 
 }
 
@@ -379,7 +379,7 @@ PXMLDocumentNodeInstance CXMLDocumentNodeInstance::FindChild(CXMLDocumentNameSpa
 PXMLDocumentNodeInstance CXMLDocumentNodeInstance::AddChild(PXMLDocumentNameSpace pNameSpace, const std::string& sName)
 {
 	if (pNameSpace.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		throw ELibMCCustomException(LIBMC_ERROR_XMLNODEHASNULLNAMESPACE, sName);
 
 	if (!m_sTextContent.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_XMLNODEHASTEXTCONTENT);
@@ -440,19 +440,35 @@ void CXMLDocumentNodeInstance::RemoveChild(CXMLDocumentNodeInstance* pChildInsta
 	if (pChildInstance == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
+	auto mapKey = std::make_pair(pChildInstance->GetNameSpace().get(), pChildInstance->GetName());
+
 	m_Children.erase(std::remove_if(m_Children.begin(), m_Children.end(),
 		[pChildInstance](const std::shared_ptr<CXMLDocumentNodeInstance>& ptr) {
 			return ptr.get() == pChildInstance;
 		}),
 		m_Children.end());
 
-
-	auto mapKey = std::make_pair(pChildInstance->GetNameSpace().get(), pChildInstance->GetName());
-	m_ChildMap.erase(mapKey);
-
 	auto iChildIter = m_ChildMapCounter.find(mapKey);
 	if (iChildIter != m_ChildMapCounter.end()) {
-		iChildIter->second--;
+		if (iChildIter->second <= 1) {
+			m_ChildMapCounter.erase(iChildIter);
+			m_ChildMap.erase(mapKey);
+		}
+		else {
+			iChildIter->second--;
+			if (iChildIter->second == 1) {
+				for (auto& child : m_Children) {
+					if ((child->GetNameSpace().get() == mapKey.first) && (child->GetName() == mapKey.second)) {
+						auto iMapIter = m_ChildMap.find(mapKey);
+						if (iMapIter != m_ChildMap.end())
+							iMapIter->second = child;
+						else
+							m_ChildMap.insert(std::make_pair(mapKey, child));
+						break;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -524,4 +540,3 @@ void CXMLDocumentNodeInstance::CopyFrom(CXMLDocumentNodeInstance* pFromInstance)
 		SetTextContent (sTextContent);
 
 }
-

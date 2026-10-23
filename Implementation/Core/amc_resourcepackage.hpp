@@ -57,15 +57,17 @@ namespace AMC {
 		std::string m_sExtension;
 		std::string m_sContentType;
 		std::string m_sUUID;
+		std::string m_sSHA256;
 		uint32_t m_nSize;
 	public:
-		CResourcePackageEntry(const std::string& sUUID, const std::string& sName, const std::string& sFileName, const std::string& sExtension, const std::string& sContentType, uint32_t nSize);
+		CResourcePackageEntry(const std::string& sUUID, const std::string& sName, const std::string& sFileName, const std::string& sExtension, const std::string& sContentType, uint32_t nSize, const std::string& sSHA256);
 
 		std::string getName();
 		std::string getFileName();
 		std::string getExtension();
 		std::string getContentType();
 		std::string getUUID();
+		std::string getSHA256();
 		uint32_t getSize();
 	};
 

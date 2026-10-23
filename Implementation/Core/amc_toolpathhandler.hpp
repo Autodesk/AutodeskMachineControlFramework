@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <string>
 #include <set>
+#include <mutex>
 
 #include "amc_toolpathentity.hpp"
 #include "amc_scatterplot.hpp"
@@ -62,6 +63,13 @@ namespace AMC {
 
 		std::map<std::string, PScatterplot> m_Scatterplots;
 
+		// Disabled build items per toolpath storage stream (all UUIDs normalized). Kept
+		// independent of the entity lifetime so that unloading a toolpath does not re-enable parts.
+		// The version counter changes on every modification so clients can detect updates.
+		std::mutex m_DisabledPartsMutex;
+		std::map<std::string, std::set<std::string>> m_DisabledParts;
+		std::map<std::string, uint64_t> m_DisabledPartsVersions;
+
 	public:
 
 		CToolpathHandler(LibMCData::PDataModel pDataModel);
@@ -83,6 +91,12 @@ namespace AMC {
 
 		void storeScatterplot (PScatterplot pScatterplot);
 		PScatterplot restoreScatterplot(const std::string & sUUID, bool bMustExist);
+
+		void disablePart(const std::string& sStreamUUID, const std::string& sPartUUID);
+		void enableAllParts(const std::string& sStreamUUID);
+		bool partIsDisabled(const std::string& sStreamUUID, const std::string& sPartUUID);
+		std::set<std::string> getDisabledParts(const std::string& sStreamUUID);
+		uint64_t getDisabledPartsVersion(const std::string& sStreamUUID);
 
 	};
 

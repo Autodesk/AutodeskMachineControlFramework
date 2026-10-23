@@ -71,6 +71,15 @@ namespace AMCData {
 			break;
 		}
 
+		case 22: {
+			pTransaction->executeStatement("ALTER TABLE `machineconfiguration_versions` ADD `name` varchar ( 256 ) NOT NULL DEFAULT ''");
+
+			// Version 0 of an XSD is always its default configuration.
+			pTransaction->executeStatement("UPDATE `machineconfiguration_versions` SET `name` = 'Default configuration' WHERE `configurationversionnumber` = 0");
+
+			break;
+		}
+
 		}
 	}
 

@@ -32,9 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_CONSTANTS
 
 #include "amc_ui_module_contentitem_alertlist.hpp"
+#include "amc_ui_expression.hpp"
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
@@ -96,100 +98,6 @@ CUIModule_ContentAlertList::~CUIModule_ContentAlertList()
 
 }
 
-void CUIModule_ContentAlertList::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pLegacyClientVariableHandler, uint32_t nStateID)
-{
-
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "alertlist");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_ITEMLOADINGTEXT, m_sLoadingText);
-	object.addString(AMC_API_KEY_UI_ITEMSELECTEVENT, m_sSelectEvent);
-	object.addString(AMC_API_KEY_UI_ITEMSELECTIONVALUEUUID, m_sSelectedBuildField);
-
-	object.addInteger(AMC_API_KEY_UI_ITEMENTRIESPERPAGE, m_nEntriesPerPage);
-
-	CJSONWriterArray headersArray(writer);
-
-
-	CJSONWriterObject headerObject1(writer);
-	headerObject1.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertTimeStampCaption);
-	headerObject1.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTTIMESTAMP);
-	headersArray.addObject(headerObject1);
-
-	CJSONWriterObject headerObject2(writer);
-	headerObject2.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertNameCaption);
-	headerObject2.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTCAPTION);
-	headersArray.addObject(headerObject2);
-
-
-	CJSONWriterObject headerObject3(writer);
-	headerObject3.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertLevelCaption);
-	headerObject3.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTLEVEL);
-	headersArray.addObject(headerObject3);
-
-	CJSONWriterObject headerObject4(writer);
-	headerObject4.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertContextCaption);
-	headerObject4.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTCONTEXT);
-	headersArray.addObject(headerObject4);
-
-	CJSONWriterObject headerObject5(writer);
-	headerObject5.addString(AMC_API_KEY_UI_ITEMTEXT, m_sAlertActiveCaption);
-	headerObject5.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMALERTACTIVE);
-	headersArray.addObject(headerObject5);
-
-	object.addArray(AMC_API_KEY_UI_ITEMHEADERS, headersArray);
-
-	CJSONWriterArray entriesArray(writer);
-	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entriesArray);
-
-	CJSONWriterArray entryArray(writer);
-
-	auto pAlertSession = m_pDataModel->CreateAlertSession();
-	auto pAlertIterator = pAlertSession->RetrieveAlerts(false);
-
-	while (pAlertIterator->MoveNext ())
-	{
-		auto pAlert = pAlertIterator->GetCurrentAlert();
-
-		std::string sAlertUUID = pAlert->GetUUID();
-		std::string sAlertIdentifier = pAlert->GetIdentifier();
-
-		std::string sAlertCaption;
-		std::string sDescriptionIdentifier = pAlert->GetDescriptionIdentifier();
-		if (!sDescriptionIdentifier.empty()) {
-			sAlertCaption = sDescriptionIdentifier;
-		}
-		else {
-			sAlertCaption = pAlert->GetDescription();
-		}
-
-		std::string sContextInformation = pAlert->GetReadableContextInformation();
-
-		std::string sTimeStamp = pAlert->GetTimestampUTC();
-
-		bool bNeedsAcknowledgement = pAlert->GetNeedsAcknowledgement ();
-
-		bool bAlertIsActive = pAlert->IsActive();
-
-		auto sAlertLevelString = pAlert->GetLevelString();
-
-		CJSONWriterObject entryObject(writer);
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTUUID, sAlertUUID);
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTIDENTIFIER, sAlertIdentifier);
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTTIMESTAMP, sTimeStamp);
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTCAPTION, sAlertCaption);
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTCONTEXT, sContextInformation);
-		entryObject.addString(AMC_API_KEY_UI_ITEMALERTLEVEL, sAlertLevelString);
-		entryObject.addBool(AMC_API_KEY_UI_ITEMALERTACTIVE, bAlertIsActive);
-		entryObject.addBool(AMC_API_KEY_UI_ITEMALERTACKNOWLEDGE, bNeedsAcknowledgement);
-
-		entryArray.addObject(entryObject);
-
-	}
-
-	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entryArray);
-}
-
-
 void CUIModule_ContentAlertList::populateClientVariables(CParameterHandler* pClientVariableHandler)
 {
 	LibMCAssertNotNull(pClientVariableHandler);
@@ -227,4 +135,33 @@ std::list <std::string> CUIModule_ContentAlertList::getReferenceUUIDs()
 	sUUIDList.push_back(getUUID ());
 
 	return sUUIDList;
+}
+
+std::string CUIModule_ContentAlertList::getItemType()
+{
+	return "alertlist";
+}
+
+void CUIModule_ContentAlertList::registerFrontendAttributes()
+{
+	CUIExpression expr;
+	expr.setFixedValue(m_sLoadingText);
+	registerItemStringAttribute("loadingtext", expr);
+
+	expr.setFixedValue(m_sSelectEvent);
+	registerItemStringAttribute("selectevent", expr);
+
+	expr.setFixedValue(std::to_string(m_nEntriesPerPage));
+	registerItemIntegerAttribute("entriesperpage", expr);
+
+	expr.setFixedValue(m_sSelectedBuildField);
+	registerItemStringAttribute("selectionvalueuuid", expr);
+
+	registerItemProviderAttribute(AMC_API_KEY_ALERTS_HEADID, eUIFrontendDefinitionAttributeType::atInteger, eUIFrontendDefinitionAttributeScope::asGlobal,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			if (m_pDataModel) {
+				auto pAlertSession = m_pDataModel->CreateAlertSession();
+				object.addInteger(sName, (int64_t)pAlertSession->GetAlertHeadID());
+			}
+		});
 }

@@ -244,6 +244,8 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_CSVPARSERUNKNOWNFIELDPARSERTYPE: return "CSVPARSERUNKNOWNFIELDPARSERTYPE";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_CSVPARSERINTERPOLATEINDEXOUTOFRANGE: return "CSVPARSERINTERPOLATEINDEXOUTOFRANGE";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDMAXPOWERVALUE: return "INVALIDMAXPOWERVALUE";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_SIMULATIONWORKINGFILEISNOTINITIALIZED: return "SIMULATIONWORKINGFILEISNOTINITIALIZED";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_SIMULATIONWORKINGFILESIZEMISMATCH: return "SIMULATIONWORKINGFILESIZEMISMATCH";
 		}
 		return "UNKNOWN";
 	}
@@ -318,6 +320,8 @@ public:
 			case LIBMCDRIVER_SCANLABSMC_ERROR_CSVPARSERUNKNOWNFIELDPARSERTYPE: return "Unknown Field Parser Type.";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_CSVPARSERINTERPOLATEINDEXOUTOFRANGE: return "Index out of range in Interpolate.";
 			case LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDMAXPOWERVALUE: return "Invalid max power value.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_SIMULATIONWORKINGFILEISNOTINITIALIZED: return "Simulation working file is not initialized.";
+			case LIBMCDRIVER_SCANLABSMC_ERROR_SIMULATIONWORKINGFILESIZEMISMATCH: return "Simulation working file size mismatch.";
 		}
 		return "unknown error";
 	}
@@ -554,6 +558,7 @@ public:
 	inline void WaitForExecution(const LibMCDriver_ScanLabSMC_uint32 nTimeOutInMilliseconds);
 	inline void StopExecution();
 	inline void LoadSimulationData(classParam<LibMCEnv::CDataTable> pSimulationDataTable);
+	inline void LoadRawSimulationData(std::vector<LibMCDriver_ScanLabSMC_uint8> & DataBuffer);
 	inline LibMCDriver_ScanLabSMC_double GetJobCharacteristic(const eJobCharacteristic eValueType);
 	inline LibMCDriver_ScanLabSMC_double GetJobDuration();
 	inline void ExecuteLaserInitSequence();
@@ -798,6 +803,7 @@ public:
 		pWrapperTable->m_SMCJob_WaitForExecution = nullptr;
 		pWrapperTable->m_SMCJob_StopExecution = nullptr;
 		pWrapperTable->m_SMCJob_LoadSimulationData = nullptr;
+		pWrapperTable->m_SMCJob_LoadRawSimulationData = nullptr;
 		pWrapperTable->m_SMCJob_GetJobCharacteristic = nullptr;
 		pWrapperTable->m_SMCJob_GetJobDuration = nullptr;
 		pWrapperTable->m_SMCJob_ExecuteLaserInitSequence = nullptr;
@@ -1077,6 +1083,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_SMCJob_LoadSimulationData == nullptr)
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_SMCJob_LoadRawSimulationData = (PLibMCDriver_ScanLabSMCSMCJob_LoadRawSimulationDataPtr) GetProcAddress(hLibrary, "libmcdriver_scanlabsmc_smcjob_loadrawsimulationdata");
+		#else // _WIN32
+		pWrapperTable->m_SMCJob_LoadRawSimulationData = (PLibMCDriver_ScanLabSMCSMCJob_LoadRawSimulationDataPtr) dlsym(hLibrary, "libmcdriver_scanlabsmc_smcjob_loadrawsimulationdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_SMCJob_LoadRawSimulationData == nullptr)
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1711,6 +1726,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCJob_LoadSimulationData == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcjob_loadrawsimulationdata", (void**)&(pWrapperTable->m_SMCJob_LoadRawSimulationData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_SMCJob_LoadRawSimulationData == nullptr) )
+			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlabsmc_smcjob_getjobcharacteristic", (void**)&(pWrapperTable->m_SMCJob_GetJobCharacteristic));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SMCJob_GetJobCharacteristic == nullptr) )
 			return LIBMCDRIVER_SCANLABSMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2185,6 +2204,19 @@ public:
 	{
 		LibMCEnvHandle hSimulationDataTable = pSimulationDataTable.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_SMCJob_LoadSimulationData(m_pHandle, hSimulationDataTable));
+	}
+	
+	/**
+	* CSMCJob::LoadRawSimulationData - Returns raw simulation data.
+	* @param[out] DataBuffer - Raw binary simulation data.
+	*/
+	void CSMCJob::LoadRawSimulationData(std::vector<LibMCDriver_ScanLabSMC_uint8> & DataBuffer)
+	{
+		LibMCDriver_ScanLabSMC_uint64 elementsNeededData = 0;
+		LibMCDriver_ScanLabSMC_uint64 elementsWrittenData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCJob_LoadRawSimulationData(m_pHandle, 0, &elementsNeededData, nullptr));
+		DataBuffer.resize((size_t) elementsNeededData);
+		CheckError(m_pWrapper->m_WrapperTable.m_SMCJob_LoadRawSimulationData(m_pHandle, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
 	}
 	
 	/**

@@ -133,9 +133,9 @@ CDiscreteFieldData2DInstance::CDiscreteFieldData2DInstance(size_t nPixelCountX, 
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDPIVALUE);
 	if (dDPIY <= 0.0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDPIVALUE);
-	if (abs (dOriginX) > DISCRETEFIELD_MAXORIGINCOORDINATE)
+	if (std::abs(dOriginX) > DISCRETEFIELD_MAXORIGINCOORDINATE)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ORIGINOUTOFRANGE);
-	if (abs(dOriginY) > DISCRETEFIELD_MAXORIGINCOORDINATE)
+	if (std::abs(dOriginY) > DISCRETEFIELD_MAXORIGINCOORDINATE)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_ORIGINOUTOFRANGE);
 
 	m_Data = std::make_unique<std::vector<double>> ();
@@ -400,7 +400,7 @@ PDiscreteFieldData2DInstance CDiscreteFieldData2DInstance::ScaleFieldUp(const ui
 			pSource++;
 
 			for (uint32_t dY = 0; dY < nFactorY; dY++) {
-				double* pTarget = &pNewField->m_Data->at(((size_t)nY * nFactorY + dY) * nNewPixelCountX);
+				double* pTarget = &pNewField->m_Data->at(((size_t)nY * nFactorY + dY) * nNewPixelCountX + (size_t)nX * nFactorX);
 				for (uint32_t dX = 0; dX < nFactorX; dX++) {
 					*pTarget = dValue;
 					pTarget++;

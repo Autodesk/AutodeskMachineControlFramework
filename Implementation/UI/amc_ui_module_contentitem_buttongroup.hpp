@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_CONTENTITEM_BUTTONGROUP
 #define __AMC_UI_MODULE_CONTENTITEM_BUTTONGROUP
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -58,6 +59,7 @@ namespace AMC {
 		cbdLeftAligned = 1,
 		cbdCentered = 2,
 		cbdEquallyDistributed = 3,
+		cbdToolbar = 4,
 	};
 
 
@@ -70,20 +72,38 @@ namespace AMC {
 
 		CUIExpression m_CaptionExpression;
 		CUIExpression m_DisabledExpression;
+		CUIExpression m_VisibleExpression;
 		CUIExpression m_TargetPageExpression;
 		CUIExpression m_EventExpression;
 		CUIExpression m_IconExpression;
+
+		// Static layout metadata (toolbar concept):
+		//   kind    = "button" | "spacer" | "spring"
+		//   variant = "default" | "primary"
+		//   width   = "auto" | "narrow" | "fixed"
+		//   iconresource = name of a packaged SVG icon resource (alternative to the named "icon")
+		std::string m_sKind;
+		std::string m_sVariant;
+		std::string m_sWidth;
+		std::string m_sIconResource;
+
+		// Space-separated list of free-form tags. Exposed as the button's "tags"
+		// UI property so event handlers can identify a sender semantically
+		// (via GetUIProperty(sender, "tags")) instead of matching the sender path.
+		std::string m_sTags;
 
 		PStateMachineData m_pStateMachineData;
 
 		std::string m_sEventFormValueSetting;
 		std::list<PUIModule_ContentFormEntity> m_pFormValues;
 
+		PUIFrontendDefinitionModuleStore m_pFrontendStore;
+
 		PParameterGroup getClientVariableGroup(CParameterHandler* pClientVariableHandler);
 
 	public:
 
-		CUIModule_ContentButton (const std::string & sGroupPath, const CUIExpression& Caption, const CUIExpression& TargetPage, const CUIExpression& Event, const std::string& sButtonName, const CUIExpression & IconName, const CUIExpression& Disabled, const std::string& sEventFormValueSetting, PStateMachineData pStateMachineData);
+		CUIModule_ContentButton (const std::string & sGroupPath, const CUIExpression& Caption, const CUIExpression& TargetPage, const CUIExpression& Event, const std::string& sButtonName, const CUIExpression & IconName, const CUIExpression& Disabled, const CUIExpression& Visible, const std::string& sEventFormValueSetting, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentButton();
 
@@ -95,6 +115,14 @@ namespace AMC {
 
 		std::string getButtonName();
 
+		void setKind(const std::string& sKind);
+		std::string getKind();
+		void setVariant(const std::string& sVariant);
+		void setWidth(const std::string& sWidth);
+		void setIconResource(const std::string& sIconResource);
+		void setTags(const std::string& sTags);
+		std::string getTags();
+
 		void addFormFieldValue(PUIModule_ContentFormEntity pEntity);
 
 		void writeFormValuesToJSON (CJSONWriterArray & pArray);
@@ -104,6 +132,12 @@ namespace AMC {
 		PParameterGroup registerClientVariableGroup(CParameterHandler* pClientVariableHandler);
 
 		void syncClientVariables(CParameterHandler* pClientVariableHandler);
+
+		// v2 frontend: register button attributes on the given child store
+		void registerFrontendAttributes(PUIFrontendDefinitionModuleStore pStore);
+
+		// v2 frontend: register eventformvalues after form values are resolved
+		void registerFrontendEventFormValues();
 
 	};
 
@@ -124,9 +158,7 @@ namespace AMC {
 
 		virtual ~CUIModule_ContentButtonGroup();
 
-		void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pLegacyClientVariableHandler, uint32_t nStateID) override;
-
-		PUIModule_ContentButton addButton(const CUIExpression& Caption, const CUIExpression& TargetPage, const CUIExpression& Event, const std::string& sButtonName, const CUIExpression& IconName, const CUIExpression& DisabledExpression, const std::string& sEventFormValueSetting);
+		PUIModule_ContentButton addButton(const CUIExpression& Caption, const CUIExpression& TargetPage, const CUIExpression& Event, const std::string& sButtonName, const CUIExpression& IconName, const CUIExpression& DisabledExpression, const CUIExpression& VisibleExpression, const std::string& sEventFormValueSetting);
 
 		virtual void configurePostLoading() override;
 
@@ -143,6 +175,9 @@ namespace AMC {
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 
 	};
 

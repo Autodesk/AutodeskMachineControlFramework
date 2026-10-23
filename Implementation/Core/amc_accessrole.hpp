@@ -48,8 +48,8 @@ namespace AMC {
 	private:
 
 		std::string m_sIdentifier;
-		CStringResource m_DisplayName;
-		CStringResource m_Description;
+		CLanguageString m_DisplayName;
+		CLanguageString m_Description;
 
 		std::mutex m_Mutex;
 
@@ -57,19 +57,15 @@ namespace AMC {
 
 	public:
 
-		CAccessRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription);
+		CAccessRole(const std::string& sIdentifier, const CLanguageString& rDisplayName, const CLanguageString& rDescription);
 		
 		virtual ~CAccessRole();
 
 		std::string getIdentifier ();
 
-		CStringResource getDisplayName();
+		CLanguageString getDisplayName();
 
-		std::string getDisplayNameString(StringLanguageID languageID);
-
-		CStringResource getDescription ();
-
-		std::string getDescriptionString(StringLanguageID languageID);
+		CLanguageString getDescription ();
 
 		bool hasPermission (const std::string & sPermissionIdentifier);
 

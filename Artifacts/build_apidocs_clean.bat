@@ -18,7 +18,13 @@ cd ..
 git log -n 1 --format="%%H" -- "OpenAPI" >"build_apidocs\_githash_apidocs.txt"
 git log -n 1 --format="%%H" -- "OpenAPI" >"Artifacts\apidocsdist\_githash_apidocs.txt"
 
-go run BuildScripts\createClientDist.go build_apidocs Artifacts\apidocsdist\apidocspackage.zip 
+set TOOLBUILDDIR=build_clientdist_tools
+if not exist "%TOOLBUILDDIR%" (mkdir "%TOOLBUILDDIR%")
+git rev-parse --verify --short HEAD >"%TOOLBUILDDIR%\githash.txt"
+git log -n 1 --format="%%H" -- "OpenAPI" >"%TOOLBUILDDIR%\clientdirhash.txt"
+cmake -S . -B "%TOOLBUILDDIR%"
+cmake --build "%TOOLBUILDDIR%" --target create_client_dist --config Release
+"%TOOLBUILDDIR%\DevPackage\Framework\create_client_dist.exe" build_apidocs Artifacts\apidocsdist\apidocspackage.zip 
 
 if "%1" neq "NOPAUSE" (
 	pause

@@ -74,19 +74,45 @@ void CUIModule_ContentChart::populateClientVariables(CParameterHandler* pClientV
 	pGroup->addNewStringParameter("dataseries", "data series UUID", AMCCommon::CUtils::createEmptyUUID());
 }
 
-
-void CUIModule_ContentChart::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
+std::string CUIModule_ContentChart::getItemType()
 {
-	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
-	std::string sDataSeriesUUID = pGroup->getParameterValueByName("dataseries");
-
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "chart");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	if (!sDataSeriesUUID.empty()) {
-		object.addString(AMC_API_KEY_UI_DATASERIES, sDataSeriesUUID);
-		auto pDataSeries = m_pDataSeriesHandler->findDataSeries(sDataSeriesUUID, false);
-		if (pDataSeries.get() != nullptr)
-			object.addInteger(AMC_API_KEY_UI_VERSION, pDataSeries->getVersion());
-	}
+	return "chart";
 }
 
+void CUIModule_ContentChart::registerFrontendAttributes()
+{
+	// The data series is set at runtime through the client variables of each session.
+	registerItemProviderAttribute(AMC_API_KEY_UI_DATASERIES, eUIFrontendDefinitionAttributeType::atUUID, eUIFrontendDefinitionAttributeScope::asSession,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			object.addString(sName, getDataSeriesUUID(pFrontendState));
+		});
+
+	registerItemProviderAttribute(AMC_API_KEY_UI_VERSION, eUIFrontendDefinitionAttributeType::atInteger, eUIFrontendDefinitionAttributeScope::asSession,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			uint32_t nDataSeriesVersion = 0;
+			std::string sDataSeriesUUID = getDataSeriesUUID(pFrontendState);
+			if (!sDataSeriesUUID.empty()) {
+				auto pDataSeries = m_pDataSeriesHandler->findDataSeries(sDataSeriesUUID, false);
+				if (pDataSeries.get() != nullptr)
+					nDataSeriesVersion = pDataSeries->getVersion();
+			}
+			object.addInteger(sName, nDataSeriesVersion);
+		});
+}
+
+std::string CUIModule_ContentChart::getDataSeriesUUID(CUIFrontendState* pFrontendState)
+{
+	std::string sDataSeriesUUID = AMCCommon::CUtils::createEmptyUUID();
+
+	if (pFrontendState != nullptr) {
+		auto pLegacyParameterHandler = pFrontendState->getLegacyParameterHandler();
+		if (pLegacyParameterHandler.get() != nullptr) {
+			auto pGroup = pLegacyParameterHandler->findGroup(getItemPath(), false);
+			if (pGroup.get() != nullptr) {
+				sDataSeriesUUID = pGroup->getParameterValueByName("dataseries");
+			}
+		}
+	}
+
+	return sDataSeriesUUID;
+}

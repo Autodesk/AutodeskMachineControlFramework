@@ -179,12 +179,39 @@ std::string CUIModule_GridSection::getRowPositionString()
 }
 
 CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
-: CUIModule (getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition ())
+: CUIModule (getNameFromXML(xmlNode), getStaticType(), sPath, pUIModuleEnvironment->getFrontendDefinition ())
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
+
+	m_pModuleStore->setAlwaysWriteSubmodules(true);
+
+	m_pModuleStore->registerStructureProperty(AMC_API_KEY_UI_COLUMNS, [this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+		CJSONWriterArray columnsArray(writer);
+		for (auto column : m_Columns) {
+			CJSONWriterObject columnObject(writer);
+			columnObject.addDouble(AMC_API_KEY_UI_COLUMNWIDTH, column->getWidth());
+			columnObject.addString(AMC_API_KEY_UI_COLUMNWIDTHUNIT, column->getWidthUnitString());
+			columnsArray.addObject(columnObject);
+		}
+		object.addArray(sPropertyName, columnsArray);
+	});
+
+	m_pModuleStore->registerStructureProperty(AMC_API_KEY_UI_ROWS, [this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+		CJSONWriterArray rowsArray(writer);
+		for (auto row : m_Rows) {
+			CJSONWriterObject rowObject(writer);
+			rowObject.addDouble(AMC_API_KEY_UI_ROWHEIGHT, row->getHeight());
+			rowObject.addString(AMC_API_KEY_UI_ROWHEIGHTUNIT, row->getHeightUnitString());
+			rowsArray.addObject(rowObject);
+		}
+		object.addArray(sPropertyName, rowsArray);
+	});
+
+	// Optional inner padding applied to each grid cell, in pixels.
+	m_nPadding = xmlNode.attribute("padding").as_uint(0);
 
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
@@ -303,6 +330,17 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath
 	registerIntegerAttribute("columncount", columnsExpression);
 	registerIntegerAttribute("rowcount", rowsExpression);
 
+	CUIExpression paddingExpression;
+	paddingExpression.setFixedValue(std::to_string(m_nPadding));
+	registerIntegerAttribute("padding", paddingExpression);
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(xmlNode.attribute("caption").as_string());
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr(xmlNode, "visible", "1");
+	registerBoolAttribute("visible", visibleExpr);
+
 }
 
 
@@ -345,69 +383,30 @@ void CUIModule_Grid::addSection(PUIModule pModule, eUIModule_GridColumnPosition 
 	m_SectionMap.insert(std::make_pair(pSection->getModule()->getUUID(), pSection));
 
 	pSection->getModule()->populateLegacyItemMap(m_ItemMap);
+
+	if (pModule->isVersion2FrontendModule()) {
+		auto pSectionStore = pModule->getFrontendModuleStore();
+		std::string sColumnPosition = CUIModule_GridColumn::gridPositionToString(columnPosition);
+		std::string sRowPosition = CUIModule_GridRow::gridPositionToString(rowPosition);
+
+		pSectionStore->registerStructureProperty(AMC_API_KEY_UI_SCROLLBARS, [bScrollbars](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			object.addBool(sPropertyName, bScrollbars);
+		});
+		pSectionStore->registerStructureProperty(AMC_API_KEY_UI_COLUMNPOSITION, [sColumnPosition](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			object.addString(sPropertyName, sColumnPosition);
+		});
+		pSectionStore->registerStructureProperty(AMC_API_KEY_UI_ROWPOSITION, [sRowPosition](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			object.addString(sPropertyName, sRowPosition);
+		});
+
+		m_pModuleStore->addChildStore(pSectionStore);
+	}
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Legacy UI System
 /////////////////////////////////////////////////////////////////////////////////////
-
-void CUIModule_Grid::writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler)
-{
-	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
-	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
-	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
-	moduleObject.addString(AMC_API_KEY_UI_CAPTION, "");
-
-	CJSONWriterArray columnsNode(writer);
-	for (auto column : m_Columns) {
-		CJSONWriterObject columnObject(writer);
-		columnObject.addDouble(AMC_API_KEY_UI_COLUMNWIDTH, column->getWidth ());
-		columnObject.addString(AMC_API_KEY_UI_COLUMNWIDTHUNIT, column->getWidthUnitString());
-		columnsNode.addObject(columnObject);
-	}
-	moduleObject.addArray(AMC_API_KEY_UI_COLUMNS, columnsNode);
-
-
-	CJSONWriterArray rowsNode(writer);
-	for (auto row : m_Rows) {
-		CJSONWriterObject rowObject(writer);
-		rowObject.addDouble(AMC_API_KEY_UI_ROWHEIGHT, row->getHeight());
-		rowObject.addString(AMC_API_KEY_UI_ROWHEIGHTUNIT, row->getHeightUnitString());
-		rowsNode.addObject(rowObject);
-	}
-	moduleObject.addArray(AMC_API_KEY_UI_ROWS, rowsNode);
-
-
-	CJSONWriterArray sectionsNode(writer);
-	for (auto section : m_SectionList) {
-		CJSONWriterObject sectionObject(writer);
-		auto pModule = section->getModule();
-		pModule->writeLegacyDefinitionToJSON(writer, sectionObject, pLegacyClientVariableHandler);
-		
-		uint32_t nGridColumn = 0;
-		uint32_t nGridRow = 0;
-		uint32_t nGridColumnSpan = 0;
-		uint32_t nGridRowSpan = 0;
-		pModule->getGridSpan(nGridColumn, nGridRow, nGridColumnSpan, nGridRowSpan);
-		
-
-		sectionObject.addInteger(AMC_API_KEY_UI_COLUMNSTART, nGridColumn);
-		sectionObject.addInteger(AMC_API_KEY_UI_COLUMNEND, nGridColumn + nGridColumnSpan - 1);
-		sectionObject.addInteger(AMC_API_KEY_UI_ROWSTART, nGridRow);
-		sectionObject.addInteger(AMC_API_KEY_UI_ROWEND, nGridRow + nGridRowSpan - 1);
-		sectionObject.addBool(AMC_API_KEY_UI_SCROLLBARS, section->getScrollbars());
-		sectionObject.addString(AMC_API_KEY_UI_COLUMNPOSITION, CUIModule_GridColumn::gridPositionToString(section->getColumnPosition()));
-		sectionObject.addString(AMC_API_KEY_UI_ROWPOSITION, CUIModule_GridRow::gridPositionToString(section->getRowPosition()));
-		sectionsNode.addObject(sectionObject);
-	}
-	moduleObject.addArray(AMC_API_KEY_UI_SECTIONS, sectionsNode);
-
-}
-
-void CUIModule_Grid::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-}
 
 PUIModuleItem CUIModule_Grid::findLegacyItem(const std::string& sUUID)
 {
@@ -458,26 +457,4 @@ void CUIModule_Grid::populateLegacyClientVariables(CParameterHandler* pParameter
 bool CUIModule_Grid::isVersion2FrontendModule()
 {
 	return true;
-}
-
-void CUIModule_Grid::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
-{
-	CUIModule::frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
-
-	CJSONWriterArray submodulesArray (writer);
-
-	for (auto section : m_SectionList) {
-
-		auto pSubmodule = section->getModule();
-		if (pSubmodule->isVersion2FrontendModule()) {
-
-			CJSONWriterObject subModuleObject(writer);
-			pSubmodule->frontendWriteModuleStatusToJSON(writer, subModuleObject, pFrontendState, pStateMachineData);
-			submodulesArray.addObject(subModuleObject);
-
-		}
-
-	}
-	
-	moduleObject.addArray("submodules", submodulesArray);
 }

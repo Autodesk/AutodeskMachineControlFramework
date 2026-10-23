@@ -705,7 +705,47 @@
 		<error name="INVALIDROWRANGE" code="680" description="Invalid row range." />
 		<error name="CONFIGURATIONLISTNAMEMISSING" code="681" description="Configuration list name missing" />
 		<error name="CONFIGURATIONLISTBUTTONNAMEMISSING" code="682" description="Configuration list button name missing" />
-						
+		<error name="NONLINEAROVERRIDEPARAMETERNOTINCREASING" code="683" description="Nonlinear override parameter not increasing" />
+		<error name="NONLINEAROVERRIDEPARAMETEROUTOFRANGE" code="684" description="Nonlinear override parameter out of range" />
+		<error name="NONLINEAROVERRIDEFACTOROUTOFRANGE" code="685" description="Nonlinear override factor out of range" />
+		<error name="EMPTYSIGNALINSTANCENAME" code="686" description="Empty signal instance name" />
+		<error name="INVALIDSIGNALINSTANCENAME" code="687" description="Invalid signal instance name" />
+		<error name="COULDNOTFINDSIGNAL" code="688" description="Could not find signal" />
+		<error name="DUPLICATESIGNALINSTANCENAME" code="689" description="Duplicate signal instance name" />
+		<error name="SIGNALINSTANCENOTFOUND" code="690" description="Signal instance not found" />
+		<error name="INVALIDSIGNALARCHIVETIMEOUT" code="691" description="Invalid signal archive timeout" />
+		<error name="UNKNOWNTELEMETRYCHANNELTYPE" code="692" description="Unknown telemetry channel type." />
+		<error name="INVALIDTELEMETRYCHANNELIDENTIFIER" code="693" description="Invalid telemetry channel identifier." />
+		<error name="TELEMETRYCHANNELALREADYEXISTS" code="694" description="Telemetry channel already exists." />
+		<error name="TELEMETRYCHANNELNOTFOUND" code="695" description="Telemetry channel not found." />					
+		<error name="TELEMETRYMARKERHASALREADYBEENFINISHED" code="696" description="Telemetry marker has already been finished." />
+		<error name="INVALIDTELEMETRYMARKERFINISHTIMESTAMP" code="697" description="Invalid telemetry marker finish timestamp." />
+		<error name="UNFINISHEDTELEMETRYMARKERSHAVENODURATION" code="698" description="Unfinished telemetry marker have no duration." />					
+		<error name="TELEMETRYMARKERALREADYREGISTERED" code="699" description="Telemetry Marker has been already registered." />					
+		<error name="TELEMETRYCHUNKSTARTTIMESTAMPAFTEREND" code="700" description="Telemetry Chunk Start timestamp is after end timestamp." />					
+		<error name="TELEMETRYCHUNKINDEXOUTOFRANGE" code="701" description="Telemetry Chunk index out of range." />	
+		<error name="TELEMETRYCHUNKIDMISMATCH" code="702" description="Telemetry Chunk ID mismatch." />	
+		<error name="TELEMETRYCHUNKISREADONLY" code="703" description="Telemetry Chunk is readonly." />	
+		<error name="TELEMETRYCHUNKSCANONLYBEARCHIVEDIFREADONLY" code="704" description="Telemetry Chunks can only be archived if readonly." />			
+		<error name="INVALIDTELEMETRYCHANNELTYPE" code="705" description="Invalid telemetry channel type." />	
+		<error name="MISSINGTELEMETRYCHANNELIDENTIFIER" code="706" description="Missing telemetry channel identifier." />	
+		<error name="MISSINGTELEMETRYCHANNELDESCRIPTION" code="707" description="Missing telemetry channel description." />	
+		<error name="XMLNODEHASNULLNAMESPACE" code="708" description="XML node has a null namespace. Ensure the XML document declares a namespace on the root element." />				
+		<error name="RESOURCEENTRYSIZISMISMATCH" code="709" description="Resource entry size mismatch between index and ZIP content." />
+		<error name="RESOURCEENTRYCHECKSUMMISMATCH" code="710" description="Resource entry SHA256 checksum mismatch." />
+		<error name="INVALIDRESOURCEENTRYSHA256" code="711" description="Invalid resource entry SHA256 value." />
+		<error name="SESSIONVARIABLENOTFOUND" code="712" description="Session variable not found." />
+		<error name="DUPLICATESESSIONVARIABLE" code="713" description="Duplicate session variable." />
+		<error name="INVALIDSESSIONVARIABLENAME" code="714" description="Invalid session variable name." />
+		<error name="MISSINGSESSIONVARIABLENAME" code="715" description="Missing session variable name." />
+		<error name="MISSINGSESSIONVARIABLETYPE" code="716" description="Missing session variable type." />
+		<error name="INVALIDSESSIONREFERENCE" code="717" description="Invalid session reference in UI expression." />
+		<error name="INVALIDTELEMETRYSETTING" code="718" description="Invalid telemetry setting." />
+				
+		
+		
+		
+																
 	</errors>
 	
 	
@@ -727,6 +767,7 @@
 	</enum>	
 
 	<enum name="StreamConnectionType">
+		<option name="Unknown" value="0"/>
 		<option name="JSONEventStream" value="1"/>
 		<option name="JPEGImageStream" value="2"/>
 	</enum>	
@@ -762,6 +803,14 @@
 
 		<method name="GetStreamType" description="Returns the stream type.">
 			<param name="StreamType" type="enum" class="StreamConnectionType" pass="return" description="Content type of the stream." />	
+		</method>
+
+		<method name="SetResumeEventID" description="Sets the last event ID that the client has already received, taken from the SSE Last-Event-ID header. Must be called before the first GetNewContent call. Streams that do not support resuming ignore it.">
+			<param name="EventID" type="uint64" pass="in" description="Last event ID the client has received. 0 means that no resume point is known and a full snapshot is sent." />	
+		</method>
+
+		<method name="IsActive" description="Returns if the stream connection is still active. Returns false once the underlying stream has ended, for example because its session was closed. The caller should then terminate the connection.">
+			<param name="IsActive" type="bool" pass="return" description="Flag if the stream connection is still active." />	
 		</method>
 
 	</class>
@@ -838,6 +887,11 @@
 			<param name="XMLString" type="string" pass="in" description="XML Configuration String." />
 		</method>
 		
+		<method name="SetParameterOverride" description="overrides a parameter with a certain value. Fails if parameter group or parameter does not exist. Fails if Value is not fitting the parameter type.">
+			<param name="ParameterPath" type="string" pass="in" description="Path of the parameter. Example: main.configgroup.currentjob" />
+			<param name="ParameterValue" type="string" pass="in" description="New Value of the parameter" />
+		</method>
+
 		<method name="StartAllThreads" description="starts the threads for all the state machines.">
 		</method>
 

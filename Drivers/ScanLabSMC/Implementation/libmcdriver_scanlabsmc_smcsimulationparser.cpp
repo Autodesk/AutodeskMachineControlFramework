@@ -39,7 +39,6 @@ Abstract: This is a stub class definition of CSMCJob
 
 #include <array>
 #include <thread>
-#include <iostream>
 #include <algorithm>
 #include <fstream>
 #include <sstream>

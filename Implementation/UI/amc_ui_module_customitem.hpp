@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_CUSTOMITEM
 #define __AMC_UI_MODULE_CUSTOMITEM
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -54,6 +55,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIExpression, PUIExpression);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 	amcDeclareDependingClass(CUIModuleCustomItem_EventParameter, PUIModuleCustomItem_EventParameter);
+	amcDeclareDependingClass(CUIFrontendState, PUIFrontendState);
 		
 
 	class CUIModuleCustomItem_Properties : public CUIModuleItem {
@@ -72,14 +74,14 @@ namespace AMC {
 
 		virtual std::string getUUID () override;
 
-		virtual void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
 		// Returns all UUIDs that could be contained in this Item
 		virtual std::list <std::string> getReferenceUUIDs();
 
 		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
 
 		void registerProperty(const std::string & sName, const std::string & sTypeString, CUIExpression valueExpression);
+
+		const std::map<std::string, CUIExpression>& getProperties() const;
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
@@ -129,7 +131,8 @@ namespace AMC {
 
 		std::string getEventName ();
 
-		virtual void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
+		// Writes the event parameters with the current values of the session's client variables.
+		void writeParametersToJSON(CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CUIFrontendState* pFrontendState);
 
 		// Returns all UUIDs that could be contained in this Item
 		virtual std::list <std::string> getReferenceUUIDs();

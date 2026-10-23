@@ -45,6 +45,22 @@ using namespace AMC;
 
 #define PEMMAXLENGTH (1024 * 1024)
 
+#define AMC_SERVER_THREADPOOLSIZE 64
+#define AMC_SERVER_MAXEVENTSTREAMS 32
+#define AMC_SERVER_EVENTSTREAM_RETRY_MS 3000
+#define AMC_SERVER_EVENTSTREAM_MAXEVENTIDLENGTH 18
+
+// httplib's defaults (SO_REUSEADDR on Windows, SO_REUSEPORT on Linux) let a second process bind an already used port without an error.
+static void setExclusiveServerSocketOptions(socket_t sock)
+{
+	int nEnable = 1;
+#ifdef _WIN32
+	setsockopt(sock, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, reinterpret_cast<char*>(&nEnable), sizeof(nEnable));
+#else
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<void*>(&nEnable), sizeof(nEnable));
+#endif
+}
+
 #ifdef _WIN32
 class CX509Certificate {
 private:
@@ -162,7 +178,7 @@ public:
 #endif // _WIN32
 
 CServer::CServer(PServerIO pServerIO)
-	: m_pServerIO (pServerIO), m_pListeningServerInstance (nullptr), m_nPort (0), m_bUseHTTPS (false), m_bServiceHasBeenStarted (false)
+	: m_pServerIO (pServerIO), m_pListeningServerInstance (nullptr), m_nPort (0), m_bUseHTTPS (false), m_bServiceHasBeenStarted (false), m_bFatalErrorOccurred (false), m_nOpenEventStreams (0)
 {
 	if (pServerIO.get() == nullptr)
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "invalid parameter");
@@ -213,6 +229,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 	m_pDataModel = nullptr;
 	m_pDataWrapper = nullptr;
 	m_pListeningServerInstance = nullptr;
+	m_bFatalErrorOccurred = false;
 
 	try {
 		uint32_t nMajorDataVersion = 0;
@@ -240,6 +257,11 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 		m_pDataModel->SetBaseTempDirectory(m_pServerConfiguration->getBaseTempDirectory ());
 
+		// MUST be set before InitialiseDatabase, which is where the telemetry data file is created.
+		if (!m_pServerConfiguration->getTelemetryEnabled())
+			log("Telemetry recording is disabled.");
+		m_pDataModel->SetTelemetryEnabled(m_pServerConfiguration->getTelemetryEnabled());
+
 		log("Initialising Database...");
 		m_pDataModel->InitialiseDatabase(m_pServerConfiguration->getDataDirectory(), m_pServerConfiguration->getDataBaseType(), m_pServerConfiguration->getConnectionString());
 
@@ -266,6 +288,11 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 		m_pContext->Log("Parsing package configuration", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
 		m_pContext->ParseConfiguration(sPackageConfigurationXML);
+
+		for (auto iParameterOverride : m_ParameterOverrides) {
+			m_pContext->Log("Overriding parameter: " + iParameterOverride.first + " = " + iParameterOverride.second, LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
+			m_pContext->SetParameterOverride(iParameterOverride.first, iParameterOverride.second);
+		}
 
 		m_pContext->Log("Loading HTTP Client from " + m_pServerConfiguration->getPackageCoreClient() + "...", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
 		m_pContext->LoadClientPackage(m_pServerConfiguration->getPackageCoreClient());
@@ -300,7 +327,14 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 						//std::cout << req.path << std::endl;
 
-						std::string sStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sPath.substr(8));
+						std::string sStreamIdentifier = sPath.substr(8);
+						if (!AMCCommon::CUtils::stringIsUUIDString(sStreamIdentifier)) {
+							res.status = 404;
+							res.set_content("Stream not found", "text/plain");
+							return;
+						}
+
+						std::string sStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamIdentifier);
 
 						std::string sBoundary = AMCCommon::CUtils::calculateRandomSHA256String(4) + "_" + sStreamUUID;
 
@@ -320,7 +354,9 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 								break;
 
 							default:
-								throw std::runtime_error("invalid stream connection type.");
+								res.status = 404;
+								res.set_content("Stream not found", "text/plain");
+								return;
 						}
 							
 						// Handle CORS preflight requests
@@ -340,6 +376,38 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 						res.set_header("Connection", "keep-alive");
 						res.set_header("Cache-Control", "no-cache");
 
+						httplib::ContentProviderResourceReleaser resourceReleaser = nullptr;
+
+						if (streamType == LibMC::eStreamConnectionType::JSONEventStream) {
+
+							// Native EventSource reconnects send Last-Event-ID; clients that open a new ticket pass lastEventId instead.
+							std::string sLastEventID = req.get_header_value("Last-Event-ID");
+							if (sLastEventID.empty() && req.has_param("lastEventId"))
+								sLastEventID = req.get_param_value("lastEventId");
+
+							uint64_t nResumeEventID = 0;
+							if ((!sLastEventID.empty()) && (sLastEventID.length() <= AMC_SERVER_EVENTSTREAM_MAXEVENTIDLENGTH) && (sLastEventID.find_first_not_of("0123456789") == std::string::npos))
+								nResumeEventID = std::stoull(sLastEventID);
+							pStreamConnection->SetResumeEventID(nResumeEventID);
+
+							// Every open event stream occupies one worker thread of the HTTP server.
+							if (m_nOpenEventStreams.fetch_add(1) >= AMC_SERVER_MAXEVENTSTREAMS) {
+								m_nOpenEventStreams.fetch_sub(1);
+								res.status = 503;
+								res.set_header("Retry-After", "5");
+								res.set_content("Too many open event streams", "text/plain");
+								return;
+							}
+
+							auto pReleased = std::make_shared<std::atomic<bool>>(false);
+							resourceReleaser = [this, pReleased](bool) {
+								if (!pReleased->exchange(true))
+									m_nOpenEventStreams.fetch_sub(1);
+							};
+
+							res.set_header("X-Accel-Buffering", "no");
+						}
+
 						res.set_content_provider(
 							sContentType.c_str (),
 							[pStreamConnection, this, streamType, sBoundary](size_t offset, httplib::DataSink& sink) -> bool {
@@ -347,14 +415,22 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 									if (!sink.is_writable())
 										return false;
 
-									// Initial connection response
-									{
-										std::string sInitial = ": connected\n\n"; // SSE comment
-										sink.os.write(sInitial.c_str(), sInitial.length());
-										sink.os.flush();
+									if (streamType == LibMC::eStreamConnectionType::JSONEventStream) {
+										if (offset == 0) {
+											std::string sInitial = "retry: " + std::to_string(AMC_SERVER_EVENTSTREAM_RETRY_MS) + "\n: connected\n\n";
+											sink.os.write(sInitial.c_str(), sInitial.length());
+											sink.os.flush();
+										}
+
+										if (!pStreamConnection->IsActive()) {
+											sink.done();
+											return true;
+										}
 									}
 
-									std::this_thread::sleep_for(std::chrono::milliseconds(pStreamConnection->GetIdleDelay()));
+									uint32_t nIdleDelay = pStreamConnection->GetIdleDelay();
+									if (nIdleDelay > 0)
+										std::this_thread::sleep_for(std::chrono::milliseconds(nIdleDelay));
 
 									auto pContent = pStreamConnection->GetNewContent();
 									if (pContent.get() != nullptr) {
@@ -366,23 +442,23 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 											switch (streamType) {
 												case LibMC::eStreamConnectionType::JSONEventStream: {
-													std::string sPayload(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
-
-													// SSE format: event + data + double newline
-													std::string sData = "data: " + sPayload + "\n\n";
-													sink.os.write(sData.c_str(), sData.length());
+													// The stream delivers fully framed SSE events.
+													sink.os.write(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
 													sink.os.flush(); // Force immediate sending
 
 													break;
 												}
 
 												case LibMC::eStreamConnectionType::JPEGImageStream: {
-													std::string sHeader = sBoundary + "\r\n" +
+													std::string sHeader = "--" + sBoundary + "\r\n" +
 														"Content-Type: " + sMIMEType + "\r\n" +
 														"Content-Length: " + std::to_string (dataBuffer.size()) + "\r\n\r\n";
 
 													sink.os.write(sHeader.c_str(), sHeader.length());
 													sink.os.write((char*)dataBuffer.data(), dataBuffer.size());
+													std::string sTrailer = "\r\n";
+													sink.os.write(sTrailer.c_str(), sTrailer.length());
+													sink.os.flush(); // Force immediate sending of frame
 
 													break;
 												}
@@ -399,7 +475,8 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 								}
 
 								return true;
-							}
+							},
+							resourceReleaser
 						);
  
 
@@ -548,18 +625,24 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 					httplib::SSLServer sslsvr(serverCertificate.getCertificate(), privateKey.getPrivateKey());
 
+					sslsvr.new_task_queue = [] { return new httplib::ThreadPool(AMC_SERVER_THREADPOOLSIZE); };
 					sslsvr.Get("^/stream/.*", streamHandler);
 					sslsvr.Get("(.*?)", requestHandler);
 					sslsvr.Post("(.*?)", requestHandler);
 					sslsvr.Put("(.*?)", requestHandler);
 					sslsvr.Options("(.*?)", requestHandler);
+					sslsvr.set_socket_options(setExclusiveServerSocketOptions);
+
+					if (!sslsvr.bind_to_port(sHostName.c_str(), nPort))
+						throw std::runtime_error("could not bind to " + sHostName + ":" + std::to_string(nPort) + " (is the port already in use by another process?)");
 
 					m_bServiceHasBeenStarted = true;
 
 					m_pListeningServerInstance = &sslsvr;
-					sslsvr.listen(sHostName.c_str(), nPort);
+					sslsvr.listen_after_bind();
 					m_pListeningServerInstance = nullptr;
 
+					this->log("Terminating all threads...");
 					m_pContext->TerminateAllThreads();
 
 				}
@@ -567,6 +650,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 					m_pListeningServerInstance = nullptr;
 					this->log("Fatal error: " + std::string(E.what()));
 
+					this->log("Terminating all threads...");
 					m_pContext->TerminateAllThreads();
 					throw;
 				}
@@ -577,36 +661,57 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 			}
 			else {
 
-				httplib::Server svr;
-				svr.Get("^/stream/.*", streamHandler);
-				svr.Get("(.*?)", requestHandler);
-				svr.Post("(.*?)", requestHandler);
-				svr.Put("(.*?)", requestHandler);
-				svr.Options("(.*?)", requestHandler);
-				m_pListeningServerInstance = &svr;
+				try {
 
-				m_bServiceHasBeenStarted = true;
+					httplib::Server svr;
+					svr.new_task_queue = [] { return new httplib::ThreadPool(AMC_SERVER_THREADPOOLSIZE); };
+					svr.Get("^/stream/.*", streamHandler);
+					svr.Get("(.*?)", requestHandler);
+					svr.Post("(.*?)", requestHandler);
+					svr.Put("(.*?)", requestHandler);
+					svr.Options("(.*?)", requestHandler);
+					svr.set_socket_options(setExclusiveServerSocketOptions);
 
-				svr.listen(sHostName.c_str(), nPort);
-				m_pListeningServerInstance = nullptr;
+					if (!svr.bind_to_port(sHostName.c_str(), nPort))
+						throw std::runtime_error("could not bind to " + sHostName + ":" + std::to_string(nPort) + " (is the port already in use by another process?)");
 
-				m_pContext->TerminateAllThreads();
+					m_pListeningServerInstance = &svr;
+
+					m_bServiceHasBeenStarted = true;
+
+					svr.listen_after_bind();
+					m_pListeningServerInstance = nullptr;
+
+					this->log("Terminating all threads...");
+					m_pContext->TerminateAllThreads();
+
+				}
+				catch (std::exception& E) {
+					m_pListeningServerInstance = nullptr;
+					this->log("Fatal error: " + std::string(E.what()));
+
+					this->log("Terminating all threads...");
+					m_pContext->TerminateAllThreads();
+					throw;
+				}
 			}
 
 			
 
-			this->log("Failed to listen on " + sHostName + ":" + std::to_string(nPort));
+			this->log("Stopped listening on " + sHostName + ":" + std::to_string(nPort));
 
 		}
 		catch (std::exception& E) {
 
 			m_pListeningServerInstance = nullptr;
+			m_bFatalErrorOccurred = true;
 			this->log("Fatal error while listening on " + sHostName + ":" + std::to_string(nPort));
 			this->log(E.what());
 		}
 
 	}
 	catch (std::exception& E) {
+		m_bFatalErrorOccurred = true;
 		this->log("Fatal initialization error: " + std::string (E.what ()));
 	}
 }
@@ -616,6 +721,12 @@ void CServer::log(const std::string& sMessage)
 {
 	m_pServerIO->logMessageString(sMessage);
 }
+
+void CServer::addConfigurationParameterOverride(const std::string& sParameterName, const std::string& sParameterValue)
+{
+	m_ParameterOverrides.emplace_back(sParameterName, sParameterValue);
+}
+
 
 PServerIO CServer::getServerIO()
 {
@@ -676,5 +787,10 @@ std::string CServer::getServerURL()
 bool CServer::getServiceHasBeenStarted()
 {
 	return m_bServiceHasBeenStarted;
+}
+
+bool CServer::getFatalErrorOccurred()
+{
+	return m_bFatalErrorOccurred;
 }
 

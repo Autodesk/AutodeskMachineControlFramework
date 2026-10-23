@@ -147,6 +147,7 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 	auto sBuildUUID = jsonRequest.getUUID(AMC_API_KEY_BUILDUUID, LIBMC_ERROR_INVALIDBUILDUUID);
 
 	CJSONWriterArray segmentArray(writer);
+	CJSONWriterArray partArray(writer);
 
 	if (sBuildUUID != AMCCommon::CUtils::createEmptyUUID()) {
 
@@ -162,6 +163,20 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 		auto pToolpath = pToolpathHandler->findToolpathEntity(sStreamUUID, false);
 		if (pToolpath == nullptr) {
 			pToolpath = pToolpathHandler->loadToolpathEntity(sStreamUUID);
+		}
+
+		auto disabledParts = pToolpathHandler->getDisabledParts(sStreamUUID);
+
+		uint32_t nPartCount = pToolpath->getPartCount();
+		for (uint32_t nPartIndex = 0; nPartIndex < nPartCount; nPartIndex++) {
+			auto pToolpathPart = pToolpath->getPart(nPartIndex);
+			auto sPartUUID = AMCCommon::CUtils::normalizeUUIDString(pToolpathPart->getUUID());
+
+			CJSONWriterObject partObject(writer);
+			partObject.addString(AMC_API_KEY_UPLOAD_BUILDPARTUUID, sPartUUID);
+			partObject.addString(AMC_API_KEY_UPLOAD_BUILDPARTNAME, pToolpathPart->getName());
+			partObject.addBool(AMC_API_KEY_PARTDISABLED, disabledParts.find(sPartUUID) != disabledParts.end());
+			partArray.addObject(partObject);
 		}
 
 		auto nLayerCount = pToolpath->getLayerCount();
@@ -187,6 +202,7 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 				double dLaserSpeed = pProfile->getDoubleValueDef("", sLaserSpeedValueName, 0.0);
 				uint32_t nColor = ((pProfile->getProfileIndex () + 1) * 12347328) & 0xFFFFFF;
 				uint32_t nPartID = pLayerData->getSegmentLocalPartID(nSegmentIndex);
+				std::string sPartUUID = pLayerData->getSegmentPartUUID(nSegmentIndex);
 				uint32_t nLaserIndex = pLayerData->getSegmentLaserIndex(nSegmentIndex);
 
 				CJSONWriterObject segmentObject(writer);
@@ -224,6 +240,7 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 					segmentObject.addDouble(AMC_API_KEY_LASERPOWER, dLaserPower);
 					segmentObject.addDouble(AMC_API_KEY_LASERSPEED, dLaserSpeed);
 					segmentObject.addInteger(AMC_API_KEY_PARTID, nPartID);
+					segmentObject.addString(AMC_API_KEY_PARTUUID, sPartUUID);
 					segmentObject.addString(AMC_API_KEY_PROFILENAME, sProfileName);
 					
 					segmentObject.addInteger(AMC_API_KEY_COLOR, nColor);
@@ -239,10 +256,11 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 
 
 	writer.addArray(AMC_API_KEY_SEGMENTS, segmentArray);
+	writer.addArray(AMC_API_KEY_PARTS, partArray);
 }
 
 
-void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth, const std::string& sStatusToQuery)
+void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth, const std::string& sStatusToQuery, CAPIFormFields& pFormFields)
 {	
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -258,14 +276,32 @@ void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAut
 
 	auto pDataModel = m_pSystemState->getDataModelInstance();
 	auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
-	auto pBuildJobIterator = pBuildJobHandler->ListJobsByStatus(buildStatus);
+
+	// The head must be read before the rows, so that a change in between is fetched again by the next delta.
+	writer.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBBUILDLISTHEADID, pBuildJobHandler->GetBuildListHeadID());
+
+	uint64_t nSinceHeadID = 0;
+	bool bIsDelta = pFormFields.getOptionalUint64RequestParameter(AMC_API_KEY_LIST_SINCE, nSinceHeadID);
+
+	LibMCData::PBuildJobIterator pBuildJobIterator;
+	if (bIsDelta) {
+		writer.addBoolean(AMC_API_KEY_LIST_DELTA, true);
+		pBuildJobIterator = pBuildJobHandler->ListJobsChangedSince(nSinceHeadID);
+	}
+	else {
+		pBuildJobIterator = pBuildJobHandler->ListJobsByStatus(buildStatus);
+	}
 
 	CJSONWriterArray jobJSONArray(writer);
+	CJSONWriterArray removedJSONArray(writer);
 
 	while (pBuildJobIterator->MoveNext()) {
 		auto pBuildJob = pBuildJobIterator->GetCurrentJob();
 
-		LibMCData::eBuildJobStatus buildStatus = pBuildJob->GetStatus();
+		if (bIsDelta && (pBuildJob->GetStatus() != buildStatus)) {
+			removedJSONArray.addString(pBuildJob->GetUUID());
+			continue;
+		}
 
 		CJSONWriterObject jobJSON(writer);
 		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBUUID, pBuildJob->GetUUID());
@@ -274,19 +310,21 @@ void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAut
 		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBLAYERCOUNT, pBuildJob->GetLayerCount());
 		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBSTATUS, pBuildJob->GetStatusString());
 		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBSIZE, pBuildJob->GetStorageStreamSize());
-		;
+		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBINCREMENTALID, pBuildJob->GetIncrementalID());
+		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBTIMESTAMP, pBuildJob->GetTimeStamp());
+		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBUSER, pBuildJob->GetCreatorName());
+		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBEXECUTIONCOUNT, pBuildJob->GetExecutionCount());
 
 		if (pBuildJob->HasThumbnailStream())
 			jobJSON.addString(AMC_API_KEY_UPLOAD_ITEMBUILDTHUMBNAIL, pBuildJob->GetThumbnailStreamUUID());
-
-		/*jobJSON.addString(AMC_API_KEY_UI_ITEMBUILDUSER, pBuildJob->GetCreatorName());
-		jobJSON.addInteger(AMC_API_KEY_UI_ITEMBUILDEXECUTIONCOUNT, pBuildJob->GetExecutionCount()); */
 
 		jobJSONArray.addObject(jobJSON);
 		
 	}
 
 	writer.addArray(AMC_API_KEY_UPLOAD_BUILDJOBARRAY, jobJSONArray);
+	if (bIsDelta)
+		writer.addArray(AMC_API_KEY_LIST_REMOVED, removedJSONArray);
 }
 
 void CAPIHandler_Build::handleListBuildDataRequest(CJSONWriter& writer, PAPIAuth pAuth, const std::string& buildUUID)
@@ -353,22 +391,26 @@ void CAPIHandler_Build::writeJobDetailsEx(CJSONWriter& writer, LibMCData::PBuild
 	}
 
 	uint32_t nPartCount = pToolpath->getPartCount();
+	auto disabledParts = pToolpathHandler->getDisabledParts(sStreamUUID);
 
 	CJSONWriterArray partJSONArray(writer);
 	for (uint32_t nPartIndex = 0; nPartIndex < nPartCount; nPartIndex++) {
 		auto pToolpathPart = pToolpath->getPart(nPartIndex);
+		auto sPartUUID = AMCCommon::CUtils::normalizeUUIDString(pToolpathPart->getUUID());
 
 		CJSONWriterObject partJSON(writer);
-		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTUUID, pToolpathPart->getUUID());
+		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTUUID, sPartUUID);
 		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTNAME, pToolpathPart->getName());
 		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTNUMBER, pToolpathPart->getPartNumber());
 		partJSON.addString(AMC_API_KEY_UPLOAD_BUILDPARTGEOMETRYUUID, pToolpathPart->getMeshUUID());
+		partJSON.addBool(AMC_API_KEY_PARTDISABLED, disabledParts.find(sPartUUID) != disabledParts.end());
 
 		partJSONArray.addObject(partJSON);
 
 	}
 
 	writer.addArray(AMC_API_KEY_UPLOAD_PARTARRAY, partJSONArray);
+	writer.addInteger(AMC_API_KEY_PARTSTATEVERSION, (int64_t)pToolpathHandler->getDisabledPartsVersion(sStreamUUID));
 
 	uint32_t nGlobalLayerThicknessInUnits = 0;
 	bool bLayerThicknessIsVariable = false;
@@ -497,7 +539,7 @@ PAPIResponse CAPIHandler_Build::handleRequest(const std::string& sURI, const eAP
 	switch (buildType) {
 	case APIHandler_BuildType::btListJobs: {
 		std::string sStatus = pFormFields.getRequestParameter (AMC_API_KEY_UPLOAD_BUILDJOBSTATUS, false);
-		handleListJobsRequest(writer, pAuth, sStatus);
+		handleListJobsRequest(writer, pAuth, sStatus, pFormFields);
 		break;
 	}
 	case APIHandler_BuildType::btToolpath:

@@ -41,11 +41,14 @@ Abstract: This is a stub class definition of CMachineConfigurationVersion
 
 using namespace LibMCData::Impl;
 
+#define MACHINECONFIGURATIONVERSION_MAXNAMELENGTH 256
+#define MACHINECONFIGURATIONVERSION_DEFAULTNAME "Default configuration"
+
 /*************************************************************************************************************************
  Class definition of CMachineConfigurationVersion 
 **************************************************************************************************************************/
 
-CMachineConfigurationVersion::CMachineConfigurationVersion(AMCData::PSQLHandler pSQLHandler, const std::string& sUUID, const std::string& sXSDUUID, LibMCData_uint32 nConfigurationVersionNumber, const std::string& sParentUUID, const std::string& sConfigurationXML, const std::string& sUserUUID, const std::string& sTimestampUTC)
+CMachineConfigurationVersion::CMachineConfigurationVersion(AMCData::PSQLHandler pSQLHandler, const std::string& sUUID, const std::string& sXSDUUID, LibMCData_uint32 nConfigurationVersionNumber, const std::string& sParentUUID, const std::string& sConfigurationXML, const std::string& sUserUUID, const std::string& sTimestampUTC, const std::string& sName)
     : m_pSQLHandler(pSQLHandler)
     , m_sUUID(AMCCommon::CUtils::normalizeUUIDString(sUUID))
     , m_sXSDUUID(AMCCommon::CUtils::normalizeUUIDString(sXSDUUID))
@@ -54,6 +57,7 @@ CMachineConfigurationVersion::CMachineConfigurationVersion(AMCData::PSQLHandler 
     , m_sConfigurationXML(sConfigurationXML)
     , m_sUserUUID(sUserUUID)
     , m_sTimestampUTC(sTimestampUTC)
+    , m_sName(sName)
 {
     if (pSQLHandler.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -79,6 +83,17 @@ CMachineConfigurationVersion::~CMachineConfigurationVersion()
 
 }
 
+std::string CMachineConfigurationVersion::checkVersionName(const std::string& sName)
+{
+    std::string sTrimmedName = AMCCommon::CUtils::trimString(sName);
+    if (sTrimmedName.empty())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "Empty configuration version name");
+    if (sTrimmedName.length() > MACHINECONFIGURATIONVERSION_MAXNAMELENGTH)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "Configuration version name is too long");
+
+    return sTrimmedName;
+}
+
 CMachineConfigurationVersion* CMachineConfigurationVersion::makeFrom(CMachineConfigurationVersion* pMachineConfigurationVersion)
 {
     if (pMachineConfigurationVersion == nullptr)
@@ -92,7 +107,8 @@ CMachineConfigurationVersion* CMachineConfigurationVersion::makeFrom(CMachineCon
                     pMachineConfigurationVersion->GetParentUUID(), 
                     pMachineConfigurationVersion->GetConfigurationXMLString(), 
                     pMachineConfigurationVersion->GetUserUUID(), 
-                    pMachineConfigurationVersion->GetTimestamp());
+                    pMachineConfigurationVersion->GetTimestamp(),
+                    pMachineConfigurationVersion->GetName());
 }
 
 std::shared_ptr<CMachineConfigurationVersion> CMachineConfigurationVersion::makeSharedFrom(CMachineConfigurationVersion* pMachineConfigurationVersion)
@@ -108,7 +124,8 @@ std::shared_ptr<CMachineConfigurationVersion> CMachineConfigurationVersion::make
         pMachineConfigurationVersion->GetParentUUID(),
         pMachineConfigurationVersion->GetConfigurationXMLString(),
         pMachineConfigurationVersion->GetUserUUID(),
-        pMachineConfigurationVersion->GetTimestamp());
+        pMachineConfigurationVersion->GetTimestamp(),
+        pMachineConfigurationVersion->GetName());
 }
 
 CMachineConfigurationVersion* CMachineConfigurationVersion::createDefaultConfigurationForXSD( AMCData::PSQLHandler pSQLHandler, const std::string& sXSDUUID, const std::string& sConfigurationXML, const std::string& sTimestampUTC)
@@ -133,10 +150,12 @@ CMachineConfigurationVersion* CMachineConfigurationVersion::createDefaultConfigu
     // Insert new configuration version with null user UUID
     std::string sUserUUID = "00000000-0000-0000-0000-000000000000";
 
+    std::string sName = MACHINECONFIGURATIONVERSION_DEFAULTNAME;
+
     auto pInsert = pSQLHandler->prepareStatement(
         "INSERT INTO machineconfiguration_versions "
-        "(uuid, xsduuid, configurationversionnumber, parentversionuuid, configurationxmlstring, useruuid, timestamp) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?)"
+        "(uuid, xsduuid, configurationversionnumber, parentversionuuid, configurationxmlstring, useruuid, timestamp, name) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
     );
 
     pInsert->setString(1, sNewUUID);
@@ -146,11 +165,12 @@ CMachineConfigurationVersion* CMachineConfigurationVersion::createDefaultConfigu
     pInsert->setString(5, sConfigurationXML);
     pInsert->setString(6, sUserUUID);
     pInsert->setString(7, sTimestampUTC);
+    pInsert->setString(8, sName);
 
     pInsert->execute();
 
     // Construct object and return
-    return new CMachineConfigurationVersion(pSQLHandler, sNewUUID, sNormalizedXSDUUID, nConfigurationVersionNumber, sParentUUID, sConfigurationXML, sUserUUID, sTimestampUTC);
+    return new CMachineConfigurationVersion(pSQLHandler, sNewUUID, sNormalizedXSDUUID, nConfigurationVersionNumber, sParentUUID, sConfigurationXML, sUserUUID, sTimestampUTC, sName);
 }
 
 LibMCData_uint32 CMachineConfigurationVersion::getLatestConfigurationNumericVersionForXSD(AMCData::PSQLHandler pSQLHandler, const std::string& sXSDUUID)
@@ -183,7 +203,7 @@ CMachineConfigurationVersion* CMachineConfigurationVersion::getLatestConfigurati
     // Query the latest version entry for given XSD
     auto pStatement = pSQLHandler->prepareStatement(
         "SELECT uuid, xsduuid, configurationversionnumber, parentversionuuid, "
-        "configurationxmlstring, useruuid, timestamp "
+        "configurationxmlstring, useruuid, timestamp, name "
         "FROM machineconfiguration_versions "
         "WHERE xsduuid = ? "
         "ORDER BY configurationversionnumber DESC LIMIT 1"
@@ -200,8 +220,9 @@ CMachineConfigurationVersion* CMachineConfigurationVersion::getLatestConfigurati
     std::string sXML = pStatement->getColumnString(5);
     std::string sUserUUID = pStatement->getColumnString(6);
     std::string sTimestamp = pStatement->getColumnString(7);
+    std::string sName = pStatement->getColumnString(8);
 
-    return new CMachineConfigurationVersion(pSQLHandler, sUUID, sXSDUUID_DB, nVersionNumber, sParentUUID, sXML, sUserUUID, sTimestamp);
+    return new CMachineConfigurationVersion(pSQLHandler, sUUID, sXSDUUID_DB, nVersionNumber, sParentUUID, sXML, sUserUUID, sTimestamp, sName);
 }
 
 CMachineConfigurationVersion* CMachineConfigurationVersion::findConfigurationVersionByUUID(AMCData::PSQLHandler pSQLHandler, const std::string& sVersionUUID)
@@ -213,7 +234,7 @@ CMachineConfigurationVersion* CMachineConfigurationVersion::findConfigurationVer
 
     auto pStatement = pSQLHandler->prepareStatement(
         "SELECT uuid, xsduuid, configurationversionnumber, parentversionuuid, "
-        "configurationxmlstring, useruuid, timestamp "
+        "configurationxmlstring, useruuid, timestamp, name "
         "FROM machineconfiguration_versions "
         "WHERE uuid = ?"
     );
@@ -229,8 +250,9 @@ CMachineConfigurationVersion* CMachineConfigurationVersion::findConfigurationVer
     std::string sXML = pStatement->getColumnString(5);
     std::string sUserUUID = pStatement->getColumnString(6);
     std::string sTimestamp = pStatement->getColumnString(7);
+    std::string sName = pStatement->getColumnString(8);
 
-    return new CMachineConfigurationVersion(pSQLHandler, sUUID, sXSDUUID, nVersionNumber, sParentUUID, sXML, sUserUUID, sTimestamp);
+    return new CMachineConfigurationVersion(pSQLHandler, sUUID, sXSDUUID, nVersionNumber, sParentUUID, sXML, sUserUUID, sTimestamp, sName);
 }
 
 IMachineConfigurationVersionIterator* CMachineConfigurationVersion::listConfigurationVersionsForXSD(
@@ -246,7 +268,7 @@ IMachineConfigurationVersionIterator* CMachineConfigurationVersion::listConfigur
     auto pTransaction = pSQLHandler->beginTransaction();
 
     std::string sQuery =
-        "SELECT uuid, configurationversionnumber, parentversionuuid, configurationxmlstring, useruuid, timestamp "
+        "SELECT uuid, configurationversionnumber, parentversionuuid, configurationxmlstring, useruuid, timestamp, name "
         "FROM machineconfiguration_versions "
         "WHERE xsduuid = ? "
         "ORDER BY configurationversionnumber ASC;";
@@ -263,9 +285,10 @@ IMachineConfigurationVersionIterator* CMachineConfigurationVersion::listConfigur
         std::string sXML = pStatement->getColumnString(4);
         std::string sUserUUID = pStatement->getColumnString(5);
         std::string sTimestamp = pStatement->getColumnString(6);
+        std::string sName = pStatement->getColumnString(7);
 
         auto pVersion = std::make_shared<CMachineConfigurationVersion>(
-            pSQLHandler, sUUID, sXSDUUID, nVersionNumber, sParentUUID, sXML, sUserUUID, sTimestamp);
+            pSQLHandler, sUUID, sXSDUUID, nVersionNumber, sParentUUID, sXML, sUserUUID, sTimestamp, sName);
 
         pIterator->AddVersion(pVersion);
     }
@@ -300,6 +323,11 @@ std::string CMachineConfigurationVersion::GetParentUUID()
     return m_sParentUUID;
 }
 
+std::string CMachineConfigurationVersion::GetName()
+{
+    return m_sName;
+}
+
 std::string CMachineConfigurationVersion::GetConfigurationXMLString()
 {
     return m_sConfigurationXML;
@@ -315,7 +343,7 @@ std::string CMachineConfigurationVersion::GetTimestamp()
     return m_sTimestampUTC;
 }
 
-IMachineConfigurationVersion* CMachineConfigurationVersion::CreateNewVersion(const std::string & sXMLString, const std::string & sUserUUID)
+IMachineConfigurationVersion* CMachineConfigurationVersion::CreateNewVersion(const std::string & sXMLString, const std::string & sUserUUID, const std::string & sName)
 {
     if (m_pSQLHandler.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -325,6 +353,8 @@ IMachineConfigurationVersion* CMachineConfigurationVersion::CreateNewVersion(con
     
     if (sUserUUID.empty())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "Empty user UUID");
+
+    std::string sCheckedName = checkVersionName(sName);
 
     std::string sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 
@@ -338,8 +368,8 @@ IMachineConfigurationVersion* CMachineConfigurationVersion::CreateNewVersion(con
     // Insert new configuration version
     auto pInsert = m_pSQLHandler->prepareStatement(
         "INSERT INTO machineconfiguration_versions "
-        "(uuid, xsduuid, configurationversionnumber, parentversionuuid, configurationxmlstring, useruuid, timestamp) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?)"
+        "(uuid, xsduuid, configurationversionnumber, parentversionuuid, configurationxmlstring, useruuid, timestamp, name) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
     );
     pInsert->setString(1, sNewUUID);
     pInsert->setString(2, m_sXSDUUID);
@@ -352,11 +382,12 @@ IMachineConfigurationVersion* CMachineConfigurationVersion::CreateNewVersion(con
     auto sTimeStampUTC = chrono.getUTCTimeInISO8601();
     
     pInsert->setString(7, sTimeStampUTC);
+    pInsert->setString(8, sCheckedName);
     pInsert->execute();
-    return new CMachineConfigurationVersion(m_pSQLHandler, sNewUUID, m_sXSDUUID, nNewVersionNumber, m_sUUID, sXMLString, sNormalizedUserUUID, sTimeStampUTC);
+    return new CMachineConfigurationVersion(m_pSQLHandler, sNewUUID, m_sXSDUUID, nNewVersionNumber, m_sUUID, sXMLString, sNormalizedUserUUID, sTimeStampUTC, sCheckedName);
 }
 
-IMachineConfigurationVersion* CMachineConfigurationVersion::MigrateToNewXSD(IMachineConfigurationXSD* pNewXSD, const std::string & sXMLString, const std::string & sUserUUID)
+IMachineConfigurationVersion* CMachineConfigurationVersion::MigrateToNewXSD(IMachineConfigurationXSD* pNewXSD, const std::string & sXMLString, const std::string & sUserUUID, const std::string & sName)
 {
 	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
 }

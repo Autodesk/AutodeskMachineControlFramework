@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_CONSTANTS
 
 #include "amc_ui_module_contentitem_image.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
@@ -83,49 +84,6 @@ CUIModule_ContentImage::~CUIModule_ContentImage()
 
 
 
-void CUIModule_ContentImage::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "image");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-
-	std::string sResourceUUID = AMCCommon::CUtils::createEmptyUUID();
-
-	auto pClientVariableGroup = pClientVariableHandler->findGroup(getItemPath(), true);
-	if (m_ImageResource.needsSync())
-		pClientVariableGroup->setParameterValueByName(AMC_API_KEY_UI_ITEMIMAGERESOURCE, m_ImageResource.evaluateStringValue(m_pStateMachineData)); 
-	if (m_AspectRatio.needsSync())
-		pClientVariableGroup->setParameterValueByName(AMC_API_KEY_UI_ITEMASPECTRATIO, m_AspectRatio.evaluateStringValue(m_pStateMachineData));
-	if (m_MaxWidth.needsSync())
-		pClientVariableGroup->setParameterValueByName(AMC_API_KEY_UI_ITEMMAXWIDTH, m_MaxWidth.evaluateStringValue(m_pStateMachineData));
-	if (m_MaxHeight.needsSync())
-		pClientVariableGroup->setParameterValueByName(AMC_API_KEY_UI_ITEMMAXHEIGHT, m_MaxHeight.evaluateStringValue(m_pStateMachineData));
-
-	std::string sResourceName = pClientVariableGroup->getParameterValueByName (AMC_API_KEY_UI_ITEMIMAGERESOURCE);
-	if (!sResourceName.empty()) {
-
-		bool bIsUUID = AMCCommon::CUtils::stringIsUUIDString(sResourceName);
-		if (bIsUUID) {
-			sResourceUUID = AMCCommon::CUtils::normalizeUUIDString(sResourceName);
-		} else {
-
-			auto pEntry = m_pResourcePackage->findEntryByName(sResourceName, false);
-			if (pEntry.get() != nullptr) {
-				sResourceUUID = pEntry->getUUID();
-			}
-		}
-	}
-	pClientVariableGroup->setParameterValueByName(AMC_API_KEY_UI_ITEMIMAGEUUID, sResourceUUID);
-
-	object.addString(AMC_API_KEY_UI_ITEMIMAGERESOURCE, sResourceUUID);
-	object.addString(AMC_API_KEY_UI_ITEMASPECTRATIO, pClientVariableGroup->getParameterValueByName(AMC_API_KEY_UI_ITEMASPECTRATIO));
-	if (!m_MaxWidth.isEmpty(m_pStateMachineData))
-		object.addString(AMC_API_KEY_UI_ITEMMAXWIDTH, pClientVariableGroup->getParameterValueByName(AMC_API_KEY_UI_ITEMMAXWIDTH));
-	if (!m_MaxHeight.isEmpty(m_pStateMachineData))
-		object.addString(AMC_API_KEY_UI_ITEMMAXHEIGHT, pClientVariableGroup->getParameterValueByName(AMC_API_KEY_UI_ITEMMAXHEIGHT));
-
-}
-
-
 void CUIModule_ContentImage::configurePostLoading()
 {
 
@@ -152,3 +110,48 @@ std::string CUIModule_ContentImage::findElementPathByUUID(const std::string& sUU
 
 	return "";
 }
+
+std::string CUIModule_ContentImage::getItemType()
+{
+	return "image";
+}
+
+void CUIModule_ContentImage::registerFrontendAttributes()
+{
+	// The resource is resolved from a resource name to its UUID.
+	registerItemProviderAttribute("resource", eUIFrontendDefinitionAttributeType::atUUID, eUIFrontendDefinitionAttributeScope::asGlobal,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			object.addString(sName, resolveResourceToUUID(m_ImageResource.evaluateStringValue(pStateMachineData)));
+		});
+
+	registerOptionalStringAttribute("aspectratio", m_AspectRatio);
+	registerOptionalStringAttribute("maxwidth", m_MaxWidth);
+	registerOptionalStringAttribute("maxheight", m_MaxHeight);
+}
+
+void CUIModule_ContentImage::registerOptionalStringAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	registerItemProviderAttribute(sName, eUIFrontendDefinitionAttributeType::atString, eUIFrontendDefinitionAttributeScope::asGlobal,
+		[optionalExpression = expression](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sAttributeName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) mutable {
+			if (!optionalExpression.isEmpty(pStateMachineData))
+				object.addString(sAttributeName, optionalExpression.evaluateStringValue(pStateMachineData));
+		});
+}
+
+std::string CUIModule_ContentImage::resolveResourceToUUID(const std::string& sResourceValue)
+{
+	if (sResourceValue.empty())
+		return AMCCommon::CUtils::createEmptyUUID();
+
+	// If it's already a UUID, normalize and return it
+	if (AMCCommon::CUtils::stringIsUUIDString(sResourceValue))
+		return AMCCommon::CUtils::normalizeUUIDString(sResourceValue);
+
+	// Otherwise treat it as a resource name and look up the UUID
+	auto pEntry = m_pResourcePackage->findEntryByName(sResourceValue, false);
+	if (pEntry.get() != nullptr)
+		return pEntry->getUUID();
+
+	return AMCCommon::CUtils::createEmptyUUID();
+}
+

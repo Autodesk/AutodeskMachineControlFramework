@@ -139,6 +139,16 @@ uint64_t CAPIJSONRequest::getUint64(const std::string& sKeyName, const uint64_t 
 	return nValue;
 }
 
+double CAPIJSONRequest::getDouble(const std::string& sKeyName, uint32_t nErrorCode) const
+{
+	if (!hasValue(sKeyName))
+		throw ELibMCInterfaceException(nErrorCode);
+	if (!m_pImpl->m_Document[sKeyName.c_str()].IsNumber())
+		throw ELibMCInterfaceException(nErrorCode);
+
+	return m_pImpl->m_Document[sKeyName.c_str()].GetDouble();
+}
+
 std::string CAPIJSONRequest::getSHA256(const std::string& sKeyName, uint32_t nErrorCode) const
 {
 	auto sNameString = getNameString(sKeyName, nErrorCode);

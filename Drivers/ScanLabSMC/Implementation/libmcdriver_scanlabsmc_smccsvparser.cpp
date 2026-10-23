@@ -42,8 +42,6 @@ Abstract: This is the class definition of CSMCCSVParser
 #include <cmath>
 
 #include <cctype> // for std::tolower
-#include <iostream>
-
 using namespace LibMCDriver_ScanLabSMC::Impl;
 
 CSMCCSVParser::CSMCCSVParser(const std::string& sAbsoluteFileNameUTF8, char delimiter)
@@ -201,10 +199,8 @@ void CSMCCSVParser::Parse(const std::vector<FieldBinding>& field_bindings)
 
 void CSMCCSVParser::ParseComment(const char* lineStart, size_t length)
 {
-    // Handle comment lines starting with '#' (optional)
-    // Example: logging or ignoring
-    // std::string_view comment(lineStart, length);
-    // std::cout << "Comment: " << comment << std::endl;
+    (void)lineStart;
+    (void)length;
 }
 
 void CSMCCSVParser::PushTimestamp(void* ts_target, double ts)
@@ -355,12 +351,8 @@ void CSMCCSVParser::ParseLaserSignal(const char* data, size_t length, void* targ
 
     std::vector<SubCycle> sub_cycles;
 
-    //std::cout << "-----------------" << std::endl;
-    //std::cout << std::string(data, length) << std::endl;
-
     ParseLaserSignal_Internal(data, length, (void*)&sub_cycles, nullptr);
     vec->push_back(sub_cycles[0].Toggle);
-    //std::cout << "init  " << sub_cycles[0].Toggle << " at " << CSMCCSVParser::FormatDouble(sub_cycles[0].TimeOffset) << std::endl;
 
     if (sub_cycles.size() > 1)
     {
@@ -373,11 +365,8 @@ void CSMCCSVParser::ParseLaserSignal(const char* data, size_t length, void* targ
             if (sub_cycles.size() > 1)
                 CSMCCSVParser::PushTimestamp(ts_target, ts + sub_cycles[i].TimeOffset);
 
-            //std::cout << "toggle to " << sub_cycles[i].Toggle << " at " << CSMCCSVParser::FormatDouble(ts) << " + " << CSMCCSVParser::FormatDouble(sub_cycles[i].TimeOffset) << std::endl;
         }
     }
-
-    //std::cout << "-----------------" << std::endl;
 }
 
 CSMCCSVParser::ParserFunc CSMCCSVParser::GetParser(FieldParserType type)

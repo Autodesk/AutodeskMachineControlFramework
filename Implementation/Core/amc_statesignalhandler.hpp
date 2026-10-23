@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_STATESIGNALHANDLER
-#define __AMC_STATESIGNALHANDLER
+#ifndef AMC_STATESIGNALHANDLER
+#define AMC_STATESIGNALHANDLER
 
 #include <memory>
 #include <string>
@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_statesignalparameter.hpp"
 #include "amc_statesignaltypes.hpp"
+#include "amc_statesignalregistry.hpp"
 #include "amc_parametergroup.hpp"
 
 
@@ -49,63 +50,126 @@ namespace AMC {
 	class CStateSignalHandler;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
 
-	// Do not include StateSignal.hpp anywhere for threadsafety!
+	class CTelemetryHandler;
+	typedef std::shared_ptr<CTelemetryHandler> PTelemetryHandler;
+
+	// Do not include StateSignal.hpp outside of amc_statesignalhandler.cpp for threadsafety!
 	class CStateSignalSlot;
 	typedef std::shared_ptr<CStateSignalSlot> PStateSignalSlot;
 
-	class CStateSignalHandler {
+	class CStateSignalArchiveWriter;
+
+	class CStateSignalInstance {
 	private:
-		
-		std::map<std::pair <std::string, std::string>, PStateSignalSlot> m_SignalMap;
-		std::unordered_map<std::string, PStateSignalSlot> m_SignalUUIDLookupMap;
-		std::mutex m_SignalMapMutex;
-		std::mutex m_SignalUUIDMapMutex;
+		std::string m_sInstanceName;
+
+		std::mutex m_SlotMutex;
+
+		CStateSignalRegistry* m_pRegistry;
+
+		std::unordered_map<std::string, PStateSignalSlot> m_Slots;
 
 	public:
 
-		CStateSignalHandler();
+		CStateSignalInstance (const std::string & sInstanceName, CStateSignalRegistry* pRegistry);
+
+		virtual ~CStateSignalInstance();
+
+		std::string getInstanceName () const;
+
+		PStateSignalSlot getSignalSlot (const std::string& sSignalName);
+
+		PStateSignalSlot getSignalSlotOrNull (const std::string& sSignalName);
+
+		PStateSignalSlot addSignalDefinition(const std::string& sSignalName, const std::vector<CStateSignalParameter>& Parameters, const std::vector<CStateSignalParameter>& Results, uint32_t nSignalReactionTimeOutInMS, uint32_t nAutomaticArchiveTimeInMS, uint32_t nSignalQueueSize, PParameterGroup pSignalInformationGroup);
+
+		void clearUnhandledSignals(uint64_t nTimestamp);
+
+		void clearUnhandledSignalsOfType(const std::string& sSignalTypeName, uint64_t nTimestamp);
+
+		bool canTrigger(const std::string& sSignalName);
+
+		bool queueIsEmpty(const std::string& sSignalName);
+
+		bool hasSignalDefinition(const std::string& sSignalName);
+
+		bool claimSignalMessage(const std::string& sSignalName, bool bCheckForReactionTimeout, uint64_t nGlobalTimestamp, uint64_t nTimeStamp, std::string& sSignalUUID, std::string& sParameterDataJSON, bool bChangePhaseToInprocess);
+
+		bool addNewInQueueSignal(const std::string& sSignalName, const std::string& sSignalUUID, const std::string& sParameterData, uint32_t nResponseTimeOutInMS, uint64_t nTimestamp);
+
+		uint32_t getAvailableSignalQueueEntryCount(const std::string& sSignalName);
+
+		uint32_t getTotalSignalQueueSize(const std::string& sSignalName);
+
+		uint32_t getDefaultReactionTimeout(const std::string& sSignalName);
+
+		void populateParameterGroup(const std::string& sSignalName, CParameterGroup* pParameterGroup);
+
+		void populateResultGroup(const std::string& sSignalName, CParameterGroup* pResultGroup);
+
+		void checkForReactionTimeouts(uint64_t nGlobalTimestamp);
+
+		void autoArchiveMessages(uint64_t nGlobalTimestamp);
+
+		void writeMessagesToArchive(CStateSignalArchiveWriter* pArchiveWriter);
+
+	};
+
+	typedef std::shared_ptr<CStateSignalInstance> PStateSignalInstance;
+
+	class CStateSignalHandler : public CStateSignalRegistry {
+	private:
+		
+		std::unordered_map<std::string, PStateSignalInstance> m_Instances;
+
+		std::mutex m_SignalInstanceMutex;
+
+
+		std::unordered_map<std::string, std::weak_ptr<CStateSignalSlot>> m_MessageSlotMap;
+
+		std::mutex m_MessageMapMutex;
+
+		PTelemetryHandler m_pTelemetryHandler;
+
+	public:
+
+		CStateSignalHandler(PTelemetryHandler pTelemetryHandler);
+
 		virtual ~CStateSignalHandler();
 
-		void addSignalDefinition(const std::string & sInstanceName, const std::string & sSignalName, const std::list<CStateSignalParameter> & Parameters, const std::list<CStateSignalParameter> & Results, uint32_t nSignalReactionTimeOutInMS, uint32_t nSignalQueueSize);
+		PStateSignalInstance registerInstance (const std::string& sInstanceName);
 
-		void clearUnhandledSignals(const std::string& sInstanceName);
+		PStateSignalInstance getInstance (const std::string & sInstanceName);
 
-		void clearUnhandledSignalsOfType(const std::string& sInstanceName, const std::string& sSignalTypeName);
+		void registerMessage(const std::string& sMessageUUID, CStateSignalSlot* pSignalSlot) override;
+
+		void unregisterMessage(const std::string& sMessageUUID) override;
+
+		PStateSignalSlot findSignalSlotOfMessage(const std::string& sMessageUUID) override;
+
+		PTelemetryChannel registerTelemetryChannel(const std::string& sChannelIdentifier, const std::string& sChannelDescription, LibMCData::eTelemetryChannelType channelType) override;
 
 		bool finalizeSignal(const std::string& sUUID);
-
-		bool canTrigger(const std::string& sInstanceName, const std::string& sSignalName);
-
-		bool hasSignalDefinition(const std::string& sInstanceName, const std::string& sSignalName);
 
 		bool findSignalPropertiesByUUID(const std::string& sSignalUUID, std::string & sInstanceName, std::string& sSignalName, std::string& sParameterData);
 
 		AMC::eAMCSignalPhase getSignalPhase (const std::string& sSignalUUID);
 
-		std::string peekSignalMessageFromQueue (const std::string& sInstanceName, const std::string& sSignalName);
+		void checkForReactionTimeouts(uint64_t nGlobalTimestamp);
 
-		bool addNewInQueueSignal(const std::string& sInstanceName, const std::string& sSignalName, const std::string& sSignalUUID, const std::string& sParameterData, uint32_t nResponseTimeOutInMS);
+		void autoArchiveMessages(uint64_t nGlobalTimestamp);
 
-		void changeSignalPhaseToHandled(const std::string& sSignalUUID, const std::string& sResultData);
+		void writeMessagesToArchive(CStateSignalArchiveWriter* pArchiveWriter);
 
-		void changeSignalPhaseToInProcess(const std::string& sSignalUUID);
+		void changeSignalPhaseToHandled(const std::string& sSignalUUID, const std::string& sResultData, uint64_t nTimestamp);
+
+		void changeSignalPhaseToInProcess(const std::string& sSignalUUID, uint64_t nTimestamp);
 		
-		void changeSignalPhaseToFailed(const std::string& sSignalUUID, const std::string& sResultData, const std::string & sErrorMessage);
-
-		uint32_t getAvailableSignalQueueEntryCount(const std::string& sInstanceName, const std::string& sSignalName);
-
-		uint32_t getTotalSignalQueueSize(const std::string& sInstanceName, const std::string& sSignalName);
-
-		uint32_t getDefaultReactionTimeout(const std::string& sInstanceName, const std::string& sSignalName);
+		void changeSignalPhaseToFailed(const std::string& sSignalUUID, const std::string& sResultData, const std::string & sErrorMessage, uint64_t nTimestamp);
 
 		uint32_t getReactionTimeout(const std::string& sSignalUUID);
 
 		std::string getResultDataJSON(const std::string& sSignalUUID);
-
-		void populateParameterGroup(const std::string& sInstanceName, const std::string& sSignalName, CParameterGroup * pParameterGroup);
-
-		void populateResultGroup(const std::string& sInstanceName, const std::string& sSignalName, CParameterGroup* pResultGroup);
-
 
 	};
 
@@ -113,5 +177,4 @@ namespace AMC {
 }
 
 
-#endif //__AMC_STATESIGNALHANDLER
-
+#endif //AMC_STATESIGNALHANDLER

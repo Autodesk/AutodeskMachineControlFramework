@@ -55,16 +55,39 @@ CSignalHandler::CSignalHandler(AMC::PStateSignalHandler pSignalHandler, std::str
 	if (!m_pSignalHandler->findSignalPropertiesByUUID(m_sSignalUUID, m_sInstanceName, m_sSignalName, sParameterData))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SIGNALNOTFOUND, "findSignalPropertiesByUUID: " + m_sSignalUUID + " (" + m_sInstanceName + "/" + m_sSignalName + ")");
 
-	m_pSignalHandler->populateParameterGroup(m_sInstanceName, m_sSignalName, m_pParameterGroup.get());
-	m_pSignalHandler->populateResultGroup(m_sInstanceName, m_sSignalName, m_pResultGroup.get());
+	auto pSignalInstance = m_pSignalHandler->getInstance(m_sInstanceName);
+
+	pSignalInstance->populateParameterGroup(m_sSignalName, m_pParameterGroup.get());
+	pSignalInstance->populateResultGroup(m_sSignalName, m_pResultGroup.get());
 
 	m_pParameterGroup->deserializeJSON(sParameterData, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
 
 }
 
+CSignalHandler::CSignalHandler(AMC::PStateSignalHandler pSignalHandler, const std::string& sInstanceName, const std::string& sSignalName, const std::string& sSignalUUID, const std::string& sParameterDataJSON, AMCCommon::PChrono pGlobalChrono)
+	: m_pSignalHandler(pSignalHandler), m_sSignalUUID(AMCCommon::CUtils::normalizeUUIDString(sSignalUUID)), m_pGlobalChrono(pGlobalChrono)
+{
+	if (pSignalHandler.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	m_sInstanceName = sInstanceName;
+	m_sSignalName = sSignalName;
+
+	m_pParameterGroup = std::make_shared<AMC::CParameterGroup>(pGlobalChrono);
+	m_pResultGroup = std::make_shared<AMC::CParameterGroup>(pGlobalChrono);
+
+	auto pSignalInstance = m_pSignalHandler->getInstance(m_sInstanceName);
+	pSignalInstance->populateParameterGroup(m_sSignalName, m_pParameterGroup.get());
+	pSignalInstance->populateResultGroup(m_sSignalName, m_pResultGroup.get());
+
+	m_pParameterGroup->deserializeJSON(sParameterDataJSON, m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970());
+}
+
 void CSignalHandler::SignalHandled()
 {
-	m_pSignalHandler->changeSignalPhaseToHandled (m_sSignalUUID, m_pResultGroup->serializeToJSON ());
+	m_pSignalHandler->changeSignalPhaseToHandled (m_sSignalUUID, m_pResultGroup->serializeToJSON (), m_pGlobalChrono->getElapsedMicroseconds());
 }
 
 LibMCEnv::eSignalPhase CSignalHandler::GetSignalPhase()
@@ -88,8 +111,8 @@ LibMCEnv::eSignalPhase CSignalHandler::GetSignalPhase()
 			return LibMCEnv::eSignalPhase::TimedOut;
 		case AMC::eAMCSignalPhase::Cleared:
 			return LibMCEnv::eSignalPhase::Cleared;
-		case AMC::eAMCSignalPhase::Retracted:
-			return LibMCEnv::eSignalPhase::Retracted;
+		case AMC::eAMCSignalPhase::Archived:
+			return LibMCEnv::eSignalPhase::Archived;
 
 		default:
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_UNDEFINEDINTERNALSIGNALPHASE);
@@ -100,13 +123,13 @@ LibMCEnv::eSignalPhase CSignalHandler::GetSignalPhase()
 
 
 void CSignalHandler::SignalInProcess()
-{
-	m_pSignalHandler->changeSignalPhaseToInProcess (m_sSignalUUID);
+{	
+	m_pSignalHandler->changeSignalPhaseToInProcess (m_sSignalUUID, m_pGlobalChrono->getElapsedMicroseconds());
 }
 
 void CSignalHandler::SignalFailed(const std::string& sErrorMessage)
 {
-	m_pSignalHandler->changeSignalPhaseToFailed(m_sSignalUUID, m_pResultGroup->serializeToJSON(), sErrorMessage);
+	m_pSignalHandler->changeSignalPhaseToFailed(m_sSignalUUID, m_pResultGroup->serializeToJSON(), sErrorMessage, m_pGlobalChrono->getElapsedMicroseconds());
 }
 
 
@@ -175,5 +198,4 @@ void CSignalHandler::SetBoolResult(const std::string & sName, const bool bValue)
 {
 	m_pResultGroup->setBoolParameterValueByName(sName, bValue);
 }
-
 

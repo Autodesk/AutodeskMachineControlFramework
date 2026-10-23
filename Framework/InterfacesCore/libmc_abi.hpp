@@ -118,6 +118,24 @@ LIBMC_DECLSPEC LibMCResult libmc_streamconnection_getidledelay(LibMC_StreamConne
 */
 LIBMC_DECLSPEC LibMCResult libmc_streamconnection_getstreamtype(LibMC_StreamConnection pStreamConnection, LibMC::eStreamConnectionType * pStreamType);
 
+/**
+* Sets the last event ID that the client has already received, taken from the SSE Last-Event-ID header. Must be called before the first GetNewContent call. Streams that do not support resuming ignore it.
+*
+* @param[in] pStreamConnection - StreamConnection instance.
+* @param[in] nEventID - Last event ID the client has received. 0 means that no resume point is known and a full snapshot is sent.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_streamconnection_setresumeeventid(LibMC_StreamConnection pStreamConnection, LibMC_uint64 nEventID);
+
+/**
+* Returns if the stream connection is still active. Returns false once the underlying stream has ended, for example because its session was closed. The caller should then terminate the connection.
+*
+* @param[in] pStreamConnection - StreamConnection instance.
+* @param[out] pIsActive - Flag if the stream connection is still active.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_streamconnection_isactive(LibMC_StreamConnection pStreamConnection, bool * pIsActive);
+
 /*************************************************************************************************************************
  Class definition for APIRequestHandler
 **************************************************************************************************************************/
@@ -254,6 +272,16 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_settempbasepath(LibMC_MCContext pMCCo
 * @return error code or 0 (success)
 */
 LIBMC_DECLSPEC LibMCResult libmc_mccontext_parseconfiguration(LibMC_MCContext pMCContext, const char * pXMLString);
+
+/**
+* overrides a parameter with a certain value. Fails if parameter group or parameter does not exist. Fails if Value is not fitting the parameter type.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pParameterPath - Path of the parameter. Example: main.configgroup.currentjob
+* @param[in] pParameterValue - New Value of the parameter
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_setparameteroverride(LibMC_MCContext pMCContext, const char * pParameterPath, const char * pParameterValue);
 
 /**
 * starts the threads for all the state machines.

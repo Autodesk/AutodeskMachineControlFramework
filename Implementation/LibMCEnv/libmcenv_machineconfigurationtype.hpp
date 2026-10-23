@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CMachineConfigurationType
 
 // Include custom headers here.
 #include "libmcdata_dynamic.hpp"
+#include "amc_statemachinedata.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -59,10 +60,11 @@ class CMachineConfigurationType : public virtual IMachineConfigurationType, publ
 private:
 
 	LibMCData::PMachineConfigurationType m_pMachineConfigurationType;
+	AMC::PStateMachineData m_pStateMachineData;
 
 public:
 
-	CMachineConfigurationType(LibMCData::PMachineConfigurationType pMachineConfigurationType);
+	CMachineConfigurationType(LibMCData::PMachineConfigurationType pMachineConfigurationType, AMC::PStateMachineData pStateMachineData);
 
 	virtual ~CMachineConfigurationType();
 
@@ -82,6 +84,8 @@ public:
 
 	IMachineConfigurationXSD* RegisterNewXSD(const std::string& sXSDString, const LibMCEnv_uint32 nXSDVersion) override;
 
+	IMachineConfigurationXSD* RegisterXSDFromResource(const std::string& sXSDResourceName, const std::string& sDefaultXMLResourceName, const LibMCEnv_uint32 nXSDVersion, const bool bFailIfExisting) override;
+
 	IMachineConfigurationVersion* CreateDefaultConfiguration(const std::string& sXSDUUID, const std::string& sDefaultXML, const std::string& sTimeStampUTC) override;
 
 	IMachineConfigurationXSD* FindXSDByNumericVersion(const LibMCEnv_uint32 nXSDVersion) override;
@@ -95,10 +99,26 @@ public:
 	IMachineConfigurationVersion* FindConfigurationVersionByUUID(const std::string& sVersionUUID) override;
 
 	IMachineConfigurationVersion* GetActiveConfigurationVersion() override;
-
+	
 	IMachineConfigurationVersion* GetLatestConfigurationVersion() override;
+		
+	IXMLDocument* GetActiveConfigurationXML() override;
+
+	IXMLDocument* GetLatestConfigurationXML() override;
 	
 	void SetActiveConfigurationVersion(const std::string& sVersionUUID) override;
+
+	IMachineConfiguration* GetActiveConfiguration() override;
+
+	IMachineConfiguration* EnsureActiveConfiguration() override;
+
+	IMachineConfigurationXSD* EnsureXSDVersion(const std::string& sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string& sDefaultXML) override;
+
+	IMachineConfigurationXSD* EnsureXSDVersionFromParameterDefaults(const std::string& sXSDString, const LibMCEnv_uint32 nXSDVersion) override;
+
+	LibMCEnv_uint32 SynchronizeParameters() override;
+
+	IMachineConfigurationVersion* ResetToParameterDefaults(const std::string& sUserUUID, const std::string& sName) override;
 };
 
 } // namespace Impl

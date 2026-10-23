@@ -42,7 +42,7 @@ CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const
 	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_sDescription (sDescription), m_sPageName (sPageName), m_sEventName (sEventName),
 	m_sUUID (AMCCommon::CUtils::createUUID ())
 {
-
+	m_Visible.setFixedValue("1");
 }
 
 CUIMenuItem::~CUIMenuItem()
@@ -83,4 +83,14 @@ std::string CUIMenuItem::getEventName()
 std::string CUIMenuItem::getPageName()
 {
 	return m_sPageName;
+}
+
+void CUIMenuItem::setVisibleExpression(const CUIExpression& visibleExpression)
+{
+	m_Visible = visibleExpression;
+}
+
+CUIExpression& CUIMenuItem::getVisibleExpression()
+{
+	return m_Visible;
 }

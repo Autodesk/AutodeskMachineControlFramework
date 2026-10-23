@@ -63,6 +63,7 @@ private:
 	*/
 
 	LibMCData::PMachineConfigurationTypeIterator m_pMachineConfigurationTypeIterator;
+	AMC::PStateMachineData m_pStateMachineData;
 
 protected:
 
@@ -81,7 +82,7 @@ public:
 	* Public member functions to implement.
 	*/
 
-	CMachineConfigurationTypeIterator(LibMCData::PMachineConfigurationTypeIterator pMachineConfigurationTypeIterator);
+	CMachineConfigurationTypeIterator(LibMCData::PMachineConfigurationTypeIterator pMachineConfigurationTypeIterator, AMC::PStateMachineData pStateMachineData);
 
 	virtual ~CMachineConfigurationTypeIterator();
 

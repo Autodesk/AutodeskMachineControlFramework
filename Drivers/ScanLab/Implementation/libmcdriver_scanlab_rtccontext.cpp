@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <string>
 #include <array>
+#include <limits>
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -59,6 +60,63 @@ using namespace LibMCDriver_ScanLab::Impl;
 #define RTCCONTEXT_MAX_LINESUBDIVISIONTHRESHOLD 1000000.0
 
 #define RTCCONTEXT_MAXSEGMENTDELAY_ONEHOURIN100KHZ 3600UL * 100000UL
+
+// Sentinel for m_nMicrovectorPowerCacheDACValue meaning "nothing cached, always re-issue".
+#define RTCCONTEXT_INVALIDMICROVECTORPOWERCACHE -1
+
+// Spare list positions kept free when checking whether a microvector block fits into the open list.
+#define RTCCONTEXT_LISTCAPACITY_SAFETYMARGIN 64
+
+// List positions a single microvector can occupy in the worst case:
+// one set_laser_power (short list command) plus one micro_vector_abs (normal list command).
+#define RTCCONTEXT_LISTPOSITIONS_PER_MICROVECTOR 2
+
+// --- Streamed microvector download (see doc/scanner_phase3_optionA.md) ---------------------------
+// The RTC6 executes one microvector per 10 us list cycle, while the measured download rate over
+// Ethernet is ~12.4 us per list position: the board consumes the list FASTER than it is loaded.
+// Streaming therefore preloads a buffer of B vectors, starts execution with execute_list_pos while
+// the list is still being written (explicitly allowed, RTC6 manual p. 447), and appends the rest
+// during marking. If the output pointer ever catches up with the input pointer the board silently
+// executes stale memory (no back-pressure, manual p. 113-114), so the margin between the two
+// pointers is checked periodically and a shortfall is a hard error.
+
+// Default fraction of the layer to preload before starting execution; the effective value is
+// m_dMicrovectorStreamPrebufferFraction, settable per machine via SetMicrovectorStreamingEnabled
+// (cardconfig/microvectorstreamingprebufferfraction, 0 = this default). Must stay >=
+// (1 - T_mark/T_load), = 0.192 at the originally measured 12.38 us/vector. 0.30 aborted a real
+// run on 2026-08-31: network jitter degraded the download to ~12.6 us/vector over a job and the
+// final margin on a 640k layer dipped 253 positions below MINMARGIN. 0.40 keeps the margin
+// comfortable up to a sustained ~14.5 us/vector; the cost is linear (~1 s per layer), an abort
+// scraps the layer.
+#define RTCCONTEXT_MICROVECTORSTREAM_PREBUFFERFRACTION 0.40
+
+// Below this prebuffer fraction the streaming is expected to abort on real-world download rates.
+// Configured values under it are accepted (they are the documented way to test the overrun
+// detector without a rebuild) but logged as a warning.
+#define RTCCONTEXT_MICROVECTORSTREAM_MINSAFEPREBUFFERFRACTION 0.25
+
+// Lower bound of the prebuffer in vectors, for short layers. The margin is smallest at download
+// end: margin_end = B - 0.238 * (N - B) at the measured rates. 150000 keeps margin_end above
+// ~66000 positions for every layer >= MINLAYERSIZE (100000 would fall below MINMARGIN for
+// layers of 300k..375k vectors and fail the last margin check spuriously).
+#define RTCCONTEXT_MICROVECTORSTREAM_MINPREBUFFER 150000
+
+// Default streaming threshold: below this layer size the sequential path is used, because the
+// streaming overhead is not worth it and the prebuffer would cover most of the layer anyway.
+// The effective threshold is m_nMicrovectorStreamMinLayerSize, settable per machine via
+// SetMicrovectorStreamingEnabled (cardconfig/microvectorstreamingminlayersize, 0 = this default).
+#define RTCCONTEXT_MICROVECTORSTREAM_MINLAYERSIZE 300000
+
+// How many vectors to append between two margin checks. Each check issues two control commands,
+// and on Ethernet every control command makes the DLL wait for all buffered list telegrams
+// (manual ch. 16.9), i.e. it drains the High Performance Mode pipeline. 20000 vectors means
+// ~100 checks on a 2M layer - do not lower this by an order of magnitude.
+#define RTCCONTEXT_MICROVECTORSTREAM_CHECKINTERVAL 20000
+
+// Minimum allowed distance between input and output pointer in list positions (= 0.5 s of
+// marking). Less than this aborts the download before the board can reach stale memory.
+#define RTCCONTEXT_MICROVECTORSTREAM_MINMARGIN 50000
+
 
 
 CRTCPowerMapping::CRTCPowerMapping ()
@@ -136,13 +194,6 @@ bool CRTCPowerMapping::mapLaserPowerFromWattsToPercent(double dLaserPowerInWatts
 		return true;
 
 	}
-
-	/*std::cout << "Calculating nonlinear mapping for " << dLaserPowerInWatts << "watts" << std::endl;
-	std::cout << "Mapping table: " << m_wattsToPercent.size() << " entries" << std::endl;
-
-	for (auto iIter : m_wattsToPercent) {
-		std::cout << "  " << iIter.x << " W -> " << iIter.y << " %" << std::endl;
-	}*/
 
 	return interpolate(m_wattsToPercent, dLaserPowerInWatts, dPercent);
 }
@@ -297,6 +348,124 @@ void CRTCPowerMapping::buildAndValidateMappings(const std::map<double, double>& 
 	}
 }
 
+/*************************************************************************************************************************
+ Class definition of CRTCDefocusCorrectionByPower
+**************************************************************************************************************************/
+
+CRTCDefocusCorrectionByPower::CRTCDefocusCorrectionByPower()
+	: m_dEpsilon(1.0e-6)
+{
+}
+
+CRTCDefocusCorrectionByPower::~CRTCDefocusCorrectionByPower()
+{
+}
+
+void CRTCDefocusCorrectionByPower::setDefocusCorrectionTable(const std::map<double, double>& defocusByPowerMap)
+{
+	if (defocusByPowerMap.empty())
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE,
+			"defocus correction table must not be empty");
+
+	// Build knot table sorted by power (std::map is already sorted by key)
+	std::vector<sDefocusKnot> table;
+	table.reserve(defocusByPowerMap.size());
+
+	for (const auto& kv : defocusByPowerMap) {
+		double dPowerInWatts = kv.first;
+		double dDefocusInMM = kv.second;
+
+		if (dPowerInWatts < 0.0)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE,
+				"defocus correction power value must be non-negative: " + std::to_string(dPowerInWatts));
+
+		table.push_back({ dPowerInWatts, dDefocusInMM });
+	}
+
+	// Validate strict monotonicity of power values (x)
+	for (size_t i = 1; i < table.size(); ++i) {
+		if (!(table[i - 1].x < table[i].x - m_dEpsilon)) {
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE,
+				"duplicate or non-increasing power value in defocus correction table at " + std::to_string(table[i].x) + " W");
+		}
+	}
+
+	m_DefocusTable = std::move(table);
+}
+
+bool CRTCDefocusCorrectionByPower::mapPowerToDefocusOffset(double dLaserPowerInWatts, double& dDefocusOffsetInMM)
+{
+	if (m_DefocusTable.empty()) {
+		dDefocusOffsetInMM = 0.0;
+		return false;
+	}
+
+	if (m_DefocusTable.size() == 1) {
+		dDefocusOffsetInMM = m_DefocusTable.front().y;
+		return true;
+	}
+
+	return interpolate(m_DefocusTable, dLaserPowerInWatts, dDefocusOffsetInMM);
+}
+
+size_t CRTCDefocusCorrectionByPower::getTableSize()
+{
+	return m_DefocusTable.size();
+}
+
+const std::vector<CRTCDefocusCorrectionByPower::sDefocusKnot>& CRTCDefocusCorrectionByPower::getTable()
+{
+	return m_DefocusTable;
+}
+
+bool CRTCDefocusCorrectionByPower::interpolate(const std::vector<sDefocusKnot>& pts, double x, double& y)
+{
+	if (pts.size() < 2) {
+		y = 0.0;
+		return false;
+	}
+
+	// Below domain -> clamp to first value
+	if (x < pts.front().x) {
+		y = pts.front().y;
+		return false;
+	}
+	// Above domain -> clamp to last value
+	if (x > pts.back().x) {
+		y = pts.back().y;
+		return false;
+	}
+
+	// Find first knot with x_k >= x
+	auto it = std::lower_bound(pts.begin(), pts.end(), x,
+		[](const sDefocusKnot& k, double xv) { return k.x < xv; });
+
+	// Exact hit?
+	if (nearlyEqual(it->x, x, m_dEpsilon)) {
+		y = it->y;
+		return true;
+	}
+
+	const sDefocusKnot& hi = *it;
+	const sDefocusKnot& lo = *(it - 1);
+
+	const double dx = hi.x - lo.x;
+	if (dx <= 0.0) {
+		y = lo.y;
+		return true;
+	}
+
+	const double t = (x - lo.x) / dx;
+	y = lo.y + t * (hi.y - lo.y);
+	return true;
+}
+
+bool CRTCDefocusCorrectionByPower::nearlyEqual(double a, double b, double eps)
+{
+	return std::abs(a - b) <= eps * std::max({ 1.0, std::abs(a), std::abs(b) });
+}
+
+
 CRTCContextOwnerData::CRTCContextOwnerData()
 	: m_nAttributeFilterValue (0), m_OIERecordingMode (LibMCDriver_ScanLab::eOIERecordingMode::OIERecordingDisabled)
 {
@@ -385,18 +554,32 @@ CRTCContext::CRTCContext(PRTCContextOwnerData pOwnerData, uint32_t nCardNo, bool
 	m_dLaserPulseHalfPeriodInMS(RTC_TIMINGDEFAULT_LASERPULSEHALFPERIOD),
     m_dLaserPulseLengthInMS(RTC_TIMINGDEFAULT_LASERPULSELENGTH),
     m_dStandbyPulseHalfPeriodInMS(RTC_TIMINGDEFAULT_STANDBYPULSEHALFPERIOD),
-    m_dStandbyPulseLengthInMS(RTC_TIMINGDEFAULT_STANDBYPULSELENGTH)
+    m_dStandbyPulseLengthInMS(RTC_TIMINGDEFAULT_STANDBYPULSELENGTH),
+	m_nMicrovectorPowerCacheDACValue (RTCCONTEXT_INVALIDMICROVECTORPOWERCACHE),
+	m_nMicrovectorPowerCachePulseHalfPeriodInBits (0xffffffffUL),
+	m_nMicrovectorPowerCachePulseLengthInBits (0xffffffffUL),
+	m_nMicrovectorPowerCommandsWritten (0),
+	m_nConfiguredListSizeA (0),
+	m_nConfiguredListSizeB (0),
+	m_nCurrentStartListIndex (1),
+	m_nCurrentStartListPosition (0),
+	m_bMicrovectorStreamingEnabled (false),
+	m_nMicrovectorStreamMinLayerSize (RTCCONTEXT_MICROVECTORSTREAM_MINLAYERSIZE),
+	m_dMicrovectorStreamPrebufferFraction (RTCCONTEXT_MICROVECTORSTREAM_PREBUFFERFRACTION)
 
 
 {
 	if (pOwnerData.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
+	m_pMicrovectorStreamExecutionStarted = std::make_shared<std::atomic<bool>> (false);
+
 	m_pScanLabSDK = pOwnerData->getScanLabSDK();
 	if (m_pScanLabSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
 	m_pPowerMapping = std::make_shared<CRTCPowerMapping>();
+	m_pJumpFilter = std::make_shared<CRTCJumpFilter>();
 
 	if (pDriverEnvironment.get () == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -427,6 +610,16 @@ void CRTCContext::loadFirmwareEx(PScanLabSDK pSDK, uint32_t nCardNo, const LibMC
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 	if (pDriverEnvironment.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	// RTC6 Software Package >= 1.23.0 (DLL 653) replaces RTC6RBF.rbf by RTC6RBF_CEBA[2|4].rbf and
+	// supports path "::", which extracts version-matched program files directly from the RTC6 DLL.
+	if (pSDK->get_dll_version() >= 653) {
+		uint32_t nErrorCode = pSDK->n_load_program_file(nCardNo, "::");
+		if (nErrorCode != 0)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE, "could not load program file: #" + std::to_string(nErrorCode));
+
+		return;
+	}
 
 	auto pWorkingDirectory = pDriverEnvironment->CreateWorkingDirectory();
 
@@ -567,6 +760,9 @@ void CRTCContext::ConfigureLists(const LibMCDriver_ScanLab_uint32 nSizeListA, co
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+	m_nConfiguredListSizeA = nSizeListA;
+	m_nConfiguredListSizeB = nSizeListB;
 }
 
 void CRTCContext::SetLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort)
@@ -585,7 +781,6 @@ void CRTCContext::DisableAutoLaserControl()
 {
 	m_pScanLabSDK->n_set_auto_laser_control(m_CardNo, 0, 0, 0, 0, 0);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
 }
 
 void CRTCContext::SetLaserControlParameters(const bool DisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive)
@@ -710,6 +905,13 @@ void CRTCContext::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, cons
 	m_pScanLabSDK->n_set_start_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+	// A new list build begins: any pending "execution already started by streaming" state
+	// belongs to the previous layer. Also remember where this list starts, because the
+	// streaming path has to start execution from here (prologue included).
+	m_pMicrovectorStreamExecutionStarted->store(false);
+	m_nCurrentStartListIndex = nListIndex;
+	m_nCurrentStartListPosition = nPosition;
+
 	m_CurrentMeasurementTagInfo.m_PartID = 0;
 	m_CurrentMeasurementTagInfo.m_ProfileID = 0;
 	m_CurrentMeasurementTagInfo.m_SegmentID = 0;
@@ -724,6 +926,14 @@ void CRTCContext::SetEndOfList()
 
 void CRTCContext::ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
 {
+	// If AddMicrovectorMovement already started this list in streaming mode, the list is
+	// running right now - a second n_execute_list_pos would fail with RTC6_BUSY (manual
+	// p. 447). Consume the flag and skip the duplicate execution request.
+	if (m_pMicrovectorStreamExecutionStarted->exchange(false)) {
+		m_pDriverEnvironment->LogMessage("ExecuteList skipped: list execution was already started by the streamed microvector download.");
+		return;
+	}
+
 	m_pScanLabSDK->n_execute_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
@@ -816,7 +1026,14 @@ void CRTCContext::writeMarkSpeed(float markSpeedinMMPerSecond)
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
 
-void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag)
+void CRTCContext::invalidateMicrovectorPowerCache()
+{
+	m_nMicrovectorPowerCacheDACValue = RTCCONTEXT_INVALIDMICROVECTORPOWERCACHE;
+	m_nMicrovectorPowerCachePulseHalfPeriodInBits = 0xffffffffUL;
+	m_nMicrovectorPowerCachePulseLengthInBits = 0xffffffffUL;
+}
+
+void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag, bool bUseMicrovectorPowerCache, bool bCheckError)
 {
 
 	double dClippedPowerFactor = dPowerInPercent / 100.0f;
@@ -857,53 +1074,99 @@ void CRTCContext::writePower(double dPowerInPercent, bool bOIEPIDControlFlag)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_PULSELENGTHCONTROLNOTSUPPORTEDBYOIE);
 		}
 
-		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		// Deliberately NOT deduplicated: n_set_multi_mcbsp_in_list is not an output latch but a
+		// telegram queued into the sample stream towards the OIE. The OIE PID loop consumes these
+		// as a stream, so suppressing "unchanged" samples would change both the count and the
+		// cadence of what it receives and desynchronise the controller and the recording alignment.
+
+		if (bCheckError)
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 
 	}
 	else {
 
-		switch (m_LaserPort) {
-		case eLaserPort::Port16bitDigital:
-			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 65535.0);
-			//nPortIndex = 3;  See set_laser_power in SDK documentation
-			m_pScanLabSDK->n_set_laser_power(m_CardNo, 3, digitalPowerValue);
+		if (m_LaserPort == eLaserPort::LaserPulseModulation) {
 
-			break;
-		case eLaserPort::Port8bitDigital:
-			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 255.0);
-			//nPortIndex = 2; See set_laser_power in SDK documentation
-			m_pScanLabSDK->n_set_laser_power(m_CardNo, 2, digitalPowerValue);
-			break;
-		case eLaserPort::Port12BitAnalog1:
-			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
-			//nPortIndex = 0;  See set_laser_power in SDK documentation
-			m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
-			break;
-		case eLaserPort::Port12BitAnalog2:
-			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
-			//nPortIndex = 1; // See set_laser_power in SDK documentation
-			m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
-			break;
-		case eLaserPort::Port12BitAnalog1andAnalog2:
-			digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
-			m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
-			m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
-			break;
-		case eLaserPort::LaserPulseModulation: 
-			{
-				uint32_t nHalfPeriodInBits = (uint32_t)round(m_dLaserPulseHalfPeriodInMS * 64.0);
-				uint32_t nFullPeriodInBits = nHalfPeriodInBits * 2;
-				uint32_t nPulseLength = (uint32_t)round((double)nFullPeriodInBits * dClippedPowerFactor);
+			uint32_t nHalfPeriodInBits = (uint32_t)round(m_dLaserPulseHalfPeriodInMS * 64.0);
+			uint32_t nFullPeriodInBits = nHalfPeriodInBits * 2;
+			uint32_t nPulseLength = (uint32_t)round((double)nFullPeriodInBits * dClippedPowerFactor);
 
-				//std::cout << "laser pulse modulation: half period " << nHalfPeriodInBits << " bits, pulse length " << nPulseLength << " bits, factor " << dClippedPowerFactor << std::endl;
+			if (bUseMicrovectorPowerCache
+				&& (nHalfPeriodInBits == m_nMicrovectorPowerCachePulseHalfPeriodInBits)
+				&& (nPulseLength == m_nMicrovectorPowerCachePulseLengthInBits))
+				return;
 
-				m_pScanLabSDK->n_set_laser_pulses(m_CardNo, nHalfPeriodInBits, nPulseLength);
+			m_pScanLabSDK->n_set_laser_pulses(m_CardNo, nHalfPeriodInBits, nPulseLength);
+
+			if (bUseMicrovectorPowerCache) {
+				m_nMicrovectorPowerCachePulseHalfPeriodInBits = nHalfPeriodInBits;
+				m_nMicrovectorPowerCachePulseLengthInBits = nPulseLength;
+				m_nMicrovectorPowerCommandsWritten++;
+			}
+
+		}
+		else {
+
+			switch (m_LaserPort) {
+			case eLaserPort::Port16bitDigital:
+				digitalPowerValue = (int32_t)round(dClippedPowerFactor * 65535.0);
+				break;
+			case eLaserPort::Port8bitDigital:
+				digitalPowerValue = (int32_t)round(dClippedPowerFactor * 255.0);
+				break;
+			case eLaserPort::Port12BitAnalog1:
+			case eLaserPort::Port12BitAnalog2:
+			case eLaserPort::Port12BitAnalog1andAnalog2:
+				digitalPowerValue = (int32_t)round(dClippedPowerFactor * 4095.0);
+				break;
+			default:
 				break;
 			}
+
+			if (bUseMicrovectorPowerCache && (digitalPowerValue == m_nMicrovectorPowerCacheDACValue))
+				return;
+
+			uint32_t nPowerCommandsWritten = 0;
+			switch (m_LaserPort) {
+			case eLaserPort::Port16bitDigital:
+				//nPortIndex = 3;  See set_laser_power in SDK documentation
+				m_pScanLabSDK->n_set_laser_power(m_CardNo, 3, digitalPowerValue);
+				nPowerCommandsWritten = 1;
+				break;
+			case eLaserPort::Port8bitDigital:
+				//nPortIndex = 2; See set_laser_power in SDK documentation
+				m_pScanLabSDK->n_set_laser_power(m_CardNo, 2, digitalPowerValue);
+				nPowerCommandsWritten = 1;
+				break;
+			case eLaserPort::Port12BitAnalog1:
+				//nPortIndex = 0;  See set_laser_power in SDK documentation
+				m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
+				nPowerCommandsWritten = 1;
+				break;
+			case eLaserPort::Port12BitAnalog2:
+				//nPortIndex = 1; // See set_laser_power in SDK documentation
+				m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
+				nPowerCommandsWritten = 1;
+				break;
+			case eLaserPort::Port12BitAnalog1andAnalog2:
+				m_pScanLabSDK->n_set_laser_power(m_CardNo, 0, digitalPowerValue);
+				m_pScanLabSDK->n_set_laser_power(m_CardNo, 1, digitalPowerValue);
+				nPowerCommandsWritten = 2;
+				break;
+			default:
+				break;
+			}
+
+			if (bUseMicrovectorPowerCache) {
+				m_nMicrovectorPowerCacheDACValue = digitalPowerValue;
+				m_nMicrovectorPowerCommandsWritten += nPowerCommandsWritten;
+			}
+
 		}
 
-		m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+		if (bCheckError)
+			m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
 		/*
 
@@ -938,7 +1201,7 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 
 	writeMarkSpeed(fMarkSpeed);
 	writeJumpSpeed(fJumpSpeed);
-	writePower(fPower, bOIEPIDControlFlag);
+	writePower(fPower, bOIEPIDControlFlag, false);
 
 
 
@@ -949,11 +1212,10 @@ void CRTCContext::jumpAbsoluteEx(double dTargetXInMM, double dTargetYInMM)
 	double dTargetXInUnits = round((dTargetXInMM - m_dLaserOriginX) * m_dCorrectionFactor);
 	double dTargetYInUnits = round((dTargetYInMM - m_dLaserOriginY) * m_dCorrectionFactor);
 
-	int nTargetX = (int32_t)dTargetXInUnits;
-	int nTargetY = (int32_t)dTargetYInUnits;
+	int32_t nTargetX = (int32_t)dTargetXInUnits;
+	int32_t nTargetY = (int32_t)dTargetYInUnits;
 
-	// Avoid Null Jumps!
-	if ((nTargetX != m_nCurrentScanPositionX) || (nTargetY != m_nCurrentScanPositionY)) {
+	if (m_pJumpFilter->jumpIsNeeded(m_nCurrentScanPositionX, m_nCurrentScanPositionY, nTargetX, nTargetY, m_dCorrectionFactor)) {
 		m_pScanLabSDK->n_jump_abs(m_CardNo, nTargetX, nTargetY);
 		m_nCurrentScanPositionX = nTargetX;
 		m_nCurrentScanPositionY = nTargetY;
@@ -995,7 +1257,7 @@ void CRTCContext::markAbsoluteEx(double dStartXInMM, double dStartYInMM, double 
 		if (m_pModulationCallback != nullptr) {
 			double dNewPowerInPercent = dLaserPowerInPercent;
 			m_pModulationCallback(dOldX, dOldY, dMarkToX, dMarkToY, dLaserPowerInPercent, nModulationType, m_pModulationCallbackUserData, &dNewPowerInPercent);
-			writePower(dNewPowerInPercent, bOIEControlFlag);
+			writePower(dNewPowerInPercent, bOIEControlFlag, false);
 		}
 
 		int32_t nTargetX = (int32_t)dTargetXInUnits;
@@ -1030,8 +1292,16 @@ void CRTCContext::DrawPolylineOIE(const LibMCDriver_ScanLab_uint64 nPointsBuffer
 	bool bOIEControlFlag = (nOIEPIDControlIndex != 0);
 	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, bOIEControlFlag);
 
-	// Z Plane
-	double defocusZ = round(fZValue * m_dZCorrectionFactor * m_dDefocusFactor);
+	// Z Plane - apply optional defocus correction based on laser power
+	double dEffectiveZValue = (double)fZValue;
+	if (m_pDefocusCorrectionByPower != nullptr) {
+		double dPowerInWatts = 0.0;
+		m_pPowerMapping->mapLaserPowerFromPercentToWatts((double)fPower, dPowerInWatts);
+		double dDefocusOffset = 0.0;
+		m_pDefocusCorrectionByPower->mapPowerToDefocusOffset(dPowerInWatts, dDefocusOffset);
+		dEffectiveZValue += dDefocusOffset;
+	}
+	double defocusZ = round(dEffectiveZValue * m_dZCorrectionFactor * m_dDefocusFactor);
 	int intDefocusZ = (int)defocusZ;
 	m_pScanLabSDK->n_set_defocus_list (m_CardNo, intDefocusZ);
 
@@ -1065,8 +1335,16 @@ void CRTCContext::DrawHatchesOIE(const LibMCDriver_ScanLab_uint64 nHatchesBuffer
 	bool bOIEControlFlag = (nOIEPIDControlIndex != 0);
 	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower, bOIEControlFlag);
 
-	// Z Plane
-	double defocusZ = round(fZValue * m_dZCorrectionFactor * m_dDefocusFactor);
+	// Z Plane - apply optional defocus correction based on laser power
+	double dEffectiveZValue = (double)fZValue;
+	if (m_pDefocusCorrectionByPower != nullptr) {
+		double dPowerInWatts = 0.0;
+		m_pPowerMapping->mapLaserPowerFromPercentToWatts((double)fPower, dPowerInWatts);
+		double dDefocusOffset = 0.0;
+		m_pDefocusCorrectionByPower->mapPowerToDefocusOffset(dPowerInWatts, dDefocusOffset);
+		dEffectiveZValue += dDefocusOffset;
+	}
+	double defocusZ = round(dEffectiveZValue * m_dZCorrectionFactor * m_dDefocusFactor);
 	int intDefocusZ = (int)defocusZ;
 	m_pScanLabSDK->n_set_defocus_list(m_CardNo, intDefocusZ);
 
@@ -1114,39 +1392,265 @@ void CRTCContext::AddMarkMovement(const LibMCDriver_ScanLab_double dTargetX, con
 	m_nCurrentScanPositionY = intY;
 }
 
+int32_t CRTCContext::ConvertDelaySecondsToTicks(double delay)
+{
+	// The argument is in SECONDS, not microseconds - sMicroVector carries sub-clock-cycle offsets
+	// produced by the path planner (one 10 us step == 1e-5), unlike SetLaserDelaysInMicroseconds.
+	// 1 tick = 1/64 us = 1e-6 / 64 s
+	// ticks = delay / (1e-6/64) = delay * 64e6
+	const int64_t ticks = static_cast<int64_t>(std::llround(delay * 64.0e6));
+
+	// Clamp to [0 .. 32767]
+	return static_cast<int32_t>( (ticks < 0) ? 0 :	(ticks > 32767) ? 32767 : ticks );
+}
+
+void CRTCContext::emitMicroVectorsToOpenList(const LibMCDriver_ScanLab::sMicroVector* pBegin, uint64_t nCount)
+{
+	auto pMicroVector = pBegin;
+
+	for (uint64_t nIndex = 0; nIndex < nCount; nIndex++) {
+
+		double dX = round((pMicroVector->m_X - m_dLaserOriginX) * m_dCorrectionFactor);
+		double dY = round((pMicroVector->m_Y - m_dLaserOriginY) * m_dCorrectionFactor);
+
+		int32_t intX = (int32_t)dX;
+		int32_t intY = (int32_t)dY;
+		int32_t intDelayLaserOn = (pMicroVector->m_LaserOnDelay < 0.0) ? -1 : ConvertDelaySecondsToTicks(pMicroVector->m_LaserOnDelay);
+		int32_t intDelayLaserOff = (pMicroVector->m_LaserOffDelay < 0.0) ? -1 : ConvertDelaySecondsToTicks(pMicroVector->m_LaserOffDelay);
+
+		// bCheckError = false: n_get_last_error is a control command, and on RTC6 Ethernet
+		// boards every control command makes the DLL wait until the board has acknowledged all
+		// buffered list commands (RTC6 manual, ch. 16.9), i.e. one network round trip per
+		// microvector. The accumulated error is checked once after the loop instead.
+		writePower(pMicroVector->m_LaserPowerInPercent, false, true, false);
+
+		m_pScanLabSDK->n_micro_vector_abs(m_CardNo, intX, intY, intDelayLaserOn, intDelayLaserOff);
+
+		m_nCurrentScanPositionX = intX;
+		m_nCurrentScanPositionY = intY;
+
+		pMicroVector++;
+
+	}
+}
+
+uint64_t CRTCContext::checkStreamMargin(uint64_t nMinObservedMargin)
+{
+	// Both pointers are ABSOLUTE list memory addresses (offsets from the start of "List1"):
+	// the output pointer via n_get_status (manual p. 503-504), the input pointer via
+	// n_get_input_pointer (p. 479 - not to be confused with the relative get_list_pointer).
+	// The manual explicitly endorses this pair for making sure unprocessed commands are not
+	// overwritten during simultaneous loading and execution (p. 504).
+	uint32_t nStatus = 0;
+	uint32_t nOutputPointer = 0;
+	m_pScanLabSDK->n_get_status(m_CardNo, &nStatus, &nOutputPointer);
+	uint64_t nInputPointer = m_pScanLabSDK->n_get_input_pointer(m_CardNo);
+
+	bool bOvertaken = ((uint64_t)nOutputPointer > nInputPointer);
+	uint64_t nMargin = bOvertaken ? 0 : (nInputPointer - (uint64_t)nOutputPointer);
+
+	if (bOvertaken || (nMargin < (uint64_t)RTCCONTEXT_MICROVECTORSTREAM_MINMARGIN)) {
+
+		// Stop the list before throwing: past this point the board would run into stale list
+		// memory with the laser armed. stop_execution also switches the laser signals off.
+		m_pScanLabSDK->n_stop_execution(m_CardNo);
+		m_pMicrovectorStreamExecutionStarted->store(false);
+
+		if (bOvertaken)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DRIVERERROR,
+				"Microvector streaming: output pointer overtook the download (output pointer at "
+				+ std::to_string(nOutputPointer) + ", input pointer at " + std::to_string(nInputPointer)
+				+ ") - the board has executed stale list memory, the layer is corrupted. Execution was stopped.");
+
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DRIVERERROR,
+			"Microvector streaming: download margin exhausted (input pointer at " + std::to_string(nInputPointer)
+			+ ", output pointer at " + std::to_string(nOutputPointer) + ", margin " + std::to_string(nMargin)
+			+ " < " + std::to_string((uint64_t)RTCCONTEXT_MICROVECTORSTREAM_MINMARGIN)
+			+ " list positions). Execution was stopped before reaching stale list memory."
+			+ " Increase cardconfig/microvectorstreamingprebufferfraction or disable streaming via"
+			+ " cardconfig/enablemicrovectorstreaming.");
+	}
+
+	return (nMargin < nMinObservedMargin) ? nMargin : nMinObservedMargin;
+}
 
 void CRTCContext::AddMicrovectorMovement(const LibMCDriver_ScanLab_uint64 nMicrovectorArrayBufferSize, const LibMCDriver_ScanLab::sMicroVector* pMicrovectorArrayBuffer)
 {
 	if (nMicrovectorArrayBufferSize > 0) {
-		if (pMicrovectorArrayBuffer == nullptr) 
+		if (pMicrovectorArrayBuffer == nullptr)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+		invalidateMicrovectorPowerCache();
 
-		auto pMicroVector = pMicrovectorArrayBuffer;
+		// Refuse to overrun the open list. The RTC6 does not report this: once the input pointer
+		// reaches the end of a list it silently wraps to the start of that same list and keeps
+		// loading (RTC6 manual, ch. 6.4.1), overwriting the beginning of the layer.
+		if (m_nConfiguredListSizeA > 0) {
 
-		for (uint64_t nIndex = 0; nIndex < nMicrovectorArrayBufferSize; nIndex++) {			
+			// n_get_input_pointer returns the ABSOLUTE list memory address, i.e. an offset
+			// relative to the start of "List1" - not a position within the open list. Derive
+			// which list we are in, and how much room is left in it. A pointer beyond both lists
+			// means we are in the protected "List3" area, where this check does not apply.
+			uint64_t nInputPointer = m_pScanLabSDK->n_get_input_pointer(m_CardNo);
+			uint64_t nListEnd = (uint64_t)m_nConfiguredListSizeA + (uint64_t)m_nConfiguredListSizeB;
 
-			double dX = round((pMicroVector->m_X - m_dLaserOriginX) * m_dCorrectionFactor);
-			double dY = round((pMicroVector->m_Y - m_dLaserOriginY) * m_dCorrectionFactor);
+			if (nInputPointer < nListEnd) {
 
-			int32_t intX = (int32_t)dX;
-			int32_t intY = (int32_t)dY;
+				if (nInputPointer < (uint64_t)m_nConfiguredListSizeA)
+					nListEnd = m_nConfiguredListSizeA;
 
-			int32_t intDelayLaserOn = -1;
-			int32_t intDelayLaserOff = -1;
+				uint64_t nAvailablePositions = nListEnd - nInputPointer;
 
-			m_pScanLabSDK->n_micro_vector_abs(m_CardNo, intX, intY, intDelayLaserOn, intDelayLaserOff);
+				// Worst case, not the cached case: the skip rate depends on the microvector data,
+				// and this guard must not rely on it.
+				uint64_t nWorstCasePositions = nMicrovectorArrayBufferSize * (uint64_t)RTCCONTEXT_LISTPOSITIONS_PER_MICROVECTOR
+					+ (uint64_t)RTCCONTEXT_LISTCAPACITY_SAFETYMARGIN;
 
-			m_nCurrentScanPositionX = intX;
-			m_nCurrentScanPositionY = intY;
+				if (nWorstCasePositions > nAvailablePositions)
+					throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DRIVERERROR,
+						"RTC list capacity exceeded: " + std::to_string(nMicrovectorArrayBufferSize)
+						+ " microvectors need up to " + std::to_string(nWorstCasePositions)
+						+ " list positions, but only " + std::to_string(nAvailablePositions)
+						+ " are left in the open list (input pointer at " + std::to_string(nInputPointer) + ")");
+			}
+		}
 
-			pMicroVector++;
+		// Streaming starts list execution after a prebuffer and appends the rest while the laser
+		// marks (see the constant block above). It requires the explicit opt-in via
+		// SetMicrovectorStreamingEnabled and stays off for small layers and when execution is
+		// already running (a second block in the same list must not issue another
+		// execute_list_pos).
+		bool bStreamDownload = m_bMicrovectorStreamingEnabled
+			&& (nMicrovectorArrayBufferSize >= m_nMicrovectorStreamMinLayerSize)
+			&& (!m_pMicrovectorStreamExecutionStarted->load());
+
+		// The loops below write the list without querying n_get_last_error per command. Clear the
+		// accumulated error first so the check after the loop reports only this block. Nothing can
+		// be masked: the checkGlobalErrorOfCard above already threw on any pre-existing error.
+		m_pScanLabSDK->n_reset_error(m_CardNo, 0xffffffff);
+
+		auto tLoadStartTime = std::chrono::steady_clock::now();
+		uint64_t nPowerCommandsBefore = m_nMicrovectorPowerCommandsWritten;
+
+		if (!bStreamDownload) {
+
+			// Sequential path - unchanged behavior: write the whole block, check once.
+			emitMicroVectorsToOpenList(pMicrovectorArrayBuffer, nMicrovectorArrayBufferSize);
+
+			m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+			// One summary line per block, not per vector. Reports both the achieved download rate and
+			// the power deduplication hit rate, which is what determines how many list positions the
+			// block actually consumed.
+			double dLoadDurationInMS = std::chrono::duration_cast<std::chrono::duration<double, std::milli>>
+				(std::chrono::steady_clock::now() - tLoadStartTime).count();
+			uint64_t nPowerCommands = m_nMicrovectorPowerCommandsWritten - nPowerCommandsBefore;
+
+			m_pDriverEnvironment->LogMessage("Wrote " + std::to_string(nMicrovectorArrayBufferSize)
+				+ " microvectors in " + std::to_string(dLoadDurationInMS) + " ms ("
+				+ std::to_string((dLoadDurationInMS * 1000.0) / (double)nMicrovectorArrayBufferSize)
+				+ " us/vector), " + std::to_string(nPowerCommands) + " power commands, "
+				+ std::to_string(nMicrovectorArrayBufferSize + nPowerCommands) + " list positions used");
+
+		}
+		else {
+
+			uint64_t nPrebufferCount = (uint64_t)((double)nMicrovectorArrayBufferSize * m_dMicrovectorStreamPrebufferFraction);
+			if (nPrebufferCount < (uint64_t)RTCCONTEXT_MICROVECTORSTREAM_MINPREBUFFER)
+				nPrebufferCount = (uint64_t)RTCCONTEXT_MICROVECTORSTREAM_MINPREBUFFER;
+			if (nPrebufferCount > nMicrovectorArrayBufferSize)
+				nPrebufferCount = nMicrovectorArrayBufferSize;
+
+			emitMicroVectorsToOpenList(pMicrovectorArrayBuffer, nPrebufferCount);
+
+			// The prologue and the prebuffer must be known-good before the laser starts on them.
+			m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+			// Start execution at the position SetStartList opened the list at, so the prologue
+			// (laser pins, delays, OIE trigger) runs first. Simultaneous loading and execution of
+			// the same list is explicitly supported (manual p. 447). Deliberately NOT routed
+			// through ExecuteList(), because that would issue a duplicate execution request.
+			// The microvector power cache remains valid across the prebuffer and append chunks.
+			m_pScanLabSDK->n_execute_list_pos(m_CardNo, m_nCurrentStartListIndex, m_nCurrentStartListPosition);
+			m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+			m_pMicrovectorStreamExecutionStarted->store(true);
+
+			// Clear again: the append loop below runs without per-command checks too.
+			m_pScanLabSDK->n_reset_error(m_CardNo, 0xffffffff);
+
+			uint64_t nMinObservedMargin = std::numeric_limits<uint64_t>::max();
+			uint64_t nWritten = nPrebufferCount;
+
+			while (nWritten < nMicrovectorArrayBufferSize) {
+
+				uint64_t nChunk = nMicrovectorArrayBufferSize - nWritten;
+				if (nChunk > (uint64_t)RTCCONTEXT_MICROVECTORSTREAM_CHECKINTERVAL)
+					nChunk = (uint64_t)RTCCONTEXT_MICROVECTORSTREAM_CHECKINTERVAL;
+
+				emitMicroVectorsToOpenList(pMicrovectorArrayBuffer + nWritten, nChunk);
+				nWritten += nChunk;
+
+				nMinObservedMargin = checkStreamMargin(nMinObservedMargin);
+			}
+
+			m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+
+			double dLoadDurationInMS = std::chrono::duration_cast<std::chrono::duration<double, std::milli>>
+				(std::chrono::steady_clock::now() - tLoadStartTime).count();
+			uint64_t nPowerCommands = m_nMicrovectorPowerCommandsWritten - nPowerCommandsBefore;
+
+			// The minimum observed margin is the main tuning indicator: close to MINMARGIN means
+			// PREBUFFERFRACTION has to grow; a large value means exposure time is wasted.
+			m_pDriverEnvironment->LogMessage("Wrote " + std::to_string(nMicrovectorArrayBufferSize)
+				+ " microvectors in " + std::to_string(dLoadDurationInMS) + " ms ("
+				+ std::to_string((dLoadDurationInMS * 1000.0) / (double)nMicrovectorArrayBufferSize)
+				+ " us/vector), " + std::to_string(nPowerCommands) + " power commands, "
+				+ std::to_string(nMicrovectorArrayBufferSize + nPowerCommands) + " list positions used"
+				+ " (streamed: execution started after " + std::to_string(nPrebufferCount)
+				+ " vectors, min margin " + std::to_string(nMinObservedMargin) + " list positions)");
 
 		}
 
-		m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
-
+		invalidateMicrovectorPowerCache();
 	}
+}
+
+
+void CRTCContext::SetMicrovectorStreamingEnabled(const bool bEnabled, const LibMCDriver_ScanLab_uint32 nMinLayerSize, const LibMCDriver_ScanLab_double dPrebufferFraction)
+{
+	uint64_t nEffectiveMinLayerSize = (nMinLayerSize == 0)
+		? (uint64_t)RTCCONTEXT_MICROVECTORSTREAM_MINLAYERSIZE
+		: (uint64_t)nMinLayerSize;
+
+	// Below the prebuffer minimum the prebuffer would cover the whole layer: execution would
+	// start only after everything is written and the margin checks would never run, so the
+	// overrun detector could not do its job. Clamp instead of failing.
+	if (nEffectiveMinLayerSize < (uint64_t)RTCCONTEXT_MICROVECTORSTREAM_MINPREBUFFER) {
+		m_pDriverEnvironment->LogMessage("Microvector streaming minimum layer size "
+			+ std::to_string(nEffectiveMinLayerSize) + " is below the prebuffer minimum, clamping to "
+			+ std::to_string((uint64_t)RTCCONTEXT_MICROVECTORSTREAM_MINPREBUFFER) + " microvectors.");
+		nEffectiveMinLayerSize = (uint64_t)RTCCONTEXT_MICROVECTORSTREAM_MINPREBUFFER;
+	}
+
+	double dEffectivePrebufferFraction = (dPrebufferFraction == 0.0)
+		? RTCCONTEXT_MICROVECTORSTREAM_PREBUFFERFRACTION
+		: dPrebufferFraction;
+
+	if ((dEffectivePrebufferFraction < 0.0) || (dEffectivePrebufferFraction > 1.0))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM,
+			"invalid microvector streaming prebuffer fraction: " + std::to_string(dPrebufferFraction));
+
+	// Deliberately accepted, not clamped: a too small fraction is the documented way to test
+	// the overrun detector (the layer aborts with a clear error instead of marking garbage).
+	if (dEffectivePrebufferFraction < RTCCONTEXT_MICROVECTORSTREAM_MINSAFEPREBUFFERFRACTION)
+		m_pDriverEnvironment->LogWarning("Microvector streaming prebuffer fraction "
+			+ std::to_string(dEffectivePrebufferFraction) + " is below the safe minimum of "
+			+ std::to_string(RTCCONTEXT_MICROVECTORSTREAM_MINSAFEPREBUFFERFRACTION)
+			+ " - streamed layers are likely to abort on the download margin check.");
+
+	m_bMicrovectorStreamingEnabled = bEnabled;
+	m_nMicrovectorStreamMinLayerSize = nEffectiveMinLayerSize;
+	m_dMicrovectorStreamPrebufferFraction = dEffectivePrebufferFraction;
 }
 
 
@@ -1260,6 +1764,67 @@ LibMCDriver_ScanLab_double CRTCContext::MapPowerWattsToPercent(const LibMCDriver
 }
 
 
+void CRTCContext::SetPiecewiseLinearDefocusCorrectionByPower(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint* pCalibrationPointsBuffer)
+{
+	if (nCalibrationPointsBufferSize == 0)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDDEFOCUSCORRECTIONTABLE, "defocus correction table must not be empty");
+
+	if (pCalibrationPointsBuffer == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
+	std::map<double, double> defocusMap;
+	for (uint64_t i = 0; i < nCalibrationPointsBufferSize; i++) {
+		const auto& point = pCalibrationPointsBuffer[i];
+		defocusMap.insert(std::make_pair(point.m_PowerInWatts, point.m_DefocusOffsetInMM));
+	}
+
+	auto pDefocusCorrection = std::make_shared<CRTCDefocusCorrectionByPower>();
+	pDefocusCorrection->setDefocusCorrectionTable(defocusMap);
+	m_pDefocusCorrectionByPower = pDefocusCorrection;
+}
+
+void CRTCContext::DisableDefocusCorrectionByPower()
+{
+	m_pDefocusCorrectionByPower = nullptr;
+}
+
+bool CRTCContext::DefocusCorrectionByPowerIsEnabled()
+{
+	return (m_pDefocusCorrectionByPower != nullptr);
+}
+
+void CRTCContext::GetDefocusCorrectionByPower(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint* pCalibrationPointsBuffer)
+{
+	if (m_pDefocusCorrectionByPower == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED, "defocus correction by power is not enabled");
+
+	auto& table = m_pDefocusCorrectionByPower->getTable();
+	size_t nTableSize = table.size();
+
+	if (pCalibrationPointsNeededCount != nullptr)
+		*pCalibrationPointsNeededCount = (LibMCDriver_ScanLab_uint64)nTableSize;
+
+	if (pCalibrationPointsBuffer != nullptr) {
+		if (nCalibrationPointsBufferSize < nTableSize)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_BUFFERTOOSMALL);
+
+		for (size_t i = 0; i < nTableSize; i++) {
+			pCalibrationPointsBuffer[i].m_PowerInWatts = table[i].x;
+			pCalibrationPointsBuffer[i].m_DefocusOffsetInMM = table[i].y;
+		}
+	}
+}
+
+LibMCDriver_ScanLab_double CRTCContext::MapDefocusCorrectionFromPower(const LibMCDriver_ScanLab_double dLaserPowerInWatts)
+{
+	if (m_pDefocusCorrectionByPower == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DEFOCUSCORRECTIONNOTENABLED, "defocus correction by power is not enabled");
+
+	double dDefocusOffset = 0.0;
+	m_pDefocusCorrectionByPower->mapPowerToDefocusOffset(dLaserPowerInWatts, dDefocusOffset);
+	return dDefocusOffset;
+}
+
 void CRTCContext::EnableSpatialLaserPowerModulation(const LibMCDriver_ScanLab::SpatialPowerModulationCallback pModulationCallback, const LibMCDriver_ScanLab_pvoid pUserData)
 {
 	if (pModulationCallback == nullptr)
@@ -1293,6 +1858,17 @@ void CRTCContext::DisableLineSubdivision()
 
 }
 
+void CRTCContext::SetMinimumJumpDistance(const LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM)
+{
+	if (!m_pJumpFilter->setMinimumJumpDistance(dMinimumJumpDistanceInMM))
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCE, "Invalid minimum jump distance: " + std::to_string(dMinimumJumpDistanceInMM));
+}
+
+LibMCDriver_ScanLab_double CRTCContext::GetMinimumJumpDistance()
+{
+	return m_pJumpFilter->getMinimumJumpDistance();
+}
+
 
 double CRTCContext::adjustLaserPowerCalibration(double dLaserPowerInPercent, double dPowerOffsetInPercent, double dPowerOutputScaling)
 {
@@ -1302,7 +1878,7 @@ double CRTCContext::adjustLaserPowerCalibration(double dLaserPowerInPercent, dou
 
 void CRTCContext::AddSetPower(const LibMCDriver_ScanLab_single fPowerInPercent)
 {
-	writePower(fPowerInPercent, false);
+	writePower(fPowerInPercent, false, false);
 }
 
 void CRTCContext::AddSetAnalogOut(const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_single fOutputValue)
@@ -1391,7 +1967,7 @@ void CRTCContext::AddSetDigitalOut(const LibMCDriver_ScanLab::eLaserPort eLaserP
 
 void CRTCContext::AddSetPowerForPIDControl(const LibMCDriver_ScanLab_single fPowerInPercent)
 {
-	writePower(fPowerInPercent, true);
+	writePower(fPowerInPercent, true, false);
 }
 
 
@@ -1458,8 +2034,6 @@ void CRTCContext::GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition
 	uint32_t Status = 0;
 	uint32_t Pos = 0;
 	m_pScanLabSDK->n_get_status(m_CardNo, &Status, &Pos);
-
-	//std::cout << "Free Variable: " << m_pScanLabSDK->n_get_value (m_CardNo, 40) << std::endl;
 
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -1753,9 +2327,30 @@ void CRTCContext::AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 n
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 	m_pScanLabSDK->n_write_io_port_mask_list(m_CardNo, nDigitalOutput, nOutputMask);
-	
+
 	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
 
+}
+
+
+LibMCDriver_ScanLab_uint32 CRTCContext::ReadDigitalInputs()
+{
+	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
+	// Only the lower 16 bits carry the digital input state (DIGITAL IN0..IN15).
+	uint32_t nInputValue = m_pScanLabSDK->n_read_io_port(m_CardNo) & 0x0000FFFFUL;
+	m_pScanLabSDK->checkLastErrorOfCard(m_CardNo);
+
+	return nInputValue;
+}
+
+bool CRTCContext::ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex)
+{
+	if (nBitIndex > 15)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM, "digital input bit index must be between 0 and 15");
+
+	uint32_t nInputValue = ReadDigitalInputs();
+
+	return (nInputValue & (1UL << nBitIndex)) != 0;
 }
 
 
@@ -2026,7 +2621,6 @@ void CRTCContext::EnableSkyWritingMode2(const LibMCDriver_ScanLab_double dTimela
 void CRTCContext::EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit)
 {
 
-	//std::cout << "Enabling Skywriting mode 3: timelag " << dTimelag << " laseronshift " << nLaserOnShift << " nprev " << nNPrev << " npost " << nNPost << " limit " << dLimit << std::endl;
 	if (dTimelag < 0.0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG);
 	if ((nLaserOnShift < (int64_t)INT32_MIN) || (nLaserOnShift > (int64_t)INT32_MAX))
@@ -2044,7 +2638,6 @@ void CRTCContext::EnableSkyWritingMode3(const LibMCDriver_ScanLab_double dTimela
 void CRTCContext::EnableSkyWritingMode4(const LibMCDriver_ScanLab_double dTimelag, const LibMCDriver_ScanLab_int64 nLaserOnShift, const LibMCDriver_ScanLab_int64 nNPrev, const LibMCDriver_ScanLab_int64 nNPost, const LibMCDriver_ScanLab_double dLimit)
 {
 
-	//std::cout << "Enabling Skywriting mode 4: timelag " << dTimelag << " laseronshift " << nLaserOnShift << " nprev " << nNPrev << " npost " << nNPost << " limit " << dLimit << std::endl;
 	if (dTimelag < 0.0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSKYWRITINGTIMELAG);
 	if ((nLaserOnShift < (int64_t)INT32_MIN) || (nLaserOnShift > (int64_t)INT32_MAX))
@@ -2113,7 +2706,9 @@ IRTCRecording* CRTCContext::PrepareRecording(const bool bKeepInMemory, const boo
 {
 	auto pCryptoContext = m_pDriverEnvironment->CreateCryptoContext();
 	std::string sUUID = pCryptoContext->CreateUUID();
-	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, m_dZCorrectionFactor, RTC_CHUNKSIZE_DEFAULT, bEnableScanheadFeedback, bEnableBacktransformation);
+	// The shared flag lets executeListWithRecording() know when the streamed microvector download
+	// has already started list execution, so it must not issue a second execute_list_pos.
+	auto pInstance = std::make_shared<CRTCRecordingInstance>(sUUID, m_pScanLabSDK, m_CardNo, m_dCorrectionFactor, m_dZCorrectionFactor, RTC_CHUNKSIZE_DEFAULT, bEnableScanheadFeedback, bEnableBacktransformation, m_pMicrovectorStreamExecutionStarted);
 
 	std::lock_guard<std::mutex> guard(m_RecordingsMutex);
 
@@ -2257,7 +2852,7 @@ uint32_t CRTCContext::saveRecordedDataBlock(std::ofstream& MyFile, uint32_t Data
 	uint32_t Error = 0;
 	uint32_t nDataLength = DataEnd - DataStart;
 
-	std::cout << "Saving RTC Data Block FROM " << DataStart << " TO " << DataEnd << std::endl;
+	m_pDriverEnvironment->LogMessage("Saving RTC data block from " + std::to_string(DataStart) + " to " + std::to_string(DataEnd));
 
 	if (nDataLength > 0) {
 
@@ -2301,8 +2896,6 @@ std::string return_current_time_and_date()
 
 void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
 {
-	//std::cout << "Executing list position" << std::endl;
-
 	m_pScanLabSDK->n_execute_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -2311,7 +2904,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 	uint32_t Increment = 100000;
 
 	std::string sFileName = "c:/temp/recording_out_" + return_current_time_and_date() + ".csv";
-	std::cout << "Creating recording file" << std::endl;
+	m_pDriverEnvironment->LogMessage("Creating RTC recording file: " + sFileName);
 
 	std::ofstream MyFile;
 	MyFile.open(sFileName, std::ios::out);
@@ -2320,7 +2913,7 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 
 	double CalibrationFactorXY = m_dCorrectionFactor;
 
-	std::cout << "Wait for measurement to start" << std::endl;
+	m_pDriverEnvironment->LogMessage("Waiting for RTC measurement to start");
 	do // Wait for measurement to start
 	{
 		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
@@ -2332,7 +2925,10 @@ void CRTCContext::ExecuteListWithRecording(const LibMCDriver_ScanLab_uint32 nLis
 
 		m_pScanLabSDK->n_get_status(m_CardNo, &Busy, &Position);
 		m_pScanLabSDK->n_measurement_status(m_CardNo, &MesBusy, &MesPosition);
-		std::cout << "RTC Status busy: " << Busy << " Position: " << Position << " Measure Busy: " << MesBusy << " Measure Position: " << MesPosition << std::endl;
+		m_pDriverEnvironment->LogMessage("RTC status: busy=" + std::to_string(Busy)
+			+ ", position=" + std::to_string(Position)
+			+ ", measurement busy=" + std::to_string(MesBusy)
+			+ ", measurement position=" + std::to_string(MesPosition));
 
 		if (MesPosition > LastPosition + Increment)
 		{
@@ -2401,7 +2997,6 @@ void CRTCContext::GetLaserOrigin(LibMCDriver_ScanLab_double& dOriginX, LibMCDriv
 
 void CRTCContext::SetLaserField(const LibMCDriver_ScanLab_double dMinX, const LibMCDriver_ScanLab_double dMinY, const LibMCDriver_ScanLab_double dMaxX, const LibMCDriver_ScanLab_double dMaxY)
 {	
-	//std::cout << "Setting laser field: " << dMinX << "/" << dMinY << " - " << dMaxX << "/" << dMaxY << std::endl;
 	if ((dMinX >= dMaxX) || (dMinY >= dMaxY))
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
 
@@ -2464,13 +3059,6 @@ void CRTCContext::updateLaserField(double dMinXInMM, double dMaxXInMM, double dM
 	int64_t nMinY = (int64_t)(round(dMinYInMM * m_dCorrectionFactor));
 	int64_t nMaxY = (int64_t)(round(dMaxYInMM * m_dCorrectionFactor));
 
-	/*std::cout << "updating laser field" << std::endl;
-	std::cout << " minx: " << nMinX << std::endl;
-	std::cout << " maxx: " << nMaxX << std::endl;
-	std::cout << " miny: " << nMinY << std::endl;
-	std::cout << " maxy: " << nMaxY << std::endl;*/
-
-
 	if (nMinX < SCANLAB_LASERFIELD_MINIMUMUNITS)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERFIELDCOORDINATES);
 	if (nMinY < SCANLAB_LASERFIELD_MINIMUMUNITS)
@@ -2518,8 +3106,6 @@ void CRTCContext::EnableMarkOnTheFly2D(const LibMCDriver_ScanLab_double dScaleXI
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINX);
 	if ((dAbsScaleY < (1.0 / 256.0)) || (dAbsScaleY > 16000.0))
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDENCODERSCALINGINY);
-
-	//std::cout << "n_set_fly_2d: card no:" << m_CardNo << " " << dScaleXInBitsPerEncoderStep << " / " << dScaleYInBitsPerEncoderStep << std::endl;
 
 	// Reset Laser position to be sure we are in scope.
 	m_pScanLabSDK->n_set_fly_2d(m_CardNo, 0.0, 0.0);
@@ -2682,6 +3268,34 @@ int64_t readSkywritingLaserOnShiftIn64thus(LibMCEnv::CToolpathLayer* pLayer, uin
 }
 
 
+void updateMinimumJumpDistanceOverride(LibMCEnv::CToolpathLayer* pLayer, uint32_t nSegmentIndex, double dBitsPerMM, CRTCJumpFilter* pJumpFilter)
+{
+	bool bHasValueInMM = pLayer->SegmentProfileHasValue(nSegmentIndex, RTCJUMPFILTER_PROFILENAMESPACE, RTCJUMPFILTER_PROFILEVALUE_MM);
+	bool bHasValueInBits = pLayer->SegmentProfileHasValue(nSegmentIndex, RTCJUMPFILTER_PROFILENAMESPACE, RTCJUMPFILTER_PROFILEVALUE_BITS);
+
+	double dValueInMM = 0.0;
+	if (bHasValueInMM)
+		dValueInMM = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, RTCJUMPFILTER_PROFILENAMESPACE, RTCJUMPFILTER_PROFILEVALUE_MM);
+
+	double dValueInBits = 0.0;
+	if (bHasValueInBits)
+		dValueInBits = pLayer->GetSegmentProfileDoubleValue(nSegmentIndex, RTCJUMPFILTER_PROFILENAMESPACE, RTCJUMPFILTER_PROFILEVALUE_BITS);
+
+	double dMinimumJumpDistanceInMM = 0.0;
+	switch (CRTCJumpFilter::resolveSegmentOverride(bHasValueInMM, dValueInMM, bHasValueInBits, dValueInBits, dBitsPerMM, dMinimumJumpDistanceInMM)) {
+	case eRTCJumpFilterOverride::Valid:
+		pJumpFilter->setSegmentOverride(dMinimumJumpDistanceInMM);
+		break;
+	case eRTCJumpFilterOverride::NoOverride:
+		pJumpFilter->clearSegmentOverride();
+		break;
+	case eRTCJumpFilterOverride::ProvidedTwice:
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_MINIMUMJUMPDISTANCEPROVIDEDTWICEINPROFILE);
+	default:
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMINIMUMJUMPDISTANCEINPROFILE, "Invalid minimum jump distance in profile of segment " + std::to_string(nSegmentIndex));
+	}
+}
+
 int64_t readSkywritingRunInPhaseInBits(LibMCEnv::CToolpathLayer* pLayer, uint32_t nSegmentIndex)
 {
 	// We think 1 Million should be enough, even if RTC Documentation says it can go up to 2^32
@@ -2780,9 +3394,7 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 		nCustomPostDelaySegmentAttributeID = (int32_t)pLayer->FindCustomSegmentAttributeID("http://schemas.scanlab.com/delay/2023/01", "postdelay");
 	}
 
-	//std::cout << "Custom predelay segment attribute " << nCustomPreDelaySegmentAttributeID << std::endl;
-	//std::cout << "Custom postdelay segment attribute " << nCustomPostDelaySegmentAttributeID << std::endl;
-
+	CRTCJumpFilterSegmentScope jumpFilterSegmentScope(m_pJumpFilter.get());
 
 	uint32_t nSegmentCount = pLayer->GetSegmentCount();
 	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
@@ -2857,6 +3469,8 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 			}
 
 			if (nLaserIndexOfSegment == nCurrentLaserIndex) {
+
+				updateMinimumJumpDistanceOverride(pLayer.get(), nSegmentIndex, m_dCorrectionFactor, m_pJumpFilter.get());
 
 				int64_t nSkywritingMode = pLayer->GetSegmentProfileIntegerValueDef(nSegmentIndex, "http://schemas.scanlab.com/skywriting/2023/01", "mode", 0);
 
@@ -2984,8 +3598,6 @@ void CRTCContext::addLayerToListEx(LibMCEnv::PToolpathLayer pLayer, eOIERecordin
 						if (nScanlabPostSegmentDelayInMicroseconds >= 0)
 							nPostSegmentDelayInTicks = (uint32_t)(nScanlabPostSegmentDelayInMicroseconds / 10);
 					}
-
-					//std::cout << "Post Segment Delay: " << nPostSegmentDelayInTicks << std::endl;
 
 					if (nPostSegmentDelayInTicks > 0) {
 						if (nPostSegmentDelayInTicks > RTCCONTEXT_MAXSEGMENTDELAY_ONEHOURIN100KHZ)

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<cfg:Configuration xmlns:cfg="com.autodesk.remotelpbf" Version="1.0" TypeName="Autodesk Remote LPBF Machine Settings">
+
+  <cfg:Simulation>
+    <cfg:SimulateLaser value="true" description="Simulate laser control" />
+  </cfg:Simulation>
+
+  <cfg:Process>
+    <cfg:ExposureTimeout value="300000" description="Exposure timeout (ms)" />
+    <cfg:WatchdogTimeout value="300000" description="Max ms between remote layer commands before auto-cancel (0 disables)" />
+  </cfg:Process>
+
+  <cfg:ScannerCard>
+    <cfg:Serial value="20065509" description="Scanner card serial number" />
+    <cfg:IPAddress value="141.60.143.95" description="Scanner Ethernet address (empty for PCI cards)" />
+    <cfg:Netmask value="255.255.255.0" description="Scanner netmask" />
+    <cfg:Port value="49374" description="Scanner port" />
+    <cfg:Timeout value="1000" description="Connection timeout (ms)" />
+    <cfg:LaserOnDelay value="100" description="Laser on delay (microseconds)" />
+    <cfg:LaserOffDelay value="100" description="Laser off delay (microseconds)" />
+    <cfg:MarkDelay value="570" description="Mark delay (microseconds)" />
+    <cfg:JumpDelay value="1400" description="Jump delay (microseconds)" />
+    <cfg:PolygonDelay value="280" description="Polygon delay (microseconds)" />
+    <cfg:LaserOriginX value="100" description="Laser origin X (mm)" />
+    <cfg:LaserOriginY value="125" description="Laser origin Y (mm)" />
+    <cfg:LaserFieldMinX value="0" description="Laser field min X (mm)" />
+    <cfg:LaserFieldMinY value="0" description="Laser field min Y (mm)" />
+    <cfg:LaserFieldMaxX value="200" description="Laser field max X (mm)" />
+    <cfg:LaserFieldMaxY value="250" description="Laser field max Y (mm)" />
+    <cfg:TransformationAngle value="90.0" description="Transformation angle (degree)" />
+    <cfg:TransformationOffsetX value="0.000" description="Transformation offset X (mm)" />
+    <cfg:TransformationOffsetY value="0.002" description="Transformation offset Y (mm)" />
+    <cfg:TransformationScaleX value="1.0" description="Transformation scale X" />
+    <cfg:TransformationScaleY value="1.0" description="Transformation scale Y" />
+  </cfg:ScannerCard>
+
+</cfg:Configuration>

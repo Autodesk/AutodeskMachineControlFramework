@@ -153,6 +153,62 @@ namespace AMC {
 		return iIter->second;
 	}
 
+	void CToolpathHandler::disablePart(const std::string& sStreamUUID, const std::string& sPartUUID)
+	{
+		std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+		std::string sNormalizedPartUUID = AMCCommon::CUtils::normalizeUUIDString(sPartUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_DisabledPartsMutex);
+		m_DisabledParts[sNormalizedStreamUUID].insert(sNormalizedPartUUID);
+		m_DisabledPartsVersions[sNormalizedStreamUUID]++;
+	}
+
+	void CToolpathHandler::enableAllParts(const std::string& sStreamUUID)
+	{
+		std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_DisabledPartsMutex);
+		m_DisabledParts.erase(sNormalizedStreamUUID);
+		m_DisabledPartsVersions[sNormalizedStreamUUID]++;
+	}
+
+	bool CToolpathHandler::partIsDisabled(const std::string& sStreamUUID, const std::string& sPartUUID)
+	{
+		std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+		std::string sNormalizedPartUUID = AMCCommon::CUtils::normalizeUUIDString(sPartUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_DisabledPartsMutex);
+		auto iIter = m_DisabledParts.find(sNormalizedStreamUUID);
+		if (iIter == m_DisabledParts.end())
+			return false;
+
+		return (iIter->second.find(sNormalizedPartUUID) != iIter->second.end());
+	}
+
+	std::set<std::string> CToolpathHandler::getDisabledParts(const std::string& sStreamUUID)
+	{
+		std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_DisabledPartsMutex);
+		auto iIter = m_DisabledParts.find(sNormalizedStreamUUID);
+		if (iIter == m_DisabledParts.end())
+			return std::set<std::string>();
+
+		return iIter->second;
+	}
+
+	uint64_t CToolpathHandler::getDisabledPartsVersion(const std::string& sStreamUUID)
+	{
+		std::string sNormalizedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
+
+		std::lock_guard<std::mutex> lockGuard(m_DisabledPartsMutex);
+		auto iIter = m_DisabledPartsVersions.find(sNormalizedStreamUUID);
+		if (iIter == m_DisabledPartsVersions.end())
+			return 0;
+
+		return iIter->second;
+	}
+
 
 }
 

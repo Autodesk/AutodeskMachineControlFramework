@@ -58,9 +58,9 @@ namespace AMC {
 
 		virtual ~CLanguageString();
 		
-		std::string getStringIdentifier ();
+		std::string getStringIdentifier () const;
 		
-		std::string getCustomValue ();
+		std::string getCustomValue () const;
 
 		std::string getTranslatedString (CLanguageDefinition * pLanguageDefinition);
 

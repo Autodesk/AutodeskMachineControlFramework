@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_jsonwriter.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 using namespace AMC;
 
@@ -107,6 +108,46 @@ void CJSONWriterObject::copyFromObject(const rapidjson::Value& objectValue)
 	m_Value.CopyFrom(objectValue, m_allocator);
 }
 
+void CJSONWriterObject::addMembersFrom(const rapidjson::Value& objectValue)
+{
+	if (!objectValue.IsObject())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	for (auto iMember = objectValue.MemberBegin(); iMember != objectValue.MemberEnd(); iMember++) {
+		rapidjson::Value nameValue(iMember->name, m_allocator);
+		rapidjson::Value memberValue(iMember->value, m_allocator);
+		m_Value.AddMember(nameValue, memberValue, m_allocator);
+	}
+}
+
+const rapidjson::Value& CJSONWriterObject::getValue() const
+{
+	return m_Value;
+}
+
+void CJSONWriterObject::addRawJSON(const std::string& sName, const std::string& sJSON)
+{
+	rapidjson::Document parsedDocument;
+	parsedDocument.Parse(sJSON.c_str());
+	if (parsedDocument.HasParseError())
+		throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEJSON, sName);
+
+	rapidjson::Value nameValue;
+	nameValue.SetString(sName.c_str(), m_allocator);
+	rapidjson::Value copiedValue(parsedDocument, m_allocator);
+
+	m_Value.AddMember(nameValue, copiedValue, m_allocator);
+}
+
+void CJSONWriterObject::addNull(const std::string& sName)
+{
+	rapidjson::Value nameValue;
+	nameValue.SetString(sName.c_str(), m_allocator);
+	rapidjson::Value nullValue(rapidjson::kNullType);
+
+	m_Value.AddMember(nameValue, nullValue, m_allocator);
+}
+
 
 
 CJSONWriterArray::CJSONWriterArray(CJSONWriter& writer)
@@ -150,6 +191,11 @@ void CJSONWriterArray::addObject(CJSONWriterObject& object)
 void CJSONWriterArray::addArray(CJSONWriterArray& array)
 {
 	m_Value.PushBack(array.m_Value, m_allocator);
+}
+
+void CJSONWriterArray::copyFromArray(const rapidjson::Value& arrayValue)
+{
+	m_Value.CopyFrom(arrayValue, m_allocator);
 }
 
 
@@ -229,6 +275,11 @@ void CJSONWriter::addArray(const std::string& sName, CJSONWriterArray& array)
 void CJSONWriter::copyFromDocument(const rapidjson::Document& document)
 {
 	m_document.CopyFrom(document, m_document.GetAllocator());
+}
+
+const rapidjson::Document& CJSONWriter::getDocument() const
+{
+	return m_document;
 }
 
 

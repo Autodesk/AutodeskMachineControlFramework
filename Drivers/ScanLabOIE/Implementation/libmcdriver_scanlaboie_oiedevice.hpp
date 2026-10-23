@@ -103,6 +103,9 @@ protected:
 	bool m_bIsConnected;
 	uint64_t m_nPacketReceiveCounter;
 	uint64_t m_nPacketReceiveSkipCounter;
+	std::atomic<uint64_t> m_nPacketCallbackCounter;
+	std::atomic<uint64_t> m_nPacketRecordedCounter;
+	std::atomic<uint64_t> m_nPacketSkippedCounter;
 
 	std::vector<POIEDeviceApp> m_AppList;
 	LibMCDriver_ScanLabOIE::eOIEDeviceDriverType m_DeviceDriverType;

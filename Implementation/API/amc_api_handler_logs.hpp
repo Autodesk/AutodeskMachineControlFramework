@@ -41,6 +41,8 @@ namespace AMC {
 	class CAPIHandler_Logs : public CAPIHandler {
 	private:
 		PLogger m_pLogger;
+
+		void handleListLogsRequest(CJSONWriter& writer, uint32_t nStartID);
 			
 	public:
 

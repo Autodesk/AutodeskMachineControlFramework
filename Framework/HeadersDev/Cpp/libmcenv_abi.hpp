@@ -1858,6 +1858,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsenderuuid(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderUUIDBufferSize, LibMCEnv_uint32* pSenderUUIDNeededChars, char * pSenderUUIDBuffer);
 
 /**
+* checks whether the UI control that triggered the event declares a given tag in its space-separated tag list.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pTag - Tag to check for.
+* @param[out] pTagExists - True if the sender declares the given tag.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_senderhastag(LibMCEnv_UIEnvironment pUIEnvironment, const char * pTag, bool * pTagExists);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.

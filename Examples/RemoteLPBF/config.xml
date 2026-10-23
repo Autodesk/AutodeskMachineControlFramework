@@ -1,0 +1,852 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02" xmlns:i18n="http://schemas.autodesk.com/amc/internationalization/2023/08" client="svelte">
+	<services threadcount="32"/>
+
+  <internationalization default="en">
+		<language identifier="en" name="English" resource="language_english" />
+		<language identifier="de" name="Deutsch" resource="language_german" />
+  </internationalization>
+
+  <accesscontrol>
+
+    <defaultusers>
+      <defaultuser name="test" salt="f735faa2ac49ac0a68dbf41d9cd57cfb426ef91eb19726afd8f075ac625cccb2" passwordhash="556080937385d8eb21ea0e8707d7cf3e94b79ed234596ba8a2ac98da1ff4fee3" description="This is a test user." />
+    </defaultusers>
+
+    <permissions>
+      <permission identifier="permission_view_builds" displayname="View Builds" description="Can view build files on machine." />
+      <permission identifier="permission_start_build" displayname="Start Build" description="Can start a new build on machine." />
+      <permission identifier="permission_user_management" displayname="User Management" description="Can create/edit local users." />
+      <permission identifier="permission_remote_execution" displayname="Remote Execution" description="Can drive layer execution over the REST interface." />
+      <permission identifier="permission_acknowledgealerts" displayname="Acknowledge Alerts" description="Can acknowledge alerts." />
+      <permission identifier="permission_modify_machine_configuration" displayname="Modify Machine Configuration" description="Can create, activate and reset machine configuration versions." />
+    </permissions>
+
+
+    <roles default="operator">
+
+      <role identifier="observer" displayname="Observer" description="Machine Observer - can not change anything">
+        <permission identifier="permission_view_builds" />
+      </role>
+
+      <role identifier="remotecontroller" displayname="Remote Controller" description="External master (PLC/MES) driving execution over REST">
+        <permission identifier="permission_view_builds" />
+        <permission identifier="permission_remote_execution" />
+      </role>
+
+      <role identifier="operator" displayname="Operator" description="Machine Operator Access">
+        <permission identifier="permission_view_builds" />
+        <permission identifier="permission_start_build" />
+        <permission identifier="permission_remote_execution" />
+      </role>
+
+      <role identifier="administrator" displayname="Administrator" description="Machine Administration Access">
+        <permission identifier="permission_view_builds" />
+        <permission identifier="permission_start_build" />
+        <permission identifier="permission_remote_execution" />
+        <permission identifier="permission_user_management" />
+        <permission identifier="permission_modify_machine_configuration" />
+      </role>
+
+    </roles>
+    
+    
+  </accesscontrol>
+
+  <alerts>
+    <alert identifier="lasernotready"	level="criticalerror"	description="Laser is not ready" acknowledgepermission="permission_acknowledgealerts" />
+    <alert identifier="lasertemperature"	level="warning"	description="Laser temperature out of range" acknowledgepermission="permission_acknowledgealerts" />
+    <alert identifier="exposurefailed"	level="fatalerror"	description="Layer exposure failed" acknowledgepermission="permission_acknowledgealerts" />
+    <alert identifier="watchdogtimeout"	level="warning"	description="Remote watchdog timed out - execution canceled" acknowledgepermission="permission_acknowledgealerts" />
+  </alerts>
+
+  <driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
+
+  <statemachine name="main" description="Main System" initstate="waitforinit" failedstate="fatalerror" library="plugin_main">
+
+		<!-- Build/job information for the currently selected and/or executing job. -->
+		<parametergroup name="jobinfo" description="Job Information">
+			<parameter name="jobname" description="Job Name" default="Job Name" type="string"/>
+			<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string"/>
+			<parameter name="layercount" description="Layer Count" default="0" type="int"/>
+			<parameter name="currentlayer" description="Current Layer (number of exposed layers)" default="0" type="int"/>
+			<parameter name="totalheight" description="Total Height" default="0" type="double" />
+			<parameter name="currentheight" description="Current Height" default="0" type="double"/>
+			<parameter name="printinprogress" description="Execution is in progress" default="0" type="bool"/>
+			<parameter name="exposuretimeout" description="Exposure Timeout (ms)" default="300000" type="int" configschema="com.autodesk.remotelpbf" configpath="Process/ExposureTimeout"/>
+		</parametergroup>
+
+		<parametergroup name="ui" description="User interface">
+			<parameter name="currentlayerdisplay" description="Current Layer Display" default="" type="string"/>
+			<parameter name="currentheightdisplay" description="Current Height Display" default="" type="string"/>
+			<parameter name="currentlayerheightdisplay" description="Current Layer / Height Display" default="---" type="string"/>
+			<parameter name="executionstatusdisplay" description="Human-readable execution status" default="Idle" type="string"/>
+			<parameter name="build_canbecanceled" description="Execution can be canceled" default="0" type="bool"/>
+			<parameter name="build_canbestarted" description="Execution can be started" default="1" type="bool"/>
+			<!-- Per-subsystem error flags driving the Overview tab's recovery UI. system_haserror
+			     gates the whole recovery section (shown when any subsystem is in error). -->
+			<parameter name="system_haserror" description="Any subsystem reported an error" default="0" type="bool"/>
+			<parameter name="main_haserror" description="Main system reported an error" default="0" type="bool"/>
+			<parameter name="laser_haserror" description="Laser system reported an error" default="0" type="bool"/>
+		</parametergroup>
+
+		<parametergroup name="configuration" description="Machine Configuration">
+			<parameter name="simulatelaser" description="Simulate laser control" default="1" type="bool" configschema="com.autodesk.remotelpbf" configpath="Simulation/SimulateLaser" />
+		</parametergroup>
+
+		<!-- Scanlab scanner card settings, mirrored from the machine configuration (ScannerCard/*).
+		     The laser state machine reads them through derived parameters at initialisation. -->
+		<parametergroup name="cardconfig" description="Scanner Card Config">
+			<parameter name="serial" description="Serial" default="20065509" type="int" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/Serial"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="141.60.143.95" type="string" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/IPAddress"/>
+			<parameter name="netmask" description="Scanner Netmask" default="255.255.255.0" type="string" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/Netmask"/>
+			<parameter name="port" description="Port" default="49374" type="int" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/Port"/>
+			<parameter name="timeout" description="Connection timeout" default="1000" type="int" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/Timeout"/>
+			<parameter name="laserondelay" description="Laser On Delay in microseconds" default="100" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserOnDelay"/>
+			<parameter name="laseroffdelay" description="Laser Off Delay in microseconds" default="100" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserOffDelay"/>
+			<parameter name="markdelay" description="Mark Delay in microseconds" default="570" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/MarkDelay"/>
+			<parameter name="jumpdelay" description="Jump Delay in microseconds" default="1400" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/JumpDelay"/>
+			<parameter name="polygondelay" description="Polygon Delay in microseconds" default="280" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/PolygonDelay"/>
+			<parameter name="laseroriginx" description="Laser Origin X" default="100" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserOriginX"/>
+			<parameter name="laseroriginy" description="Laser Origin Y" default="125" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserOriginY"/>
+			<parameter name="laserfield_minx" description="Laser Field Min X" default="0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserFieldMinX"/>
+			<parameter name="laserfield_miny" description="Laser Field Min Y" default="0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserFieldMinY"/>
+			<parameter name="laserfield_maxx" description="Laser Field Max X" default="200" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserFieldMaxX"/>
+			<parameter name="laserfield_maxy" description="Laser Field Max Y" default="250" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/LaserFieldMaxY"/>
+			<parameter name="transformation_angle" description="Transformation Angle (in degree)" default="90.0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationAngle"/>
+			<parameter name="transformation_offsetx" description="Transformation Offset X (in mm)" default="0.000" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationOffsetX"/>
+			<parameter name="transformation_offsety" description="Transformation Offset Y (in mm)" default="0.002" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationOffsetY"/>
+			<parameter name="transformation_scalex" description="Transformation Scale X" default="1.0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationScaleX"/>
+			<parameter name="transformation_scaley" description="Transformation Scale Y" default="1.0" type="double" configschema="com.autodesk.remotelpbf" configpath="ScannerCard/TransformationScaleY"/>
+		</parametergroup>
+
+		<!-- Read-only summary of the persistent machine configuration, populated at init and
+		     whenever the active version changes (see applyMachineConfigurationToRuntime). -->
+		<parametergroup name="configstatus" description="Machine Settings Configuration Status">
+			<parameter name="activeversiondisplay" description="Active configuration version" default="---" type="string" />
+			<parameter name="activetimestamp" description="Active configuration created" default="---" type="string" />
+			<parameter name="activeuser" description="Active configuration author" default="---" type="string" />
+			<parameter name="applied" description="Machine configuration has been applied at least once" default="0" type="bool" />
+		</parametergroup>
+
+		<!-- Remote-driven execution state. Once execution is active, an external master triggers
+		     one layer exposure at a time over the REST external-event interface. -->
+		<parametergroup name="execution" description="Remote Execution State">
+			<parameter name="executionactive" description="An execution is currently active" default="0" type="bool"/>
+			<parameter name="exposing" description="A layer is currently being exposed" default="0" type="bool"/>
+			<parameter name="cancelrequested" description="A cancel was latched during exposure" default="0" type="bool"/>
+			<parameter name="currentlayer" description="Index of the layer requested for / being exposed" default="-1" type="int"/>
+			<parameter name="lastexposedlayer" description="Index of the last successfully exposed layer" default="-1" type="int"/>
+			<parameter name="exposurecount" description="Number of layer exposures completed in this execution" default="0" type="int"/>
+			<parameter name="lasterror" description="Laser subsystem is in error" default="0" type="bool"/>
+			<parameter name="watchdogtimeout" description="Max ms between layer commands before auto-cancel (0 disables)" default="300000" type="int" configschema="com.autodesk.remotelpbf" configpath="Process/WatchdogTimeout"/>
+			<parameter name="waitingsince" description="Global timer stamp (ms) when the current wait started" default="0" type="int"/>
+			<parameter name="watchdogremainingms" description="Remaining watchdog time in ms" default="0" type="int"/>
+		</parametergroup>
+
+		<!-- Operator-triggered exposure of a single layer from the build library preview, outside
+		     of an execution. Only possible while main is idle. -->
+		<parametergroup name="singleexposure" description="Single Layer Exposure">
+			<parameter name="jobuuid" description="Build job of the requested layer" default="00000000-0000-0000-0000-000000000000" type="string"/>
+			<parameter name="layerindex" description="Requested layer index" default="0" type="int"/>
+		</parametergroup>
+
+		<!-- Operator selects a build and starts execution. jobuuid identifies the build job. -->
+		<signaldefinition name="signal_startexecution">
+			<parameter name="jobuuid" type="string"/>
+		</signaldefinition>
+
+		<!-- Remote master requests exposure of a specific layer. Any layer of the build can be
+		     requested in any order (also repeatedly), as long as the laser is OK; the result is
+		     returned synchronously to the caller, while the exposure itself runs asynchronously. -->
+		<signaldefinition name="signal_exposelayer">
+			<parameter name="layerindex" type="int"/>
+			<result name="accepted" type="bool"/>
+			<result name="errormessage" type="string"/>
+		</signaldefinition>
+
+		<!-- Operator requests exposure of a single layer of a build (the layer shown in the build
+		     library preview). Accepted only while idle; the exposure runs asynchronously. -->
+		<signaldefinition name="signal_exposesinglelayer">
+			<parameter name="jobuuid" type="string"/>
+			<parameter name="layerindex" type="int"/>
+			<result name="accepted" type="bool"/>
+			<result name="errormessage" type="string"/>
+		</signaldefinition>
+
+		<!-- Remote master ends the execution early (before the last layer). -->
+		<signaldefinition name="signal_finishexecution">
+		</signaldefinition>
+
+		<!-- Remote master is still alive between layers: re-arms the watchdog while waiting. -->
+		<signaldefinition name="signal_keepalive">
+		</signaldefinition>
+
+		<!-- Cancel the running execution (from UI or REST). Cancelable, not pausable. -->
+		<signaldefinition name="signal_cancelbuild">
+		</signaldefinition>
+
+		<!-- Recovery: raised from the UI (or main) to clear a fatal error and re-run initialisation. -->
+		<signaldefinition name="signal_initialize_again">
+			<result name="success" type="bool"/>
+		</signaldefinition>
+
+		<signaldefinition name="signal_changesimulationparameters" publish="1">
+			<parameter name="simulatelaser" type="bool"/>
+		</signaldefinition>
+
+		<!-- Raised by the machine configuration page after a version is activated or saved,
+		     so the main state machine re-applies the active configuration to live parameters. -->
+		<signaldefinition name="signal_reloadconfiguration" publish="1">
+		</signaldefinition>
+
+		<state name="waitforinit" repeatdelay="10">
+			<outstate target="init"/>
+		</state>
+
+		<state name="init" repeatdelay="10">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="idle" repeatdelay="10">
+			<outstate target="idle"/>
+			<outstate target="initexecution"/>
+			<outstate target="singleexposure"/>
+		</state>
+
+		<state name="singleexposure" repeatdelay="50">
+			<outstate target="idle"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+		<state name="initexecution" repeatdelay="50">
+			<outstate target="execution_waiting"/>
+			<outstate target="cancelexecution"/>
+		</state>
+
+		<state name="execution_waiting" repeatdelay="50">
+			<outstate target="execution_waiting"/>
+			<outstate target="execution_exposing"/>
+			<outstate target="finishexecution"/>
+			<outstate target="cancelexecution"/>
+		</state>
+
+		<state name="execution_exposing" repeatdelay="50">
+			<outstate target="execution_waiting"/>
+			<outstate target="finishexecution"/>
+			<outstate target="cancelexecution"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+		<state name="finishexecution" repeatdelay="100">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="cancelexecution" repeatdelay="100">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="1000">
+			<outstate target="waitforinit"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+
+	<statemachine name="laser" description="Laser System" initstate="waitforinit" failedstate="fatalerror" library="plugin_laser">
+
+		<parametergroup name="cardconfig" description="Scanner Card Config">
+			<parameter name="cardtype" description="Scanner Card Type" default="scanlab" type="string"/>
+			<derivedparameter name="configurationapplied" statemachine="main" group="configstatus" parameter="applied"/>
+			<derivedparameter name="simulatelaser" statemachine="main" group="configuration" parameter="simulatelaser"/>
+			<derivedparameter name="serial" statemachine="main" group="cardconfig" parameter="serial"/>
+			<derivedparameter name="ipaddress" statemachine="main" group="cardconfig" parameter="ipaddress"/>
+			<derivedparameter name="netmask" statemachine="main" group="cardconfig" parameter="netmask"/>
+			<derivedparameter name="port" statemachine="main" group="cardconfig" parameter="port"/>
+			<derivedparameter name="timeout" statemachine="main" group="cardconfig" parameter="timeout"/>
+			<derivedparameter name="laserondelay" statemachine="main" group="cardconfig" parameter="laserondelay"/>
+			<derivedparameter name="laseroffdelay" statemachine="main" group="cardconfig" parameter="laseroffdelay"/>
+			<derivedparameter name="markdelay" statemachine="main" group="cardconfig" parameter="markdelay"/>
+			<derivedparameter name="jumpdelay" statemachine="main" group="cardconfig" parameter="jumpdelay"/>
+			<derivedparameter name="polygondelay" statemachine="main" group="cardconfig" parameter="polygondelay"/>
+			<derivedparameter name="laseroriginx" statemachine="main" group="cardconfig" parameter="laseroriginx"/>
+			<derivedparameter name="laseroriginy" statemachine="main" group="cardconfig" parameter="laseroriginy"/>
+			<derivedparameter name="laserfield_minx" statemachine="main" group="cardconfig" parameter="laserfield_minx"/>
+			<derivedparameter name="laserfield_miny" statemachine="main" group="cardconfig" parameter="laserfield_miny"/>
+			<derivedparameter name="laserfield_maxx" statemachine="main" group="cardconfig" parameter="laserfield_maxx"/>
+			<derivedparameter name="laserfield_maxy" statemachine="main" group="cardconfig" parameter="laserfield_maxy"/>
+			<derivedparameter name="transformation_angle" statemachine="main" group="cardconfig" parameter="transformation_angle"/>
+			<derivedparameter name="transformation_offsetx" statemachine="main" group="cardconfig" parameter="transformation_offsetx"/>
+			<derivedparameter name="transformation_offsety" statemachine="main" group="cardconfig" parameter="transformation_offsety"/>
+			<derivedparameter name="transformation_scalex" statemachine="main" group="cardconfig" parameter="transformation_scalex"/>
+			<derivedparameter name="transformation_scaley" statemachine="main" group="cardconfig" parameter="transformation_scaley"/>
+		</parametergroup>
+
+		<parametergroup name="powercalibration" description="Laser Power Calibration">
+			<parameter name="calibrationsetpoint0" description="0% laser power (W)" default="0" type="double"/>
+			<parameter name="calibrationsetpoint100" description="100% laser power (W)" default="200" type="double"/>
+		</parametergroup> 
+
+
+		<parametergroup name="correction" description="Scanlab Correction Data">
+			<parameter name="resourcename" description="Correction resource name" default="d2_720r_p" type="string"/>
+			<parameter name="tableindex" description="Correction table index" default="1" type="int"/>
+			<parameter name="dimension" description="Correction file dimension" default="3" type="int"/>
+			<parameter name="tablenumbera" description="Table number head A" default="1" type="int"/>
+			<parameter name="tablenumberb" description="Table number head B" default="0" type="int"/>
+			<parameter name="correctionfactor" description="Correction Factor" default="3088.0" type="double"/>			
+		</parametergroup>
+
+		<parametergroup name="lasersignaltiming" description="CO2 Laser Signal Timing">
+			<parameter name="laseronsignal" description="Laser On GPIO State" default="0" type="bool"/>
+			<parameter name="enableleadtime" description="Wait after switching the laser enable pin on before a layer is drawn (in Milliseconds)" default="0" type="int"/>
+			<parameter name="pulsehalfperiod" description="Laser Pulse Half Period (in Microseconds)" default="25" type="double"/>
+			<parameter name="pulselength" description="Default Laser Pulse Length (in Microseconds)" default="5" type="double"/>
+			<parameter name="standbyhalfperiod" description="Standby Tickle Signal Half Period (in Microseconds)" default="100" type="double"/>
+			<parameter name="standbylength" description="Standby Tickle Signal Length (in Microseconds)" default="1" type="double"/>
+		</parametergroup>
+
+		<parametergroup name="laserfeedback" description="Laser Feedback Status">
+			<parameter name="laserok" description="Laser OK Status (DI0)" default="1" type="bool"/>
+			<parameter name="temperatureok" description="Temperature OK Status (DI1)" default="1" type="bool"/>
+			<parameter name="laserdigitalinput" description="Laser Digital Input (DI0-DI15)" default="0" type="int"/>
+		</parametergroup>
+
+		<driverparametergroup name="sdkstate" description="Scanlab SDK State" driver="scanlab"/>
+
+		<!-- Recovery: raised from the UI to clear a fatal error and re-run initialisation. -->
+		<signaldefinition name="signal_initialize_again">
+			<result name="success" type="bool"/>
+		</signaldefinition>
+
+		<signaldefinition name="signal_exposure">
+			<parameter name="jobuuid" type="string"/>
+			<parameter name="layerindex" type="int"/>
+			<parameter name="timeout" type="int"/>
+			<result name="success" type="bool"/>
+		</signaldefinition>
+
+		<signaldefinition name="signal_changelaseronoff">
+			<parameter name="laseron" type="bool"/>
+			<result name="success" type="bool"/>
+		</signaldefinition>
+
+		<state name="waitforinit" repeatdelay="100">
+			<outstate target="waitforinit"/>
+			<outstate target="init"/>
+		</state>
+
+		<state name="init" repeatdelay="100">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="idle" repeatdelay="50">
+			<outstate target="idle"/>
+			<outstate target="exposure"/>
+			<outstate target="laserpowerchange"/>
+		</state>
+
+		<state name="exposure" repeatdelay="50">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="laserpowerchange" repeatdelay="50">
+			<outstate target="idle"/>
+		</state>
+		
+
+		<state name="fatalerror" repeatdelay="5000">
+			<outstate target="waitforinit"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+
+
+	<userinterface appname="Autodesk Remote LPBF" copyright="2026 Autodesk Inc." mainpage="importbuildjob" library="plugin_userinterface">
+
+		<logo resource="ui_logo" aspectratio="5.7"/>
+
+		<login
+			backgroundresource="login_background"
+			welcomemessage="Please log in with your credentials."
+		/>
+
+		<colors>
+			<!-- Autodesk brand. A dark slate primary (mid-lightness so the client's
+			     dark-mode derivation neither blows it out nor crushes it) with the
+			     Autodesk-blue accent (#0696D7). Reads well with white content
+			     (icons/captions) in both light and dark themes. -->
+			<color name="primary" red="0.145" green="0.161" blue="0.184"/>
+			<color name="secondary" red="0.3" green="0.3" blue="0.3"/>
+			<color name="accent" red="0.024" green="0.588" blue="0.843"/>
+			<color name="error" red="0.867" green="0.133" blue="0.133"/>
+		</colors>
+
+		<!-- Per-client-session variables. Every browser session has its own copy, so selecting a
+		     build in one client does not change the build library of another client, and a new
+		     login starts with no build selected. -->
+		<sessionvariables>
+			<parameter name="build_isselected" type="bool" default="0" description="A build job is currently selected/loaded in the build library"/>
+			<parameter name="selectedbuilduuid" type="uuid" default="00000000-0000-0000-0000-000000000000" description="UUID of the currently selected build job"/>
+
+			<!-- Part selected in the "Parts" tab of the process page. Filled by the onselectprocesspart
+			     event and reset for all sessions whenever a build is started. -->
+			<parameter name="processpart_isselected" type="bool" default="0" description="A part is selected in the process page part list"/>
+			<parameter name="processpart_candisable" type="bool" default="0" description="The selected process part can be disabled"/>
+			<parameter name="processpart_isdisabled" type="bool" default="0" description="The selected process part has been disabled"/>
+			<parameter name="processpart_uuid" type="uuid" default="00000000-0000-0000-0000-000000000000" description="Build item UUID of the selected process part"/>
+			<parameter name="processpart_name" type="string" default="" description="Name of the selected process part"/>
+			<parameter name="processpart_number" type="string" default="" description="Part number of the selected process part"/>
+			<parameter name="processpart_meshuuid" type="string" default="" description="Mesh UUID of the selected process part"/>
+			<parameter name="processpart_buildname" type="string" default="" description="Name of the build job of the selected process part"/>
+			<parameter name="processpart_status" type="string" default="" description="Human readable status of the selected process part"/>
+			<parameter name="processpart_confirmname" type="string" default="" description="Name typed into the disable-part confirmation dialog"/>
+
+			<!-- Name of a new machine configuration version, typed into the machine settings dialog.
+			     Reset to "" whenever the dialog is opened. -->
+			<parameter name="configversion_name" type="string" default="" description="Name typed for a new configuration version"/>
+			<parameter name="configreset_confirmation" type="string" default="" description="Confirmation text typed for a factory reset"/>
+		</sessionvariables>
+
+		<!-- Read-only details of the part selected in the execution page "Parts" tab. All values come
+		     from the processpart_* session variables, filled by the onselectprocesspart event. -->
+		<dialog name="partinfodialog">
+			<content name="pidlgcontent" title="Part Information">
+
+				<statusbanner name="pidisabledbanner" severity="warning" title="Part disabled" description="This part has been disabled. It is not exposed in any subsequent layer of this build." sync:visible="session.processpart_isdisabled"/>
+
+				<form name="pidlgform">
+					<edit name="name" caption="Part name" sync:value="session.processpart_name" readonly="1"/>
+					<edit name="number" caption="Part number" sync:value="session.processpart_number" readonly="1"/>
+					<edit name="status" caption="Status" sync:value="session.processpart_status" readonly="1"/>
+					<edit name="build" caption="Build" sync:value="session.processpart_buildname" readonly="1"/>
+					<edit name="uuid" caption="Part UUID" sync:value="session.processpart_uuid" readonly="1"/>
+					<edit name="meshuuid" caption="Mesh UUID" sync:value="session.processpart_meshuuid" readonly="1"/>
+				</form>
+
+				<buttongroup name="pidlgactions" distribution="equal">
+					<button name="close" caption="Close" event="onclosedialog" variant="primary"/>
+				</buttongroup>
+
+			</content>
+		</dialog>
+
+
+		<!-- Confirmation for disabling the selected process part. The operator has to type the part
+		     name; OK only disables the part if the typed name matches. Both buttons send the typed
+		     name back so the field can be cleared the next time the dialog opens. -->
+		<dialog name="disablepartdialog">
+			<content name="dpdlgcontent" title="Disable Part">
+
+				<statusbanner name="dpwarning" severity="warning" title="Do you really want to disable this part?" description="A disabled part is no longer exposed in any subsequent layer of this build. This cannot be undone while the execution is running."/>
+
+				<form name="dpdlgform">
+					<edit name="partname" caption="Part to disable" sync:value="session.processpart_name" readonly="1"/>
+					<edit name="confirmname" caption="Please enter the name of the part" sync:value="session.processpart_confirmname"/>
+				</form>
+
+				<buttongroup name="dpdlgactions" distribution="equal">
+					<button name="ok" caption="OK" event="onconfirmdisablepart" variant="primary" formvalues="dpdlgform"/>
+					<button name="cancel" caption="Cancel" event="oncanceldisablepart" formvalues="dpdlgform"/>
+				</buttongroup>
+
+			</content>
+		</dialog>
+
+
+		<!-- Editable machine settings, opened from the read-only Machine Settings card via the
+		     "Change configuration" button. Fields are pre-populated from the live parameters
+		     via sync:value; OK stores them as a new machine-settings configuration version with
+		     the entered name. OK is refused while the name is empty. -->
+		<dialog name="machinesettingsdialog">
+			<content name="msdlgcontent" title="Change Machine Settings">
+
+				<form name="msdlgform">
+					<edit name="versionname" caption="Configuration name" sync:value="session.configversion_name"/>
+					<switch name="simulatelaser" caption="Simulate laser control" sync:value="main.configuration.simulatelaser"/>
+					<edit name="exposuretimeout" caption="Exposure timeout (ms)" sync:value="main.jobinfo.exposuretimeout"/>
+					<edit name="watchdogtimeout" caption="Remote watchdog timeout (ms, 0 = disabled)" sync:value="main.execution.watchdogtimeout"/>
+					<edit name="card_serial" caption="Scanner card serial" sync:value="main.cardconfig.serial"/>
+					<edit name="card_ipaddress" caption="Scanner IP address (empty for PCI)" sync:value="main.cardconfig.ipaddress"/>
+					<edit name="card_netmask" caption="Scanner netmask" sync:value="main.cardconfig.netmask"/>
+					<edit name="card_port" caption="Scanner port" sync:value="main.cardconfig.port"/>
+					<edit name="card_timeout" caption="Scanner connection timeout (ms)" sync:value="main.cardconfig.timeout"/>
+					<edit name="card_laserondelay" caption="Laser on delay (µs)" sync:value="main.cardconfig.laserondelay"/>
+					<edit name="card_laseroffdelay" caption="Laser off delay (µs)" sync:value="main.cardconfig.laseroffdelay"/>
+					<edit name="card_markdelay" caption="Mark delay (µs)" sync:value="main.cardconfig.markdelay"/>
+					<edit name="card_jumpdelay" caption="Jump delay (µs)" sync:value="main.cardconfig.jumpdelay"/>
+					<edit name="card_polygondelay" caption="Polygon delay (µs)" sync:value="main.cardconfig.polygondelay"/>
+					<edit name="card_laseroriginx" caption="Laser origin X (mm)" sync:value="main.cardconfig.laseroriginx"/>
+					<edit name="card_laseroriginy" caption="Laser origin Y (mm)" sync:value="main.cardconfig.laseroriginy"/>
+					<edit name="card_laserfield_minx" caption="Laser field min X (mm)" sync:value="main.cardconfig.laserfield_minx"/>
+					<edit name="card_laserfield_miny" caption="Laser field min Y (mm)" sync:value="main.cardconfig.laserfield_miny"/>
+					<edit name="card_laserfield_maxx" caption="Laser field max X (mm)" sync:value="main.cardconfig.laserfield_maxx"/>
+					<edit name="card_laserfield_maxy" caption="Laser field max Y (mm)" sync:value="main.cardconfig.laserfield_maxy"/>
+					<edit name="card_transformation_angle" caption="Transformation angle (degree)" sync:value="main.cardconfig.transformation_angle"/>
+					<edit name="card_transformation_offsetx" caption="Transformation offset X (mm)" sync:value="main.cardconfig.transformation_offsetx"/>
+					<edit name="card_transformation_offsety" caption="Transformation offset Y (mm)" sync:value="main.cardconfig.transformation_offsety"/>
+					<edit name="card_transformation_scalex" caption="Transformation scale X" sync:value="main.cardconfig.transformation_scalex"/>
+					<edit name="card_transformation_scaley" caption="Transformation scale Y" sync:value="main.cardconfig.transformation_scaley"/>
+				</form>
+
+				<buttongroup name="msdlgactions" distribution="equal">
+					<button name="ok" caption="OK" event="onmachinesettingsok" variant="primary" formvalues="msdlgform"/>
+					<button name="cancel" caption="Cancel" event="onmachinesettingscancel" formvalues="msdlgform"/>
+				</buttongroup>
+
+			</content>
+		</dialog>
+
+
+		<!-- Machine settings version history, opened from the Machine Settings card via the
+		     "View Configuration History" button. Lists all machine-settings versions and lets
+		     the operator activate one; "Back" simply closes the dialog. -->
+		<dialog name="machinehistorydialog">
+			<content name="mhdlgcontent" title="Machine Settings History">
+
+				<configurationlist loadingtext="Loading configurations" entriesperpage="10" schema="com.autodesk.remotelpbf" selectevent="onactivatemachinesettings">
+					<button name="activate" caption="Set Active" event="onactivatemachinesettings"/>
+				</configurationlist>
+
+				<buttongroup name="mhdlgactions" distribution="equal">
+					<button name="back" caption="Back" event="onclosedialog"/>
+				</buttongroup>
+
+			</content>
+		</dialog>
+
+		<!-- Factory reset is deliberately separate from history activation. It creates and activates
+		     a new, user-attributed version from the defaults declared by this installation. -->
+		<dialog name="factoryresetdialog">
+			<content name="frdlgcontent" title="Reset to Factory Settings">
+				<statusbanner name="frwarning" severity="warning" title="Reset machine configuration?" description="A new configuration version will be created from the defaults in config.xml. Existing history is preserved."/>
+				<form name="frdlgform">
+					<edit name="confirmation" caption="Type RESET to confirm" sync:value="session.configreset_confirmation"/>
+				</form>
+				<buttongroup name="frdlgactions" distribution="equal">
+					<button name="confirm" caption="Create and Activate Factory Version" event="onconfirmfactoryreset" variant="primary" formvalues="frdlgform"/>
+					<button name="cancel" caption="Cancel" event="oncancelfactoryreset" formvalues="frdlgform"/>
+				</buttongroup>
+			</content>
+		</dialog>
+
+
+		<!-- Build library: select or upload a build, then start execution. Once started, the
+		     external master drives the layer exposures over REST. -->
+		<page name="importbuildjob">
+			<grid name="importgrid" padding="8">
+				<column width="7" unit="free"/>
+				<column width="3" unit="free"/>
+
+				<row height="1" unit="free"/>
+				<row height="50" unit="pt"/>
+
+				<layerview name="preview" cardstyle="elevated" columnstart="1" rowstart="1" columnend="1" rowend="2">
+					<platform sizex="200" sizey="250" originx="0" originy="0" paddingx="50" paddingy="50" transformangle="0" rotationcenterx="0" rotationcentery="0" translationx="0" translationy="0" showcoordinatesystem="1" baseimage="buildplate-clean2" dark_baseimage="buildplate-dark-ui2"/>
+				</layerview>
+
+				<tabs name="uploadtab" columnstart="2" rowstart="1" columnend="2" rowend="1" rowposition="top">
+					<!-- Shown until a build is selected: the build list (top) and the upload widget (bottom). -->
+					<content name="select" caption="Select Build" cardstyle="elevated" sync:visible="!session.build_isselected">
+						<buildlist loadingtext="Loading builds" entriesperpage="20" selectevent="onselectbuild"/>
+						<upload class="build" caption="Select 3MF files to upload" successevent="onuploadfinished"/>
+					</content>
+					<!-- Replaces the "Select Build" tab once a build is selected: build details + part list. -->
+					<content name="builddetails" caption="Build Details" cardstyle="elevated" sync:visible="session.build_isselected">
+						<partlist name="parts" sync:builduuid="session.selectedbuilduuid" loadingtext="Loading build details..." selectevent="onselectpart"/>
+						<buttongroup name="previewactions" distribution="equal">
+							<button name="exposepreviewlayer" caption="Expose Layer" event="onexposepreviewlayer" sync:disabled="!main.ui.build_canbestarted"/>
+						</buttongroup>
+					</content>
+				</tabs>
+
+				<content name="UploadButtons" columnstart="2" rowstart="2" columnend="2" rowend="2" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button name="startexecution" caption="Start Execution" variant="primary" event="startexecution" sync:disabled="!main.ui.build_canbestarted"/>
+						<button name="closebuild" caption="Close Build" event="closebuild" sync:disabled="!session.build_isselected"/>
+					</buttongroup>
+				</content>
+			</grid>
+		</page>
+
+		<page name="buildhistory">
+			<content name="executionlibrary" title="Build History">
+				<executionlist loadingtext="Loading builds" entriesperpage="20" selectevent="" thumbnail="thumbnail_default">
+					<button name="details" caption="Details" selectevent=""/>
+				</executionlist>
+			</content>
+		</page>
+
+		<!-- Execution page: live toolpath preview of the executing build plus the remote execution
+		     status. Layers are triggered by the external master; the operator can only cancel. -->
+		<page name="buildstatus">
+
+			<grid name="previewgrid" padding="6">
+				<column width="3" unit="free"/>
+				<column width="2" unit="free"/>
+
+				<row height="1" unit="free"/>
+
+				<layerview name="preview" columnstart="1" rowstart="1" columnend="1" rowend="1" cardstyle="elevated">
+					<platform sizex="200" sizey="250" originx="0" originy="0" paddingx="50" paddingy="50" transformangle="0" rotationcenterx="0" rotationcentery="0" translationx="0" translationy="0" showcoordinatesystem="1" sync:layerindex="main.jobinfo.currentlayer" baseimage="buildplate-clean2" dark_baseimage="buildplate-dark-ui2"/>
+					<references sync:builduuid="main.jobinfo.jobuuid"/>
+				</layerview>
+
+				<tabs name="buildtabs" columnstart="2" rowstart="1" columnend="2" rowend="1">
+
+					<content name="overview" caption="Overview" cardstyle="elevated">
+						<grid name="overviewgrid" padding="2">
+							<column width="1" unit="free"/>
+							<column width="130" unit="pt"/>
+
+							<row height="60" unit="pt"/>
+							<row height="40" unit="pt"/>
+							<row height="40" unit="pt"/>
+							<row height="12" unit="pt"/>
+							<row height="44" unit="pt"/>
+							<row height="44" unit="pt"/>
+							<row height="44" unit="pt"/>
+							<row height="44" unit="pt"/>
+							<row height="1" unit="free"/>
+
+							<content name="ov_banner" columnstart="1" rowstart="1" columnend="2" rowend="1" rowposition="centered">
+								<statusbanner name="ov_ok" severity="ok" title="All systems nominal" description="All subsystems are operating normally." sync:visible="!main.ui.system_haserror"/>
+								<statusbanner name="ov_error" severity="error" title="System error" description="One or more subsystems reported an error. Use the recovery button next to the affected subsystem." sync:visible="main.ui.system_haserror"/>
+							</content>
+
+							<content name="ov_mainstatecell" columnstart="1" rowstart="2" columnend="1" rowend="2" rowposition="centered">
+								<form name="ov_mainform">
+									<edit name="ov_mainstate" caption="Main System" sync:value="main.$state" readonly="1"/>
+								</form>
+							</content>
+							<content name="ov_mainreset" columnstart="2" rowstart="2" columnend="2" rowend="2" rowposition="centered">
+								<buttongroup name="ov_mainresetgroup" distribution="equal">
+									<button name="resetmain" caption="Reset" event="onresetmain" sync:disabled="!main.ui.main_haserror"/>
+								</buttongroup>
+							</content>
+
+							<content name="ov_laserstatecell" columnstart="1" rowstart="3" columnend="1" rowend="3" rowposition="centered">
+								<form name="ov_laserform">
+									<edit name="ov_laserstate" caption="Laser System" sync:value="laser.$state" readonly="1"/>
+								</form>
+							</content>
+							<content name="ov_laserreset" columnstart="2" rowstart="3" columnend="2" rowend="3" rowposition="centered">
+								<buttongroup name="ov_laserresetgroup" distribution="equal">
+									<button name="resetlaser" caption="Reset" event="onresetlaser" sync:disabled="!main.ui.laser_haserror"/>
+								</buttongroup>
+							</content>
+
+							<content name="ov_jobnamecell" columnstart="1" rowstart="5" columnend="2" rowend="5" rowposition="centered">
+								<form name="ov_jobnameform">
+									<edit name="ov_jobname" caption="Build name" sync:value="main.jobinfo.jobname" readonly="1"/>
+								</form>
+							</content>
+
+							<!-- Execution status (col 1) with the Cancel action to its right (col 2). -->
+							<content name="ov_statuscell" columnstart="1" rowstart="6" columnend="1" rowend="6" rowposition="centered">
+								<form name="ov_statusform">
+									<edit name="ov_status" caption="Execution status" sync:value="main.ui.executionstatusdisplay" readonly="1"/>
+								</form>
+							</content>
+							<content name="ov_actionscell" columnstart="2" rowstart="6" columnend="2" rowend="6" rowposition="centered">
+								<buttongroup name="ov_actions" distribution="equal">
+									<button name="ov_cancel" caption="Cancel" event="cancelexecution" sync:disabled="!main.ui.build_canbecanceled"/>
+								</buttongroup>
+							</content>
+
+							<content name="ov_layercell" columnstart="1" rowstart="7" columnend="2" rowend="7" rowposition="centered">
+								<form name="ov_layerform">
+									<edit name="ov_layer" caption="Last exposed layer" sync:value="main.ui.currentlayerheightdisplay" readonly="1"/>
+								</form>
+							</content>
+
+							<content name="ov_watchdogcell" columnstart="1" rowstart="8" columnend="2" rowend="8" rowposition="centered">
+								<form name="ov_watchdogform">
+									<edit name="ov_exposurecount" caption="Layers exposed" sync:value="main.execution.exposurecount" readonly="1"/>
+									<edit name="ov_watchdog" caption="Watchdog remaining (ms)" sync:value="main.execution.watchdogremainingms" readonly="1"/>
+								</form>
+							</content>
+
+							<!-- The remaining space holds the live system log and the part list of the
+							     current build job. -->
+							<tabs name="ov_logtabs" columnstart="1" rowstart="9" columnend="2" rowend="9">
+								<content name="ov_logs" caption="Logs" scrollbars="1">
+									<logs name="systemlog" caption="Log Messages">
+									</logs>
+								</content>
+								<content name="ov_parts" caption="Parts" scrollbars="1">
+									<partlist name="processparts" sync:builduuid="main.jobinfo.jobuuid" showdetails="false" loadingtext="Loading parts..." selectevent="onselectprocesspart"/>
+									<buttongroup name="ov_partactions" distribution="equal">
+										<button name="partinfo" caption="Part Information" event="onprocesspartinfo" sync:disabled="!session.processpart_isselected"/>
+										<button name="disablepart" caption="Disable Part" event="onprocesspartdisable" sync:disabled="!session.processpart_candisable"/>
+									</buttongroup>
+								</content>
+							</tabs>
+
+						</grid>
+					</content>
+
+					<content name="laserstatus" caption="Laser" cardstyle="elevated" scrollbars="1">
+						<statuslist name="ls_laser_status">
+							<row label="Laser activated" sync:source="laser.lasersignaltiming.laseronsignal" display="onoff"/>
+							<row label="Laser OK" sync:source="laser.laserfeedback.laserok" display="map">
+								<map value="1" text="Yes" severity="success"/>
+								<map value="0" text="No" severity="error"/>
+							</row>
+							<row label="Temperature OK" sync:source="laser.laserfeedback.temperatureok" display="map">
+								<map value="1" text="Yes" severity="success"/>
+								<map value="0" text="No" severity="error"/>
+							</row>
+						</statuslist>
+					</content>
+
+					<content name="systemstate" caption="Parameters" cardstyle="elevated" scrollbars="1">
+						<parameterlist loadingtext="Loading parameters">
+							<column identifier="parameter" width="auto" sizeable="true"/>
+							<column identifier="value" width="160pt"/>
+							<column identifier="group" visible="false"/>
+							<column identifier="system" visible="false"/>
+							<entry statemachine="main" group="jobinfo"/>
+							<entry statemachine="main" group="execution"/>
+							<entry statemachine="laser" group="cardconfig"/>
+							<entry statemachine="laser" group="sdkstate"/>
+							<entry statemachine="laser" group="correction"/>
+						</parameterlist>
+					</content>
+
+				</tabs>
+
+			</grid>
+		</page>
+
+
+		<!--
+			Machine Configuration page. Presents the persistent, versioned machine
+			configuration (schema com.autodesk.remotelpbf). The main state machine registers
+			the configuration type and mirrors the active version into the live parameters
+			(see applyMachineConfigurationToRuntime).
+		-->
+		<page name="machineconfig">
+			<grid name="cfggrid">
+				<column width="1" unit="free"/>
+				<column width="1" unit="free"/>
+
+				<row height="1" unit="free"/>
+				<row height="2" unit="free"/>
+
+				<content name="cfgsettings" title="Machine Settings" subtitle="Read-only - use Change configuration to edit" cardstyle="elevated" columnstart="1" rowstart="1" columnend="1" rowend="2" scrollbars="1">
+					<form name="cfgsettingsform">
+						<switch name="simulatelaser" caption="Simulate laser control" readonly="1" sync:value="main.configuration.simulatelaser"/>
+						<edit name="exposuretimeout" caption="Exposure timeout (ms)" readonly="1" sync:value="main.jobinfo.exposuretimeout"/>
+						<edit name="watchdogtimeout" caption="Remote watchdog timeout (ms, 0 = disabled)" readonly="1" sync:value="main.execution.watchdogtimeout"/>
+					</form>
+					<buttongroup name="cfgsettingsactions" distribution="equal">
+						<button name="changecfg" caption="Change configuration" event="onopenmachinesettings" variant="primary"/>
+						<button name="historycfg" caption="View Configuration History" event="onopenmachinehistory"/>
+						<button name="resetcfg" caption="Reset to Factory Settings" event="onopenfactoryreset"/>
+					</buttongroup>
+				</content>
+
+				<content name="cfgstatus" title="Active Version" cardstyle="elevated" columnstart="2" rowstart="1" columnend="2" rowend="1" scrollbars="1">
+					<form name="cfgstatusform">
+						<edit name="activeversion" caption="Active configuration" readonly="1" sync:value="main.configstatus.activeversiondisplay"/>
+						<edit name="activetimestamp" caption="Created" readonly="1" sync:value="main.configstatus.activetimestamp"/>
+						<edit name="activeuser" caption="Author" readonly="1" sync:value="main.configstatus.activeuser"/>
+					</form>
+				</content>
+
+				<content name="cfgscannercard" title="Scanner Card" subtitle="Scanlab RTC6 - applied at laser initialisation" cardstyle="elevated" columnstart="2" rowstart="2" columnend="2" rowend="2" scrollbars="1">
+					<form name="cfgscannercardform">
+						<edit name="serial" caption="Serial" readonly="1" sync:value="main.cardconfig.serial"/>
+						<edit name="ipaddress" caption="IP address" readonly="1" sync:value="main.cardconfig.ipaddress"/>
+						<edit name="netmask" caption="Netmask" readonly="1" sync:value="main.cardconfig.netmask"/>
+						<edit name="port" caption="Port" readonly="1" sync:value="main.cardconfig.port"/>
+						<edit name="timeout" caption="Connection timeout (ms)" readonly="1" sync:value="main.cardconfig.timeout"/>
+						<edit name="laserondelay" caption="Laser on delay (µs)" readonly="1" sync:value="main.cardconfig.laserondelay"/>
+						<edit name="laseroffdelay" caption="Laser off delay (µs)" readonly="1" sync:value="main.cardconfig.laseroffdelay"/>
+						<edit name="markdelay" caption="Mark delay (µs)" readonly="1" sync:value="main.cardconfig.markdelay"/>
+						<edit name="jumpdelay" caption="Jump delay (µs)" readonly="1" sync:value="main.cardconfig.jumpdelay"/>
+						<edit name="polygondelay" caption="Polygon delay (µs)" readonly="1" sync:value="main.cardconfig.polygondelay"/>
+						<edit name="laseroriginx" caption="Laser origin X (mm)" readonly="1" sync:value="main.cardconfig.laseroriginx"/>
+						<edit name="laseroriginy" caption="Laser origin Y (mm)" readonly="1" sync:value="main.cardconfig.laseroriginy"/>
+						<edit name="laserfield_minx" caption="Laser field min X (mm)" readonly="1" sync:value="main.cardconfig.laserfield_minx"/>
+						<edit name="laserfield_miny" caption="Laser field min Y (mm)" readonly="1" sync:value="main.cardconfig.laserfield_miny"/>
+						<edit name="laserfield_maxx" caption="Laser field max X (mm)" readonly="1" sync:value="main.cardconfig.laserfield_maxx"/>
+						<edit name="laserfield_maxy" caption="Laser field max Y (mm)" readonly="1" sync:value="main.cardconfig.laserfield_maxy"/>
+						<edit name="transformation_angle" caption="Transformation angle (degree)" readonly="1" sync:value="main.cardconfig.transformation_angle"/>
+						<edit name="transformation_offsetx" caption="Transformation offset X (mm)" readonly="1" sync:value="main.cardconfig.transformation_offsetx"/>
+						<edit name="transformation_offsety" caption="Transformation offset Y (mm)" readonly="1" sync:value="main.cardconfig.transformation_offsety"/>
+						<edit name="transformation_scalex" caption="Transformation scale X" readonly="1" sync:value="main.cardconfig.transformation_scalex"/>
+						<edit name="transformation_scaley" caption="Transformation scale Y" readonly="1" sync:value="main.cardconfig.transformation_scaley"/>
+					</form>
+				</content>
+
+			</grid>
+		</page>
+
+
+		<page name="systemstatus">
+			<grid name="statusgrid">
+				<column width="1" unit="free"/>
+				<column width="1" unit="free"/>
+
+				<row height="2" unit="free"/>
+				<row height="1" unit="free"/>
+
+				<content name="mainparams" title="Main State" columnstart="1" rowstart="1" columnend="1" rowend="1" scrollbars="1">
+					<parameterlist loadingtext="Loading parameters">
+						<entry statemachine="main" group="jobinfo"/>
+						<entry statemachine="main" group="execution"/>
+						<entry statemachine="main" group="ui"/>
+						<entry statemachine="main" group="configuration"/>
+					</parameterlist>
+				</content>
+
+				<content name="laserparams" title="Laser State" columnstart="2" rowstart="1" columnend="2" rowend="1" scrollbars="1">
+					<parameterlist loadingtext="Loading parameters">
+						<entry statemachine="laser" group="sdkstate"/>
+						<entry statemachine="laser" group="cardconfig"/>
+						<entry statemachine="laser" group="laserfeedback"/>
+					</parameterlist>
+				</content>
+
+				<content name="alertpage" title="Alerts" columnstart="1" rowstart="2" columnend="2" rowend="2">
+					<alertlist name="alerts" loadingtext="Loading alerts" entriesperpage="20" />
+				</content>
+
+			</grid>
+		</page>
+
+		<page name="systemlog">
+			<logs name="systemlog" caption="Log Messages">
+			</logs>
+		</page>
+
+		<page name="processhistory">
+			<content name="processhistorycontent" title="Process Parameter History">
+				<journalhistory name="processhistorybrowser" title="Process Parameter History"/>
+			</content>
+		</page>
+
+		<menu>
+			<item id="buildlist" icon="mdi-folder" permission="permission_view_builds" description="Upload build files and start an execution." caption="Build Library" targetpage="importbuildjob"/>
+			<item id="buildprocess" icon="mdi-laser-pointer" caption="Execution" description="Monitor the remotely driven execution." targetpage="buildstatus"/>
+			<item id="buildhistory" icon="mdi-clock" permission="permission_view_builds" description="Browse past executions on this machine." caption="Build History" targetpage="buildhistory"/>
+			<item id="systemstatus" icon="mdi-view-dashboard" caption="System Status" description="Display current machine status." targetpage="systemstatus"/>
+			<item id="processhistory" icon="mdi-chart-line" caption="Process History" description="Interactively browse recorded process parameter history." targetpage="processhistory"/>
+			<item id="machineconfig" icon="mdi-cog" caption="Machine Configuration" description="View, activate and edit the persistent machine configuration." targetpage="machineconfig"/>
+			<item id="systemlog" icon="mdi-file-document-outline" caption="System Logs" description="Browse and display stored system log files." targetpage="systemlog"/>
+		</menu>
+
+
+		<toolbar logoresource="ui_toolbarlogo">
+			<item id="home" icon="mdi-apps" caption="Home" targetpage="importbuildjob"/>
+			<item id="logout" icon="mdi-logout" caption="Log out" event="logout"/>
+		</toolbar>
+
+
+	</userinterface>
+</machinedefinition>

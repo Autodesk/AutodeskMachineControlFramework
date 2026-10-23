@@ -36,7 +36,7 @@ Interface version: 3.1.3
 
 ]]
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 ### The implementation of the S7Net Communication Protocol component
 project(LibS7Com)

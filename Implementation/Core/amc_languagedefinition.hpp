@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <set>
 #include <memory>
+#include <mutex>
 
 namespace AMC {
 	
@@ -48,6 +49,8 @@ namespace AMC {
 		PLanguageDefinition m_pParentLanguage;
 
 		std::map <std::string, std::string> m_TranslationMap;
+
+		std::mutex m_TranslationMissesMutex;
 		std::set <std::string> m_TranslationMisses;
 
 	public:
@@ -60,7 +63,13 @@ namespace AMC {
 		
 		PLanguageDefinition getParentLanguage ();
 
-		std::string getTranslatedString (const std::string & sStringIdentifier);
+		// Looks up the identifier in this language and its parents. Does not record a miss.
+		bool findTranslation (const std::string & sStringIdentifier, std::string & sValue);
+
+		// Returns the translation, or the fallback value if there is none (the identifier, if the fallback is empty). Records a miss.
+		std::string getTranslatedString (const std::string & sStringIdentifier, const std::string & sFallbackValue);
+
+		std::set<std::string> getTranslationMisses ();
 
 		bool stringExists (const std::string& sStringIdentifier);
 

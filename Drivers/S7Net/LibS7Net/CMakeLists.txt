@@ -13,7 +13,7 @@ Interface version: 1.2.0
 
 ]]
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 ### The implementation of the LibS7Net Component
 project(LibS7Net)

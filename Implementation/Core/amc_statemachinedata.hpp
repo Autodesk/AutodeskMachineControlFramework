@@ -32,12 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMC_PARAMETERINSTANCES
 
 #include "amc_parameterhandler.hpp"
+#include "amc_frontendchangecounter.hpp"
 
 #include <memory>
 #include <vector>
 #include <map>
 #include <string>
+#include <functional>
 #include <mutex>
+#include <utility>
 
 namespace AMC {
 
@@ -52,6 +55,8 @@ namespace AMC {
 		std::map <std::string, PParameterGroup> m_StateMachineDataStores;
 		std::map <std::string, std::string> m_StateMachineStates;
 
+		PFrontendChangeCounter m_pFrontendChangeCounter;
+
 		std::mutex m_Mutex;
 		
 	public:
@@ -59,8 +64,12 @@ namespace AMC {
 		CStateMachineData();
 		virtual ~CStateMachineData();
 
+		// Bumped by state changes and by the parameter groups the frontend displays.
+		PFrontendChangeCounter getFrontendChangeCounter();
+
 		void registerParameterHandler (const std::string & sInstanceName, PParameterHandler pParameterHandler, AMCCommon::PChrono pChrono);
 		PParameterHandler getParameterHandler (const std::string& sInstanceName);
+		std::vector<std::pair<std::string, PParameterHandler>> getParameterHandlers();
 
 		CParameterGroup* getDataStore(const std::string& sInstanceName);
 		void setInstanceStateName(const std::string& sInstanceName, const std::string& sInstanceState);
@@ -75,4 +84,3 @@ namespace AMC {
 
 
 #endif //__AMC_PARAMETERHANDLER
-

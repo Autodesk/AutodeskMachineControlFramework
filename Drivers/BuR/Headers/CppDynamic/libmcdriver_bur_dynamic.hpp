@@ -658,6 +658,7 @@ public:
 	inline void AddCommand(classParam<CPLCCommand> pCommandInstance);
 	inline void FinishList();
 	inline void ExecuteList();
+	inline void ExecuteAndDeleteList();
 	inline bool WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS);
 	inline void PauseList();
 	inline void ResumeList();
@@ -824,6 +825,7 @@ public:
 		pWrapperTable->m_PLCCommandList_AddCommand = nullptr;
 		pWrapperTable->m_PLCCommandList_FinishList = nullptr;
 		pWrapperTable->m_PLCCommandList_ExecuteList = nullptr;
+		pWrapperTable->m_PLCCommandList_ExecuteAndDeleteList = nullptr;
 		pWrapperTable->m_PLCCommandList_WaitForList = nullptr;
 		pWrapperTable->m_PLCCommandList_PauseList = nullptr;
 		pWrapperTable->m_PLCCommandList_ResumeList = nullptr;
@@ -1001,6 +1003,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PLCCommandList_ExecuteList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommandList_ExecuteAndDeleteList = (PLibMCDriver_BuRPLCCommandList_ExecuteAndDeleteListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommandlist_executeanddeletelist");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommandList_ExecuteAndDeleteList = (PLibMCDriver_BuRPLCCommandList_ExecuteAndDeleteListPtr) dlsym(hLibrary, "libmcdriver_bur_plccommandlist_executeanddeletelist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommandList_ExecuteAndDeleteList == nullptr)
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1256,6 +1267,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_ExecuteList == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_executeanddeletelist", (void**)&(pWrapperTable->m_PLCCommandList_ExecuteAndDeleteList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_ExecuteAndDeleteList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_waitforlist", (void**)&(pWrapperTable->m_PLCCommandList_WaitForList));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_WaitForList == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1484,11 +1499,19 @@ public:
 	}
 	
 	/**
-	* CPLCCommandList::ExecuteList - Execute command list.
+	* CPLCCommandList::ExecuteList - Execute command list. The list is kept on the PLC and must be removed manually via DeleteList once it has finished executing.
 	*/
 	void CPLCCommandList::ExecuteList()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_ExecuteList(m_pHandle));
+	}
+	
+	/**
+	* CPLCCommandList::ExecuteAndDeleteList - Executes the command list and instructs the PLC to delete it automatically once execution has finished. No manual DeleteList call is required afterwards.
+	*/
+	void CPLCCommandList::ExecuteAndDeleteList()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_ExecuteAndDeleteList(m_pHandle));
 	}
 	
 	/**

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	CStateMachineData::CStateMachineData()
+		: m_pFrontendChangeCounter(std::make_shared<CFrontendChangeCounter>())
 	{
 
 	}
@@ -45,6 +46,11 @@ namespace AMC {
 	CStateMachineData::~CStateMachineData()
 	{
 
+	}
+
+	PFrontendChangeCounter CStateMachineData::getFrontendChangeCounter()
+	{
+		return m_pFrontendChangeCounter;
 	}
 
 
@@ -58,19 +64,38 @@ namespace AMC {
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 		m_StateMachineParameters.insert(std::make_pair(sInstanceName, pParameterHandler));
-		m_StateMachineDataStores.insert(std::make_pair(sInstanceName, std::make_shared<CParameterGroup> ("", "", pGlobalChrono)));
+		auto pDataStore = std::make_shared<CParameterGroup>("", "", pGlobalChrono);
+		pDataStore->setFrontendChangeCounter(m_pFrontendChangeCounter);
+		m_StateMachineDataStores.insert(std::make_pair(sInstanceName, pDataStore));
 		m_StateMachineStates.insert(std::make_pair(sInstanceName, ""));
 	}
 
 	PParameterHandler CStateMachineData::getParameterHandler(const std::string& sInstanceName)
 	{
+		PParameterHandler pHandler;
+		{
+			std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+			auto iter = m_StateMachineParameters.find(sInstanceName);
+			if (iter == m_StateMachineParameters.end())
+				throw ELibMCCustomException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
+
+			pHandler = iter->second;
+		}
+
+		return pHandler;
+	}
+
+	std::vector<std::pair<std::string, PParameterHandler>> CStateMachineData::getParameterHandlers()
+	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-		auto iter = m_StateMachineParameters.find(sInstanceName);
-		if(iter == m_StateMachineParameters.end ())
-			throw ELibMCCustomException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
+		std::vector<std::pair<std::string, PParameterHandler>> result;
+		result.reserve(m_StateMachineParameters.size());
+		for (auto& entry : m_StateMachineParameters)
+			result.push_back(entry);
 
-		return iter->second;
+		return result;
 	}
 
 
@@ -88,11 +113,14 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		auto iIter = m_StateMachineStates.find(sInstanceName);
-		if (iIter != m_StateMachineStates.end())
+		if (iIter != m_StateMachineStates.end()) {
+			if (iIter->second == sInstanceState)
+				return;
 			m_StateMachineStates.erase(sInstanceName);
-		
+		}
 
 		m_StateMachineStates.insert(std::make_pair (sInstanceName, sInstanceState));
+		m_pFrontendChangeCounter->bump();
 
 	}
 
@@ -161,5 +189,4 @@ namespace AMC {
 
 
 }
-
 

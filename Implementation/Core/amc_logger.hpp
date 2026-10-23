@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_LOGGER
 #define __AMC_LOGGER
 
+#include <cstdint>
 #include <vector>
 #include <memory>
 #include <string>

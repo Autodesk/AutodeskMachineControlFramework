@@ -1415,6 +1415,17 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addmicrovectormovement(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nMicrovectorArrayBufferSize, const LibMCDriver_ScanLab::sMicroVector * pMicrovectorArrayBuffer);
 
 /**
+* Enables or disables the streamed microvector download with overlapped marking. If enabled, AddMicrovectorMovement of a layer of at least MinLayerSize microvectors starts list execution after a prebuffer and appends the remaining microvectors while the laser is already marking. Default is disabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bEnabled - True to enable the streamed microvector download.
+* @param[in] nMinLayerSize - Minimum layer size in microvectors for streaming to be used; smaller layers are downloaded sequentially. 0 uses the built-in default of 300000. Values below the prebuffer minimum of 150000 are clamped to it.
+* @param[in] dPrebufferFraction - Fraction of the layer (0..1) that is downloaded before execution starts. 0 uses the built-in default of 0.4. Values below 0.25 risk margin aborts on download slowdowns and are only meant for testing the overrun detector.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setmicrovectorstreamingenabled(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bEnabled, LibMCDriver_ScanLab_uint32 nMinLayerSize, LibMCDriver_ScanLab_double dPrebufferFraction);
+
+/**
 * Returns the currently set free variable.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -1695,6 +1706,25 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_addwritemaskeddigitaliolist(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nDigitalOutput, LibMCDriver_ScanLab_uint32 nOutputMask);
+
+/**
+* Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pDigitalInput - Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readdigitalinputs(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pDigitalInput);
+
+/**
+* Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nBitIndex - Index of the digital input bit to read. MUST be between 0 and 15.
+* @param[out] pValue - Current state of the requested digital input bit.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_readdigitalinputbit(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nBitIndex, bool * pValue);
 
 /**
 * Writes an OIE enabling command block to the open list.
@@ -2152,6 +2182,54 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_mappowerwattstopercent(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserPowerInWatts, LibMCDriver_ScanLab_double * pLaserPowerInPercent);
 
 /**
+* Sets a piecewise linear defocus correction table that maps laser power (in watts) to a defocus offset (in mm). This compensates for focus shift caused by thermal lensing at different power levels. The correction is automatically added to the Z defocus value during marking operations.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[in] pCalibrationPointsBuffer - DefocusCorrectionPoint buffer of Defocus correction points that map laser power to defocus offset. Power values MUST be non-negative and strictly increasing in the array. Array MUST NOT be empty.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setpiecewiselineardefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer);
+
+/**
+* Disables the defocus correction by laser power. After calling this, no power-dependent defocus adjustment will be applied.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disabledefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Returns whether defocus correction by laser power is currently enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pIsEnabled - True if defocus correction by power is enabled.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_defocuscorrectionbypowerisenabled(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pIsEnabled);
+
+/**
+* Returns the current defocus correction table. Fails if defocus correction is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+* @param[out] pCalibrationPointsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pCalibrationPointsBuffer - DefocusCorrectionPoint  buffer of Defocus Correction Points
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getdefocuscorrectionbypower(LibMCDriver_ScanLab_RTCContext pRTCContext, const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer);
+
+/**
+* Looks up the defocus correction offset for a given laser power. Fails if defocus correction is not enabled.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dLaserPowerInWatts - Laser Power in Watts
+* @param[out] pDefocusOffsetInMM - Defocus offset in millimeters
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_mapdefocuscorrectionfrompower(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dLaserPowerInWatts, LibMCDriver_ScanLab_double * pDefocusOffsetInMM);
+
+/**
 * Enables a spatial laser power modulation via callback.
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -2185,6 +2263,24 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disablelinesubdivision(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Sets the minimum jump distance. Jumps shorter than this distance, measured from the current scan position, are not written to the list, so the following mark starts at the current scan position and no skywriting is added for the jump. Jumps to the current scan position are never written. Default is 0. A segment profile can override it for the jumps of that segment with the value minimumdistance (in mm) or minimumdistance_bits (in RTC bits) in the namespace http://schemas.scanlab.com/jump/2026/10.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dMinimumJumpDistanceInMM - Minimum jump distance in mm. 0 disables the check. MUST be between 0 and 1 mm.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setminimumjumpdistance(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM);
+
+/**
+* Returns the minimum jump distance.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pMinimumJumpDistanceInMM - Minimum jump distance in mm. 0 if disabled.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getminimumjumpdistance(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pMinimumJumpDistanceInMM);
 
 /**
 * Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.

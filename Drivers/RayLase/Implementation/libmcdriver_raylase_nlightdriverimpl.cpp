@@ -219,11 +219,14 @@ void CNLightDriverImpl::clearNLightError(rlHandle cardHandle)
     uint32_t nRetryCount = m_nLaserReactionRetries;
     while (nRetryCount > 0) {
         m_pDriverEnvironment->Sleep(m_nLaserReactionDelayInMilliseconds);
-        if (laserHasError(cardHandle))
+        if (!laserHasError(cardHandle))
             break;
 
         nRetryCount--;
     }
+
+    m_pSDK->checkError(m_pSDK->rlGpioWrite(cardHandle, eRLIOPort::ioPortD, eRLPinAction::paClear, (uint32_t)eNlightDriverBoardIOPins::CLEAR_ERROR));
+    m_pDriverEnvironment->Sleep(nSignalDelayInMS);
 
     if (nRetryCount == 0)
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_NLIGHTEXTERNALCONTROLNOTREADY);

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <cstdint>
 #include <vector>
 
 namespace AMC {

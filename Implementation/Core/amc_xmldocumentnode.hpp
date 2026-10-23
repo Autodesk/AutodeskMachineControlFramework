@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_XMLDOCUMENTNODE
 #define __AMC_XMLDOCUMENTNODE
 
+#include <cstdint>
 #include <string>
 #include <memory>
 #include <vector>

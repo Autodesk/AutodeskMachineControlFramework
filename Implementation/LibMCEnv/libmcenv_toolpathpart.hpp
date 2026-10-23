@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 #include "amc_meshhandler.hpp"
+#include "amc_toolpathhandler.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -60,14 +61,22 @@ protected:
 
 	AMC::PToolpathPart m_pPart;
 	AMC::PMeshHandler m_pMeshHandler;
+	AMC::PToolpathHandler m_pToolpathHandler;
+	std::string m_sStorageUUID;
 
 public:
-	CToolpathPart(AMC::PToolpathPart pPart, AMC::PMeshHandler pMeshHandler);
+	CToolpathPart(AMC::PToolpathPart pPart, AMC::PMeshHandler pMeshHandler, AMC::PToolpathHandler pToolpathHandler, const std::string & sStorageUUID);
 	virtual ~CToolpathPart();
 
 	std::string GetName() override;
 
 	std::string GetUUID() override;
+
+	std::string GetPartNumber() override;
+
+	std::string GetMeshUUID() override;
+
+	bool IsDisabled() override;
 
 	IModelDataComponentInstance* GetRootComponent() override;
 

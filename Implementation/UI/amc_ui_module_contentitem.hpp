@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_CONTENTITEM
 #define __AMC_UI_MODULE_CONTENTITEM
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -40,6 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_jsonwriter.hpp"
 #include "amc_ui_module_item.hpp"
+#include "amc_ui_frontenddefinition.hpp"
+#include "amc_ui_frontendstate.hpp"
+#include "amc_ui_expression.hpp"
 
 #define AMC_CONTENT_MAXENTRYCOUNT (1024 * 1024)
 
@@ -49,6 +53,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 
 	class CUIModule_ContentItem : public CUIModuleItem {
 	protected:		
@@ -56,6 +61,7 @@ namespace AMC {
 		std::string m_sUUID;
 		std::string m_sItemName;
 
+		PUIFrontendDefinitionModuleStore m_pItemModuleStore;
 
 	public:
 
@@ -65,12 +71,34 @@ namespace AMC {
 
 		virtual std::string getUUID () override;
 
-		virtual void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pLegacyClientVariableHandler, uint32_t nStateID) override;
-
 		// Returns all UUIDs that could be contained in this Item
 		virtual std::list <std::string> getReferenceUUIDs();
 
 		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
+
+		/////////////////////////////////////////////////////////////////////////////////////
+		// New UI Frontend System
+		/////////////////////////////////////////////////////////////////////////////////////
+
+		// Initialize the v2 frontend module store for this item. Called after construction.
+		void initFrontendModuleStore(CUIFrontendDefinition* pFrontendDefinition);
+
+		// Override in subclasses to register v2 attributes with the module store.
+		virtual void registerFrontendAttributes();
+
+		// Returns the item type string for the v2 frontend (e.g. "paragraph", "image").
+		virtual std::string getItemType();
+
+		// Returns the v2 frontend module store of this item, or nullptr if it has not been initialized.
+		PUIFrontendDefinitionModuleStore getFrontendModuleStore();
+
+		// Helpers for registering v2 attributes
+		PUIFrontendDefinitionAttribute registerItemStringAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemBoolAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemIntegerAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemNumberAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemUUIDAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemProviderAttribute(const std::string& sName, eUIFrontendDefinitionAttributeType attributeType, eUIFrontendDefinitionAttributeScope scope, UIFrontendDefinitionProvider provider);
 
 	};
 

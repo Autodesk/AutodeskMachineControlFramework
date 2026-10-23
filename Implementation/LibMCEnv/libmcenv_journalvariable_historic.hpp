@@ -73,6 +73,8 @@ public:
 
     LibMCEnv_int64 ComputeIntegerSample(const LibMCEnv_uint64 nTimeInMicroSeconds) override;
 
+    IUniformJournalSampling* SampleUniform(const LibMCEnv_uint64 nStartTimeStamp, const LibMCEnv_uint64 nEndTimeStamp, const LibMCEnv_uint32 nNumberOfSamples) override;
+
 };
 
 } // namespace Impl

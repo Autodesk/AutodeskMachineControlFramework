@@ -311,6 +311,16 @@ LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_b
 LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_analogoutputexists(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pName, bool * pNameExists);
 
 /**
+* Returns if an analog input is out of bounds. The raw values itself will be clipped to the configured range.
+*
+* @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
+* @param[in] pName - Name of variable. Fails if Variable does not exist or is not an analog variable.
+* @param[out] pInputIsOutOfBounds - Flag if the raw value is out of bounds and has been clipped to the input window.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_analoginputisoutofbounds(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pName, bool * pInputIsOutOfBounds);
+
+/**
 * Reads a value from an digital input variable. Fails if variable does not exist.
 *
 * @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.

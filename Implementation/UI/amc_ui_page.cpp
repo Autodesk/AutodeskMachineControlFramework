@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_page.hpp"
 #include "amc_ui_module.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "amc_parameterhandler.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
@@ -54,6 +55,7 @@ CUIPage::CUIPage(const std::string& sName, CUIModule_UIEventHandler* pUIEventHan
 
 	m_sUUID = AMCCommon::CUtils::createUUID();
 
+	m_Visible.setFixedValue("1");
 
 }
 
@@ -125,16 +127,6 @@ void CUIPage::ensureUIEventExists(const std::string& sEventName)
 // Legacy UI System
 /////////////////////////////////////////////////////////////////////////////////////
 
-void CUIPage::writeLegacyModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleArray, CParameterHandler* pLegacyClientVariableHandler)
-{
-	for (auto module : m_Modules) {
-		CJSONWriterObject moduleObject(writer);		
-		module->writeLegacyDefinitionToJSON(writer, moduleObject, pLegacyClientVariableHandler);
-
-		moduleArray.addObject(moduleObject);
-	}
-}
-
 PUIModule CUIPage::findModuleByUUID(const std::string& sUUID)
 {
 	auto iIter = m_ModuleMapOfPage.find(sUUID);
@@ -191,21 +183,25 @@ void CUIPage::populateClientVariables(CParameterHandler* pParameterHandler)
 // New UI Frontend System
 /////////////////////////////////////////////////////////////////////////////////////
 
-void CUIPage::frontendWritePageStatusToJSON(CJSONWriter& writer, CJSONWriterObject& pageObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+void CUIPage::frontendWritePageStatusToJSON(CJSONWriter& writer, CJSONWriterObject& pageObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData, bool bWriteModules, const sUIFrontendBuildEpoch& epoch)
 {
 
 	pageObject.addString("name", m_sName);
 	pageObject.addString("uuid", AMCCommon::CUtils::normalizeUUIDString(m_sUUID));
 
-	if (!m_Caption.isEmpty (pStateMachineData))
-		pageObject.addString("caption", m_Caption.evaluateStringValue (pStateMachineData));
-	if (!m_Description.isEmpty(pStateMachineData))
-		pageObject.addString("description", m_Description.evaluateStringValue (pStateMachineData));
-	if (!m_Icon.isEmpty(pStateMachineData))
-		pageObject.addString("icon", m_Icon.evaluateStringValue (pStateMachineData));
+	if (!m_Caption.isEmpty (pStateMachineData, pFrontendState))
+		pageObject.addString("caption", m_Caption.evaluateStringValue (pStateMachineData, pFrontendState));
+	if (!m_Description.isEmpty(pStateMachineData, pFrontendState))
+		pageObject.addString("description", m_Description.evaluateStringValue (pStateMachineData, pFrontendState));
+	if (!m_Icon.isEmpty(pStateMachineData, pFrontendState))
+		pageObject.addString("icon", m_Icon.evaluateStringValue (pStateMachineData, pFrontendState));
+	pageObject.addBool("visible", m_Visible.evaluateBoolValue(pStateMachineData, pFrontendState));
 
 	pageObject.addInteger("gridcolumns", m_nGridColumns);
 	pageObject.addInteger("gridrows", m_nGridRows);
+
+	if (!bWriteModules)
+		return;
 
 	CJSONWriterArray moduleArray(writer);
 
@@ -214,7 +210,7 @@ void CUIPage::frontendWritePageStatusToJSON(CJSONWriter& writer, CJSONWriterObje
 		if (pModule->isVersion2FrontendModule()) {
 			CJSONWriterObject moduleObject(writer);
 
-			pModule->frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
+			pModule->frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData, epoch);
 
 			moduleArray.addObject(moduleObject);
 		}
@@ -223,5 +219,24 @@ void CUIPage::frontendWritePageStatusToJSON(CJSONWriter& writer, CJSONWriterObje
 
 	pageObject.addArray("modules", moduleArray);
 
+}
+
+void CUIPage::setVisibleExpression(const CUIExpression& visibleExpression)
+{
+	m_Visible = visibleExpression;
+}
+
+bool CUIPage::isVisible(CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+{
+	return m_Visible.evaluateBoolValue(pStateMachineData, pFrontendState);
+}
+
+void CUIPage::collectSessionReferences(std::vector<std::string>& references)
+{
+	for (auto pExpression : { &m_Icon, &m_Caption, &m_Description, &m_Visible }) {
+		std::string sReference = pExpression->getSessionReference();
+		if (!sReference.empty())
+			references.push_back(sReference);
+	}
 }
 

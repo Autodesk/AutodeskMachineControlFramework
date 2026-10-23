@@ -42,6 +42,7 @@ Abstract: This is the class declaration of CRTCRecording
 #include <map>
 #include <array>
 #include <mutex>
+#include <atomic>
 
 
 #define RTC_CHANNELCOUNT 8
@@ -163,6 +164,12 @@ private:
 
 	std::array<PRTCRecordingChannel, RTC_CHANNELCOUNT> m_Channels;
 
+	// Shared with the owning CRTCContext. Set while the streamed microvector download has
+	// already started list execution; executeListWithRecording() then MUST NOT issue a second
+	// execute_list_pos (the RTC6 would report RTC6_BUSY) and only runs the readout loop.
+	// May be nullptr (no streaming-aware context).
+	std::shared_ptr<std::atomic<bool>> m_pListExecutionAlreadyStarted;
+
 	void readRecordedDataBlockFromRTC(uint32_t DataStart, uint32_t DataEnd);
 
 	static std::string normalizeChannelName(const std::string& sChannelName);
@@ -171,7 +178,7 @@ private:
 
 public:
 
-	CRTCRecordingInstance(const std::string & sUUID, PScanLabSDK pSDK, uint32_t cardNo, double dXYCorrectionFactor, double dZCorrectionFactor, size_t nChunkSize, bool bEnableScanheadFeedback, bool bEnableBacktransformation);
+	CRTCRecordingInstance(const std::string & sUUID, PScanLabSDK pSDK, uint32_t cardNo, double dXYCorrectionFactor, double dZCorrectionFactor, size_t nChunkSize, bool bEnableScanheadFeedback, bool bEnableBacktransformation, std::shared_ptr<std::atomic<bool>> pListExecutionAlreadyStarted);
 
 	virtual ~CRTCRecordingInstance();
 	

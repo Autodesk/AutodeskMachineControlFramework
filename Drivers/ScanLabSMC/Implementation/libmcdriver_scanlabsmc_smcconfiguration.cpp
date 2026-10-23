@@ -35,8 +35,6 @@ Abstract: This is a stub class definition of CSMCConfiguration
 #include "libmcdriver_scanlabsmc_interfaceexception.hpp"
 
 // Include custom headers here.
-#include <iostream>
-
 using namespace LibMCDriver_ScanLabSMC::Impl;
 
 #define SMCCONFIGURATION_MINSERIALNUMBER 1
@@ -131,6 +129,8 @@ void CSMCConfiguration::SetCorrectionFile(const LibMCDriver_ScanLabSMC_uint64 nC
 
     }
 
+    m_pDriverEnvironment->LogMessage("Correction file data loaded from memory, size: " + std::to_string(m_CorrectionFileData.size()));
+
 }
 
 void CSMCConfiguration::SetCorrectionFileResource(const std::string& sResourceName)
@@ -151,8 +151,10 @@ void CSMCConfiguration::SetCorrectionFileResource(const std::string& sResourceNa
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_RTCCORRECTIONRESOURCENOTFOUND, "RTC correction resource not found: " + sResourceName);
     }
 
+    m_pDriverEnvironment->LogMessage ("Correction file data loaded from resource " + sResourceName + ", size: " + std::to_string (m_CorrectionFileData.size()));
 
 }
+
 
 
 void CSMCConfiguration::SetConfigurationTemplateResource(const std::string& sResourceName)
@@ -211,6 +213,8 @@ void CSMCConfiguration::SetFirmware(const LibMCDriver_ScanLabSMC_uint64 nFirmwar
 {
     m_FirmwareData.resize (0);
     m_FPGAData.resize (0);
+    m_FPGADataCEBA2.resize (0);
+    m_FPGADataCEBA4.resize (0);
     m_AuxiliaryData.resize (0);
 
     if (nFirmwareDataBufferSize > 0) {
@@ -250,6 +254,8 @@ void CSMCConfiguration::SetFirmwareResources(const std::string& sFirmwareDataRes
 {
     m_FirmwareData.resize(0);
     m_FPGAData.resize(0);
+    m_FPGADataCEBA2.resize(0);
+    m_FPGADataCEBA4.resize(0);
     m_AuxiliaryData.resize(0);
 
     if (sFirmwareDataResource.empty())
@@ -283,6 +289,24 @@ void CSMCConfiguration::SetFirmwareResources(const std::string& sFirmwareDataRes
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_RTCFPGARESOURCENOTFOUND, "RTC FPGA resource not found: " + sFPGADataResource);
     }
 
+    // RTC6 Software Package >= 1.23.0 replaces RTC6RBF.rbf by RTC6RBF_CEBA[2|4].rbf; the CEBA
+    // resources are optional and only present when the machine ships a matching RTC6 DLL.
+    std::string sFPGADataResourceCEBA2 = sFPGADataResource + "_ceba2";
+    if (m_pDriverEnvironment->MachineHasResourceData(sFPGADataResourceCEBA2)) {
+        m_pDriverEnvironment->RetrieveMachineResourceData(sFPGADataResourceCEBA2, m_FPGADataCEBA2);
+    }
+    else if (m_pDriverEnvironment->DriverHasResourceData(sFPGADataResourceCEBA2)) {
+        m_pDriverEnvironment->RetrieveDriverResourceData(sFPGADataResourceCEBA2, m_FPGADataCEBA2);
+    }
+
+    std::string sFPGADataResourceCEBA4 = sFPGADataResource + "_ceba4";
+    if (m_pDriverEnvironment->MachineHasResourceData(sFPGADataResourceCEBA4)) {
+        m_pDriverEnvironment->RetrieveMachineResourceData(sFPGADataResourceCEBA4, m_FPGADataCEBA4);
+    }
+    else if (m_pDriverEnvironment->DriverHasResourceData(sFPGADataResourceCEBA4)) {
+        m_pDriverEnvironment->RetrieveDriverResourceData(sFPGADataResourceCEBA4, m_FPGADataCEBA4);
+    }
+
     if (sAuxiliaryDataResource.empty())
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCAUXILIARYRESOURCENAME);
 
@@ -299,14 +323,17 @@ void CSMCConfiguration::SetFirmwareResources(const std::string& sFirmwareDataRes
 
 }
 
-std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCEnv::PWorkingFile& newCorrectionFile, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion, const std::string& sRTCIPAddress)
+std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory* pWorkingDirectory, LibMCDriver_ScanLabSMC::eSMCConfigVersion configVersion, const std::string& sRTCIPAddress, LibMCEnv::PWorkingFile pCorrectionFileToUse)
 {
 
     if (pWorkingDirectory == nullptr)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
     if ((m_nSerialNumber < SMCCONFIGURATION_MINSERIALNUMBER) || (m_nSerialNumber > SMCCONFIGURATION_MAXSERIALNUMBER))
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDRTCSERIALNUMBER);
-    if (m_CorrectionFileData.size () == 0)
+    if (pCorrectionFileToUse.get() == nullptr)
+        throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+
+    if (pCorrectionFileToUse->GetSize () == 0)
         throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_EMPTYRTCCORRECTIONFILE);
 
     if (!sRTCIPAddress.empty()) {
@@ -315,9 +342,11 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
                 throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDIPADDRESS, "invalid RTC IP Address: " + sRTCIPAddress);
     }
 
-    newCorrectionFile = pWorkingDirectory->StoreCustomDataInTempFile("ct5", m_CorrectionFileData);
-
     pWorkingDirectory->StoreCustomData("RTC6RBF.rbf", m_FPGAData);
+    if (!m_FPGADataCEBA2.empty())
+        pWorkingDirectory->StoreCustomData("RTC6RBF_CEBA2.rbf", m_FPGADataCEBA2);
+    if (!m_FPGADataCEBA4.empty())
+        pWorkingDirectory->StoreCustomData("RTC6RBF_CEBA4.rbf", m_FPGADataCEBA4);
     if (sRTCIPAddress.empty()) {
         pWorkingDirectory->StoreCustomData("RTC6OUT.out", m_FirmwareData);
     }
@@ -328,7 +357,7 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     pWorkingDirectory->StoreCustomData("RTC6DAT.dat", m_AuxiliaryData);
 
     std::string sBaseDirectoryPath = pWorkingDirectory->GetAbsoluteFilePath();
-    std::string sCorrectionFilePath = newCorrectionFile->GetAbsoluteFileName();
+    std::string sCorrectionFilePath = pCorrectionFileToUse->GetAbsoluteFileName();
     std::string sLogFilePath = pWorkingDirectory->GetAbsoluteFilePath() + "/log.txt";
 
     std::string sSimulationDirectory = sBaseDirectoryPath + "/";
@@ -567,10 +596,13 @@ std::string CSMCConfiguration::buildConfigurationXML(LibMCEnv::CWorkingDirectory
     }
 
     std::string sXMLString = pXMLDocument->SaveToString (true);
-
-    //std::cout << sXMLString << std::endl;
     
     //m_pDriverEnvironment->Sleep(100000);
 
     return sXMLString;
 };
+
+std::vector<uint8_t> & CSMCConfiguration::getCorrectionFileData()
+{
+    return m_CorrectionFileData;
+}

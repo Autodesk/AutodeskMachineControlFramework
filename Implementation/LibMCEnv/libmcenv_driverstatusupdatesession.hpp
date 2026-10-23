@@ -48,6 +48,7 @@ Abstract: This is the class declaration of CDriverStatusUpdateSession
 #include "amc_parametergroup.hpp"
 #include "amc_logger.hpp"
 #include "common_chrono.hpp"
+#include "amc_telemetry.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -63,12 +64,13 @@ private:
 	AMC::PLogger m_pLogger;
 	std::string m_sDriverName;
 	AMCCommon::PChrono m_pGlobalChrono;
+	AMC::PTelemetryHandler m_pTelemetryHandler;
 
 	AMCCommon::CChrono m_Chrono;
 
 public:
 
-	CDriverStatusUpdateSession(AMC::PParameterGroup pParameterGroup, AMC::PLogger pLogger, std::string sDriverName, AMCCommon::PChrono pGlobalChrono);
+	CDriverStatusUpdateSession(AMC::PParameterGroup pParameterGroup, AMC::PLogger pLogger, std::string sDriverName, AMCCommon::PChrono pGlobalChrono, AMC::PTelemetryHandler pTelemetryHandler);
 	
 	virtual ~CDriverStatusUpdateSession();
 
@@ -99,6 +101,8 @@ public:
 	LibMCEnv_int64 GetIntegerParameter(const std::string& sParameterName) override;
 
 	bool GetBoolParameter(const std::string& sParameterName) override;
+
+	ITelemetryChannel* FindTelemetryChannel(const std::string& sChannelIdentifier, const bool bFailIfNotExisting) override;
 
 };
 

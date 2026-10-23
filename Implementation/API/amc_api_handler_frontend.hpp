@@ -37,8 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_response.hpp"
 
 #include "amc_systemstate.hpp"
+#include "amc_api_frontendeventstream.hpp"
+
+#define AMC_API_FRONTEND_STREAMTICKET_LIFETIME_SECONDS 30
+// Limits for the comma separated page and dialog names of a stream scope.
+#define AMC_API_FRONTEND_STREAMSCOPE_MAXLENGTH 16384
+#define AMC_API_FRONTEND_STREAMSCOPE_MAXNAMES 256
 
 namespace AMC {
+
+	class CAPISessionHandler;
+	typedef std::shared_ptr<CAPISessionHandler> PAPISessionHandler;
 
 	enum class APIHandler_FrontendType {
 		ftUnknown = 0,
@@ -51,20 +60,49 @@ namespace AMC {
 		ftSubscriptionKeepAlive = 7,
 		ftSubscriptionReset = 8,
 		ftTriggerEvent = 2,
+		ftMetrics = 9,
+		ftParameterListDefinition = 10,
+		ftParameterListValues = 11,
+		ftStreamTicket = 12,
+		ftStreamScope = 13,
 	};
 
 	class CAPIHandler_Frontend : public CAPIHandler {
 	private:
 		
 		PSystemState m_pSystemState;
+		PAPISessionHandler m_pSessionHandler;
 
 		APIHandler_FrontendType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sParameterUUID, std::string & sAdditionalParameter);
 
-		void handleStatusRequest(CJSONWriter& writer, PAPIAuth pAuth);
+		// Clients that pass the "pages" query parameter only receive modules for the listed pages and the dialogs in "dialogs".
+		// Clients that pass "since" (a revision of the same pages and dialogs) receive only the changed attributes
+		// if that revision is still in the session's revision log, and the full status otherwise.
+		std::string handleStatusRequest(CAPIFormFields& pFormFields, PAPIAuth pAuth);
+
+		// Optional query parameters: "definitionhash" and "valueshash" (last known hashes) and "rows" (row indices/ranges, e.g. "0-24,30").
+		void handleParameterListRequest(CJSONWriter& writer, const std::string& sItemUUID, bool bValuesOnly, CAPIFormFields& pFormFields, PAPIAuth pAuth);
+
+		// Records an aggregated frontend reactivity metrics window pushed by the client.
+		// The session UUID is stamped server-side from the authenticated session, never trusted from the body.
+		void handleMetricsRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
+
+		PAPIFrontendEventStream getOrCreateEventStream(PAPIAuth pAuth);
+
+		// Reads the optional "client", "pages" and "dialogs" members of a stream request body and applies the scope
+		// to the event stream. Returns the normalized client ID, or an empty string if the body carries none.
+		std::string applyStreamScope(PAPIFrontendEventStream pEventStream, const uint8_t* pBodyData, const size_t nBodyDataSize, bool bClientIsMandatory);
+
+		// Issues a short-lived single-use ticket for the session's event stream, to be opened as /stream/{ticket}.
+		// The optional body {client, pages, dialogs} identifies the browser tab and its active pages and dialogs.
+		void handleStreamTicketRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
+
+		// Updates the active pages and dialogs of a client of the session's event stream. Body: {client, pages, dialogs}.
+		void handleStreamScopeRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 	public:
 
-		CAPIHandler_Frontend(PSystemState pSystemState);
+		CAPIHandler_Frontend(PSystemState pSystemState, PAPISessionHandler pSessionHandler);
 
 		virtual ~CAPIHandler_Frontend();
 				

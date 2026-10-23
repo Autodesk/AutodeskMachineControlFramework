@@ -67,11 +67,13 @@ namespace AMC {
 		std::string m_sDataDirectory;
 		LibMCData::eDataBaseType m_DataBaseType;
 		std::string m_sConnectionString;
+		bool m_bTelemetryEnabled;
 
 		std::string m_sPackageName;
 		std::string m_sPackageCoreClient;
 		std::string m_sPackageConfig;
 		std::string m_sPackageAPIDocs;
+		std::string m_sClientVariant;
 
 		bool m_bUseSSL;
 		std::string m_sServerCertificatePEM;
@@ -91,6 +93,7 @@ namespace AMC {
 		std::string getDataDirectory ();
 		LibMCData::eDataBaseType getDataBaseType ();
 		std::string getConnectionString ();
+		bool getTelemetryEnabled ();
 		std::string getPackageName ();
 		std::string getPackageCoreClient ();
 		std::string getPackageAPIDocs ();

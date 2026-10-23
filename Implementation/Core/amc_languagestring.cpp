@@ -44,7 +44,7 @@ namespace AMC {
 		: m_sStringIdentifier (sStringIdentifier), m_sCustomValue (sCustomValue)
 	{
 		if (!sStringIdentifier.empty()) {
-			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sStringIdentifier))
+			if (!AMCCommon::CUtils::stringIsValidLanguageStringIdentifier(sStringIdentifier))
 				throw ELibMCCustomException(LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER, sStringIdentifier);
 
 		}
@@ -55,16 +55,20 @@ namespace AMC {
 
 	CLanguageString::CLanguageString(pugi::xml_node & xmlNode, const std::string & sAttributeName)
 	{
-		std::string sStringIdentifier = xmlNode.attribute("i18n:description").as_string ();
+		if (sAttributeName.empty())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		std::string sI18NAttributeName = "i18n:" + sAttributeName;
+		std::string sStringIdentifier = xmlNode.attribute(sI18NAttributeName.c_str()).as_string ();
 
 		if (!sStringIdentifier.empty()) {
-			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sStringIdentifier))
+			if (!AMCCommon::CUtils::stringIsValidLanguageStringIdentifier(sStringIdentifier))
 				throw ELibMCCustomException(LIBMC_ERROR_INVALIDLANGUAGESTRINGIDENTIFIER, sStringIdentifier);
 
 			m_sStringIdentifier = sStringIdentifier;
 		}
 
-		m_sCustomValue = xmlNode.attribute("description").as_string ();
+		m_sCustomValue = xmlNode.attribute(sAttributeName.c_str()).as_string ();
 
 	}
 
@@ -74,12 +78,12 @@ namespace AMC {
 
 	}
 
-	std::string CLanguageString::getStringIdentifier()
+	std::string CLanguageString::getStringIdentifier() const
 	{
 		return m_sStringIdentifier;
 	}
 
-	std::string CLanguageString::getCustomValue()
+	std::string CLanguageString::getCustomValue() const
 	{
 		return m_sCustomValue;
 	}
@@ -92,7 +96,7 @@ namespace AMC {
 		if (m_sStringIdentifier.empty())
 			return m_sCustomValue;
 
-		return pLanguageDefinition->getTranslatedString(m_sStringIdentifier);
+		return pLanguageDefinition->getTranslatedString(m_sStringIdentifier, m_sCustomValue);
 	}
 
 	std::string CLanguageString::getTranslatedString(PLanguageDefinition pLanguageDefinition)

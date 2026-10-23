@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_CONTENTITEM_CHART
 #define __AMC_UI_MODULE_CONTENTITEM_CHART
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -54,6 +55,8 @@ namespace AMC {
 		PStateMachineData m_pStateMachineData;
 		PDataSeriesHandler m_pDataSeriesHandler;
 
+		std::string getDataSeriesUUID(CUIFrontendState* pFrontendState);
+
 	public:
 
 		static PUIModule_ContentChart makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
@@ -62,15 +65,17 @@ namespace AMC {
 		
 		virtual ~CUIModule_ContentChart();
 
-		void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
-	};
+			// New UI Frontend System
+			virtual std::string getItemType() override;
+			virtual void registerFrontendAttributes() override;
+
+		};
 
 
 }
 
 
 #endif //__AMC_UI_MODULE_CONTENTITEM_CHART
-

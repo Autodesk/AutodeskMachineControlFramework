@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UTILS
 #define __AMC_UTILS
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -55,6 +56,7 @@ namespace AMCCommon {
 	public:
 
 		static std::string createUUID();
+		static std::string createUUIDV4();
 		static std::string normalizeUUIDString(const std::string & sRawString);
 		static std::string normalizeSHA256String(const std::string & sRawString);		
 		static std::string createEmptyUUID();
@@ -105,9 +107,14 @@ namespace AMCCommon {
 
 		static bool stringIsValidAlphanumericNameString(const std::string& sString); // Only alphanumeric characters and underscore, underscore not as first character!
 		static bool stringIsValidAlphanumericPathString(const std::string& sString); // Only alphanumeric name strings separated by dots
+		static bool stringIsValidLanguageIdentifier(const std::string& sString); // BCP 47 style tag, for example en, de-CH or pt-BR
+		static bool stringIsValidLanguageStringIdentifier(const std::string& sString); // Alphanumeric path string with at most 63 characters, for example alerts.dooropen
+		static bool stringIsValidFileName(const std::string& sFileName); // No path delimiters or reserved characters
 
 		static std::string getCurrentUserHomeDirectory();
 		static std::string getTempFolder();
+		static std::string getOperatingSystemIdentifier();
+		static std::string getMachineIdentifier();
 
 	};
 
@@ -116,4 +123,3 @@ namespace AMCCommon {
 
 
 #endif //__AMC_UTILS
-

@@ -40,6 +40,7 @@ Abstract: This is a stub class definition of COIEDevice
 #include <iostream>
 #include <cstring>
 #include <sstream>
+#include <limits>
 
 // Include custom headers here.
 using namespace LibMCDriver_ScanLabOIE::Impl;
@@ -116,6 +117,9 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 	  n_LastReceivedMeasurementTag (0),
 	  m_nPacketReceiveCounter (0),
 	  m_nPacketReceiveSkipCounter (1),
+	  m_nPacketCallbackCounter(0),
+	  m_nPacketRecordedCounter(0),
+	  m_nPacketSkippedCounter(0),
 	  m_DeviceDriverType(eOIEDeviceDriverType::Unknown),
 	  m_RecordingFrequency(LibMCDriver_ScanLabOIE::eOIERecordingFrequency::Record100kHz)
 
@@ -340,6 +344,10 @@ void COIEDeviceInstance::Connect(const std::string& sUserName, const std::string
 	pDLLCache = nullptr;
 
 	n_LastReceivedMeasurementTag = 0;
+	m_nPacketReceiveCounter = 0;
+	m_nPacketCallbackCounter = 0;
+	m_nPacketRecordedCounter = 0;
+	m_nPacketSkippedCounter = 0;
 
 }
 
@@ -485,8 +493,29 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 
 	{
 		std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
-		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(m_nSensorSignalCount, m_nRTCSignalCount, m_nAdditionalSignalCount, 1024);
+		const uint32_t nValuesPerRecord = m_nSensorSignalCount + m_nRTCSignalCount + m_nAdditionalSignalCount;
+		const uint64_t nTargetBufferSizeInBytes = 8ULL * 1024ULL * 1024ULL;
+		const uint64_t nTargetBufferSizeInValues = nTargetBufferSizeInBytes / sizeof(int32_t);
+
+		uint32_t nBufferSizeInRecords = 256;
+		if (nValuesPerRecord > 0) {
+			uint64_t nCalculatedBufferSizeInRecords = nTargetBufferSizeInValues / nValuesPerRecord;
+			if (nCalculatedBufferSizeInRecords > (uint64_t)(std::numeric_limits<uint32_t>::max)())
+				nCalculatedBufferSizeInRecords = (uint64_t)(std::numeric_limits<uint32_t>::max)();
+			if (nCalculatedBufferSizeInRecords >= 256)
+				nBufferSizeInRecords = (uint32_t)nCalculatedBufferSizeInRecords;
+		}
+
+		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(m_nSensorSignalCount, m_nRTCSignalCount, m_nAdditionalSignalCount, nBufferSizeInRecords);
 	}
+
+	std::cout << "OIE-DIAG startAppEx: driverType=" << (uint32_t)m_DeviceDriverType
+		<< " recordingFrequency=" << (uint32_t)m_RecordingFrequency
+		<< " packetSkipCounter=" << m_nPacketReceiveSkipCounter
+		<< " rtcSignals=" << m_nRTCSignalCount
+		<< " sensorSignals=" << m_nSensorSignalCount
+		<< " additionalSignals=" << m_nAdditionalSignalCount
+		<< std::endl;
 
 }
 
@@ -572,7 +601,7 @@ void COIEDeviceInstance::SetRecordingFrequency(const LibMCDriver_ScanLabOIE::eOI
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_FREQUENCYCHANGENOTALLOWED);
 
 
-		switch (m_RecordingFrequency) {
+		switch (eFrequency) {
 			case eOIERecordingFrequency::Record100kHz: 
 				m_nPacketReceiveSkipCounter = 1;
 				break;
@@ -606,6 +635,8 @@ void COIEDeviceInstance::SetRecordingFrequency(const LibMCDriver_ScanLabOIE::eOI
 		}
 
 		m_RecordingFrequency = eFrequency;
+		std::cout << "OIE-DIAG SetRecordingFrequency: eFrequency=" << (uint32_t)eFrequency
+			<< " packetSkipCounter=" << m_nPacketReceiveSkipCounter << std::endl;
 
 	}
 	else {
@@ -715,6 +746,9 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 {
 	bool bSkipPacket = (m_nPacketReceiveCounter % m_nPacketReceiveSkipCounter) != 0;
 	m_nPacketReceiveCounter++;
+	m_nPacketCallbackCounter++;
+	if (bSkipPacket)
+		m_nPacketSkippedCounter++;
 
 	try {
 		if (!bSkipPacket) {
@@ -726,19 +760,45 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 				if (m_pCurrentDataRecording.get() != nullptr) {
 
 
+					// First uint32 of packet is packet number.
+					uint32_t* pPacketNumber = (uint32_t*)pkt;
+					// Second uint32 of packet is measurement tag.
+					uint32_t* pMeasurementTag = (pPacketNumber + 1);
+
 					double dX = 0.0;
 					double dY = 0.0;
 
 					if (m_bHasCorrectionData) {
-						m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_xy(pkt, &dX, &dY));
+						oie_error nXYError = m_pOIESDK->oie_pkt_get_xy(pkt, &dX, &dY);
+						if (nXYError != 0) {
+							static uint64_t nXYFallbackCounter = 0;
+							nXYFallbackCounter++;
+
+							if ((nXYFallbackCounter <= 20) || ((nXYFallbackCounter % 1000) == 0)) {
+								std::string sXYError = "unknown OIE xy error";
+								if (m_pOIESDK->oie_get_error != nullptr) {
+									const size_t nXYErrorBufferSize = 1024;
+									std::vector<char> buffer;
+									buffer.resize(nXYErrorBufferSize + 1);
+									m_pOIESDK->oie_get_error(nXYError, buffer.data(), (int32_t)buffer.size());
+									buffer.at(nXYErrorBufferSize) = 0;
+									sXYError = std::string(buffer.data());
+								}
+
+								std::cout << "OIE-DIAG xy fallback #" << nXYFallbackCounter
+									<< " packet=" << *pPacketNumber
+									<< " tag=" << *pMeasurementTag
+									<< " error=" << sXYError
+									<< " (" << nXYError << ")"
+									<< std::endl;
+							}
+
+							dX = 0.0;
+							dY = 0.0;
+						}
 					}
 
 					//std::cout << "Packet: " << " X: " << dX << " Y: " << dY << std::endl;
-
-					// First uint32 of packet is packet number
-					uint32_t* pPacketNumber = (uint32_t*)pkt;
-					// Second uint32 of packet is measurement tag...
-					uint32_t* pMeasurementTag = (pPacketNumber + 1);
 
 					/*if (*pPacketNumber > 4193900) {
 						std::cout << "Measurement tag" << *pMeasurementTag << " at packet ID " << *pPacketNumber << std::endl;
@@ -750,33 +810,58 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 					}*/
 					n_LastReceivedMeasurementTag = *pMeasurementTag;
 
+					const uint32_t nExpectedSensorSignalCount = m_pCurrentDataRecording->getSensorValuesPerRecord();
+					const uint32_t nExpectedRTCSignalCount = m_pCurrentDataRecording->getRTCValuesPerRecord();
+					const uint32_t nExpectedAdditionalSignalCount = m_pCurrentDataRecording->getAdditionalValuesPerRecord();
+
 					// Record sensor values first.
 					uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);
 					//std::cout << "Sensor signal count" << sensorSignalCount << std::endl;
 
-					for (uint32_t sensorSignalIndex = 0; sensorSignalIndex < sensorSignalCount; sensorSignalIndex++)
+					uint32_t sensorSignalCopyCount = (sensorSignalCount < nExpectedSensorSignalCount) ? sensorSignalCount : nExpectedSensorSignalCount;
+					for (uint32_t sensorSignalIndex = 0; sensorSignalIndex < sensorSignalCopyCount; sensorSignalIndex++)
 					{
 						int32_t nValue = 0;
 						m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_sensor_signal(pkt, sensorSignalIndex, &nValue));
 						m_pCurrentDataRecording->recordValue(nValue);
 					}
+					for (uint32_t sensorSignalIndex = sensorSignalCopyCount; sensorSignalIndex < nExpectedSensorSignalCount; sensorSignalIndex++)
+						m_pCurrentDataRecording->recordValue(0);
 
 					// record RTC values second
 					uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
 					//std::cout << "RTC signal count" << rtcSignalCount << std::endl;
-					for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
+					uint32_t rtcSignalCopyCount = (rtcSignalCount < nExpectedRTCSignalCount) ? rtcSignalCount : nExpectedRTCSignalCount;
+					for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCopyCount; rtcSignalIndex++)
 					{
 						int32_t nValue = 0;
 						m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_rtc_signal(pkt, rtcSignalIndex, &nValue));
 
 						m_pCurrentDataRecording->recordValue(nValue);
 					}
+					for (uint32_t rtcSignalIndex = rtcSignalCopyCount; rtcSignalIndex < nExpectedRTCSignalCount; rtcSignalIndex++)
+						m_pCurrentDataRecording->recordValue(0);
 
 					// Record additional values last
 					uint32_t additionalSignalCount = m_pOIESDK->oie_pkt_get_app_data_count(pkt);
 					//std::cout << "Additional signal count" << additionalSignalCount << " (packetNr " << *pPacketNumber << ")" << std::endl;
 
-					for (uint32_t additionalSignalIndex = 0; additionalSignalIndex < additionalSignalCount; additionalSignalIndex++)
+					if ((sensorSignalCount != nExpectedSensorSignalCount) || (rtcSignalCount != nExpectedRTCSignalCount) || (additionalSignalCount != nExpectedAdditionalSignalCount)) {
+						static uint64_t nSignalCountMismatchCounter = 0;
+						nSignalCountMismatchCounter++;
+
+						if ((nSignalCountMismatchCounter <= 20) || ((nSignalCountMismatchCounter % 1000) == 0)) {
+							std::cout << "OIE-DIAG packet signal-count mismatch #" << nSignalCountMismatchCounter
+								<< " packet=" << *pPacketNumber
+								<< " tag=" << *pMeasurementTag
+								<< " expected[s/r/a]=" << nExpectedSensorSignalCount << "/" << nExpectedRTCSignalCount << "/" << nExpectedAdditionalSignalCount
+								<< " got[s/r/a]=" << sensorSignalCount << "/" << rtcSignalCount << "/" << additionalSignalCount
+								<< std::endl;
+						}
+					}
+
+					uint32_t additionalSignalCopyCount = (additionalSignalCount < nExpectedAdditionalSignalCount) ? additionalSignalCount : nExpectedAdditionalSignalCount;
+					for (uint32_t additionalSignalIndex = 0; additionalSignalIndex < additionalSignalCopyCount; additionalSignalIndex++)
 					{
 						int32_t nValue = 0;
 						m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_app_data(pkt, additionalSignalIndex, &nValue));
@@ -784,9 +869,12 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 
 						m_pCurrentDataRecording->recordValue(nValue);
 					}
+					for (uint32_t additionalSignalIndex = additionalSignalCopyCount; additionalSignalIndex < nExpectedAdditionalSignalCount; additionalSignalIndex++)
+						m_pCurrentDataRecording->recordValue(0);
 
 
 					m_pCurrentDataRecording->finishRecord();
+					m_nPacketRecordedCounter++;
 
 				}
 			}
@@ -801,8 +889,19 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 
 		} */
 	}
+	catch (std::exception& E) {
+		static uint64_t nPacketExceptionCounter = 0;
+		nPacketExceptionCounter++;
+		if ((nPacketExceptionCounter <= 20) || ((nPacketExceptionCounter % 1000) == 0)) {
+			std::cout << "OIE-DIAG packet exception #" << nPacketExceptionCounter << ": " << E.what() << std::endl;
+		}
+	}
 	catch (...) {
-		//std::cout << "error getting data" << std::endl;
+		static uint64_t nPacketUnknownExceptionCounter = 0;
+		nPacketUnknownExceptionCounter++;
+		if ((nPacketUnknownExceptionCounter <= 20) || ((nPacketUnknownExceptionCounter % 1000) == 0)) {
+			std::cout << "OIE-DIAG packet unknown exception #" << nPacketUnknownExceptionCounter << std::endl;
+		}
 	}
 }
 
@@ -830,6 +929,13 @@ PDataRecordingInstance COIEDeviceInstance::RetrieveCurrentRecording()
 		m_pCurrentDataRecording = nullptr;
 		m_pCurrentDataRecording = pOldRecording->createEmptyDuplicate();
 
+		std::cout << "OIE-DIAG retrieve: records=" << pOldRecording->getRecordCount()
+			<< " callbacks=" << m_nPacketCallbackCounter.load()
+			<< " recorded=" << m_nPacketRecordedCounter.load()
+			<< " skipped=" << m_nPacketSkippedCounter.load()
+			<< " skipCounter=" << m_nPacketReceiveSkipCounter
+			<< std::endl;
+
 		return pOldRecording;
 	}
 	else {
@@ -850,6 +956,10 @@ void COIEDeviceInstance::ClearCurrentRecording()
 		m_pCurrentDataRecording = pOldRecording->createEmptyDuplicate();
 
 		n_LastReceivedMeasurementTag = 0;
+		m_nPacketReceiveCounter = 0;
+		m_nPacketCallbackCounter = 0;
+		m_nPacketRecordedCounter = 0;
+		m_nPacketSkippedCounter = 0;
 
 	}
 }

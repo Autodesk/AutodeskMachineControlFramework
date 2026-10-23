@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
+#include "amc_ui_module_contentitem_parameterlist.hpp"
 #include "amc_ui_module_custom.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_ui_expression.hpp"
@@ -57,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger.hpp"
 #include "amc_statesignalhandler.hpp"
 #include "amc_userinformation.hpp"
+#include "amc_api_auth.hpp"
 
 #include "amc_api_constants.hpp"
 
@@ -120,7 +122,7 @@ CUIHandler::CUIHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PUISystemState pU
     if (pUISystemState.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-    m_pFrontendDefinition = std::make_shared<CUIFrontendDefinition>(m_pUISystemState->getGlobalChronoInstance ());
+    m_pFrontendDefinition = std::make_shared<CUIFrontendDefinition>(m_pUISystemState->getGlobalChronoInstance (), m_pUISystemState->getStateMachineData()->getFrontendChangeCounter());
 }
 
 CUIHandler::~CUIHandler()
@@ -142,7 +144,7 @@ std::string CUIHandler::getCopyrightString()
     return m_sCopyrightString;
 }
 
-void CUIHandler::addMenuItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sDescription, const std::string& sTargetPage, const std::string& sEventName)
+void CUIHandler::addMenuItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sDescription, const std::string& sTargetPage, const std::string& sEventName, const CUIExpression& visible)
 {
     std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
@@ -152,10 +154,12 @@ void CUIHandler::addMenuItem_Unsafe(const std::string& sID, const std::string& s
     if (!sEventName.empty())
         ensureUIEventExists(sEventName);
 
-    m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption, sDescription, sTargetPage, sEventName));
+    auto pMenuItem = std::make_shared<CUIMenuItem>(sID, sIcon, sCaption, sDescription, sTargetPage, sEventName);
+    pMenuItem->setVisibleExpression(visible);
+    m_MenuItems.push_back(pMenuItem);
 }
 
-void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName)
+void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName, const CUIExpression& visible)
 {
     std::lock_guard<std::mutex> lockGuard(m_Mutex);
     
@@ -166,6 +170,7 @@ void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string
         ensureUIEventExists(sEventName);
 
     auto pToolbarItem = std::make_shared<CUIToolbarItem>(sID, sIcon, sCaption, sTargetPage, sEventName);
+    pToolbarItem->setVisibleExpression(visible);
     m_ToolbarItems.push_back(pToolbarItem);
     m_ToolbarItemUUIDMap.insert(std::make_pair (pToolbarItem->getUUID(), pToolbarItem));
 }
@@ -260,6 +265,55 @@ void CUIHandler::setCoreResourcePackage(PResourcePackage pCoreResourcePackage)
 
 }
 
+void CUIHandler::loadSessionVariablesFromXML(pugi::xml_node& sessionVariablesNode)
+{
+    auto parameterNodes = sessionVariablesNode.children("parameter");
+    for (pugi::xml_node parameterNode : parameterNodes) {
+        auto nameAttrib = parameterNode.attribute("name");
+        if (nameAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGSESSIONVARIABLENAME);
+        std::string sName = nameAttrib.as_string();
+
+        auto typeAttrib = parameterNode.attribute("type");
+        if (typeAttrib.empty())
+            throw ELibMCCustomException(LIBMC_ERROR_MISSINGSESSIONVARIABLETYPE, sName);
+
+        auto descriptionAttrib = parameterNode.attribute("description");
+        auto defaultValueAttrib = parameterNode.attribute("default");
+
+        m_pFrontendDefinition->addSessionVariable(sName, typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string());
+    }
+}
+
+void CUIHandler::validateSessionReferences()
+{
+    std::vector<std::string> references;
+
+    m_pFrontendDefinition->collectSessionReferences(references);
+
+    for (auto& pPage : m_Pages)
+        pPage.second->collectSessionReferences(references);
+    for (auto& pCustomPage : m_CustomPages)
+        pCustomPage.second->collectSessionReferences(references);
+    for (auto& pDialog : m_Dialogs)
+        pDialog.second->collectSessionReferences(references);
+
+    for (auto& pMenuItem : m_MenuItems) {
+        std::string sReference = pMenuItem->getVisibleExpression().getSessionReference();
+        if (!sReference.empty())
+            references.push_back(sReference);
+    }
+    for (auto& pToolbarItem : m_ToolbarItems) {
+        std::string sReference = pToolbarItem->getVisibleExpression().getSessionReference();
+        if (!sReference.empty())
+            references.push_back(sReference);
+    }
+
+    auto pAccessControl = m_pUISystemState->getAccessControl();
+    for (auto& sReference : references)
+        CUIFrontendState::validateSessionReference(sReference, m_pFrontendDefinition.get(), pAccessControl.get());
+}
+
 
 void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath)
 {
@@ -306,10 +360,12 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMAINPAGE);
     std::string sMainPage(mainpageAttrib.as_string());
 
-    auto colorsNode = xmlNode.child("colors");
-    if (!colorsNode.empty()) {
+    auto defaultThemeAttrib = xmlNode.attribute("defaulttheme");
+    m_sDefaultTheme = defaultThemeAttrib.empty() ? "light" : defaultThemeAttrib.as_string();
 
-        auto colorNodes = colorsNode.children("color");
+    auto parseColorBlock = [](pugi::xml_node& parentNode, std::map<std::string, uint32_t>& targetMap)
+    {
+        auto colorNodes = parentNode.children("color");
         for (pugi::xml_node colorNode : colorNodes) {
             auto nameColorAttrib = colorNode.attribute("name");
             auto redColorAttrib = colorNode.attribute("red");
@@ -325,7 +381,6 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
                 throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORGREENCHANNEL);
             if (blueColorAttrib.empty())
                 throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORBLUECHANNEL);
-
 
             double dRed = redColorAttrib.as_double(-1.0);
             double dGreen = greenColorAttrib.as_double(-1.0);
@@ -348,16 +403,31 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
             if (nBlue > 255) nBlue = 255;
 
             uint32_t nColor = (nRed + nGreen * 256 + nBlue * 65536);
-            m_Colors.insert(std::make_pair (sColorName, nColor));
-
+            targetMap.insert(std::make_pair (sColorName, nColor));
         }
+    };
 
-    }
+    auto colorsNode = xmlNode.child("colors");
+    if (!colorsNode.empty())
+        parseColorBlock(colorsNode, m_Colors);
+
+    auto darkColorsNode = xmlNode.child("darkcolors");
+    if (!darkColorsNode.empty())
+        parseColorBlock(darkColorsNode, m_DarkColors);
 
     auto loginNode = xmlNode.child("login");
     if (!loginNode.empty()) {
         m_LoginBackgroundUUID = CUIExpression(loginNode, "backgroundresource", "");
+        m_DarkLoginBackgroundUUID = CUIExpression(loginNode, "dark_backgroundresource", "");
         m_LoginWelcomeMessage = CUIExpression(loginNode, "welcomemessage", "");
+
+        auto loginStyleAttrib = loginNode.attribute("loginstyle");
+        m_sLoginStyle = loginStyleAttrib.empty() ? "classic" : loginStyleAttrib.as_string();
+
+        m_LoginSubtitle = CUIExpression(loginNode, "loginsubtitle", "");
+
+        auto panelResourceAttrib = loginNode.attribute("panelresource");
+        m_sPanelResourceName = panelResourceAttrib.empty() ? "" : panelResourceAttrib.as_string();
     }
 
 
@@ -371,6 +441,12 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
         m_sLogoUUID = pResourceEntry->getUUID ();
 
+        auto darkResourceAttrib = logoNode.attribute("dark_resource");
+        if (!darkResourceAttrib.empty()) {
+            auto pDarkResourceEntry = m_pCoreResourcePackage->findEntryByName(darkResourceAttrib.as_string(), true);
+            m_sDarkLogoUUID = pDarkResourceEntry->getUUID();
+        }
+
         auto aspectratioAttrib = logoNode.attribute("aspectratio");
         if (!aspectratioAttrib.empty()) {
             m_dLogoAspectRatio = aspectratioAttrib.as_float();
@@ -382,6 +458,10 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         if ((m_dLogoAspectRatio < AMC_UI_IMAGE_MINASPECTRATIO) || (m_dLogoAspectRatio > AMC_UI_IMAGE_MAXASPECTRATIO))
             throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDASPECTRATIO, std::to_string(m_dLogoAspectRatio));
     }
+
+    auto sessionVariablesNode = xmlNode.child("sessionvariables");
+    if (!sessionVariablesNode.empty())
+        loadSessionVariablesFromXML(sessionVariablesNode);
 
     auto pageNodes = xmlNode.children("page");
     for (pugi::xml_node pageNode : pageNodes) {
@@ -401,6 +481,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         CUIExpression description(pageNode, "description");
 
         auto pPage = addPage_Unsafe(sPageName, icon, caption, description, sShowEvent);
+        pPage->setVisibleExpression(CUIExpression(pageNode, "visible", "1"));
 
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
@@ -433,6 +514,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         
 
         auto pPage = addCustomPage_Unsafe(sPageName, sComponentName, icon, caption, description);
+        pPage->setVisibleExpression(CUIExpression(custompageNode, "visible", "1"));
 
         auto pCustomModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pUISystemState, pPage.get(), m_pCoreResourcePackage, m_pFrontendDefinition.get ());
         auto pCustomModule = std::make_shared<CUIModule_Custom>(custompageNode, sPageName, pCustomModuleEnvironment);
@@ -471,6 +553,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         std::string sDialogTitle(dialogTitleAttrib.as_string());
 
         auto pDialog = addDialog_Unsafe(sDialogName, sDialogTitle, icon, caption, description);
+        pDialog->setVisibleExpression(CUIExpression(dialogNode, "visible", "1"));
 
         auto dialogChildren = dialogNode.children();
         for (pugi::xml_node dialogChild : dialogChildren) {
@@ -507,7 +590,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         auto targetPageAttrib = menuItem.attribute("targetpage");
         auto eventNameAttrib = menuItem.attribute("event");
 
-        addMenuItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), descriptionAttrib.as_string(), targetPageAttrib.as_string(), eventNameAttrib.as_string ());
+        addMenuItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), descriptionAttrib.as_string(), targetPageAttrib.as_string(), eventNameAttrib.as_string (), CUIExpression(menuItem, "visible", "1"));
     }
 
     auto toolbarNode = xmlNode.child("toolbar");
@@ -534,7 +617,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         auto targetPageAttrib = toolbarItem.attribute("targetpage");
         auto eventNameAttrib = toolbarItem.attribute("event");
 
-        addToolbarItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string(), eventNameAttrib.as_string());
+        addToolbarItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string(), eventNameAttrib.as_string(), CUIExpression(toolbarItem, "visible", "1"));
     }
 
     auto pMainPage = findPage (sMainPage);
@@ -547,6 +630,8 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibr
         pCustomPage.second->configurePostLoading();
     for (auto pDialog : m_Dialogs)
         pDialog.second->configurePostLoading();
+
+    validateSessionReferences();
 
 }
 
@@ -665,6 +750,8 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
                         throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
 
                     sSenderPath = pModuleItem->findElementPathByUUID(sSenderUUID);
+                    if (sSenderPath.empty())
+                        sSenderPath = pModuleItem->getItemPath();
                 }
 
             }
@@ -880,10 +967,11 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
         pDialog.second->populateClientVariables(pClientVariableHandler);
     }
 }
+/////////////////////////////////////////////////////////////////////////////////////
+// Shared UI bootstrap configuration
+/////////////////////////////////////////////////////////////////////////////////////
 
-
-
-void CUIHandler::writeLegacyConfigurationToJSON(CJSONWriter& writer)
+void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer)
 {
     auto pStateMachineData = m_pUISystemState->getStateMachineData();
 
@@ -892,6 +980,8 @@ void CUIHandler::writeLegacyConfigurationToJSON(CJSONWriter& writer)
     writer.addString(AMC_API_KEY_UI_MAINPAGE, m_sMainPageName);
 
     writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
+    if (!m_sDarkLogoUUID.empty())
+        writer.addString(AMC_API_KEY_UI_DARKLOGOUUID, m_sDarkLogoUUID);
     writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
 
     if (!m_ToolbarLogoResourceName.empty()) {
@@ -903,29 +993,60 @@ void CUIHandler::writeLegacyConfigurationToJSON(CJSONWriter& writer)
         auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(m_LoginBackgroundUUID.evaluateStringValue(pStateMachineData), true);
         writer.addString(AMC_API_KEY_UI_LOGINBACKGROUNDUUID, pResourceEntry->getUUID());
     }
+    if (!m_DarkLoginBackgroundUUID.isEmpty(pStateMachineData)) {
+        auto pDarkResourceEntry = m_pCoreResourcePackage->findEntryByName(m_DarkLoginBackgroundUUID.evaluateStringValue(pStateMachineData), true);
+        writer.addString(AMC_API_KEY_UI_DARKLOGINBACKGROUNDUUID, pDarkResourceEntry->getUUID());
+    }
     writer.addString(AMC_API_KEY_UI_LOGINWELCOMEMESSAGE, m_LoginWelcomeMessage.evaluateStringValue(pStateMachineData));
 
-    CJSONWriterObject colorsObject(writer);
-    for (auto color : m_Colors) {
+    writer.addString(AMC_API_KEY_UI_LOGINSTYLE, m_sLoginStyle);
+    writer.addString(AMC_API_KEY_UI_LOGINSUBTITLE, m_LoginSubtitle.evaluateStringValue(pStateMachineData));
 
-        std::stringstream sColorStream;
-        uint32_t nRed = color.second & 0xff;
-        uint32_t nGreen = (color.second >> 8) & 0xff;
-        uint32_t nBlue = (color.second >> 16) & 0xff;
-
-        sColorStream << "#" << std::setfill('0') << std::setw(2) << std::hex << nRed << std::setfill('0') << std::setw(2) << std::hex << nGreen << std::setfill('0') << std::setw(2) << std::hex << nBlue;
-
-        colorsObject.addString(color.first, sColorStream.str());
+    if (!m_sPanelResourceName.empty()) {
+        auto pPanelResource = m_pCoreResourcePackage->findEntryByName(m_sPanelResourceName, true);
+        writer.addString(AMC_API_KEY_UI_LOGINPANELUUID, pPanelResource->getUUID());
     }
 
-    writer.addObject(AMC_API_KEY_UI_COLORS, colorsObject);
+    writer.addString(AMC_API_KEY_UI_DEFAULTTHEME, m_sDefaultTheme);
+
+    auto writeColorMap = [&writer](const std::map<std::string, uint32_t>& colorMap, const std::string& sKey)
+    {
+        CJSONWriterObject colorsObject(writer);
+        for (auto color : colorMap) {
+            std::stringstream sColorStream;
+            uint32_t nRed = color.second & 0xff;
+            uint32_t nGreen = (color.second >> 8) & 0xff;
+            uint32_t nBlue = (color.second >> 16) & 0xff;
+
+            sColorStream << "#" << std::setfill('0') << std::setw(2) << std::hex << nRed << std::setfill('0') << std::setw(2) << std::hex << nGreen << std::setfill('0') << std::setw(2) << std::hex << nBlue;
+
+            colorsObject.addString(color.first, sColorStream.str());
+        }
+        writer.addObject(sKey, colorsObject);
+    };
+
+    writeColorMap(m_Colors, AMC_API_KEY_UI_COLORS);
+
+    if (!m_DarkColors.empty())
+        writeColorMap(m_DarkColors, AMC_API_KEY_UI_DARKCOLORS);
 
 }
 
-void CUIHandler::writeLegacyStateToJSON(CJSONWriter& writer, CParameterHandler* pLegacyClientVariableHandler)
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+void CUIHandler::frontendWriteStatusToJSON(CJSONWriter& writer, CAPIAuth* pAuth, const std::set<std::string>* pActivePageNames, const std::set<std::string>* pActiveDialogNames, const sUIFrontendBuildEpoch& epoch)
 {
-    CJSONWriterArray menuItems(writer);
+    LibMCAssertNotNull(pAuth);
 
+    auto pFrontendState = pAuth->getFrontendState().get();
+    LibMCAssertNotNull(pFrontendState);
+
+    pFrontendState->setSessionIdentity(pAuth->getSessionUUID(), pAuth->getUserInformation(), m_pUISystemState->getAccessControl());
+
+    auto pStateMachineData = m_pUISystemState->getStateMachineData().get ();
+
+    CJSONWriterArray menuItems(writer);
     for (auto iter : m_MenuItems) {
         CJSONWriterObject menuItem(writer);
         menuItem.addString(AMC_API_KEY_UI_ID, iter->getID());
@@ -935,13 +1056,12 @@ void CUIHandler::writeLegacyStateToJSON(CJSONWriter& writer, CParameterHandler* 
         menuItem.addString(AMC_API_KEY_UI_DESCRIPTION, iter->getDescription());
         menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPageName());
         menuItem.addString(AMC_API_KEY_UI_EVENTNAME, iter->getEventName());
+        menuItem.addBool(AMC_API_KEY_UI_VISIBLE, iter->getVisibleExpression().evaluateBoolValue(pStateMachineData, pFrontendState));
         menuItems.addObject(menuItem);
     }
-
     writer.addArray(AMC_API_KEY_UI_MENUITEMS, menuItems);
 
     CJSONWriterArray toolbarItems(writer);
-
     for (auto iter : m_ToolbarItems) {
         CJSONWriterObject toolbarItem(writer);
         toolbarItem.addString(AMC_API_KEY_UI_ID, iter->getID());
@@ -950,82 +1070,76 @@ void CUIHandler::writeLegacyStateToJSON(CJSONWriter& writer, CParameterHandler* 
         toolbarItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption());
         toolbarItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPageName());
         toolbarItem.addString(AMC_API_KEY_UI_EVENTNAME, iter->getEventName());
+        toolbarItem.addBool(AMC_API_KEY_UI_VISIBLE, iter->getVisibleExpression().evaluateBoolValue(pStateMachineData, pFrontendState));
         toolbarItems.addObject(toolbarItem);
     }
     writer.addArray(AMC_API_KEY_UI_TOOLBARITEMS, toolbarItems);
 
+    auto isActiveName = [](const std::set<std::string>* pActiveNames, const std::string& sName) -> bool {
+        return (pActiveNames != nullptr) && (pActiveNames->find(sName) != pActiveNames->end());
+    };
+    bool bWriteAllModules = (pActivePageNames == nullptr);
 
     CJSONWriterArray pages(writer);
     for (auto iter : m_Pages) {
-        CJSONWriterObject page(writer);
-        page.addString(AMC_API_KEY_UI_PAGENAME, iter.second->getName());
-        page.addString(AMC_API_KEY_UI_UUID, iter.second->getUUID());
-        page.addString(AMC_API_KEY_UI_PAGESHOWEVENT, iter.second->getShowEvent());
+        CJSONWriterObject pageObject(writer);
 
-        CJSONWriterArray modules(writer);
-        iter.second->writeLegacyModulesToJSON(writer, modules, pLegacyClientVariableHandler);
+        bool bWriteModules = bWriteAllModules || isActiveName(pActivePageNames, iter.first);
+        iter.second->frontendWritePageStatusToJSON(writer, pageObject, pFrontendState, pStateMachineData, bWriteModules, epoch);
 
-        page.addArray(AMC_API_KEY_UI_MODULES, modules);
-
-        pages.addObject(page);
+        pages.addObject(pageObject);
     }
     writer.addArray(AMC_API_KEY_UI_PAGES, pages);
 
     CJSONWriterArray custompages(writer);
     for (auto iter : m_CustomPages) {
         CJSONWriterObject custompage(writer);
-        custompage.addString(AMC_API_KEY_UI_PAGENAME, iter.second->getName());
         custompage.addString(AMC_API_KEY_UI_COMPONENTNAME, iter.second->getComponentName());
-
-        CJSONWriterArray modules(writer);
-        iter.second->writeLegacyModulesToJSON(writer, modules, pLegacyClientVariableHandler);
-
-        custompage.addArray(AMC_API_KEY_UI_MODULES, modules);
-
+        bool bWriteModules = bWriteAllModules || isActiveName(pActivePageNames, iter.first);
+        iter.second->frontendWritePageStatusToJSON(writer, custompage, pFrontendState, pStateMachineData, bWriteModules, epoch);
         custompages.addObject(custompage);
     }
     writer.addArray(AMC_API_KEY_UI_CUSTOMPAGES, custompages);
 
-
     CJSONWriterArray dialogs(writer);
     for (auto iter : m_Dialogs) {
         CJSONWriterObject dialog(writer);
-        dialog.addString(AMC_API_KEY_UI_DIALOGNAME, iter.second->getName());
         dialog.addString(AMC_API_KEY_UI_DIALOGTITLE, iter.second->getTitle());
-
-        CJSONWriterArray modules(writer);
-        iter.second->writeLegacyModulesToJSON(writer, modules, pLegacyClientVariableHandler);
-
-        dialog.addArray(AMC_API_KEY_UI_MODULES, modules);
-
+        bool bWriteModules = bWriteAllModules || isActiveName(pActiveDialogNames, iter.first);
+        iter.second->frontendWritePageStatusToJSON(writer, dialog, pFrontendState, pStateMachineData, bWriteModules, epoch);
         dialogs.addObject(dialog);
     }
     writer.addArray(AMC_API_KEY_UI_DIALOGS, dialogs);
 
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
-// New UI Frontend System
-/////////////////////////////////////////////////////////////////////////////////////
-void CUIHandler::frontendWriteStatusToJSON(CJSONWriter& writer, CUIFrontendState* pFrontendState)
+void CUIHandler::frontendWriteParameterListToJSON(CJSONWriter& writer, CAPIAuth* pAuth, const std::string& sItemUUID, bool bValuesOnly, const std::string& sKnownDefinitionHash, const std::string& sKnownValuesHash, const std::string& sRowIndices)
 {
+    LibMCAssertNotNull(pAuth);
 
-    auto pStateMachineData = m_pUISystemState->getStateMachineData().get ();
-    CJSONWriterArray pages(writer);
-    for (auto iter : m_Pages) {
-        CJSONWriterObject pageObject(writer);
+    auto pFrontendState = pAuth->getFrontendState().get();
+    LibMCAssertNotNull(pFrontendState);
 
-        iter.second->frontendWritePageStatusToJSON(writer, pageObject, pFrontendState, pStateMachineData);
+    pFrontendState->setSessionIdentity(pAuth->getSessionUUID(), pAuth->getUserInformation(), m_pUISystemState->getAccessControl());
 
-        pages.addObject(pageObject);
-    }
-    writer.addArray(AMC_API_KEY_UI_PAGES, pages);
+    auto pStateMachineData = m_pUISystemState->getStateMachineData().get();
 
+    // Unknown items, other item types and items on hidden pages are reported identically.
+    auto pPage = findPageOfModuleItem(sItemUUID);
+    if ((pPage.get() == nullptr) || (!pPage->isVisible(pFrontendState, pStateMachineData)))
+        throw ELibMCCustomException(LIBMC_ERROR_MODULEITEMNOTFOUND, sItemUUID);
+
+    auto pParameterList = std::dynamic_pointer_cast<CUIModule_ContentParameterList>(pPage->findModuleItemByUUID(sItemUUID));
+    if (pParameterList.get() == nullptr)
+        throw ELibMCCustomException(LIBMC_ERROR_MODULEITEMNOTFOUND, sItemUUID);
+
+    if (bValuesOnly)
+        pParameterList->writeValuesToJSON(writer, sKnownDefinitionHash, sKnownValuesHash, sRowIndices);
+    else
+        pParameterList->writeDefinitionToJSON(writer);
 }
 
 PUIFrontendDefinition CUIHandler::getFrontendDefinition()
 {
     return m_pFrontendDefinition;
 }
-

@@ -37,6 +37,8 @@ Abstract: This is the class declaration of CImageLoader
 
 #include "libmcenv_interfaces.hpp"
 
+#include "amc_resourcepackage.hpp"
+
 // Parent classes
 #include "libmcenv_base.hpp"
 #ifdef _MSC_VER
@@ -58,9 +60,11 @@ namespace Impl {
 class CImageLoader : public virtual IImageLoader, public virtual CBase {
 private:
 
+	AMC::PResourcePackage m_pMachineResourcePackage;
+
 public:
 
-    CImageLoader();
+    CImageLoader(AMC::PResourcePackage pMachineResourcePackage);
 
     virtual ~CImageLoader();
 
@@ -68,7 +72,11 @@ public:
 
 	IImageData * LoadJPEGImage(const LibMCEnv_uint64 nJPEGDataBufferSize, const LibMCEnv_uint8 * pJPEGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
-	IImageData * CreateImageFromRawRGB24Data(const LibMCEnv_uint64 nRGB24DataBufferSize, const LibMCEnv_uint8 * pRGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+	IImageData* LoadPNGImageFromResource(const std::string& sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+
+	IImageData* LoadJPEGImageFromResource(const std::string& sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+
+    IImageData * CreateImageFromRawRGB24Data(const LibMCEnv_uint64 nRGB24DataBufferSize, const LibMCEnv_uint8 * pRGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
 	IImageData * CreateImageFromRawRGBA32Data(const LibMCEnv_uint64 nRGBA32DataBufferSize, const LibMCEnv_uint8 * pRGBA32DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 

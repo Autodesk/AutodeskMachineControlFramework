@@ -653,6 +653,32 @@ LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadsimulationdata(Li
 	}
 }
 
+LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_loadrawsimulationdata(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, const LibMCDriver_ScanLabSMC_uint64 nDataBufferSize, LibMCDriver_ScanLabSMC_uint64* pDataNeededCount, LibMCDriver_ScanLabSMC_uint8 * pDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pSMCJob;
+
+	try {
+		if ((!pDataBuffer) && !(pDataNeededCount))
+			throw ELibMCDriver_ScanLabSMCInterfaceException (LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDPARAM);
+		ISMCJob* pISMCJob = dynamic_cast<ISMCJob*>(pIBaseClass);
+		if (!pISMCJob)
+			throw ELibMCDriver_ScanLabSMCInterfaceException(LIBMCDRIVER_SCANLABSMC_ERROR_INVALIDCAST);
+		
+		pISMCJob->LoadRawSimulationData(nDataBufferSize, pDataNeededCount, pDataBuffer);
+
+		return LIBMCDRIVER_SCANLABSMC_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabSMCInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabSMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabSMCResult libmcdriver_scanlabsmc_smcjob_getjobcharacteristic(LibMCDriver_ScanLabSMC_SMCJob pSMCJob, eLibMCDriver_ScanLabSMCJobCharacteristic eValueType, LibMCDriver_ScanLabSMC_double * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pSMCJob;
@@ -2245,6 +2271,8 @@ LibMCDriver_ScanLabSMCResult LibMCDriver_ScanLabSMC::Impl::LibMCDriver_ScanLabSM
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_stopexecution;
 	if (sProcName == "libmcdriver_scanlabsmc_smcjob_loadsimulationdata") 
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_loadsimulationdata;
+	if (sProcName == "libmcdriver_scanlabsmc_smcjob_loadrawsimulationdata") 
+		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_loadrawsimulationdata;
 	if (sProcName == "libmcdriver_scanlabsmc_smcjob_getjobcharacteristic") 
 		*ppProcAddress = (void*) &libmcdriver_scanlabsmc_smcjob_getjobcharacteristic;
 	if (sProcName == "libmcdriver_scanlabsmc_smcjob_getjobduration") 

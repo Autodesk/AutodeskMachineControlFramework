@@ -43,7 +43,7 @@ Abstract: This is a stub class definition of CDriver_ScanLabSMC
 
 #define SCANLABSMC_DEFAULT_SMCDLLRESOURCENAME "scanmotioncontrol_x64"
 #define SCANLABSMC_DEFAULT_RTCDLLRESOURCENAME "rtc6dllx64"
-#define SCANLABSMC_DEFAULT_RTCSERVICEDLLRESOURCENAME "RtcService_x64"
+#define SCANLABSMC_DEFAULT_RTCSERVICEDLLRESOURCENAME "RtcService_x64rwd"
 #define SCANLABSMC_DEFAULT_XERCESDLLRESOURCENAME "xerces-c_3_2"
 
 using namespace LibMCDriver_ScanLabSMC::Impl;
@@ -256,7 +256,7 @@ void CDriver_ScanLabSMC::LoadSDK()
     m_pRTCDLL = m_pDLLDirectory->StoreCustomData("RTC6DLLx64.dll", m_RTCDLLResourceData);
     
     if (m_sType == "scanlab-smc-1.0" || m_sType == "scanlab-smc-1.1" || m_sType == "scanlab-smc-latest")
-        m_pRTCServiceDLL = m_pDLLDirectory->StoreCustomData("RtcService_x64.dll", m_RTCServiceDLLResourceData);
+        m_pRTCServiceDLL = m_pDLLDirectory->StoreCustomData("RtcService_x64rwd.dll", m_RTCServiceDLLResourceData);
 
     m_pXercesDLL = m_pDLLDirectory->StoreCustomData("xerces-c_3_2.dll", m_XercesDLLResourceData);
 

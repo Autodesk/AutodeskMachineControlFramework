@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameter_derived.hpp"
 #include "amc_statejournal.hpp"
 #include "amc_constants.hpp"
+#include "amc_frontendchangecounter.hpp"
 
 #include "amc_jsonwriter.hpp"
 #include "common_utils.hpp"
@@ -103,6 +104,13 @@ namespace AMC {
 		m_ParameterList.push_back(pParameter);
 	}
 
+	// No Mutex here!
+	void CParameterGroup::notifyFrontendIfChanged(CParameter* pParameter, uint64_t nChangeCounterBefore)
+	{
+		if ((m_pFrontendChangeCounter.get() != nullptr) && (pParameter->getChangeCounter() != nChangeCounterBefore))
+			m_pFrontendChangeCounter->bump();
+	}
+
 	uint32_t CParameterGroup::getParameterCount()
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
@@ -134,6 +142,36 @@ namespace AMC {
 		sDescription = iIter->second->getDescription();
 		sDefaultValue = iIter->second->getDefaultValue();
 
+	}
+
+	void CParameterGroup::setParameterConfigurationMapping(const std::string& sName, const std::string& sConfigurationSchema, const std::string& sConfigurationPath)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+
+		if (m_Parameters.find(sName) == m_Parameters.end())
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
+		if (sConfigurationSchema.empty() || sConfigurationPath.empty())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, m_sName + "/" + sName);
+		if (m_ConfigurationMappings.find(sName) != m_ConfigurationMappings.end())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, "duplicate configuration mapping for " + m_sName + "/" + sName);
+
+		m_ConfigurationMappings.insert(std::make_pair(sName, std::make_pair(sConfigurationSchema, sConfigurationPath)));
+	}
+
+	bool CParameterGroup::getParameterConfigurationMapping(const std::string& sName, std::string& sConfigurationSchema, std::string& sConfigurationPath)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+
+		auto iIter = m_ConfigurationMappings.find(sName);
+		if (iIter == m_ConfigurationMappings.end()) {
+			sConfigurationSchema.clear();
+			sConfigurationPath.clear();
+			return false;
+		}
+
+		sConfigurationSchema = iIter->second.first;
+		sConfigurationPath = iIter->second.second;
+		return true;
 	}
 
 
@@ -275,7 +313,9 @@ namespace AMC {
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
 		auto pParameter = m_ParameterList[nIndex];
+		uint64_t nChangeCounter = pParameter->getChangeCounter();
 		pParameter->setStringValue(sValue, nAbsoluteTimeStamp);
+		notifyFrontendIfChanged(pParameter.get(), nChangeCounter);
 	}
 
 	void CParameterGroup::setParameterValueByName(const std::string& sName, const std::string& sValue)
@@ -288,7 +328,9 @@ namespace AMC {
 
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
+		uint64_t nChangeCounter = iIter->second->getChangeCounter();
 		iIter->second->setStringValue(sValue, nAbsoluteTimeStamp);
+		notifyFrontendIfChanged(iIter->second.get(), nChangeCounter);
 	}
 
 	void CParameterGroup::setDoubleParameterValueByIndex(const uint32_t nIndex, const double dValue)
@@ -300,7 +342,9 @@ namespace AMC {
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
 		auto pParameter = m_ParameterList[nIndex];
+		uint64_t nChangeCounter = pParameter->getChangeCounter();
 		pParameter->setDoubleValue(dValue, nAbsoluteTimeStamp);
+		notifyFrontendIfChanged(pParameter.get(), nChangeCounter);
 	}
 
 	void CParameterGroup::setDoubleParameterValueByName(const std::string& sName, const double dValue)
@@ -313,7 +357,9 @@ namespace AMC {
 
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
+		uint64_t nChangeCounter = iIter->second->getChangeCounter();
 		iIter->second->setDoubleValue(dValue, nAbsoluteTimeStamp);
+		notifyFrontendIfChanged(iIter->second.get(), nChangeCounter);
 
 	}
 
@@ -326,7 +372,9 @@ namespace AMC {
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
 		auto pParameter = m_ParameterList[nIndex];
+		uint64_t nChangeCounter = pParameter->getChangeCounter();
 		pParameter->setIntValue(nValue, nAbsoluteTimeStamp);
+		notifyFrontendIfChanged(pParameter.get(), nChangeCounter);
 
 	}
 
@@ -340,7 +388,9 @@ namespace AMC {
 
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
+		uint64_t nChangeCounter = iIter->second->getChangeCounter();
 		iIter->second->setIntValue(nValue, nAbsoluteTimeStamp);
+		notifyFrontendIfChanged(iIter->second.get(), nChangeCounter);
 
 	}
 
@@ -353,7 +403,9 @@ namespace AMC {
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
 		auto pParameter = m_ParameterList[nIndex];
+		uint64_t nChangeCounter = pParameter->getChangeCounter();
 		pParameter->setBoolValue(bValue, nAbsoluteTimeStamp);
+		notifyFrontendIfChanged(pParameter.get(), nChangeCounter);
 	}
 
 	void CParameterGroup::setBoolParameterValueByName(const std::string& sName, const bool bValue)
@@ -366,7 +418,9 @@ namespace AMC {
 
 		uint64_t nAbsoluteTimeStamp = m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970();
 
+		uint64_t nChangeCounter = iIter->second->getChangeCounter();
 		iIter->second->setBoolValue(bValue, nAbsoluteTimeStamp);
+		notifyFrontendIfChanged(iIter->second.get(), nChangeCounter);
 
 	}
 
@@ -405,7 +459,9 @@ namespace AMC {
 			if (iIter == m_Parameters.end())
 				throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
+			uint64_t nChangeCounter = iIter->second->getChangeCounter();
 			iIter->second->setStringValue(sValue, nAbsoluteTimeStamp);
+			notifyFrontendIfChanged(iIter->second.get(), nChangeCounter);
 		}
 	}
 
@@ -417,6 +473,7 @@ namespace AMC {
 		for (auto pParameter : m_ParameterList) {
 			pParameterGroup->addParameterInternal (pParameter->duplicate ());
 		}
+		pParameterGroup->m_ConfigurationMappings = m_ConfigurationMappings;
 		
 	}
 
@@ -624,6 +681,12 @@ namespace AMC {
 		m_sInstanceName = sInstanceName;
 	}
 
+	void CParameterGroup::setFrontendChangeCounter(PFrontendChangeCounter pFrontendChangeCounter)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		m_pFrontendChangeCounter = pFrontendChangeCounter;
+	}
+
 
 	void CParameterGroup::setParameterPersistentUUID(const std::string& sParameterName, const std::string& sPersistentUUID)
 	{
@@ -653,8 +716,11 @@ namespace AMC {
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		for (auto pParameter : m_ParameterList) {
 			auto pValuedParameter = std::dynamic_pointer_cast<CParameter_Valued> (pParameter);
-			if (pValuedParameter.get() != nullptr)
+			if (pValuedParameter.get() != nullptr) {
+				uint64_t nChangeCounter = pValuedParameter->getChangeCounter();
 				pValuedParameter->setPersistencyHandler (pPersistencyHandler, nAbsoluteTimeStamp);
+				notifyFrontendIfChanged(pValuedParameter.get(), nChangeCounter);
+			}
 		}
 
 	}

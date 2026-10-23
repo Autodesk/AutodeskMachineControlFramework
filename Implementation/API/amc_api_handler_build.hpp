@@ -62,7 +62,7 @@ namespace AMC {
 
 		void handleToolpathRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
-		void handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth, const std::string & sStatusToQuery);
+		void handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth, const std::string & sStatusToQuery, CAPIFormFields& pFormFields);
 		void handleListBuildDataRequest(CJSONWriter& writer, PAPIAuth pAuth, const std::string& buildUUID);
 		PAPIResponse handleGetBuildDataRequest(PAPIAuth pAuth, const std::string& buildDataUUID);
 		void handleBuildJobDetailsRequest(CJSONWriter& writer, PAPIAuth pAuth, const std::string& buildUUID);

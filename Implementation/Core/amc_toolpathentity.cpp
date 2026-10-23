@@ -176,7 +176,7 @@ namespace AMC {
 	}
 
 
-	PToolpathLayerData CToolpathEntity::readLayer(uint32_t nLayerIndex)
+	PToolpathLayerData CToolpathEntity::readLayer(uint32_t nLayerIndex, const std::set<std::string>& excludedPartUUIDs)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
@@ -186,8 +186,60 @@ namespace AMC {
 		double dUnits = m_pToolpath->GetUnits();
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
+		cacheLayerContent_Unsafe(nLayerIndex, p3MFLayerData->GetSegmentCount() > 0);
+
 		auto nZValue = m_pToolpath->GetLayerZMax(nLayerIndex);
-		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName, m_CustomSegmentAttributes);
+		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName, m_CustomSegmentAttributes, excludedPartUUIDs);
+	}
+
+	void CToolpathEntity::cacheLayerContent_Unsafe(uint32_t nLayerIndex, bool bHasSegments)
+	{
+		if (m_LayerContentCache.empty())
+			m_LayerContentCache.resize(m_pToolpath->GetLayerCount(), eToolpathLayerContent::Unknown);
+
+		if (nLayerIndex < m_LayerContentCache.size())
+			m_LayerContentCache[nLayerIndex] = bHasSegments ? eToolpathLayerContent::NonEmpty : eToolpathLayerContent::Empty;
+	}
+
+	bool CToolpathEntity::layerHasSegments(uint32_t nLayerIndex)
+	{
+		// The lock is taken per layer, so that a long search does not block other readers of this toolpath.
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_pToolpath.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_BUILDHASNOTOOLPATH);
+
+		if ((nLayerIndex < m_LayerContentCache.size()) && (m_LayerContentCache[nLayerIndex] != eToolpathLayerContent::Unknown))
+			return (m_LayerContentCache[nLayerIndex] == eToolpathLayerContent::NonEmpty);
+
+		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
+		bool bHasSegments = (p3MFLayerData->GetSegmentCount() > 0);
+		cacheLayerContent_Unsafe(nLayerIndex, bHasSegments);
+
+		return bHasSegments;
+	}
+
+	bool CToolpathEntity::findNonEmptyLayer(uint32_t nMinLayerIndex, uint32_t nMaxLayerIndex, bool bFromMinToMax, uint32_t& nFoundLayerIndex)
+	{
+		if (nMinLayerIndex > nMaxLayerIndex)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		uint32_t nLayerCount = getLayerCount();
+		if (nMinLayerIndex >= nLayerCount)
+			return false;
+		if (nMaxLayerIndex >= nLayerCount)
+			nMaxLayerIndex = nLayerCount - 1;
+
+		uint32_t nRangeCount = nMaxLayerIndex - nMinLayerIndex + 1;
+		for (uint32_t nStep = 0; nStep < nRangeCount; nStep++) {
+			uint32_t nLayerIndex = bFromMinToMax ? (nMinLayerIndex + nStep) : (nMaxLayerIndex - nStep);
+			if (layerHasSegments(nLayerIndex)) {
+				nFoundLayerIndex = nLayerIndex;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 

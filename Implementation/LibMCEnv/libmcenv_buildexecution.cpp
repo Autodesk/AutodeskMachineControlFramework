@@ -416,7 +416,7 @@ std::string CBuildExecution::StoreDataTable(const std::string& sIdentifier, cons
 
 	std::string sNormalizedUserUUID;
 	if (!sUserUUID.empty())
-		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sNormalizedUserUUID);
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 	else
 		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 
@@ -522,7 +522,7 @@ IJournalHandler* CBuildExecution::LoadAttachedJournal(const LibMCEnv_uint32 nCac
 
 		uint64_t nMemoryQuotaInBytes = ((uint64_t)nCacheMemoryQuotaInMegabytes) * 1024ULL;
 
-		return new CJournalHandler_Historic(std::make_shared<AMC::CStateJournalReader>(pDataReader, nMemoryQuotaInBytes, nullptr));
+		return new CJournalHandler_Historic(std::make_shared<AMC::CStateJournalReader>(pDataReader, nMemoryQuotaInBytes, nullptr), m_pDataModel, sJournalUUIDToLoad, m_pGlobalChrono);
 
 	}
 

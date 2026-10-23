@@ -726,6 +726,17 @@ bool CDriver_BK9xxx::AnalogOutputExists(const std::string & sName)
 	return iIter != m_AnalogOutputIOMap.end();
 }
 
+bool CDriver_BK9xxx::AnalogInputIsOutOfBounds(const std::string& sName)
+{
+	auto iIter = m_AnalogInputIOMap.find(sName);
+	if (iIter == m_AnalogInputIOMap.end())
+		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_ANALOGIONOTFOUND, "analog IO not found: " + sName);
+
+	return iIter->second->getActualValueIsOutOfBounds ();
+
+}
+
+
 bool CDriver_BK9xxx::GetDigitalInput(const std::string & sVariableName)
 {
 	auto iIter = m_DigitalInputIOMap.find(sVariableName);

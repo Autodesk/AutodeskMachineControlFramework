@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_GRID
 #define __AMC_UI_MODULE_GRID
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -126,6 +127,9 @@ namespace AMC {
 		std::vector<PUIModule_GridRow> m_Rows;
 		std::vector<PUIModule_GridColumn> m_Columns;
 
+		// Inner padding applied to each grid cell, in pixels (0 = none).
+		uint32_t m_nPadding;
+
 		void addSection(PUIModule pModule, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition, bool bScrollbars);
 
 	public:
@@ -150,10 +154,6 @@ namespace AMC {
 		// Legacy UI System
 		/////////////////////////////////////////////////////////////////////////////////////
 		
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
-		virtual void writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler) override;
-
 		virtual void populateLegacyItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 		
 		virtual void populateModuleMap(std::map<std::string, PUIModule>& moduleMap) override;
@@ -167,8 +167,6 @@ namespace AMC {
 		/////////////////////////////////////////////////////////////////////////////////////
 		// New UI Frontend System
 		/////////////////////////////////////////////////////////////////////////////////////
-
-		virtual void frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData) override;
 
 		bool isVersion2FrontendModule() override;
 

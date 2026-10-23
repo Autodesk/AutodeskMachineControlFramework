@@ -76,6 +76,10 @@ protected:
 	LibMCData::LogCallback m_pLogCallback;
 	LibMCData_pvoid m_pLogUserData;
 
+	// Telemetry recording flag. Defaults to true, so that a caller that never calls
+	// SetTelemetryEnabled gets stock behaviour. Latched in InitialiseDatabase.
+	bool m_bTelemetryEnabled;
+
 public:
 
 	CDataModel();
@@ -83,6 +87,10 @@ public:
 	virtual ~CDataModel();
 
 	void InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType dataBaseType, const std::string & sConnectionString) override;
+
+	void SetTelemetryEnabled(const bool bTelemetryEnabled) override;
+
+	bool GetTelemetryEnabled() override;
 
 	LibMCData_uint32 GetDataModelVersion() override;
 
@@ -101,11 +109,19 @@ public:
 
 	IAlertSession* CreateAlertSession() override;
 
+	ITelemetrySession* CreateTelemetrySession() override;
+
+	ITelemetryReader* CreateTelemetryReader(const std::string& sJournalUUID) override;
+
 	IBuildJobHandler* CreateBuildJobHandler() override;
 
 	ILoginHandler* CreateLoginHandler() override;
 
 	IPersistencyHandler* CreatePersistencyHandler() override;
+
+	IUserPreferenceHandler* CreateUserPreferenceHandler() override;
+
+	ISessionMetricsHandler* CreateSessionMetricsHandler() override;
 
 	void SetBaseTempDirectory(const std::string& sTempDirectory) override;
 

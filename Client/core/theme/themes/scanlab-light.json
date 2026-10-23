@@ -1,0 +1,23 @@
+{
+	"name": "ScanLab Corporate Light",
+	"description": "Light industrial theme following the ScanLab corporate style guide. Light gray backgrounds, ScanLab red accent, clean typography.",
+	"tokens": {
+		"--amcf-color-bg":             "#E0E3E7",
+		"--amcf-color-surface":        "#FFFFFF",
+		"--amcf-color-surface-raised": "#F5F6F8",
+		"--amcf-color-surface-inset":  "#D8DBDF",
+		"--amcf-color-surface-hover":  "#ECEEF0",
+		"--amcf-color-primary":        "#C8102E",
+		"--amcf-color-primary-hover":  "#A00D24",
+		"--amcf-color-ok":             "#43A047",
+		"--amcf-color-warn":           "#F9A825",
+		"--amcf-color-error":          "#C8102E",
+		"--amcf-color-info":           "#2979FF",
+		"--amcf-color-text":           "#1E1E1E",
+		"--amcf-color-text-muted":     "#5F6368",
+		"--amcf-color-text-dim":       "#90A4AE",
+		"--amcf-color-border":         "#C8CCD0",
+		"--amcf-color-border-strong":  "#9BA3AB",
+		"--amcf-font-family":          "\"Segoe UI\", \"Inter\", \"Helvetica Neue\", Arial, sans-serif"
+	}
+}

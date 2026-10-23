@@ -101,6 +101,25 @@ IAlertIterator* CAlertSession::RetrieveAlerts(const bool bOnlyActive)
     return pResultIterator.release ();
 }
 
+IAlertIterator* CAlertSession::RetrieveAlertsChangedSince(const LibMCData_uint64 nIncrementalID)
+{
+    std::unique_ptr<CAlertIterator> pResultIterator(new CAlertIterator());
+    std::vector<std::string> alertUUIDs;
+
+    m_pJournal->retrieveAlertsChangedSince(alertUUIDs, nIncrementalID);
+
+    for (auto sUUID : alertUUIDs)
+        pResultIterator->AddAlert(std::make_shared<CAlert>(m_pJournal, sUUID));
+
+    return pResultIterator.release();
+}
+
+
+LibMCData_uint64 CAlertSession::GetAlertHeadID()
+{
+    return m_pJournal->getAlertHeadID();
+}
+
 
 IAlertIterator* CAlertSession::RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive)
 {

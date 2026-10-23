@@ -57,15 +57,22 @@ namespace AMC {
 		std::string m_sDescription;
 
 		AMCCommon::PChrono m_pGlobalChrono;
+
+		PFrontendChangeCounter m_pFrontendChangeCounter;
 		
 	public:
 
-		CParameterHandler(std::string sDescription, AMCCommon::PChrono pGlobalChrono);
+		// pFrontendChangeCounter may be null if the frontend does not display the parameters.
+		CParameterHandler(std::string sDescription, AMCCommon::PChrono pGlobalChrono, PFrontendChangeCounter pFrontendChangeCounter);
 		
 		virtual ~CParameterHandler();		
 		
 		bool hasGroup (const std::string & sName);
+
+		// The group keeps its own frontend change counter.
 		void addGroup (PParameterGroup pGroup);
+
+		// The new group bumps the frontend change counter of the handler.
 		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
 
 		uint32_t getGroupCount();

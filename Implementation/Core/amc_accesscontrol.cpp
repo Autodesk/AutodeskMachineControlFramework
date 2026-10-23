@@ -50,7 +50,7 @@ namespace AMC {
 
 	}
 
-	PAccessPermission CAccessControl::addPermission(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
+	PAccessPermission CAccessControl::addPermission(const std::string& sIdentifier, const CLanguageString& rDisplayName, const CLanguageString& rDescription)
 	{
 
 		if (hasPermission(sIdentifier))
@@ -67,7 +67,7 @@ namespace AMC {
 
 	}
 
-	PAccessRole CAccessControl::addRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
+	PAccessRole CAccessControl::addRole(const std::string& sIdentifier, const CLanguageString& rDisplayName, const CLanguageString& rDescription)
 	{
 		if (hasRole(sIdentifier))
 			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEROLEIDENTIFIER, sIdentifier);
@@ -138,10 +138,10 @@ namespace AMC {
 		m_Permissions.clear();
 		m_Roles.clear();
 
-		CStringResource nameResource("Default Role");
-		CStringResource descriptionResource("");
+		CLanguageString displayName("", "Default Role");
+		CLanguageString description("", "");
 
-		auto pDefaultRole = std::make_shared<CAccessRole>("default", nameResource, descriptionResource);
+		auto pDefaultRole = std::make_shared<CAccessRole>("default", displayName, description);
 		m_Roles.insert(std::make_pair(pDefaultRole->getIdentifier(), pDefaultRole));
 
 		m_pDefaultRole = pDefaultRole;

@@ -48,16 +48,43 @@ using namespace AMC;
 /////////////////////////////////////////////////////////////////////////////////////
 
 CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
-: CUIModule (getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition ())
+: CUIModule (getNameFromXML(xmlNode), getStaticType(), sPath, pUIModuleEnvironment->getFrontendDefinition ())
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
+
+	m_pModuleStore->setAlwaysWriteSubmodules(true);
 
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
 		auto pTab = CUIModuleFactory::createModule(childNode, sPath, pUIModuleEnvironment);
 		addTab (pTab);			
 	}
+
+	auto captionAttrib = xmlNode.attribute("caption");
+	m_sCaption = captionAttrib.as_string();
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(m_sCaption);
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr(xmlNode, "visible", "1");
+	registerBoolAttribute("visible", visibleExpr);
+
+	// Optional card framing (mirrors the "content" module), so a tab control can be
+	// rendered inside an elevated/outlined/tinted card with an optional title/subtitle.
+	auto cardStyleAttrib = xmlNode.attribute("cardstyle");
+	CUIExpression cardStyleExpr;
+	cardStyleExpr.setFixedValue(cardStyleAttrib.empty() ? "none" : cardStyleAttrib.as_string());
+	registerStringAttribute("cardstyle", cardStyleExpr);
+
+	CUIExpression cardTitleExpr;
+	cardTitleExpr.setFixedValue(xmlNode.attribute("title").as_string());
+	registerStringAttribute("title", cardTitleExpr);
+
+	CUIExpression cardSubtitleExpr;
+	cardSubtitleExpr.setFixedValue(xmlNode.attribute("subtitle").as_string());
+	registerStringAttribute("subtitle", cardSubtitleExpr);
 
 }
 
@@ -103,41 +130,15 @@ void CUIModule_Tabs::addTab(PUIModule pTab)
 
 	pTab->populateLegacyItemMap(m_ItemMap);
 
+	if (pTab->isVersion2FrontendModule())
+		m_pModuleStore->addChildStore(pTab->getFrontendModuleStore());
+
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Legacy UI System
 /////////////////////////////////////////////////////////////////////////////////////
-
-
-void CUIModule_Tabs::writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler)
-{
-	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
-	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
-	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
-	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
-
-	CJSONWriterArray tabsNode(writer);
-	for (auto tab : m_Tabs) {
-		CJSONWriterObject tabObject(writer);
-		tab->writeLegacyDefinitionToJSON(writer, tabObject, pLegacyClientVariableHandler);
-		tabsNode.addObject(tabObject);
-	}
-	moduleObject.addArray(AMC_API_KEY_UI_TABS, tabsNode);
-
-}
-
-void CUIModule_Tabs::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-	CJSONWriterArray tabsNode(writer);
-	for (auto tab : m_Tabs) {
-		CJSONWriterObject tabObject(writer);
-		tab->addContentToJSON(writer, tabObject, pClientVariableHandler, nStateID);
-		tabsNode.addObject(tabObject);
-	}
-	moduleObject.addArray(AMC_API_KEY_UI_TABS, tabsNode);
-}
 
 PUIModuleItem CUIModule_Tabs::findLegacyItem(const std::string& sUUID)
 {
@@ -182,29 +183,6 @@ void CUIModule_Tabs::populateModuleMap(std::map<std::string, PUIModule>& moduleM
 /////////////////////////////////////////////////////////////////////////////////////
 // New UI Frontend System
 /////////////////////////////////////////////////////////////////////////////////////
-
-
-void CUIModule_Tabs::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
-{
-	CUIModule::frontendWriteModuleStatusToJSON(writer, moduleObject, pFrontendState, pStateMachineData);
-
-	CJSONWriterArray submodulesArray(writer);
-
-	for (auto & pTab : m_Tabs) {
-
-		if (pTab->isVersion2FrontendModule()) {
-
-			CJSONWriterObject subModuleObject(writer);
-			pTab->frontendWriteModuleStatusToJSON(writer, subModuleObject, pFrontendState, pStateMachineData);
-			submodulesArray.addObject(subModuleObject);
-
-		}
-
-	}
-
-	moduleObject.addArray("submodules", submodulesArray);
-
-}
 
 
 bool CUIModule_Tabs::isVersion2FrontendModule()

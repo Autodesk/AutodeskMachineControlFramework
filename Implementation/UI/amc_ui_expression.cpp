@@ -57,12 +57,22 @@ CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& a
 	readFromXML(xmlNode, attributeName, defaultValue, false);
 }
 
+CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, const char* defaultValue)
+{
+	readFromXML(xmlNode, attributeName, (defaultValue != nullptr) ? defaultValue : "", false);
+}
+
 void CUIExpression::setFixedValue(const std::string& sValue)
 {
 	m_sFixedValue = sValue;
 	m_sExpressionValue = "";
 }
 
+void CUIExpression::setSyncValue(const std::string& sValue)
+{
+	m_sExpressionValue = sValue;
+	m_sFixedValue = "";
+}
 
 void CUIExpression::readFromXML(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue, bool bValueMustExist)
 {
@@ -94,9 +104,33 @@ void CUIExpression::readFromXML(const pugi::xml_node& xmlNode, const std::string
 	}
 }
 
-std::string CUIExpression::evaluateValueEx(CStateMachineData* pStateMachineData)
+bool CUIExpression::isSessionReference(const std::string& sReference)
+{
+	return (sReference.rfind("session.", 0) == 0) || (sReference.rfind("$session.", 0) == 0) || (sReference.rfind("$user.", 0) == 0);
+}
+
+std::string CUIExpression::getSessionReference()
+{
+	std::string sReference = AMCCommon::CUtils::trimString(m_sExpressionValue);
+	if ((!sReference.empty()) && (sReference.at(0) == '!'))
+		sReference = AMCCommon::CUtils::trimString(sReference.substr(1));
+
+	if (isSessionReference(sReference))
+		return sReference;
+
+	return "";
+}
+
+std::string CUIExpression::evaluateValueEx(CStateMachineData* pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
 	if (!m_sExpressionValue.empty()) {
+		std::string sSessionReference = AMCCommon::CUtils::trimString(m_sExpressionValue);
+		if (isSessionReference(sSessionReference)) {
+			if (pSessionContext == nullptr)
+				return "";
+			return pSessionContext->evaluateSessionReference(sSessionReference);
+		}
+
 		LibMCAssertNotNull(pStateMachineData);
 
 		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
@@ -152,10 +186,10 @@ const char* parseDotString(const char* pChar, uint32_t& nPrecision)
 
 }
 
-std::string CUIExpression::evaluateStringValue(CStateMachineData* pStateMachineData)
+std::string CUIExpression::evaluateStringValue(CStateMachineData* pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
 	if (m_sFormatString.empty ())
-		return evaluateValueEx(pStateMachineData);
+		return evaluateValueEx(pStateMachineData, pSessionContext);
 
 	std::stringstream sStream;
 	const char* pChar = m_sFormatString.c_str();
@@ -176,21 +210,21 @@ std::string CUIExpression::evaluateStringValue(CStateMachineData* pStateMachineD
 				break;
 
 			case 'd':
-				sStream << evaluateIntegerValue (pStateMachineData);
+				sStream << evaluateIntegerValue (pStateMachineData, pSessionContext);
 				break;
 
 			case 'f':
-				sStream << evaluateNumberValue(pStateMachineData);
+				sStream << evaluateNumberValue(pStateMachineData, pSessionContext);
 				break;
 
 			case 's':
-				sStream << evaluateValueEx(pStateMachineData);
+				sStream << evaluateValueEx(pStateMachineData, pSessionContext);
 				break;
 
 			case '.': 
 				pChar = parseDotString(pChar + 1, nPrecision);
 
-				sStream << std::fixed << std::setprecision(nPrecision) << evaluateNumberValue(pStateMachineData);
+				sStream << std::fixed << std::setprecision(nPrecision) << evaluateNumberValue(pStateMachineData, pSessionContext);
 				break;
 
 			default:
@@ -206,14 +240,21 @@ std::string CUIExpression::evaluateStringValue(CStateMachineData* pStateMachineD
 	
 }
 
-std::string CUIExpression::evaluateStringValue(PStateMachineData pStateMachineData)
+std::string CUIExpression::evaluateStringValue(PStateMachineData pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
-	return evaluateStringValue(pStateMachineData.get());
+	return evaluateStringValue(pStateMachineData.get(), pSessionContext);
 }
 
-double CUIExpression::evaluateNumberValue(CStateMachineData* pStateMachineData)
+double CUIExpression::evaluateNumberValue(CStateMachineData* pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
 	if (!m_sExpressionValue.empty()) {
+		std::string sSessionReference = AMCCommon::CUtils::trimString(m_sExpressionValue);
+		if (isSessionReference(sSessionReference)) {
+			if (pSessionContext == nullptr)
+				return 0.0;
+			return pSessionContext->evaluateSessionReferenceAsNumber(sSessionReference);
+		}
+
 		LibMCAssertNotNull(pStateMachineData);
 
 		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
@@ -241,14 +282,21 @@ double CUIExpression::evaluateNumberValue(CStateMachineData* pStateMachineData)
 
 }
 
-double CUIExpression::evaluateNumberValue(PStateMachineData pStateMachineData)
+double CUIExpression::evaluateNumberValue(PStateMachineData pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
-	return evaluateNumberValue(pStateMachineData.get());
+	return evaluateNumberValue(pStateMachineData.get(), pSessionContext);
 }
 
-int64_t CUIExpression::evaluateIntegerValue(CStateMachineData* pStateMachineData)
+int64_t CUIExpression::evaluateIntegerValue(CStateMachineData* pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
 	if (!m_sExpressionValue.empty()) {
+		std::string sSessionReference = AMCCommon::CUtils::trimString(m_sExpressionValue);
+		if (isSessionReference(sSessionReference)) {
+			if (pSessionContext == nullptr)
+				return 0;
+			return pSessionContext->evaluateSessionReferenceAsInteger(sSessionReference);
+		}
+
 		LibMCAssertNotNull(pStateMachineData);
 
 		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
@@ -276,16 +324,14 @@ int64_t CUIExpression::evaluateIntegerValue(CStateMachineData* pStateMachineData
 
 }
 
-int64_t CUIExpression::evaluateIntegerValue(PStateMachineData pStateMachineData)
+int64_t CUIExpression::evaluateIntegerValue(PStateMachineData pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
-	return evaluateIntegerValue(pStateMachineData.get());
+	return evaluateIntegerValue(pStateMachineData.get(), pSessionContext);
 }
 
-bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
+bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
 	if (!m_sExpressionValue.empty()) {
-		LibMCAssertNotNull(pStateMachineData);
-
 		std::string sTrimmedExpression = AMCCommon::CUtils::trimString(m_sExpressionValue);
 
 		if (sTrimmedExpression.empty())
@@ -294,13 +340,22 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 		std::string sExpression;
 		bool bInvert;
 		if (sTrimmedExpression.at(0) == '!') {
-			sExpression = sTrimmedExpression.substr(1);
+			sExpression = AMCCommon::CUtils::trimString(sTrimmedExpression.substr(1));
 			bInvert = true;
 		}
 		else {
 			sExpression = sTrimmedExpression;
 			bInvert = false;
 		}
+
+		if (isSessionReference(sExpression)) {
+			bool bSessionValue = false;
+			if (pSessionContext != nullptr)
+				bSessionValue = pSessionContext->evaluateSessionReferenceAsBool(sExpression);
+			return bInvert ? !bSessionValue : bSessionValue;
+		}
+
+		LibMCAssertNotNull(pStateMachineData);
 
 		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
 		CStateMachineData::extractParameterDetailsFromDotString(sExpression, sParameterInstanceName, sParameterGroupName, sParameterName, false, false);
@@ -332,6 +387,12 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 			bInvert = false;
 		}
 
+		// Handle "true" / "false" string literals (e.g. from XML boolean attributes)
+		if (sExpression == "true")
+			return !bInvert;
+		if (sExpression == "false")
+			return bInvert;
+
 		std::string::const_iterator it = sExpression.begin();
 		while (it != sExpression.end() && (std::isdigit(*it) || (*it == '+') || (*it == '-'))) ++it;
 		bool bIsNumber = !sExpression.empty() && it == sExpression.end();
@@ -351,14 +412,14 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 
 }
 
-bool CUIExpression::evaluateBoolValue(PStateMachineData pStateMachineData)
+bool CUIExpression::evaluateBoolValue(PStateMachineData pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
-	return evaluateBoolValue(pStateMachineData.get ());
+	return evaluateBoolValue(pStateMachineData.get (), pSessionContext);
 }
 
-std::string CUIExpression::evaluateUUIDValue(CStateMachineData* pStateMachineData)
+std::string CUIExpression::evaluateUUIDValue(CStateMachineData* pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
-	std::string sValue = evaluateStringValue(pStateMachineData);
+	std::string sValue = evaluateStringValue(pStateMachineData, pSessionContext);
 
 	if (AMCCommon::CUtils::stringIsUUIDString(sValue))
 		return AMCCommon::CUtils::normalizeUUIDString(sValue);
@@ -367,15 +428,19 @@ std::string CUIExpression::evaluateUUIDValue(CStateMachineData* pStateMachineDat
 	
 }
 
-std::string CUIExpression::evaluateUUIDValue(PStateMachineData pStateMachineData)
+std::string CUIExpression::evaluateUUIDValue(PStateMachineData pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
-	return evaluateUUIDValue(pStateMachineData.get());
+	return evaluateUUIDValue(pStateMachineData.get(), pSessionContext);
 }
 
 
 void CUIExpression::checkExpressionSyntax(CStateMachineData* pStateMachineData)
 {
-	evaluateValueEx(pStateMachineData);
+	// Session references are validated against the declared session variables after the UI is loaded.
+	if (!getSessionReference().empty())
+		return;
+
+	evaluateValueEx(pStateMachineData, nullptr);
 }
 
 void CUIExpression::checkExpressionSyntax(PStateMachineData pStateMachineData)
@@ -388,13 +453,13 @@ bool CUIExpression::needsSync()
 	return !m_sExpressionValue.empty();
 }
 
-bool CUIExpression::isEmpty(CStateMachineData* pStateMachineData)
+bool CUIExpression::isEmpty(CStateMachineData* pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
-	std::string sValue = evaluateValueEx(pStateMachineData);
+	std::string sValue = evaluateValueEx(pStateMachineData, pSessionContext);
 	return sValue.empty();
 }
 
-bool CUIExpression::isEmpty(PStateMachineData pStateMachineData)
+bool CUIExpression::isEmpty(PStateMachineData pStateMachineData, CUIExpressionSessionContext* pSessionContext)
 {
-	return isEmpty(pStateMachineData.get ());
+	return isEmpty(pStateMachineData.get (), pSessionContext);
 }

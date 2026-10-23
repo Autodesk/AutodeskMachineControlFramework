@@ -55,13 +55,15 @@ CSignalTrigger::CSignalTrigger(AMC::PStateSignalHandler pSignalHandler, std::str
 	m_sSignalUUID = AMCCommon::CUtils::createUUID();
 	m_bIsPreparing = true;
 	
-	m_nReactionTimeOutInMs = m_pSignalHandler->getDefaultReactionTimeout (m_sInstanceName, m_sSignalName);
+
+	auto pSignalInstance = m_pSignalHandler->getInstance(m_sInstanceName);
+	m_nReactionTimeOutInMs = pSignalInstance->getDefaultReactionTimeout (m_sSignalName);
 
 	m_pParameterGroup = std::make_shared<AMC::CParameterGroup>(pGlobalChrono);
 	m_pResultGroup = std::make_shared<AMC::CParameterGroup>(pGlobalChrono);
 
-	m_pSignalHandler->populateParameterGroup (m_sInstanceName, m_sSignalName, m_pParameterGroup.get());
-	m_pSignalHandler->populateResultGroup(m_sInstanceName, m_sSignalName, m_pResultGroup.get());
+	pSignalInstance->populateParameterGroup (m_sSignalName, m_pParameterGroup.get());
+	pSignalInstance->populateResultGroup(m_sSignalName, m_pResultGroup.get());
 
 }
 
@@ -79,18 +81,22 @@ bool CSignalTrigger::CanTrigger()
 	if (!m_bIsPreparing)
 		return false;
 
-	return m_pSignalHandler->canTrigger(m_sInstanceName, m_sSignalName);
+	auto pSignalInstance = m_pSignalHandler->getInstance(m_sInstanceName);
+
+	return pSignalInstance->canTrigger(m_sSignalName);
 }
 
 
 LibMCEnv_uint32 CSignalTrigger::GetAvailableSignalQueueSlots()
 {
-	return m_pSignalHandler->getAvailableSignalQueueEntryCount(m_sInstanceName, m_sSignalName);
+	auto pSignalInstance = m_pSignalHandler->getInstance(m_sInstanceName);
+	return pSignalInstance->getAvailableSignalQueueEntryCount(m_sSignalName);
 }
 
 LibMCEnv_uint32 CSignalTrigger::GetTotalSignalQueueSlots()
 {
-	return m_pSignalHandler->getTotalSignalQueueSize(m_sInstanceName, m_sSignalName);
+	auto pSignalInstance = m_pSignalHandler->getInstance(m_sInstanceName);
+	return pSignalInstance->getTotalSignalQueueSize(m_sSignalName);
 }
 
 LibMCEnv::eSignalPhase CSignalTrigger::GetSignalPhase()
@@ -117,8 +123,8 @@ LibMCEnv::eSignalPhase CSignalTrigger::GetSignalPhase()
 		return LibMCEnv::eSignalPhase::TimedOut;
 	case AMC::eAMCSignalPhase::Cleared:
 		return LibMCEnv::eSignalPhase::Cleared;
-	case AMC::eAMCSignalPhase::Retracted:
-		return LibMCEnv::eSignalPhase::Retracted;
+	case AMC::eAMCSignalPhase::Archived:
+		return LibMCEnv::eSignalPhase::Archived;
 
 	default:
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_UNDEFINEDINTERNALSIGNALPHASE);
@@ -156,7 +162,8 @@ void CSignalTrigger::Trigger()
 
 bool CSignalTrigger::TryTrigger()
 {
-	bool bSuccess = m_pSignalHandler->addNewInQueueSignal(m_sInstanceName, m_sSignalName, m_sSignalUUID, m_pParameterGroup->serializeToJSON(), m_nReactionTimeOutInMs);
+	auto pSignalInstance = m_pSignalHandler->getInstance(m_sInstanceName);
+	bool bSuccess = pSignalInstance->addNewInQueueSignal(m_sSignalName, m_sSignalUUID, m_pParameterGroup->serializeToJSON(), m_nReactionTimeOutInMs, m_pGlobalChrono->getElapsedMicroseconds());
 	if (bSuccess ) {
 		m_bIsPreparing = false;
 		return true;
@@ -192,7 +199,7 @@ bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOutInMillisecond
 	while (!bIsTimeOut) {	
 
 		auto signalPhase = m_pSignalHandler->getSignalPhase(m_sSignalUUID);
-		bool bHasBeenHandled = (signalPhase == AMC::eAMCSignalPhase::Handled) || (signalPhase == AMC::eAMCSignalPhase::Failed) || (signalPhase == AMC::eAMCSignalPhase::Cleared) || (signalPhase == AMC::eAMCSignalPhase::Retracted) || (signalPhase == AMC::eAMCSignalPhase::TimedOut);
+		bool bHasBeenHandled = (signalPhase == AMC::eAMCSignalPhase::Handled) || (signalPhase == AMC::eAMCSignalPhase::Failed) || (signalPhase == AMC::eAMCSignalPhase::Cleared) || (signalPhase == AMC::eAMCSignalPhase::Archived) || (signalPhase == AMC::eAMCSignalPhase::TimedOut);
 		
 		if (bHasBeenHandled) {
 			std::string sResultDataJSON = m_pSignalHandler->getResultDataJSON (m_sSignalUUID);

@@ -35,6 +35,7 @@ Abstract: This is the class declaration of CStorageStream
 #ifndef __LIBMCDATA_STORAGESTREAM
 #define __LIBMCDATA_STORAGESTREAM
 
+#include <cstdint>
 #include "libmcdata_interfaces.hpp"
 
 // Parent classes

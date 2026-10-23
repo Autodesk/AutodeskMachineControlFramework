@@ -43,11 +43,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_exceptiontypes.hpp"
 #include "libmcdata_dynamic.hpp"
 
+#include <cstdint>
+#include <map>
+
 using namespace AMC;
 
 #define CONTENTCONFIGURATIONLISTHEADER_DEFAULTCAPTION_THUMBNAIL "Thumbnail"
 #define CONTENTCONFIGURATIONLISTHEADER_DEFAULTCAPTION_CONFIGURATIONNAME "Configuration name"
 #define CONTENTCONFIGURATIONLISTHEADER_DEFAULTCAPTION_CONFIGURATIONTIMESTAMP "Upload time"
+#define CONTENTCONFIGURATIONLIST_DEFAULTSCHEMA "com.scanlab.ocmsmc"
+
+static void fnv1aMixString(uint64_t& nHash, const std::string& sValue)
+{
+	for (unsigned char nChar : sValue) {
+		nHash ^= (uint64_t)nChar;
+		nHash *= 1099511628211ULL;
+	}
+}
 
 
 CUIModule_ContentConfigurationListButton::CUIModule_ContentConfigurationListButton(const std::string& sButtonName, CUIExpression captionExpression, const std::string& sEvent)
@@ -93,7 +105,11 @@ PUIModule_ContentConfigurationList CUIModule_ContentConfigurationList::makeFromX
 
 	auto entriesperpageAttrib = xmlNode.attribute("entriesperpage");
 	auto selectEventAttrib = xmlNode.attribute("selectevent");
+	auto schemaAttrib = xmlNode.attribute("schema");
 	std::string sSelectEvent = selectEventAttrib.as_string();
+	std::string sSchema = schemaAttrib.as_string();
+	if (sSchema.empty())
+		sSchema = CONTENTCONFIGURATIONLIST_DEFAULTSCHEMA;
 
 	int nEntriesPerPage;
 	if (!entriesperpageAttrib.empty()) {
@@ -121,7 +137,7 @@ PUIModule_ContentConfigurationList CUIModule_ContentConfigurationList::makeFromX
 
 	CUIExpression loadingText(xmlNode, "loadingtext");
 
-	auto pConfigurationList = std::make_shared <CUIModule_ContentConfigurationList>(loadingText, nEntriesPerPage, sSelectEvent, pUIModuleEnvironment->dataModel(), sItemName, sModulePath, sDefaultThumbnailUUID, pUIModuleEnvironment->stateMachineData());
+	auto pConfigurationList = std::make_shared <CUIModule_ContentConfigurationList>(loadingText, nEntriesPerPage, sSelectEvent, sSchema, pUIModuleEnvironment->dataModel(), sItemName, sModulePath, sDefaultThumbnailUUID, pUIModuleEnvironment->stateMachineData());
 
 	auto buttonNodes = xmlNode.children("button");
 	for (auto buttonNode : buttonNodes) {
@@ -145,14 +161,15 @@ PUIModule_ContentConfigurationList CUIModule_ContentConfigurationList::makeFromX
 
 }
 
-CUIModule_ContentConfigurationList::CUIModule_ContentConfigurationList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData)
+CUIModule_ContentConfigurationList::CUIModule_ContentConfigurationList(const CUIExpression& loadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, const std::string& sConfigurationSchema, LibMCData::PDataModel pDataModel, const std::string& sItemName, const std::string& sModulePath, const std::string sDefaultThumbnailResourceUUID, PStateMachineData pStateMachineData)
 	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), 
 	  m_LoadingText(loadingText), 
 	  m_nEntriesPerPage(nEntriesPerPage), 
 	  m_sSelectEvent(sSelectEvent), 
+	  m_sConfigurationSchema(sConfigurationSchema),
 	  m_pDataModel (pDataModel), 
 	  m_pStateMachineData (pStateMachineData),
-  	  m_sDefaultThumbnailResourceUUID (AMCCommon::CUtils::normalizeUUIDString (sDefaultThumbnailResourceUUID))
+	  m_sDefaultThumbnailResourceUUID (AMCCommon::CUtils::normalizeUUIDString (sDefaultThumbnailResourceUUID))
 
 {
 	if (sModulePath.empty ())
@@ -162,6 +179,8 @@ CUIModule_ContentConfigurationList::CUIModule_ContentConfigurationList(const CUI
 	if (pDataModel.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pStateMachineData.get () == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (m_sConfigurationSchema.empty())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	m_sSelectedConfigurationFieldUUID = AMCCommon::CUtils::createUUID();
@@ -211,6 +230,15 @@ void CUIModule_ContentConfigurationList::writeHeadersToJSON(CJSONWriter& writer,
 		headerObject.addBool(AMC_API_KEY_UI_ITEMSORTABLE, true);
 		headerObject.addString(AMC_API_KEY_UI_ITEMWIDTH, "5vw");
 		headerObject.addString("align", "center");
+		headersArray.addObject(headerObject);
+	}
+
+	{
+		CJSONWriterObject headerObject(writer);
+		headerObject.addString(AMC_API_KEY_UI_ITEMTEXT, "Name");
+		headerObject.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMCONFIGURATIONNAME);
+		headerObject.addBool(AMC_API_KEY_UI_ITEMSORTABLE, true);
+		headerObject.addString(AMC_API_KEY_UI_ITEMWIDTH, "15vw");
 		headersArray.addObject(headerObject);
 	}
 
@@ -311,99 +339,13 @@ void CUIModule_ContentConfigurationList::addLegacyDefinitionToJSON(CJSONWriter& 
 }
 #endif 
 
-void CUIModule_ContentConfigurationList::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-	std::string sLoadingText = m_LoadingText.evaluateStringValue(m_pStateMachineData);
-
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "configurationlist");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_ITEMLOADINGTEXT, sLoadingText);
-	object.addString(AMC_API_KEY_UI_ITEMSELECTEVENT, m_sSelectEvent);
-	object.addString(AMC_API_KEY_UI_ITEMSELECTIONVALUEUUID, m_sSelectedConfigurationFieldUUID);
-	object.addString(AMC_API_KEY_UI_ITEMBUTTONVALUEUUID, m_sSelectedButtonFieldUUID);
-	object.addInteger(AMC_API_KEY_UI_ITEMENTRIESPERPAGE, m_nEntriesPerPage);
-
-	writeHeadersToJSON(writer, object);
-	writeButtonsToJSON(writer, object);
-
-	CJSONWriterArray entryArray(writer);
-
-	//auto pConfigurationJobHandler = m_pDataModel->CreateConfigurationJobHandler();
-
-
-	auto pConfigurationType = m_pDataModel->FindConfigurationTypeBySchema("com.scanlab.ocmsmc");
-
-	if (pConfigurationType.get() != nullptr)
-	{
-
-		auto pConfigurationVersionsIterator = pConfigurationType->ListAllConfigurationVersions();
-
-		auto pActiveConfiguration = pConfigurationType->GetActiveConfigurationVersion();
-
-
-		while (pConfigurationVersionsIterator->MoveNext()) {
-
-			auto pConfigurationVersion = pConfigurationVersionsIterator->GetCurrent();
-
-			CJSONWriterObject entryObject(writer);
-
-			if(pConfigurationVersion->GetVersionUUID() == pActiveConfiguration->GetVersionUUID())
-				entryObject.addBool("configurationActive", true);
-			else
-				entryObject.addBool("configurationActive", false);
-
-			entryObject.addInteger("configurationVersion", pConfigurationVersion->GetNumericVersion());
-			entryObject.addString("userName", pConfigurationVersion->GetUserUUID());
-			entryObject.addString(AMC_API_KEY_UI_ITEMCONFIGURATIONUUID, pConfigurationVersion->GetVersionUUID());
-			entryObject.addString(AMC_API_KEY_UI_ITEMCONFIGURATIONTIMESTAMP, pConfigurationVersion->GetTimestamp());
-
-			entryArray.addObject(entryObject);
-		}
-	}
-
-	//--------------------------------------------
-#if 0
-	auto pConfigurationTypeIterator = m_pDataModel->ListRegisteredConfigurationTypes();
-
-	while (pConfigurationTypeIterator->MoveNext ()) {
-		
-		auto pConfigurationJob = pConfigurationTypeIterator->GetCurrent();
-
-		CJSONWriterObject entryObject(writer);
-
-
-		entryObject.addString("configurationVersion", "v1.2.3");
-		entryObject.addString("userName", "test");
-
-		entryObject.addString(AMC_API_KEY_UI_ITEMCONFIGURATIONNAME, pConfigurationJob->GetName());
-		//entryObject.addInteger(AMC_API_KEY_UI_ITEMCONFIGURATIONLAYERS, pConfigurationJob->GetLayerCount());
-		entryObject.addString(AMC_API_KEY_UI_ITEMCONFIGURATIONUUID, pConfigurationJob->GetUUID());
-		entryObject.addString(AMC_API_KEY_UI_ITEMCONFIGURATIONTIMESTAMP, pConfigurationJob->GetTimestamp());
-#if 0
-		if (pConfigurationJob->HasThumbnailStream ())
-			entryObject.addString(AMC_API_KEY_UI_ITEMCONFIGURATIONTHUMBNAIL, pConfigurationJob->GetThumbnailStreamUUID ());
-		else
-			entryObject.addString(AMC_API_KEY_UI_ITEMCONFIGURATIONTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
-
-		entryObject.addString(AMC_API_KEY_UI_ITEMCONFIGURATIONUSER, pConfigurationJob->GetCreatorName());
-		entryObject.addInteger(AMC_API_KEY_UI_ITEMCONFIGURATIONEXECUTIONCOUNT, pConfigurationJob->GetExecutionCount());
-
-#endif
-		entryArray.addObject(entryObject);
-
-	}
-#endif
-	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entryArray);
-}
-
-
 void CUIModule_ContentConfigurationList::populateClientVariables(CParameterHandler* pClientVariableHandler)
 {
 	LibMCAssertNotNull(pClientVariableHandler);
 	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "configuration list UI element");
 	pGroup->addNewStringParameter("selecteduuid", "selected configuration UUID", AMCCommon::CUtils::createEmptyUUID());
-	//pGroup->addNewStringParameter("buttonuuid", "button UUID", AMCCommon::CUtils::createEmptyUUID());
-	//pGroup->addNewStringParameter("buttonname", "button Name", "");	
+	pGroup->addNewStringParameter("buttonuuid", "button UUID", AMCCommon::CUtils::createEmptyUUID());
+	pGroup->addNewStringParameter("buttonname", "button Name", "");	
 }
 
 void CUIModule_ContentConfigurationList::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
@@ -476,4 +418,70 @@ void CUIModule_ContentConfigurationList::addButton(const std::string& sButtonNam
 	m_ButtonUUIDMap.insert(std::make_pair(pButton->getUUID (), pButton));
 
 
+}
+
+std::string CUIModule_ContentConfigurationList::getItemType()
+{
+	return "configurationlist";
+}
+
+void CUIModule_ContentConfigurationList::registerFrontendAttributes()
+{
+	registerItemStringAttribute("loadingtext", m_LoadingText);
+	CUIExpression selectEventExpr;
+	selectEventExpr.setFixedValue(m_sSelectEvent);
+	registerItemStringAttribute("selectevent", selectEventExpr);
+	CUIExpression entriesExpr;
+	entriesExpr.setFixedValue(std::to_string(m_nEntriesPerPage));
+	registerItemIntegerAttribute("entriesperpage", entriesExpr);
+
+	CUIExpression selectionValueUUIDExpr;
+	selectionValueUUIDExpr.setFixedValue(m_sSelectedConfigurationFieldUUID);
+	registerItemUUIDAttribute("selectionvalueuuid", selectionValueUUIDExpr);
+
+	CUIExpression buttonValueUUIDExpr;
+	buttonValueUUIDExpr.setFixedValue(m_sSelectedButtonFieldUUID);
+	registerItemUUIDAttribute("buttonvalueuuid", buttonValueUUIDExpr);
+
+	CUIExpression schemaExpr;
+	schemaExpr.setFixedValue(m_sConfigurationSchema);
+	registerItemStringAttribute("schema", schemaExpr);
+
+	registerItemProviderAttribute(AMC_API_KEY_CONFIGURATIONS_HEADID, eUIFrontendDefinitionAttributeType::atInteger, eUIFrontendDefinitionAttributeScope::asGlobal,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			object.addInteger(sName, (int64_t)calculateHeadID());
+		});
+
+	registerItemProviderAttribute(AMC_API_KEY_UI_ENTRYBUTTONS, eUIFrontendDefinitionAttributeType::atArray, eUIFrontendDefinitionAttributeScope::asGlobal,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			writeButtonsToJSON(writer, object);
+		});
+}
+
+uint32_t CUIModule_ContentConfigurationList::calculateHeadID()
+{
+	uint64_t nConfigurationListHeadID = 1469598103934665603ULL;
+	fnv1aMixString(nConfigurationListHeadID, m_sConfigurationSchema);
+
+	if (m_pDataModel) {
+		auto pConfigurationType = m_pDataModel->FindConfigurationTypeBySchema(m_sConfigurationSchema);
+		if (pConfigurationType.get() != nullptr) {
+			auto pVersionIterator = pConfigurationType->ListAllConfigurationVersions();
+			auto pActiveVersion = pConfigurationType->GetActiveConfigurationVersion();
+			std::string sActiveUUID;
+			if (pActiveVersion.get() != nullptr)
+				sActiveUUID = pActiveVersion->GetVersionUUID();
+
+			while (pVersionIterator->MoveNext()) {
+				auto pVersion = pVersionIterator->GetCurrent();
+				std::string sVersionUUID = pVersion->GetVersionUUID();
+				fnv1aMixString(nConfigurationListHeadID, sVersionUUID);
+				fnv1aMixString(nConfigurationListHeadID, std::to_string(pVersion->GetNumericVersion()));
+				fnv1aMixString(nConfigurationListHeadID, pVersion->GetTimestamp());
+				fnv1aMixString(nConfigurationListHeadID, (sVersionUUID == sActiveUUID) ? "1" : "0");
+			}
+		}
+	}
+
+	return (uint32_t)(nConfigurationListHeadID & 0x7fffffffULL);
 }

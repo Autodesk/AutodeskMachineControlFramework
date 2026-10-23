@@ -59,9 +59,9 @@ namespace AMC {
 		
 		virtual ~CAccessControl();
 
-		PAccessPermission addPermission (const std::string & sIdentifier, const CStringResource & rDisplayName, const CStringResource & rDescription);
+		PAccessPermission addPermission (const std::string & sIdentifier, const CLanguageString & rDisplayName, const CLanguageString & rDescription);
 		
-		PAccessRole addRole (const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription);
+		PAccessRole addRole (const std::string& sIdentifier, const CLanguageString& rDisplayName, const CLanguageString& rDescription);
 		
 		PAccessPermission findPermission (const std::string & sIdentifier, bool bMustExist);
 		

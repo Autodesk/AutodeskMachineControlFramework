@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Libraries/cpp-httplib/httplib.h"
 
 #include "amc_test.hpp"
+#include "common_utils.hpp"
 #include <iostream>
 #include <chrono>
 #include <pugixml.hpp>
@@ -41,6 +42,34 @@ using namespace AMCTest;
 #define GITHASH_MAX_LENGTH 8
 
 #define XMLNS_TESTDEFINITION "http://schemas.autodesk.com/amc/testdefinitions/2020/02"
+
+static std::string getPlatformLibraryExtension()
+{
+#ifdef _WIN32
+	return ".dll";
+#elif defined(__APPLE__)
+	return ".dylib";
+#else
+	return ".so";
+#endif
+}
+
+static std::string resolveLibraryPath(const std::string& sLibraryName)
+{
+	std::vector<std::string> searchPaths = {
+		"./" + sLibraryName,
+		"./Output/" + sLibraryName,
+		"../Output/" + sLibraryName,
+		"build_linux64/Output/" + sLibraryName
+	};
+
+	for (const auto& sPath : searchPaths) {
+		if (AMCCommon::CUtils::fileOrPathExistsOnDisk(sPath))
+			return sPath;
+	}
+
+	return "./" + sLibraryName;
+}
 
 CTest::CTest(PTestIO pTestIO, const std::string& sPackageConfigurationXML, const std::string& sGitHash)
 	: m_pTestIO (pTestIO), m_sGitHash (sGitHash), m_sPackageConfigurationXML (sPackageConfigurationXML)
@@ -169,9 +198,11 @@ void CTest::executeBlocking()
 		uint32_t nMinorFrameworkVersion = 0;
 		uint32_t nMicroFrameworkVersion = 0;
 
+		std::string sLibraryExtension = getPlatformLibraryExtension();
+
 		log ("Loading data model...");
-		std::string sDataModelLibraryPath = m_sGitHash + "_core_libmcdata.dll";
-		std::string sCoreLibraryPath = m_sGitHash + "_core_libmc.dll";
+		std::string sDataModelLibraryPath = resolveLibraryPath(m_sGitHash + "_core_libmcdata" + sLibraryExtension);
+		std::string sCoreLibraryPath = resolveLibraryPath(m_sGitHash + "_core_libmc" + sLibraryExtension);
 		std::string sCoreLibraryResourcePath = m_sGitHash + "_core.data";
 		std::string sTestOutputDirectory = "./";
 
@@ -252,4 +283,3 @@ void CTest::log(const std::string& sMessage)
 {
 	m_pTestIO->logMessageString(sMessage);
 }
-

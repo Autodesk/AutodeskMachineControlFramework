@@ -39,16 +39,87 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <thread>
 #include <sstream>
+#include <iomanip>
 #include <atomic>
 #include <vector>
 #include <list>
 #include <mutex>
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
+#include "amc_telemetry.hpp"
+#include "amc_parametergroup.hpp"
+#include "libmcdata_dynamic.hpp"
+#include "amc_unittests_libmcdata.hpp"
 
 
 namespace AMCUnitTest {
 
+    class CDummyRegistry : public AMC::CStateSignalRegistry {
 
+    public:
+
+        CDummyRegistry(bool bTelemetryEnabled = true)
+        {
+            initializeTelemetry(bTelemetryEnabled);
+        }
+
+        void registerMessage(const std::string& sMessageUUID, AMC::CStateSignalSlot* pSignalSlot) override
+        {
+
+        }
+
+        void unregisterMessage(const std::string& sMessageUUID) override
+        {
+
+        }
+
+        AMC::PStateSignalSlot findSignalSlotOfMessage(const std::string& sMessageUUID)
+        {
+            return nullptr;
+        }
+
+        AMC::PTelemetryChannel registerTelemetryChannel(const std::string& sChannelIdentifier, const std::string& sChannelDescription, LibMCData::eTelemetryChannelType channelType) override
+        {
+            return m_pTelemetryHandler->registerChannel(sChannelIdentifier, sChannelDescription, channelType);
+        }
+
+        AMCCommon::PChrono getChrono()
+        {
+            return m_pChrono;
+        }
+
+    private:
+        void initializeTelemetry(bool bTelemetryEnabled)
+        {
+            std::string sRootPath = "temp";
+            if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sRootPath))
+                AMCCommon::CUtils::createDirectoryOnDisk(sRootPath);
+
+            std::string sBasePath = sRootPath + "/signalslot_" + AMCCommon::CUtils::createUUID();
+            if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sBasePath))
+                AMCCommon::CUtils::createDirectoryOnDisk(sBasePath);
+
+            std::string sDatabaseFile = sBasePath + "/signalslot.db";
+
+            m_pDataWrapper = AMCUnitTest::loadLibMCDataInProcess();
+            m_pDataModel = m_pDataWrapper->CreateDataModelInstance();
+            m_pDataModel->SetTelemetryEnabled(bTelemetryEnabled);
+            m_pDataModel->InitialiseDatabase(sBasePath, LibMCData::eDataBaseType::SqLite, sDatabaseFile);
+            m_pTelemetrySession = m_pDataModel->CreateTelemetrySession();
+
+            m_pChrono = std::make_shared<AMCCommon::CChrono>();
+            m_pTelemetryWriter = std::make_shared<AMC::CTelemetryWriter>(m_pTelemetrySession, m_pChrono, bTelemetryEnabled);
+            m_pTelemetryHandler = std::make_shared<AMC::CTelemetryHandler>(m_pTelemetryWriter);
+        }
+
+        LibMCData::PWrapper m_pDataWrapper;
+        LibMCData::PDataModel m_pDataModel;
+        LibMCData::PTelemetrySession m_pTelemetrySession;
+        AMCCommon::PChrono m_pChrono;
+        AMC::PTelemetryWriter m_pTelemetryWriter;
+        std::shared_ptr<AMC::CTelemetryHandler> m_pTelemetryHandler;
+
+    };
 
 
 class CUnitTestGroup_SignalSlot : public CUnitTestGroup {
@@ -70,21 +141,72 @@ public:
         registerTest("SignalPhaseTransition", "Tests InQueue → InProcess → Handled", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_SignalPhaseTransition, this));
         registerTest("SignalFailureTransition", "Tests InQueue → Failed", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_SignalFailureTransition, this));
         registerTest("QueueOverflow", "Tests rejection of signal if queue is full", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_QueueOverflow, this));
-        registerTest("PeekQueue", "Tests peeking the front UUID in the queue", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_PeekQueue, this));
         registerTest("ParameterResultAccess", "Tests getting parameter and result JSON", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_ParameterResultAccess, this));
         registerTest("ClearQueueWorks", "Clears the queue and marks signals as cleared", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_ClearQueueWorks, this));
         registerTest("TimeoutAndOverflowTest", "Simulates queue overflow and timeout scenarios", eUnitTestCategory::utOptionalPass, std::bind(&CUnitTestGroup_SignalSlot::test_TimeoutAndOverflowTest, this));
+        registerTest("TimingStatisticsWithTelemetryOn", "Signal timing parameters update with telemetry enabled", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_TimingStatisticsWithTelemetryOn, this));
+        registerTest("TimingStatisticsWithTelemetryOff", "Signal timing parameters still update with telemetry disabled", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_TimingStatisticsWithTelemetryOff, this));
     }
 
 private:
 
+    // Drives a signal through InQueue -> InProcess -> Handled and returns the timing parameters
+    // that CStateSignalSlot::updateTimingStatistics feeds from the telemetry channels.
+    void driveSignalAndReadTimings(bool bTelemetryEnabled, int64_t& nReactionTime, int64_t& nFinishTime)
+    {
+        CDummyRegistry registry(bTelemetryEnabled);
+
+        auto pInformationGroup = std::make_shared<AMC::CParameterGroup>("signalinfo", "signal information", registry.getChrono());
+
+        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5000, 3, pInformationGroup, &registry);
+        std::string uuid = "0f0e0d0c-0b0a-0908-0706-050403020100";
+
+        AMCCommon::CChrono chrono;
+        chrono.sleepMicroseconds(500);
+
+        auto pMessage = slot.addNewInQueueSignalInternal(uuid, "{}", 500, chrono.getElapsedMicroseconds());
+        assertTrue(pMessage != nullptr);
+
+        chrono.sleepMicroseconds(1000);
+        assertTrue(slot.changeSignalPhaseToInProcessInternal(uuid, chrono.getElapsedMicroseconds()));
+
+        chrono.sleepMicroseconds(1000);
+        assertTrue(slot.changeSignalPhaseToHandledInternal(uuid, "{\"result\":true}", chrono.getElapsedMicroseconds()));
+
+        nReactionTime = pInformationGroup->getIntParameterValueByName("reactiontime_signal");
+        nFinishTime = pInformationGroup->getIntParameterValueByName("finishtime_signal");
+    }
+
+    void test_TimingStatisticsWithTelemetryOn() {
+        int64_t nReactionTime = 0;
+        int64_t nFinishTime = 0;
+        driveSignalAndReadTimings(true, nReactionTime, nFinishTime);
+
+        assertTrue(nReactionTime > 0, "reactiontime_ should be updated with telemetry enabled");
+        assertTrue(nFinishTime > 0, "finishtime_ should be updated with telemetry enabled");
+    }
+
+    void test_TimingStatisticsWithTelemetryOff() {
+        // This is the acceptance criterion for the telemetry off-switch: dropping telemetry at the
+        // writer must NOT zero the live signal timing parameters, which are fed from the in-memory
+        // channel statistics rather than from anything written to disk.
+        int64_t nReactionTime = 0;
+        int64_t nFinishTime = 0;
+        driveSignalAndReadTimings(false, nReactionTime, nFinishTime);
+
+        assertTrue(nReactionTime > 0, "reactiontime_ must still be updated with telemetry disabled");
+        assertTrue(nFinishTime > 0, "finishtime_ must still be updated with telemetry disabled");
+    }
+
     void test_CreateSignalSlotBasic() {
-        std::list<AMC::CStateSignalParameter> params;
-        std::list<AMC::CStateSignalParameter> results;
+        std::vector<AMC::CStateSignalParameter> params;
+        std::vector<AMC::CStateSignalParameter> results;
         params.emplace_back("p1", "string", true);
         results.emplace_back("r1", "int", true);
 
-        AMC::CStateSignalSlot slot("instance", "signal", params, results, 500, 10);
+        CDummyRegistry registry;
+
+        AMC::CStateSignalSlot slot("instance", "signal", params, results, 500, 5000, 10, nullptr, &registry);
 
         assertTrue(slot.getNameInternal() == "signal");
         assertTrue(slot.getInstanceNameInternal() == "instance");
@@ -93,10 +215,17 @@ private:
     }
 
     void test_AddSignalToQueue() {
-        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5);
+        CDummyRegistry registry;
+
+        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5000, 5, nullptr, &registry);
         std::string uuid = "11111111-2222-3333-4444-555555555555";
 
-        bool added = slot.addNewInQueueSignalInternal(uuid, "{\"param\":\"value\"}", 500);
+       
+        AMCCommon::CChrono chrono;
+
+        chrono.sleepMicroseconds(500);
+
+        bool added = slot.addNewInQueueSignalInternal(uuid, "{\"param\":\"value\"}", 500, chrono.getElapsedMicroseconds ()) != nullptr;
         assertTrue(added);
 
         assertIntegerRange(slot.getAvailableSignalQueueEntriesInternal(), 0, 4);
@@ -104,79 +233,135 @@ private:
     }
 
     void test_SignalPhaseTransition() {
-        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 3);
+
+        CDummyRegistry registry;
+
+        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5000, 3, nullptr, &registry);
         std::string uuid = "77777777-8888-9999-aaaa-bbbbbbbbbbbb";
 
-        assertTrue(slot.addNewInQueueSignalInternal(uuid, "{}", 500));
-        assertTrue(slot.changeSignalPhaseToInProcessInternal(uuid));
+        AMCCommon::CChrono chrono;
+
+        chrono.sleepMicroseconds(500);
+
+        auto pMessage = slot.addNewInQueueSignalInternal(uuid, "{}", 500, chrono.getElapsedMicroseconds());
+        assertTrue(pMessage != nullptr);
+        chrono.sleepMicroseconds(500);
+
+        assertTrue(slot.changeSignalPhaseToInProcessInternal(uuid, chrono.getElapsedMicroseconds()));
         assertTrue(slot.getSignalPhaseInternal(uuid) == AMC::eAMCSignalPhase::InProcess);
 
-        assertTrue(slot.changeSignalPhaseToHandledInternal(uuid, "{\"result\":true}"));
+        chrono.sleepMicroseconds(1000);
+
+        assertTrue(slot.changeSignalPhaseToHandledInternal(uuid, "{\"result\":true}", chrono.getElapsedMicroseconds()));
         assertTrue(slot.getSignalPhaseInternal(uuid) == AMC::eAMCSignalPhase::Handled);
 
         assertTrue(slot.getResultDataJSONInternal(uuid) == "{\"result\":true}");
     }
 
     void test_SignalFailureTransition() {
-        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 2);
+
+        CDummyRegistry registry;
+
+        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5000, 2, nullptr, &registry);
         std::string uuid = "deadbeef-dead-beef-dead-beefdeadbeef";
 
-        assertTrue(slot.addNewInQueueSignalInternal(uuid, "{}", 500));
-        assertTrue(slot.changeSignalPhaseToInFailedInternal(uuid, "{\"ok\":false}", "error"));
+        AMCCommon::CChrono chrono;
+        chrono.sleepMicroseconds(500);
+
+        auto pMessage = slot.addNewInQueueSignalInternal(uuid, "{}", 500, chrono.getElapsedMicroseconds());
+        assertTrue(pMessage != nullptr);
+
+        chrono.sleepMicroseconds(500);
+        assertTrue(slot.changeSignalPhaseToInFailedInternal(uuid, "{\"ok\":false}", "error", chrono.getElapsedMicroseconds()));
         assertTrue(slot.getSignalPhaseInternal(uuid) == AMC::eAMCSignalPhase::Failed);
     }
 
     void test_QueueOverflow() {
-        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 1);
-        assertTrue(slot.addNewInQueueSignalInternal("uuid1", "{}", 500));
-        assertFalse(slot.addNewInQueueSignalInternal("uuid2", "{}", 500)); // queue full
+
+        CDummyRegistry registry;
+
+        AMCCommon::CChrono chrono;
+        chrono.sleepMicroseconds(500);
+
+        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5000, 1, nullptr, &registry);
+
+        auto pMessage1 = slot.addNewInQueueSignalInternal("00000001-0000-0000-0000-000000000001", "{}", 500, chrono.getElapsedMicroseconds());
+        assertTrue(pMessage1 != nullptr);
+        chrono.sleepMicroseconds(500);
+
+        auto pMessage2 = slot.addNewInQueueSignalInternal("00000002-0000-0000-0000-000000000002", "{}", 500, chrono.getElapsedMicroseconds());
+        assertFalse(pMessage2 != nullptr); // queue full
     }
 
-    void test_PeekQueue() {
-        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 3);
-        slot.addNewInQueueSignalInternal("uuid-a", "{\"a\":1}", 400);
-        slot.addNewInQueueSignalInternal("uuid-b", "{\"b\":2}", 400);
-        assertTrue(slot.peekMessageFromQueueInternal() == AMCCommon::CUtils::normalizeUUIDString("uuid-a"));
-    }
 
     void test_ParameterResultAccess() {
-        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 2);
-        std::string uuid = "testuuid";
-        slot.addNewInQueueSignalInternal(uuid, "{\"param\":\"abc\"}", 1000);
+
+        CDummyRegistry registry;
+
+        AMCCommon::CChrono chrono;
+        chrono.sleepMicroseconds(500);
+
+        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5000, 2, nullptr, &registry);
+        std::string uuid = "e5e57000-0000-0000-0000-000000000001";
+
+        chrono.sleepMicroseconds(500);
+        slot.addNewInQueueSignalInternal(uuid, "{\"param\":\"abc\"}", 1000, chrono.getElapsedMicroseconds());
+
+        chrono.sleepMicroseconds(500);
         assertTrue(slot.getParameterDataJSONInternal(uuid) == "{\"param\":\"abc\"}");
-        slot.changeSignalPhaseToHandledInternal(uuid, "{\"result\":123}");
+
+        chrono.sleepMicroseconds(500);
+        slot.changeSignalPhaseToHandledInternal(uuid, "{\"result\":123}", chrono.getElapsedMicroseconds());
         assertTrue(slot.getResultDataJSONInternal(uuid) == "{\"result\":123}");
     }
 
     void test_ClearQueueWorks() {
-        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 2);
-        slot.addNewInQueueSignalInternal("one", "{}", 500);
-        slot.addNewInQueueSignalInternal("two", "{}", 500);
 
-        std::vector<std::string> clearedUUIDs;
-        slot.clearQueueInternal(clearedUUIDs);
+        CDummyRegistry registry;
+
+        AMCCommon::CChrono chrono;
+        chrono.sleepMicroseconds(500);
+
+        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5000, 2, nullptr, &registry);
+
+        chrono.sleepMicroseconds(500);
+        slot.addNewInQueueSignalInternal("11110001-0000-0000-0000-000000000001", "{}", 500, chrono.getElapsedMicroseconds());
+
+        chrono.sleepMicroseconds(500);
+        slot.addNewInQueueSignalInternal("22220002-0000-0000-0000-000000000002", "{}", 500, chrono.getElapsedMicroseconds());
+
+        chrono.sleepMicroseconds(500);
+        slot.clearQueueInternal();
         assertTrue(slot.getAvailableSignalQueueEntriesInternal() == 2);
     }
 
 
     void test_TimeoutAndOverflowTest() {
+
+        CDummyRegistry registry;
+
+        AMCCommon::CChrono chrono;
+
+        chrono.sleepMicroseconds(500);
+
         const int capacity = 10;
         const int total = 15;
-        AMC::CStateSignalSlot slot("overflowInstance", "overflowSignal", {}, {}, 50, capacity);
+        AMC::CStateSignalSlot slot("overflowInstance", "overflowSignal", {}, {}, 50, 5000, capacity, nullptr, &registry);
 
         std::vector<std::string> accepted, rejected;
 
         for (int i = 0; i < total; ++i) {
             std::stringstream ss;
-            ss << "overflow-" << i;
-            std::string uuid = AMCCommon::CUtils::normalizeUUIDString(ss.str());
+            ss << "f10" << std::setfill('0') << std::setw(5) << i << "-0000-0000-0000-000000000000";
+            std::string uuid = ss.str();
 
-            bool ok = slot.addNewInQueueSignalInternal(uuid, "{}", 50);
+            auto pMessage = slot.addNewInQueueSignalInternal(uuid, "{}", 50, chrono.getElapsedMicroseconds());
+			bool ok = pMessage != nullptr;
             if (ok) accepted.push_back(uuid);
             else rejected.push_back(uuid);
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        chrono.sleepMilliseconds(200);
 
         int timedOut = 0;
         for (const auto& uuid : accepted) {

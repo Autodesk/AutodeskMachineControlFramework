@@ -74,7 +74,11 @@ public:
 
     IAlertIterator* RetrieveAlerts(const bool bOnlyActive) override;
 
+    IAlertIterator* RetrieveAlertsChangedSince(const LibMCData_uint64 nIncrementalID) override;
+
     IAlertIterator* RetrieveAlertsByType(const std::string& sIdentifier, const bool bOnlyActive) override;
+
+    LibMCData_uint64 GetAlertHeadID() override;
 
 };
 

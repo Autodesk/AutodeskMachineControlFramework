@@ -134,6 +134,14 @@ IRTCContext* CRTCSelector::acquireCardEx(const LibMCDriver_ScanLab_uint32 nNumbe
 
 	}
 
+	// High Performance Mode has to be (re-)asserted AFTER acquire_rtc: eth_set_high_performance_mode
+	// needs access rights to the board, and the call in setCommunicationTimeoutsBeforeAcquire above
+	// runs before they are granted, so it is rejected with error 3 (RTC6_ACCESS_DENIED). Without
+	// this mode the RTC6 DLL waits for a board response after every single list telegram, which
+	// costs a full network round trip per list command.
+	if (bIsNetworkCard)
+		enableHighPerformanceMode(cardNo);
+
 	return new CRTCContext(m_pRTCContextOwnerData, cardNo, bIsNetworkCard, m_pDriverEnvironment);
 }
 
@@ -245,13 +253,42 @@ void CRTCSelector::setCommunicationTimeoutsBeforeAcquire(uint32_t nCardNo)
 	double dOldMultiplier = 0.0;
 	uint32_t nOldMode = 0;
 
-	// Turn on high performance mode...
+	// Turn on high performance mode... note that this call needs access rights to the board and
+	// will be rejected here, because acquire_rtc has not run yet. acquireCardEx re-asserts it
+	// afterwards via enableHighPerformanceMode(); this call is kept only to preserve the previous
+	// ordering for the timeout setup below.
 	m_pScanLabSDK->n_eth_set_high_performance_mode(nCardNo, 1);
 
 	// Set Timeouts, but keep old mode
 	m_pScanLabSDK->n_eth_get_com_timeouts_auto(nCardNo, &dOldInitialTimeout, &dOldMaxTimeout, &dOldMultiplier, &nOldMode);
 	m_pScanLabSDK->n_eth_set_com_timeouts_auto(nCardNo, m_dDefaultInitialTimeout, m_dDefaultMaxTimeout, m_dDefaultMultiplier, nOldMode);
 
+}
+
+void CRTCSelector::enableHighPerformanceMode(uint32_t nCardNo)
+{
+	uint32_t nErrorCode = m_pScanLabSDK->n_eth_set_high_performance_mode(nCardNo, 1);
+
+	if (nErrorCode == 0) {
+		m_pDriverEnvironment->LogMessage("RTC6 Ethernet High Performance Mode enabled for card #" + std::to_string(nCardNo));
+		return;
+	}
+
+	// Not fatal - the card works, just slowly. But it must be visible, because it silently
+	// multiplies every list download time by roughly an order of magnitude.
+	std::string sReason;
+	switch (nErrorCode) {
+		case 1: sReason = "mode not allowed"; break;
+		case 2: sReason = "BIOS-ETH is older than 35"; break;
+		case 3: sReason = "no access rights to the board"; break;
+		case 4: sReason = "not an RTC6 Ethernet board"; break;
+		case SCANLAB_HIGHPERFORMANCEMODE_NOTAVAILABLE: sReason = "RTC6 DLL is older than DLL633 and does not export the call"; break;
+		default: sReason = "unknown error"; break;
+	}
+
+	m_pDriverEnvironment->LogWarning("Could not enable RTC6 Ethernet High Performance Mode for card #"
+		+ std::to_string(nCardNo) + ": " + sReason + " (error " + std::to_string(nErrorCode)
+		+ "). List downloads will be significantly slower.");
 }
 
 void CRTCSelector::loadFirmwareBeforeAcquisition(uint32_t nCardNo, bool bIsNetwork, bool bMustHaveData)

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_STATEMACHINESTATE
 #define __AMC_STATEMACHINESTATE
 
+#include <cstdint>
 #include <vector>
 #include <string>
 #include <memory>
@@ -53,6 +54,9 @@ namespace AMC {
 	class CStateMachineState;
 	typedef std::shared_ptr<CStateMachineState> PStateMachineState;
 
+	class CTelemetryChannel;
+	typedef std::shared_ptr<CTelemetryChannel> PTelemetryChannel;
+
 	class CStateMachineState {
 	private:
 		std::string m_sName;
@@ -61,6 +65,8 @@ namespace AMC {
 		std::vector <PStateMachineState> m_OutStateList;
 
 		AMCCommon::PChrono m_pGlobalChrono;
+		PTelemetryChannel m_pTelemetryExecutionChannel;
+		PTelemetryChannel m_pTelemetryRepeatDelayChannel;
 
 		uint64_t m_LastExecutionTimeStampInMicroseconds;
 		uint32_t m_nRepeatDelay;
@@ -73,10 +79,13 @@ namespace AMC {
 		
 	public:
 
-		CStateMachineState(const std::string & sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMCCommon::PChrono pGlobalChrono);
+		CStateMachineState(const std::string & sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMCCommon::PChrono pGlobalChrono, PTelemetryHandler pTelemetryHandler);
 		virtual ~CStateMachineState();
 
 		std::string getName() const;
+		std::string getTelemetryExecutionName() const;
+		std::string getTelemetryRepeatDelayName() const;
+
 		uint32_t getOutstateCount() const;
 		std::string getOutstateName(uint32_t nIndex) const;
 

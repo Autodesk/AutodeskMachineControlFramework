@@ -69,11 +69,12 @@ namespace AMC {
 		std::string m_sUserLanguageIdentifier;
 		std::string m_sUserRoleIdentifier;
 
-		bool m_bAuthenticated;		
+		bool m_bAuthenticated;
+		uint64_t m_nLastActivityMicroseconds;
 					
 	public:
 
-		CAPISession(PUIFrontendDefinition pFrontendDefinition);
+		CAPISession(PUIFrontendDefinition pFrontendDefinition, AMCCommon::PChrono pGlobalChrono);
 		virtual ~CAPISession();
 
 		std::string getUUID ();		
@@ -85,6 +86,8 @@ namespace AMC {
 		std::string getUserRoleIdentifier();
 		std::string getToken ();
 		bool isAuthenticated ();
+		uint64_t getLastActivityMicroseconds ();
+		void updateLastActivity (uint64_t nNowMicroseconds);
 		
 		void authorizeSessionByPassword(const std::string & sSaltedPasswordHash, const std::string & sClientKey);
 		void setUserDetails(const std::string& sUserName, const std::string & sHashedPassword, const std::string& sUserUUID, const std::string& sUserDescription, const std::string& sUserRoleIdentifier, const std::string& sUserLanguageIdentifier);

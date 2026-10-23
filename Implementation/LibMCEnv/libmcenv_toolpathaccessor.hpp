@@ -78,6 +78,8 @@ public:
 
 	IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) override;
 
+	LibMCEnv_uint32 FindNonEmptyLayer(const LibMCEnv_uint32 nMinLayerIndex, const LibMCEnv_uint32 nMaxLayerIndex, const bool bFromMinToMax) override;
+
 	LibMCEnv_double GetUnits() override;
 
 	LibMCEnv_uint32 GetPartCount() override;

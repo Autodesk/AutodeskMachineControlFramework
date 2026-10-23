@@ -537,6 +537,7 @@ public:
 	inline bool DigitalOutputExists(const std::string & sName);
 	inline bool AnalogInputExists(const std::string & sName);
 	inline bool AnalogOutputExists(const std::string & sName);
+	inline bool AnalogInputIsOutOfBounds(const std::string & sName);
 	inline bool GetDigitalInput(const std::string & sVariableName);
 	inline bool GetDigitalOutput(const std::string & sVariableName);
 	inline LibMCDriver_BK9xxx_uint32 GetAnalogInputRaw(const std::string & sVariableName);
@@ -695,6 +696,7 @@ public:
 		pWrapperTable->m_Driver_BK9xxx_DigitalOutputExists = nullptr;
 		pWrapperTable->m_Driver_BK9xxx_AnalogInputExists = nullptr;
 		pWrapperTable->m_Driver_BK9xxx_AnalogOutputExists = nullptr;
+		pWrapperTable->m_Driver_BK9xxx_AnalogInputIsOutOfBounds = nullptr;
 		pWrapperTable->m_Driver_BK9xxx_GetDigitalInput = nullptr;
 		pWrapperTable->m_Driver_BK9xxx_GetDigitalOutput = nullptr;
 		pWrapperTable->m_Driver_BK9xxx_GetAnalogInputRaw = nullptr;
@@ -987,6 +989,15 @@ public:
 			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_BK9xxx_AnalogInputIsOutOfBounds = (PLibMCDriver_BK9xxxDriver_BK9xxx_AnalogInputIsOutOfBoundsPtr) GetProcAddress(hLibrary, "libmcdriver_bk9xxx_driver_bk9xxx_analoginputisoutofbounds");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BK9xxx_AnalogInputIsOutOfBounds = (PLibMCDriver_BK9xxxDriver_BK9xxx_AnalogInputIsOutOfBoundsPtr) dlsym(hLibrary, "libmcdriver_bk9xxx_driver_bk9xxx_analoginputisoutofbounds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BK9xxx_AnalogInputIsOutOfBounds == nullptr)
+			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_BK9xxx_GetDigitalInput = (PLibMCDriver_BK9xxxDriver_BK9xxx_GetDigitalInputPtr) GetProcAddress(hLibrary, "libmcdriver_bk9xxx_driver_bk9xxx_getdigitalinput");
 		#else // _WIN32
 		pWrapperTable->m_Driver_BK9xxx_GetDigitalInput = (PLibMCDriver_BK9xxxDriver_BK9xxx_GetDigitalInputPtr) dlsym(hLibrary, "libmcdriver_bk9xxx_driver_bk9xxx_getdigitalinput");
@@ -1244,6 +1255,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_bk9xxx_driver_bk9xxx_analogoutputexists", (void**)&(pWrapperTable->m_Driver_BK9xxx_AnalogOutputExists));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BK9xxx_AnalogOutputExists == nullptr) )
+			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bk9xxx_driver_bk9xxx_analoginputisoutofbounds", (void**)&(pWrapperTable->m_Driver_BK9xxx_AnalogInputIsOutOfBounds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BK9xxx_AnalogInputIsOutOfBounds == nullptr) )
 			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_bk9xxx_driver_bk9xxx_getdigitalinput", (void**)&(pWrapperTable->m_Driver_BK9xxx_GetDigitalInput));
@@ -1615,6 +1630,19 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BK9xxx_AnalogOutputExists(m_pHandle, sName.c_str(), &resultNameExists));
 		
 		return resultNameExists;
+	}
+	
+	/**
+	* CDriver_BK9xxx::AnalogInputIsOutOfBounds - Returns if an analog input is out of bounds. The raw values itself will be clipped to the configured range.
+	* @param[in] sName - Name of variable. Fails if Variable does not exist or is not an analog variable.
+	* @return Flag if the raw value is out of bounds and has been clipped to the input window.
+	*/
+	bool CDriver_BK9xxx::AnalogInputIsOutOfBounds(const std::string & sName)
+	{
+		bool resultInputIsOutOfBounds = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BK9xxx_AnalogInputIsOutOfBounds(m_pHandle, sName.c_str(), &resultInputIsOutOfBounds));
+		
+		return resultInputIsOutOfBounds;
 	}
 	
 	/**

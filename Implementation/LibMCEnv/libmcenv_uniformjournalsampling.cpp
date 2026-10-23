@@ -43,34 +43,86 @@ using namespace LibMCEnv::Impl;
  Class definition of CUniformJournalSampling 
 **************************************************************************************************************************/
 
+CUniformJournalSampling::CUniformJournalSampling(const std::string& sVariableName, LibMCEnv_uint64 nStartTimeStamp, LibMCEnv_uint64 nEndTimeStamp, const std::vector<AMC::sJournalEnvelopeSample>& samples)
+	: m_sVariableName(sVariableName), m_nStartTimeStamp(nStartTimeStamp), m_nEndTimeStamp(nEndTimeStamp), m_Samples(samples)
+{
+}
+
+CUniformJournalSampling::~CUniformJournalSampling()
+{
+}
+
 std::string CUniformJournalSampling::GetVariableName()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_sVariableName;
 }
 
 LibMCEnv_uint32 CUniformJournalSampling::GetNumberOfSamples()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return (LibMCEnv_uint32)m_Samples.size();
 }
 
 LibMCEnv_uint64 CUniformJournalSampling::GetStartTimeStamp()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nStartTimeStamp;
 }
 
 LibMCEnv_uint64 CUniformJournalSampling::GetEndTimeStamp()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	return m_nEndTimeStamp;
 }
 
 void CUniformJournalSampling::GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	if (nIndex >= m_Samples.size())
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	auto& sample = m_Samples.at(nIndex);
+	nTimeStamp = sample.m_nTimeStampInMicroSeconds;
+	dValue = sample.m_dAverageValue;
 }
 
 void CUniformJournalSampling::GetAllSamples(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry* pSamplesBuffer)
 {
-    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+	uint64_t nCount = (uint64_t)m_Samples.size();
+
+	if (pSamplesNeededCount != nullptr)
+		*pSamplesNeededCount = nCount;
+
+	if (pSamplesBuffer != nullptr) {
+		if (nSamplesBufferSize < nCount)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+		LibMCEnv::sTimeStreamEntry* pTarget = pSamplesBuffer;
+		for (auto& sample : m_Samples) {
+			pTarget->m_TimestampInMicroSeconds = sample.m_nTimeStampInMicroSeconds;
+			pTarget->m_Value = sample.m_dAverageValue;
+			pTarget++;
+		}
+	}
+}
+
+void CUniformJournalSampling::GetAllSamplesWithBounds(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEnvelopeEntry* pSamplesBuffer)
+{
+	uint64_t nCount = (uint64_t)m_Samples.size();
+
+	if (pSamplesNeededCount != nullptr)
+		*pSamplesNeededCount = nCount;
+
+	if (pSamplesBuffer != nullptr) {
+		if (nSamplesBufferSize < nCount)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+		LibMCEnv::sTimeStreamEnvelopeEntry* pTarget = pSamplesBuffer;
+		for (auto& sample : m_Samples) {
+			pTarget->m_TimestampInMicroSeconds = sample.m_nTimeStampInMicroSeconds;
+			pTarget->m_MinValue = sample.m_dMinValue;
+			pTarget->m_MaxValue = sample.m_dMaxValue;
+			pTarget->m_AverageValue = sample.m_dAverageValue;
+			pTarget->m_LastValue = sample.m_dLastValue;
+			pTarget++;
+		}
+	}
 }
 
 

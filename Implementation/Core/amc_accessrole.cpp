@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CAccessRole::CAccessRole(const std::string& sIdentifier, const CStringResource& rDisplayName, const CStringResource& rDescription)
+	CAccessRole::CAccessRole(const std::string& sIdentifier, const CLanguageString& rDisplayName, const CLanguageString& rDescription)
 		: m_sIdentifier (sIdentifier), m_DisplayName (rDisplayName), m_Description (rDescription)
 	{
 		if (sIdentifier.empty())
@@ -60,24 +60,14 @@ namespace AMC {
 		return m_sIdentifier;
 	}
 
-	CStringResource CAccessRole::getDisplayName()
+	CLanguageString CAccessRole::getDisplayName()
 	{
 		return m_DisplayName;
 	}
 
-	std::string CAccessRole::getDisplayNameString(StringLanguageID languageID)
-	{
-		return m_DisplayName.get(languageID);
-	}
-
-	CStringResource CAccessRole::getDescription()
+	CLanguageString CAccessRole::getDescription()
 	{
 		return m_Description;
-	}
-
-	std::string CAccessRole::getDescriptionString(StringLanguageID languageID)
-	{
-		return m_Description.get (languageID);
 	}
 
 	bool CAccessRole::hasPermission(const std::string& sPermissionIdentifier)

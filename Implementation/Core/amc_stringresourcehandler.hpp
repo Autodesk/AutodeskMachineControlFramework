@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_STRINGRESOURCEHANDLER
 #define __AMC_STRINGRESOURCEHANDLER
 
+#include <cstdint>
 #include "amc_stringresource.hpp"
 #include "amc_stringresourcetable.hpp"
 #include <mutex>

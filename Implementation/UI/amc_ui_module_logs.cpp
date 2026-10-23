@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_ui_handler.hpp"
+#include "amc_ui_frontendstate.hpp"
 
 #include "common_utils.hpp"
 
@@ -70,44 +72,6 @@ std::string CUIModule_LogsItem::findElementPathByUUID(const std::string& sUUID)
 }
 
 
-void CUIModule_LogsItem::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-	//auto pGroup = pClientVariableHandler->findGroup(getItemPath (), true);
-
-	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData ();
-	uint32_t nMaxEntriesToRetrieve = 128;
-
-	CJSONWriterArray jsonLogEntryArray(writer);
-
-	auto pLogger = m_pUIModuleEnvironment->getLogger();
-	if (pLogger->supportsLogMessagesRetrieval()) {
-		std::vector<CLoggerEntry> loggerEntries;
-		uint32_t nEndID = pLogger->getLogMessageHeadID();
-		uint32_t nStartID = nStateID;
-		if ((nStartID + nMaxEntriesToRetrieve) < nEndID)
-			nStartID = nEndID - nMaxEntriesToRetrieve;
-
-		pLogger->retrieveLogMessages(loggerEntries, nStartID, nEndID, LibMCData::eLogLevel::Message);
-
-		for (auto loggerEntry : loggerEntries) {
-			CJSONWriterObject jsonEntryObject(writer);
-
-			jsonEntryObject.addInteger (AMC_API_KEY_UI_LOGENTRYID, loggerEntry.getID ());
-			jsonEntryObject.addString(AMC_API_KEY_UI_LOGSUBSYSTEM, loggerEntry.getSubSystem());
-			jsonEntryObject.addString(AMC_API_KEY_UI_LOGTIMESTAMP, loggerEntry.getTimeStamp());
-			jsonEntryObject.addString(AMC_API_KEY_UI_LOGMESSAGE, loggerEntry.getMessage());
-			jsonEntryObject.addString(AMC_API_KEY_UI_LOGLEVEL, loggerEntry.getlogLevelString());
-
-			jsonLogEntryArray.addObject(jsonEntryObject);
-		}
-
-	}
-
-
-	object.addArray(AMC_API_KEY_UI_LOGENTRIES, jsonLogEntryArray);
-
-}
-
 void CUIModule_LogsItem::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
 {
 
@@ -118,7 +82,8 @@ void CUIModule_LogsItem::setEventPayloadValue(const std::string& sEventName, con
 /////////////////////////////////////////////////////////////////////////////////////
 
 CUIModule_Logs::CUIModule_Logs(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
-: CUIModule (getNameFromXML(xmlNode), sPath, pUIModuleEnvironment->getFrontendDefinition ())
+: CUIModule (getNameFromXML(xmlNode), getStaticType(), sPath, pUIModuleEnvironment->getFrontendDefinition ()),
+  m_pUIModuleEnvironment (pUIModuleEnvironment)
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
@@ -130,7 +95,43 @@ CUIModule_Logs::CUIModule_Logs(pugi::xml_node& xmlNode, const std::string& sPath
 
 	auto captionAttrib = xmlNode.attribute("caption");
 	m_sCaption = captionAttrib.as_string();
-	
+
+	m_nDefaultCount = xmlNode.attribute("defaultcount").as_uint(200);
+	m_bShowToolbar = xmlNode.attribute("showtoolbar").as_bool(true);
+	m_nMaxClientEntries = xmlNode.attribute("maxcliententries").as_uint(2000);
+	m_sDownloadPrefix = xmlNode.attribute("downloadprefix").as_string("log");
+
+	CUIExpression defaultCountExpr;
+	defaultCountExpr.setFixedValue(std::to_string(m_nDefaultCount));
+	registerIntegerAttribute("defaultcount", defaultCountExpr);
+
+	CUIExpression showToolbarExpr;
+	showToolbarExpr.setFixedValue(m_bShowToolbar ? "1" : "0");
+	registerBoolAttribute("showtoolbar", showToolbarExpr);
+
+	CUIExpression maxClientEntriesExpr;
+	maxClientEntriesExpr.setFixedValue(std::to_string(m_nMaxClientEntries));
+	registerIntegerAttribute("maxcliententries", maxClientEntriesExpr);
+
+	CUIExpression downloadPrefixExpr;
+	downloadPrefixExpr.setFixedValue(m_sDownloadPrefix);
+	registerStringAttribute("downloadprefix", downloadPrefixExpr);
+
+	CUIExpression captionExpr;
+	captionExpr.setFixedValue(m_sCaption);
+	registerStringAttribute("caption", captionExpr);
+
+	CUIExpression visibleExpr;
+	visibleExpr.setFixedValue("1");
+	registerBoolAttribute("visible", visibleExpr);
+
+	registerProviderAttribute("logheadid", eUIFrontendDefinitionAttributeType::atInteger, eUIFrontendDefinitionAttributeScope::asGlobal,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			auto pLogger = m_pUIModuleEnvironment->getLogger();
+			if (pLogger->supportsLogMessagesRetrieval())
+				object.addInteger(sName, pLogger->getLogMessageHeadID());
+		});
+
 	m_LogsItem = std::make_shared<CUIModule_LogsItem>(getModulePath (), pUIModuleEnvironment);
 
 }
@@ -161,20 +162,6 @@ std::string CUIModule_Logs::getCaption()
 // Legacy UI System
 /////////////////////////////////////////////////////////////////////////////////////
 
-
-void CUIModule_Logs::writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler)
-{
-	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
-	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
-	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
-	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
-
-
-}
-
-void CUIModule_Logs::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-}
 
 PUIModuleItem CUIModule_Logs::findLegacyItem(const std::string& sUUID)
 {

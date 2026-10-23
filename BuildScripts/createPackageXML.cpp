@@ -51,6 +51,7 @@ void writeUsage()
 	std::cout << "   --output: Output package xml file to write. (default: GITHASH_package.xml)" << std::endl;
 	std::cout << "   --serveroutput: Server Output xml file to write. (default: amc_server.xml)" << std::endl;
 	std::cout << "   --tempdir: Temporary directory to write into server path. (default: no custom temp dir)" << std::endl;
+	std::cout << "   --client: Client variant to select (vue2 or svelte). (default: vue2)" << std::endl;
 }
 
 
@@ -85,6 +86,7 @@ int main(int argc, char* argv[])
 		std::string sOutputFileName = "";
 		std::string sCustomTempDir = "";
 		std::string sServerOutputFileName = "amc_server.xml";
+		std::string sClientVariant = "";
 		for (size_t argIdx = 0; argIdx < argumentList.size(); argIdx++) {
 
 			bool bHandled = false;
@@ -134,6 +136,15 @@ int main(int argc, char* argv[])
 				sServerOutputFileName = argumentList[argIdx];
 				bHandled = true;
 			} 
+			
+			if (sArgument == "--client") {
+				argIdx++;
+				if (argIdx >= argumentList.size())
+					throw std::runtime_error("missing client variant in argument");
+
+				sClientVariant = argumentList[argIdx];
+				bHandled = true;
+			}
 
 			if (!bHandled) {
 				std::cout << "Warning! Unknown argument passed: " << sArgument << std::endl;
@@ -153,6 +164,9 @@ int main(int argc, char* argv[])
 		if (sOutputFileName.empty()) {
 			sOutputFileName = sDevPackagePrefix + "_package.xml";
 		}
+		
+		if (!sClientVariant.empty() && !AMCCommon::CUtils::stringIsValidAlphanumericNameString(sClientVariant))
+			throw std::runtime_error("invalid client variant: " + sClientVariant);
 
 		std::cout << "Importing " << sConfigFileName << "..." << std::endl;
 		std::string sConfigAsString;
@@ -171,6 +185,18 @@ int main(int argc, char* argv[])
 		std::set<std::string> drivers;
 
 		auto mainNode = doc.child("machinedefinition");
+		if (mainNode.empty())
+			mainNode = doc.child("testdefinition");
+		if (mainNode.empty())
+			throw std::runtime_error("missing machine definition node!");
+
+		std::string sConfigClientVariant;
+		auto clientAttrib = mainNode.attribute("client");
+		if (!clientAttrib.empty()) {
+			sConfigClientVariant = clientAttrib.as_string();
+			if (!sConfigClientVariant.empty() && !AMCCommon::CUtils::stringIsValidAlphanumericNameString(sConfigClientVariant))
+				throw std::runtime_error("invalid client variant in configuration: " + sConfigClientVariant);
+		}
 		auto driversNodes = mainNode.children("driver");
 		for (pugi::xml_node driversNode : driversNodes)
 		{
@@ -252,7 +278,18 @@ int main(int argc, char* argv[])
 #endif
 		std::string sPackageName = "Build " + sDevPackagePrefix;
 		std::string sConfigName = sDevPackagePrefix + "_config.xml";
-		std::string sClientName = sDevPackagePrefix + "_core.client";
+		std::string sClientNameVue2 = sDevPackagePrefix + "_core_vue2.client";
+		std::string sClientNameSvelte = sDevPackagePrefix + "_core_svelte.client";
+		std::string sDefaultClient = sClientVariant;
+		if (sDefaultClient.empty())
+			sDefaultClient = sConfigClientVariant;
+		if (sDefaultClient.empty())
+			sDefaultClient = "vue2";
+		if ((sDefaultClient != "vue2") && (sDefaultClient != "svelte"))
+			throw std::runtime_error("unsupported client variant: " + sDefaultClient);
+		std::string sClientName = sClientNameVue2;
+		if (sDefaultClient == "svelte")
+			sClientName = sClientNameSvelte;
 		std::string sAPIDocsName = sDevPackagePrefix + "_core.apidocs";
 		std::string sCoreName = sDevPackagePrefix + "_core_libmc." + sExtension;
 		std::string sCoreResourcesName = sDevPackagePrefix + "_core.data";
@@ -264,6 +301,10 @@ int main(int argc, char* argv[])
 		packageXMLStream << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 		packageXMLStream << "<amcpackage xmlns=\"http://schemas.autodesk.com/amcpackage/2020/06\">\n";
 		packageXMLStream << "  <build name=\"" << sPackageName << "\" configuration=\"" << sConfigName << "\" coreclient=\"" << sClientName << "\" apidocs=\"" << sAPIDocsName << "\">\n";
+		packageXMLStream << "    <coreclients default=\"" << sDefaultClient << "\">\n";
+		packageXMLStream << "      <coreclient name=\"vue2\" file=\"" << sClientNameVue2 << "\" />\n";
+		packageXMLStream << "      <coreclient name=\"svelte\" file=\"" << sClientNameSvelte << "\" />\n";
+		packageXMLStream << "    </coreclients>\n";
 
 		packageXMLStream << "    <library name=\"core\" import=\"" << sCoreName << "\" resources=\"" << sCoreResourcesName << "\" />\n";
 		packageXMLStream << "    <library name=\"datamodel\" import=\"" << sCoreDataName << "\" />\n";

@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CParameterHandler::CParameterHandler(std::string sDescription, AMCCommon::PChrono pGlobalChrono)
-		: m_sDescription (sDescription), m_pGlobalChrono (pGlobalChrono)
+	CParameterHandler::CParameterHandler(std::string sDescription, AMCCommon::PChrono pGlobalChrono, PFrontendChangeCounter pFrontendChangeCounter)
+		: m_sDescription (sDescription), m_pGlobalChrono (pGlobalChrono), m_pFrontendChangeCounter (pFrontendChangeCounter)
 	{
 		if (pGlobalChrono.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -80,6 +80,7 @@ namespace AMC {
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sName);
 
 		PParameterGroup pGroup = std::make_shared<CParameterGroup>(sName, sDescription, m_pGlobalChrono);
+		pGroup->setFrontendChangeCounter(m_pFrontendChangeCounter);
 		addGroup(pGroup);
 		return pGroup;
 	}
@@ -136,7 +137,7 @@ namespace AMC {
 
 	PParameterHandler CParameterHandler::duplicate()
 	{
-		auto pResult = std::make_shared<CParameterHandler>(m_sDescription, m_pGlobalChrono);
+		auto pResult = std::make_shared<CParameterHandler>(m_sDescription, m_pGlobalChrono, m_pFrontendChangeCounter);
 		for (auto pGroup : m_GroupList) {
 			auto pNewGroup = pResult->addGroup(pGroup->getName(), pGroup->getDescription());
 			pNewGroup->addDuplicatesFromGroup(pGroup.get());

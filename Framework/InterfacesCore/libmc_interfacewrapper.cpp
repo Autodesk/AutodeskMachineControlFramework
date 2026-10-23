@@ -241,6 +241,56 @@ LibMCResult libmc_streamconnection_getstreamtype(LibMC_StreamConnection pStreamC
 	}
 }
 
+LibMCResult libmc_streamconnection_setresumeeventid(LibMC_StreamConnection pStreamConnection, LibMC_uint64 nEventID)
+{
+	IBase* pIBaseClass = (IBase *)pStreamConnection;
+
+	try {
+		IStreamConnection* pIStreamConnection = dynamic_cast<IStreamConnection*>(pIBaseClass);
+		if (!pIStreamConnection)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIStreamConnection->SetResumeEventID(nEventID);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_streamconnection_isactive(LibMC_StreamConnection pStreamConnection, bool * pIsActive)
+{
+	IBase* pIBaseClass = (IBase *)pStreamConnection;
+
+	try {
+		if (pIsActive == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		IStreamConnection* pIStreamConnection = dynamic_cast<IStreamConnection*>(pIBaseClass);
+		if (!pIStreamConnection)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		*pIsActive = pIStreamConnection->IsActive();
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for APIRequestHandler
@@ -657,6 +707,36 @@ LibMCResult libmc_mccontext_parseconfiguration(LibMC_MCContext pMCContext, const
 	}
 }
 
+LibMCResult libmc_mccontext_setparameteroverride(LibMC_MCContext pMCContext, const char * pParameterPath, const char * pParameterValue)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pParameterPath == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pParameterValue == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sParameterPath(pParameterPath);
+		std::string sParameterValue(pParameterValue);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIMCContext->SetParameterOverride(sParameterPath, sParameterValue);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCResult libmc_mccontext_startallthreads(LibMC_MCContext pMCContext)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
@@ -991,6 +1071,10 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_streamconnection_getidledelay;
 	if (sProcName == "libmc_streamconnection_getstreamtype") 
 		*ppProcAddress = (void*) &libmc_streamconnection_getstreamtype;
+	if (sProcName == "libmc_streamconnection_setresumeeventid") 
+		*ppProcAddress = (void*) &libmc_streamconnection_setresumeeventid;
+	if (sProcName == "libmc_streamconnection_isactive") 
+		*ppProcAddress = (void*) &libmc_streamconnection_isactive;
 	if (sProcName == "libmc_apirequesthandler_expectsrawbody") 
 		*ppProcAddress = (void*) &libmc_apirequesthandler_expectsrawbody;
 	if (sProcName == "libmc_apirequesthandler_expectsformdata") 
@@ -1015,6 +1099,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_mccontext_settempbasepath;
 	if (sProcName == "libmc_mccontext_parseconfiguration") 
 		*ppProcAddress = (void*) &libmc_mccontext_parseconfiguration;
+	if (sProcName == "libmc_mccontext_setparameteroverride") 
+		*ppProcAddress = (void*) &libmc_mccontext_setparameteroverride;
 	if (sProcName == "libmc_mccontext_startallthreads") 
 		*ppProcAddress = (void*) &libmc_mccontext_startallthreads;
 	if (sProcName == "libmc_mccontext_terminateallthreads") 

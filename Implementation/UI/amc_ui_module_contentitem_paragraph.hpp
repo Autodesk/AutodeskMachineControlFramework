@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_CONTENTITEM_PARAGRAPH
 #define __AMC_UI_MODULE_CONTENTITEM_PARAGRAPH
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -51,18 +52,23 @@ namespace AMC {
 	protected:		
 
 		std::string m_sText;
+		std::string m_sVariant;
+		CUIExpression m_TextExpression;
+		CUIExpression m_VariantExpression;
 
 	public:
 
 		static PUIModule_ContentParagraph makeFromXML(const pugi::xml_node & xmlNode, const std::string& sItemName, const std::string& sModulePath);
 
-		CUIModule_ContentParagraph(const std::string& sText, const std::string & sItemName, const std::string& sModulePath);
+		CUIModule_ContentParagraph(const std::string& sText, const CUIExpression& textExpression, const std::string& sVariant, const CUIExpression& variantExpression, const std::string & sItemName, const std::string& sModulePath);
 		
 		virtual ~CUIModule_ContentParagraph();
 
 		std::string getText ();
 
-		virtual void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 
 	};
 

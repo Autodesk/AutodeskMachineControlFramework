@@ -37,9 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_journalsession.hpp"
 #include "libmcdata_journalreader.hpp"
 #include "libmcdata_alertsession.hpp"
+#include "libmcdata_telemetrysession.hpp"
+#include "libmcdata_telemetryreader.hpp"
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
 #include "libmcdata_persistencyhandler.hpp"
+#include "libmcdata_userpreferencehandler.hpp"
+#include "libmcdata_sessionmetricshandler.hpp"
 #include "libmcdata_installationinformation.hpp"
 #include "libmcdata_machineconfigurationtype.hpp"
 
@@ -52,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amcdata_databasemigrator_persistentparameters.hpp"
 #include "amcdata_databasemigrator_journals.hpp"
 #include "amcdata_databasemigrator_machineconfiguration.hpp"
+#include "amcdata_databasemigrator_sessions.hpp"
+#include "amcdata_databasemigrator_userpreferences.hpp"
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
@@ -69,7 +75,7 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 CDataModel::CDataModel()
-    : m_eDataBaseType(eDataBaseType::Unknown), m_pLogCallback (nullptr), m_pLogUserData (nullptr)
+    : m_eDataBaseType(eDataBaseType::Unknown), m_pLogCallback (nullptr), m_pLogUserData (nullptr), m_bTelemetryEnabled (true)
 {
     m_sSessionUUID = AMCCommon::CUtils::createUUID();
 
@@ -135,6 +141,8 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_PersistentParameters>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Journals>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_MachineConfiguration>());
+    migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Sessions>());
+    migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_UserPreferences>());
     migrator.migrateDatabaseSchemas(m_pSQLHandler, m_sInstallationUUID, m_sInstallationSecret);
 
     // Store Database type after successful initialisation
@@ -143,20 +151,38 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     auto sJournalBasePath = m_pStorageState->getJournalBasePath(m_sTimeFileName);
     auto sJournalName = m_pStorageState->getJournalFileName(m_sTimeFileName);
     auto sJournalChunkBaseName = m_pStorageState->getJournalChunkBaseName(m_sTimeFileName);
+    auto sTelemetryChunkBaseName = m_pStorageState->getTelemetryChunkBaseName(m_sTimeFileName);;
 
-    m_pJournal = std::make_shared<AMCData::CJournal> (sJournalBasePath, sJournalName, sJournalChunkBaseName, m_sSessionUUID);
+    m_pJournal = std::make_shared<AMCData::CJournal> (sJournalBasePath, sJournalName, sJournalChunkBaseName, sTelemetryChunkBaseName, m_sSessionUUID, m_bTelemetryEnabled);
 
-    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, logfilepath, journalfilepath, schemaversion, githash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, telemetryfilename, logfilepath, journalfilepath, schemaversion, githash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     pStatement->setString(1, m_sSessionUUID);
     pStatement->setString(2, m_sStartTime);
     pStatement->setString(3, sJournalName);
     pStatement->setString(4, sJournalChunkBaseName);
-    pStatement->setString(5, "");
+    pStatement->setString(5, sTelemetryChunkBaseName);
     pStatement->setString(6, "");
-    pStatement->setInt(7, m_pJournal->getSchemaVersion ());
-    pStatement->setString(8, __STRINGIZE_VALUE_OF(__GITHASH));
+    pStatement->setString(7, "");
+    pStatement->setInt(8, m_pJournal->getSchemaVersion ());
+    pStatement->setString(9, __STRINGIZE_VALUE_OF(__GITHASH));
     pStatement->execute();
 
+}
+
+void CDataModel::SetTelemetryEnabled(const bool bTelemetryEnabled)
+{
+    // The flag is latched by InitialiseDatabase, which is where the telemetry data file is
+    // created. Changing it afterwards cannot un-create that file, so fail loudly instead of
+    // silently ignoring the call.
+    if (m_pJournal.get() != nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_TELEMETRYSETTINGAFTERINITIALISATION);
+
+    m_bTelemetryEnabled = bTelemetryEnabled;
+}
+
+bool CDataModel::GetTelemetryEnabled()
+{
+    return m_bTelemetryEnabled;
 }
 
 LibMCData_uint32 CDataModel::GetDataModelVersion()
@@ -225,6 +251,23 @@ IAlertSession* CDataModel::CreateAlertSession()
 
 }
 
+ITelemetrySession* CDataModel::CreateTelemetrySession()
+{
+    if (m_pJournal.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNAL);
+
+    return new CTelemetrySession(m_pJournal);
+
+}
+
+ITelemetryReader* CDataModel::CreateTelemetryReader(const std::string& sJournalUUID)
+{
+    auto sJournalBasePath = m_pStorageState->getJournalBasePath(m_sTimeFileName);
+
+    return new CTelemetryReader(m_pSQLHandler, sJournalUUID, sJournalBasePath);
+}
+
+
 
 IBuildJobHandler* CDataModel::CreateBuildJobHandler()
 {
@@ -243,6 +286,19 @@ ILoginHandler* CDataModel::CreateLoginHandler()
 IPersistencyHandler* CDataModel::CreatePersistencyHandler()
 {
     return new CPersistencyHandler(m_pSQLHandler);
+}
+
+IUserPreferenceHandler* CDataModel::CreateUserPreferenceHandler()
+{
+    return new CUserPreferenceHandler(m_pSQLHandler);
+}
+
+ISessionMetricsHandler* CDataModel::CreateSessionMetricsHandler()
+{
+    if (m_pJournal.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDJOURNAL);
+
+    return new CSessionMetricsHandler(m_pJournal);
 }
 
 void CDataModel::SetBaseTempDirectory(const std::string& sTempDirectory)

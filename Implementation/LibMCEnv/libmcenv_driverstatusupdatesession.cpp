@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CDriverStatusUpdateSession
 
 #include "libmcenv_driverstatusupdatesession.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_telemetrychannel.hpp"
 
 // Include custom headers here.
 #include "Common/common_utils.hpp"
@@ -43,8 +44,8 @@ using namespace LibMCEnv::Impl;
  Class definition of CDriverStatusUpdateSession 
 **************************************************************************************************************************/
 
-CDriverStatusUpdateSession::CDriverStatusUpdateSession(AMC::PParameterGroup pParameterGroup, AMC::PLogger pLogger, std::string sDriverName, AMCCommon::PChrono pGlobalChrono)
-	: m_pParameterGroup (pParameterGroup), m_pLogger (pLogger), m_sDriverName (sDriverName), m_pGlobalChrono (pGlobalChrono)
+CDriverStatusUpdateSession::CDriverStatusUpdateSession(AMC::PParameterGroup pParameterGroup, AMC::PLogger pLogger, std::string sDriverName, AMCCommon::PChrono pGlobalChrono, AMC::PTelemetryHandler pTelemetryHandler)
+	: m_pParameterGroup (pParameterGroup), m_pLogger (pLogger), m_sDriverName (sDriverName), m_pGlobalChrono (pGlobalChrono), m_pTelemetryHandler (pTelemetryHandler)
 {
 	if (pParameterGroup.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -52,7 +53,9 @@ CDriverStatusUpdateSession::CDriverStatusUpdateSession(AMC::PParameterGroup pPar
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pGlobalChrono.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-	
+	if (pTelemetryHandler.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
 
 }
 
@@ -131,4 +134,17 @@ LibMCEnv_int64 CDriverStatusUpdateSession::GetIntegerParameter(const std::string
 bool CDriverStatusUpdateSession::GetBoolParameter(const std::string& sParameterName)
 {
 	return m_pParameterGroup->getBoolParameterValueByName(sParameterName);
+}
+
+ITelemetryChannel* CDriverStatusUpdateSession::FindTelemetryChannel(const std::string& sChannelIdentifier, const bool bFailIfNotExisting)
+{
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sChannelIdentifier))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "invalid driver telemetry channel identifier: " + sChannelIdentifier + " (driver " + m_sDriverName + ")");
+
+	std::string sIdentifier = m_sDriverName + "." + sChannelIdentifier;
+
+	m_pTelemetryHandler->findChannelByIdentifier(sIdentifier, true);
+
+	return new CTelemetryChannel(m_pTelemetryHandler, m_sDriverName, sChannelIdentifier);
+
 }

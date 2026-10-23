@@ -84,6 +84,8 @@ private:
 	uint32_t m_nMinorVersion;
 	uint32_t m_nPatchVersion;
 
+	std::atomic<uint64_t> m_UpdateCounter;
+
 	void LoadSDKIfNeeded();
 
 public:

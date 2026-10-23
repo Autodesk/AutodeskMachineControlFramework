@@ -68,11 +68,6 @@ std::string CUIModuleGraphicItem::getUUID()
 }
 
 
-void CUIModuleGraphicItem::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-
-}
-
 std::list <std::string> CUIModuleGraphicItem::getReferenceUUIDs()
 {
 	std::list <std::string> resultList;
@@ -85,4 +80,43 @@ std::list <std::string> CUIModuleGraphicItem::getReferenceUUIDs()
 void CUIModuleGraphicItem::populateClientVariables(CParameterHandler* pParameterHandler)
 {
 
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// New UI Frontend System
+/////////////////////////////////////////////////////////////////////////////////////
+
+void CUIModuleGraphicItem::initFrontendModuleStore(CUIFrontendDefinition* pFrontendDefinition)
+{
+	LibMCAssertNotNull(pFrontendDefinition);
+	m_pItemModuleStore = pFrontendDefinition->registerModuleStore(m_sUUID, getItemPath(), getItemType());
+	registerFrontendAttributes();
+}
+
+void CUIModuleGraphicItem::registerFrontendAttributes()
+{
+}
+
+std::string CUIModuleGraphicItem::getItemType()
+{
+	return "";
+}
+
+PUIFrontendDefinitionModuleStore CUIModuleGraphicItem::getFrontendModuleStore()
+{
+	return m_pItemModuleStore;
+}
+
+PUIFrontendDefinitionAttribute CUIModuleGraphicItem::registerItemStringAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atString, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModuleGraphicItem::registerItemNumberAttribute(const std::string& sName, const CUIExpression& expression)
+{
+	if (m_pItemModuleStore == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	return m_pItemModuleStore->registerValue(sName, eUIFrontendDefinitionAttributeType::atNumber, expression);
 }

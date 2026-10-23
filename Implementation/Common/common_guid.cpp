@@ -31,7 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <vector>
-
+#include <chrono>
+#include <cstdint>
+#include <stdexcept>
+#include <random>
 
 #ifdef _WIN32
 #define _WIN32_LEAN_AND_MEAN
@@ -65,12 +68,60 @@ namespace AMCCommon {
 	}
 #endif //_WASM
 
-	std::string CUtils::createUUID()
+	inline std::uint64_t getCurrentUnixTimeStamp()
 	{
-		auto guid = xg::newGuid();
-		return normalizeUUIDString(guid.str());
+		using namespace std::chrono;
+		return static_cast<std::uint64_t>(
+			duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count()
+			);
 	}
 
+	inline char makeUUIDHexChar(std::uint64_t nHexElement)
+	{
+		static constexpr char sHexDigits[] = "0123456789abcdef";
+
+		if (nHexElement >= 16)
+			throw std::runtime_error("invalid uuid hex character");
+
+		return sHexDigits[nHexElement];
+	}
+
+	std::string CUtils::createUUID()
+	{
+		std::string sUUID = xg::newGuid().str();
+
+		if (sUUID.length() != 36)
+			throw std::runtime_error("created invalid uuid String");
+
+		// UUIDv7: first 48 bits (12 hex chars) are unix epoch milliseconds
+		const std::uint64_t nUnixTimeMs = getCurrentUnixTimeStamp() & 0x0000FFFFFFFFFFFFULL;
+
+		// Patch the first 12 hex digits: positions 0..7 and 9..12 (skip hyphen at position 8)
+		for (int nHexDigitIndex = 0; nHexDigitIndex < 12; ++nHexDigitIndex)
+		{
+			const std::uint64_t nNibble = (nUnixTimeMs >> ((11 - nHexDigitIndex) * 4)) & 0x0FULL;
+			const int nStringIndex = (nHexDigitIndex < 8) ? nHexDigitIndex : (nHexDigitIndex + 1);
+
+			sUUID.at(nStringIndex) = makeUUIDHexChar(nNibble);
+		}
+
+		// Version nibble: xxxxxxxx-xxxx-7xxx-....
+		sUUID.at(14) = makeUUIDHexChar(7);
+
+		// Variant nibble: ....-yxxx-.... must be 8..b (RFC 4122 variant).
+		 sUUID.at(19) = "89ab"[static_cast<unsigned>(std::random_device{}() & 0x3)];
+
+		return normalizeUUIDString(sUUID);
+	}
+
+
+	std::string CUtils::createUUIDV4()
+	{
+		auto guid = xg::newGuid();
+		std::string sUUID = guid.str();
+
+		return normalizeUUIDString(guid.str());
+	}
 
 	std::string CUtils::calculateRandomSHA256String(const uint32_t nIterations)
 	{

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 #include <mutex>
 #include <map>
+#include <set>
 #include <vector>
 
 #include "lib3mf/lib3mf_dynamic.hpp"
@@ -66,7 +67,8 @@ namespace AMC {
 
 	typedef struct _sToolpathLayerOverride {
 		uint32_t m_nSubInterpolationCount;
-		Lib3MF::sHatchModificationInterpolationData * m_pSubInterpolationData;
+		uint32_t m_nSubInterpolationOffset;
+		//Lib3MF::sHatchModificationInterpolationData * m_pSubInterpolationData;
 		double m_dFactors[3]; // F, G and H
 	} sToolpathLayerOverride;
 
@@ -187,7 +189,8 @@ namespace AMC {
 
 	public:
 
-		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName, std::vector<PToolpathCustomSegmentAttribute> customSegmentAttributes);
+		// Segments whose build item UUID (normalized) is contained in excludedPartUUIDs are skipped entirely.
+		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName, std::vector<PToolpathCustomSegmentAttribute> customSegmentAttributes, const std::set<std::string>& excludedPartUUIDs);
 		virtual ~CToolpathLayerData();		
 
 		std::string getUUID ();

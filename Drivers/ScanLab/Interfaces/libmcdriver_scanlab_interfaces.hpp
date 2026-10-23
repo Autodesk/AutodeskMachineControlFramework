@@ -1409,6 +1409,14 @@ public:
 	virtual void AddMicrovectorMovement(const LibMCDriver_ScanLab_uint64 nMicrovectorArrayBufferSize, const LibMCDriver_ScanLab::sMicroVector * pMicrovectorArrayBuffer) = 0;
 
 	/**
+	* IRTCContext::SetMicrovectorStreamingEnabled - Enables or disables the streamed microvector download with overlapped marking. If enabled, AddMicrovectorMovement of a layer of at least MinLayerSize microvectors starts list execution after a prebuffer and appends the remaining microvectors while the laser is already marking. Default is disabled.
+	* @param[in] bEnabled - True to enable the streamed microvector download.
+	* @param[in] nMinLayerSize - Minimum layer size in microvectors for streaming to be used; smaller layers are downloaded sequentially. 0 uses the built-in default of 300000. Values below the prebuffer minimum of 150000 are clamped to it.
+	* @param[in] dPrebufferFraction - Fraction of the layer (0..1) that is downloaded before execution starts. 0 uses the built-in default of 0.4. Values below 0.25 risk margin aborts on download slowdowns and are only meant for testing the overrun detector.
+	*/
+	virtual void SetMicrovectorStreamingEnabled(const bool bEnabled, const LibMCDriver_ScanLab_uint32 nMinLayerSize, const LibMCDriver_ScanLab_double dPrebufferFraction) = 0;
+
+	/**
 	* IRTCContext::GetCurrentFreeVariable - Returns the currently set free variable.
 	* @param[in] nVariableNo - Number of the variable (0-7).
 	* @return Value to return.
@@ -1608,6 +1616,19 @@ public:
 	* @param[in] nOutputMask - Mask of the digital IO. Only the bits with value 1 are changed in the output state. MUST be between 0 and 65535.
 	*/
 	virtual void AddWriteMaskedDigitalIOList(const LibMCDriver_ScanLab_uint32 nDigitalOutput, const LibMCDriver_ScanLab_uint32 nOutputMask) = 0;
+
+	/**
+	* IRTCContext::ReadDigitalInputs - Reads the current state of the 16-bit digital input port (DIGITAL IN0...DIGITAL IN15) on the EXTENSION 1 socket connector immediately.
+	* @return Current state of the 16 digital inputs. Bit 0 corresponds to DIGITAL IN0, bit 15 to DIGITAL IN15.
+	*/
+	virtual LibMCDriver_ScanLab_uint32 ReadDigitalInputs() = 0;
+
+	/**
+	* IRTCContext::ReadDigitalInputBit - Reads the current state of a single bit of the 16-bit digital input port on the EXTENSION 1 socket connector immediately.
+	* @param[in] nBitIndex - Index of the digital input bit to read. MUST be between 0 and 15.
+	* @return Current state of the requested digital input bit.
+	*/
+	virtual bool ReadDigitalInputBit(const LibMCDriver_ScanLab_uint32 nBitIndex) = 0;
 
 	/**
 	* IRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
@@ -1924,6 +1945,39 @@ public:
 	virtual LibMCDriver_ScanLab_double MapPowerWattsToPercent(const LibMCDriver_ScanLab_double dLaserPowerInWatts) = 0;
 
 	/**
+	* IRTCContext::SetPiecewiseLinearDefocusCorrectionByPower - Sets a piecewise linear defocus correction table that maps laser power (in watts) to a defocus offset (in mm). This compensates for focus shift caused by thermal lensing at different power levels. The correction is automatically added to the Z defocus value during marking operations.
+	* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+	* @param[in] pCalibrationPointsBuffer - Defocus correction points that map laser power to defocus offset. Power values MUST be non-negative and strictly increasing in the array. Array MUST NOT be empty.
+	*/
+	virtual void SetPiecewiseLinearDefocusCorrectionByPower(const LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, const LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer) = 0;
+
+	/**
+	* IRTCContext::DisableDefocusCorrectionByPower - Disables the defocus correction by laser power. After calling this, no power-dependent defocus adjustment will be applied.
+	*/
+	virtual void DisableDefocusCorrectionByPower() = 0;
+
+	/**
+	* IRTCContext::DefocusCorrectionByPowerIsEnabled - Returns whether defocus correction by laser power is currently enabled.
+	* @return True if defocus correction by power is enabled.
+	*/
+	virtual bool DefocusCorrectionByPowerIsEnabled() = 0;
+
+	/**
+	* IRTCContext::GetDefocusCorrectionByPower - Returns the current defocus correction table. Fails if defocus correction is not enabled.
+	* @param[in] nCalibrationPointsBufferSize - Number of elements in buffer
+	* @param[out] pCalibrationPointsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pCalibrationPointsBuffer - DefocusCorrectionPoint buffer of Defocus Correction Points
+	*/
+	virtual void GetDefocusCorrectionByPower(LibMCDriver_ScanLab_uint64 nCalibrationPointsBufferSize, LibMCDriver_ScanLab_uint64* pCalibrationPointsNeededCount, LibMCDriver_ScanLab::sDefocusCorrectionPoint * pCalibrationPointsBuffer) = 0;
+
+	/**
+	* IRTCContext::MapDefocusCorrectionFromPower - Looks up the defocus correction offset for a given laser power. Fails if defocus correction is not enabled.
+	* @param[in] dLaserPowerInWatts - Laser Power in Watts
+	* @return Defocus offset in millimeters
+	*/
+	virtual LibMCDriver_ScanLab_double MapDefocusCorrectionFromPower(const LibMCDriver_ScanLab_double dLaserPowerInWatts) = 0;
+
+	/**
 	* IRTCContext::EnableSpatialLaserPowerModulation - Enables a spatial laser power modulation via callback.
 	* @param[in] pModulationCallback - callback function
 	* @param[in] nUserData - Userdata that is passed to the callback function
@@ -1945,6 +1999,18 @@ public:
 	* IRTCContext::DisableLineSubdivision - Disables the subdivision of mark lines.
 	*/
 	virtual void DisableLineSubdivision() = 0;
+
+	/**
+	* IRTCContext::SetMinimumJumpDistance - Sets the minimum jump distance. Jumps shorter than this distance, measured from the current scan position, are not written to the list, so the following mark starts at the current scan position and no skywriting is added for the jump. Jumps to the current scan position are never written. Default is 0. A segment profile can override it for the jumps of that segment with the value minimumdistance (in mm) or minimumdistance_bits (in RTC bits) in the namespace http://schemas.scanlab.com/jump/2026/10.
+	* @param[in] dMinimumJumpDistanceInMM - Minimum jump distance in mm. 0 disables the check. MUST be between 0 and 1 mm.
+	*/
+	virtual void SetMinimumJumpDistance(const LibMCDriver_ScanLab_double dMinimumJumpDistanceInMM) = 0;
+
+	/**
+	* IRTCContext::GetMinimumJumpDistance - Returns the minimum jump distance.
+	* @return Minimum jump distance in mm. 0 if disabled.
+	*/
+	virtual LibMCDriver_ScanLab_double GetMinimumJumpDistance() = 0;
 
 	/**
 	* IRTCContext::ReadMultiMCBSP - Reads a multi MCBSP register from the RTC Card. Should be used only for debugging purposes.

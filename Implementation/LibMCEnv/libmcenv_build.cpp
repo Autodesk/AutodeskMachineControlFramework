@@ -81,6 +81,19 @@ CBuild::~CBuild()
 {
 }
 
+CBuild* CBuild::makeFrom(CBuild* pBuild)
+{
+	if (pBuild == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+	return new CBuild(pBuild->m_pDataModel, pBuild->m_sBuildJobUUID, pBuild->m_pToolpathHandler, pBuild->m_pMeshHandler, pBuild->m_pGlobalChrono, pBuild->m_pStateJournal);
+}
+
+std::shared_ptr<CBuild> CBuild::makeSharedFrom(CBuild* pBuild)
+{
+	return std::shared_ptr<CBuild>(makeFrom(pBuild));
+}
+
 std::string CBuild::GetName()
 {
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
@@ -93,6 +106,39 @@ std::string CBuild::GetBuildUUID()
 	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
 	return pBuildJob->GetUUID();
+}
+
+std::string CBuild::GetCreatedTimestamp()
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return pBuildJob->GetTimeStamp();
+}
+
+std::string CBuild::GetLastExecutionTimestamp()
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+
+	// Find the latest execution timestamp
+	std::string sLatestExecutionTime = "";
+	uint64_t nLatestExecutionMicroseconds = 0;
+
+	auto pJobExecutionIterator = pBuildJob->RetrieveBuildJobExecutions("");
+	while (pJobExecutionIterator->MoveNext()) {
+		auto pJobExecution = pJobExecutionIterator->GetCurrentJobExecution();
+		uint64_t nExecutionTime = pJobExecution->GetStartTimeStampInMicroseconds();
+		if (nExecutionTime > nLatestExecutionMicroseconds) {
+			nLatestExecutionMicroseconds = nExecutionTime;
+		}
+	}
+
+	// Convert to ISO 8601 format if we found any executions
+	if (nLatestExecutionMicroseconds > 0) {
+		sLatestExecutionTime = AMCCommon::CChrono::convertToISO8601TimeUTC(nLatestExecutionMicroseconds);
+	}
+
+	return sLatestExecutionTime;
 }
 
 std::string CBuild::GetStorageUUID()
@@ -171,6 +217,43 @@ IToolpathAccessor * CBuild::CreateToolpathAccessor()
 
 	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
 	return new CToolpathAccessor(sStreamUUID, pBuildJob->GetUUID(), m_pToolpathHandler, m_pMeshHandler);
+}
+
+void CBuild::DisablePart(const std::string& sPartUUID)
+{
+	if (!AMCCommon::CUtils::stringIsUUIDString(sPartUUID))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "invalid part uuid: " + sPartUUID);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
+
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(sStreamUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	auto pPart = pToolpathEntity->findPartByUUID(sPartUUID);
+	if (pPart.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHPARTNOTFOUND, sPartUUID);
+
+	m_pToolpathHandler->disablePart(sStreamUUID, pPart->getUUID());
+}
+
+bool CBuild::PartIsDisabled(const std::string& sPartUUID)
+{
+	if (!AMCCommon::CUtils::stringIsUUIDString(sPartUUID))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "invalid part uuid: " + sPartUUID);
+
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	return m_pToolpathHandler->partIsDisabled(pBuildJob->GetStorageStreamUUID(), sPartUUID);
+}
+
+void CBuild::EnableAllParts()
+{
+	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(m_sBuildJobUUID);
+	m_pToolpathHandler->enableAllParts(pBuildJob->GetStorageStreamUUID());
 }
 
 
@@ -337,7 +420,7 @@ std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::st
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLENAME);
 	if (sIdentifier.empty())
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EMPTYDATATABLEIDENTIFIER);
-	if (AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sIdentifier))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDATATABLEIDENTIFIER, "invalid datatable identifier: " + sIdentifier);
 
 	if (pFieldDataInstance == nullptr)
@@ -345,7 +428,7 @@ std::string CBuild::StoreDataTable(const std::string& sIdentifier, const std::st
 
 	std::string sNormalizedUserUUID;
 	if (!sUserUUID.empty())
-		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sNormalizedUserUUID);
+		sNormalizedUserUUID = AMCCommon::CUtils::normalizeUUIDString(sUserUUID);
 	else
 		sNormalizedUserUUID = AMCCommon::CUtils::createEmptyUUID();
 

@@ -108,6 +108,8 @@
 		<error name="CSVPARSERUNKNOWNFIELDPARSERTYPE" code="1054" description="Unknown Field Parser Type." />
 		<error name="CSVPARSERINTERPOLATEINDEXOUTOFRANGE" code="1055" description="Index out of range in Interpolate." />
 		<error name="INVALIDMAXPOWERVALUE" code="1056" description="Invalid max power value." />
+		<error name="SIMULATIONWORKINGFILEISNOTINITIALIZED" code="1057" description="Simulation working file is not initialized." />
+		<error name="SIMULATIONWORKINGFILESIZEMISMATCH" code="1058" description="Simulation working file size mismatch." />
 		
 	</errors>
 
@@ -331,6 +333,10 @@ Custom implementation
 
 		<method name="LoadSimulationData" description="Reads the SMC Simulation data into a data table.">
 			<param name="SimulationDataTable" type="class" class="LibMCEnv:DataTable" pass="in" description="Data table object to read the simulation into." />
+		</method>	
+
+		<method name="LoadRawSimulationData" description="Returns raw simulation data.">
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Raw binary simulation data." />
 		</method>	
 		
 		<method name="GetJobCharacteristic" description="Returns a characteristic value of a job.">

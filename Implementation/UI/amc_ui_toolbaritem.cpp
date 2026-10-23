@@ -43,7 +43,7 @@ CUIToolbarItem::CUIToolbarItem(const std::string& sID, const std::string& sIcon,
 	: m_sID(sID), m_sIcon(sIcon), m_sCaption(sCaption), m_sPageName(sPageName), m_sEventName(sEventName),
 	m_sUUID(AMCCommon::CUtils::createUUID ())
 {
-
+	m_Visible.setFixedValue("1");
 }
 
 CUIToolbarItem::~CUIToolbarItem()
@@ -80,4 +80,14 @@ std::string CUIToolbarItem::getEventName()
 std::string CUIToolbarItem::getPageName()
 {
 	return m_sPageName;
+}
+
+void CUIToolbarItem::setVisibleExpression(const CUIExpression& visibleExpression)
+{
+	m_Visible = visibleExpression;
+}
+
+CUIExpression& CUIToolbarItem::getVisibleExpression()
+{
+	return m_Visible;
 }

@@ -35,6 +35,7 @@ Abstract: This is the class declaration of CStorage
 #ifndef __LIBMCDATA_STORAGE
 #define __LIBMCDATA_STORAGE
 
+#include <cstdint>
 #include "libmcdata_interfaces.hpp"
 
 // Parent classes

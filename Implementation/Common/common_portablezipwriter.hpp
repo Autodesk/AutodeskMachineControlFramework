@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __COMMON_PORTABLEZIPWRITER
 #define __COMMON_PORTABLEZIPWRITER
 
+#include <cstdint>
 #include <string>
 #include <list>
 
@@ -57,6 +58,7 @@ namespace AMCCommon {
 		~CPortableZIPWriter();
 
 		PExportStream createEntry(const std::string sName, uint64_t nUnixTimeStamp);
+		PExportStream createEntryWithExternalAttributes(const std::string sName, uint64_t nUnixTimeStamp, uint32_t nExternalFileAttributes);
 		void closeEntry();
 
 		void writeDeflatedBuffer(uint32_t nEntryKey, const void * pBuffer, uint32_t cbCompressedBytes);

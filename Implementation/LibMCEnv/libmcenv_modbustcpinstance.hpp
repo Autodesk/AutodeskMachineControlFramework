@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __LIBMCDRIVER_MODBUSTCPINSTANCE
 #define __LIBMCDRIVER_MODBUSTCPINSTANCE
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <memory>

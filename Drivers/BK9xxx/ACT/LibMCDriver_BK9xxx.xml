@@ -265,6 +265,11 @@ Custom implementation
 			<param name="NameExists" type="bool" pass="return" description="Flag if value exists." />
 		</method>				
 
+		<method name="AnalogInputIsOutOfBounds" description="Returns if an analog input is out of bounds. The raw values itself will be clipped to the configured range.">
+			<param name="Name" type="string" pass="in" description="Name of variable. Fails if Variable does not exist or is not an analog variable." />
+			<param name="InputIsOutOfBounds" type="bool" pass="return" description="Flag if the raw value is out of bounds and has been clipped to the input window." />
+		</method>		
+
 		<method name="GetDigitalInput" description="Reads a value from an digital input variable. Fails if variable does not exist.">
 			<param name="VariableName" type="string" pass="in" description="Name of variable." />
 			<param name="Value" type="bool" pass="return" description="Result value." />

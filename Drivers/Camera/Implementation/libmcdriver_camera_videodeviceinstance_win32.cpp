@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CVideoDevice
 #include "libmcdriver_camera_interfaceexception.hpp"
 
 #include <array>
+#include <chrono>
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -55,13 +56,18 @@ extern std::string wstring_to_utf8(const std::wstring& wstr);
  Class definition of CVideoDevice 
 **************************************************************************************************************************/
 
-CVideoDeviceInstance_Win32::CVideoDeviceInstance_Win32(const std::string& sIdentifier, const std::string& sOSName, const std::string& sFriendlyName)
+CVideoDeviceInstance_Win32::CVideoDeviceInstance_Win32(const std::string& sIdentifier, const std::string& sOSName, const std::string& sFriendlyName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
     : m_sIdentifier (sIdentifier), 
     m_nCurrentResolutionX (0),
     m_nCurrentResolutionY (0), 
     m_nCurrentFrameRate (0),
-    m_SourceFormat (eVideoSourceFormat::Invalid)
+    m_SourceFormat (eVideoSourceFormat::Invalid),
+    m_pDriverEnvironment (pDriverEnvironment),
+    m_bCapturing (false),
+    m_dDesiredFramerateInFPS (0.0)
 {
+    if (pDriverEnvironment.get() == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
 
 #ifdef _WIN32
 
@@ -184,12 +190,19 @@ CVideoDeviceInstance_Win32::CVideoDeviceInstance_Win32(const std::string& sIdent
 
 std::string GUIDToString(const GUID& guid) {
     wchar_t guidString[39] = { 0 };  // GUID string format is 38 characters long plus null terminator
-    StringFromGUID2(guid, guidString, 39);
+    int nCharsWritten = StringFromGUID2(guid, guidString, 39);
+    if (nCharsWritten == 0)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM, "could not convert GUID to string");
     guidString[38] = 0;
-    std::wstring sResultStringW (guidString);
-    std::string sResultString(sResultStringW.begin(), sResultStringW.end());
 
-    return sResultString;
+    // GUID strings are pure ASCII, so a simple narrowing loop is safe
+    std::string sResult;
+    sResult.reserve(38);
+    for (int i = 0; i < 38 && guidString[i] != 0; i++) {
+        sResult.push_back(static_cast<char>(guidString[i]));
+    }
+
+    return sResult;
 }
 #endif
 
@@ -256,7 +269,7 @@ void CVideoDeviceInstance_Win32::refreshSupportedResolutions()
 
 CVideoDeviceInstance_Win32::~CVideoDeviceInstance_Win32()
 {
-
+    stopStreamCapture();
 }
 
 std::string CVideoDeviceInstance_Win32::getFriendlyName()
@@ -557,21 +570,140 @@ void CVideoDeviceInstance_Win32::setResolution(uint32_t nWidth, uint32_t nHeight
 #endif //_WIN32
 }
 
+void CVideoDeviceInstance_Win32::captureThreadFunction()
+{
+    while (m_bCapturing.load()) {
+        try {
+            auto pImage = m_pDriverEnvironment->CreateEmptyImage(
+                m_nCurrentResolutionX, m_nCurrentResolutionY,
+                72.0, 72.0, LibMCEnv::eImagePixelFormat::RGB24bit);
+
+            auto startTime = std::chrono::high_resolution_clock::now();
+
+            if (captureRawImage(pImage)) {
+                m_pActiveStream->PushFrame(pImage.get());
+            }
+
+            auto endTime = std::chrono::high_resolution_clock::now();
+            double dFrameDurationInSeconds = std::chrono::duration<double>(endTime - startTime).count();
+
+            {
+                std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+                m_FrameDurationsInSeconds.push_back(dFrameDurationInSeconds);
+            }
+
+            // Sleep for the remaining frame time if capture was faster than desired
+            if (m_nCurrentFrameRate > 0) {
+                double dDesiredDurationInSeconds = 1.0 / (double)m_nCurrentFrameRate;
+                double dRemainingInSeconds = dDesiredDurationInSeconds - dFrameDurationInSeconds;
+                if (dRemainingInSeconds > 0.0) {
+                    auto nSleepMicroseconds = (uint64_t)(dRemainingInSeconds * STREAMCAPTURE_MICROSECONDS_PER_SECOND);
+                    std::this_thread::sleep_for(std::chrono::microseconds(nSleepMicroseconds));
+                }
+            }
+        }
+        catch (...) {
+            // If a single frame fails, continue capturing rather than killing the thread.
+            // A brief sleep avoids busy-looping on persistent errors.
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+}
+
 void CVideoDeviceInstance_Win32::startStreamCapture(LibMCEnv::PVideoStream pStreamInstance)
 {
+    if (pStreamInstance.get() == nullptr)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+
+    if ((m_nCurrentResolutionX == 0) || (m_nCurrentResolutionY == 0) || (m_nCurrentFrameRate == 0))
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_CAMERARESOLUTIONNOTSET);
+
+    // Validate that camera resolution matches the video stream dimensions
+    uint32_t nStreamWidth = pStreamInstance->GetWidth();
+    uint32_t nStreamHeight = pStreamInstance->GetHeight();
+    if (nStreamWidth != m_nCurrentResolutionX || nStreamHeight != m_nCurrentResolutionY)
+        throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM,
+            "video stream dimensions (" + std::to_string(nStreamWidth) + "x" + std::to_string(nStreamHeight) +
+            ") do not match camera resolution (" + std::to_string(m_nCurrentResolutionX) + "x" + std::to_string(m_nCurrentResolutionY) + ")");
+
+    // Stop any existing capture before starting a new one
+    stopStreamCapture();
+
+    m_pActiveStream = pStreamInstance;
+    m_dDesiredFramerateInFPS = (double)m_nCurrentFrameRate;
+
+    {
+        std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+        m_FrameDurationsInSeconds.clear();
+    }
+
+    m_bCapturing.store(true);
+    m_pCaptureThread = std::make_unique<std::thread>(&CVideoDeviceInstance_Win32::captureThreadFunction, this);
 }
 
 void CVideoDeviceInstance_Win32::stopStreamCapture()
 {
+    m_bCapturing.store(false);
+
+    if (m_pCaptureThread && m_pCaptureThread->joinable()) {
+        m_pCaptureThread->join();
+    }
+
+    m_pCaptureThread.reset();
+    m_pActiveStream = nullptr;
 }
 
 bool CVideoDeviceInstance_Win32::streamCaptureIsActive()
 {
-    return false;   
+    return m_bCapturing.load();
 }
 
 void CVideoDeviceInstance_Win32::getStreamCaptureStatistics(LibMCDriver_Camera_double & dDesiredFramerate, LibMCDriver_Camera_double & dMinFramerate, LibMCDriver_Camera_double & dMaxFramerate, LibMCDriver_Camera_double & dMeanFramerate, LibMCDriver_Camera_double & dStdDevFramerate)
 {
+    std::lock_guard<std::mutex> lock(m_StatisticsMutex);
+
+    dDesiredFramerate = m_dDesiredFramerateInFPS;
+    dMinFramerate = 0.0;
+    dMaxFramerate = 0.0;
+    dMeanFramerate = 0.0;
+    dStdDevFramerate = 0.0;
+
+    if (m_FrameDurationsInSeconds.size() < STREAMCAPTURE_STATISTICS_MIN_FRAME_COUNT)
+        return;
+
+    // Compute min/max/mean of actual frame durations, then convert to FPS
+    double dMinDuration = m_FrameDurationsInSeconds[0];
+    double dMaxDuration = m_FrameDurationsInSeconds[0];
+    double dSumDuration = 0.0;
+
+    for (const auto& dDuration : m_FrameDurationsInSeconds) {
+        if (dDuration < dMinDuration)
+            dMinDuration = dDuration;
+        if (dDuration > dMaxDuration)
+            dMaxDuration = dDuration;
+        dSumDuration += dDuration;
+    }
+
+    double dMeanDuration = dSumDuration / (double)m_FrameDurationsInSeconds.size();
+
+    // Standard deviation of durations
+    double dVarianceSum = 0.0;
+    for (const auto& dDuration : m_FrameDurationsInSeconds) {
+        double dDiff = dDuration - dMeanDuration;
+        dVarianceSum += dDiff * dDiff;
+    }
+    double dStdDevDuration = std::sqrt(dVarianceSum / (double)m_FrameDurationsInSeconds.size());
+
+    // Convert durations to framerates (shorter duration = higher framerate)
+    if (dMinDuration > 0.0)
+        dMaxFramerate = 1.0 / dMinDuration;
+    if (dMaxDuration > 0.0)
+        dMinFramerate = 1.0 / dMaxDuration;
+    if (dMeanDuration > 0.0) {
+        dMeanFramerate = 1.0 / dMeanDuration;
+        // Propagate std dev from duration to framerate via |df/dt| = 1/t^2
+        dStdDevFramerate = dStdDevDuration / (dMeanDuration * dMeanDuration);
+    }
 }
 
 

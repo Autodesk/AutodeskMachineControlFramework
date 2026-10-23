@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel)
+CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpathHandler pToolpathHandler, PStateSignalHandler pSignalHandler, PLogger pLogger, PStateJournal pStateJournal, const std::string& sTestOutputPath, PAccessControl pAccessControl, PLanguageHandler pLanguageHandler, PMeshHandler pMeshHandler, PDataSeriesHandler pDataSeriesHandler, AMCCommon::PChrono pGlobalChronoInstance, PAlertHandler pAlertHandler, LibMCData::PDataModel pDataModel, PStreamRegistry pStreamRegistry)
     : m_pStateMachineData(pStateMachineData),
     m_pSignalHandler(pSignalHandler),
     m_pDataModel(pDataModel),
@@ -48,7 +48,8 @@ CUISystemState::CUISystemState(PStateMachineData pStateMachineData, AMC::PToolpa
     m_pMeshHandler(pMeshHandler),
     m_pDataSeriesHandler (pDataSeriesHandler),
     m_pGlobalChronoInstance (pGlobalChronoInstance),
-    m_pAlertHandler (pAlertHandler)
+    m_pAlertHandler (pAlertHandler),
+    m_pStreamRegistry (pStreamRegistry)
 {
     if (pStateMachineData.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -144,6 +145,11 @@ LibMCData::PDataModel CUISystemState::getDataModel()
 PDataSeriesHandler CUISystemState::getDataSeriesHandler()
 {
     return m_pDataSeriesHandler;
+}
+
+PStreamRegistry CUISystemState::getStreamRegistry()
+{
+    return m_pStreamRegistry;
 }
 
 AMCCommon::PChrono CUISystemState::getGlobalChronoInstance()

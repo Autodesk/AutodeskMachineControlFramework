@@ -1,0 +1,57 @@
+{
+  "name": "AutodeskMachineControlFramework",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.1.96",
+    "apexcharts": "^4.0.0",
+    "axios": "^0.24.0",
+    "luxon": "^3.2.1",
+    "roboto-fontface": "^0.10.0",
+    "three": "^0.156.1",
+    "three-svg-loader": "^0.3.1",
+    "vue": "^2.7.14",
+    "vue-apexcharts": "^1.6.2",
+    "vuetify": "^2.6.14"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "@babel/eslint-parser"
+    },
+    "rules": {
+      "no-mixed-spaces-and-tabs": 0,
+      "vue/no-mutating-props": 0
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.19.1",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "eslint": "^8.34.0",
+    "eslint-plugin-vue": "^9.9.0",
+    "sass": "^1.58.3",
+    "sass-loader": "^13.2.0",
+    "vue-cli-plugin-vuetify": "^2.5.8",
+    "vue-template-compiler": "^2.7.14",
+    "vuetify-loader": "^1.9.2"
+  }
+}

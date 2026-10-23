@@ -136,6 +136,16 @@ namespace AMC {
 
 	}
 
+	bool CAPIFormFields::getOptionalUint64RequestParameter(const std::string& sName, uint64_t& nValue)
+	{
+		std::string sValue = getRequestParameter(sName, false);
+		if (sValue.empty() || (sValue.length() > 18) || (sValue.find_first_not_of("0123456789") != std::string::npos))
+			return false;
+
+		nValue = std::stoull(sValue);
+		return true;
+	}
+
 
 	CAPIHandler::CAPIHandler(const std::string& sClientHash)
 		: m_sClientHash (sClientHash)

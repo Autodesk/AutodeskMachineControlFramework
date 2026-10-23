@@ -1,0 +1,9 @@
+{
+  "name": "amc-client-tests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "node:test tests for the framework-agnostic client code in Client/core. No dependencies: third-party imports are stubbed (support/coreLoaderHooks.mjs).",
+  "scripts": {
+    "test": "node --test"
+  }
+}

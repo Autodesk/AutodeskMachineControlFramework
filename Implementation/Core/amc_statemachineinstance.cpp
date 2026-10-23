@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statemachineinstance.hpp"
 #include "amc_statemachinedata.hpp"
 
+#include "amc_telemetry.hpp"
+
 #include "libmc_exceptiontypes.hpp"
 
 #include "libmcenv_abi.hpp"
@@ -53,7 +55,7 @@ namespace AMC {
 		LibMCAssertNotNull(pStateJournal.get());
 
 
-		m_ParameterHandler = std::make_shared<CParameterHandler>(sDescription, m_pSystemState->getGlobalChronoInstance ());
+		m_ParameterHandler = std::make_shared<CParameterHandler>(sDescription, m_pSystemState->getGlobalChronoInstance (), m_pSystemState->stateMachineData()->getFrontendChangeCounter());
 		m_pSystemState->stateMachineData()->registerParameterHandler (sName, m_ParameterHandler, m_pSystemState->getGlobalChronoInstance ());
 
 	}
@@ -88,7 +90,7 @@ namespace AMC {
 		if (sStateName.length() == 0)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSTATENAME, m_sName);
 
-		auto pResult = std::make_shared<CStateMachineState>(m_sName, sStateName, nRepeatDelayInMS, m_pEnvironmentWrapper, m_pSystemState->getGlobalChronoInstance());
+		auto pResult = std::make_shared<CStateMachineState>(m_sName, sStateName, nRepeatDelayInMS, m_pEnvironmentWrapper, m_pSystemState->getGlobalChronoInstance(), m_pSystemState->getTelemetryHandlerInstance ());
 
 		m_States.insert(std::make_pair(sStateName, pResult));
 		m_StateList.push_back(pResult);
@@ -321,7 +323,7 @@ namespace AMC {
 
 	void CStateMachineInstance::terminateThread()
 	{
-		m_pSystemState->logger()->logMessage("terminating instance thread ", m_sName, eLogLevel::Message);
+		m_pSystemState->logger()->logMessage("terminating " + m_sName + " instance thread", m_sName, eLogLevel::Message);
 
 		if (!threadIsRunning())
 			throw ELibMCCustomException(LIBMC_ERROR_THREADISNOTRUNNING, m_sName);
@@ -402,7 +404,6 @@ namespace AMC {
 	{
 		return m_ParameterHandler.get ();
 	}
-
 
 
 }

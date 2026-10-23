@@ -86,6 +86,8 @@ public:
 
 	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;
 
+	IBuildJobIterator * ListJobsChangedSince(const LibMCData_uint64 nIncrementalID) override;
+
     IBuildJob* FindJobOfData(const std::string& sDataUUID) override;
 
     std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
@@ -95,6 +97,12 @@ public:
     IBuildJobExecution* RetrieveJobExecution(const std::string& sExecutionUUID) override;
 
     IBuildJobExecutionIterator* ListJobExecutions(const std::string& sMinTimestamp, const std::string& sMaxTimestamp, const std::string& sJournalUUIDFilter) override;
+
+    IBuildJobExecutionIterator* ListJobExecutionsChangedSince(const LibMCData_uint64 nIncrementalID) override;
+
+    LibMCData_uint64 GetBuildListHeadID() override;
+
+    LibMCData_uint64 GetExecutionListHeadID() override;
 
 };
 

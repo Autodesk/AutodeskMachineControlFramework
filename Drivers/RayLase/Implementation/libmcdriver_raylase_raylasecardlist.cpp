@@ -87,7 +87,7 @@ void CRaylaseCoordinateTransform::applyTransform(double& dX, double& dY)
 }
 
 
-CRaylaseCardList::CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double dMaxLaserPowerInWatts, PRaylaseCoordinateTransform pCoordinateTransform, const std::map<std::string, ePartSuppressionMode>& partSuppressions, PNLightDriverImpl pNLightBoardImpl)
+CRaylaseCardList::CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double dMaxLaserPowerInWatts, PRaylaseCoordinateTransform pCoordinateTransform, const std::map<std::string, ePartSuppressionMode>& partSuppressions, PNLightDriverImpl pNLightBoardImpl, PRaylaseCardIOCycleMapping pIOCycleMapping)
     : m_pSDK(pSDK), 
     m_ListHandle(0), 
     m_CardHandle(cardHandle), 
@@ -95,7 +95,8 @@ CRaylaseCardList::CRaylaseCardList(PRaylaseSDK pSDK, rlHandle cardHandle, double
     m_nListIDOnCard (RAYLASE_LISTONCARDNOTSET),
     m_pCoordinateTransform (pCoordinateTransform),
     m_PartSuppressions (partSuppressions),
-    m_pNLightBoardImpl (pNLightBoardImpl)
+    m_pNLightBoardImpl (pNLightBoardImpl),
+    m_pIOCycleMapping (pIOCycleMapping)
 
 {
     if (pSDK.get() == nullptr)
@@ -165,6 +166,16 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
     double dUnits = pLayer->GetUnits();
 
+	// Check if pre/post cycle attributes are present
+    uint32_t nPreCycleAttributeID = 0;
+    if (pLayer->HasCustomSegmentAttribute("http://schemas.raylase.com/iocontrol/2026/01", "precycleid"))
+        nPreCycleAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.raylase.com/iocontrol/2026/01", "precycleid");
+
+    uint32_t nPostCycleAttributeID = 0;
+    if (pLayer->HasCustomSegmentAttribute("http://schemas.raylase.com/iocontrol/2026/01", "postcycleid"))
+        nPostCycleAttributeID = pLayer->FindCustomSegmentAttributeID("http://schemas.raylase.com/iocontrol/2026/01", "postcycleid");
+
+
     m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(m_ListHandle), "rlListAppendLaserOff");
 
     uint32_t nSegmentCount = pLayer->GetSegmentCount();
@@ -196,6 +207,16 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
                 bDrawSegment = false;
         }
 
+
+        // Check for pre/postcycles to execute.
+        int64_t nPreCycleID = 0;
+        if (nPreCycleAttributeID != 0)
+            nPreCycleID = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nPreCycleAttributeID);
+
+        int64_t nPostCycleID = 0;
+        if (nPostCycleAttributeID != 0)
+			nPostCycleID = pLayer->GetSegmentIntegerAttribute(nSegmentIndex, nPostCycleAttributeID);
+       
         // Check if part is not to be ignored
         std::string sSegmentPartUUID = pLayer->GetSegmentPartUUID(nSegmentIndex);
         ePartSuppressionMode suppressionMode = getPartSuppressionMode(sSegmentPartUUID);
@@ -229,6 +250,17 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
                 }
 
+            }
+
+
+            // Execute pre-cycle if specified
+            if (nPreCycleID != 0) {
+                if (m_pIOCycleMapping.get() == nullptr)
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND, "Pre-cycle ID " + std::to_string(nPreCycleID) + " specified but no IO cycle mapping available");
+                if (!m_pIOCycleMapping->ioCycleExists((uint32_t)nPreCycleID))
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND, "Pre-cycle ID " + std::to_string(nPreCycleID) + " not found");
+                auto pPreCycle = m_pIOCycleMapping->getIOCycle((uint32_t)nPreCycleID);
+                executeIOCycle(pPreCycle);
             }
             
 
@@ -345,6 +377,16 @@ void CRaylaseCardList::addLayerToList(LibMCEnv::PToolpathLayer pLayer, uint32_t 
 
             }
 
+            // Execute post-cycle if specified
+            if (nPostCycleID != 0) {
+                if (m_pIOCycleMapping.get() == nullptr)
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND, "Post-cycle ID " + std::to_string(nPostCycleID) + " specified but no IO cycle mapping available");
+                if (!m_pIOCycleMapping->ioCycleExists((uint32_t)nPostCycleID))
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_IOCYCLENOTFOUND, "Post-cycle ID " + std::to_string(nPostCycleID) + " not found");
+                auto pPostCycle = m_pIOCycleMapping->getIOCycle((uint32_t)nPostCycleID);
+                executeIOCycle(pPostCycle);
+            }
+
         }
 
     }
@@ -427,6 +469,75 @@ LibMCDriver_Raylase::ePartSuppressionMode CRaylaseCardList::getPartSuppressionMo
         return iIter->second;
 
     return LibMCDriver_Raylase::ePartSuppressionMode::DontSuppress;
+}
+
+
+void CRaylaseCardList::executeIOCycle(PRaylaseIOCycleImpl pIOCycle)
+{
+    if (pIOCycle.get() == nullptr)
+        return;
+
+    const auto& entries = pIOCycle->getEntries();
+    for (const auto& entry : entries) {
+        switch (entry.m_EntryType) {
+        case eIOCycleEntryType::SignalOut:
+        {
+            // Convert LibMCDriver_Raylase::eIOPort to eRLIOPort
+            eRLIOPort rlPort = eRLIOPort::ioPortA;
+            switch (entry.m_IOPort) {
+            case eIOPort::PortA: rlPort = eRLIOPort::ioPortA; break;
+            case eIOPort::PortB: rlPort = eRLIOPort::ioPortB; break;
+            case eIOPort::PortC: rlPort = eRLIOPort::ioPortC; break;
+            case eIOPort::PortD: rlPort = eRLIOPort::ioPortD; break;
+            case eIOPort::PortE: rlPort = eRLIOPort::ioPortE; break;
+            default:
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT);
+            }
+
+            // Set or clear the pin based on m_bHighNotLow
+            uint32_t nPinMask = (1u << entry.m_nIOPin);
+            eRLPinAction pinAction = entry.m_bHighNotLow ? eRLPinAction::paSet : eRLPinAction::paClear;
+            m_pSDK->checkError(m_pSDK->rlListAppendGpioValue(m_ListHandle, rlPort, pinAction, nPinMask), "rlListAppendGpioValue");
+            break;
+        }
+
+        case eIOCycleEntryType::WaitForSignal:
+        {
+            // Convert LibMCDriver_Raylase::eIOPort to eRLIOPort
+            eRLIOPort rlPort = eRLIOPort::ioPortA;
+            switch (entry.m_IOPort) {
+            case eIOPort::PortA: rlPort = eRLIOPort::ioPortA; break;
+            case eIOPort::PortB: rlPort = eRLIOPort::ioPortB; break;
+            case eIOPort::PortC: rlPort = eRLIOPort::ioPortC; break;
+            case eIOPort::PortD: rlPort = eRLIOPort::ioPortD; break;
+            case eIOPort::PortE: rlPort = eRLIOPort::ioPortE; break;
+            default:
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDIOPORT);
+            }
+
+            // Wait for input signal on the specified pin
+            // ifNotTrue: if false, waits for condition to be true (pin high when m_bHighNotLow is true)
+            //            if true, waits for condition to be false (pin low when m_bHighNotLow is true)
+            // So we invert m_bHighNotLow for the ifNotTrue parameter
+            uint32_t nPinMask = (1u << entry.m_nIOPin);
+            int32_t nTimeoutInMicroseconds = (int32_t)entry.m_nTimeoutOrDelayInMicroseconds;
+            bool bIfNotTrue = !entry.m_bHighNotLow;
+            m_pSDK->checkError(m_pSDK->rlListAppendWaitForInput(m_ListHandle, nPinMask, rlPort, true, bIfNotTrue, nPinMask, nTimeoutInMicroseconds), "rlListAppendWaitForInput");
+            break;
+        }
+
+        case eIOCycleEntryType::Delay:
+        {
+            // Delay is specified in microseconds, SDK expects seconds
+            double dDelayInSeconds = (double)entry.m_nTimeoutOrDelayInMicroseconds / 1000000.0;
+            m_pSDK->checkError(m_pSDK->rlListAppendSleep(m_ListHandle, dDelayInSeconds), "rlListAppendSleep");
+            break;
+        }
+
+        default:
+            break;
+        }
+    }
 }
 
 

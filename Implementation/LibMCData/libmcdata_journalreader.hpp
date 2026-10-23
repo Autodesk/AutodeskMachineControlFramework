@@ -35,6 +35,7 @@ Abstract: This is the class declaration of CJournalReader
 #ifndef __LIBMCDATA_JOURNALREADER
 #define __LIBMCDATA_JOURNALREADER
 
+#include <cstdint>
 #include "libmcdata_interfaces.hpp"
 #include "amcdata_journalchunkdatafile.hpp"
 #include "libmcdata_journalchunkintegerdata.hpp"

@@ -43,9 +43,7 @@ namespace AMC {
 	enum class APIHandler_UIType {
 		utUnknown = 0,
 		utConfiguration = 1,
-		utState = 2,
 		utImage = 3,
-		utContentItem = 4,
 		utEvent = 5,
 		utChart = 6,
 		utMeshGeometry = 7,
@@ -53,8 +51,7 @@ namespace AMC {
 		utDownload = 9,
 		utPointCloud = 10,
 		utWidgetRequest = 11,
-		utPointChannel = 12,
-		utModule = 13
+		utPointChannel = 12
 	};
 
 	class CAPIHandler_UI : public CAPIHandler {
@@ -65,8 +62,6 @@ namespace AMC {
 		APIHandler_UIType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sParameterUUID, std::string & sAdditionalParameter);
 
 		void handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth);
-		void handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth);
-		void handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth, uint32_t nStateID);
 		PAPIResponse handleImageRequest(const std::string & sParameterUUID, PAPIAuth pAuth);
 		PAPIResponse handleChartRequest(const std::string& sParameterUUID, PAPIAuth pAuth);
 		PAPIResponse handleDownloadRequest(const std::string& sParameterUUID, PAPIAuth pAuth);
@@ -74,8 +69,6 @@ namespace AMC {
 		void handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 		void handleWidgetRequest(CJSONWriter& writer, const std::string & sWidgetUUID, const std::string& sRequestType, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 		void handlePointChannelDataRequest(CJSONWriter& writer, const std::string& sParameterUUID, const std::string& sAdditionalParameter, PAPIAuth pAuth);
-
-		void handleModuleRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth, uint32_t nStateID);
 
 	public:
 

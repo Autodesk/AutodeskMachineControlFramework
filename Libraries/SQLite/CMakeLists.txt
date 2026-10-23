@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.10)
 project(SQLite3
     VERSION   3.31.1
     LANGUAGES C

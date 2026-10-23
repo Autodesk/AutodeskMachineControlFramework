@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
@@ -235,67 +236,6 @@ void CUIModule_ContentExecutionList::writeButtonsToJSON(CJSONWriter& writer, CJS
 
 
 
-void CUIModule_ContentExecutionList::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-	std::string sLoadingText = m_LoadingText.evaluateStringValue(m_pStateMachineData);
-
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "executionlist");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_ITEMLOADINGTEXT, sLoadingText);
-	object.addString(AMC_API_KEY_UI_ITEMSELECTEVENT, m_sSelectEvent);
-	object.addString(AMC_API_KEY_UI_ITEMSELECTIONVALUEUUID, m_sSelectedExecutionFieldUUID);
-	object.addString(AMC_API_KEY_UI_ITEMBUTTONVALUEUUID, m_sSelectedButtonFieldUUID);
-	object.addInteger(AMC_API_KEY_UI_ITEMENTRIESPERPAGE, m_nEntriesPerPage);
-
-	writeHeadersToJSON(writer, object);
-	writeButtonsToJSON(writer, object);
-
-	CJSONWriterArray entryArray(writer);
-
-	auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
-	
-
-	auto pExecutionIterator = pBuildJobHandler->ListJobExecutions("", "", "");
-	while (pExecutionIterator->MoveNext()) {
-
-		auto pExecution = pExecutionIterator->GetCurrentJobExecution();
-
-		LibMCData::eBuildJobExecutionStatus status = pExecution->GetStatus();
-		std::string sStatusString = pExecution->GetStatusString();
-		bool bHasEndTime = (status == LibMCData::eBuildJobExecutionStatus::Finished);
-
-		uint64_t nStartTimeStamp = pExecution->GetStartTimeStampInMicroseconds();
-		uint64_t nEndTimeStamp = 0;
-		
-		if (bHasEndTime) {
-			nEndTimeStamp = pExecution->GetEndTimeStampInMicroseconds();
-		}
-
-		int64_t nDurationInSeconds = pExecution->ComputeElapsedTimeInMicroseconds (m_pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 (), false) / 1000000LL;
-
-		CJSONWriterObject entryObject(writer);
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONNAME, pExecution->GetJobName());
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUUID, pExecution->GetExecutionUUID());
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONDESCRIPTION, pExecution->GetDescription());
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONSTARTTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC (nStartTimeStamp));
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONENDTIMESTAMP, AMCCommon::CChrono::convertToISO8601TimeUTC(nEndTimeStamp));
-		entryObject.addInteger(AMC_API_KEY_UI_ITEMEXECUTIONDURATION, nDurationInSeconds);
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONTHUMBNAIL, m_sDefaultThumbnailResourceUUID);
-		entryObject.addInteger(AMC_API_KEY_UI_ITEMEXECUTIONLAYERCOUNT, pExecution->GetJobLayerCount());
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONSTATUS, sStatusString);
-		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONBUILDSTATUS, pExecution->GetJobStatusString());
-
-		//		entryObject.addString(AMC_API_KEY_UI_ITEMEXECUTIONUSER, pExecution->GetCreatorName());
-
-		entryArray.addObject(entryObject);
-
-	}
-
-	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entryArray);
-
-}
-
-
 void CUIModule_ContentExecutionList::populateClientVariables(CParameterHandler* pClientVariableHandler)
 {
 	LibMCAssertNotNull(pClientVariableHandler);
@@ -375,4 +315,47 @@ void CUIModule_ContentExecutionList::addButton(const std::string& sButtonName, C
 	m_ButtonUUIDMap.insert(std::make_pair(pButton->getUUID(), pButton));
 
 
+}
+
+std::string CUIModule_ContentExecutionList::getItemType()
+{
+	return "executionlist";
+}
+
+void CUIModule_ContentExecutionList::registerFrontendAttributes()
+{
+	registerItemStringAttribute("loadingtext", m_LoadingText);
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectEvent);
+		registerItemStringAttribute("selectevent", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(std::to_string(m_nEntriesPerPage));
+		registerItemIntegerAttribute("entriesperpage", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectedExecutionFieldUUID);
+		registerItemStringAttribute("selectionvalueuuid", expr);
+	}
+	{
+		CUIExpression expr;
+		expr.setFixedValue(m_sSelectedButtonFieldUUID);
+		registerItemStringAttribute("buttonvalueuuid", expr);
+	}
+
+	registerItemProviderAttribute(AMC_API_KEY_EXECUTIONS_HEADID, eUIFrontendDefinitionAttributeType::atInteger, eUIFrontendDefinitionAttributeScope::asGlobal,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			if (m_pDataModel) {
+				auto pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+				object.addInteger(sName, (int64_t)pBuildJobHandler->GetExecutionListHeadID());
+			}
+		});
+
+	registerItemProviderAttribute(AMC_API_KEY_UI_ENTRYBUTTONS, eUIFrontendDefinitionAttributeType::atArray, eUIFrontendDefinitionAttributeScope::asGlobal,
+		[this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+			writeButtonsToJSON(writer, object);
+		});
 }

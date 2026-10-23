@@ -49,9 +49,11 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_tempstreamwriter.hpp"
 #include "libmcenv_zipstreamwriter.hpp"
 #include "libmcenv_imageloader.hpp"
+#include "libmcenv_videostream.hpp"
 #include "libmcenv_machineconfigurationhandler.hpp"
 
 #include "amc_systemstate.hpp"
+#include "amc_streamregistry.hpp"
 #include "amc_accesscontrol.hpp"
 #include "amc_meshhandler.hpp"
 #include "amc_dataserieshandler.hpp"
@@ -60,6 +62,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_imagedata.hpp"
 #include "libmcenv_testenvironment.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_builditerator.hpp"
 #include "libmcenv_buildexecution.hpp"
 #include "libmcenv_streamreader.hpp"
 #include "libmcenv_datatable.hpp"
@@ -69,12 +72,14 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_ui_frontendstate.hpp"
 #include "libmcdata_dynamic.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
 
 #include <cmath>
+#include <sstream>
 
 #define DOWNLOADFILENAME_MAXLENGTH 256
 
@@ -174,6 +179,9 @@ void CUIEnvironment::StartStreamDownload(const std::string& sUUID, const std::st
     if (sFilename.size () > DOWNLOADFILENAME_MAXLENGTH)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME);
 
+    if (!AMCCommon::CUtils::stringIsValidFileName(sFilename))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME, "invalid download stream filename: " + sFilename);
+
     if (!m_pAPIAuth->userIsAuthorized ())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_USERISNOTAUTHORIZED);
 
@@ -182,7 +190,14 @@ void CUIEnvironment::StartStreamDownload(const std::string& sUUID, const std::st
     auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
 
     std::string sTicketUUID = m_pAPIAuth->createStreamDownloadTicket (sNormalizedUUID, sFilename);
-    pStorage->CreateDownloadTicket (sTicketUUID, sNormalizedUUID, sFilename, m_pAPIAuth->getSessionUUID (), sUserUUID, pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
+    try {
+        pStorage->CreateDownloadTicket (sTicketUUID, sNormalizedUUID, sFilename, m_pAPIAuth->getSessionUUID (), sUserUUID, pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970 ());
+    }
+    catch (LibMCData::ELibMCDataException & E) {
+        if (E.getErrorCode() == LIBMCDATA_ERROR_INVALIDCLIENTFILENAME)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOWNLOADSTREAMFILENAME, E.what());
+        throw;
+    }
 
     m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_StreamDownload>(sTicketUUID, sFilename));
 }
@@ -212,10 +227,38 @@ std::string CUIEnvironment::RetrieveEventSenderUUID()
 }
 
 
+bool CUIEnvironment::SenderHasTag(const std::string& sTag)
+{
+    if (sTag.empty())
+        return false;
+
+    // Tags are exposed as the sender element's "tags" UI property (a space-separated
+    // list). Reading it fails for elements that do not declare tags (e.g. non-button
+    // senders), which simply means "no such tag".
+    std::string sTags;
+    try {
+        sTags = GetUIProperty(m_sSenderName, "tags");
+    }
+    catch (...) {
+        return false;
+    }
+
+    std::stringstream tagStream(sTags);
+    std::string sCurrentTag;
+    while (tagStream >> sCurrentTag) {
+        if (sCurrentTag == sTag)
+            return true;
+    }
+    return false;
+}
+
+
 ISignalTrigger * CUIEnvironment::PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName)
 {
-    if (!m_pUISystemState->getSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
+    auto pSignalInstance = m_pUISystemState->getSignalHandler()->getInstance(sMachineInstance);
+
+    if (!pSignalInstance->hasSignalDefinition(sSignalName))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON, "could not find signal definition: " + sMachineInstance + "/" + sSignalName);
 
     return new CSignalTrigger(m_pUISystemState->getSignalHandler(), sMachineInstance, sSignalName, m_pUISystemState->getGlobalChronoInstance ());
 }
@@ -275,6 +318,57 @@ bool CUIEnvironment::GetMachineParameterAsBool(const std::string& sMachineInstan
     auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getBoolParameterValueByName(sParameterName);
+}
+
+LibMCEnv_uint32 CUIEnvironment::GetMachineParameterGroupParameterCount(const std::string& sMachineInstance, const std::string& sParameterGroup)
+{
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    return pGroup->getParameterCount();
+}
+
+std::string CUIEnvironment::GetMachineParameterGroupParameterName(const std::string& sMachineInstance, const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex)
+{
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    if (nIndex >= pGroup->getParameterCount())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "parameter index out of range: " + sParameterGroup + "/" + std::to_string(nIndex));
+
+    std::string sName, sDescription, sDefaultValue;
+    pGroup->getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+    return sName;
+}
+
+std::string CUIEnvironment::GetMachineParameterGroupParameterDescription(const std::string& sMachineInstance, const std::string& sParameterGroup, const LibMCEnv_uint32 nIndex)
+{
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    if (nIndex >= pGroup->getParameterCount())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "parameter index out of range: " + sParameterGroup + "/" + std::to_string(nIndex));
+
+    std::string sName, sDescription, sDefaultValue;
+    pGroup->getParameterInfo(nIndex, sName, sDescription, sDefaultValue);
+    return sDescription;
+}
+
+// Maps an internal parameter data type to the plugin-facing enum.
+static LibMCEnv::eParameterDataType parameterDataTypeToEnum(AMC::eParameterDataType eType)
+{
+    switch (eType) {
+        case AMC::eParameterDataType::String: return LibMCEnv::eParameterDataType::String;
+        case AMC::eParameterDataType::UUID: return LibMCEnv::eParameterDataType::UUID;
+        case AMC::eParameterDataType::Integer: return LibMCEnv::eParameterDataType::Integer;
+        case AMC::eParameterDataType::Double: return LibMCEnv::eParameterDataType::Double;
+        case AMC::eParameterDataType::Bool: return LibMCEnv::eParameterDataType::Bool;
+        default: return LibMCEnv::eParameterDataType::Unknown;
+    }
+}
+
+LibMCEnv::eParameterDataType CUIEnvironment::GetMachineParameterGroupParameterType(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
+{
+    auto pParameterHandler = m_pUISystemState->getStateMachineData()->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    return parameterDataTypeToEnum(pGroup->getParameterDataTypeByName(sParameterName));
 }
 
 
@@ -383,6 +477,106 @@ void CUIEnvironment::SetUIPropertyAsBool(const std::string& sElementPath, const 
     pGroup->setBoolParameterValueByName(sPropertyName, bValue);
 }
 
+std::string CUIEnvironment::GetSessionUUID()
+{
+    return m_pAPIAuth->getSessionUUID();
+}
+
+bool CUIEnvironment::HasSessionVariable(const std::string& sVariableName)
+{
+    return m_pUIHandler->getFrontendDefinition()->hasSessionVariable(sVariableName);
+}
+
+std::string CUIEnvironment::GetSessionVariable(const std::string& sVariableName)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    return pFrontendState->getSessionVariable(sVariableName);
+}
+
+std::string CUIEnvironment::GetSessionVariableAsUUID(const std::string& sVariableName)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    return pFrontendState->getSessionVariableAsUUID(sVariableName);
+}
+
+LibMCEnv_double CUIEnvironment::GetSessionVariableAsDouble(const std::string& sVariableName)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    return pFrontendState->getSessionVariableAsDouble(sVariableName);
+}
+
+LibMCEnv_int64 CUIEnvironment::GetSessionVariableAsInteger(const std::string& sVariableName)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    return pFrontendState->getSessionVariableAsInteger(sVariableName);
+}
+
+bool CUIEnvironment::GetSessionVariableAsBool(const std::string& sVariableName)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    return pFrontendState->getSessionVariableAsBool(sVariableName);
+}
+
+void CUIEnvironment::SetSessionVariable(const std::string& sVariableName, const std::string& sValue)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    pFrontendState->setSessionVariable(sVariableName, sValue);
+}
+
+void CUIEnvironment::SetSessionVariableAsUUID(const std::string& sVariableName, const std::string& sValue)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    pFrontendState->setSessionVariableAsUUID(sVariableName, sValue);
+}
+
+void CUIEnvironment::SetSessionVariableAsDouble(const std::string& sVariableName, const LibMCEnv_double dValue)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    pFrontendState->setSessionVariableAsDouble(sVariableName, dValue);
+}
+
+void CUIEnvironment::SetSessionVariableAsInteger(const std::string& sVariableName, const LibMCEnv_int64 nValue)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    pFrontendState->setSessionVariableAsInteger(sVariableName, nValue);
+}
+
+void CUIEnvironment::SetSessionVariableAsBool(const std::string& sVariableName, const bool bValue)
+{
+    auto pFrontendState = m_pAPIAuth->getFrontendState();
+    if (pFrontendState.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
+    pFrontendState->setSessionVariableAsBool(sVariableName, bValue);
+}
+
 
 
 IImageData* CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
@@ -392,7 +586,36 @@ IImageData* CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, 
 
 IImageLoader* CUIEnvironment::CreateImageLoader()
 {
-    return new CImageLoader();
+
+    auto pCoreResourcePackage = m_pUIHandler->getCoreResourcePackage();
+    if (pCoreResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    return new CImageLoader (pCoreResourcePackage);
+}
+
+IVideoStream* CUIEnvironment::CreateVideoStream(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_uint32 nDesiredFrameDurationInMicroseconds, const LibMCEnv_uint32 nPauseToleranceInMicroseconds, const LibMCEnv_uint32 nFrameCacheDurationInMicroseconds)
+{
+    auto pRegistry = m_pUISystemState->getStreamRegistry();
+    if (pRegistry.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pInstance = pRegistry->createVideoStream(nPixelSizeX, nPixelSizeY, nDesiredFrameDurationInMicroseconds, nPauseToleranceInMicroseconds, nFrameCacheDurationInMicroseconds);
+
+    return new CVideoStream(pInstance);
+}
+
+IVideoStream* CUIEnvironment::FindVideoStream(const std::string& sStreamUUID)
+{
+    auto pRegistry = m_pUISystemState->getStreamRegistry();
+    if (pRegistry.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    auto pInstance = pRegistry->findVideoStream(sStreamUUID);
+    if (pInstance.get() == nullptr)
+        return nullptr;
+
+    return new CVideoStream(pInstance);
 }
 
 
@@ -598,6 +821,122 @@ IBuildExecution* CUIEnvironment::GetBuildExecution(const std::string& sExecution
     auto pBuildExecution = pBuildJobHandler->RetrieveJobExecution(sNormalizedExecutionUUID);
     return new CBuildExecution (pBuildExecution, pDataModel, m_pUISystemState->getToolpathHandler(), m_pUISystemState->getMeshHandler(), m_pUISystemState->getGlobalChronoInstance(), m_pUISystemState->getStateJournal ());
 
+}
+
+IBuildIterator* CUIEnvironment::GetRecentBuildJobs(const LibMCEnv_uint32 nMaxCount)
+{
+    if (nMaxCount == 0)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "MaxCount must be greater than 0");
+
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+    auto pBuildJobIterator = pBuildJobHandler->ListJobsByStatus(LibMCData::eBuildJobStatus::Validated);
+
+    std::unique_ptr<CBuildIterator> pResultIterator(new CBuildIterator());
+
+    uint32_t nCount = 0;
+    while (pBuildJobIterator->MoveNext() && (nCount < nMaxCount)) {
+        auto pBuildJob = pBuildJobIterator->GetCurrentJob();
+        auto pBuild = std::make_shared<CBuild>(pDataModel, pBuildJob->GetUUID(),
+            m_pUISystemState->getToolpathHandler(),
+            m_pUISystemState->getMeshHandler(),
+            m_pUISystemState->getGlobalChronoInstance(),
+            m_pUISystemState->getStateJournal());
+        pResultIterator->AddBuild(pBuild);
+        nCount++;
+    }
+
+    return pResultIterator.release();
+}
+
+std::string CUIEnvironment::CreateBuildJobFromStorage(const std::string& sStorageStreamUUID, const std::string& sBuildName)
+{
+    // Validate inputs
+    std::string sNormalizedStorageUUID = AMCCommon::CUtils::normalizeUUIDString(sStorageStreamUUID);
+
+    if (sBuildName.empty())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "build name must not be empty");
+
+    // Get services
+    auto pDataModel = m_pUISystemState->getDataModel();
+    auto pStorage = pDataModel->CreateStorage();
+    auto pGlobalChrono = m_pUISystemState->getGlobalChronoInstance();
+
+    // Verify stream exists and is 3MF
+    if (!pStorage->StreamIsReady(sNormalizedStorageUUID))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "storage stream does not exist: " + sNormalizedStorageUUID);
+
+    auto pStream = pStorage->RetrieveStream(sNormalizedStorageUUID);
+    if (pStream->GetMIMEType() != "application/3mf")
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM, "storage stream is not a 3MF file (MIME type: " + pStream->GetMIMEType() + ")");
+
+    // Create build job
+    std::string sBuildUUID = AMCCommon::CUtils::createUUID();
+    auto pBuildJobHandler = pDataModel->CreateBuildJobHandler();
+    pBuildJobHandler->CreateJob(
+        sBuildUUID,
+        sBuildName,
+        m_pAPIAuth->getUserUUID(),
+        sNormalizedStorageUUID,
+        pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970()
+    );
+
+    // Validate and extract metadata
+    auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+    auto pToolpathHandler = m_pUISystemState->getToolpathHandler();
+
+    pBuildJob->StartValidating();
+
+    std::set<std::string> attachmentRelationsToRead;
+    AMC::CToolpathEntity toolpathEntity(
+        pDataModel,
+        sNormalizedStorageUUID,
+        pToolpathHandler->getLib3MFWrapper(),
+        sBuildName,
+        true,
+        attachmentRelationsToRead
+    );
+
+    pBuildJob->FinishValidating(toolpathEntity.getLayerCount());
+
+    // Add toolpath data
+    pBuildJob->AddJobData(
+        pStream->GetContextIdentifier(),
+        pStream->GetName(),
+        pStream,
+        LibMCData::eCustomDataType::Toolpath,
+        m_pAPIAuth->getUserUUID(),
+        pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970()
+    );
+
+    // Extract and add thumbnail if present
+    std::vector<uint8_t> thumbNailBuffer;
+    std::string thumbNailMimeType;
+    if (toolpathEntity.readThumbnail(thumbNailBuffer, thumbNailMimeType)) {
+        std::string sThumbnailUUID = AMCCommon::CUtils::createUUID();
+        pStorage->StoreNewStream(
+            sThumbnailUUID,
+            "thumbnail",
+            thumbNailMimeType,
+            thumbNailBuffer,
+            m_pAPIAuth->getUserUUID(),
+            pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970()
+        );
+        auto pThumbnailStream = pStorage->RetrieveStream(sThumbnailUUID);
+
+        pBuildJob->AddJobData(
+            "thumbnail",
+            "thumbnail",
+            pThumbnailStream,
+            LibMCData::eCustomDataType::Thumbnail,
+            m_pAPIAuth->getUserUUID(),
+            pGlobalChrono->getUTCTimeStampInMicrosecondsSince1970()
+        );
+
+        pBuildJob->SetThumbnailStreamUUID(sThumbnailUUID);
+    }
+
+    return sBuildUUID;
 }
 
 
@@ -1007,6 +1346,69 @@ void CUIEnvironment::AddExternalEventResultValue(const std::string& sReturnValue
     m_ExternalEventReturnValues->AddMember(jsonName, jsonValue, m_ExternalEventReturnValues->GetAllocator ());
 }
 
+void CUIEnvironment::SetStringResult(const std::string& sReturnValueName, const std::string& sReturnValue)
+{
+	// Convenience wrapper for AddExternalEventResultValue
+	AddExternalEventResultValue(sReturnValueName, sReturnValue);
+}
+
+void CUIEnvironment::SetIntegerResult(const std::string& sReturnValueName, const LibMCEnv_int64 nReturnValue)
+{
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sReturnValueName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY, "invalid external return value key: " + sReturnValueName);
+
+	if (AMC::CUIHandleEventResponse::externalValueNameIsReserved(sReturnValueName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED, "external return value key is reserved: " + sReturnValueName);
+
+	if (m_ExternalEventReturnValues->HasMember(sReturnValueName.c_str()))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DUPLICATEEXTERNALEVENTRETURNKEY, "duplicate external event return key: " + sReturnValueName);
+
+	rapidjson::Value jsonName;
+	rapidjson::Value jsonValue;
+
+	jsonName.SetString(sReturnValueName.c_str(), m_ExternalEventReturnValues->GetAllocator());
+	jsonValue.SetInt64(nReturnValue);
+	m_ExternalEventReturnValues->AddMember(jsonName, jsonValue, m_ExternalEventReturnValues->GetAllocator());
+}
+
+void CUIEnvironment::SetBoolResult(const std::string& sReturnValueName, const bool bReturnValue)
+{
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sReturnValueName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY, "invalid external return value key: " + sReturnValueName);
+
+	if (AMC::CUIHandleEventResponse::externalValueNameIsReserved(sReturnValueName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED, "external return value key is reserved: " + sReturnValueName);
+
+	if (m_ExternalEventReturnValues->HasMember(sReturnValueName.c_str()))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DUPLICATEEXTERNALEVENTRETURNKEY, "duplicate external event return key: " + sReturnValueName);
+
+	rapidjson::Value jsonName;
+	rapidjson::Value jsonValue;
+
+	jsonName.SetString(sReturnValueName.c_str(), m_ExternalEventReturnValues->GetAllocator());
+	jsonValue.SetBool(bReturnValue);
+	m_ExternalEventReturnValues->AddMember(jsonName, jsonValue, m_ExternalEventReturnValues->GetAllocator());
+}
+
+void CUIEnvironment::SetDoubleResult(const std::string& sReturnValueName, const LibMCEnv_double dReturnValue)
+{
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sReturnValueName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDEXTERNALEVENTRETURNVALUEKEY, "invalid external return value key: " + sReturnValueName);
+
+	if (AMC::CUIHandleEventResponse::externalValueNameIsReserved(sReturnValueName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_EXTERNALEVENTRETURNVALUEKEYISRESERVED, "external return value key is reserved: " + sReturnValueName);
+
+	if (m_ExternalEventReturnValues->HasMember(sReturnValueName.c_str()))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DUPLICATEEXTERNALEVENTRETURNKEY, "duplicate external event return key: " + sReturnValueName);
+
+	rapidjson::Value jsonName;
+	rapidjson::Value jsonValue;
+
+	jsonName.SetString(sReturnValueName.c_str(), m_ExternalEventReturnValues->GetAllocator());
+	jsonValue.SetDouble(dReturnValue);
+	m_ExternalEventReturnValues->AddMember(jsonName, jsonValue, m_ExternalEventReturnValues->GetAllocator());
+}
+
 IJSONObject* CUIEnvironment::GetExternalEventParameters()
 {
     return new CJSONObject(m_ExternalEventParameters, m_ExternalEventParameters.get());
@@ -1089,5 +1491,5 @@ IJSONObject* CUIEnvironment::ParseJSONData(const LibMCEnv_uint64 nJSONDataBuffer
 
 IMachineConfigurationHandler* CUIEnvironment::CreateMachineConfigurationHandler()
 {
-    return new CMachineConfigurationHandler(m_pUISystemState->getDataModel());
+    return new CMachineConfigurationHandler(m_pUISystemState->getDataModel(), m_pUISystemState->getStateMachineData());
 }

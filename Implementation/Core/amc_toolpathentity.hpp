@@ -53,6 +53,12 @@ namespace AMC {
 	class CToolpathEntity;
 	typedef std::shared_ptr<CToolpathEntity> PToolpathEntity;
 
+	enum class eToolpathLayerContent : uint8_t {
+		Unknown = 0,
+		Empty = 1,
+		NonEmpty = 2
+	};
+
 	class CToolpathEntity {
 	private:		
 		uint32_t m_ReferenceCount;
@@ -78,6 +84,14 @@ namespace AMC {
 
 		std::string m_sDebugName;
 
+		// Per-layer emptiness cache. Guarded by m_Mutex.
+		std::vector<eToolpathLayerContent> m_LayerContentCache;
+
+		// MUST be called with m_Mutex locked.
+		void cacheLayerContent_Unsafe(uint32_t nLayerIndex, bool bHasSegments);
+
+		bool layerHasSegments(uint32_t nLayerIndex);
+
 		void copyMetaDataNode (AMC::PXMLDocumentNodeInstance pTargetNodeInstance, Lib3MF::PCustomXMLNode pSourceNodeInstance);
 
 		Lib3MF::PAttachment findBinaryMetaData(const std::string& sPath, bool bMustExist);
@@ -94,7 +108,10 @@ namespace AMC {
 
 		uint32_t getLayerCount();	
 
-		PToolpathLayerData readLayer(uint32_t nLayerIndex);
+		PToolpathLayerData readLayer(uint32_t nLayerIndex, const std::set<std::string>& excludedPartUUIDs = std::set<std::string>());
+
+		// Returns false if all layers in the range are empty. nMaxLayerIndex is clamped to the layer count.
+		bool findNonEmptyLayer(uint32_t nMinLayerIndex, uint32_t nMaxLayerIndex, bool bFromMinToMax, uint32_t& nFoundLayerIndex);
 
 		double getUnits();
 

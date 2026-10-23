@@ -41,9 +41,11 @@ using namespace LibMCEnv::Impl;
  Class definition of CImageLoader 
 **************************************************************************************************************************/
 
-CImageLoader::CImageLoader()
+CImageLoader::CImageLoader(AMC::PResourcePackage pMachineResourcePackage)
+	: m_pMachineResourcePackage(pMachineResourcePackage)
 {
-
+    if (pMachineResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
 CImageLoader::~CImageLoader()
@@ -61,6 +63,26 @@ IImageData * CImageLoader::LoadJPEGImage(const LibMCEnv_uint64 nJPEGDataBufferSi
 {
     return CImageData::createFromJPEG(pJPEGDataBuffer, nJPEGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
 }
+
+IImageData* CImageLoader::LoadPNGImageFromResource(const std::string& sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    std::vector<uint8_t> imageData;
+
+	m_pMachineResourcePackage->readEntry(sResourceName, imageData);
+
+	return LoadPNGImage(imageData.size(), imageData.data(), dDPIValueX, dDPIValueY, ePixelFormat);
+
+}
+
+IImageData* CImageLoader::LoadJPEGImageFromResource(const std::string& sResourceName, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    std::vector<uint8_t> imageData;
+
+    m_pMachineResourcePackage->readEntry(sResourceName, imageData);
+
+	return LoadJPEGImage(imageData.size(), imageData.data(), dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
 
 IImageData * CImageLoader::CreateImageFromRawRGB24Data(const LibMCEnv_uint64 nRGB24DataBufferSize, const LibMCEnv_uint8 * pRGB24DataBuffer, const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
 {

@@ -436,6 +436,14 @@ public:
 	virtual void LoadSimulationData(LibMCEnv::PDataTable pSimulationDataTable) = 0;
 
 	/**
+	* ISMCJob::LoadRawSimulationData - Returns raw simulation data.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[out] pDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBuffer - uint8 buffer of Raw binary simulation data.
+	*/
+	virtual void LoadRawSimulationData(LibMCDriver_ScanLabSMC_uint64 nDataBufferSize, LibMCDriver_ScanLabSMC_uint64* pDataNeededCount, LibMCDriver_ScanLabSMC_uint8 * pDataBuffer) = 0;
+
+	/**
 	* ISMCJob::GetJobCharacteristic - Returns a characteristic value of a job.
 	* @param[in] eValueType - Type of job
 	* @return Characteristic Value

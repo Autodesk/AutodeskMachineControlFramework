@@ -85,6 +85,9 @@ namespace AMC {
 		bool hasRequestParameter(const std::string& sName);
 		std::string getRequestParameter(const std::string& sName, bool bFailIfNotExistent);
 
+		// Returns false if the parameter is missing or not a decimal number of at most 18 digits.
+		bool getOptionalUint64RequestParameter(const std::string& sName, uint64_t& nValue);
+
 	};
 
 	class CAPIHandler {

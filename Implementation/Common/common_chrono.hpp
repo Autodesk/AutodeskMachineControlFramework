@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_CHRONO
 #define __AMC_CHRONO
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -67,6 +68,11 @@ namespace AMCCommon {
 
 			// Returns Absolute UTC Time Stamp in ISO8601 formatting
 			std::string getUTCTimeInISO8601();
+
+			// Returns Monotonic Elapsed Time in microseconds since instance creation
+			// This time is NOT affected by system clock adjustments (NTP, manual changes)
+			// Use this for timing and delays, NOT for absolute timestamps
+			uint64_t getElapsedMicroseconds();
 
 			// Sleeps for some seconds
 			static void sleepSeconds(const uint64_t seconds);

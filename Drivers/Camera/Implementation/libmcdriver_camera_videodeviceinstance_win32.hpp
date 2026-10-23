@@ -38,6 +38,11 @@ Abstract: This is the class declaration of CVideoDevice
 #include "libmcdriver_camera_interfaces.hpp"
 #include "libmcdriver_camera_videoresolution.hpp"
 
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <vector>
+
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
@@ -48,6 +53,10 @@ Abstract: This is the class declaration of CVideoDevice
 #include <mfidl.h>
 #include <wrl/client.h>
 #endif
+
+#define STREAMCAPTURE_MICROSECONDS_PER_SECOND 1000000.0
+#define STREAMCAPTURE_STATISTICS_MIN_FRAME_COUNT 2
+#define STREAMCAPTURE_THREAD_SHUTDOWN_TIMEOUT_MS 5000
 
 namespace LibMCDriver_Camera {
 namespace Impl {
@@ -69,6 +78,21 @@ private:
 
 	eVideoSourceFormat m_SourceFormat;
 
+	// Driver environment for creating images during stream capture
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
+	// Stream capture state
+	LibMCEnv::PVideoStream m_pActiveStream;
+	std::unique_ptr<std::thread> m_pCaptureThread;
+	std::atomic<bool> m_bCapturing;
+
+	// Stream capture statistics (protected by m_StatisticsMutex)
+	mutable std::mutex m_StatisticsMutex;
+	std::vector<double> m_FrameDurationsInSeconds;
+	double m_dDesiredFramerateInFPS;
+
+	void captureThreadFunction();
+
 #ifdef _WIN32
 	Microsoft::WRL::ComPtr<IMFSourceReader> m_pSourceReader;
 	Microsoft::WRL::ComPtr<IMFMediaType> m_pMediaType;
@@ -88,7 +112,7 @@ private:
 
 public:
 
-	CVideoDeviceInstance_Win32(const std::string & sIdentifier, const std::string & sOSName, const std::string & sFriendlyName);
+	CVideoDeviceInstance_Win32(const std::string & sIdentifier, const std::string & sOSName, const std::string & sFriendlyName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	virtual ~CVideoDeviceInstance_Win32();
 

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_GRAPHICITEM_IMAGE
 #define __AMC_UI_MODULE_GRAPHICITEM_IMAGE
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -66,7 +67,9 @@ namespace AMC {
 		
 		virtual ~CUIModule_GraphicImage();
 
-		void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 
 	};
 

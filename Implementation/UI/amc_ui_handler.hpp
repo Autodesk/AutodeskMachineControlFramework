@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 #include <string>
+#include <set>
 #include <mutex>
 
 namespace LibMCUI {
@@ -101,14 +102,21 @@ namespace AMC {
 
 		std::mutex m_Mutex;
 		std::map<std::string, uint32_t> m_Colors;
+		std::map<std::string, uint32_t> m_DarkColors;
+		std::string m_sDefaultTheme;
 
 		std::string m_sAppName;
 		std::string m_sCopyrightString;
 		std::string m_sLogoUUID;
+		std::string m_sDarkLogoUUID;
 		double m_dLogoAspectRatio;
 
 		CUIExpression m_LoginBackgroundUUID;
+		CUIExpression m_DarkLoginBackgroundUUID;
 		CUIExpression m_LoginWelcomeMessage;
+		std::string m_sLoginStyle;
+		CUIExpression m_LoginSubtitle;
+		std::string m_sPanelResourceName;
 
 		std::string m_sMainPageName;
 
@@ -132,8 +140,13 @@ namespace AMC {
 		PUIFrontendDefinition m_pFrontendDefinition;
 
 
-		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string & sDescription, const std::string& sTargetPage, const std::string & sEventName);
-		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName);
+		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string & sDescription, const std::string& sTargetPage, const std::string & sEventName, const CUIExpression& visible);
+		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName, const CUIExpression& visible);
+
+		void loadSessionVariablesFromXML(pugi::xml_node& sessionVariablesNode);
+
+		// Ensures that all session references of the loaded UI refer to declared session variables or known permissions.
+		void validateSessionReferences();
 
 		PUIPage addPage_Unsafe (const std::string& sName, const CUIExpression& icon, const CUIExpression& caption, const CUIExpression& description, const std::string& sShowEvent);
 
@@ -174,10 +187,13 @@ namespace AMC {
 
 
 		/////////////////////////////////////////////////////////////////////////////////////
+		// Shared UI bootstrap configuration
+		/////////////////////////////////////////////////////////////////////////////////////
+		void writeConfigurationToJSON (CJSONWriter& writer);
+
+		/////////////////////////////////////////////////////////////////////////////////////
 		// Legacy UI System
 		/////////////////////////////////////////////////////////////////////////////////////
-		void writeLegacyConfigurationToJSON (CJSONWriter& writer);
-		void writeLegacyStateToJSON(CJSONWriter& writer, CParameterHandler* pLegacyClientVariableHandler);
 		PUIModuleItem findModuleItem(const std::string& sUUID);
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler);
@@ -186,7 +202,13 @@ namespace AMC {
 		/////////////////////////////////////////////////////////////////////////////////////
 		// New UI Frontend System
 		/////////////////////////////////////////////////////////////////////////////////////
-		void frontendWriteStatusToJSON (CJSONWriter& writer, CUIFrontendState * pFrontendState);
+		// If pActivePageNames is null, all pages, custom pages and dialogs are written with their modules.
+		// Otherwise only the named pages/custom pages and the dialogs named in pActiveDialogNames carry modules.
+		// Writes modules only for the active pages and dialogs, or for all of them if pActivePageNames is null.
+		void frontendWriteStatusToJSON (CJSONWriter& writer, CAPIAuth * pAuth, const std::set<std::string>* pActivePageNames, const std::set<std::string>* pActiveDialogNames, const sUIFrontendBuildEpoch& epoch);
+
+		// Writes the definition (or only the values) of a parameter list that sits on a page visible to the session.
+		void frontendWriteParameterListToJSON (CJSONWriter& writer, CAPIAuth* pAuth, const std::string& sItemUUID, bool bValuesOnly, const std::string& sKnownDefinitionHash, const std::string& sKnownValuesHash, const std::string& sRowIndices);
 
 		PUIFrontendDefinition getFrontendDefinition ();
 
@@ -198,4 +220,3 @@ namespace AMC {
 
 
 #endif //__AMC_UI_HANDLER
-

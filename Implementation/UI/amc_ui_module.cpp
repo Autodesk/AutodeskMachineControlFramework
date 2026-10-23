@@ -106,7 +106,7 @@ PDataSeriesHandler CUIModuleEnvironment::dataSeriesHandler()
 }
 
 
-CUIModule::CUIModule(const std::string& sName, const std::string& sParentPath, CUIFrontendDefinition* pFrontendDefinition)
+CUIModule::CUIModule(const std::string& sName, const std::string& sModuleType, const std::string& sParentPath, CUIFrontendDefinition* pFrontendDefinition)
 	: m_sName (sName), 
 	m_sUUID (AMCCommon::CUtils::createUUID ()),
 	m_nGridColumn (1), m_nGridRow (1), m_nGridColumnSpan (1), m_nGridRowSpan (1)
@@ -121,7 +121,29 @@ CUIModule::CUIModule(const std::string& sName, const std::string& sParentPath, C
 
 	m_sModulePath = sParentPath + "." + sName;
 
-	m_pModuleStore = pFrontendDefinition->registerModuleStore(m_sUUID, m_sModulePath);
+	m_pModuleStore = pFrontendDefinition->registerModuleStore(m_sUUID, m_sModulePath, sModuleType);
+
+	m_pModuleStore->registerStructureProperty("name", [this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+		object.addString(sPropertyName, m_sName);
+	});
+
+	// Grid placement is only written if it differs from the default cell.
+	m_pModuleStore->registerStructureProperty("gridcolumn", [this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+		if ((m_nGridColumn > 1) || (m_nGridRow > 1))
+			object.addInteger(sPropertyName, m_nGridColumn);
+	});
+	m_pModuleStore->registerStructureProperty("gridrow", [this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+		if ((m_nGridColumn > 1) || (m_nGridRow > 1))
+			object.addInteger(sPropertyName, m_nGridRow);
+	});
+	m_pModuleStore->registerStructureProperty("gridcolumnspan", [this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+		if ((m_nGridColumnSpan > 1) || (m_nGridRowSpan > 1))
+			object.addInteger(sPropertyName, m_nGridColumnSpan);
+	});
+	m_pModuleStore->registerStructureProperty("gridrowspan", [this](CJSONWriter& writer, CJSONWriterObject& object, const std::string& sPropertyName, CStateMachineData* pStateMachineData, CUIFrontendState* pFrontendState) {
+		if ((m_nGridColumnSpan > 1) || (m_nGridRowSpan > 1))
+			object.addInteger(sPropertyName, m_nGridRowSpan);
+	});
 
 }
 
@@ -158,28 +180,18 @@ bool CUIModule::isVersion2FrontendModule()
 	return false;
 }
 
-void CUIModule::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData)
+void CUIModule::frontendWriteModuleStatusToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendState* pFrontendState, CStateMachineData* pStateMachineData, const sUIFrontendBuildEpoch& epoch)
 {
 	if (pFrontendState == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	moduleObject.addString("moduletype", getType ());
-	moduleObject.addString("uuid", m_sUUID);
-	if ((m_nGridColumn > 1) || (m_nGridRow > 1)) {
-		moduleObject.addInteger("gridcolumn", m_nGridColumn);
-		moduleObject.addInteger("gridrow", m_nGridRow);
-	}
-	if ((m_nGridColumnSpan > 1) || (m_nGridRowSpan > 1)) {
-		moduleObject.addInteger("gridcolumnspan", m_nGridColumnSpan);
-		moduleObject.addInteger("gridrowspan", m_nGridRowSpan);
-	}
+	pFrontendState->writeModuleStoreToJSON(writer, moduleObject, m_pModuleStore.get(), pStateMachineData, epoch);
 
-	CJSONWriterObject attributesObject(writer);
+}
 
-	pFrontendState->writeModuleAttributesToJSON (writer, attributesObject, m_pModuleStore.get(), pStateMachineData);	
-
-	moduleObject.addObject("attributes", attributesObject);
-
+PUIFrontendDefinitionModuleStore CUIModule::getFrontendModuleStore()
+{
+	return m_pModuleStore;
 }
 
 
@@ -189,11 +201,6 @@ void CUIModule::populateLegacyItemMap(std::map<std::string, PUIModuleItem>& item
 }
 
 void CUIModule::populateLegacyClientVariables(CParameterHandler* pParameterHandler)
-{
-
-}
-
-void CUIModule::writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler)
 {
 
 }
@@ -256,4 +263,9 @@ PUIFrontendDefinitionAttribute CUIModule::registerStringAttribute(const std::str
 PUIFrontendDefinitionAttribute CUIModule::registerBoolAttribute(const std::string& sAttributeName, const CUIExpression& expression)
 {
 	return m_pModuleStore->registerValue(sAttributeName, eUIFrontendDefinitionAttributeType::atBoolean, expression);
+}
+
+PUIFrontendDefinitionAttribute CUIModule::registerProviderAttribute(const std::string& sAttributeName, eUIFrontendDefinitionAttributeType attributeType, eUIFrontendDefinitionAttributeScope scope, UIFrontendDefinitionProvider provider)
+{
+	return m_pModuleStore->registerProvider(sAttributeName, attributeType, scope, provider);
 }

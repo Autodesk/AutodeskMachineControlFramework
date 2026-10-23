@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include "common_chrono.hpp"
+#include "libmcdata_dynamic.hpp"
 
 namespace AMC {
 
@@ -56,12 +57,18 @@ namespace AMC {
 		std::mutex m_Mutex;
 
 		std::map <std::string, PAPISession> m_SessionMap;
+
+		AMCCommon::PChrono m_pGlobalChrono;
+		LibMCData::PDataModel m_pDataModel;
+
+		uint64_t m_nSessionTimeoutSeconds;
+		uint64_t m_nUnauthSessionTimeoutSeconds;
 			
 	protected:
 			
 	public:
 
-		CAPISessionHandler();
+		CAPISessionHandler(AMCCommon::PChrono pGlobalChrono, LibMCData::PDataModel pDataModel);
 		virtual ~CAPISessionHandler();
 
 		PAPIAuth createAuthentication(const std::string& sAuthorizationJSON, AMCCommon::PChrono pGlobalChrono);
@@ -79,6 +86,16 @@ namespace AMC {
 		std::string getSessionToken(const std::string& sSessionUUID);
 
 		bool sessionIsAuthenticated(const std::string& sSessionUUID);
+
+		void setSessionTimeout(uint64_t nAuthSeconds, uint64_t nUnauthSeconds);
+
+		void deactivateSession(const std::string& sSessionUUID);
+
+		void cleanupExpiredSessions();
+
+		// Marks the session as active without a request, e.g. while it has an open event stream.
+		// Returns false if the session does not exist anymore.
+		bool refreshSessionActivity(const std::string& sSessionUUID);
 
 	};
 

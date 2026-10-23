@@ -27,23 +27,146 @@
       "description": "Authentication flow"
     },
     {
-      "name": "general",
-      "description": "General API end points, data exchange"
+      "name": "data",
+      "description": "Data endpoints for queries and streams (logs, executions, alerts, configurations, and binary data payloads)"
+    },
+    {
+      "name": "ext",
+      "description": "Application specific end points"
     },
     {
       "name": "frontend",
       "description": "Frontent end point"
     },
     {
-      "name": "stream",
-      "description": "Data streaming end points"
+      "name": "general",
+      "description": "General API end points, data exchange"
     },
     {
-      "name": "ext",
-      "description": "Application specific end points"
+      "name": "userpreferences",
+      "description": "Generic per-user preference store (favorites, sorting, filters and view presets)"
     }
   ],
   "paths": {
+    "/userpreferences": {
+      "get": {
+        "tags": [
+          "userpreferences"
+        ],
+        "summary": "Retrieve a stored user preference",
+        "description": "Retrieves the preference value stored for the authenticated user under the given domain and key. Returns exists=false and an empty value if no preference is stored.",
+        "operationId": "retrieveUserPreference",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "query",
+            "required": true,
+            "description": "Domain the preference belongs to, e.g. 'parameterlist'.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "description": "Key identifying the preference within the domain.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Preference lookup result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferenceResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "userpreferences"
+        ],
+        "summary": "Store a user preference",
+        "description": "Stores (creates or overwrites) a preference value for the authenticated user under the given domain and key. The value is an opaque, client-defined string (typically a stringified JSON document).",
+        "operationId": "storeUserPreference",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPreferenceStoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Preference stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferenceMutationResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/userpreferences/delete": {
+      "post": {
+        "tags": [
+          "userpreferences"
+        ],
+        "summary": "Delete a user preference",
+        "description": "Removes a preference for the authenticated user under the given domain and key. Does nothing if the preference does not exist.",
+        "operationId": "deleteUserPreference",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPreferenceDeleteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Preference deletion result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferenceMutationResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/auth": {
       "post": {
         "tags": [
@@ -162,14 +285,46 @@
         }
       }
     },
-    "/status": {
+    "/config": {
       "get": {
         "tags": [
           "general"
         ],
-        "summary": "Query the full system state",
-        "description": "Queries a full image of all state variables",
-        "operationId": "retrieveStatus",
+        "summary": "Retrieve UI configuration",
+        "description": "Returns the server-provided UI configuration used to bootstrap the active web client.",
+        "operationId": "getConfig",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statemachines": {
+      "get": {
+        "tags": [
+          "general"
+        ],
+        "summary": "List state machine instances",
+        "description": "Returns all configured state machine instances with their current state.",
+        "operationId": "retrieveStateMachines",
         "security": [
           {
             "bearerAuth": []
@@ -181,7 +336,55 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatusResponse"
+                  "$ref": "#/components/schemas/StateMachineListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statemachines/{instancename}": {
+      "get": {
+        "tags": [
+          "general"
+        ],
+        "summary": "Retrieve details of one state machine instance",
+        "description": "Returns one state machine instance including parameter groups and parameter values.",
+        "operationId": "retrieveStateMachineByInstanceName",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "instancename",
+            "in": "path",
+            "description": "State machine instance name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateMachineDetailResponse"
                 }
               }
             }
@@ -213,6 +416,16 @@
               "default": "validated"
             },
             "description": "can be archived or validated"
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{1,18}$"
+            },
+            "description": "Head id of a previous response. If given, only jobs whose incremental id is larger are returned, the response has delta=true, and jobs that no longer have the requested status are listed in removed. Invalid values are ignored and yield the full list."
           }
         ],
         "summary": "Retrieve build list of the system",
@@ -325,6 +538,286 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BuildDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/build/toolpath": {
+      "post": {
+        "tags": [
+          "general"
+        ],
+        "summary": "Retrieve toolpath segments for one layer",
+        "description": "Returns the geometric segment data for a specific layer of a build job.",
+        "operationId": "getBuildToolpathLayer",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildToolpathRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildToolpathResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logs": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve log entries",
+        "description": "Returns the latest log entries (up to 128). Supports incremental polling when used with the startID path parameter.",
+        "operationId": "getLogEntries",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogEntriesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logs/{startID}": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve log entries after a given ID",
+        "description": "Returns log entries with an ID greater than startID. Use for incremental polling by passing the highest ID received so far.",
+        "operationId": "getLogEntriesIncremental",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "startID",
+            "in": "path",
+            "description": "The log entry ID to start from (exclusive). Only entries after this ID are returned.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 42
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogEntriesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/executions": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve job execution list",
+        "description": "Returns all build job executions with their status, timestamps, and duration.",
+        "operationId": "getExecutionList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{1,18}$"
+            },
+            "description": "Head id of a previous response. If given, only executions whose incremental id is larger are returned and the response has delta=true. Invalid values are ignored and yield the full list."
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve alert list",
+        "description": "Returns all alerts including their level, context, and acknowledgement status.",
+        "operationId": "getAlertList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{1,18}$"
+            },
+            "description": "Head id of a previous response. If given, only alerts whose incremental id is larger are returned and the response has delta=true. Invalid values are ignored and yield the full list."
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/configurations": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve configuration version list",
+        "description": "Returns all configuration versions for a given schema. The schema query parameter is required to identify the configuration type.",
+        "operationId": "getConfigurationList",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "schema",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The configuration schema identifier to query versions for.",
+            "example": "com.scanlab.ocmsmc"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurationListResponse"
                 }
               }
             }
@@ -553,6 +1046,448 @@
       }
     },
 
+    "/image/{imageUUID}": {
+      "get": {
+        "tags": [
+          "general"
+        ],
+        "summary": "Retrieve an image resource by UUID",
+        "description": "Returns the binary image data for a given resource UUID. Looks up the resource in the core resource package first, then falls back to storage. This endpoint does not require authentication because images are typically loaded by HTML img tags that cannot send Bearer tokens.",
+        "operationId": "getImage",
+        "parameters": [
+          {
+            "name": "imageUUID",
+            "in": "path",
+            "description": "UUID of the image resource to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The binary image data with the appropriate content type.",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Image resource not found"
+          }
+        }
+      }
+    },
+
+    "/dataseries/{dataseriesUUID}": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve chart data series as binary float buffer",
+        "operationId": "getDataSeries",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "dataseriesUUID",
+            "in": "path",
+            "description": "Data series UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary float32 stream containing x/y pairs",
+            "content": {
+              "application/binary": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/pointcloud/{scatterplotUUID}": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve point cloud as binary float buffer",
+        "operationId": "getPointCloud",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "scatterplotUUID",
+            "in": "path",
+            "description": "Scatterplot UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary float32 stream containing x/y point pairs",
+            "content": {
+              "application/binary": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/pointchanneldata/{scatterplotUUID}/{channelName}": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve named scatterplot channel data",
+        "operationId": "getPointChannelData",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "scatterplotUUID",
+            "in": "path",
+            "description": "Scatterplot UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "channelName",
+            "in": "path",
+            "description": "Channel name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/meshgeometry/{meshUUID}": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve mesh face geometry as binary float buffer",
+        "operationId": "getMeshGeometry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "meshUUID",
+            "in": "path",
+            "description": "Mesh UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary float32 stream containing triangle vertices",
+            "content": {
+              "application/binary": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/meshedges/{meshUUID}": {
+      "get": {
+        "tags": [
+          "data"
+        ],
+        "summary": "Retrieve mesh edge geometry as binary float buffer",
+        "operationId": "getMeshEdges",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "meshUUID",
+            "in": "path",
+            "description": "Mesh UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary float32 stream containing edge line segments",
+            "content": {
+              "application/binary": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/event": {
+      "post": {
+        "tags": [
+          "frontend"
+        ],
+        "summary": "Trigger a UI event",
+        "operationId": "triggerUiEvent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "eventname"
+                ],
+                "properties": {
+                  "eventname": {
+                    "type": "string"
+                  },
+                  "sender": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "formvaluejson": {
+                    "type": "object"
+                  },
+                  "parameters": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/widget/{widgetUUID}/{requestType}": {
+      "post": {
+        "tags": [
+          "frontend"
+        ],
+        "summary": "Send a custom request to a widget/module item",
+        "operationId": "widgetRequest",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "widgetUUID",
+            "in": "path",
+            "description": "Widget (module item) UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "requestType",
+            "in": "path",
+            "description": "Alphanumeric request type",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "/frontend": {
       "get": {
         "tags": [
@@ -563,6 +1498,37 @@
         "security": [
           {
             "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pages",
+            "in": "query",
+            "description": "Comma-separated names of the active pages and custom pages. If given, only these pages and the dialogs listed in 'dialogs' contain modules; all other pages and dialogs only contain their header and visibility.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dialogs",
+            "in": "query",
+            "description": "Comma-separated names of the open dialogs. Only evaluated together with 'pages'.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "description": "Revision of the frontend status the client already holds, requested with the same 'pages' and 'dialogs'. If the session still buffers the changes since that revision, the response only contains 'base' and 'changed'; otherwise it contains the full status.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
           }
         ],
         "responses": {
@@ -590,13 +1556,214 @@
       }
     },
 
+    "/frontend/parameterlist/{itemUUID}": {
+      "get": {
+        "tags": [
+          "frontend"
+        ],
+        "summary": "Query the row definitions and current values of a parameter list.",
+        "description": "Returns the static row definitions (entries) together with the current values of all rows (values, same order) and a definition hash. The item must be placed on a page, custom page or dialog that is visible to the session.",
+        "operationId": "frontendParameterListDefinition",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "itemUUID",
+            "in": "path",
+            "description": "UUID of the parameter list module",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "definitionhash": { "type": "string" },
+                    "entries": { "type": "array", "items": { "type": "object" } },
+                    "values": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown parameter list or not visible to the session"
+          }
+        }
+      }
+    },
+    "/frontend/parameterlist/{itemUUID}/values": {
+      "get": {
+        "tags": [
+          "frontend"
+        ],
+        "summary": "Query the current values of a subset of parameter list rows.",
+        "description": "If definitionhash is outdated, only definitionchanged=true is returned and the definition needs to be queried again. If valueshash matches the current values of the requested rows, unchanged=true is returned without values.",
+        "operationId": "frontendParameterListValues",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "itemUUID",
+            "in": "path",
+            "description": "UUID of the parameter list module",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "definitionhash",
+            "in": "query",
+            "description": "Definition hash of the client-side row definitions.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rows",
+            "in": "query",
+            "description": "Comma separated row indices and index ranges, e.g. '0-24,30'. All rows if omitted. Values are returned in request order.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "valueshash",
+            "in": "query",
+            "description": "Values hash of the last response for the same row selection.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "definitionhash": { "type": "string" },
+                    "definitionchanged": { "type": "boolean" },
+                    "valueshash": { "type": "string" },
+                    "unchanged": { "type": "boolean" },
+                    "values": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown parameter list, not visible to the session or invalid row selection"
+          }
+        }
+      }
+    },
+    "/frontend/streamticket": {
+      "post": {
+        "tags": [
+          "frontend"
+        ],
+        "summary": "Issue a ticket for the session's server-sent event stream.",
+        "description": "The ticket is single-use, expires after 'lifetime' seconds and is bound to the calling session. Open the stream with GET /stream/{ticket} (outside of /api, text/event-stream). The stream sends 'snapshot' events ({revision, stores}: store UUID -> attribute -> value) and 'patch' events ({revision, base, changed}, removed attributes are null), each with the revision as event id, plus ': keepalive' comments. To resume after a disconnect, request a new ticket and pass the last received event id as Last-Event-ID header or lastEventId query parameter; the server replies with a patch if the revision is still buffered and with a snapshot otherwise. The stream ends when the session is closed or expires. Unknown, used or expired tickets yield 404, too many open streams yield 503. With a body that names the client, the stream only carries modules of the client's active pages and dialogs (plus menu and toolbar items); without a body it carries all modules.",
+        "operationId": "frontendStreamTicket",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FrontendStreamScope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ticket": { "type": "string", "format": "uuid" },
+                    "lifetime": { "type": "integer", "description": "Seconds until the ticket expires." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/frontend/streamscope": {
+      "post": {
+        "tags": [
+          "frontend"
+        ],
+        "summary": "Update the active pages and dialogs of a client of the session's event stream.",
+        "description": "Restricts the modules the client's stream connections carry to the listed pages and dialogs (plus menu and toolbar items). The next event of these connections is a snapshot of the new scope.",
+        "operationId": "frontendStreamScope",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  { "$ref": "#/components/schemas/FrontendStreamScope" },
+                  { "required": [ "client" ] }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing or invalid client ID, or too many names"
+          }
+        }
+      }
+    },
     "/frontend/event": {
       "post": {
         "tags": [
           "frontend"
         ],
+        "deprecated": true,
         "summary": "Trigger a frontend event.",
-        "operationId": "frontendPageStatus",
+        "operationId": "frontendEventLegacy",
         "security": [
           {
             "bearerAuth": []
@@ -992,6 +2159,114 @@
       }
     },
     "schemas": {
+      "FrontendStreamScope": {
+        "type": "object",
+        "properties": {
+          "client": { "type": "string", "format": "uuid", "description": "Random ID of the browser tab, kept for the lifetime of the tab." },
+          "pages": { "type": "string", "description": "Comma separated names of the active pages (at most 256 names and 16384 characters)." },
+          "dialogs": { "type": "string", "description": "Comma separated names of the open dialogs (at most 256 names and 16384 characters)." }
+        }
+      },
+      "UserPreferenceStoreRequest": {
+        "required": [
+          "domain",
+          "key",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Domain the preference belongs to, e.g. 'parameterlist'.",
+            "example": "parameterlist"
+          },
+          "key": {
+            "type": "string",
+            "description": "Key identifying the preference within the domain.",
+            "example": "systemstatepage.systemstate"
+          },
+          "value": {
+            "type": "string",
+            "description": "Opaque, client-defined preference value. Typically a stringified JSON document.",
+            "example": "{\"version\":1,\"favorites\":[]}"
+          }
+        }
+      },
+      "UserPreferenceDeleteRequest": {
+        "required": [
+          "domain",
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Domain the preference belongs to.",
+            "example": "parameterlist"
+          },
+          "key": {
+            "type": "string",
+            "description": "Key identifying the preference within the domain.",
+            "example": "systemstatepage.systemstate"
+          }
+        }
+      },
+      "UserPreferenceResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "exists",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type. The value of this field should be 'com.autodesk.machinecontrol.userpreferences' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.userpreferences"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "exists": {
+            "type": "boolean",
+            "description": "Whether a preference is stored for the requested domain and key.",
+            "example": true
+          },
+          "value": {
+            "type": "string",
+            "description": "Stored preference value. Empty string if the preference does not exist.",
+            "example": "{\"version\":1,\"favorites\":[]}"
+          }
+        }
+      },
+      "UserPreferenceMutationResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "exists"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type. The value of this field should be 'com.autodesk.machinecontrol.userpreferences' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.userpreferences"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "exists": {
+            "type": "boolean",
+            "description": "For store requests, always true. For delete requests, whether the preference existed prior to deletion.",
+            "example": true
+          }
+        }
+      },
       "VersionResponse": {
         "required": [
           "protocol",
@@ -1035,6 +2310,98 @@
           "message": {
             "type": "string",
             "example": "Error description string"
+          }
+        }
+      },
+      "ConfigResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "appname",
+          "copyright",
+          "mainpage",
+          "logouuid",
+          "logoaspectratio",
+          "loginwelcomemessage",
+          "colors"
+        ],
+        "type": "object",
+        "description": "Server-provided client bootstrap configuration.",
+        "example": {
+          "protocol": "AMC",
+          "version": "2.0.0",
+          "appname": "Autodesk Machine Control Framework",
+          "copyright": "Copyright (C) 2026 Autodesk Inc.",
+          "mainpage": "dashboard",
+          "logouuid": "8f4a6dd8-a88d-4dd1-a139-0b73e2f25353",
+          "logoaspectratio": 1.5,
+          "toolbarlogouuid": "3ddc0457-bbe6-47f5-a379-96f1571698cd",
+          "loginbackgrounduuid": "66b3e377-ef71-4e2c-af95-b6f237f89d20",
+          "loginwelcomemessage": "Welcome",
+          "colors": {
+            "primary": "#004F7A",
+            "secondary": "#00A3A3",
+            "accent": "#FFB400",
+            "error": "#B00020"
+          }
+        },
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "Response protocol identifier."
+          },
+          "version": {
+            "type": "string",
+            "description": "Response protocol version."
+          },
+          "appname": {
+            "type": "string",
+            "description": "Application display name."
+          },
+          "copyright": {
+            "type": "string",
+            "description": "Copyright footer text."
+          },
+          "mainpage": {
+            "type": "string",
+            "description": "Name of the page opened after startup."
+          },
+          "logouuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Image UUID for the login/main logo."
+          },
+          "logoaspectratio": {
+            "type": "number",
+            "description": "Aspect ratio of the logo image."
+          },
+          "toolbarlogouuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Optional image UUID for the toolbar logo."
+          },
+          "loginbackgrounduuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Optional image UUID for the login background."
+          },
+          "loginwelcomemessage": {
+            "type": "string",
+            "description": "Welcome message shown on login."
+          },
+          "colors": {
+            "type": "object",
+            "description": "Theme color map as hex color strings.",
+            "additionalProperties": {
+              "type": "string",
+              "example": "#004F7A"
+            },
+            "example": {
+              "primary": "#004F7A",
+              "secondary": "#00A3A3",
+              "accent": "#FFB400",
+              "error": "#B00020"
+            }
           }
         }
       },
@@ -1294,6 +2661,121 @@
           }
         }
       },
+      "BuildToolpathRequest": {
+        "required": [
+          "builduuid",
+          "layerindex"
+        ],
+        "type": "object",
+        "properties": {
+          "builduuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Build job UUID."
+          },
+          "layerindex": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "0-based layer index to retrieve."
+          }
+        }
+      },
+      "BuildToolpathPoint": {
+        "required": [
+          "x",
+          "y"
+        ],
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "X coordinate in mm."
+          },
+          "y": {
+            "type": "number",
+            "description": "Y coordinate in mm."
+          }
+        }
+      },
+      "BuildToolpathSegment": {
+        "required": [
+          "type",
+          "points",
+          "laserpower",
+          "laserspeed",
+          "partid",
+          "profilename",
+          "color",
+          "laserindex"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Segment type.",
+            "enum": [
+              "hatch",
+              "polyline"
+            ]
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuildToolpathPoint"
+            }
+          },
+          "laserpower": {
+            "type": "number",
+            "description": "Laser power value for this segment."
+          },
+          "laserspeed": {
+            "type": "number",
+            "description": "Laser speed value for this segment."
+          },
+          "partid": {
+            "type": "integer",
+            "description": "Part identifier."
+          },
+          "profilename": {
+            "type": "string",
+            "description": "Toolpath profile name."
+          },
+          "color": {
+            "type": "integer",
+            "description": "Display color as packed RGB integer."
+          },
+          "laserindex": {
+            "type": "integer",
+            "description": "Laser index for this segment."
+          }
+        }
+      },
+      "BuildToolpathResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "segments"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type. Must be 'com.autodesk.machinecontrol.build'.",
+            "example": "com.autodesk.machinecontrol.build"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuildToolpathSegment"
+            }
+          }
+        }
+      },
       "StateMachineParameter": {
         "required": [
           "name",
@@ -1359,7 +2841,26 @@
           }
         }
       },
-      "StatusResponse": {
+      "StateMachineInstanceSummary": {
+        "required": [
+          "name",
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the state machine instance",
+            "example": "main"
+          },
+          "state": {
+            "type": "string",
+            "description": "The current state of the state machine instance",
+            "example": "idle"
+          }
+        }
+      },
+      "StateMachineListResponse": {
         "required": [
           "protocol",
           "version",
@@ -1369,7 +2870,7 @@
         "properties": {
           "protocol": {
             "type": "string",
-            "description": "The protocol type, used for identifying error messages. he value of this field should be 'com.autodesk.machinecontrol.status' and must be verified by the client.",
+            "description": "The protocol type, used for identifying state machine responses. The value of this field should be 'com.autodesk.machinecontrol.status' and must be verified by the client.",
             "example": "com.autodesk.machinecontrol.status"
           },
           "version": {
@@ -1380,7 +2881,57 @@
           "instances": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/StateMachineInstance"
+              "$ref": "#/components/schemas/StateMachineInstanceSummary"
+            }
+          }
+        }
+      },
+      "StateMachineDetailResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "instance"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying state machine responses. The value of this field should be 'com.autodesk.machinecontrol.status' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.status"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "instance": {
+            "$ref": "#/components/schemas/StateMachineInstance"
+          }
+        }
+      },
+      "StatusResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "instances"
+        ],
+        "type": "object",
+        "description": "Deprecated compatibility schema. Use StateMachineListResponse.",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type, used for identifying state machine responses. The value of this field should be 'com.autodesk.machinecontrol.status' and must be verified by the client.",
+            "example": "com.autodesk.machinecontrol.status"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "instances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StateMachineInstanceSummary"
             }
           }
         }
@@ -1563,6 +3114,37 @@
             "items": {
               "$ref": "#/components/schemas/FrontendPage"
             }
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Revision of the returned status within the session. Pass it as 'since' in the next request with the same pages and dialogs.",
+            "example": 42
+          },
+          "base": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Only present in a patch response: the revision the changes are relative to (the requested 'since').",
+            "example": 40
+          },
+          "changed": {
+            "type": "object",
+            "description": "Only present in a patch response, which then carries no menu items, pages or dialogs. Maps the UUID of a menu item, toolbar item, page, custom page, dialog or module to its changed attributes. For items and pages these are their own members, for modules the members of 'attributes'. A null value removes the attribute. Values are absolute, so a patch also applies to any revision between 'base' and 'revision'.",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "example": {
+              "b7800e04-9200-4015-bd35-fd4cf9e00393": {
+                "caption": "Layer 12 of 300",
+                "progress": 4.0
+              }
+            }
+          },
+          "servertime": {
+            "type": "number",
+            "description": "Time in milliseconds the server needed to build the response.",
+            "example": 1.25
           }
         }
       },
@@ -1737,10 +3319,343 @@
             "description": "Version of the protocol.",
             "example": "2.0.0"
           },
+          "buildlistheadid": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Head id of the build list, read before the rows were queried. Pass it as since to fetch the next delta."
+          },
+          "delta": {
+            "type": "boolean",
+            "description": "True if the request had a valid since parameter and buildjobs only holds the changed jobs."
+          },
           "buildjobs": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/BuildJobInstance"
+            }
+          },
+          "removed": {
+            "type": "array",
+            "description": "Only in delta responses: UUIDs of jobs changed since the given head that no longer have the requested status.",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "LogEntry": {
+        "required": [
+          "id",
+          "message",
+          "loglevel"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Monotonically increasing log entry ID, used for incremental polling.",
+            "example": 42
+          },
+          "subsystem": {
+            "type": "string",
+            "description": "The subsystem that generated the log entry.",
+            "example": "main"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "ISO 8601 UTC timestamp of the log entry.",
+            "example": "2025-01-15T10:30:00.000Z"
+          },
+          "message": {
+            "type": "string",
+            "description": "The log message text.",
+            "example": "Build job started"
+          },
+          "loglevel": {
+            "type": "string",
+            "description": "The severity level of the log entry.",
+            "enum": ["FatalError", "CriticalError", "Warning", "Message", "Info", "Debug"],
+            "example": "Message"
+          }
+        }
+      },
+      "LogEntriesResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "logentries"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type identifier.",
+            "example": "com.autodesk.machinecontrol.logs"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "logentries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LogEntry"
+            }
+          }
+        }
+      },
+      "ExecutionEntry": {
+        "required": [
+          "executionuuid",
+          "executionname"
+        ],
+        "type": "object",
+        "properties": {
+          "executionuuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The UUID of the job execution.",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "executionname": {
+            "type": "string",
+            "description": "The name of the executed job.",
+            "example": "test.3mf"
+          },
+          "executiondescription": {
+            "type": "string",
+            "description": "A description of the execution.",
+            "example": "Standard build run"
+          },
+          "executionstarttimestamp": {
+            "type": "string",
+            "description": "ISO 8601 UTC timestamp when the execution started.",
+            "example": "2025-01-15T10:30:00.000Z"
+          },
+          "executionendtimestamp": {
+            "type": "string",
+            "description": "ISO 8601 UTC timestamp when the execution ended. Empty if still running.",
+            "example": "2025-01-15T11:45:00.000Z"
+          },
+          "executionduration": {
+            "type": "integer",
+            "description": "Elapsed time in seconds since the execution started.",
+            "example": 4500
+          },
+          "executionstatus": {
+            "type": "string",
+            "description": "Current status of the execution (e.g. InProgress, Finished).",
+            "example": "Finished"
+          },
+          "executionbuildstatus": {
+            "type": "string",
+            "description": "Status of the parent build job.",
+            "example": "validated"
+          },
+          "executionlayercount": {
+            "type": "integer",
+            "description": "The layer count of the executed job.",
+            "example": 120
+          },
+          "jobuuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The UUID of the parent build job.",
+            "example": "8bf469fa-4c36-474f-8ade-8474a1d621bd"
+          },
+          "executionthumbnail": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of the thumbnail image for the executed job. May be absent if no thumbnail exists.",
+            "example": "8bf469fa-4c36-474f-8ade-8474a1d621bd"
+          }
+        }
+      },
+      "ExecutionListResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "executions"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type identifier.",
+            "example": "com.autodesk.machinecontrol.build"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "executionlistheadid": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Head id of the execution list, read before the rows were queried. Pass it as since to fetch the next delta."
+          },
+          "delta": {
+            "type": "boolean",
+            "description": "True if the request had a valid since parameter and executions only holds the changed executions."
+          },
+          "executions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecutionEntry"
+            }
+          }
+        }
+      },
+      "AlertEntry": {
+        "required": [
+          "alertuuid",
+          "alertidentifier"
+        ],
+        "type": "object",
+        "properties": {
+          "alertuuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The UUID of the alert.",
+            "example": "d4e5f6a7-b8c9-0123-4567-89abcdef0123"
+          },
+          "alertidentifier": {
+            "type": "string",
+            "description": "A machine-readable identifier for the alert type.",
+            "example": "LASER_INTERLOCK_OPEN"
+          },
+          "alerttimestamp": {
+            "type": "string",
+            "description": "ISO 8601 UTC timestamp when the alert was raised.",
+            "example": "2025-01-15T10:30:00.000Z"
+          },
+          "alertcaption": {
+            "type": "string",
+            "description": "Human-readable caption or description of the alert.",
+            "example": "Laser interlock is open"
+          },
+          "alertcontext": {
+            "type": "string",
+            "description": "Readable context information about the alert.",
+            "example": "Driver: ScanLab, State: idle"
+          },
+          "alertlevel": {
+            "type": "string",
+            "description": "The severity level of the alert.",
+            "enum": ["FatalError", "CriticalError", "Warning", "Message"],
+            "example": "Warning"
+          },
+          "alertactive": {
+            "type": "boolean",
+            "description": "Whether the alert is currently active.",
+            "example": true
+          },
+          "alertneedsacknowledge": {
+            "type": "boolean",
+            "description": "Whether the alert requires user acknowledgement to clear.",
+            "example": false
+          }
+        }
+      },
+      "AlertListResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "alerts"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type identifier.",
+            "example": "com.autodesk.machinecontrol.status"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "alertlistheadid": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Head id of the alert list, read before the rows were queried. Pass it as since to fetch the next delta."
+          },
+          "delta": {
+            "type": "boolean",
+            "description": "True if the request had a valid since parameter and alerts only holds the changed alerts."
+          },
+          "alerts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AlertEntry"
+            }
+          }
+        }
+      },
+      "ConfigurationVersionEntry": {
+        "required": [
+          "configurationuuid",
+          "configurationversion"
+        ],
+        "type": "object",
+        "properties": {
+          "configurationuuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The UUID of the configuration version.",
+            "example": "f1e2d3c4-b5a6-9780-1234-567890abcdef"
+          },
+          "configurationversion": {
+            "type": "integer",
+            "description": "The numeric version number of the configuration.",
+            "example": 3
+          },
+          "configurationname": {
+            "type": "string",
+            "description": "Name of the configuration version. Versions created before names were introduced are reported as 'Version <number>'.",
+            "example": "Recoater speed tuned"
+          },
+          "configurationactive": {
+            "type": "boolean",
+            "description": "Whether this is the currently active configuration version.",
+            "example": true
+          },
+          "configurationtimestamp": {
+            "type": "string",
+            "description": "Timestamp when this configuration version was created.",
+            "example": "2025-01-15T10:30:00.000Z"
+          },
+          "username": {
+            "type": "string",
+            "description": "Login name of the user who created this version. 'system' for versions created by the machine itself; the user UUID if the user cannot be resolved.",
+            "example": "operator"
+          }
+        }
+      },
+      "ConfigurationListResponse": {
+        "required": [
+          "protocol",
+          "version",
+          "configurations"
+        ],
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "description": "The protocol type identifier.",
+            "example": "com.autodesk.machinecontrol.status"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the protocol.",
+            "example": "2.0.0"
+          },
+          "configurations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConfigurationVersionEntry"
             }
           }
         }

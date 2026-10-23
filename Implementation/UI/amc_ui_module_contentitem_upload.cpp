@@ -55,14 +55,15 @@ PUIModule_ContentUpload CUIModule_ContentUpload::makeFromXML(const pugi::xml_nod
 
 	auto successeventAttrib = xmlNode.attribute("successevent");
 	auto failureeventAttrib = xmlNode.attribute("failureevent");
+	auto acceptedtypesAttrib = xmlNode.attribute("acceptedtypes");
 
-	return std::make_shared <CUIModule_ContentUpload> (pUIModuleEnvironment->contentRegistry(), classExpression, captionExpression, successeventAttrib.as_string (), failureeventAttrib.as_string (), sItemName, sModulePath, pUIModuleEnvironment->stateMachineData ());
+	return std::make_shared <CUIModule_ContentUpload> (pUIModuleEnvironment->contentRegistry(), classExpression, captionExpression, successeventAttrib.as_string (), failureeventAttrib.as_string (), acceptedtypesAttrib.as_string (), sItemName, sModulePath, pUIModuleEnvironment->stateMachineData ());
 }
 
 
 
-CUIModule_ContentUpload::CUIModule_ContentUpload(CUIModule_ContentRegistry* pOwner, CUIExpression uploadClass, CUIExpression uploadCaption, const std::string& sSuccessEvent, const std::string& sFailureEvent, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_UploadClass(uploadClass), m_UploadCaption (uploadCaption), m_sSuccessEvent (sSuccessEvent), m_sFailureEvent (sFailureEvent), m_pStateMachineData (pStateMachineData), m_pOwner (pOwner)
+CUIModule_ContentUpload::CUIModule_ContentUpload(CUIModule_ContentRegistry* pOwner, CUIExpression uploadClass, CUIExpression uploadCaption, const std::string& sSuccessEvent, const std::string& sFailureEvent, const std::string& sAcceptedTypes, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_UploadClass(uploadClass), m_UploadCaption (uploadCaption), m_sSuccessEvent (sSuccessEvent), m_sFailureEvent (sFailureEvent), m_sAcceptedTypes (sAcceptedTypes), m_pStateMachineData (pStateMachineData), m_pOwner (pOwner)
 {
 	LibMCAssertNotNull(pStateMachineData);
 	LibMCAssertNotNull(pOwner);
@@ -73,20 +74,6 @@ CUIModule_ContentUpload::~CUIModule_ContentUpload()
 {
 
 }
-
-void CUIModule_ContentUpload::addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
-{
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "upload");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADCLASS, m_UploadClass.evaluateStringValue (m_pStateMachineData));
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADCAPTION, m_UploadCaption.evaluateStringValue (m_pStateMachineData));
-	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISINITIAL, 1);
-	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISSAVING, 0);
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADFILENAME, "");
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADSUCCESSEVENT, m_sSuccessEvent);
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADFAILUREEVENT, m_sFailureEvent);
-}
-
 
 void CUIModule_ContentUpload::configurePostLoading()
 {
@@ -108,12 +95,8 @@ void CUIModule_ContentUpload::populateClientVariables(CParameterHandler* pClient
 void CUIModule_ContentUpload::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
 {
 	LibMCAssertNotNull(pClientVariableHandler);
-	if (AMCCommon::CUtils::normalizeUUIDString (sPayloadUUID) == getUUID()) {
-		auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
-		pGroup->setParameterValueByName("uploaduuid", AMCCommon::CUtils::normalizeUUIDString (sPayloadValue));
-
-	}
-
+	auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+	pGroup->setParameterValueByName("uploaduuid", AMCCommon::CUtils::normalizeUUIDString (sPayloadValue));
 }
 
 
@@ -123,4 +106,24 @@ std::string CUIModule_ContentUpload::findElementPathByUUID(const std::string& sU
 		return getItemPath();
 
 	return "";
+}
+
+std::string CUIModule_ContentUpload::getItemType()
+{
+	return "upload";
+}
+
+void CUIModule_ContentUpload::registerFrontendAttributes()
+{
+	registerItemStringAttribute("uploadclass", m_UploadClass);
+	registerItemStringAttribute("uploadcaption", m_UploadCaption);
+	CUIExpression successEventExpr;
+	successEventExpr.setFixedValue(m_sSuccessEvent);
+	registerItemStringAttribute("successevent", successEventExpr);
+	CUIExpression failureEventExpr;
+	failureEventExpr.setFixedValue(m_sFailureEvent);
+	registerItemStringAttribute("failureevent", failureEventExpr);
+	CUIExpression acceptedTypesExpr;
+	acceptedTypesExpr.setFixedValue(m_sAcceptedTypes);
+	registerItemStringAttribute("acceptedtypes", acceptedTypesExpr);
 }

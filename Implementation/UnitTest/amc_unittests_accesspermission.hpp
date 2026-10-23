@@ -57,16 +57,16 @@ namespace AMCUnitTest {
 	private:
 
 		void testCreateValidPermission() {
-			AMC::CAccessPermission perm("editfiles", AMC::CStringResource("Edit Files"), AMC::CStringResource("Allows file editing."));
+			AMC::CAccessPermission perm("editfiles", AMC::CLanguageString("", "Edit Files"), AMC::CLanguageString("", "Allows file editing."));
 			assertTrue(perm.getIdentifier() == "editfiles");
-			assertTrue(perm.getDisplayNameString(1) == "Edit Files");
-			assertTrue(perm.getDescriptionString(1) == "Allows file editing.");
+			assertTrue(perm.getDisplayName().getCustomValue() == "Edit Files");
+			assertTrue(perm.getDescription().getCustomValue() == "Allows file editing.");
 		}
 
 		void testEmptyIdentifierThrows() {
 			bool thrown = false;
 			try {
-				AMC::CAccessPermission perm("", AMC::CStringResource("Invalid"), AMC::CStringResource("Should throw"));
+				AMC::CAccessPermission perm("", AMC::CLanguageString("", "Invalid"), AMC::CLanguageString("", "Should throw"));
 			}
 			catch (...) {
 				thrown = true;
@@ -77,7 +77,7 @@ namespace AMCUnitTest {
 		void testInvalidIdentifierThrows() {
 			bool thrown = false;
 			try {
-				AMC::CAccessPermission perm("bad id!", AMC::CStringResource("Bad ID"), AMC::CStringResource("Invalid characters"));
+				AMC::CAccessPermission perm("bad id!", AMC::CLanguageString("", "Bad ID"), AMC::CLanguageString("", "Invalid characters"));
 			}
 			catch (...) {
 				thrown = true;
@@ -86,12 +86,14 @@ namespace AMCUnitTest {
 		}
 
 		void testAccessorsReturnExpectedValues() {
-			AMC::CStringResource displayName("Manage Access");
-			AMC::CStringResource description("Grants full access control");
+			AMC::CLanguageString displayName("permissions.manageaccess", "Manage Access");
+			AMC::CLanguageString description("permissions.manageaccess_desc", "Grants full access control");
 			AMC::CAccessPermission perm("manageaccess", displayName, description);
 
-			assertTrue(perm.getDisplayName().get(1) == "Manage Access");
-			assertTrue(perm.getDescription().get(1) == "Grants full access control");
+			assertTrue(perm.getDisplayName().getStringIdentifier() == "permissions.manageaccess");
+			assertTrue(perm.getDisplayName().getCustomValue() == "Manage Access");
+			assertTrue(perm.getDescription().getStringIdentifier() == "permissions.manageaccess_desc");
+			assertTrue(perm.getDescription().getCustomValue() == "Grants full access control");
 		}
 
 	};

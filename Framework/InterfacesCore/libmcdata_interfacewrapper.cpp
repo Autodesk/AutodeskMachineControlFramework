@@ -1336,6 +1336,760 @@ LibMCDataResult libmcdata_alertsession_retrievealertsbytype(LibMCData_AlertSessi
 	}
 }
 
+LibMCDataResult libmcdata_alertsession_getalertheadid(LibMCData_AlertSession pAlertSession, LibMCData_uint64 * pHeadID)
+{
+	IBase* pIBaseClass = (IBase *)pAlertSession;
+
+	try {
+		if (pHeadID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IAlertSession* pIAlertSession = dynamic_cast<IAlertSession*>(pIBaseClass);
+		if (!pIAlertSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pHeadID = pIAlertSession->GetAlertHeadID();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_alertsession_retrievealertschangedsince(LibMCData_AlertSession pAlertSession, LibMCData_uint64 nIncrementalID, LibMCData_AlertIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pAlertSession;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IAlertSession* pIAlertSession = dynamic_cast<IAlertSession*>(pIBaseClass);
+		if (!pIAlertSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIAlertSession->RetrieveAlertsChangedSince(nIncrementalID);
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for TelemetrySession
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_telemetrysession_getsessionuuid(LibMCData_TelemetrySession pTelemetrySession, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetrySession;
+
+	try {
+		if ( (!pSessionUUIDBuffer) && !(pSessionUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID("");
+		ITelemetrySession* pITelemetrySession = dynamic_cast<ITelemetrySession*>(pIBaseClass);
+		if (!pITelemetrySession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSessionUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sSessionUUID = pITelemetrySession->GetSessionUUID();
+
+			pITelemetrySession->_setCache (new ParameterCache_1<std::string> (sSessionUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITelemetrySession->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sSessionUUID);
+			pITelemetrySession->_setCache (nullptr);
+		}
+		
+		if (pSessionUUIDNeededChars)
+			*pSessionUUIDNeededChars = (LibMCData_uint32) (sSessionUUID.size()+1);
+		if (pSessionUUIDBuffer) {
+			if (sSessionUUID.size() >= nSessionUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iSessionUUID = 0; iSessionUUID < sSessionUUID.size(); iSessionUUID++)
+				pSessionUUIDBuffer[iSessionUUID] = sSessionUUID[iSessionUUID];
+			pSessionUUIDBuffer[sSessionUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetrysession_createchannelindb(LibMCData_TelemetrySession pTelemetrySession, const char * pUUID, eLibMCDataTelemetryChannelType eChannelType, LibMCData_uint32 nChannelIndex, const char * pChannelIdentifier, const char * pChannelDescription)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetrySession;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pChannelIdentifier == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pChannelDescription == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sChannelIdentifier(pChannelIdentifier);
+		std::string sChannelDescription(pChannelDescription);
+		ITelemetrySession* pITelemetrySession = dynamic_cast<ITelemetrySession*>(pIBaseClass);
+		if (!pITelemetrySession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pITelemetrySession->CreateChannelInDB(sUUID, eChannelType, nChannelIndex, sChannelIdentifier, sChannelDescription);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetrysession_writetelemetrychunk(LibMCData_TelemetrySession pTelemetrySession, LibMCData_uint64 nChunkID, LibMCData_uint64 nStartTimeStamp, LibMCData_uint64 nEndTimeStamp, LibMCData_uint64 nTelemetryEntriesBufferSize, const sLibMCDataTelemetryChunkEntry * pTelemetryEntriesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetrySession;
+
+	try {
+		if ( (!pTelemetryEntriesBuffer) && (nTelemetryEntriesBufferSize>0))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetrySession* pITelemetrySession = dynamic_cast<ITelemetrySession*>(pIBaseClass);
+		if (!pITelemetrySession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pITelemetrySession->WriteTelemetryChunk(nChunkID, nStartTimeStamp, nEndTimeStamp, nTelemetryEntriesBufferSize, pTelemetryEntriesBuffer);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for TelemetryChunkData
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_telemetrychunkdata_getchunkindex(LibMCData_TelemetryChunkData pTelemetryChunkData, LibMCData_uint64 * pChunkIndex)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChunkData;
+
+	try {
+		if (pChunkIndex == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryChunkData* pITelemetryChunkData = dynamic_cast<ITelemetryChunkData*>(pIBaseClass);
+		if (!pITelemetryChunkData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pChunkIndex = pITelemetryChunkData->GetChunkIndex();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetrychunkdata_getstarttimestamp(LibMCData_TelemetryChunkData pTelemetryChunkData, LibMCData_uint64 * pStartTimeStamp)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChunkData;
+
+	try {
+		if (pStartTimeStamp == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryChunkData* pITelemetryChunkData = dynamic_cast<ITelemetryChunkData*>(pIBaseClass);
+		if (!pITelemetryChunkData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pStartTimeStamp = pITelemetryChunkData->GetStartTimeStamp();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetrychunkdata_getendtimestamp(LibMCData_TelemetryChunkData pTelemetryChunkData, LibMCData_uint64 * pEndTimeStamp)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChunkData;
+
+	try {
+		if (pEndTimeStamp == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryChunkData* pITelemetryChunkData = dynamic_cast<ITelemetryChunkData*>(pIBaseClass);
+		if (!pITelemetryChunkData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pEndTimeStamp = pITelemetryChunkData->GetEndTimeStamp();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetrychunkdata_getentrycount(LibMCData_TelemetryChunkData pTelemetryChunkData, LibMCData_uint64 * pEntryCount)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChunkData;
+
+	try {
+		if (pEntryCount == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryChunkData* pITelemetryChunkData = dynamic_cast<ITelemetryChunkData*>(pIBaseClass);
+		if (!pITelemetryChunkData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pEntryCount = pITelemetryChunkData->GetEntryCount();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetrychunkdata_getentries(LibMCData_TelemetryChunkData pTelemetryChunkData, const LibMCData_uint64 nTelemetryEntriesBufferSize, LibMCData_uint64* pTelemetryEntriesNeededCount, sLibMCDataTelemetryChunkEntry * pTelemetryEntriesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryChunkData;
+
+	try {
+		if ((!pTelemetryEntriesBuffer) && !(pTelemetryEntriesNeededCount))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryChunkData* pITelemetryChunkData = dynamic_cast<ITelemetryChunkData*>(pIBaseClass);
+		if (!pITelemetryChunkData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pITelemetryChunkData->GetEntries(nTelemetryEntriesBufferSize, pTelemetryEntriesNeededCount, pTelemetryEntriesBuffer);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for TelemetryReader
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_telemetryreader_getsessionuuid(LibMCData_TelemetryReader pTelemetryReader, const LibMCData_uint32 nSessionUUIDBufferSize, LibMCData_uint32* pSessionUUIDNeededChars, char * pSessionUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if ( (!pSessionUUIDBuffer) && !(pSessionUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID("");
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSessionUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sSessionUUID = pITelemetryReader->GetSessionUUID();
+
+			pITelemetryReader->_setCache (new ParameterCache_1<std::string> (sSessionUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITelemetryReader->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sSessionUUID);
+			pITelemetryReader->_setCache (nullptr);
+		}
+		
+		if (pSessionUUIDNeededChars)
+			*pSessionUUIDNeededChars = (LibMCData_uint32) (sSessionUUID.size()+1);
+		if (pSessionUUIDBuffer) {
+			if (sSessionUUID.size() >= nSessionUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iSessionUUID = 0; iSessionUUID < sSessionUUID.size(); iSessionUUID++)
+				pSessionUUIDBuffer[iSessionUUID] = sSessionUUID[iSessionUUID];
+			pSessionUUIDBuffer[sSessionUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_getstarttime(LibMCData_TelemetryReader pTelemetryReader, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if ( (!pTimestampBuffer) && !(pTimestampNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTimestamp("");
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTimestampBuffer == nullptr);
+		if (isCacheCall) {
+			sTimestamp = pITelemetryReader->GetStartTime();
+
+			pITelemetryReader->_setCache (new ParameterCache_1<std::string> (sTimestamp));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITelemetryReader->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sTimestamp);
+			pITelemetryReader->_setCache (nullptr);
+		}
+		
+		if (pTimestampNeededChars)
+			*pTimestampNeededChars = (LibMCData_uint32) (sTimestamp.size()+1);
+		if (pTimestampBuffer) {
+			if (sTimestamp.size() >= nTimestampBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTimestamp = 0; iTimestamp < sTimestamp.size(); iTimestamp++)
+				pTimestampBuffer[iTimestamp] = sTimestamp[iTimestamp];
+			pTimestampBuffer[sTimestamp.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_getlifetimeinmicroseconds(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint64 * pLifeTime)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if (pLifeTime == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pLifeTime = pITelemetryReader->GetLifeTimeInMicroseconds();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_getchannelcount(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pCount = pITelemetryReader->GetChannelCount();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_getchannelinformation(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 nChannelIndex, const LibMCData_uint32 nChannelUUIDBufferSize, LibMCData_uint32* pChannelUUIDNeededChars, char * pChannelUUIDBuffer, eLibMCDataTelemetryChannelType * pChannelType, const LibMCData_uint32 nIdentifierBufferSize, LibMCData_uint32* pIdentifierNeededChars, char * pIdentifierBuffer, const LibMCData_uint32 nDescriptionBufferSize, LibMCData_uint32* pDescriptionNeededChars, char * pDescriptionBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if ( (!pChannelUUIDBuffer) && !(pChannelUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pChannelType)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pDescriptionBuffer) && !(pDescriptionNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sChannelUUID("");
+		std::string sIdentifier("");
+		std::string sDescription("");
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pChannelUUIDBuffer == nullptr) || (pIdentifierBuffer == nullptr) || (pDescriptionBuffer == nullptr);
+		if (isCacheCall) {
+			pITelemetryReader->GetChannelInformation(nChannelIndex, sChannelUUID, *pChannelType, sIdentifier, sDescription);
+
+			pITelemetryReader->_setCache (new ParameterCache_4<std::string, LibMCData::eTelemetryChannelType, std::string, std::string> (sChannelUUID, *pChannelType, sIdentifier, sDescription));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_4<std::string, LibMCData::eTelemetryChannelType, std::string, std::string>*> (pITelemetryReader->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sChannelUUID, *pChannelType, sIdentifier, sDescription);
+			pITelemetryReader->_setCache (nullptr);
+		}
+		
+		if (pChannelUUIDNeededChars)
+			*pChannelUUIDNeededChars = (LibMCData_uint32) (sChannelUUID.size()+1);
+		if (pChannelUUIDBuffer) {
+			if (sChannelUUID.size() >= nChannelUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iChannelUUID = 0; iChannelUUID < sChannelUUID.size(); iChannelUUID++)
+				pChannelUUIDBuffer[iChannelUUID] = sChannelUUID[iChannelUUID];
+			pChannelUUIDBuffer[sChannelUUID.size()] = 0;
+		}
+		if (pIdentifierNeededChars)
+			*pIdentifierNeededChars = (LibMCData_uint32) (sIdentifier.size()+1);
+		if (pIdentifierBuffer) {
+			if (sIdentifier.size() >= nIdentifierBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
+				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
+			pIdentifierBuffer[sIdentifier.size()] = 0;
+		}
+		if (pDescriptionNeededChars)
+			*pDescriptionNeededChars = (LibMCData_uint32) (sDescription.size()+1);
+		if (pDescriptionBuffer) {
+			if (sDescription.size() >= nDescriptionBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iDescription = 0; iDescription < sDescription.size(); iDescription++)
+				pDescriptionBuffer[iDescription] = sDescription[iDescription];
+			pDescriptionBuffer[sDescription.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_findchannelbyidentifier(LibMCData_TelemetryReader pTelemetryReader, const char * pIdentifier, LibMCData_uint32 * pChannelIndex, bool * pFound)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pChannelIndex)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pFound == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pFound = pITelemetryReader->FindChannelByIdentifier(sIdentifier, *pChannelIndex);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_getchunkcount(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pCount = pITelemetryReader->GetChunkCount();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_getchunkinformation(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 nChunkIndex, LibMCData_uint64 * pStartTimeStamp, LibMCData_uint64 * pEndTimeStamp, LibMCData_uint64 * pEntryCount)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if (!pStartTimeStamp)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pEndTimeStamp)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pEntryCount)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pITelemetryReader->GetChunkInformation(nChunkIndex, *pStartTimeStamp, *pEndTimeStamp, *pEntryCount);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_readchunkdata(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 nChunkIndex, LibMCData_TelemetryChunkData * pChunkData)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if (pChunkData == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseChunkData(nullptr);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseChunkData = pITelemetryReader->ReadChunkData(nChunkIndex);
+
+		*pChunkData = (IBase*)(pBaseChunkData);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_findchunksintimerange(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint64 nStartTimeStampInMicroseconds, LibMCData_uint64 nEndTimeStampInMicroseconds, const LibMCData_uint64 nChunkIndicesBufferSize, LibMCData_uint64* pChunkIndicesNeededCount, LibMCData_uint32 * pChunkIndicesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if ((!pChunkIndicesBuffer) && !(pChunkIndicesNeededCount))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pITelemetryReader->FindChunksInTimeRange(nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, nChunkIndicesBufferSize, pChunkIndicesNeededCount, pChunkIndicesBuffer);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_queryintervals(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint64 nStartTimeStampInMicroseconds, LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint32 nChannelIndex, const LibMCData_uint64 nIntervalsBufferSize, LibMCData_uint64* pIntervalsNeededCount, sLibMCDataTelemetryIntervalData * pIntervalsBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if ((!pIntervalsBuffer) && !(pIntervalsNeededCount))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pITelemetryReader->QueryIntervals(nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, nChannelIndex, nIntervalsBufferSize, pIntervalsNeededCount, pIntervalsBuffer);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_queryinstantmarkers(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint64 nStartTimeStampInMicroseconds, LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint32 nChannelIndex, const LibMCData_uint64 nEntriesBufferSize, LibMCData_uint64* pEntriesNeededCount, sLibMCDataTelemetryChunkEntry * pEntriesBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if ((!pEntriesBuffer) && !(pEntriesNeededCount))
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pITelemetryReader->QueryInstantMarkers(nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, nChannelIndex, nEntriesBufferSize, pEntriesNeededCount, pEntriesBuffer);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_telemetryreader_getchannelstatistics(LibMCData_TelemetryReader pTelemetryReader, LibMCData_uint32 nChannelIndex, LibMCData_uint64 nStartTimeStampInMicroseconds, LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint64 * pIntervalCount, LibMCData_uint64 * pInstantMarkerCount, LibMCData_uint64 * pTotalDurationInMicroseconds, LibMCData_uint64 * pMinDurationInMicroseconds, LibMCData_uint64 * pMaxDurationInMicroseconds, LibMCData_uint64 * pAvgDurationInMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pTelemetryReader;
+
+	try {
+		if (!pIntervalCount)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pInstantMarkerCount)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pTotalDurationInMicroseconds)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pMinDurationInMicroseconds)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pMaxDurationInMicroseconds)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pAvgDurationInMicroseconds)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ITelemetryReader* pITelemetryReader = dynamic_cast<ITelemetryReader*>(pIBaseClass);
+		if (!pITelemetryReader)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pITelemetryReader->GetChannelStatistics(nChannelIndex, nStartTimeStampInMicroseconds, nEndTimeStampInMicroseconds, *pIntervalCount, *pInstantMarkerCount, *pTotalDurationInMicroseconds, *pMinDurationInMicroseconds, *pMaxDurationInMicroseconds, *pAvgDurationInMicroseconds);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for JournalChunkIntegerData
@@ -6206,6 +6960,32 @@ LibMCDataResult libmcdata_buildjob_retrievebuildjobexecutionsbystatus(LibMCData_
 	}
 }
 
+LibMCDataResult libmcdata_buildjob_getincrementalid(LibMCData_BuildJob pBuildJob, LibMCData_uint64 * pIncrementalID)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		if (pIncrementalID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pIncrementalID = pIBuildJob->GetIncrementalID();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for BuildJobIterator
@@ -6531,6 +7311,114 @@ LibMCDataResult libmcdata_buildjobhandler_listjobexecutions(LibMCData_BuildJobHa
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
 		pBaseIteratorInstance = pIBuildJobHandler->ListJobExecutions(sMinTimestamp, sMaxTimestamp, sJournalUUIDFilter);
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobhandler_getbuildlistheadid(LibMCData_BuildJobHandler pBuildJobHandler, LibMCData_uint64 * pHeadID)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
+
+	try {
+		if (pHeadID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBuildJobHandler* pIBuildJobHandler = dynamic_cast<IBuildJobHandler*>(pIBaseClass);
+		if (!pIBuildJobHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pHeadID = pIBuildJobHandler->GetBuildListHeadID();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobhandler_getexecutionlistheadid(LibMCData_BuildJobHandler pBuildJobHandler, LibMCData_uint64 * pHeadID)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
+
+	try {
+		if (pHeadID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBuildJobHandler* pIBuildJobHandler = dynamic_cast<IBuildJobHandler*>(pIBaseClass);
+		if (!pIBuildJobHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pHeadID = pIBuildJobHandler->GetExecutionListHeadID();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobhandler_listjobschangedsince(LibMCData_BuildJobHandler pBuildJobHandler, LibMCData_uint64 nIncrementalID, LibMCData_BuildJobIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IBuildJobHandler* pIBuildJobHandler = dynamic_cast<IBuildJobHandler*>(pIBaseClass);
+		if (!pIBuildJobHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIBuildJobHandler->ListJobsChangedSince(nIncrementalID);
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobhandler_listjobexecutionschangedsince(LibMCData_BuildJobHandler pBuildJobHandler, LibMCData_uint64 nIncrementalID, LibMCData_BuildJobExecutionIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IBuildJobHandler* pIBuildJobHandler = dynamic_cast<IBuildJobHandler*>(pIBaseClass);
+		if (!pIBuildJobHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIBuildJobHandler->ListJobExecutionsChangedSince(nIncrementalID);
 
 		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
 		return LIBMCDATA_SUCCESS;
@@ -7716,6 +8604,123 @@ LibMCDataResult libmcdata_loginhandler_getactiveusers(LibMCData_LoginHandler pLo
 	}
 }
 
+LibMCDataResult libmcdata_loginhandler_createloginsession(LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, LibMCData_uint64 nCreateTimeInMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pLoginHandler;
+
+	try {
+		if (pSessionUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID(pSessionUUID);
+		ILoginHandler* pILoginHandler = dynamic_cast<ILoginHandler*>(pIBaseClass);
+		if (!pILoginHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pILoginHandler->CreateLoginSession(sSessionUUID, nCreateTimeInMicroseconds);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_loginhandler_updateloginsessionauthentication(LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, const char * pUserUUID, const char * pUsername, const char * pUserRole)
+{
+	IBase* pIBaseClass = (IBase *)pLoginHandler;
+
+	try {
+		if (pSessionUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pUserUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pUsername == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pUserRole == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID(pSessionUUID);
+		std::string sUserUUID(pUserUUID);
+		std::string sUsername(pUsername);
+		std::string sUserRole(pUserRole);
+		ILoginHandler* pILoginHandler = dynamic_cast<ILoginHandler*>(pIBaseClass);
+		if (!pILoginHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pILoginHandler->UpdateLoginSessionAuthentication(sSessionUUID, sUserUUID, sUsername, sUserRole);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_loginhandler_updateloginsessionactivity(LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID, LibMCData_uint64 nTimestampInMicroseconds)
+{
+	IBase* pIBaseClass = (IBase *)pLoginHandler;
+
+	try {
+		if (pSessionUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID(pSessionUUID);
+		ILoginHandler* pILoginHandler = dynamic_cast<ILoginHandler*>(pIBaseClass);
+		if (!pILoginHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pILoginHandler->UpdateLoginSessionActivity(sSessionUUID, nTimestampInMicroseconds);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_loginhandler_deactivateloginsession(LibMCData_LoginHandler pLoginHandler, const char * pSessionUUID)
+{
+	IBase* pIBaseClass = (IBase *)pLoginHandler;
+
+	try {
+		if (pSessionUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID(pSessionUUID);
+		ILoginHandler* pILoginHandler = dynamic_cast<ILoginHandler*>(pIBaseClass);
+		if (!pILoginHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pILoginHandler->DeactivateLoginSession(sSessionUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for PersistencyHandler
@@ -8211,6 +9216,207 @@ LibMCDataResult libmcdata_persistencyhandler_retrievepersistentboolparameter(Lib
 
 
 /*************************************************************************************************************************
+ Class implementation for UserPreferenceHandler
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_userpreferencehandler_hasuserpreference(LibMCData_UserPreferenceHandler pUserPreferenceHandler, const char * pUserUUID, const char * pDomain, const char * pKey, bool * pPreferenceExists)
+{
+	IBase* pIBaseClass = (IBase *)pUserPreferenceHandler;
+
+	try {
+		if (pUserUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pDomain == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pKey == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pPreferenceExists == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUserUUID(pUserUUID);
+		std::string sDomain(pDomain);
+		std::string sKey(pKey);
+		IUserPreferenceHandler* pIUserPreferenceHandler = dynamic_cast<IUserPreferenceHandler*>(pIBaseClass);
+		if (!pIUserPreferenceHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pPreferenceExists = pIUserPreferenceHandler->HasUserPreference(sUserUUID, sDomain, sKey);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_userpreferencehandler_retrieveuserpreference(LibMCData_UserPreferenceHandler pUserPreferenceHandler, const char * pUserUUID, const char * pDomain, const char * pKey, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUserPreferenceHandler;
+
+	try {
+		if (pUserUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pDomain == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pKey == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pValueBuffer) && !(pValueNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUserUUID(pUserUUID);
+		std::string sDomain(pDomain);
+		std::string sKey(pKey);
+		std::string sValue("");
+		IUserPreferenceHandler* pIUserPreferenceHandler = dynamic_cast<IUserPreferenceHandler*>(pIBaseClass);
+		if (!pIUserPreferenceHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pValueBuffer == nullptr);
+		if (isCacheCall) {
+			sValue = pIUserPreferenceHandler->RetrieveUserPreference(sUserUUID, sDomain, sKey);
+
+			pIUserPreferenceHandler->_setCache (new ParameterCache_1<std::string> (sValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUserPreferenceHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sValue);
+			pIUserPreferenceHandler->_setCache (nullptr);
+		}
+		
+		if (pValueNeededChars)
+			*pValueNeededChars = (LibMCData_uint32) (sValue.size()+1);
+		if (pValueBuffer) {
+			if (sValue.size() >= nValueBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
+				pValueBuffer[iValue] = sValue[iValue];
+			pValueBuffer[sValue.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_userpreferencehandler_storeuserpreference(LibMCData_UserPreferenceHandler pUserPreferenceHandler, const char * pUserUUID, const char * pDomain, const char * pKey, const char * pValue, LibMCData_uint64 nAbsoluteTimeStamp)
+{
+	IBase* pIBaseClass = (IBase *)pUserPreferenceHandler;
+
+	try {
+		if (pUserUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pDomain == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pKey == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUserUUID(pUserUUID);
+		std::string sDomain(pDomain);
+		std::string sKey(pKey);
+		std::string sValue(pValue);
+		IUserPreferenceHandler* pIUserPreferenceHandler = dynamic_cast<IUserPreferenceHandler*>(pIBaseClass);
+		if (!pIUserPreferenceHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIUserPreferenceHandler->StoreUserPreference(sUserUUID, sDomain, sKey, sValue, nAbsoluteTimeStamp);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_userpreferencehandler_deleteuserpreference(LibMCData_UserPreferenceHandler pUserPreferenceHandler, const char * pUserUUID, const char * pDomain, const char * pKey, bool * pPreferenceExisted)
+{
+	IBase* pIBaseClass = (IBase *)pUserPreferenceHandler;
+
+	try {
+		if (pUserUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pDomain == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pKey == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pPreferenceExisted == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUserUUID(pUserUUID);
+		std::string sDomain(pDomain);
+		std::string sKey(pKey);
+		IUserPreferenceHandler* pIUserPreferenceHandler = dynamic_cast<IUserPreferenceHandler*>(pIBaseClass);
+		if (!pIUserPreferenceHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pPreferenceExisted = pIUserPreferenceHandler->DeleteUserPreference(sUserUUID, sDomain, sKey);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for SessionMetricsHandler
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_sessionmetricshandler_addfrontendmetrics(LibMCData_SessionMetricsHandler pSessionMetricsHandler, const char * pSessionUUID, const char * pLabel, LibMCData_uint64 nIntervalStart, LibMCData_uint64 nIntervalEnd, LibMCData_uint32 nRequestCount, LibMCData_double dSumDurationMS, LibMCData_double dMinDurationMS, LibMCData_double dMaxDurationMS, LibMCData_double dSumSqDurationMS, LibMCData_uint64 nPayloadSumBytes, LibMCData_uint64 nPayloadMaxBytes, LibMCData_double dServerBuildSumMS, LibMCData_uint64 nAbsoluteTimeStamp)
+{
+	IBase* pIBaseClass = (IBase *)pSessionMetricsHandler;
+
+	try {
+		if (pSessionUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pLabel == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sSessionUUID(pSessionUUID);
+		std::string sLabel(pLabel);
+		ISessionMetricsHandler* pISessionMetricsHandler = dynamic_cast<ISessionMetricsHandler*>(pIBaseClass);
+		if (!pISessionMetricsHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pISessionMetricsHandler->AddFrontendMetrics(sSessionUUID, sLabel, nIntervalStart, nIntervalEnd, nRequestCount, dSumDurationMS, dMinDurationMS, dMaxDurationMS, dSumSqDurationMS, nPayloadSumBytes, nPayloadMaxBytes, dServerBuildSumMS, nAbsoluteTimeStamp);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for MachineConfigurationVersion
 **************************************************************************************************************************/
 LibMCDataResult libmcdata_machineconfigurationversion_getversionuuid(LibMCData_MachineConfigurationVersion pMachineConfigurationVersion, const LibMCData_uint32 nVersionUUIDBufferSize, LibMCData_uint32* pVersionUUIDNeededChars, char * pVersionUUIDBuffer)
@@ -8383,6 +9589,54 @@ LibMCDataResult libmcdata_machineconfigurationversion_getparentuuid(LibMCData_Ma
 	}
 }
 
+LibMCDataResult libmcdata_machineconfigurationversion_getname(LibMCData_MachineConfigurationVersion pMachineConfigurationVersion, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfigurationVersion;
+
+	try {
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sName("");
+		IMachineConfigurationVersion* pIMachineConfigurationVersion = dynamic_cast<IMachineConfigurationVersion*>(pIBaseClass);
+		if (!pIMachineConfigurationVersion)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			sName = pIMachineConfigurationVersion->GetName();
+
+			pIMachineConfigurationVersion->_setCache (new ParameterCache_1<std::string> (sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMachineConfigurationVersion->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sName);
+			pIMachineConfigurationVersion->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCData_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_machineconfigurationversion_getconfigurationxmlstring(LibMCData_MachineConfigurationVersion pMachineConfigurationVersion, const LibMCData_uint32 nXMLStringBufferSize, LibMCData_uint32* pXMLStringNeededChars, char * pXMLStringBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pMachineConfigurationVersion;
@@ -8527,7 +9781,7 @@ LibMCDataResult libmcdata_machineconfigurationversion_gettimestamp(LibMCData_Mac
 	}
 }
 
-LibMCDataResult libmcdata_machineconfigurationversion_createnewversion(LibMCData_MachineConfigurationVersion pMachineConfigurationVersion, const char * pXMLString, const char * pUserUUID, LibMCData_MachineConfigurationVersion * pCurrentInstance)
+LibMCDataResult libmcdata_machineconfigurationversion_createnewversion(LibMCData_MachineConfigurationVersion pMachineConfigurationVersion, const char * pXMLString, const char * pUserUUID, const char * pName, LibMCData_MachineConfigurationVersion * pCurrentInstance)
 {
 	IBase* pIBaseClass = (IBase *)pMachineConfigurationVersion;
 
@@ -8536,16 +9790,19 @@ LibMCDataResult libmcdata_machineconfigurationversion_createnewversion(LibMCData
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pUserUUID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pCurrentInstance == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sXMLString(pXMLString);
 		std::string sUserUUID(pUserUUID);
+		std::string sName(pName);
 		IBase* pBaseCurrentInstance(nullptr);
 		IMachineConfigurationVersion* pIMachineConfigurationVersion = dynamic_cast<IMachineConfigurationVersion*>(pIBaseClass);
 		if (!pIMachineConfigurationVersion)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pBaseCurrentInstance = pIMachineConfigurationVersion->CreateNewVersion(sXMLString, sUserUUID);
+		pBaseCurrentInstance = pIMachineConfigurationVersion->CreateNewVersion(sXMLString, sUserUUID, sName);
 
 		*pCurrentInstance = (IBase*)(pBaseCurrentInstance);
 		return LIBMCDATA_SUCCESS;
@@ -8561,7 +9818,7 @@ LibMCDataResult libmcdata_machineconfigurationversion_createnewversion(LibMCData
 	}
 }
 
-LibMCDataResult libmcdata_machineconfigurationversion_migratetonewxsd(LibMCData_MachineConfigurationVersion pMachineConfigurationVersion, LibMCData_MachineConfigurationXSD pNewXSD, const char * pXMLString, const char * pUserUUID, LibMCData_MachineConfigurationVersion * pCurrentInstance)
+LibMCDataResult libmcdata_machineconfigurationversion_migratetonewxsd(LibMCData_MachineConfigurationVersion pMachineConfigurationVersion, LibMCData_MachineConfigurationXSD pNewXSD, const char * pXMLString, const char * pUserUUID, const char * pName, LibMCData_MachineConfigurationVersion * pCurrentInstance)
 {
 	IBase* pIBaseClass = (IBase *)pMachineConfigurationVersion;
 
@@ -8569,6 +9826,8 @@ LibMCDataResult libmcdata_machineconfigurationversion_migratetonewxsd(LibMCData_
 		if (pXMLString == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pUserUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pCurrentInstance == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
@@ -8579,12 +9838,13 @@ LibMCDataResult libmcdata_machineconfigurationversion_migratetonewxsd(LibMCData_
 		
 		std::string sXMLString(pXMLString);
 		std::string sUserUUID(pUserUUID);
+		std::string sName(pName);
 		IBase* pBaseCurrentInstance(nullptr);
 		IMachineConfigurationVersion* pIMachineConfigurationVersion = dynamic_cast<IMachineConfigurationVersion*>(pIBaseClass);
 		if (!pIMachineConfigurationVersion)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pBaseCurrentInstance = pIMachineConfigurationVersion->MigrateToNewXSD(pINewXSD, sXMLString, sUserUUID);
+		pBaseCurrentInstance = pIMachineConfigurationVersion->MigrateToNewXSD(pINewXSD, sXMLString, sUserUUID, sName);
 
 		*pCurrentInstance = (IBase*)(pBaseCurrentInstance);
 		return LIBMCDATA_SUCCESS;
@@ -9678,6 +10938,56 @@ LibMCDataResult libmcdata_datamodel_initialisedatabase(LibMCData_DataModel pData
 	}
 }
 
+LibMCDataResult libmcdata_datamodel_settelemetryenabled(LibMCData_DataModel pDataModel, bool bTelemetryEnabled)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIDataModel->SetTelemetryEnabled(bTelemetryEnabled);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_gettelemetryenabled(LibMCData_DataModel pDataModel, bool * pTelemetryEnabled)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pTelemetryEnabled == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pTelemetryEnabled = pIDataModel->GetTelemetryEnabled();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_datamodel_getdatamodelversion(LibMCData_DataModel pDataModel, LibMCData_uint32 * pVersion)
 {
 	IBase* pIBaseClass = (IBase *)pDataModel;
@@ -9991,6 +11301,65 @@ LibMCDataResult libmcdata_datamodel_createloginhandler(LibMCData_DataModel pData
 	}
 }
 
+LibMCDataResult libmcdata_datamodel_createtelemetrysession(LibMCData_DataModel pDataModel, LibMCData_TelemetrySession * pTelemetrySessionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pTelemetrySessionInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseTelemetrySessionInstance(nullptr);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseTelemetrySessionInstance = pIDataModel->CreateTelemetrySession();
+
+		*pTelemetrySessionInstance = (IBase*)(pBaseTelemetrySessionInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_createtelemetryreader(LibMCData_DataModel pDataModel, const char * pJournalUUID, LibMCData_TelemetryReader * pTelemetryReader)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pJournalUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pTelemetryReader == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sJournalUUID(pJournalUUID);
+		IBase* pBaseTelemetryReader(nullptr);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseTelemetryReader = pIDataModel->CreateTelemetryReader(sJournalUUID);
+
+		*pTelemetryReader = (IBase*)(pBaseTelemetryReader);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_datamodel_createpersistencyhandler(LibMCData_DataModel pDataModel, LibMCData_PersistencyHandler * pPersistencyHandler)
 {
 	IBase* pIBaseClass = (IBase *)pDataModel;
@@ -10006,6 +11375,62 @@ LibMCDataResult libmcdata_datamodel_createpersistencyhandler(LibMCData_DataModel
 		pBasePersistencyHandler = pIDataModel->CreatePersistencyHandler();
 
 		*pPersistencyHandler = (IBase*)(pBasePersistencyHandler);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_createuserpreferencehandler(LibMCData_DataModel pDataModel, LibMCData_UserPreferenceHandler * pUserPreferenceHandler)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pUserPreferenceHandler == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseUserPreferenceHandler(nullptr);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseUserPreferenceHandler = pIDataModel->CreateUserPreferenceHandler();
+
+		*pUserPreferenceHandler = (IBase*)(pBaseUserPreferenceHandler);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_createsessionmetricshandler(LibMCData_DataModel pDataModel, LibMCData_SessionMetricsHandler * pSessionMetricsHandler)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pSessionMetricsHandler == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseSessionMetricsHandler(nullptr);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseSessionMetricsHandler = pIDataModel->CreateSessionMetricsHandler();
+
+		*pSessionMetricsHandler = (IBase*)(pBaseSessionMetricsHandler);
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
@@ -10406,6 +11831,52 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_alertsession_retrievealerts;
 	if (sProcName == "libmcdata_alertsession_retrievealertsbytype") 
 		*ppProcAddress = (void*) &libmcdata_alertsession_retrievealertsbytype;
+	if (sProcName == "libmcdata_alertsession_getalertheadid") 
+		*ppProcAddress = (void*) &libmcdata_alertsession_getalertheadid;
+	if (sProcName == "libmcdata_alertsession_retrievealertschangedsince") 
+		*ppProcAddress = (void*) &libmcdata_alertsession_retrievealertschangedsince;
+	if (sProcName == "libmcdata_telemetrysession_getsessionuuid") 
+		*ppProcAddress = (void*) &libmcdata_telemetrysession_getsessionuuid;
+	if (sProcName == "libmcdata_telemetrysession_createchannelindb") 
+		*ppProcAddress = (void*) &libmcdata_telemetrysession_createchannelindb;
+	if (sProcName == "libmcdata_telemetrysession_writetelemetrychunk") 
+		*ppProcAddress = (void*) &libmcdata_telemetrysession_writetelemetrychunk;
+	if (sProcName == "libmcdata_telemetrychunkdata_getchunkindex") 
+		*ppProcAddress = (void*) &libmcdata_telemetrychunkdata_getchunkindex;
+	if (sProcName == "libmcdata_telemetrychunkdata_getstarttimestamp") 
+		*ppProcAddress = (void*) &libmcdata_telemetrychunkdata_getstarttimestamp;
+	if (sProcName == "libmcdata_telemetrychunkdata_getendtimestamp") 
+		*ppProcAddress = (void*) &libmcdata_telemetrychunkdata_getendtimestamp;
+	if (sProcName == "libmcdata_telemetrychunkdata_getentrycount") 
+		*ppProcAddress = (void*) &libmcdata_telemetrychunkdata_getentrycount;
+	if (sProcName == "libmcdata_telemetrychunkdata_getentries") 
+		*ppProcAddress = (void*) &libmcdata_telemetrychunkdata_getentries;
+	if (sProcName == "libmcdata_telemetryreader_getsessionuuid") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_getsessionuuid;
+	if (sProcName == "libmcdata_telemetryreader_getstarttime") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_getstarttime;
+	if (sProcName == "libmcdata_telemetryreader_getlifetimeinmicroseconds") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_getlifetimeinmicroseconds;
+	if (sProcName == "libmcdata_telemetryreader_getchannelcount") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_getchannelcount;
+	if (sProcName == "libmcdata_telemetryreader_getchannelinformation") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_getchannelinformation;
+	if (sProcName == "libmcdata_telemetryreader_findchannelbyidentifier") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_findchannelbyidentifier;
+	if (sProcName == "libmcdata_telemetryreader_getchunkcount") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_getchunkcount;
+	if (sProcName == "libmcdata_telemetryreader_getchunkinformation") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_getchunkinformation;
+	if (sProcName == "libmcdata_telemetryreader_readchunkdata") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_readchunkdata;
+	if (sProcName == "libmcdata_telemetryreader_findchunksintimerange") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_findchunksintimerange;
+	if (sProcName == "libmcdata_telemetryreader_queryintervals") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_queryintervals;
+	if (sProcName == "libmcdata_telemetryreader_queryinstantmarkers") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_queryinstantmarkers;
+	if (sProcName == "libmcdata_telemetryreader_getchannelstatistics") 
+		*ppProcAddress = (void*) &libmcdata_telemetryreader_getchannelstatistics;
 	if (sProcName == "libmcdata_journalchunkintegerdata_getchunkindex") 
 		*ppProcAddress = (void*) &libmcdata_journalchunkintegerdata_getchunkindex;
 	if (sProcName == "libmcdata_journalchunkintegerdata_getstarttimestamp") 
@@ -10682,6 +12153,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_buildjob_retrievebuildjobexecutions;
 	if (sProcName == "libmcdata_buildjob_retrievebuildjobexecutionsbystatus") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_retrievebuildjobexecutionsbystatus;
+	if (sProcName == "libmcdata_buildjob_getincrementalid") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_getincrementalid;
 	if (sProcName == "libmcdata_buildjobiterator_getcurrentjob") 
 		*ppProcAddress = (void*) &libmcdata_buildjobiterator_getcurrentjob;
 	if (sProcName == "libmcdata_buildjobhandler_createjob") 
@@ -10702,6 +12175,14 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_buildjobhandler_retrievejobexecution;
 	if (sProcName == "libmcdata_buildjobhandler_listjobexecutions") 
 		*ppProcAddress = (void*) &libmcdata_buildjobhandler_listjobexecutions;
+	if (sProcName == "libmcdata_buildjobhandler_getbuildlistheadid") 
+		*ppProcAddress = (void*) &libmcdata_buildjobhandler_getbuildlistheadid;
+	if (sProcName == "libmcdata_buildjobhandler_getexecutionlistheadid") 
+		*ppProcAddress = (void*) &libmcdata_buildjobhandler_getexecutionlistheadid;
+	if (sProcName == "libmcdata_buildjobhandler_listjobschangedsince") 
+		*ppProcAddress = (void*) &libmcdata_buildjobhandler_listjobschangedsince;
+	if (sProcName == "libmcdata_buildjobhandler_listjobexecutionschangedsince") 
+		*ppProcAddress = (void*) &libmcdata_buildjobhandler_listjobexecutionschangedsince;
 	if (sProcName == "libmcdata_userlist_count") 
 		*ppProcAddress = (void*) &libmcdata_userlist_count;
 	if (sProcName == "libmcdata_userlist_getuserproperties") 
@@ -10752,6 +12233,14 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_loginhandler_setuserpasswordbyuuid;
 	if (sProcName == "libmcdata_loginhandler_getactiveusers") 
 		*ppProcAddress = (void*) &libmcdata_loginhandler_getactiveusers;
+	if (sProcName == "libmcdata_loginhandler_createloginsession") 
+		*ppProcAddress = (void*) &libmcdata_loginhandler_createloginsession;
+	if (sProcName == "libmcdata_loginhandler_updateloginsessionauthentication") 
+		*ppProcAddress = (void*) &libmcdata_loginhandler_updateloginsessionauthentication;
+	if (sProcName == "libmcdata_loginhandler_updateloginsessionactivity") 
+		*ppProcAddress = (void*) &libmcdata_loginhandler_updateloginsessionactivity;
+	if (sProcName == "libmcdata_loginhandler_deactivateloginsession") 
+		*ppProcAddress = (void*) &libmcdata_loginhandler_deactivateloginsession;
 	if (sProcName == "libmcdata_persistencyhandler_haspersistentparameter") 
 		*ppProcAddress = (void*) &libmcdata_persistencyhandler_haspersistentparameter;
 	if (sProcName == "libmcdata_persistencyhandler_getpersistentparameterdetails") 
@@ -10780,6 +12269,16 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentintegerparameter;
 	if (sProcName == "libmcdata_persistencyhandler_retrievepersistentboolparameter") 
 		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentboolparameter;
+	if (sProcName == "libmcdata_userpreferencehandler_hasuserpreference") 
+		*ppProcAddress = (void*) &libmcdata_userpreferencehandler_hasuserpreference;
+	if (sProcName == "libmcdata_userpreferencehandler_retrieveuserpreference") 
+		*ppProcAddress = (void*) &libmcdata_userpreferencehandler_retrieveuserpreference;
+	if (sProcName == "libmcdata_userpreferencehandler_storeuserpreference") 
+		*ppProcAddress = (void*) &libmcdata_userpreferencehandler_storeuserpreference;
+	if (sProcName == "libmcdata_userpreferencehandler_deleteuserpreference") 
+		*ppProcAddress = (void*) &libmcdata_userpreferencehandler_deleteuserpreference;
+	if (sProcName == "libmcdata_sessionmetricshandler_addfrontendmetrics") 
+		*ppProcAddress = (void*) &libmcdata_sessionmetricshandler_addfrontendmetrics;
 	if (sProcName == "libmcdata_machineconfigurationversion_getversionuuid") 
 		*ppProcAddress = (void*) &libmcdata_machineconfigurationversion_getversionuuid;
 	if (sProcName == "libmcdata_machineconfigurationversion_getxsduuid") 
@@ -10788,6 +12287,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_machineconfigurationversion_getnumericversion;
 	if (sProcName == "libmcdata_machineconfigurationversion_getparentuuid") 
 		*ppProcAddress = (void*) &libmcdata_machineconfigurationversion_getparentuuid;
+	if (sProcName == "libmcdata_machineconfigurationversion_getname") 
+		*ppProcAddress = (void*) &libmcdata_machineconfigurationversion_getname;
 	if (sProcName == "libmcdata_machineconfigurationversion_getconfigurationxmlstring") 
 		*ppProcAddress = (void*) &libmcdata_machineconfigurationversion_getconfigurationxmlstring;
 	if (sProcName == "libmcdata_machineconfigurationversion_getuseruuid") 
@@ -10856,6 +12357,10 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_installationinformation_getbasetempdirectory;
 	if (sProcName == "libmcdata_datamodel_initialisedatabase") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_initialisedatabase;
+	if (sProcName == "libmcdata_datamodel_settelemetryenabled") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_settelemetryenabled;
+	if (sProcName == "libmcdata_datamodel_gettelemetryenabled") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_gettelemetryenabled;
 	if (sProcName == "libmcdata_datamodel_getdatamodelversion") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_getdatamodelversion;
 	if (sProcName == "libmcdata_datamodel_getinstallationinformation") 
@@ -10876,8 +12381,16 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_datamodel_createalertsession;
 	if (sProcName == "libmcdata_datamodel_createloginhandler") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_createloginhandler;
+	if (sProcName == "libmcdata_datamodel_createtelemetrysession") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_createtelemetrysession;
+	if (sProcName == "libmcdata_datamodel_createtelemetryreader") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_createtelemetryreader;
 	if (sProcName == "libmcdata_datamodel_createpersistencyhandler") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_createpersistencyhandler;
+	if (sProcName == "libmcdata_datamodel_createuserpreferencehandler") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_createuserpreferencehandler;
+	if (sProcName == "libmcdata_datamodel_createsessionmetricshandler") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_createsessionmetricshandler;
 	if (sProcName == "libmcdata_datamodel_setbasetempdirectory") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_setbasetempdirectory;
 	if (sProcName == "libmcdata_datamodel_getbasetempdirectory") 

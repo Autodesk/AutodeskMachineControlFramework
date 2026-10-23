@@ -260,7 +260,10 @@ IJSONObject * CJSONArray::AddObjectValue()
 
 	jsonValue.SetObject();
 
-	auto pMember = &m_pInstance->PushBack(jsonValue, m_pDocument->GetAllocator());
+	m_pInstance->PushBack(jsonValue, m_pDocument->GetAllocator());
+
+	// Get pointer to the newly added element (last element in array)
+	auto pMember = &(*m_pInstance)[m_pInstance->Size() - 1];
 
 	return new CJSONObject(m_pDocument, pMember);
 }
@@ -271,7 +274,10 @@ IJSONArray * CJSONArray::AddArrayValue()
 
 	jsonValue.SetArray();
 
-	auto pMember = &m_pInstance->PushBack(jsonValue, m_pDocument->GetAllocator());
+	m_pInstance->PushBack(jsonValue, m_pDocument->GetAllocator());
+
+	// Get pointer to the newly added element (last element in array)
+	auto pMember = &(*m_pInstance)[m_pInstance->Size() - 1];
 
 	return new CJSONArray(m_pDocument, pMember);
 }

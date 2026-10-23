@@ -50,9 +50,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPI::CAPI()
+CAPI::CAPI(AMCCommon::PChrono pGlobalChrono, LibMCData::PDataModel pDataModel)
 {
-	m_pSessionHandler = std::make_shared<CAPISessionHandler>();
+	m_pSessionHandler = std::make_shared<CAPISessionHandler>(pGlobalChrono, pDataModel);
 }
 
 CAPI::~CAPI()

@@ -34,17 +34,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_parameterhandler.hpp"
 #include "amc_ui_frontenddefinition.hpp"
+#include "amc_ui_frontendsnapshot.hpp"
+#include "amc_jsoneventstreaminstance.hpp"
 
 #include "common_chrono.hpp"
 
+#include <functional>
+#include <mutex>
+
 namespace AMC {
 
-	class CUIFrontendState {
+	class CUserInformation;
+	typedef std::shared_ptr<CUserInformation> PUserInformation;
+
+	class CAccessControl;
+	typedef std::shared_ptr<CAccessControl> PAccessControl;
+
+	class CUIFrontendState : public CUIExpressionSessionContext {
 	private:
 
 		PParameterHandler m_pLegacyParameterHandler;
 	
 		PUIFrontendDefinition m_pFrontendDefinition;
+
+		std::mutex m_SessionMutex;
+		PParameterGroup m_pSessionVariables;
+		uint64_t m_nAppliedBroadcastCounter;
+
+		std::string m_sSessionUUID;
+		PUserInformation m_pUserInformation;
+		PAccessControl m_pAccessControl;
+
+		CUIFrontendRevisionLog m_RevisionLog;
+
+		std::mutex m_EventStreamMutex;
+		PJSONEventStreamInstance m_pEventStream;
+
+		// Returns the session variable group after applying broadcasts that arrived since the last access.
+		CParameterGroup* getSessionVariables();
+
+		CParameterGroup* findSessionVariableGroup(const std::string& sName);
+
+		std::string evaluateBuiltinReference(const std::string& sReference);
 
 	public:
 
@@ -54,11 +85,47 @@ namespace AMC {
 
 		PParameterHandler getLegacyParameterHandler ();
 
-		void writeModuleAttributesToJSON(CJSONWriter& writer, CJSONWriterObject &attributesObject, CUIFrontendDefinitionModuleStore * pModuleStore, CStateMachineData* pStateMachineData);
+		void setSessionIdentity(const std::string& sSessionUUID, PUserInformation pUserInformation, PAccessControl pAccessControl);
+
+		CUIFrontendRevisionLog& getRevisionLog();
+
+		// Returns the session's event stream. Calls createStream if there is none or the previous one has ended.
+		PJSONEventStreamInstance getOrCreateEventStream(const std::function<PJSONEventStreamInstance()>& createStream);
+
+		// Ends and releases the session's event stream, if any. Must be called when the session closes,
+		// since the stream keeps a reference to the session's authentication.
+		void endEventStream();
+
+		bool hasSessionVariable(const std::string& sName);
+
+		std::string getSessionVariable(const std::string& sName);
+		std::string getSessionVariableAsUUID(const std::string& sName);
+		double getSessionVariableAsDouble(const std::string& sName);
+		int64_t getSessionVariableAsInteger(const std::string& sName);
+		bool getSessionVariableAsBool(const std::string& sName);
+
+		void setSessionVariable(const std::string& sName, const std::string& sValue);
+		void setSessionVariableAsUUID(const std::string& sName, const std::string& sValue);
+		void setSessionVariableAsDouble(const std::string& sName, double dValue);
+		void setSessionVariableAsInteger(const std::string& sName, int64_t nValue);
+		void setSessionVariableAsBool(const std::string& sName, bool bValue);
+
+		virtual std::string evaluateSessionReference(const std::string& sReference) override;
+		virtual bool evaluateSessionReferenceAsBool(const std::string& sReference) override;
+		virtual int64_t evaluateSessionReferenceAsInteger(const std::string& sReference) override;
+		virtual double evaluateSessionReferenceAsNumber(const std::string& sReference) override;
+
+		// Throws if a session reference is malformed, refers to an undeclared session variable or an unknown permission.
+		static void validateSessionReference(const std::string& sReference, CUIFrontendDefinition* pFrontendDefinition, CAccessControl* pAccessControl);
+
+		void writeModuleAttributesToJSON(CJSONWriter& writer, CJSONWriterObject &attributesObject, CUIFrontendDefinitionModuleStore * pModuleStore, CStateMachineData* pStateMachineData, const sUIFrontendBuildEpoch& epoch);
+
+		// Recursive serialization: writes moduletype, uuid, attributes, and submodules (if children exist).
+		// The definition tree owns the hierarchy; the stores hold flat attribute values.
+		void writeModuleStoreToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CUIFrontendDefinitionModuleStore* pModuleStore, CStateMachineData* pStateMachineData, const sUIFrontendBuildEpoch& epoch);
 
 	};
 
 }
 
 #endif //__AMC_UI_FRONTENDSTATE
-

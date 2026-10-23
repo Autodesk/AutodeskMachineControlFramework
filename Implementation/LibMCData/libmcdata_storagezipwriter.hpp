@@ -35,6 +35,7 @@ Abstract: This is the class declaration of CStorageZIPWriter
 #ifndef __LIBMCDATA_STORAGEZIPWRITER
 #define __LIBMCDATA_STORAGEZIPWRITER
 
+#include <cstdint>
 #include "libmcdata_interfaces.hpp"
 
 // Parent classes

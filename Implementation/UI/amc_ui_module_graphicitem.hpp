@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_GRAPHICITEM
 #define __AMC_UI_MODULE_GRAPHICITEM
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -41,6 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Libraries/PugiXML/pugixml.hpp"
 #include "amc_jsonwriter.hpp"
 #include "amc_ui_module_item.hpp"
+#include "amc_ui_frontenddefinition.hpp"
+#include "amc_ui_frontendstate.hpp"
+#include "amc_ui_expression.hpp"
 
 namespace AMC {
 
@@ -58,6 +62,8 @@ namespace AMC {
 	
 		std::string m_sUUID;
 		std::string m_sItemName;
+
+		PUIFrontendDefinitionModuleStore m_pItemModuleStore;
 		
 	public:
 
@@ -67,12 +73,24 @@ namespace AMC {
 
 		virtual std::string getUUID () override;
 
-		virtual void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
 		// Returns all UUIDs that could be contained in this Item
 		virtual std::list <std::string> getReferenceUUIDs();
 
 		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
+
+		/////////////////////////////////////////////////////////////////////////////////////
+		// New UI Frontend System
+		/////////////////////////////////////////////////////////////////////////////////////
+
+		void initFrontendModuleStore(CUIFrontendDefinition* pFrontendDefinition);
+		virtual void registerFrontendAttributes();
+		virtual std::string getItemType();
+
+		// Returns the v2 frontend module store of this item, or nullptr if it has not been initialized.
+		PUIFrontendDefinitionModuleStore getFrontendModuleStore();
+
+		PUIFrontendDefinitionAttribute registerItemStringAttribute(const std::string& sName, const CUIExpression& expression);
+		PUIFrontendDefinitionAttribute registerItemNumberAttribute(const std::string& sName, const CUIExpression& expression);
 
 	};
 

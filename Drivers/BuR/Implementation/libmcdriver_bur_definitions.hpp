@@ -76,6 +76,7 @@ namespace Impl {
         ftDInt = 3,
         ftBool = 4,
         ftReal = 5,
+        ftSInt = 6,
     };
 
     class ITimeStampGenerator {
@@ -207,6 +208,25 @@ namespace Impl {
 
     };
 
+
+
+    class CDriver_BuRSIntValue : public CDriver_BuRValue {
+    protected:
+        int64_t m_nValue;
+
+    public:
+
+        CDriver_BuRSIntValue(const std::string& sName, const std::string& sDescription, const uint32_t nAddress);
+
+        ePLCFieldType getFieldType() override;
+
+        PDriver_BuRValue duplicate() override;
+
+        void setIntegerValue(uint64_t nValue) override;
+
+        void writeToPayload(sAMCFToPLCPacketPayload& payLoad) override;
+
+    };
 
 
     class CDriver_BuRBoolValue : public CDriver_BuRValue {

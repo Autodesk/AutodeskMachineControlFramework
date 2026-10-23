@@ -30,14 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_api_handler_logs.hpp"
 #include "libmc_interfaceexception.hpp"
+#include "amc_loggerentry.hpp"
 
 #include <vector>
 #include <memory>
 #include <string>
-#include <iostream>
-
 
 using namespace AMC;
+
+#define APIHANDLER_LOGS_MAXENTRIES 128
 
 CAPIHandler_Logs::CAPIHandler_Logs(PLogger pLogger, const std::string& sClientHash)
 	: CAPIHandler (sClientHash), m_pLogger (pLogger)
@@ -56,24 +57,60 @@ std::string CAPIHandler_Logs::getBaseURI ()
 {
 	return "api/logs";
 }
-		
+
+void CAPIHandler_Logs::handleListLogsRequest(CJSONWriter& writer, uint32_t nStartID)
+{
+	CJSONWriterArray logArray(writer);
+
+	if (m_pLogger->supportsLogMessagesRetrieval()) {
+		uint32_t nHeadID = m_pLogger->getLogMessageHeadID();
+
+		uint32_t nEndID = nHeadID;
+		if (nStartID == 0) {
+			// No startID: return latest entries
+			nStartID = (nEndID > APIHANDLER_LOGS_MAXENTRIES) ? (nEndID - APIHANDLER_LOGS_MAXENTRIES) : 0;
+		}
+
+		if (nStartID < nEndID) {
+			std::vector<CLoggerEntry> logEntries;
+			m_pLogger->retrieveLogMessages(logEntries, nStartID, nEndID, eLogLevel::Message);
+
+			for (auto& entry : logEntries) {
+				CJSONWriterObject entryObject(writer);
+				entryObject.addInteger("id", entry.getID());
+				entryObject.addString("subsystem", entry.getSubSystem());
+				entryObject.addString("timestamp", entry.getTimeStamp());
+				entryObject.addString("message", entry.getMessage());
+				entryObject.addString("loglevel", entry.getlogLevelString());
+				logArray.addObject(entryObject);
+			}
+		}
+	}
+
+	writer.addArray("logentries", logArray);
+}
+
+
 PAPIResponse CAPIHandler_Logs::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
-	std::cout << sURI << std::endl;
-
 	if (requestType == eAPIRequestType::rtGet) {
-		std::string sURIParam = sURI.substr(9); // remove "api/logs/" from the URI...
+		// Parse optional startID from URI: api/logs or api/logs/{startID}
+		std::string sURIParam = sURI.substr(8); // remove "api/logs" from the URI
+		if (!sURIParam.empty() && sURIParam[0] == '/')
+			sURIParam = sURIParam.substr(1);
 
-		uint32_t maxLogEntries = 32;
 		uint32_t nStartID = 0;
-		if (sURIParam.length() > 0) {
+		if (!sURIParam.empty()) {
 			nStartID = std::stoul(sURIParam);
 		}
 
+		CJSONWriter writer;
+		writeJSONHeader(writer, AMC_API_PROTOCOL_LOGS);
+		handleListLogsRequest(writer, nStartID);
+		return std::make_shared<CAPIStringResponse>(AMC_API_HTTP_SUCCESS, AMC_API_CONTENTTYPE, writer.saveToString());
 	}
 
-
-	return nullptr;
+	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 }
 
 		

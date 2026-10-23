@@ -283,7 +283,7 @@ IVideoDevice* CDriver_Camera_Windows::OpenVideoDevice(const std::string& sIdenti
     if (iIter != m_VideoDeviceIdentifierMap.end())
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_CAMERAIDENTIFIERALREADYREGISTERED, "camera identifier already registered: " + sIdentifier);
 
-    auto pDeviceInstance = std::make_shared<CVideoDeviceInstance_Win32> (sIdentifier, sOSName, sFriendlyName);
+    auto pDeviceInstance = std::make_shared<CVideoDeviceInstance_Win32> (sIdentifier, sOSName, sFriendlyName, m_pDriverEnvironment);
 
     m_VideoDeviceIdentifierMap.insert(std::make_pair (sIdentifier, pDeviceInstance));
     m_VideoDeviceOSNameMap.insert(std::make_pair (sOSName, pDeviceInstance));

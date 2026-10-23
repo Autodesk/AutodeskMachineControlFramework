@@ -45,6 +45,9 @@ Abstract: This is the class declaration of CUniformJournalSampling
 #endif
 
 // Include custom headers here.
+#include "amc_statejournal.hpp"
+#include <vector>
+#include <string>
 
 
 namespace LibMCEnv {
@@ -58,26 +61,16 @@ namespace Impl {
 class CUniformJournalSampling : public virtual IUniformJournalSampling, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+	std::string m_sVariableName;
+	LibMCEnv_uint64 m_nStartTimeStamp;
+	LibMCEnv_uint64 m_nEndTimeStamp;
+	std::vector<AMC::sJournalEnvelopeSample> m_Samples;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CUniformJournalSampling(const std::string& sVariableName, LibMCEnv_uint64 nStartTimeStamp, LibMCEnv_uint64 nEndTimeStamp, const std::vector<AMC::sJournalEnvelopeSample>& samples);
 
-
-	/**
-	* Public member functions to implement.
-	*/
+	virtual ~CUniformJournalSampling();
 
 	std::string GetVariableName() override;
 
@@ -90,6 +83,8 @@ public:
 	void GetSample(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 & nTimeStamp, LibMCEnv_double & dValue) override;
 
 	void GetAllSamples(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEntry* pSamplesBuffer) override;
+
+	void GetAllSamplesWithBounds(LibMCEnv_uint64 nSamplesBufferSize, LibMCEnv_uint64* pSamplesNeededCount, LibMCEnv::sTimeStreamEnvelopeEntry* pSamplesBuffer) override;
 
 };
 

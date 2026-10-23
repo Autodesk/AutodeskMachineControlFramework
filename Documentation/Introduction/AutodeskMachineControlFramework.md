@@ -284,14 +284,140 @@ As those are many configurations, in order to balance complexity with the need o
 
 ### 1.3. Modular Architecture and the need for a Client-Server system
 
-There are a lot of ways and opinions how one could define a modular architecture. 
+There are many interpretations of "modular architecture", but in AMCF the meaning is practical: each part of the system should be replaceable or extensible without rewriting the entire stack. A machine builder should be able to swap a driver, add a new build strategy, or customize the operator workflow while keeping safety logic, scheduling, and API contracts intact. Modularity only exists if separation of concerns is enforced by clear boundaries, stable interfaces, and explicit data ownership. This reduces integration risk, accelerates vendor onboarding, and prevents long-term drift between UI and machine behavior.
+
+At the highest level, AMCF is organized into three layers: a deterministic core server that owns state, scheduling, and safety-relevant decisions; a client layer that renders the UI and communicates over a stable API; and a plugin/driver layer that integrates hardware and process logic. Each layer is independently replaceable as long as its interface contract is respected. The server is the single source of truth, the client is a consumer and operator interface, and the plugin layer is the only place that should know about proprietary device details.
+
+This structure naturally leads to a client-server architecture. In industrial control systems, the UI is only one of several consumers of machine state and services. Other consumers include automated test harnesses, remote service tools, analytics pipelines, and manufacturing execution systems (MES). A client-server design formalizes that all machine functionality is exposed as a service usable by any authorized client. This is critical for integration with factory ecosystems, for multi-client access, and for consistent behavior across different deployment contexts.
+
+The server is designed to run headless with identical behavior whether a UI is attached or not. It can run on an industrial PC, a rack-mounted server, or a virtualized environment for simulation and testing. Clients can be local (HMI), remote (service), or distributed. Because the server owns state and arbitrates actions, multiple clients can connect simultaneously without introducing inconsistent behavior. The server validates all actions under the same safety and scheduling constraints, ensuring that client diversity does not compromise correctness.
+
+The client-server split also prevents tight coupling between UI logic and machine logic. In tightly coupled systems, UI features become de facto control logic and are hard to test or reuse. AMCF enforces that control actions are implemented in the server and exposed via API endpoints. The UI does not "own" functionality; it only presents it. This keeps control logic testable with automated clients and makes UI redesigns low risk with respect to core machine behavior.
+
+Determinism and safety are major reasons to keep the server authoritative. Machine control requires predictable timing, state transitions, and interlocks. The server enforces these constraints without being affected by UI latency or network variability. By isolating timing-sensitive logic in the server, AMCF ensures safety-critical transitions execute under controlled conditions.
+
+The plugin and driver layer is the mechanism that localizes hardware differences. Machines vary in sensors, actuators, motion controllers, scanners, cameras, and safety devices. AMCF isolates hardware integration into drivers and plugin interfaces so machine builders can tailor their hardware stack without modifying the core. Vendor-specific SDKs or protocols belong here, not in the server or client. This keeps the server stable and makes new hardware onboarding a localized change rather than a system-wide refactor.
+
+Because drivers and plugins are modular, they can be tested in isolation. Simulation drivers can provide deterministic responses for unit and integration tests, and process logic can be exercised without real hardware. The same API surface used in production is used in tests, which reduces the need for custom harnesses and makes test results representative. A simulated server can also support UI development and regression testing without constant access to a physical machine.
+
+From a deployment and operations perspective, the client-server model separates update cycles. UI features often evolve faster than core machine logic, so a workflow or dashboard can ship without touching the server. Conversely, a server security or safety patch can be deployed without rebuilding the UI, reducing downtime and validation effort.
+
+Scalability, security, and resilience also improve. As machines become more connected, a server with a single authoritative state can serve multiple clients with controlled permissions. Authentication and authorization are enforced in one place, and client commands are validated as untrusted input. If a UI disconnects or a network link fails, the server continues operating safely and clients can recover state through the API.
+
+In practice, the architecture supports common deployment patterns without special cases:
+
+- Local HMI with server on the same machine for low-latency control.
+- Remote UI clients over a network for monitoring and service.
+- Headless server operation with automated clients or scripts for testing and integration.
+
+All of these use the same API contract, which makes them predictable and easier to maintain.
+
+Finally, modularity is essential for long-term evolution. Machines often live for decades, while UI technologies and hardware components evolve quickly. A stable server with versioned interfaces allows new clients, plugins, and drivers to evolve independently. This is a strategy for managing change across the lifetime of a machine, not just a technical preference.
+
+In summary, AMCF’s modular architecture provides strong boundaries between control logic, hardware integration, and user interaction. The client-server split enables determinism, safety, multi-client support, independent updates, robust testing, and long-term maintainability. It allows AMCF to function as a platform rather than a single-purpose application, supporting diverse machines and workflows while keeping the core stable and reliable.
 
 ### 1.4. Plugin mechanism and choice of programming language
 
+Every machine is a specialized system. The framework therefore exposes extension points for:
+
+- Drivers (hardware connectivity)
+- Process logic (build strategies, motion sequences)
+- UI modules (custom operator workflows)
+
+AMCF standardizes these extension points with a strict interface contract rather than ad hoc C++ headers. The contract is defined in XML and consumed by the Autodesk Component Toolkit (ACT), which generates the bindings, ABI headers, and wrapper code used across the framework. This is a deliberate design choice: interface definitions are treated as declarative specifications, while generated artifacts are treated as build outputs. Developers change the XML, regenerate, and then implement or consume the resulting interfaces. This avoids hand-crafted glue code, enforces consistency, and makes interface evolution explicit and auditable.
+
+ACT XML files live alongside the framework and drivers. Examples include `ACT/LibMCEnv.xml` for core environment interfaces, `SDK/ACT/LibAMCF.xml` for the public SDK, and `Drivers/*/ACT/LibMCDriver_*.xml` for hardware drivers. These XML files describe the library namespace, versioning, error codes, data types, and the classes and methods exposed by the component. XML is used because it is concise, diff-friendly, and easy to validate. It also scales well across different interface scopes: a core server API, a single driver, or a UI plugin can all be expressed with the same schema.
+
+The XML definition is the single source of truth for interface shape. It captures:
+
+- Library identity and version metadata (library name, namespace, base name).
+- Error codes and error descriptions to keep API behavior consistent.
+- Types, enums, and data structures shared across components.
+- Class and method signatures, including parameters and return values.
+- Import relationships between components, where one interface depends on another.
+
+From that XML, ACT generates the bindings and ABI layers that allow components to interact safely. In this repository, the generated output includes C and C++ headers, dynamic loader wrappers, ABI definitions, and language-specific bindings for the SDK. You can see these outputs in folders such as `Framework/HeadersCore`, `Framework/InterfacesCore`, `SDK/Headers`, and in each driver’s `Headers` and `Interfaces` directories. Generated source and header files are clearly marked as ACT output; they should not be edited directly. The workflow is always: edit the XML, run ACT to regenerate, and then update implementation code as needed.
+
+This approach also explains the choice of programming language. Plugins and drivers are implemented in C++ because machine control and hardware access require deterministic performance, tight memory control, and straightforward integration with existing SDKs. C++ also maps well onto the ABI layer that ACT generates. However, by using ACT-generated bindings, AMCF can expose those same interfaces to additional languages where appropriate, especially for higher-level integration and client tooling. The SDK includes bindings in multiple languages (for example C, C++, Python, and NodeJS), which makes it possible to integrate with external systems or build tooling without re-implementing the core logic. The interface surface remains the same because it is defined once in XML and re-generated for each target language.
+
+ACT is also what makes versioning and backward compatibility tractable. Because interfaces are declarative, changes can be reviewed in a single file and then propagated to all bindings in a controlled manner. This reduces the risk of ABI mismatches between the server, plugins, and clients. It also means that changes to error codes, types, or method signatures are visible and can be enforced during code review, which supports long-term maintainability and supports multiple platform builds without custom glue.
+
+For driver development, the XML approach is particularly valuable. A driver can import core components (for example `LibMCEnv`) to reuse shared types and services while defining only the driver-specific API. The generated headers provide a consistent interface to the server, while the implementation stays focused on vendor SDK integration and device-specific logic. This keeps driver code smaller and more predictable, and it avoids diverging conventions from one driver to the next. The same mechanism is used for UI plugins and process logic modules, which makes the overall plugin ecosystem easier to extend and document.
+
+In short, AMCF’s plugin mechanism depends on ACT as the interface definition and code generation layer. XML definitions make contracts explicit, reduce ambiguity, and allow consistent bindings across languages. C++ remains the primary implementation language for performance and control, while ACT-generated bindings open the ecosystem to other languages for integration, tooling, and client development. This combination gives AMCF both the low-level control required for machine operation and the flexibility needed for long-term platform growth.
+
 ### 1.5. The Hourglass pattern and Stable ABIs
+
+The hourglass model in AMCF is realized through ACT’s ABI strategy. At the top, you can have a rich, high-level class architecture: interfaces, inheritance, and structured types that make sense to an SDK user or driver author. At the bottom, you can have many different consumers and host environments that each want a simple, stable way to call into that architecture. The narrow middle is a plain C ABI that acts as the stable contract between them.
+
+ACT takes the declarative interface definition and generates a flat C DLL surface. Each class instance becomes a handle, and each method becomes a function that takes that handle plus serialized parameters. The C ABI uses standard error codes for all calls, which ensures a consistent failure model regardless of language or runtime. This layer is intentionally minimal: no C++ name mangling, no exceptions, no STL types, and no compiler-specific ABI details. The result is a binary interface that remains stable across compiler versions and across languages.
+
+On the consumer side, ACT-generated bindings reconstruct the richer class model. The C ABI functions are wrapped into language-native classes or interfaces, exposing idiomatic method calls, typed parameters, and resource lifetimes. From the point of view of a client, it feels like using a normal SDK. Under the hood, each call is routed through the C ABI, with error codes translated into language-native exceptions or return types. This "expand again" step is what preserves developer ergonomics while keeping the ABI compatible and predictable.
+
+The benefit of this pattern is that the complex class hierarchy is not the ABI; the ABI is the thin C layer. That means new languages can be supported by generating new wrappers without changing the core, and drivers or plugins compiled with older toolchains can keep working against newer servers as long as the C layer remains compatible. It also means that runtime loading becomes simple and uniform: every plugin is just a DLL with a defined set of exported C functions, and every consumer speaks the same function-level contract.
+
+This model also makes it straightforward to integrate proprietary third-party code. A plugin or driver can link against vendor SDKs, hardware libraries, or closed-source toolkits internally while exposing only the stable C ABI to the outside. The proprietary dependency stays encapsulated behind the handle-based interface, so the rest of the system does not have to understand or adapt to vendor-specific binaries, compilers, or error models. As long as the plugin respects the ABI contract, the core remains unaffected and stability is preserved.
+
+The hourglass approach helps manage change at different speeds. Vendor SDKs may update frequently, operating systems may add new requirements, and clients may demand new UX capabilities. Those changes can be absorbed at the edges without forcing a ripple through the system, because the middle remains narrow and stable. ACT’s generated C ABI becomes the governance point for compatibility, allowing the framework to enforce versioning, detect mismatches early, and keep older components operational during a transition.
+
+In practice, this means API boundaries are strict. Input and output types are explicit, error codes are formalized, and versioning is part of the design, not an afterthought. The narrow middle becomes a safe place to stand: a known set of behaviors that clients and drivers can trust. The wide edges remain free to innovate, but they do so by speaking the same stable language. Over time, this approach protects the system from fragmentation, keeps long-lived deployments supportable, and allows AMCF to grow in capability without sacrificing reliability.
 
 ### 1.6. API First Design guidelines and best practices
 
+API-first means the server API is the primary product surface, and everything else
+(UI, scripts, automation, and integrations) is a client of that API. If a feature
+is important for operators or external systems, it must be reachable through a
+documented endpoint. This keeps the behavior consistent across clients, reduces
+hidden state, and makes integration predictable. It also forces the team to think
+about stability and supportability before a feature ships.
+
+API-first has a few core implications for the framework. The server owns the
+domain model and state transitions; the UI only visualizes and orchestrates.
+Business rules live in the server API layer so that a button click and a remote
+integration call have the same effect. Features must be implemented as API
+capabilities first, then consumed by UI or plugins. This prevents UI-only logic,
+ensures testability, and avoids subtle discrepancies between local and remote
+operation.
+
+To keep the API reliable and evolvable, design endpoints as explicit contracts.
+Every request should return structured data and explicit error codes, never rely
+on ad-hoc text or ambiguous HTTP status mapping. Favor clear, typed payloads over
+deeply nested or under-specified blobs. When a request changes server state,
+make the operation explicit and document the required preconditions (e.g.,
+machine state, permissions, or resource locks). Where possible, design actions
+to be idempotent so clients can retry safely. Use pagination for lists, stable
+identifiers for resources, and consistent naming across endpoints.
+
+Versioning is non-negotiable. Any breaking change must be introduced as a new
+API version, with existing versions kept operational for a defined period. Add
+new fields in a backward-compatible way and avoid changing semantics of existing
+fields. Deprecate with a clear migration path, and document the planned removal
+window. This approach protects older UI packages and external integrations while
+allowing forward progress. In practice, API versioning should be reflected in
+endpoint paths and in the generated client bindings where applicable.
+
+Security and permissions must be enforced at the API boundary. Do not depend on
+UI behavior for access control. Every endpoint should validate permissions based
+on roles and session context, and return clear errors when access is denied. If
+an action has safety implications, the API should require explicit confirmation
+or a stronger permission scope, and that requirement should be documented.
+
+Observability is part of the contract. API calls should generate structured
+logs, meaningful error codes, and correlate with build/job identifiers when
+relevant. This makes it possible to trace behavior in the field and tie a
+failure to a specific build, configuration, or machine state. For long-running
+operations, provide status or progress endpoints and consistent polling or event
+mechanisms. Avoid hidden background tasks that cannot be queried or cancelled.
+
+Finally, design the API so it is pleasant to consume. Documentation should
+describe the purpose of each endpoint, the request and response models, and
+example payloads. Keep names consistent, provide clear field descriptions, and
+call out invariants. A simple rule is to treat the API docs as a first-class
+deliverable that changes in lockstep with the code. Tests should validate both
+success and failure cases, and new features should add API-level tests alongside
+implementation changes. When in doubt, ask: could a third-party integration
+reliably use this endpoint without reading the server code? If the answer is
+no, the API is not yet first-class.
 ### 1.7. Serialization principles, XML, JSON and binary storage
 
 ### 1.8. Resource handling and file access
@@ -304,6 +430,14 @@ There are a lot of ways and opinions how one could define a modular architecture
 
 ### 2.2. Using of git hashes in the core code
 
+The framework embeds git hashes into build artifacts to track provenance. This allows the machine operator and developer to identify the exact source revision of a running system, which is critical for:
+
+- Debugging field issues
+- Reproducing test results
+- Verifying compatibility of plugins and packages
+
+Build scripts store hashes in `build_<platform>/githash.txt` and package metadata, and the server exposes this information in its output folder and logs.
+
 ### 2.3. Stable APIs, Backwards compatibility and Data migration
 
 ### 2.4. Separation of Data and Logic and forward compatibilty.
@@ -311,6 +445,8 @@ There are a lot of ways and opinions how one could define a modular architecture
 ### 2.5. Package management, CI/CD and proper build pipelines.
 
 ### 2.6. Testing Framework
+
+Testing is integrated into the CMake build and includes both unit tests and system tests. The unit test framework in `Implementation/UnitTest` is built into the `amc_unittest` binary, while driver tests live under `Tests/<DriverName>Test`. Tests are expected to run against deterministic inputs and use simulation drivers where possible.
 
 ## 3. General Backend Architecture
 
@@ -485,4 +621,3 @@ There are a lot of ways and opinions how one could define a modular architecture
 # VII Tutorials
 
 # VIII AMCF REST API Documentation
-

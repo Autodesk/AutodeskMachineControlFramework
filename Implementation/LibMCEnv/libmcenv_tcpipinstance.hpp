@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __LIBMCDRIVER_TCPIPINSTANCE
 #define __LIBMCDRIVER_TCPIPINSTANCE
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <memory>

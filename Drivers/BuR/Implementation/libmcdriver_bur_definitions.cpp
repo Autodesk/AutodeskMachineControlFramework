@@ -252,6 +252,36 @@ void CDriver_BuRIntValue::writeToPayload(sAMCFToPLCPacketPayload& payLoad)
 }
 
 
+CDriver_BuRSIntValue::CDriver_BuRSIntValue(const std::string& sName, const std::string& sDescription, const uint32_t nAddress)
+    : CDriver_BuRValue(sName, sDescription, nAddress), m_nValue(0)
+{
+
+}
+
+ePLCFieldType CDriver_BuRSIntValue::getFieldType()
+{
+    return ePLCFieldType::ftSInt;
+}
+
+PDriver_BuRValue CDriver_BuRSIntValue::duplicate()
+{
+    auto pDuplicate = std::make_shared<CDriver_BuRSIntValue>(m_sName, m_sDescription, m_nAddress);
+    pDuplicate->m_nValue = m_nValue;
+    return pDuplicate;
+}
+
+void CDriver_BuRSIntValue::setIntegerValue(uint64_t nValue)
+{
+    m_nValue = nValue;
+}
+
+void CDriver_BuRSIntValue::writeToPayload(sAMCFToPLCPacketPayload& payLoad)
+{
+    uint8_t nValue = (uint8_t) m_nValue;
+    writeDataToPayload(payLoad, (uint8_t*)&nValue, sizeof(nValue));
+}
+
+
 CDriver_BuRBoolValue::CDriver_BuRBoolValue(const std::string& sName, const std::string& sDescription, const uint32_t nAddress)
     : CDriver_BuRValue(sName, sDescription, nAddress), m_bValue(false)
 {

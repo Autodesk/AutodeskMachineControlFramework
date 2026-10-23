@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error this header is protected and should only be included in the corresponding implementation CPP files.
 #endif
 
+#include "amc_ui_expression.hpp"
+
 namespace AMC {
 
 	amcDeclareDependingClass(CUIPage, PUIPage);
@@ -50,6 +52,8 @@ namespace AMC {
 		std::string m_sCaption;
 		std::string m_sEventName;
 		std::string m_sPageName;
+
+		CUIExpression m_Visible;
 
 	public:
 
@@ -64,6 +68,8 @@ namespace AMC {
 		std::string getEventName();
 		std::string getPageName();
 
+		void setVisibleExpression(const CUIExpression& visibleExpression);
+		CUIExpression& getVisibleExpression();
 				
 	};
 	

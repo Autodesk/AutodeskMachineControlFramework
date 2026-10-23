@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_API_JSONREQUEST
 #define __AMC_API_JSONREQUEST
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <map>
@@ -62,6 +63,7 @@ namespace AMC {
 		std::string getJSONObjectString (const std::string& sKeyName, uint32_t nErrorCode) const;
 		std::string getNameString(const std::string& sKeyName, uint32_t nErrorCode) const;
 		uint64_t getUint64 (const std::string& sKeyName, const uint64_t nMinValue, const uint64_t nMaxValue, uint32_t nErrorCode) const;
+		double getDouble (const std::string& sKeyName, uint32_t nErrorCode) const;
 		std::string getSHA256(const std::string& sKeyName, uint32_t nErrorCode) const;
 	};
 

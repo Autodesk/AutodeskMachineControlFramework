@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CJournalHandler
 #include "libmcenv_journalhandler_historic.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_journalvariable_historic.hpp"
+#include "libmcenv_telemetryhandler.hpp"
 
 // Include custom headers here.
 #include "libmcenv_datetime.hpp"
@@ -45,10 +46,14 @@ using namespace LibMCEnv::Impl;
  Class definition of CJournalHandler_Historic 
 **************************************************************************************************************************/
 
-CJournalHandler_Historic::CJournalHandler_Historic(AMC::PStateJournalReader pJournalReader)
-	: m_pJournalReader (pJournalReader)
+CJournalHandler_Historic::CJournalHandler_Historic(AMC::PStateJournalReader pJournalReader, LibMCData::PDataModel pDataModel, const std::string& sJournalUUID, AMCCommon::PChrono pGlobalChrono)
+	: m_pJournalReader(pJournalReader), m_pDataModel(pDataModel), m_sJournalUUID(sJournalUUID), m_pGlobalChrono(pGlobalChrono)
 {
 	if (pJournalReader.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pDataModel.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pGlobalChrono.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
@@ -63,6 +68,32 @@ IJournalVariable* CJournalHandler_Historic::RetrieveJournalVariable(const std::s
 	
 	return new CJournalVariable_Historic(m_pJournalReader, sVariableName);
 
+}
+
+namespace {
+	LibMCEnv::eParameterDataType convertHistoricParameterDataType(LibMCData::eParameterDataType eDataType)
+	{
+		switch (eDataType) {
+		case LibMCData::eParameterDataType::String: return LibMCEnv::eParameterDataType::String;
+		case LibMCData::eParameterDataType::UUID: return LibMCEnv::eParameterDataType::UUID;
+		case LibMCData::eParameterDataType::Integer: return LibMCEnv::eParameterDataType::Integer;
+		case LibMCData::eParameterDataType::Double: return LibMCEnv::eParameterDataType::Double;
+		case LibMCData::eParameterDataType::Bool: return LibMCEnv::eParameterDataType::Bool;
+		default: return LibMCEnv::eParameterDataType::Unknown;
+		}
+	}
+}
+
+LibMCEnv_uint32 CJournalHandler_Historic::GetVariableCount()
+{
+	return m_pJournalReader->getVariableCount();
+}
+
+void CJournalHandler_Historic::GetVariableInformation(const LibMCEnv_uint32 nIndex, std::string& sName, LibMCEnv::eParameterDataType& eDataType, LibMCEnv_double& dUnits)
+{
+	LibMCData::eParameterDataType eCoreDataType = LibMCData::eParameterDataType::Unknown;
+	m_pJournalReader->getVariableInformation(nIndex, sName, eCoreDataType, dUnits);
+	eDataType = convertHistoricParameterDataType(eCoreDataType);
 }
 
 
@@ -102,5 +133,12 @@ IAlertIterator* CJournalHandler_Historic::RetrieveAlerts(const LibMCEnv_uint64 n
 IAlertIterator* CJournalHandler_Historic::RetrieveAlertsFromTimeInterval(const LibMCEnv_uint64 nStartTimeInMicroseconds, const LibMCEnv_uint64 nEndTimeInMicroseconds)
 {
 	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+ITelemetryHandler* CJournalHandler_Historic::LoadTelemetryHandler()
+{
+	auto pTelemetryReader = m_pDataModel->CreateTelemetryReader(m_sJournalUUID);
+	std::string sStartTime = m_pJournalReader->getStartTimeAsUTC();
+	return new CTelemetryHandler(pTelemetryReader, m_pGlobalChrono, sStartTime);
 }
 

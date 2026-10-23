@@ -42,12 +42,14 @@ using namespace LibMCEnv::Impl;
 /*************************************************************************************************************************
  Class definition of CToolpathPart
 **************************************************************************************************************************/
-CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart, AMC::PMeshHandler pMeshHandler)
-	: m_pPart (pPart), m_pMeshHandler (pMeshHandler)
+CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart, AMC::PMeshHandler pMeshHandler, AMC::PToolpathHandler pToolpathHandler, const std::string& sStorageUUID)
+	: m_pPart (pPart), m_pMeshHandler (pMeshHandler), m_pToolpathHandler (pToolpathHandler), m_sStorageUUID (sStorageUUID)
 {
 	if (pMeshHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 	if (pPart.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 }
 
@@ -64,6 +66,21 @@ std::string CToolpathPart::GetName()
 std::string CToolpathPart::GetUUID()
 {
 	return m_pPart->getUUID();
+}
+
+std::string CToolpathPart::GetPartNumber()
+{
+	return m_pPart->getPartNumber();
+}
+
+std::string CToolpathPart::GetMeshUUID()
+{
+	return m_pPart->getMeshUUID();
+}
+
+bool CToolpathPart::IsDisabled()
+{
+	return m_pToolpathHandler->partIsDisabled(m_sStorageUUID, m_pPart->getUUID());
 }
 
 IModelDataComponentInstance* CToolpathPart::GetRootComponent()

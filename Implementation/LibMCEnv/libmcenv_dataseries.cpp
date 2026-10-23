@@ -164,10 +164,9 @@ void CDataSeries::SampleJournalVariable(IJournalVariable* pJournalVariable, cons
 	if (nNumberOfSamples < 2)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDNUMBEROFSAMPLES);
 
-	auto pJournalVariableImpl = dynamic_cast<CJournalVariable_Current*> (pJournalVariable);
-	if (pJournalVariableImpl == nullptr)
-		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-
+	// Sampling is performed through the IJournalVariable interface (ComputeDoubleSample below),
+	// so both current (CJournalVariable_Current) and historic (CJournalVariable_Historic)
+	// variables are supported. Previously a dynamic_cast restricted this to current variables only.
 	if (nEndTimeStamp < nStartTimeStamp)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDJOURNALVARIABLEINTERVAL);
 

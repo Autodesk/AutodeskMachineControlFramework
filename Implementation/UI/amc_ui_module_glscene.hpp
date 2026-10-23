@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_GLSCENE
 #define __AMC_UI_MODULE_GLSCENE
 
+#include <cstdint>
 #include "header_protection.hpp"
 #include "amc_ui_module_item.hpp"
 
@@ -43,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Libraries/PugiXML/pugixml.hpp"
 #include <array>
+#include <vector>
 
 namespace AMC {
 
@@ -101,8 +103,6 @@ namespace AMC {
 
 		PUIModule_GLSceneModel getModel();
 
-		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object);
-
 		void setPosition(CUIExpression positionX, CUIExpression positionY, CUIExpression positionZ);
 
 		void getPosition(CUIExpression & positionX, CUIExpression & positionY, CUIExpression & positionZ);
@@ -127,8 +127,6 @@ namespace AMC {
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
-		virtual void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
 		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
 
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler);
@@ -150,6 +148,18 @@ namespace AMC {
 
 		PUIModule_GLSceneItem m_pSceneItem;
 
+		PUIModuleEnvironment m_pUIModuleEnvironment;
+
+		struct DynamicMeshInstance {
+			std::string uuid;
+			std::string name;
+			std::string meshUUID;
+		};
+
+		void ensureBuildMeshesRegistered(const std::string& sBuildUUID, std::vector<DynamicMeshInstance>& instances);
+
+		void writeInstancesToJSON(CJSONWriter& writer, CJSONWriterObject& object, const std::string& sName, CUIFrontendState* pFrontendState);
+
 	public:
 
 		/////////////////////////////////////////////////////////////////////////////////////
@@ -170,13 +180,7 @@ namespace AMC {
 		// Legacy UI System
 		/////////////////////////////////////////////////////////////////////////////////////
 		
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
-		void writeLegacySceneToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler);
-
 		virtual void populateModuleMap(std::map<std::string, PUIModule>& moduleMap) override;
-
-		virtual void writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler) override;
 
 		virtual void populateLegacyItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
@@ -184,6 +188,11 @@ namespace AMC {
 
 		virtual void populateLegacyClientVariables(CParameterHandler* pParameterHandler) override;
 
+		/////////////////////////////////////////////////////////////////////////////////////
+		// New UI Frontend System
+		/////////////////////////////////////////////////////////////////////////////////////
+
+		bool isVersion2FrontendModule() override;
 
 	};
 

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_GRAPHICITEM_SVGIMAGE
 #define __AMC_UI_MODULE_GRAPHICITEM_SVGIMAGE
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -86,6 +87,8 @@ namespace AMC {
 
 		std::vector <PUIModule_GraphicSVGImageTransform> m_Transforms;
 
+		void evaluateTransformedPosition(double& dX, double& dY);
+
 	public:
 
 		static PUIModule_GraphicSVGImage makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
@@ -94,10 +97,11 @@ namespace AMC {
 		
 		virtual ~CUIModule_GraphicSVGImage();
 
-		void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
 		void addTransform(PUIModule_GraphicSVGImageTransform pTransform);
 
+		// New UI Frontend System
+		virtual std::string getItemType() override;
+		virtual void registerFrontendAttributes() override;
 
 	};
 

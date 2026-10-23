@@ -61,6 +61,9 @@ class ILogSession;
 class IAlert;
 class IAlertIterator;
 class IAlertSession;
+class ITelemetrySession;
+class ITelemetryChunkData;
+class ITelemetryReader;
 class IJournalChunkIntegerData;
 class IJournalSession;
 class IJournalReader;
@@ -80,6 +83,8 @@ class IBuildJobHandler;
 class IUserList;
 class ILoginHandler;
 class IPersistencyHandler;
+class IUserPreferenceHandler;
+class ISessionMetricsHandler;
 class IMachineConfigurationVersion;
 class IMachineConfigurationVersionIterator;
 class IMachineConfigurationXSD;
@@ -192,6 +197,31 @@ template <class T1, class T2, class T3, class T4, class T5> class ParameterCache
 			param3 = m_param3;
 			param4 = m_param4;
 			param5 = m_param5;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+	public:
+		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
 		}
 };
 
@@ -603,9 +633,223 @@ public:
 	*/
 	virtual IAlertIterator * RetrieveAlertsByType(const std::string & sIdentifier, const bool bOnlyActive) = 0;
 
+	/**
+	* IAlertSession::GetAlertHeadID - Returns the current maximum incremental ID across all alerts. Used by the frontend to detect when the alert list has changed.
+	* @return Maximum incremental ID, or 0 if no alerts exist.
+	*/
+	virtual LibMCData_uint64 GetAlertHeadID() = 0;
+
+	/**
+	* IAlertSession::RetrieveAlertsChangedSince - Retrieves all alerts whose incremental ID is larger than the given one, ordered by timestamp. Used by the frontend to fetch only the changed rows of the alert list.
+	* @param[in] nIncrementalID - Incremental ID to compare against, usually a head ID returned by GetAlertHeadID.
+	* @return AlertIterator Instance. List may be empty.
+	*/
+	virtual IAlertIterator * RetrieveAlertsChangedSince(const LibMCData_uint64 nIncrementalID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IAlertSession> PIAlertSession;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetrySession 
+**************************************************************************************************************************/
+
+class ITelemetrySession : public virtual IBase {
+public:
+	/**
+	* ITelemetrySession::GetSessionUUID - retrieves the session UUID.
+	* @return Session UUID
+	*/
+	virtual std::string GetSessionUUID() = 0;
+
+	/**
+	* ITelemetrySession::CreateChannelInDB - creates channel in journal DB.
+	* @param[in] sUUID - Channel UUID
+	* @param[in] eChannelType - Telemetry Channel Type
+	* @param[in] nChannelIndex - Channel Index
+	* @param[in] sChannelIdentifier - Channel Identifier
+	* @param[in] sChannelDescription - Channel Identifier
+	*/
+	virtual void CreateChannelInDB(const std::string & sUUID, const LibMCData::eTelemetryChannelType eChannelType, const LibMCData_uint32 nChannelIndex, const std::string & sChannelIdentifier, const std::string & sChannelDescription) = 0;
+
+	/**
+	* ITelemetrySession::WriteTelemetryChunk - Writes a telemetry chunk to the current telemetry file.
+	* @param[in] nChunkID - ID of chunk in session (1-based).
+	* @param[in] nStartTimeStamp - Start time stamp of chunk.
+	* @param[in] nEndTimeStamp - End time stamp of chunk.
+	* @param[in] nTelemetryEntriesBufferSize - Number of elements in buffer
+	* @param[in] pTelemetryEntriesBuffer - Telemetry entries to write.
+	*/
+	virtual void WriteTelemetryChunk(const LibMCData_uint64 nChunkID, const LibMCData_uint64 nStartTimeStamp, const LibMCData_uint64 nEndTimeStamp, const LibMCData_uint64 nTelemetryEntriesBufferSize, const LibMCData::sTelemetryChunkEntry * pTelemetryEntriesBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetrySession> PITelemetrySession;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryChunkData 
+**************************************************************************************************************************/
+
+class ITelemetryChunkData : public virtual IBase {
+public:
+	/**
+	* ITelemetryChunkData::GetChunkIndex - Returns index of chunk.
+	* @return Index of the chunk
+	*/
+	virtual LibMCData_uint64 GetChunkIndex() = 0;
+
+	/**
+	* ITelemetryChunkData::GetStartTimeStamp - Returns start time stamp of chunk.
+	* @return Start Timestamp of the chunk (in microseconds)
+	*/
+	virtual LibMCData_uint64 GetStartTimeStamp() = 0;
+
+	/**
+	* ITelemetryChunkData::GetEndTimeStamp - Returns end time stamp of chunk.
+	* @return End Timestamp of the chunk (in microseconds)
+	*/
+	virtual LibMCData_uint64 GetEndTimeStamp() = 0;
+
+	/**
+	* ITelemetryChunkData::GetEntryCount - Returns the number of entries in this chunk.
+	* @return Number of entries.
+	*/
+	virtual LibMCData_uint64 GetEntryCount() = 0;
+
+	/**
+	* ITelemetryChunkData::GetEntries - Returns the raw telemetry entries.
+	* @param[in] nTelemetryEntriesBufferSize - Number of elements in buffer
+	* @param[out] pTelemetryEntriesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pTelemetryEntriesBuffer - TelemetryChunkEntry buffer of Telemetry entries array.
+	*/
+	virtual void GetEntries(LibMCData_uint64 nTelemetryEntriesBufferSize, LibMCData_uint64* pTelemetryEntriesNeededCount, LibMCData::sTelemetryChunkEntry * pTelemetryEntriesBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryChunkData> PITelemetryChunkData;
+
+
+/*************************************************************************************************************************
+ Class interface for TelemetryReader 
+**************************************************************************************************************************/
+
+class ITelemetryReader : public virtual IBase {
+public:
+	/**
+	* ITelemetryReader::GetSessionUUID - Retrieves the session UUID.
+	* @return Session UUID
+	*/
+	virtual std::string GetSessionUUID() = 0;
+
+	/**
+	* ITelemetryReader::GetStartTime - Returns the start timestamp of the telemetry session.
+	* @return Timestamp in ISO8601 UTC format
+	*/
+	virtual std::string GetStartTime() = 0;
+
+	/**
+	* ITelemetryReader::GetLifeTimeInMicroseconds - Get telemetry session life time in microseconds.
+	* @return Telemetry life time in microseconds.
+	*/
+	virtual LibMCData_uint64 GetLifeTimeInMicroseconds() = 0;
+
+	/**
+	* ITelemetryReader::GetChannelCount - Returns number of telemetry channels.
+	* @return Number of channels in session.
+	*/
+	virtual LibMCData_uint32 GetChannelCount() = 0;
+
+	/**
+	* ITelemetryReader::GetChannelInformation - Returns the information for a channel.
+	* @param[in] nChannelIndex - Index of the channel (0-based).
+	* @param[out] sChannelUUID - UUID of the channel.
+	* @param[out] eChannelType - Type of the channel.
+	* @param[out] sIdentifier - Identifier of the channel.
+	* @param[out] sDescription - Description of the channel.
+	*/
+	virtual void GetChannelInformation(const LibMCData_uint32 nChannelIndex, std::string & sChannelUUID, LibMCData::eTelemetryChannelType & eChannelType, std::string & sIdentifier, std::string & sDescription) = 0;
+
+	/**
+	* ITelemetryReader::FindChannelByIdentifier - Finds a channel by its identifier.
+	* @param[in] sIdentifier - Channel identifier to search for.
+	* @param[out] nChannelIndex - Index of the channel if found.
+	* @return True if channel was found.
+	*/
+	virtual bool FindChannelByIdentifier(const std::string & sIdentifier, LibMCData_uint32 & nChannelIndex) = 0;
+
+	/**
+	* ITelemetryReader::GetChunkCount - Returns number of telemetry chunks.
+	* @return Number of chunks in session.
+	*/
+	virtual LibMCData_uint32 GetChunkCount() = 0;
+
+	/**
+	* ITelemetryReader::GetChunkInformation - Returns the information for a chunk.
+	* @param[in] nChunkIndex - Index of the chunk.
+	* @param[out] nStartTimeStamp - Start timestamp of the chunk in microseconds.
+	* @param[out] nEndTimeStamp - End timestamp of the chunk in microseconds.
+	* @param[out] nEntryCount - Number of entries in the chunk.
+	*/
+	virtual void GetChunkInformation(const LibMCData_uint32 nChunkIndex, LibMCData_uint64 & nStartTimeStamp, LibMCData_uint64 & nEndTimeStamp, LibMCData_uint64 & nEntryCount) = 0;
+
+	/**
+	* ITelemetryReader::ReadChunkData - Reads telemetry chunk data from disk.
+	* @param[in] nChunkIndex - Index of the Chunk to read. Fails if chunk index is not found.
+	* @return Telemetry Chunk Data Instance
+	*/
+	virtual ITelemetryChunkData * ReadChunkData(const LibMCData_uint32 nChunkIndex) = 0;
+
+	/**
+	* ITelemetryReader::FindChunksInTimeRange - Finds all chunks that overlap with a time range.
+	* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+	* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+	* @param[in] nChunkIndicesBufferSize - Number of elements in buffer
+	* @param[out] pChunkIndicesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pChunkIndicesBuffer - uint32 buffer of Array of chunk indices.
+	*/
+	virtual void FindChunksInTimeRange(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint64 nChunkIndicesBufferSize, LibMCData_uint64* pChunkIndicesNeededCount, LibMCData_uint32 * pChunkIndicesBuffer) = 0;
+
+	/**
+	* ITelemetryReader::QueryIntervals - Queries completed intervals (start+end marker pairs) within a time range.
+	* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+	* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+	* @param[in] nChannelIndex - Channel index to filter by. Use 0xFFFFFFFF for all channels.
+	* @param[in] nIntervalsBufferSize - Number of elements in buffer
+	* @param[out] pIntervalsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pIntervalsBuffer - TelemetryIntervalData buffer of Array of interval data.
+	*/
+	virtual void QueryIntervals(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, const LibMCData_uint32 nChannelIndex, LibMCData_uint64 nIntervalsBufferSize, LibMCData_uint64* pIntervalsNeededCount, LibMCData::sTelemetryIntervalData * pIntervalsBuffer) = 0;
+
+	/**
+	* ITelemetryReader::QueryInstantMarkers - Queries instant markers within a time range.
+	* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+	* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+	* @param[in] nChannelIndex - Channel index to filter by. Use 0xFFFFFFFF for all channels.
+	* @param[in] nEntriesBufferSize - Number of elements in buffer
+	* @param[out] pEntriesNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pEntriesBuffer - TelemetryChunkEntry buffer of Array of instant marker entries.
+	*/
+	virtual void QueryInstantMarkers(const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, const LibMCData_uint32 nChannelIndex, LibMCData_uint64 nEntriesBufferSize, LibMCData_uint64* pEntriesNeededCount, LibMCData::sTelemetryChunkEntry * pEntriesBuffer) = 0;
+
+	/**
+	* ITelemetryReader::GetChannelStatistics - Gets aggregated statistics for a channel within a time range.
+	* @param[in] nChannelIndex - Channel index.
+	* @param[in] nStartTimeStampInMicroseconds - Start of the time range.
+	* @param[in] nEndTimeStampInMicroseconds - End of the time range.
+	* @param[out] nIntervalCount - Number of completed intervals.
+	* @param[out] nInstantMarkerCount - Number of instant markers.
+	* @param[out] nTotalDurationInMicroseconds - Sum of all interval durations.
+	* @param[out] nMinDurationInMicroseconds - Minimum interval duration.
+	* @param[out] nMaxDurationInMicroseconds - Maximum interval duration.
+	* @param[out] nAvgDurationInMicroseconds - Average interval duration.
+	*/
+	virtual void GetChannelStatistics(const LibMCData_uint32 nChannelIndex, const LibMCData_uint64 nStartTimeStampInMicroseconds, const LibMCData_uint64 nEndTimeStampInMicroseconds, LibMCData_uint64 & nIntervalCount, LibMCData_uint64 & nInstantMarkerCount, LibMCData_uint64 & nTotalDurationInMicroseconds, LibMCData_uint64 & nMinDurationInMicroseconds, LibMCData_uint64 & nMaxDurationInMicroseconds, LibMCData_uint64 & nAvgDurationInMicroseconds) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITelemetryReader> PITelemetryReader;
 
 
 /*************************************************************************************************************************
@@ -1700,6 +1944,12 @@ public:
 	*/
 	virtual IBuildJobExecutionIterator * RetrieveBuildJobExecutionsByStatus(const LibMCData::eBuildJobExecutionStatus eStatusFilter, const std::string & sJournalUUIDFilter) = 0;
 
+	/**
+	* IBuildJob::GetIncrementalID - Returns the monotonically increasing incremental ID of the build job. Used for frontend change detection.
+	* @return Incremental ID of the build job. Increases with every status change.
+	*/
+	virtual LibMCData_uint64 GetIncrementalID() = 0;
+
 };
 
 typedef IBaseSharedPtr<IBuildJob> PIBuildJob;
@@ -1796,6 +2046,32 @@ public:
 	* @return Returns the list of execution instances that are queried. List may be empty.
 	*/
 	virtual IBuildJobExecutionIterator * ListJobExecutions(const std::string & sMinTimestamp, const std::string & sMaxTimestamp, const std::string & sJournalUUIDFilter) = 0;
+
+	/**
+	* IBuildJobHandler::GetBuildListHeadID - Returns the current maximum incremental ID across all build jobs. Used by the frontend to detect when the build list has changed.
+	* @return Maximum incremental ID, or 0 if no jobs exist.
+	*/
+	virtual LibMCData_uint64 GetBuildListHeadID() = 0;
+
+	/**
+	* IBuildJobHandler::GetExecutionListHeadID - Returns the current maximum incremental ID across all build job executions. Used by the frontend to detect when the execution list has changed.
+	* @return Maximum incremental ID, or 0 if no executions exist.
+	*/
+	virtual LibMCData_uint64 GetExecutionListHeadID() = 0;
+
+	/**
+	* IBuildJobHandler::ListJobsChangedSince - Retrieves all build jobs of any status whose incremental ID is larger than the given one, ordered by timestamp descending. Used by the frontend to fetch only the changed rows of the build list.
+	* @param[in] nIncrementalID - Incremental ID to compare against, usually a head ID returned by GetBuildListHeadID.
+	* @return Build Job Iterator Instance. List may be empty.
+	*/
+	virtual IBuildJobIterator * ListJobsChangedSince(const LibMCData_uint64 nIncrementalID) = 0;
+
+	/**
+	* IBuildJobHandler::ListJobExecutionsChangedSince - Retrieves all active build executions whose incremental ID is larger than the given one, ordered by start timestamp descending. Used by the frontend to fetch only the changed rows of the execution list.
+	* @param[in] nIncrementalID - Incremental ID to compare against, usually a head ID returned by GetExecutionListHeadID.
+	* @return Returns the list of execution instances that changed. List may be empty.
+	*/
+	virtual IBuildJobExecutionIterator * ListJobExecutionsChangedSince(const LibMCData_uint64 nIncrementalID) = 0;
 
 };
 
@@ -2009,6 +2285,35 @@ public:
 	*/
 	virtual IUserList * GetActiveUsers() = 0;
 
+	/**
+	* ILoginHandler::CreateLoginSession - Creates a new login session record in the database.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] nCreateTimeInMicroseconds - Creation timestamp in microseconds since epoch.
+	*/
+	virtual void CreateLoginSession(const std::string & sSessionUUID, const LibMCData_uint64 nCreateTimeInMicroseconds) = 0;
+
+	/**
+	* ILoginHandler::UpdateLoginSessionAuthentication - Updates a login session after successful authentication.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] sUserUUID - UUID of the authenticated user.
+	* @param[in] sUsername - Login name of the authenticated user.
+	* @param[in] sUserRole - Role of the authenticated user.
+	*/
+	virtual void UpdateLoginSessionAuthentication(const std::string & sSessionUUID, const std::string & sUserUUID, const std::string & sUsername, const std::string & sUserRole) = 0;
+
+	/**
+	* ILoginHandler::UpdateLoginSessionActivity - Updates the last activity timestamp of a login session.
+	* @param[in] sSessionUUID - UUID of the session.
+	* @param[in] nTimestampInMicroseconds - New activity timestamp in microseconds since epoch.
+	*/
+	virtual void UpdateLoginSessionActivity(const std::string & sSessionUUID, const LibMCData_uint64 nTimestampInMicroseconds) = 0;
+
+	/**
+	* ILoginHandler::DeactivateLoginSession - Marks a login session as inactive.
+	* @param[in] sSessionUUID - UUID of the session.
+	*/
+	virtual void DeactivateLoginSession(const std::string & sSessionUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<ILoginHandler> PILoginHandler;
@@ -2138,6 +2443,83 @@ typedef IBaseSharedPtr<IPersistencyHandler> PIPersistencyHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for UserPreferenceHandler 
+**************************************************************************************************************************/
+
+class IUserPreferenceHandler : public virtual IBase {
+public:
+	/**
+	* IUserPreferenceHandler::HasUserPreference - Checks if a preference has been stored for the given user, domain and key.
+	* @param[in] sUserUUID - UUID of the user the preference belongs to.
+	* @param[in] sDomain - Domain the preference belongs to, e.g. 'parameterlist'. MUST NOT be empty.
+	* @param[in] sKey - Key identifying the preference within the domain. MUST NOT be empty.
+	* @return returns if the preference exists.
+	*/
+	virtual bool HasUserPreference(const std::string & sUserUUID, const std::string & sDomain, const std::string & sKey) = 0;
+
+	/**
+	* IUserPreferenceHandler::RetrieveUserPreference - Retrieves a stored preference value. Fails if the preference does not exist.
+	* @param[in] sUserUUID - UUID of the user the preference belongs to.
+	* @param[in] sDomain - Domain the preference belongs to.
+	* @param[in] sKey - Key identifying the preference within the domain.
+	* @return Stored value of the preference.
+	*/
+	virtual std::string RetrieveUserPreference(const std::string & sUserUUID, const std::string & sDomain, const std::string & sKey) = 0;
+
+	/**
+	* IUserPreferenceHandler::StoreUserPreference - Stores a preference value. Creates a new preference or overwrites the existing one.
+	* @param[in] sUserUUID - UUID of the user the preference belongs to.
+	* @param[in] sDomain - Domain the preference belongs to. MUST NOT be empty.
+	* @param[in] sKey - Key identifying the preference within the domain. MUST NOT be empty.
+	* @param[in] sValue - Value to store.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	*/
+	virtual void StoreUserPreference(const std::string & sUserUUID, const std::string & sDomain, const std::string & sKey, const std::string & sValue, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+
+	/**
+	* IUserPreferenceHandler::DeleteUserPreference - Removes a preference from the database. Does nothing if the preference does not exist.
+	* @param[in] sUserUUID - UUID of the user the preference belongs to.
+	* @param[in] sDomain - Domain the preference belongs to.
+	* @param[in] sKey - Key identifying the preference within the domain.
+	* @return returns if the preference existed.
+	*/
+	virtual bool DeleteUserPreference(const std::string & sUserUUID, const std::string & sDomain, const std::string & sKey) = 0;
+
+};
+
+typedef IBaseSharedPtr<IUserPreferenceHandler> PIUserPreferenceHandler;
+
+
+/*************************************************************************************************************************
+ Class interface for SessionMetricsHandler 
+**************************************************************************************************************************/
+
+class ISessionMetricsHandler : public virtual IBase {
+public:
+	/**
+	* ISessionMetricsHandler::AddFrontendMetrics - Adds an aggregated frontend metrics record for a measurement window. The moments (count, sum, min, max, sumsq) are stored raw so mean/stddev can be derived and records re-aggregated.
+	* @param[in] sSessionUUID - UUID of the login session the metrics belong to.
+	* @param[in] sLabel - Label identifying the measured request family, e.g. 'frontend'.
+	* @param[in] nIntervalStart - Start of the measurement window in Microseconds since 1970.
+	* @param[in] nIntervalEnd - End of the measurement window in Microseconds since 1970.
+	* @param[in] nRequestCount - Number of requests captured in the window.
+	* @param[in] dSumDurationMS - Sum of roundtrip durations in milliseconds.
+	* @param[in] dMinDurationMS - Minimum roundtrip duration in milliseconds.
+	* @param[in] dMaxDurationMS - Maximum roundtrip duration in milliseconds.
+	* @param[in] dSumSqDurationMS - Sum of squared roundtrip durations in milliseconds (for stddev).
+	* @param[in] nPayloadSumBytes - Sum of response payload sizes in bytes.
+	* @param[in] nPayloadMaxBytes - Maximum response payload size in bytes.
+	* @param[in] dServerBuildSumMS - Sum of the server-reported build times in milliseconds.
+	* @param[in] nAbsoluteTimeStamp - Absolute Time Stamp in Microseconds since 1970.
+	*/
+	virtual void AddFrontendMetrics(const std::string & sSessionUUID, const std::string & sLabel, const LibMCData_uint64 nIntervalStart, const LibMCData_uint64 nIntervalEnd, const LibMCData_uint32 nRequestCount, const LibMCData_double dSumDurationMS, const LibMCData_double dMinDurationMS, const LibMCData_double dMaxDurationMS, const LibMCData_double dSumSqDurationMS, const LibMCData_uint64 nPayloadSumBytes, const LibMCData_uint64 nPayloadMaxBytes, const LibMCData_double dServerBuildSumMS, const LibMCData_uint64 nAbsoluteTimeStamp) = 0;
+
+};
+
+typedef IBaseSharedPtr<ISessionMetricsHandler> PISessionMetricsHandler;
+
+
+/*************************************************************************************************************************
  Class interface for MachineConfigurationVersion 
 **************************************************************************************************************************/
 
@@ -2168,6 +2550,12 @@ public:
 	virtual std::string GetParentUUID() = 0;
 
 	/**
+	* IMachineConfigurationVersion::GetName - Returns the name of the configuration version.
+	* @return Name of the configuration version. Default configurations are named 'Default configuration'. Versions created before names were introduced return an empty string.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
 	* IMachineConfigurationVersion::GetConfigurationXMLString - Returns the configuration XML content as string.
 	* @return XML String.
 	*/
@@ -2189,18 +2577,20 @@ public:
 	* IMachineConfigurationVersion::CreateNewVersion - Creates a new configuration version from this one with the same XSD.
 	* @param[in] sXMLString - New XML Configuration String. MUST conform to current XSD.
 	* @param[in] sUserUUID - User UUID for logging the user who initiated the change.
+	* @param[in] sName - Name of the new version. MUST NOT be empty or only whitespace, and MUST NOT be longer than 256 characters. Leading and trailing whitespace is removed.
 	* @return Returns the newly created MachineConfigurationVersion instance.
 	*/
-	virtual IMachineConfigurationVersion * CreateNewVersion(const std::string & sXMLString, const std::string & sUserUUID) = 0;
+	virtual IMachineConfigurationVersion * CreateNewVersion(const std::string & sXMLString, const std::string & sUserUUID, const std::string & sName) = 0;
 
 	/**
 	* IMachineConfigurationVersion::MigrateToNewXSD - Creates a new configuration version from this one but with a different XSD.
 	* @param[in] pNewXSD - New XSD to use. MUST be of the same type as the current. MUST have an increased version number.
 	* @param[in] sXMLString - New XML Configuration String. MUST conform to new XSD.
 	* @param[in] sUserUUID - User UUID for logging the user who initiated the change.
+	* @param[in] sName - Name of the new version. MUST NOT be empty or only whitespace, and MUST NOT be longer than 256 characters.
 	* @return Returns the newly created MachineConfigurationVersion instance.
 	*/
-	virtual IMachineConfigurationVersion * MigrateToNewXSD(IMachineConfigurationXSD* pNewXSD, const std::string & sXMLString, const std::string & sUserUUID) = 0;
+	virtual IMachineConfigurationVersion * MigrateToNewXSD(IMachineConfigurationXSD* pNewXSD, const std::string & sXMLString, const std::string & sUserUUID, const std::string & sName) = 0;
 
 };
 
@@ -2353,7 +2743,7 @@ public:
 	virtual IMachineConfigurationXSD * FindXSDByUUID(const std::string & sXSDUUID) = 0;
 
 	/**
-	* IMachineConfigurationType::CreateDefaultConfiguration - Creates the default configuration for a given XSD version. Fails if a configuration for this XSD already exists.
+	* IMachineConfigurationType::CreateDefaultConfiguration - Creates the default configuration for a given XSD version, named 'Default configuration'. Fails if a configuration for this XSD already exists.
 	* @param[in] sXSDUUID - UUID of the XSD to base the default configuration on.
 	* @param[in] sDefaultXML - Configuration XML string conforming to the given XSD.
 	* @param[in] sTimeStampUTC - Creation timestamp in UTC.
@@ -2465,6 +2855,18 @@ public:
 	virtual void InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType eDataBaseType, const std::string & sConnectionString) = 0;
 
 	/**
+	* IDataModel::SetTelemetryEnabled - enables or disables telemetry recording. Must be called before InitialiseDatabase.
+	* @param[in] bTelemetryEnabled - Flag if telemetry recording shall be enabled.
+	*/
+	virtual void SetTelemetryEnabled(const bool bTelemetryEnabled) = 0;
+
+	/**
+	* IDataModel::GetTelemetryEnabled - returns if telemetry recording is enabled.
+	* @return Flag if telemetry recording is enabled.
+	*/
+	virtual bool GetTelemetryEnabled() = 0;
+
+	/**
 	* IDataModel::GetDataModelVersion - returns the linear data model version.
 	* @return Data model version.
 	*/
@@ -2527,10 +2929,35 @@ public:
 	virtual ILoginHandler * CreateLoginHandler() = 0;
 
 	/**
+	* IDataModel::CreateTelemetrySession - creates a global telemetry session access class.
+	* @return Telemetry class instance.
+	*/
+	virtual ITelemetrySession * CreateTelemetrySession() = 0;
+
+	/**
+	* IDataModel::CreateTelemetryReader - Creates an access instance to telemetry from a past journal session. Fails if telemetry cannot be accessed.
+	* @param[in] sJournalUUID - UUID of journal to load. UUID MUST NOT reference the current journaling session.
+	* @return TelemetryReader class instance.
+	*/
+	virtual ITelemetryReader * CreateTelemetryReader(const std::string & sJournalUUID) = 0;
+
+	/**
 	* IDataModel::CreatePersistencyHandler - creates a persistency handler instance.
 	* @return PersistencyHandler instance.
 	*/
 	virtual IPersistencyHandler * CreatePersistencyHandler() = 0;
+
+	/**
+	* IDataModel::CreateUserPreferenceHandler - creates a user preference handler instance.
+	* @return UserPreferenceHandler instance.
+	*/
+	virtual IUserPreferenceHandler * CreateUserPreferenceHandler() = 0;
+
+	/**
+	* IDataModel::CreateSessionMetricsHandler - creates a session metrics handler instance.
+	* @return SessionMetricsHandler instance.
+	*/
+	virtual ISessionMetricsHandler * CreateSessionMetricsHandler() = 0;
 
 	/**
 	* IDataModel::SetBaseTempDirectory - Sets a custom base temp directory. An empty string defaults to the system temp directory.

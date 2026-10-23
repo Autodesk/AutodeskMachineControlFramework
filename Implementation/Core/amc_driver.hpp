@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_DRIVER
 #define __AMC_DRIVER
 
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>
@@ -95,6 +96,7 @@ namespace AMC {
 		void releaseDriverHandle(const std::string& sInstanceName);
 
 		PParameterGroup getParameterGroup();
+		void getVersionInfo(uint32_t& nMajor, uint32_t& nMinor, uint32_t& nMicro, std::string& sBuild);
 				
 	};
 	
@@ -104,4 +106,3 @@ namespace AMC {
 
 
 #endif //__AMC_DRIVER
-

@@ -102,6 +102,10 @@ CDataRecordingInstance::CDataRecordingInstance(uint32_t nSensorValuesPerRecord, 
 
     m_nValueCountPerBuffer = (size_t)m_nValuesPerRecord * (size_t)nBufferSizeInRecords;
     memset((void*)&m_CurrentEntry, 0, sizeof(m_CurrentEntry));
+
+    // Pre-allocate first buffer eagerly to avoid first-packet allocation latency.
+    m_pCurrentBuffer = std::make_shared<CDataRecordingBuffer>(m_nValueCountPerBuffer);
+    m_Buffers.push_back(m_pCurrentBuffer);
 }
 
 CDataRecordingInstance::~CDataRecordingInstance()

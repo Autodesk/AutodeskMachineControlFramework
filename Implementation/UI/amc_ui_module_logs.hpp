@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_LOGS
 #define __AMC_UI_MODULE_LOGS
 
+#include <cstdint>
 #include "header_protection.hpp"
 
 #ifndef __AMCIMPL_UI_MODULE
@@ -67,8 +68,6 @@ namespace AMC {
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
-		virtual void addLegacyContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-
 		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
 
 	};
@@ -80,6 +79,13 @@ namespace AMC {
 		std::string m_sCaption;
 
 		PUIModule_LogsItem m_LogsItem;
+
+		PUIModuleEnvironment m_pUIModuleEnvironment;
+
+		uint32_t m_nDefaultCount;
+		bool m_bShowToolbar;
+		uint32_t m_nMaxClientEntries;
+		std::string m_sDownloadPrefix;
 
 	public:
 
@@ -103,10 +109,6 @@ namespace AMC {
 
 		virtual void populateModuleMap(std::map<std::string, PUIModule>& moduleMap) override;
 
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
-		
-		virtual void writeLegacyDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pLegacyClientVariableHandler) override;
-
 		virtual void populateLegacyItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
 		virtual PUIModuleItem findLegacyItem(const std::string& sUUID) override;
@@ -115,7 +117,7 @@ namespace AMC {
 		// New UI Frontend System
 		/////////////////////////////////////////////////////////////////////////////////////
 
-		bool isVersion2FrontendModule();
+		bool isVersion2FrontendModule() override;
 
 	};
 

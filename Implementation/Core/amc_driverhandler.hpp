@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_DRIVERHANDLER
 #define __AMC_DRIVERHANDLER
 
+#include <cstdint>
 #include <map>
 #include <list>
 #include <string>
@@ -72,6 +73,15 @@ namespace AMC {
 	class CMeshHandler;
 	typedef std::shared_ptr<CMeshHandler> PMeshHandler;
 
+	class CTelemetryHandler;
+	typedef std::shared_ptr<CTelemetryHandler> PTelemetryHandler;
+
+	class CStreamRegistry;
+	typedef std::shared_ptr<CStreamRegistry> PStreamRegistry;
+
+	class CFrontendChangeCounter;
+	typedef std::shared_ptr<CFrontendChangeCounter> PFrontendChangeCounter;
+
 	class CDriverHandler {
 	private:
 
@@ -83,6 +93,11 @@ namespace AMC {
 		LibMCData::PDataModel m_pDataModel;
 		AMCCommon::PChrono m_pGlobalChrono;
 		PStateJournal m_pStateJournal;
+		AMC::PTelemetryHandler m_pTelemetryHandler;
+		AMC::PStreamRegistry m_pStreamRegistry;
+
+		// Driver parameters reach the frontend through derived parameters of the state machines.
+		PFrontendChangeCounter m_pFrontendChangeCounter;
 
 		// List and Map of registered drivers
 		std::list<PDriver> m_DriverList;
@@ -98,13 +113,14 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PMeshHandler pMeshHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, PStateJournal pStateJournal);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PMeshHandler pMeshHandler, PLogger pLogger, LibMCData::PDataModel pDataModel, AMCCommon::PChrono pGlobalChrono, PStateJournal pStateJournal, AMC::PTelemetryHandler pTelemetryHandler, AMC::PStreamRegistry pStreamRegistry, PFrontendChangeCounter pFrontendChangeCounter);
 
 		virtual ~CDriverHandler();
 
 		void registerDriver(const std::string& sName, const std::string& sType, const std::string & sLibraryName, const std::string& sLibraryPath, const std::string & sResourcePath, const std::string & sDriverConfigurationData, AMC::PResourcePackage pMachineResourcePackage);
 
 		void GetDriverInformation (const std::string& sName, std::string& sType, HSymbolLookupHandle & pSymbolLookup);
+		void GetDriverVersionInfo(const std::string& sName, uint32_t& nMajor, uint32_t& nMinor, uint32_t& nMicro, std::string& sBuild);
 
 		HDriverHandle acquireDriver (const std::string& sName, const std::string& sInstanceName);
 
@@ -123,4 +139,3 @@ namespace AMC {
 
 
 #endif //__AMC_DRIVERHANDLER
-

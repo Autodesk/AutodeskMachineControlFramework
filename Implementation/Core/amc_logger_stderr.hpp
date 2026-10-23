@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_LOGGER_STDERR
 #define __AMC_LOGGER_STDERR
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>

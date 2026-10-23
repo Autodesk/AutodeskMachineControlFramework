@@ -60,6 +60,10 @@ protected:
 
 	void setCommunicationTimeoutsBeforeAcquire (uint32_t nCardNo);
 
+	// Turns on RTC6 Ethernet High Performance Mode and logs a warning if the card rejects it.
+	// MUST be called after acquire_rtc, because the call needs access rights to the board.
+	void enableHighPerformanceMode (uint32_t nCardNo);
+
 	void loadFirmwareBeforeAcquisition (uint32_t nCardNo, bool bIsNetwork, bool bMustHaveData);
 
 	void loadFirmwareForSearchNumber (uint32_t nSearchNo, bool bMustHaveData);

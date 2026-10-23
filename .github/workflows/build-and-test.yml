@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc g++ cmake golang uuid-dev
+        sudo apt-get install -y gcc g++ cmake golang uuid-dev libssl-dev lcov
 
     - name: Run pre-build script
       run: |
@@ -30,3 +30,37 @@ jobs:
 
     - name: Run unit tests
       run: ./build_linux64/Output/amc_unittest
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: ${{ success() }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc g++ cmake golang uuid-dev libssl-dev lcov
+
+    - name: Run pre-build script (hashes and baseline)
+      run: |
+        chmod +x ./build_clean_linux64.sh
+        ./build_clean_linux64.sh
+      shell: bash
+
+    - name: Run coverage (unit tests)
+      run: |
+        chmod +x ./coverage_linux.sh
+        ./coverage_linux.sh
+      shell: bash
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: |
+          build_coverage/coverage_html
+          build_coverage/coverage.info

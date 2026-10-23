@@ -61,20 +61,20 @@ namespace AMCUnitTest {
 	private:
 
 		AMC::PAccessPermission makePermission(const std::string& id, const std::string& name = "Display", const std::string& desc = "Description") {
-			return std::make_shared<AMC::CAccessPermission>(id, AMC::CStringResource(name), AMC::CStringResource(desc));
+			return std::make_shared<AMC::CAccessPermission>(id, AMC::CLanguageString("", name), AMC::CLanguageString("", desc));
 		}
 
 		void testCreateValidRole() {
-			AMC::CAccessRole role("admin", AMC::CStringResource("Administrator"), AMC::CStringResource("Manages everything"));
+			AMC::CAccessRole role("admin", AMC::CLanguageString("", "Administrator"), AMC::CLanguageString("", "Manages everything"));
 			assertTrue(role.getIdentifier() == "admin");
-			assertTrue(role.getDisplayNameString(1) == "Administrator");
-			assertTrue(role.getDescriptionString(1) == "Manages everything");
+			assertTrue(role.getDisplayName().getCustomValue() == "Administrator");
+			assertTrue(role.getDescription().getCustomValue() == "Manages everything");
 		}
 
 		void testCreateInvalidRoleThrows() {
 			bool thrown = false;
 			try {
-				AMC::CAccessRole role("invalid id!", AMC::CStringResource("X"), AMC::CStringResource("Y"));
+				AMC::CAccessRole role("invalid id!", AMC::CLanguageString("", "X"), AMC::CLanguageString("", "Y"));
 			}
 			catch (...) {
 				thrown = true;
@@ -83,7 +83,7 @@ namespace AMCUnitTest {
 		}
 
 		void testAddPermissionToRole() {
-			AMC::CAccessRole role("user", AMC::CStringResource("User"), AMC::CStringResource("Standard user"));
+			AMC::CAccessRole role("user", AMC::CLanguageString("", "User"), AMC::CLanguageString("", "Standard user"));
 			auto perm = makePermission("read");
 
 			role.addPermission(perm);
@@ -91,7 +91,7 @@ namespace AMCUnitTest {
 		}
 
 		void testDuplicatePermissionThrows() {
-			AMC::CAccessRole role("user", AMC::CStringResource("User"), AMC::CStringResource("Standard user"));
+			AMC::CAccessRole role("user", AMC::CLanguageString("", "User"), AMC::CLanguageString("", "Standard user"));
 			auto perm = makePermission("read");
 
 			role.addPermission(perm);
@@ -107,7 +107,7 @@ namespace AMCUnitTest {
 		}
 
 		void testRemovePermission() {
-			AMC::CAccessRole role("user", AMC::CStringResource("User"), AMC::CStringResource("Standard user"));
+			AMC::CAccessRole role("user", AMC::CLanguageString("", "User"), AMC::CLanguageString("", "Standard user"));
 			auto perm = makePermission("read");
 
 			role.addPermission(perm);
@@ -118,7 +118,7 @@ namespace AMCUnitTest {
 		}
 
 		void testGetPermissionsList() {
-			AMC::CAccessRole role("user", AMC::CStringResource("User"), AMC::CStringResource("Standard user"));
+			AMC::CAccessRole role("user", AMC::CLanguageString("", "User"), AMC::CLanguageString("", "Standard user"));
 			role.addPermission(makePermission("read"));
 			role.addPermission(makePermission("write"));
 
@@ -137,7 +137,7 @@ namespace AMCUnitTest {
 		}
 
 		void testAddNullPermissionThrows() {
-			AMC::CAccessRole role("user", AMC::CStringResource("User"), AMC::CStringResource("Standard user"));
+			AMC::CAccessRole role("user", AMC::CLanguageString("", "User"), AMC::CLanguageString("", "Standard user"));
 
 			bool thrown = false;
 			try {

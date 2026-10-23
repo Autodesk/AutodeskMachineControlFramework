@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMCCOMMON_EXPORTSTREAM
 #define __AMCCOMMON_EXPORTSTREAM
 
+#include <cstdint>
 #include <memory>
 
 namespace AMCCommon {
