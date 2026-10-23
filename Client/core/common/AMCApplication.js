@@ -123,6 +123,8 @@ export default class AMCApplication extends Common.AMCObject {
 			frontendScope: "",
 			frontendRequestSerial: 0,
 			frontendAppliedSerial: 0,
+			// /api/frontend requests sent by retrieveFrontendState that have not settled yet.
+			frontendRequestsInFlight: 0,
 			navigationRequestSerial: 0,
 			frontendMetrics: this._createEmptyFrontendMetrics (),
 			userUUID: Common.nullUUID (),
@@ -966,7 +968,13 @@ export default class AMCApplication extends Common.AMCObject {
 		if (this.API.frontendState && (this.API.frontendRevision > 0) && (this.API.frontendScope === requestScope))
 			requestParams.since = this.API.frontendRevision;
 
+		// Counted for the fallback polling (see _startFrontendPolling) and released however the request
+		// ends; axiosGetRequest's default timeout bounds how long a hung request can hold polling back.
+		this.API.frontendRequestsInFlight++;
 		return this.axiosGetRequest("/frontend", { params: requestParams })
+		.finally(() => {
+			this.API.frontendRequestsInFlight--;
+		})
 		.then(resultJSON => {
 			this._recordFrontendMetric (requestStartMS, resultJSON);
 
@@ -1665,7 +1673,15 @@ export default class AMCApplication extends Common.AMCObject {
 		if (updates.pollTimer)
 			return;
 
+		// A tick never adds a second request: it is skipped while any /api/frontend request sent by
+		// retrieveFrontendState is pending (an earlier poll, a navigation refresh, or a poll still running
+		// from before the stream took over), so a server slower than the interval does not get an ever
+		// growing number of overlapping polls. Navigation refreshes themselves are not held back; the
+		// reply serials keep their results in order. A skipped tick also skips updateModules, so while
+		// polling, module data is refreshed once per reply.
 		updates.pollTimer = setInterval (() => {
+			if (this.API.frontendRequestsInFlight > 0)
+				return;
 			this.retrieveFrontendState ()
 			.finally (() => {
 				this.updateModules ();
