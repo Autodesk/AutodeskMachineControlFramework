@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CMachineConfigurationType
 
 // Include custom headers here.
 #include "libmcdata_dynamic.hpp"
+#include "amc_statemachinedata.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -59,10 +60,11 @@ class CMachineConfigurationType : public virtual IMachineConfigurationType, publ
 private:
 
 	LibMCData::PMachineConfigurationType m_pMachineConfigurationType;
+	AMC::PStateMachineData m_pStateMachineData;
 
 public:
 
-	CMachineConfigurationType(LibMCData::PMachineConfigurationType pMachineConfigurationType);
+	CMachineConfigurationType(LibMCData::PMachineConfigurationType pMachineConfigurationType, AMC::PStateMachineData pStateMachineData);
 
 	virtual ~CMachineConfigurationType();
 
@@ -111,6 +113,12 @@ public:
 	IMachineConfiguration* EnsureActiveConfiguration() override;
 
 	IMachineConfigurationXSD* EnsureXSDVersion(const std::string& sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string& sDefaultXML) override;
+
+	IMachineConfigurationXSD* EnsureXSDVersionFromParameterDefaults(const std::string& sXSDString, const LibMCEnv_uint32 nXSDVersion) override;
+
+	LibMCEnv_uint32 SynchronizeParameters() override;
+
+	IMachineConfigurationVersion* ResetToParameterDefaults(const std::string& sUserUUID, const std::string& sName) override;
 };
 
 } // namespace Impl

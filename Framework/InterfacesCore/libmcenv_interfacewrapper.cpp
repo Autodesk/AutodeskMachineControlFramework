@@ -29690,6 +29690,97 @@ LibMCEnvResult libmcenv_machineconfigurationtype_ensurexsdversion(LibMCEnv_Machi
 	}
 }
 
+LibMCEnvResult libmcenv_machineconfigurationtype_ensurexsdversionfromparameterdefaults(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDString, LibMCEnv_uint32 nXSDVersion, LibMCEnv_MachineConfigurationXSD * pXSDInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfigurationType;
+
+	try {
+		if (pXSDString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pXSDInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sXSDString(pXSDString);
+		IBase* pBaseXSDInstance(nullptr);
+		IMachineConfigurationType* pIMachineConfigurationType = dynamic_cast<IMachineConfigurationType*>(pIBaseClass);
+		if (!pIMachineConfigurationType)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseXSDInstance = pIMachineConfigurationType->EnsureXSDVersionFromParameterDefaults(sXSDString, nXSDVersion);
+
+		*pXSDInstance = (IBase*)(pBaseXSDInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfigurationtype_synchronizeparameters(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_uint32 * pAppliedParameterCount)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfigurationType;
+
+	try {
+		if (pAppliedParameterCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IMachineConfigurationType* pIMachineConfigurationType = dynamic_cast<IMachineConfigurationType*>(pIBaseClass);
+		if (!pIMachineConfigurationType)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAppliedParameterCount = pIMachineConfigurationType->SynchronizeParameters();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_machineconfigurationtype_resettoparameterdefaults(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pUserUUID, const char * pName, LibMCEnv_MachineConfigurationVersion * pVersionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pMachineConfigurationType;
+
+	try {
+		if (pUserUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pVersionInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sUserUUID(pUserUUID);
+		std::string sName(pName);
+		IBase* pBaseVersionInstance(nullptr);
+		IMachineConfigurationType* pIMachineConfigurationType = dynamic_cast<IMachineConfigurationType*>(pIBaseClass);
+		if (!pIMachineConfigurationType)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseVersionInstance = pIMachineConfigurationType->ResetToParameterDefaults(sUserUUID, sName);
+
+		*pVersionInstance = (IBase*)(pBaseVersionInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for MachineConfigurationTypeIterator
@@ -39070,6 +39161,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_ensureactiveconfiguration;
 	if (sProcName == "libmcenv_machineconfigurationtype_ensurexsdversion") 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_ensurexsdversion;
+	if (sProcName == "libmcenv_machineconfigurationtype_ensurexsdversionfromparameterdefaults") 
+		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_ensurexsdversionfromparameterdefaults;
+	if (sProcName == "libmcenv_machineconfigurationtype_synchronizeparameters") 
+		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_synchronizeparameters;
+	if (sProcName == "libmcenv_machineconfigurationtype_resettoparameterdefaults") 
+		*ppProcAddress = (void*) &libmcenv_machineconfigurationtype_resettoparameterdefaults;
 	if (sProcName == "libmcenv_machineconfigurationtypeiterator_getcurrent") 
 		*ppProcAddress = (void*) &libmcenv_machineconfigurationtypeiterator_getcurrent;
 	if (sProcName == "libmcenv_machineconfigurationhandler_registermachineconfigurationtype") 

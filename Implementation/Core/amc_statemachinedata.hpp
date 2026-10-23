@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <functional>
 #include <mutex>
+#include <utility>
 
 namespace AMC {
 
@@ -68,6 +69,7 @@ namespace AMC {
 
 		void registerParameterHandler (const std::string & sInstanceName, PParameterHandler pParameterHandler, AMCCommon::PChrono pChrono);
 		PParameterHandler getParameterHandler (const std::string& sInstanceName);
+		std::vector<std::pair<std::string, PParameterHandler>> getParameterHandlers();
 
 		CParameterGroup* getDataStore(const std::string& sInstanceName);
 		void setInstanceStateName(const std::string& sInstanceName, const std::string& sInstanceState);

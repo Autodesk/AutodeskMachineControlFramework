@@ -9869,6 +9869,37 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_ensureactivec
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_ensurexsdversion(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDString, LibMCEnv_uint32 nXSDVersion, const char * pDefaultXML, LibMCEnv_MachineConfigurationXSD * pXSDInstance);
 
+/**
+* Registers a new XSD version and generates its default configuration from state-machine parameters mapped to this configuration schema. Returns null if the given version is not newer.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[in] pXSDString - XSD String of the version. MUST be a valid schema of this type.
+* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+* @param[out] pXSDInstance - The newly registered XSD, or null if the version was not newer than the latest.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_ensurexsdversionfromparameterdefaults(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pXSDString, LibMCEnv_uint32 nXSDVersion, LibMCEnv_MachineConfigurationXSD * pXSDInstance);
+
+/**
+* Applies every parameter of the active configuration to the state-machine parameters mapped to this configuration schema. All values are validated before any runtime parameter is changed.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[out] pAppliedParameterCount - Number of mapped runtime parameters that have been synchronized.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_synchronizeparameters(LibMCEnv_MachineConfigurationType pMachineConfigurationType, LibMCEnv_uint32 * pAppliedParameterCount);
+
+/**
+* Creates and activates a new auditable configuration version from the mapped state-machine parameter defaults, then synchronizes the runtime parameters. Existing configuration history is preserved.
+*
+* @param[in] pMachineConfigurationType - MachineConfigurationType instance.
+* @param[in] pUserUUID - UUID of the user requesting the reset.
+* @param[in] pName - Name of the new factory-reset configuration version.
+* @param[out] pVersionInstance - The newly created and active factory-reset configuration version.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_machineconfigurationtype_resettoparameterdefaults(LibMCEnv_MachineConfigurationType pMachineConfigurationType, const char * pUserUUID, const char * pName, LibMCEnv_MachineConfigurationVersion * pVersionInstance);
+
 /*************************************************************************************************************************
  Class definition for MachineConfigurationTypeIterator
 **************************************************************************************************************************/

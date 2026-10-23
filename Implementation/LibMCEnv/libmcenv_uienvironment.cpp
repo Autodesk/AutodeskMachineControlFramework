@@ -1491,5 +1491,5 @@ IJSONObject* CUIEnvironment::ParseJSONData(const LibMCEnv_uint64 nJSONDataBuffer
 
 IMachineConfigurationHandler* CUIEnvironment::CreateMachineConfigurationHandler()
 {
-    return new CMachineConfigurationHandler(m_pUISystemState->getDataModel());
+    return new CMachineConfigurationHandler(m_pUISystemState->getDataModel(), m_pUISystemState->getStateMachineData());
 }

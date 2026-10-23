@@ -895,13 +895,25 @@ void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParamet
             throw ELibMCCustomException(LIBMC_ERROR_MISSINGPARAMETERTYPE, pGroup->getName() + "/" + nameAttrib.as_string());
         auto unitsAttrib = parameterNode.attribute("units");
         auto persistentAttrib = parameterNode.attribute("persistent");
+        auto configurationSchemaAttrib = parameterNode.attribute("configschema");
+        auto configurationPathAttrib = parameterNode.attribute("configpath");
 
         std::string sName = nameAttrib.as_string();
         std::string sPersistentUUID = persistentAttrib.as_string();
+        std::string sConfigurationSchema = configurationSchemaAttrib.as_string();
+        std::string sConfigurationPath = configurationPathAttrib.as_string();
        
         pGroup->addNewTypedParameter(sName, typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string(), unitsAttrib.as_string());
         if (!sPersistentUUID.empty())
             pGroup->setParameterPersistentUUID(sName, sPersistentUUID);
+
+        if (sConfigurationSchema.empty() != sConfigurationPath.empty())
+            throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, "configschema and configpath must be specified together for " + pGroup->getName() + "/" + sName);
+        if (!sConfigurationSchema.empty()) {
+            if ((sConfigurationPath.front() == '/') || (sConfigurationPath.back() == '/') || (sConfigurationPath.find("//") != std::string::npos))
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, "invalid configpath for " + pGroup->getName() + "/" + sName + ": " + sConfigurationPath);
+            pGroup->setParameterConfigurationMapping(sName, sConfigurationSchema, sConfigurationPath);
+        }
     }
 
 }

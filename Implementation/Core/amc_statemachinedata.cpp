@@ -86,6 +86,18 @@ namespace AMC {
 		return pHandler;
 	}
 
+	std::vector<std::pair<std::string, PParameterHandler>> CStateMachineData::getParameterHandlers()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		std::vector<std::pair<std::string, PParameterHandler>> result;
+		result.reserve(m_StateMachineParameters.size());
+		for (auto& entry : m_StateMachineParameters)
+			result.push_back(entry);
+
+		return result;
+	}
+
 
 	CParameterGroup* CStateMachineData::getDataStore(const std::string& sInstanceName)
 	{

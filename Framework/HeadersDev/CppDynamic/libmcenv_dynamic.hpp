@@ -3519,6 +3519,9 @@ public:
 	inline PMachineConfiguration GetActiveConfiguration();
 	inline PMachineConfiguration EnsureActiveConfiguration();
 	inline PMachineConfigurationXSD EnsureXSDVersion(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string & sDefaultXML);
+	inline PMachineConfigurationXSD EnsureXSDVersionFromParameterDefaults(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion);
+	inline LibMCEnv_uint32 SynchronizeParameters();
+	inline PMachineConfigurationVersion ResetToParameterDefaults(const std::string & sUserUUID, const std::string & sName);
 };
 	
 /*************************************************************************************************************************
@@ -4857,6 +4860,9 @@ public:
 		pWrapperTable->m_MachineConfigurationType_GetActiveConfiguration = nullptr;
 		pWrapperTable->m_MachineConfigurationType_EnsureActiveConfiguration = nullptr;
 		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion = nullptr;
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersionFromParameterDefaults = nullptr;
+		pWrapperTable->m_MachineConfigurationType_SynchronizeParameters = nullptr;
+		pWrapperTable->m_MachineConfigurationType_ResetToParameterDefaults = nullptr;
 		pWrapperTable->m_MachineConfigurationTypeIterator_GetCurrent = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_RegisterMachineConfigurationType = nullptr;
 		pWrapperTable->m_MachineConfigurationHandler_HasMachineConfigurationType = nullptr;
@@ -13376,6 +13382,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersionFromParameterDefaults = (PLibMCEnvMachineConfigurationType_EnsureXSDVersionFromParameterDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_ensurexsdversionfromparameterdefaults");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_EnsureXSDVersionFromParameterDefaults = (PLibMCEnvMachineConfigurationType_EnsureXSDVersionFromParameterDefaultsPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_ensurexsdversionfromparameterdefaults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_EnsureXSDVersionFromParameterDefaults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_SynchronizeParameters = (PLibMCEnvMachineConfigurationType_SynchronizeParametersPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_synchronizeparameters");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_SynchronizeParameters = (PLibMCEnvMachineConfigurationType_SynchronizeParametersPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_synchronizeparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_SynchronizeParameters == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MachineConfigurationType_ResetToParameterDefaults = (PLibMCEnvMachineConfigurationType_ResetToParameterDefaultsPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtype_resettoparameterdefaults");
+		#else // _WIN32
+		pWrapperTable->m_MachineConfigurationType_ResetToParameterDefaults = (PLibMCEnvMachineConfigurationType_ResetToParameterDefaultsPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtype_resettoparameterdefaults");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MachineConfigurationType_ResetToParameterDefaults == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_MachineConfigurationTypeIterator_GetCurrent = (PLibMCEnvMachineConfigurationTypeIterator_GetCurrentPtr) GetProcAddress(hLibrary, "libmcenv_machineconfigurationtypeiterator_getcurrent");
 		#else // _WIN32
 		pWrapperTable->m_MachineConfigurationTypeIterator_GetCurrent = (PLibMCEnvMachineConfigurationTypeIterator_GetCurrentPtr) dlsym(hLibrary, "libmcenv_machineconfigurationtypeiterator_getcurrent");
@@ -19146,6 +19179,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_ensurexsdversion", (void**)&(pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_EnsureXSDVersion == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_ensurexsdversionfromparameterdefaults", (void**)&(pWrapperTable->m_MachineConfigurationType_EnsureXSDVersionFromParameterDefaults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_EnsureXSDVersionFromParameterDefaults == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_synchronizeparameters", (void**)&(pWrapperTable->m_MachineConfigurationType_SynchronizeParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_SynchronizeParameters == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_machineconfigurationtype_resettoparameterdefaults", (void**)&(pWrapperTable->m_MachineConfigurationType_ResetToParameterDefaults));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MachineConfigurationType_ResetToParameterDefaults == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_machineconfigurationtypeiterator_getcurrent", (void**)&(pWrapperTable->m_MachineConfigurationTypeIterator_GetCurrent));
@@ -32701,6 +32746,53 @@ public:
 		} else {
 			return nullptr;
 		}
+	}
+	
+	/**
+	* CMachineConfigurationType::EnsureXSDVersionFromParameterDefaults - Registers a new XSD version and generates its default configuration from state-machine parameters mapped to this configuration schema. Returns null if the given version is not newer.
+	* @param[in] sXSDString - XSD String of the version. MUST be a valid schema of this type.
+	* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+	* @return The newly registered XSD, or null if the version was not newer than the latest.
+	*/
+	PMachineConfigurationXSD CMachineConfigurationType::EnsureXSDVersionFromParameterDefaults(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion)
+	{
+		LibMCEnvHandle hXSDInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_EnsureXSDVersionFromParameterDefaults(m_pHandle, sXSDString.c_str(), nXSDVersion, &hXSDInstance));
+		
+		if (hXSDInstance) {
+			return std::make_shared<CMachineConfigurationXSD>(m_pWrapper, hXSDInstance);
+		} else {
+			return nullptr;
+		}
+	}
+	
+	/**
+	* CMachineConfigurationType::SynchronizeParameters - Applies every parameter of the active configuration to the state-machine parameters mapped to this configuration schema. All values are validated before any runtime parameter is changed.
+	* @return Number of mapped runtime parameters that have been synchronized.
+	*/
+	LibMCEnv_uint32 CMachineConfigurationType::SynchronizeParameters()
+	{
+		LibMCEnv_uint32 resultAppliedParameterCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_SynchronizeParameters(m_pHandle, &resultAppliedParameterCount));
+		
+		return resultAppliedParameterCount;
+	}
+	
+	/**
+	* CMachineConfigurationType::ResetToParameterDefaults - Creates and activates a new auditable configuration version from the mapped state-machine parameter defaults, then synchronizes the runtime parameters. Existing configuration history is preserved.
+	* @param[in] sUserUUID - UUID of the user requesting the reset.
+	* @param[in] sName - Name of the new factory-reset configuration version.
+	* @return The newly created and active factory-reset configuration version.
+	*/
+	PMachineConfigurationVersion CMachineConfigurationType::ResetToParameterDefaults(const std::string & sUserUUID, const std::string & sName)
+	{
+		LibMCEnvHandle hVersionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MachineConfigurationType_ResetToParameterDefaults(m_pHandle, sUserUUID.c_str(), sName.c_str(), &hVersionInstance));
+		
+		if (!hVersionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CMachineConfigurationVersion>(m_pWrapper, hVersionInstance);
 	}
 	
 	/**

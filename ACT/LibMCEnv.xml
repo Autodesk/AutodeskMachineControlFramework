@@ -5404,6 +5404,22 @@
 			<param name="XSDInstance" type="optionalclass" class="MachineConfigurationXSD" pass="return" description="The newly registered XSD, or null if the version was not newer than the latest." />
 		</method>
 
+		<method name="EnsureXSDVersionFromParameterDefaults" description="Registers a new XSD version and generates its default configuration from state-machine parameters mapped to this configuration schema. Returns null if the given version is not newer.">
+			<param name="XSDString" type="string" pass="in" description="XSD String of the version. MUST be a valid schema of this type." />
+			<param name="XSDVersion" type="uint32" pass="in" description="Version to add. Registered only if larger than GetLatestXSDNumericVersion." />
+			<param name="XSDInstance" type="optionalclass" class="MachineConfigurationXSD" pass="return" description="The newly registered XSD, or null if the version was not newer than the latest." />
+		</method>
+
+		<method name="SynchronizeParameters" description="Applies every parameter of the active configuration to the state-machine parameters mapped to this configuration schema. All values are validated before any runtime parameter is changed.">
+			<param name="AppliedParameterCount" type="uint32" pass="return" description="Number of mapped runtime parameters that have been synchronized." />
+		</method>
+
+		<method name="ResetToParameterDefaults" description="Creates and activates a new auditable configuration version from the mapped state-machine parameter defaults, then synchronizes the runtime parameters. Existing configuration history is preserved.">
+			<param name="UserUUID" type="string" pass="in" description="UUID of the user requesting the reset." />
+			<param name="Name" type="string" pass="in" description="Name of the new factory-reset configuration version." />
+			<param name="VersionInstance" type="class" class="MachineConfigurationVersion" pass="return" description="The newly created and active factory-reset configuration version." />
+		</method>
+
 	</class>
 
 	<class name="MachineConfigurationTypeIterator" parent="Iterator" description="Iterator over MachineConfigurationType instances.">

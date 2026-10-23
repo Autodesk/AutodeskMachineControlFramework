@@ -7629,6 +7629,28 @@ public:
 	*/
 	virtual IMachineConfigurationXSD * EnsureXSDVersion(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion, const std::string & sDefaultXML) = 0;
 
+	/**
+	* IMachineConfigurationType::EnsureXSDVersionFromParameterDefaults - Registers a new XSD version and generates its default configuration from state-machine parameters mapped to this configuration schema. Returns null if the given version is not newer.
+	* @param[in] sXSDString - XSD String of the version. MUST be a valid schema of this type.
+	* @param[in] nXSDVersion - Version to add. Registered only if larger than GetLatestXSDNumericVersion.
+	* @return The newly registered XSD, or null if the version was not newer than the latest.
+	*/
+	virtual IMachineConfigurationXSD * EnsureXSDVersionFromParameterDefaults(const std::string & sXSDString, const LibMCEnv_uint32 nXSDVersion) = 0;
+
+	/**
+	* IMachineConfigurationType::SynchronizeParameters - Applies every parameter of the active configuration to the state-machine parameters mapped to this configuration schema. All values are validated before any runtime parameter is changed.
+	* @return Number of mapped runtime parameters that have been synchronized.
+	*/
+	virtual LibMCEnv_uint32 SynchronizeParameters() = 0;
+
+	/**
+	* IMachineConfigurationType::ResetToParameterDefaults - Creates and activates a new auditable configuration version from the mapped state-machine parameter defaults, then synchronizes the runtime parameters. Existing configuration history is preserved.
+	* @param[in] sUserUUID - UUID of the user requesting the reset.
+	* @param[in] sName - Name of the new factory-reset configuration version.
+	* @return The newly created and active factory-reset configuration version.
+	*/
+	virtual IMachineConfigurationVersion * ResetToParameterDefaults(const std::string & sUserUUID, const std::string & sName) = 0;
+
 };
 
 typedef IBaseSharedPtr<IMachineConfigurationType> PIMachineConfigurationType;

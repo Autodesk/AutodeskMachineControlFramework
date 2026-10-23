@@ -46,6 +46,7 @@ Abstract: This is the class declaration of CMachineConfigurationHandler
 
 // Include custom headers here.
 #include "libmcdata_dynamic.hpp"
+#include "amc_statemachinedata.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
@@ -59,10 +60,11 @@ class CMachineConfigurationHandler : public virtual IMachineConfigurationHandler
 private:
 
 	LibMCData::PDataModel m_pDataModel;
+	AMC::PStateMachineData m_pStateMachineData;
 
 public:
 
-    CMachineConfigurationHandler (LibMCData::PDataModel pDataModel);
+    CMachineConfigurationHandler (LibMCData::PDataModel pDataModel, AMC::PStateMachineData pStateMachineData);
 
     virtual ~CMachineConfigurationHandler();
 

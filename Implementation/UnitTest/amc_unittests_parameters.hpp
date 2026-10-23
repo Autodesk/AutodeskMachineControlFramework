@@ -54,6 +54,7 @@ namespace AMCUnitTest {
 			registerTest("ParameterSerialization", "Parameter group JSON serialization", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Parameters::testParameterSerialization, this));
 			registerTest("ParameterHandlerBasics", "Parameter handler group management and duplication", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Parameters::testParameterHandlerBasics, this));
 			registerTest("ParameterGroupEnumeration", "Parameter group enumeration by index (count/name/description)", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Parameters::testParameterGroupEnumeration, this));
+			registerTest("ParameterConfigurationMapping", "Parameter configuration mapping metadata", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Parameters::testParameterConfigurationMapping, this));
 		}
 
 		void initializeTests() override {
@@ -309,6 +310,50 @@ namespace AMCUnitTest {
 				thrown = true;
 			}
 			assertTrue(thrown, "Expected getParameterInfo to throw on out-of-range index");
+		}
+
+		void testParameterConfigurationMapping()
+		{
+			auto chrono = std::make_shared<AMCCommon::CChrono>();
+			auto pChangeCounter = std::make_shared<AMC::CFrontendChangeCounter>();
+			AMC::CParameterHandler handler("handler", chrono, pChangeCounter);
+			auto pGroup = handler.addGroup("cardconfig", "Scanner Card Config");
+			pGroup->setJournal(nullptr, "main");
+			pGroup->addNewIntParameter("serial", "Serial", 20065509);
+			pGroup->addNewStringParameter("unmapped", "Unmapped", "value");
+			pGroup->setParameterConfigurationMapping("serial", "com.autodesk.remotelpbf", "ScannerCard/Serial");
+
+			std::string sSchema, sPath;
+			assertTrue(pGroup->getParameterConfigurationMapping("serial", sSchema, sPath));
+			assertTrue(sSchema == "com.autodesk.remotelpbf");
+			assertTrue(sPath == "ScannerCard/Serial");
+			assertFalse(pGroup->getParameterConfigurationMapping("unmapped", sSchema, sPath));
+			assertTrue(sSchema.empty());
+			assertTrue(sPath.empty());
+
+			auto pDuplicate = handler.duplicate();
+			auto pDuplicateGroup = pDuplicate->findGroup("cardconfig", true);
+			assertTrue(pDuplicateGroup->getParameterConfigurationMapping("serial", sSchema, sPath));
+			assertTrue(sSchema == "com.autodesk.remotelpbf");
+			assertTrue(sPath == "ScannerCard/Serial");
+
+			bool bThrown = false;
+			try {
+				pGroup->setParameterConfigurationMapping("missing", "schema", "Path");
+			}
+			catch (...) {
+				bThrown = true;
+			}
+			assertTrue(bThrown, "Expected a mapping for a missing parameter to be rejected");
+
+			bThrown = false;
+			try {
+				pGroup->setParameterConfigurationMapping("serial", "schema", "Other/Path");
+			}
+			catch (...) {
+				bThrown = true;
+			}
+			assertTrue(bThrown, "Expected a duplicate parameter mapping to be rejected");
 		}
 	};
 

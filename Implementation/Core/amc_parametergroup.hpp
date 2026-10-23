@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <string>
 #include <mutex>
+#include <utility>
 
 #include "amc_parametertype.hpp"
 
@@ -72,6 +73,7 @@ namespace AMC {
 		std::string m_sDescription;
 		std::map<std::string, PParameter> m_Parameters;
 		std::vector<PParameter> m_ParameterList;
+		std::map<std::string, std::pair<std::string, std::string>> m_ConfigurationMappings;
 
 		PStateJournal m_pStateJournal;
 		std::string m_sInstanceName;
@@ -120,6 +122,9 @@ namespace AMC {
 		uint32_t getParameterCount();
 		void getParameterInfo(const uint32_t nIndex, std::string & sName, std::string & sDescription, std::string & sDefaultValue);		
 		void getParameterInfoByName(const std::string& sName, std::string& sDescription, std::string& sDefaultValue);
+
+		void setParameterConfigurationMapping(const std::string& sName, const std::string& sConfigurationSchema, const std::string& sConfigurationPath);
+		bool getParameterConfigurationMapping(const std::string& sName, std::string& sConfigurationSchema, std::string& sConfigurationPath);
 
 		std::string getParameterValueByIndex(const uint32_t nIndex);
 		std::string getParameterValueByName(const std::string & sName);

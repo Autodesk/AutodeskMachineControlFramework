@@ -144,6 +144,36 @@ namespace AMC {
 
 	}
 
+	void CParameterGroup::setParameterConfigurationMapping(const std::string& sName, const std::string& sConfigurationSchema, const std::string& sConfigurationPath)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+
+		if (m_Parameters.find(sName) == m_Parameters.end())
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
+		if (sConfigurationSchema.empty() || sConfigurationPath.empty())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, m_sName + "/" + sName);
+		if (m_ConfigurationMappings.find(sName) != m_ConfigurationMappings.end())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, "duplicate configuration mapping for " + m_sName + "/" + sName);
+
+		m_ConfigurationMappings.insert(std::make_pair(sName, std::make_pair(sConfigurationSchema, sConfigurationPath)));
+	}
+
+	bool CParameterGroup::getParameterConfigurationMapping(const std::string& sName, std::string& sConfigurationSchema, std::string& sConfigurationPath)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+
+		auto iIter = m_ConfigurationMappings.find(sName);
+		if (iIter == m_ConfigurationMappings.end()) {
+			sConfigurationSchema.clear();
+			sConfigurationPath.clear();
+			return false;
+		}
+
+		sConfigurationSchema = iIter->second.first;
+		sConfigurationPath = iIter->second.second;
+		return true;
+	}
+
 
 	std::string CParameterGroup::getParameterValueByIndex(const uint32_t nIndex)
 	{
@@ -443,6 +473,7 @@ namespace AMC {
 		for (auto pParameter : m_ParameterList) {
 			pParameterGroup->addParameterInternal (pParameter->duplicate ());
 		}
+		pParameterGroup->m_ConfigurationMappings = m_ConfigurationMappings;
 		
 	}
 

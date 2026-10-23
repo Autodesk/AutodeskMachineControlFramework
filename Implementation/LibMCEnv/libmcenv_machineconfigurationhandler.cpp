@@ -44,8 +44,8 @@ using namespace LibMCEnv::Impl;
 /*************************************************************************************************************************
  Class definition of CMachineConfigurationHandler 
 **************************************************************************************************************************/
-CMachineConfigurationHandler::CMachineConfigurationHandler(LibMCData::PDataModel pDataModel)
-    : m_pDataModel (pDataModel)
+CMachineConfigurationHandler::CMachineConfigurationHandler(LibMCData::PDataModel pDataModel, AMC::PStateMachineData pStateMachineData)
+    : m_pDataModel (pDataModel), m_pStateMachineData (pStateMachineData)
 {
     if (pDataModel.get () == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -63,7 +63,7 @@ IMachineConfigurationType * CMachineConfigurationHandler::RegisterMachineConfigu
 		// Check if the name is equal
 		if (pConfigurationType->GetName() == sName) {
 			// Already registered
-			return new CMachineConfigurationType(pConfigurationType);
+			return new CMachineConfigurationType(pConfigurationType, m_pStateMachineData);
 		}
 		else {
 			// Schema type already registered, but with a different name
@@ -74,7 +74,7 @@ IMachineConfigurationType * CMachineConfigurationHandler::RegisterMachineConfigu
 		pConfigurationType = m_pDataModel->CreateConfigurationType(sSchemaType, sName);
     }
 
-    return new CMachineConfigurationType(pConfigurationType);		
+    return new CMachineConfigurationType(pConfigurationType, m_pStateMachineData);		
 }
 
 bool CMachineConfigurationHandler::HasMachineConfigurationType(const std::string & sSchemaType)
@@ -94,7 +94,7 @@ IMachineConfigurationTypeIterator* CMachineConfigurationHandler::ListRegisteredT
 	if (pIterator.get() == nullptr)
 		return nullptr;
 
-    return new CMachineConfigurationTypeIterator(pIterator);
+    return new CMachineConfigurationTypeIterator(pIterator, m_pStateMachineData);
 }
 
 IMachineConfigurationType* CMachineConfigurationHandler::FindConfigurationTypeByUUID(const std::string& sTypeUUID)
@@ -108,7 +108,7 @@ IMachineConfigurationType* CMachineConfigurationHandler::FindConfigurationTypeBy
     if (pConfigurationType.get() == nullptr)
         return nullptr;
 
-    return new CMachineConfigurationType(pConfigurationType);
+    return new CMachineConfigurationType(pConfigurationType, m_pStateMachineData);
 }
 
 IMachineConfigurationType* CMachineConfigurationHandler::FindConfigurationTypeBySchema(const std::string& sSchemaType)
@@ -117,5 +117,5 @@ IMachineConfigurationType* CMachineConfigurationHandler::FindConfigurationTypeBy
     if (pConfigurationType.get() == nullptr)
         return nullptr;
 
-    return new CMachineConfigurationType(pConfigurationType);
+    return new CMachineConfigurationType(pConfigurationType, m_pStateMachineData);
 }

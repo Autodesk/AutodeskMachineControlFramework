@@ -855,7 +855,7 @@ IJSONObject* CStateEnvironment::ParseJSONData(const LibMCEnv_uint64 nJSONDataBuf
 
 IMachineConfigurationHandler* CStateEnvironment::CreateMachineConfigurationHandler()
 {
-	return new CMachineConfigurationHandler(m_pSystemState->getDataModelInstance ());
+	return new CMachineConfigurationHandler(m_pSystemState->getDataModelInstance (), m_pSystemState->getStateMachineData ());
 }
 
 

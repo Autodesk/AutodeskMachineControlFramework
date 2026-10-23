@@ -35,8 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_unittests_libmcdata.hpp"
 #include "common_utils.hpp"
 #include "libmcdata_dynamic.hpp"
+#include "libmcenv_machineconfigurationtype.hpp"
+#include "amc_statemachinedata.hpp"
+#include "amc_frontendchangecounter.hpp"
 
 #include <cstdint>
+#include <memory>
 #include <string>
 
 namespace AMCUnitTest {
@@ -77,6 +81,7 @@ namespace AMCUnitTest {
 			registerTest("VersionDefaultName", "Default configuration version name", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_MachineConfig::testVersionDefaultName, this));
 			registerTest("VersionCreateNamed", "Create named configuration version", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_MachineConfig::testVersionCreateNamed, this));
 			registerTest("VersionRejectEmptyName", "Reject configuration version without name", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_MachineConfig::testVersionRejectEmptyName, this));
+			registerTest("ParameterSynchronization", "Generate, apply and reset a mapped parameter configuration", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_LibMCData_MachineConfig::testParameterSynchronization, this));
 		}
 
 		void initializeTests() override {
@@ -138,6 +143,88 @@ namespace AMCUnitTest {
 		std::string getCurrentTimestampUTC()
 		{
 			return "2025-01-15T12:00:00Z";
+		}
+
+		void testParameterSynchronization()
+		{
+			auto fixture = createFixture("parameter_synchronization");
+			const std::string sSchema = "com.autodesk.unittest.parametersync";
+			const std::string sTypeName = "Parameter Synchronization Test";
+
+			auto pChrono = std::make_shared<AMCCommon::CChrono>();
+			auto pChangeCounter = std::make_shared<AMC::CFrontendChangeCounter>();
+			auto pHandler = std::make_shared<AMC::CParameterHandler>("main", pChrono, pChangeCounter);
+			auto pGroup = pHandler->addGroup("settings", "Settings");
+			pGroup->setJournal(nullptr, "main");
+			pGroup->addNewIntParameter("count", "Count", 42);
+			pGroup->addNewBoolParameter("enabled", "Enabled", true);
+			pGroup->addNewStringParameter("label", "Label", "factory");
+			pGroup->setParameterConfigurationMapping("count", sSchema, "Settings/Count");
+			pGroup->setParameterConfigurationMapping("enabled", sSchema, "Settings/Enabled");
+			pGroup->setParameterConfigurationMapping("label", sSchema, "Settings/Label");
+
+			auto pStateMachineData = std::make_shared<AMC::CStateMachineData>();
+			pStateMachineData->registerParameterHandler("main", pHandler, pChrono);
+
+			auto pDataType = fixture.m_pDataModel->CreateConfigurationType(sSchema, sTypeName);
+			LibMCEnv::Impl::CMachineConfigurationType configurationType(pDataType, pStateMachineData);
+
+			std::string sXSD = R"(<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:cfg="com.autodesk.unittest.parametersync"
+           targetNamespace="com.autodesk.unittest.parametersync"
+           elementFormDefault="qualified">
+  <xs:element name="Configuration" type="cfg:ConfigurationType"/>
+  <xs:complexType name="ConfigurationType">
+    <xs:sequence>
+      <xs:element name="Settings" type="cfg:SettingsType"/>
+    </xs:sequence>
+    <xs:attribute name="Version" type="xs:string" use="required"/>
+    <xs:attribute name="TypeName" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SettingsType">
+    <xs:sequence>
+      <xs:element name="Count" type="cfg:ValueType"/>
+      <xs:element name="Enabled" type="cfg:ValueType"/>
+      <xs:element name="Label" type="cfg:ValueType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ValueType">
+    <xs:attribute name="value" type="xs:string" use="required"/>
+    <xs:attribute name="description" type="xs:string" use="optional"/>
+  </xs:complexType>
+</xs:schema>)";
+
+			std::unique_ptr<LibMCEnv::Impl::IMachineConfigurationXSD> pXSD(
+				configurationType.EnsureXSDVersionFromParameterDefaults(sXSD, 1));
+			assertAssigned(pXSD.get(), "The first XSD and generated default configuration should be created");
+
+			pGroup->setIntParameterValueByName("count", 7);
+			pGroup->setBoolParameterValueByName("enabled", false);
+			pGroup->setParameterValueByName("label", "changed");
+			assertTrue(configurationType.SynchronizeParameters() == 3);
+			assertTrue(pGroup->getIntParameterValueByName("count") == 42);
+			assertTrue(pGroup->getBoolParameterValueByName("enabled"));
+			assertTrue(pGroup->getParameterValueByName("label") == "factory");
+
+			std::unique_ptr<LibMCEnv::Impl::IMachineConfiguration> pConfiguration(configurationType.GetActiveConfiguration());
+			pConfiguration->SetIntegerParameter("Settings/Count", 99);
+			pConfiguration->SetBoolParameter("Settings/Enabled", false);
+			pConfiguration->SetStringParameter("Settings/Label", "custom");
+			std::unique_ptr<LibMCEnv::Impl::IMachineConfigurationVersion> pCustomVersion(
+				pConfiguration->CommitAndActivate(AMCCommon::CUtils::createUUID(), "Custom settings"));
+
+			configurationType.SynchronizeParameters();
+			assertTrue(pGroup->getIntParameterValueByName("count") == 99);
+			assertFalse(pGroup->getBoolParameterValueByName("enabled"));
+			assertTrue(pGroup->getParameterValueByName("label") == "custom");
+
+			std::unique_ptr<LibMCEnv::Impl::IMachineConfigurationVersion> pResetVersion(
+				configurationType.ResetToParameterDefaults(AMCCommon::CUtils::createUUID(), "Factory reset"));
+			assertTrue(pResetVersion->GetName() == "Factory reset");
+			assertTrue(pGroup->getIntParameterValueByName("count") == 42);
+			assertTrue(pGroup->getBoolParameterValueByName("enabled"));
+			assertTrue(pGroup->getParameterValueByName("label") == "factory");
 		}
 
 		// ============= MachineConfigurationType Tests =============
