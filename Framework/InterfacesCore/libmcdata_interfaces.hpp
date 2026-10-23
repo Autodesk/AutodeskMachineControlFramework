@@ -2855,6 +2855,18 @@ public:
 	virtual void InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType eDataBaseType, const std::string & sConnectionString) = 0;
 
 	/**
+	* IDataModel::SetTelemetryEnabled - enables or disables telemetry recording. Must be called before InitialiseDatabase.
+	* @param[in] bTelemetryEnabled - Flag if telemetry recording shall be enabled.
+	*/
+	virtual void SetTelemetryEnabled(const bool bTelemetryEnabled) = 0;
+
+	/**
+	* IDataModel::GetTelemetryEnabled - returns if telemetry recording is enabled.
+	* @return Flag if telemetry recording is enabled.
+	*/
+	virtual bool GetTelemetryEnabled() = 0;
+
+	/**
 	* IDataModel::GetDataModelVersion - returns the linear data model version.
 	* @return Data model version.
 	*/

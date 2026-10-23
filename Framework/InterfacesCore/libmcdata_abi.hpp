@@ -3434,6 +3434,24 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_installationinformation_getbasetemp
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_initialisedatabase(LibMCData_DataModel pDataModel, const char * pDataDirectory, LibMCData::eDataBaseType eDataBaseType, const char * pConnectionString);
 
 /**
+* enables or disables telemetry recording. Must be called before InitialiseDatabase.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] bTelemetryEnabled - Flag if telemetry recording shall be enabled.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_settelemetryenabled(LibMCData_DataModel pDataModel, bool bTelemetryEnabled);
+
+/**
+* returns if telemetry recording is enabled.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pTelemetryEnabled - Flag if telemetry recording is enabled.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_gettelemetryenabled(LibMCData_DataModel pDataModel, bool * pTelemetryEnabled);
+
+/**
 * returns the linear data model version.
 *
 * @param[in] pDataModel - DataModel instance.

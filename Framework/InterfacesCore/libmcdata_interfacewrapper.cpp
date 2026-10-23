@@ -10938,6 +10938,56 @@ LibMCDataResult libmcdata_datamodel_initialisedatabase(LibMCData_DataModel pData
 	}
 }
 
+LibMCDataResult libmcdata_datamodel_settelemetryenabled(LibMCData_DataModel pDataModel, bool bTelemetryEnabled)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIDataModel->SetTelemetryEnabled(bTelemetryEnabled);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_gettelemetryenabled(LibMCData_DataModel pDataModel, bool * pTelemetryEnabled)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pTelemetryEnabled == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pTelemetryEnabled = pIDataModel->GetTelemetryEnabled();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_datamodel_getdatamodelversion(LibMCData_DataModel pDataModel, LibMCData_uint32 * pVersion)
 {
 	IBase* pIBaseClass = (IBase *)pDataModel;
@@ -12307,6 +12357,10 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_installationinformation_getbasetempdirectory;
 	if (sProcName == "libmcdata_datamodel_initialisedatabase") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_initialisedatabase;
+	if (sProcName == "libmcdata_datamodel_settelemetryenabled") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_settelemetryenabled;
+	if (sProcName == "libmcdata_datamodel_gettelemetryenabled") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_gettelemetryenabled;
 	if (sProcName == "libmcdata_datamodel_getdatamodelversion") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_getdatamodelversion;
 	if (sProcName == "libmcdata_datamodel_getinstallationinformation") 

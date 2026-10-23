@@ -690,6 +690,7 @@ public:
 			case LIBMCDATA_ERROR_TELEMETRYCHANNELNOTFOUND: return "TELEMETRYCHANNELNOTFOUND";
 			case LIBMCDATA_ERROR_JOBNAMETOOLONG: return "JOBNAMETOOLONG";
 			case LIBMCDATA_ERROR_STRINGPARAMETERTOOLONG: return "STRINGPARAMETERTOOLONG";
+			case LIBMCDATA_ERROR_TELEMETRYSETTINGAFTERINITIALISATION: return "TELEMETRYSETTINGAFTERINITIALISATION";
 		}
 		return "UNKNOWN";
 	}
@@ -1079,6 +1080,7 @@ public:
 			case LIBMCDATA_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
 			case LIBMCDATA_ERROR_JOBNAMETOOLONG: return "Job name exceeds maximum allowed length";
 			case LIBMCDATA_ERROR_STRINGPARAMETERTOOLONG: return "String parameter exceeds maximum allowed length";
+			case LIBMCDATA_ERROR_TELEMETRYSETTINGAFTERINITIALISATION: return "Telemetry setting changed after database initialisation";
 		}
 		return "unknown error";
 	}
@@ -2197,6 +2199,8 @@ public:
 	}
 	
 	inline void InitialiseDatabase(const std::string & sDataDirectory, const eDataBaseType eDataBaseType, const std::string & sConnectionString);
+	inline void SetTelemetryEnabled(const bool bTelemetryEnabled);
+	inline bool GetTelemetryEnabled();
 	inline LibMCData_uint32 GetDataModelVersion();
 	inline void GetInstallationInformation(std::string & sDEPRECIATEDInstallationUUID, std::string & sDEPRECIATEDInstallationSecret);
 	inline PInstallationInformation GetInstallationInformationObject();
@@ -2616,6 +2620,8 @@ public:
 		pWrapperTable->m_InstallationInformation_GetInstallationSecret = nullptr;
 		pWrapperTable->m_InstallationInformation_GetBaseTempDirectory = nullptr;
 		pWrapperTable->m_DataModel_InitialiseDatabase = nullptr;
+		pWrapperTable->m_DataModel_SetTelemetryEnabled = nullptr;
+		pWrapperTable->m_DataModel_GetTelemetryEnabled = nullptr;
 		pWrapperTable->m_DataModel_GetDataModelVersion = nullptr;
 		pWrapperTable->m_DataModel_GetInstallationInformation = nullptr;
 		pWrapperTable->m_DataModel_GetInstallationInformationObject = nullptr;
@@ -5362,6 +5368,24 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataModel_SetTelemetryEnabled = (PLibMCDataDataModel_SetTelemetryEnabledPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_settelemetryenabled");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_SetTelemetryEnabled = (PLibMCDataDataModel_SetTelemetryEnabledPtr) dlsym(hLibrary, "libmcdata_datamodel_settelemetryenabled");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_SetTelemetryEnabled == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataModel_GetTelemetryEnabled = (PLibMCDataDataModel_GetTelemetryEnabledPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_gettelemetryenabled");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_GetTelemetryEnabled = (PLibMCDataDataModel_GetTelemetryEnabledPtr) dlsym(hLibrary, "libmcdata_datamodel_gettelemetryenabled");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_GetTelemetryEnabled == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataModel_GetDataModelVersion = (PLibMCDataDataModel_GetDataModelVersionPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_getdatamodelversion");
 		#else // _WIN32
 		pWrapperTable->m_DataModel_GetDataModelVersion = (PLibMCDataDataModel_GetDataModelVersionPtr) dlsym(hLibrary, "libmcdata_datamodel_getdatamodelversion");
@@ -6838,6 +6862,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_initialisedatabase", (void**)&(pWrapperTable->m_DataModel_InitialiseDatabase));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_InitialiseDatabase == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_settelemetryenabled", (void**)&(pWrapperTable->m_DataModel_SetTelemetryEnabled));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_SetTelemetryEnabled == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_gettelemetryenabled", (void**)&(pWrapperTable->m_DataModel_GetTelemetryEnabled));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_GetTelemetryEnabled == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_getdatamodelversion", (void**)&(pWrapperTable->m_DataModel_GetDataModelVersion));
@@ -11346,6 +11378,27 @@ public:
 	void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const eDataBaseType eDataBaseType, const std::string & sConnectionString)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_InitialiseDatabase(m_pHandle, sDataDirectory.c_str(), eDataBaseType, sConnectionString.c_str()));
+	}
+	
+	/**
+	* CDataModel::SetTelemetryEnabled - enables or disables telemetry recording. Must be called before InitialiseDatabase.
+	* @param[in] bTelemetryEnabled - Flag if telemetry recording shall be enabled.
+	*/
+	void CDataModel::SetTelemetryEnabled(const bool bTelemetryEnabled)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_SetTelemetryEnabled(m_pHandle, bTelemetryEnabled));
+	}
+	
+	/**
+	* CDataModel::GetTelemetryEnabled - returns if telemetry recording is enabled.
+	* @return Flag if telemetry recording is enabled.
+	*/
+	bool CDataModel::GetTelemetryEnabled()
+	{
+		bool resultTelemetryEnabled = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetTelemetryEnabled(m_pHandle, &resultTelemetryEnabled));
+		
+		return resultTelemetryEnabled;
 	}
 	
 	/**

@@ -3421,6 +3421,24 @@ typedef LibMCDataResult (*PLibMCDataInstallationInformation_GetBaseTempDirectory
 typedef LibMCDataResult (*PLibMCDataDataModel_InitialiseDatabasePtr) (LibMCData_DataModel pDataModel, const char * pDataDirectory, LibMCData::eDataBaseType eDataBaseType, const char * pConnectionString);
 
 /**
+* enables or disables telemetry recording. Must be called before InitialiseDatabase.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] bTelemetryEnabled - Flag if telemetry recording shall be enabled.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_SetTelemetryEnabledPtr) (LibMCData_DataModel pDataModel, bool bTelemetryEnabled);
+
+/**
+* returns if telemetry recording is enabled.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pTelemetryEnabled - Flag if telemetry recording is enabled.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_GetTelemetryEnabledPtr) (LibMCData_DataModel pDataModel, bool * pTelemetryEnabled);
+
+/**
 * returns the linear data model version.
 *
 * @param[in] pDataModel - DataModel instance.
@@ -4021,6 +4039,8 @@ typedef struct {
 	PLibMCDataInstallationInformation_GetInstallationSecretPtr m_InstallationInformation_GetInstallationSecret;
 	PLibMCDataInstallationInformation_GetBaseTempDirectoryPtr m_InstallationInformation_GetBaseTempDirectory;
 	PLibMCDataDataModel_InitialiseDatabasePtr m_DataModel_InitialiseDatabase;
+	PLibMCDataDataModel_SetTelemetryEnabledPtr m_DataModel_SetTelemetryEnabled;
+	PLibMCDataDataModel_GetTelemetryEnabledPtr m_DataModel_GetTelemetryEnabled;
 	PLibMCDataDataModel_GetDataModelVersionPtr m_DataModel_GetDataModelVersion;
 	PLibMCDataDataModel_GetInstallationInformationPtr m_DataModel_GetInstallationInformation;
 	PLibMCDataDataModel_GetInstallationInformationObjectPtr m_DataModel_GetInstallationInformationObject;

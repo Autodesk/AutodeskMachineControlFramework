@@ -97,7 +97,7 @@ std::string CServerLibrary::getResourcePath()
 }
 
 CServerConfiguration::CServerConfiguration(const std::string& configurationXMLString, PServerIO pServerIO)
-	: m_nPort(0), m_DataBaseType(LibMCData::eDataBaseType::Unknown), m_bUseSSL (false)
+	: m_nPort(0), m_DataBaseType(LibMCData::eDataBaseType::Unknown), m_bUseSSL (false), m_bTelemetryEnabled (true)
 {
 
 	if (pServerIO.get() == nullptr)
@@ -212,6 +212,21 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDDATABASETYPE, "Invalid database type: " + sDataBaseType);
 	}
 
+	// Optional telemetry off-switch. Absent means "on", which is stock behaviour.
+	auto telemetryAttrib = dataNode.attribute("telemetry");
+	if (!telemetryAttrib.empty()) {
+		std::string sTelemetrySetting = telemetryAttrib.as_string();
+		if (sTelemetrySetting == "on") {
+			m_bTelemetryEnabled = true;
+		}
+		else if (sTelemetrySetting == "off") {
+			m_bTelemetryEnabled = false;
+		}
+		else {
+			throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDTELEMETRYSETTING, "Invalid telemetry setting: " + sTelemetrySetting + " (must be \"on\" or \"off\")");
+		}
+	}
+
 	auto defaultPackageNode = amcNode.child("defaultpackage");
 	if (defaultPackageNode.empty ())
 		throw LibMC::ELibMCException(LIBMC_ERROR_DEFAULTPACKAGEMISSING, "Default package missing");
@@ -253,6 +268,11 @@ LibMCData::eDataBaseType CServerConfiguration::getDataBaseType()
 std::string CServerConfiguration::getConnectionString()
 {
 	return m_sConnectionString;
+}
+
+bool CServerConfiguration::getTelemetryEnabled()
+{
+	return m_bTelemetryEnabled;
 }
 
 std::string CServerConfiguration::getPackageName()

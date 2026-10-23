@@ -477,6 +477,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_TELEMETRYCHANNELNOTFOUND 450 /** Telemetry channel not found. */
 #define LIBMCDATA_ERROR_JOBNAMETOOLONG 451 /** Job name exceeds maximum allowed length */
 #define LIBMCDATA_ERROR_STRINGPARAMETERTOOLONG 452 /** String parameter exceeds maximum allowed length */
+#define LIBMCDATA_ERROR_TELEMETRYSETTINGAFTERINITIALISATION 453 /** Telemetry setting changed after database initialisation */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -866,6 +867,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_TELEMETRYCHANNELNOTFOUND: return "Telemetry channel not found.";
     case LIBMCDATA_ERROR_JOBNAMETOOLONG: return "Job name exceeds maximum allowed length";
     case LIBMCDATA_ERROR_STRINGPARAMETERTOOLONG: return "String parameter exceeds maximum allowed length";
+    case LIBMCDATA_ERROR_TELEMETRYSETTINGAFTERINITIALISATION: return "Telemetry setting changed after database initialisation";
     default: return "unknown error";
   }
 }

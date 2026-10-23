@@ -75,7 +75,7 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 CDataModel::CDataModel()
-    : m_eDataBaseType(eDataBaseType::Unknown), m_pLogCallback (nullptr), m_pLogUserData (nullptr)
+    : m_eDataBaseType(eDataBaseType::Unknown), m_pLogCallback (nullptr), m_pLogUserData (nullptr), m_bTelemetryEnabled (true)
 {
     m_sSessionUUID = AMCCommon::CUtils::createUUID();
 
@@ -153,7 +153,7 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     auto sJournalChunkBaseName = m_pStorageState->getJournalChunkBaseName(m_sTimeFileName);
     auto sTelemetryChunkBaseName = m_pStorageState->getTelemetryChunkBaseName(m_sTimeFileName);;
 
-    m_pJournal = std::make_shared<AMCData::CJournal> (sJournalBasePath, sJournalName, sJournalChunkBaseName, sTelemetryChunkBaseName, m_sSessionUUID);
+    m_pJournal = std::make_shared<AMCData::CJournal> (sJournalBasePath, sJournalName, sJournalChunkBaseName, sTelemetryChunkBaseName, m_sSessionUUID, m_bTelemetryEnabled);
 
     auto pStatement = m_pSQLHandler->prepareStatement("INSERT INTO journals (uuid, starttime, logfilename, journalfilename, telemetryfilename, logfilepath, journalfilepath, schemaversion, githash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     pStatement->setString(1, m_sSessionUUID);
@@ -167,6 +167,22 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     pStatement->setString(9, __STRINGIZE_VALUE_OF(__GITHASH));
     pStatement->execute();
 
+}
+
+void CDataModel::SetTelemetryEnabled(const bool bTelemetryEnabled)
+{
+    // The flag is latched by InitialiseDatabase, which is where the telemetry data file is
+    // created. Changing it afterwards cannot un-create that file, so fail loudly instead of
+    // silently ignoring the call.
+    if (m_pJournal.get() != nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_TELEMETRYSETTINGAFTERINITIALISATION);
+
+    m_bTelemetryEnabled = bTelemetryEnabled;
+}
+
+bool CDataModel::GetTelemetryEnabled()
+{
+    return m_bTelemetryEnabled;
 }
 
 LibMCData_uint32 CDataModel::GetDataModelVersion()

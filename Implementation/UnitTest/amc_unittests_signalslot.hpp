@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
 #include "amc_telemetry.hpp"
+#include "amc_parametergroup.hpp"
 #include "libmcdata_dynamic.hpp"
 #include "amc_unittests_libmcdata.hpp"
 
@@ -57,9 +58,9 @@ namespace AMCUnitTest {
 
     public:
 
-        CDummyRegistry()
+        CDummyRegistry(bool bTelemetryEnabled = true)
         {
-            initializeTelemetry();
+            initializeTelemetry(bTelemetryEnabled);
         }
 
         void registerMessage(const std::string& sMessageUUID, AMC::CStateSignalSlot* pSignalSlot) override
@@ -82,8 +83,13 @@ namespace AMCUnitTest {
             return m_pTelemetryHandler->registerChannel(sChannelIdentifier, sChannelDescription, channelType);
         }
 
+        AMCCommon::PChrono getChrono()
+        {
+            return m_pChrono;
+        }
+
     private:
-        void initializeTelemetry()
+        void initializeTelemetry(bool bTelemetryEnabled)
         {
             std::string sRootPath = "temp";
             if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sRootPath))
@@ -97,11 +103,12 @@ namespace AMCUnitTest {
 
             m_pDataWrapper = AMCUnitTest::loadLibMCDataInProcess();
             m_pDataModel = m_pDataWrapper->CreateDataModelInstance();
+            m_pDataModel->SetTelemetryEnabled(bTelemetryEnabled);
             m_pDataModel->InitialiseDatabase(sBasePath, LibMCData::eDataBaseType::SqLite, sDatabaseFile);
             m_pTelemetrySession = m_pDataModel->CreateTelemetrySession();
 
             m_pChrono = std::make_shared<AMCCommon::CChrono>();
-            m_pTelemetryWriter = std::make_shared<AMC::CTelemetryWriter>(m_pTelemetrySession, m_pChrono);
+            m_pTelemetryWriter = std::make_shared<AMC::CTelemetryWriter>(m_pTelemetrySession, m_pChrono, bTelemetryEnabled);
             m_pTelemetryHandler = std::make_shared<AMC::CTelemetryHandler>(m_pTelemetryWriter);
         }
 
@@ -137,9 +144,59 @@ public:
         registerTest("ParameterResultAccess", "Tests getting parameter and result JSON", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_ParameterResultAccess, this));
         registerTest("ClearQueueWorks", "Clears the queue and marks signals as cleared", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_ClearQueueWorks, this));
         registerTest("TimeoutAndOverflowTest", "Simulates queue overflow and timeout scenarios", eUnitTestCategory::utOptionalPass, std::bind(&CUnitTestGroup_SignalSlot::test_TimeoutAndOverflowTest, this));
+        registerTest("TimingStatisticsWithTelemetryOn", "Signal timing parameters update with telemetry enabled", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_TimingStatisticsWithTelemetryOn, this));
+        registerTest("TimingStatisticsWithTelemetryOff", "Signal timing parameters still update with telemetry disabled", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_SignalSlot::test_TimingStatisticsWithTelemetryOff, this));
     }
 
 private:
+
+    // Drives a signal through InQueue -> InProcess -> Handled and returns the timing parameters
+    // that CStateSignalSlot::updateTimingStatistics feeds from the telemetry channels.
+    void driveSignalAndReadTimings(bool bTelemetryEnabled, int64_t& nReactionTime, int64_t& nFinishTime)
+    {
+        CDummyRegistry registry(bTelemetryEnabled);
+
+        auto pInformationGroup = std::make_shared<AMC::CParameterGroup>("signalinfo", "signal information", registry.getChrono());
+
+        AMC::CStateSignalSlot slot("instance", "signal", {}, {}, 1000, 5000, 3, pInformationGroup, &registry);
+        std::string uuid = "0f0e0d0c-0b0a-0908-0706-050403020100";
+
+        AMCCommon::CChrono chrono;
+        chrono.sleepMicroseconds(500);
+
+        auto pMessage = slot.addNewInQueueSignalInternal(uuid, "{}", 500, chrono.getElapsedMicroseconds());
+        assertTrue(pMessage != nullptr);
+
+        chrono.sleepMicroseconds(1000);
+        assertTrue(slot.changeSignalPhaseToInProcessInternal(uuid, chrono.getElapsedMicroseconds()));
+
+        chrono.sleepMicroseconds(1000);
+        assertTrue(slot.changeSignalPhaseToHandledInternal(uuid, "{\"result\":true}", chrono.getElapsedMicroseconds()));
+
+        nReactionTime = pInformationGroup->getIntParameterValueByName("reactiontime_signal");
+        nFinishTime = pInformationGroup->getIntParameterValueByName("finishtime_signal");
+    }
+
+    void test_TimingStatisticsWithTelemetryOn() {
+        int64_t nReactionTime = 0;
+        int64_t nFinishTime = 0;
+        driveSignalAndReadTimings(true, nReactionTime, nFinishTime);
+
+        assertTrue(nReactionTime > 0, "reactiontime_ should be updated with telemetry enabled");
+        assertTrue(nFinishTime > 0, "finishtime_ should be updated with telemetry enabled");
+    }
+
+    void test_TimingStatisticsWithTelemetryOff() {
+        // This is the acceptance criterion for the telemetry off-switch: dropping telemetry at the
+        // writer must NOT zero the live signal timing parameters, which are fed from the in-memory
+        // channel statistics rather than from anything written to disk.
+        int64_t nReactionTime = 0;
+        int64_t nFinishTime = 0;
+        driveSignalAndReadTimings(false, nReactionTime, nFinishTime);
+
+        assertTrue(nReactionTime > 0, "reactiontime_ must still be updated with telemetry disabled");
+        assertTrue(nFinishTime > 0, "finishtime_ must still be updated with telemetry disabled");
+    }
 
     void test_CreateSignalSlotBasic() {
         std::vector<AMC::CStateSignalParameter> params;

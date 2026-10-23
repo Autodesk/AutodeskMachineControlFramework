@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
 #include <string>
+#include <filesystem>
 
 namespace AMCUnitTest {
 
@@ -64,6 +65,13 @@ namespace AMCUnitTest {
 			registerTest("TypeMappingRoundTrip", "Telemetry channel type mapping round-trip", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTypeMappingRoundTrip, this));
 			registerTest("TypeMappingInvalidThrows", "Telemetry channel type mapping rejects invalid strings", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTypeMappingInvalidThrows, this));
 			registerTest("ChunkArchivePath", "Chunk read-only and archive path works", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testChunkArchivePath, this));
+			registerTest("TelemetryOnCreatesDataFile", "Telemetry enabled creates a telemetry data file", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTelemetryOnCreatesDataFile, this));
+			registerTest("TelemetryOffCreatesNoDataFile", "Telemetry disabled creates no telemetry data file", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTelemetryOffCreatesNoDataFile, this));
+			registerTest("TelemetryOffKeepsMarkerStatistics", "Telemetry disabled still updates marker statistics", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTelemetryOffKeepsMarkerStatistics, this));
+			registerTest("TelemetryOffScopeDoesNotThrow", "Telemetry disabled scopes complete without throwing", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTelemetryOffScopeDoesNotThrow, this));
+			registerTest("TelemetryOffReaderIsEmpty", "Telemetry reader on a disabled session reports channels but no data", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTelemetryOffReaderIsEmpty, this));
+			registerTest("TelemetrySettingAfterInitThrows", "Changing the telemetry setting after initialisation fails", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTelemetrySettingAfterInitThrows, this));
+			registerTest("TelemetryEnabledDefaultsToOn", "Telemetry defaults to enabled when never set", eUnitTestCategory::utMandatoryPass, std::bind(&CUnitTestGroup_Telemetry::testTelemetryEnabledDefaultsToOn, this));
 		}
 
 		void initializeTests() override {
@@ -78,9 +86,11 @@ namespace AMCUnitTest {
 			AMCCommon::PChrono m_pChrono;
 			AMC::PTelemetryWriter m_pWriter;
 			AMC::PTelemetryHandler m_pHandler;
+			std::string m_sBasePath;
+			std::string m_sJournalUUID;
 		} sTelemetryFixture;
 
-		sTelemetryFixture createFixture(const std::string& sSuffix)
+		sTelemetryFixture createFixture(const std::string& sSuffix, bool bTelemetryEnabled = true)
 		{
 			sTelemetryFixture fixture;
 
@@ -94,16 +104,45 @@ namespace AMCUnitTest {
 
 			std::string sDatabaseFile = sBasePath + "/telemetry.db";
 
+			fixture.m_sBasePath = sBasePath;
 			fixture.m_pDataWrapper = AMCUnitTest::loadLibMCDataInProcess();
 			fixture.m_pDataModel = fixture.m_pDataWrapper->CreateDataModelInstance();
+
+			// MUST happen before InitialiseDatabase, which is where the telemetry file is created.
+			fixture.m_pDataModel->SetTelemetryEnabled(bTelemetryEnabled);
+
 			fixture.m_pDataModel->InitialiseDatabase(sBasePath, LibMCData::eDataBaseType::SqLite, sDatabaseFile);
 			fixture.m_pTelemetrySession = fixture.m_pDataModel->CreateTelemetrySession();
+			fixture.m_sJournalUUID = fixture.m_pDataModel->CreateJournalSession()->GetSessionUUID();
 
 			fixture.m_pChrono = std::make_shared<AMCCommon::CChrono>();
-			fixture.m_pWriter = std::make_shared<AMC::CTelemetryWriter>(fixture.m_pTelemetrySession, fixture.m_pChrono);
+			fixture.m_pWriter = std::make_shared<AMC::CTelemetryWriter>(fixture.m_pTelemetrySession, fixture.m_pChrono, bTelemetryEnabled);
 			fixture.m_pHandler = std::make_shared<AMC::CTelemetryHandler>(fixture.m_pWriter);
 
 			return fixture;
+		}
+
+		// Each telemetry-mode test needs a directory of its own, so that a data file left behind by
+		// an earlier run cannot be mistaken for one created by this one.
+		sTelemetryFixture createUniqueFixture(const std::string& sSuffix, bool bTelemetryEnabled)
+		{
+			return createFixture(sSuffix + "_" + AMCCommon::CUtils::createUUID(), bTelemetryEnabled);
+		}
+
+		uint32_t countTelemetryDataFiles(const std::string& sBasePath)
+		{
+			uint32_t nCount = 0;
+			for (const auto& entry : std::filesystem::directory_iterator(sBasePath)) {
+				if (!entry.is_regular_file())
+					continue;
+
+				std::string sFileName = entry.path().filename().string();
+				if ((sFileName.rfind("telemetry_", 0) == 0) && (sFileName.size() >= 5)
+					&& (sFileName.compare(sFileName.size() - 5, 5, ".data") == 0))
+					nCount++;
+			}
+
+			return nCount;
 		}
 
 		AMC::PTelemetryChannel createChannel(sTelemetryFixture& fixture, const std::string& sIdentifier)
@@ -372,6 +411,110 @@ namespace AMCUnitTest {
 			assertTrue(pChunk1->isReadOnly());
 
 			fixture.m_pHandler->archiveOldChunksToDB();
+		}
+
+		void testTelemetryOnCreatesDataFile()
+		{
+			auto fixture = createUniqueFixture("mode_on", true);
+			assertTrue(fixture.m_pDataModel->GetTelemetryEnabled(), "Telemetry should report as enabled");
+			assertTrue(countTelemetryDataFiles(fixture.m_sBasePath) == 1, "Expected exactly one telemetry data file");
+		}
+
+		void testTelemetryOffCreatesNoDataFile()
+		{
+			auto fixture = createUniqueFixture("mode_off", false);
+			assertFalse(fixture.m_pDataModel->GetTelemetryEnabled(), "Telemetry should report as disabled");
+			assertTrue(countTelemetryDataFiles(fixture.m_sBasePath) == 0, "Expected no telemetry data file at session start");
+
+			// Recording activity must not create one later either.
+			auto pChannel = createChannel(fixture, "off_channel");
+			for (uint32_t nIndex = 0; nIndex < 32; nIndex++) {
+				auto scope = pChannel->startIntervalScope(nIndex);
+				AMCCommon::CChrono::sleepMicroseconds(10);
+			}
+			pChannel->createInstantMarker(7);
+			fixture.m_pHandler->archiveOldChunksToDB();
+
+			assertTrue(countTelemetryDataFiles(fixture.m_sBasePath) == 0, "Expected no telemetry data file after recording activity");
+		}
+
+		void testTelemetryOffKeepsMarkerStatistics()
+		{
+			// This is the behaviour CStateSignalSlot::updateTimingStatistics depends on: the
+			// reactiontime_ / finishtime_ / acknowledgetime_ signal parameters are fed from
+			// getMaxDurationInMicroseconds, which must keep working with telemetry disabled.
+			auto fixture = createUniqueFixture("off_stats", false);
+			auto pChannel = createChannel(fixture, "off_stats_channel");
+
+			auto pMarker = pChannel->startIntervalMarker(42);
+			AMCCommon::CChrono::sleepMicroseconds(500);
+			pMarker->finishMarker();
+
+			assertTrue(pMarker->isFinished(), "Marker should be finished with telemetry disabled");
+			assertTrue(pMarker->getDuration() > 0, "Marker duration should be recorded with telemetry disabled");
+			assertTrue(pChannel->getMaxDurationInMicroseconds() == pMarker->getDuration(), "Channel max duration should track the marker with telemetry disabled");
+			assertTrue(pChannel->getTotalMarkersCreated() == 1, "Marker count should be tracked with telemetry disabled");
+		}
+
+		void testTelemetryOffScopeDoesNotThrow()
+		{
+			auto fixture = createUniqueFixture("off_scope", false);
+			auto pChannel = createChannel(fixture, "off_scope_channel");
+
+			bool thrown = false;
+			try {
+				for (uint32_t nIndex = 0; nIndex < 16; nIndex++) {
+					auto scope = pChannel->startIntervalScope(nIndex);
+					AMCCommon::CChrono::sleepMicroseconds(10);
+				}
+			}
+			catch (...) {
+				thrown = true;
+			}
+
+			assertFalse(thrown, "Telemetry scopes must not throw with telemetry disabled");
+			assertTrue(pChannel->getTotalMarkersCreated() == 16, "All markers should still be created");
+			assertTrue(pChannel->getMaxDurationInMicroseconds() > 0, "Scope durations should still be recorded");
+		}
+
+		void testTelemetryOffReaderIsEmpty()
+		{
+			auto fixture = createUniqueFixture("off_reader", false);
+			auto pChannel = createChannel(fixture, "off_reader_channel");
+			pChannel->createInstantMarker(1);
+			fixture.m_pHandler->archiveOldChunksToDB();
+
+			// Channel registration is deliberately unaffected by the off-switch, so that an "off"
+			// session is still self-describing.
+			auto pReader = fixture.m_pDataModel->CreateTelemetryReader(fixture.m_sJournalUUID);
+			assertTrue(pReader->GetChannelCount() == 1, "Reader should report the registered channel");
+			assertTrue(pReader->GetChunkCount() == 0, "Reader should report no chunks for a disabled session");
+
+			uint32_t nChannelIndex = 0;
+			assertTrue(pReader->FindChannelByIdentifier("off_reader_channel", nChannelIndex), "Reader should find the registered channel");
+		}
+
+		void testTelemetrySettingAfterInitThrows()
+		{
+			auto fixture = createUniqueFixture("set_after_init", true);
+
+			bool thrown = false;
+			try {
+				fixture.m_pDataModel->SetTelemetryEnabled(false);
+			}
+			catch (...) {
+				thrown = true;
+			}
+
+			assertTrue(thrown, "Expected SetTelemetryEnabled after InitialiseDatabase to throw");
+		}
+
+		void testTelemetryEnabledDefaultsToOn()
+		{
+			// A caller that never calls SetTelemetryEnabled must get stock behaviour.
+			auto pDataWrapper = AMCUnitTest::loadLibMCDataInProcess();
+			auto pDataModel = pDataWrapper->CreateDataModelInstance();
+			assertTrue(pDataModel->GetTelemetryEnabled(), "Telemetry should default to enabled");
 		}
 	};
 

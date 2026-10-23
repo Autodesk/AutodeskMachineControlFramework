@@ -176,16 +176,18 @@ namespace AMC {
 
 
 
-	CTelemetryWriter::CTelemetryWriter(LibMCData::PTelemetrySession pTelemetrySession, AMCCommon::PChrono pGlobalChrono)
+	CTelemetryWriter::CTelemetryWriter(LibMCData::PTelemetrySession pTelemetrySession, AMCCommon::PChrono pGlobalChrono, bool bTelemetryEnabled)
 		: m_pTelemetrySession(pTelemetrySession), m_nNextMarkerID(1), m_pGlobalChrono (pGlobalChrono),
-		m_nChunkIntervalInMicroseconds (TELEMETRY_DEFAULT_CHUNKINTERVAL_MICROSECONDS)
+		m_nChunkIntervalInMicroseconds (TELEMETRY_DEFAULT_CHUNKINTERVAL_MICROSECONDS),
+		m_bTelemetryEnabled (bTelemetryEnabled)
 	{
 		if (pGlobalChrono.get () == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 		if (pTelemetrySession.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-		extendChunksUntil(1);
+		if (m_bTelemetryEnabled)
+			extendChunksUntil(1);
 	}
 
 	CTelemetryWriter::~CTelemetryWriter()
@@ -247,6 +249,22 @@ namespace AMC {
 
 	void CTelemetryWriter::writeEntry(const LibMCData::sTelemetryChunkEntry& entry)
 	{
+		// Telemetry is dropped HERE, at the writer, and deliberately not earlier.
+		//
+		// Do NOT "optimise" this by short-circuiting marker creation (for example with a no-op
+		// CTelemetryMarker). CStateSignalSlot::updateTimingStatistics feeds the live
+		// reactiontime_ / finishtime_ / acknowledgetime_ parameters of every signal from
+		// CTelemetryChannel::getMaxDurationInMicroseconds, which is updated by unregisterMarker
+		// in CTelemetryMarker::finishMarker - independently of this writer. Killing markers
+		// would silently zero those three parameters on every device.
+		//
+		// Dropping at this level is also symmetric: registerOpenInterval and eraseOpenInterval are
+		// both called from CTelemetryDataChunk::writeEntry, so neither runs and no open-interval
+		// state is orphaned. With no chunk ever allocated, archiveOldChunksToDB no-ops and
+		// CJournal::writeTelemetryChunk is never reached.
+		if (!m_bTelemetryEnabled)
+			return;
+
 		auto pChunk = getOrCreateChunkByTimestamp(entry.m_TimeStamp);
 		pChunk->writeEntry(entry);
 

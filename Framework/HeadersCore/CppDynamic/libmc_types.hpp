@@ -731,6 +731,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGSESSIONVARIABLENAME 715 /** Missing session variable name. */
 #define LIBMC_ERROR_MISSINGSESSIONVARIABLETYPE 716 /** Missing session variable type. */
 #define LIBMC_ERROR_INVALIDSESSIONREFERENCE 717 /** Invalid session reference in UI expression. */
+#define LIBMC_ERROR_INVALIDTELEMETRYSETTING 718 /** Invalid telemetry setting. */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -1374,6 +1375,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGSESSIONVARIABLENAME: return "Missing session variable name.";
     case LIBMC_ERROR_MISSINGSESSIONVARIABLETYPE: return "Missing session variable type.";
     case LIBMC_ERROR_INVALIDSESSIONREFERENCE: return "Invalid session reference in UI expression.";
+    case LIBMC_ERROR_INVALIDTELEMETRYSETTING: return "Invalid telemetry setting.";
     default: return "unknown error";
   }
 }

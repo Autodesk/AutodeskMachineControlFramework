@@ -809,6 +809,7 @@ public:
 			case LIBMC_ERROR_MISSINGSESSIONVARIABLENAME: return "MISSINGSESSIONVARIABLENAME";
 			case LIBMC_ERROR_MISSINGSESSIONVARIABLETYPE: return "MISSINGSESSIONVARIABLETYPE";
 			case LIBMC_ERROR_INVALIDSESSIONREFERENCE: return "INVALIDSESSIONREFERENCE";
+			case LIBMC_ERROR_INVALIDTELEMETRYSETTING: return "INVALIDTELEMETRYSETTING";
 		}
 		return "UNKNOWN";
 	}
@@ -1452,6 +1453,7 @@ public:
 			case LIBMC_ERROR_MISSINGSESSIONVARIABLENAME: return "Missing session variable name.";
 			case LIBMC_ERROR_MISSINGSESSIONVARIABLETYPE: return "Missing session variable type.";
 			case LIBMC_ERROR_INVALIDSESSIONREFERENCE: return "Invalid session reference in UI expression.";
+			case LIBMC_ERROR_INVALIDTELEMETRYSETTING: return "Invalid telemetry setting.";
 		}
 		return "unknown error";
 	}

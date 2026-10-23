@@ -151,9 +151,10 @@ namespace AMCData {
 		return m_nTotalSize;
 	}
 
-	CJournal::CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string& sTelemetryChunkBaseName, const std::string& sSessionUUID)
+	CJournal::CJournal(const std::string& sJournalBasePath, const std::string& sJournalName, const std::string& sJournalChunkBaseName, const std::string& sTelemetryChunkBaseName, const std::string& sSessionUUID, bool bTelemetryEnabled)
 		: m_LogID(1), m_AlertID(1), m_sSessionUUID(AMCCommon::CUtils::normalizeUUIDString(sSessionUUID)),
-		m_sJournalBasePath(sJournalBasePath), m_sChunkBaseName (sJournalChunkBaseName), m_sTelemetryChunkBaseName(sTelemetryChunkBaseName)
+		m_sJournalBasePath(sJournalBasePath), m_sChunkBaseName (sJournalChunkBaseName), m_sTelemetryChunkBaseName(sTelemetryChunkBaseName),
+		m_bTelemetryEnabled (bTelemetryEnabled)
 	{
 		if (sJournalChunkBaseName.empty())
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM, "Journal chunk base name is empty");
@@ -296,7 +297,12 @@ namespace AMCData {
 		pSessionMetricsStatement = nullptr;
 
 		m_pCurrentJournalFile = createJournalFile();
-		m_pCurrentTelemetryFile = createTelemetryFile();
+
+		// With telemetry disabled, no data file is created at all. The telemetry_* tables above are
+		// still created, so the schema stays uniform and a reader can enumerate the registered
+		// channels of an "off" session.
+		if (m_bTelemetryEnabled)
+			m_pCurrentTelemetryFile = createTelemetryFile();
 
 	}
 
@@ -1051,6 +1057,14 @@ namespace AMCData {
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 		if (nStartTimeStamp > nEndTimeStamp)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+		// With telemetry disabled there is no data file to write to. libmc drops entries before they
+		// ever become chunks, so this should be unreachable, but the two libraries are versioned
+		// separately and a flag that reaches one and not the other must not be a null dereference.
+		if (!m_bTelemetryEnabled)
+			return;
+		if (m_pCurrentTelemetryFile.get() == nullptr)
+			return;
 
 		if (m_pCurrentTelemetryFile->getTotalSize() > getMaxChunkFileSizeQuotaInBytes())
 			m_pCurrentTelemetryFile = createTelemetryFile();

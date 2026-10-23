@@ -93,7 +93,7 @@ namespace AMC {
 
 		m_pAccessControl = std::make_shared<CAccessControl> ();
 
-		auto pTelemetryWriter = std::make_shared<CTelemetryWriter> (m_pDataModel->CreateTelemetrySession (), m_pGlobalChrono);
+		auto pTelemetryWriter = std::make_shared<CTelemetryWriter> (m_pDataModel->CreateTelemetrySession (), m_pGlobalChrono, m_pDataModel->GetTelemetryEnabled ());
 		m_pTelemetryHandler = std::make_shared<CTelemetryHandler> (pTelemetryWriter);
 
 		m_pMeshHandler = std::make_shared<CMeshHandler>();

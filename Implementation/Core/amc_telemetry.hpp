@@ -127,11 +127,15 @@ namespace AMC {
 
 			std::atomic<uint64_t> m_nNextMarkerID;
 
+			// If false, writeEntry drops every entry, so no chunk is ever allocated and nothing is
+			// archived to disk. Markers themselves are still created - see writeEntry.
+			bool m_bTelemetryEnabled;
+
 			void extendChunksUntil(uint64_t nMaxChunkIndexOneBased);
 
 		public:
 
-			CTelemetryWriter(LibMCData::PTelemetrySession pTelemetrySession, AMCCommon::PChrono pGlobalChrono);
+			CTelemetryWriter(LibMCData::PTelemetrySession pTelemetrySession, AMCCommon::PChrono pGlobalChrono, bool bTelemetryEnabled = true);
 
 			virtual ~CTelemetryWriter();
 

@@ -257,6 +257,11 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 		m_pDataModel->SetBaseTempDirectory(m_pServerConfiguration->getBaseTempDirectory ());
 
+		// MUST be set before InitialiseDatabase, which is where the telemetry data file is created.
+		if (!m_pServerConfiguration->getTelemetryEnabled())
+			log("Telemetry recording is disabled.");
+		m_pDataModel->SetTelemetryEnabled(m_pServerConfiguration->getTelemetryEnabled());
+
 		log("Initialising Database...");
 		m_pDataModel->InitialiseDatabase(m_pServerConfiguration->getDataDirectory(), m_pServerConfiguration->getDataBaseType(), m_pServerConfiguration->getConnectionString());
 

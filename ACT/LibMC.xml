@@ -740,6 +740,7 @@
 		<error name="MISSINGSESSIONVARIABLENAME" code="715" description="Missing session variable name." />
 		<error name="MISSINGSESSIONVARIABLETYPE" code="716" description="Missing session variable type." />
 		<error name="INVALIDSESSIONREFERENCE" code="717" description="Invalid session reference in UI expression." />
+		<error name="INVALIDTELEMETRYSETTING" code="718" description="Invalid telemetry setting." />
 				
 		
 		
